@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -16,9 +15,7 @@ import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.util.SystemPropertyUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -28,9 +25,8 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -56,6 +52,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     //config
   	private NurseSiteMaintainConfigCheckItem objPairCheckItem;
   	private List<AssetInfo> listCheckAssets;
+  	private List<OrgInfo> listOrgInfo;
   	private List<String> listCheckDate;
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
@@ -68,6 +65,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<MaintainDataPair> checkListWeekDays;
   	private List<MaintainDataPair> checkListMonthDays;
   	private List<AssetInfo> checkListAssets;
+  	private List<OrgInfo> checkListOrgInfo;
   	private List<String> orgUidList;
   	private List<String> userUidList;
   	private DualListModel<AssetInfo> availableAssets;
@@ -80,20 +78,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
-        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
         orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
+        checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
         loadUserUidList();
-//        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
-//		listStrNurseSiteMaintainConfig=new ArrayList<SimplePair>();
-//		if(listNurseSiteMaintainConfig!=null&&listNurseSiteMaintainConfig.size()>0){
-////			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
-//			for(int i=0;i<listNurseSiteMaintainConfig.size();++i){
-//				NurseSiteMaintainConfig tempConfig=listNurseSiteMaintainConfig.get(i);
-//				SimplePair p=new SimplePair(tempConfig.getName(),tempConfig.getId());
-//				listStrNurseSiteMaintainConfig.add(p);
-//			}
-//		}
-        
         //test
     }
 
@@ -110,26 +97,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         }
         searchFilters.add(new SearchFilter("createBy.uid", SearchFilter.Operator.IN, userUidList, "1*"));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
-//        List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
-//        List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
-//        try {
-//        	if(listResult!=null && listResult.size()>0 && orgUidList!=null){
-//            	for(int i=0;i<listResult.size();++i){
-//            		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
-//            		while(it.hasNext()){
-//            			String orgUid=it.next().getOrgUid();
-//            			if(orgUidList.contains(orgUid)){
-//            				listNewResult.add(listResult.get(i));
-//            				break;
-//            			}
-//            		}
-//            	}
-//            }
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			LOGGER.error(e.getMessage());
-//		}
-//        PageImpl<NurseSiteMaintainConfig> pageNewResult=new PageImpl<NurseSiteMaintainConfig>(listNewResult);
         return pageResult;
     }
 
@@ -149,10 +116,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     public void save() {
-    	saveMaintainConfig(this.selected);
-    	if(blnModifyAll){
-    		nurseSiteMaintainService.updateUnCheckedMaintainData(this.selected, currentUser, 0, listCheckAssets);
-    	}
+    	saveMaintainConfig(this.selected,true);
+        this.selected=null;
+        WebUtil.addSuccessMessage("保存成功");
+    }
+    
+    public void update(){
+    	saveMaintainConfig(this.selected,false);
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
     }
@@ -177,6 +147,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		// TODO Auto-generated method stub
 		super.prepareCreate();
 		initValues();
+		loadMaintainConfig(this.selected,true);
 	}
 	
 	@Override
@@ -184,7 +155,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		// TODO Auto-generated method stub
 		super.prepareEdit();
 		initValues();
-		loadMaintainConfig(this.selected);
+		loadMaintainConfig(this.selected,false);
 	}
 	private void initValues(){
 		this.listCheckAssets=new ArrayList<AssetInfo>();
@@ -192,36 +163,63 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listMonthDay=new ArrayList<String>();
 		this.listWeekDay=new ArrayList<String>();
 		listPairCheckItems=null;
+		isSaveDisable=true;
 		initObjPairCheckItem();
+		if(listOrgInfo==null){
+			listOrgInfo=new ArrayList<OrgInfo>();
+		}
+		else{
+			listOrgInfo.clear();
+		}
 	}
 	private void initObjPairCheckItem(){
 		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
 		objPairCheckItem.setKey(new Date().getTime()+"");
 	}
-	private void loadMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
+	private void loadMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isCreate) {
 		if(nurseSiteMaintainConfig!=null){
-			String parentId=nurseSiteMaintainConfig.getId();
-			if(StringUtils.isNotEmpty(parentId)){
-				listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
-				checkListAssets.removeAll(listCheckAssets);
-				availableAssets=new DualListModel<>(checkListAssets, listCheckAssets);
+			if(isCreate){
+				checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
 			}
-			Integer type=nurseSiteMaintainConfig.getType();
-			String typeValue=nurseSiteMaintainConfig.getTypeValue();
-			if(type!=null && StringUtils.isNotEmpty(typeValue)){
-				List<String> listTemp=Arrays.asList(typeValue.split(","));
-				if(type==1){
-//					listCheckDate=listTemp;
-					perDayCount=Integer.parseInt(typeValue);
+			else{
+				checkListAssets=nurseSiteMaintainService.getListAssetBySelfClinicalScope(currentUser.getSiteUID(), currentUser.getUid(),nurseSiteMaintainConfig.getClinicalDeptUID());
+			}
+			if(checkListAssets!=null){
+				String parentId=nurseSiteMaintainConfig.getId();
+				if(StringUtils.isNotEmpty(parentId)){
+					listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
+					checkListAssets.removeAll(listCheckAssets);
 				}
-				else if(type==2){
-					listWeekDay=listTemp;
+				Integer type=nurseSiteMaintainConfig.getType();
+				String typeValue=nurseSiteMaintainConfig.getTypeValue();
+				if(type!=null && StringUtils.isNotEmpty(typeValue)){
+					List<String> listTemp=Arrays.asList(typeValue.split(","));
+					if(type==1){
+//						listCheckDate=listTemp;
+						perDayCount=Integer.parseInt(typeValue);
+					}
+					else if(type==2){
+						listWeekDay=listTemp;
+					}
+					else if(type==3){
+						listMonthDay=listTemp;
+					}
 				}
-				else if(type==3){
-					listMonthDay=listTemp;
+				if(StringUtils.isNotEmpty(this.selected.getClinicalDeptUID())){
+					OrgInfo orgInfo=nurseSiteMaintainService.findOrgInfoByUid(this.selected.getClinicalDeptUID());
+					if(orgInfo!=null){
+						listOrgInfo.add(orgInfo);
+					}
 				}
 			}
 		}
+		if(checkListAssets==null){
+			checkListAssets=new ArrayList<AssetInfo>();
+		}
+		if(listCheckAssets==null){
+			listCheckAssets=new ArrayList<AssetInfo>();
+		}
+		availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 	}
 	
 	//当前user的可见范围的orgUid,
@@ -231,7 +229,15 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	
-	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
+	public boolean checkListCheckAssets(){
+		boolean result=false;
+		if(listCheckAssets!=null && listCheckAssets.size()>0){
+			result=true;
+		}
+		return result;
+	}
+	
+	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isSave) {
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
 			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
@@ -298,7 +304,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		}
 		nurseSiteMaintainConfig.setCheckItems(tempResult);
-		nurseSiteMaintainService.saveMaintainConfig(nurseSiteMaintainConfig, listCheckAssets);
+		if(isSave){
+			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets,blnModifyAll);
+		}
+		else{
+			nurseSiteMaintainService.updateMaintainConfig(nurseSiteMaintainConfig,currentUser, listCheckAssets,blnModifyAll);
+		}
 		return true;
 	}
 	
@@ -309,6 +320,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			} else {
 				listCheckAssets.remove((AssetInfo) item);
 			}
+		}
+		if(listCheckAssets.size()==0){
+			isSaveDisable=true;
+		}
+		else{
+			isSaveDisable=false;
 		}
 	}
 	
@@ -515,6 +532,30 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
 		this.availableAssets = availableAssets;
+	}
+
+	public List<OrgInfo> getListOrgInfo() {
+		return listOrgInfo;
+	}
+
+	public void setListOrgInfo(List<OrgInfo> listOrgInfo) {
+		this.listOrgInfo = listOrgInfo;
+	}
+
+	public List<String> getOrgUidList() {
+		return orgUidList;
+	}
+
+	public void setOrgUidList(List<String> orgUidList) {
+		this.orgUidList = orgUidList;
+	}
+
+	public List<OrgInfo> getCheckListOrgInfo() {
+		return checkListOrgInfo;
+	}
+
+	public void setCheckListOrgInfo(List<OrgInfo> checkListOrgInfo) {
+		this.checkListOrgInfo = checkListOrgInfo;
 	}
 	
 }

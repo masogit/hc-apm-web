@@ -101,6 +101,12 @@ public class NurseSiteMaintainConfigItem implements Serializable {
 	@Column(name="asset_uid")
 	private String assetUid;
 	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
+	
 
 	public String getId() {
 		return id;
@@ -236,6 +242,22 @@ public class NurseSiteMaintainConfigItem implements Serializable {
 
 	public void setAssetUid(String assetUid) {
 		this.assetUid = assetUid;
+	}
+	
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
 	}
 
 	@Override
