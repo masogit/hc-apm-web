@@ -254,18 +254,14 @@ public class MaintainController {
 		}
 		int beforeSize=listMaintainData.size();
 		Date afterDate=data.getScheduleDate();
-		System.out.println(afterDate.toString());
 		boolean add=false;
 		for(int i=0;i<listMaintainData.size();++i){
 			Date tempDate=listMaintainData.get(i).getScheduleDate();
-			System.out.println(tempDate.toString());
 			try {
 				if(sdf.parse(sdf.format(tempDate)).compareTo(sdf.parse(sdf.format(afterDate)))==0){
-					System.out.println("equals");
 					add=true;
 				}
 				else{
-					System.out.println("not equals");
 					if(add){
 						listMaintainData.add(i, data);
 						return;
