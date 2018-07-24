@@ -17,6 +17,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,8 +28,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 @Entity
 @Table(name = "nurse_site_maintain_config")
-public class NurseSiteMaintainConfig implements Serializable {
-
+public class NurseSiteMaintainConfig implements Serializable,Cloneable {
+	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainConfig.class);
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -84,6 +86,11 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name="check_items_detail",columnDefinition="text")
 	private String checkItemsDetail;
 	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
 	
 	//1:day,2:week,3:month,4:year
 	@Column(name="type")
@@ -222,6 +229,22 @@ public class NurseSiteMaintainConfig implements Serializable {
 	public void setCheckItemsDetail(String checkItemsDetail) {
 		this.checkItemsDetail = checkItemsDetail;
 	}
+	
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
+	}
 
 	@Override
 	public int hashCode() {
@@ -247,5 +270,22 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Override
 	public String toString() {
 		return "NurseSiteMaintainConfig [ id=" + id + " ]";
+	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+	
+	public NurseSiteMaintainConfig cloneObj(){
+		NurseSiteMaintainConfig temp=null;
+		try {
+			temp=(NurseSiteMaintainConfig)this.clone();
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
+		return temp;
 	}
 }
