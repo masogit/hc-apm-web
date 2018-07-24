@@ -12,6 +12,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
+                
      <ui:define name="preRenderView">
          <h:outputScript name="js/main.js"/>
          <f:metadata>
@@ -100,7 +101,7 @@
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                         </p:commandButton>
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{sharedAssetRequestV2Controller.workOrderRouter()}" oncomplete="router(xhr, status, args)"/>
                         
                         <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.getViewPageA('Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetRequestV2Controller.operation)}"  disabled="#{empty sharedAssetRequestV2Controller.selected}"/>-->
                     </f:facet>
@@ -120,6 +121,9 @@
                 </p:overlayPanel>
                 
             </h:form>
+            <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="提示信息" >
+                <p:outputPanel>如需借用设备请拨打虚拟网 #{sharedAssetRequestV2Controller.getOnCallNumber()}</p:outputPanel>
+            </p:dialog>
             </div>
             </div>
         </div>
@@ -133,14 +137,19 @@
                 });
             }
 
-
             function openSwapTypeViewWindow(xhr, status, args) {
                 this.location.href = args.url;
             }
-
+            
+            function router(xhr, status, args) {
+            	var d = PF('UserAccountEditDialog');
+            	if(args['showNotification']) {
+            		d.show();
+            	}
+            }
+            
         </script>
     </ui:define>
-    
 
 </ui:composition>
     <!--</html>-->
