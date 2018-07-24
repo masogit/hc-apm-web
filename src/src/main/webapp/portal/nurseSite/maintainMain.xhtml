@@ -39,7 +39,7 @@
 	                        </p:column>
 	                    </p:selectManyMenu> -->
 						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
-							converter="orgInfoConverter" required="false" label="-" updateLabel="true" showHeader="false">
+							converter="orgInfoConverter" required="false" label="请选择..." updateLabel="true" showHeader="false">
 							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
 							<f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
 						</p:selectCheckboxMenu>
