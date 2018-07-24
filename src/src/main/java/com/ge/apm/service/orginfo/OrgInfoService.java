@@ -1,5 +1,6 @@
 package com.ge.apm.service.orginfo;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
@@ -29,6 +30,9 @@ public class OrgInfoService {
 
     @Autowired
     private OrgInfoRepository orgDao;
+
+    @Autowired
+    private AssetInfoRepository assetInfoDao;
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
@@ -155,7 +159,9 @@ public class OrgInfoService {
                             }
 
                             orgDao.save(found);
-
+                            if (found.getOrgType() == 4) {
+                                assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
+                            }
                             message = "更新成功";
 
                         }
