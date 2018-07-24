@@ -155,12 +155,12 @@
                                 <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">#{msg.intExtType}*</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
