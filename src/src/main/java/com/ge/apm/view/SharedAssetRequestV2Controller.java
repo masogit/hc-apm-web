@@ -1736,11 +1736,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     
     public String getOnCallNumber() {
     	List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
-    	Optional<SharedAssetConfig> sharedAssetConfig = Optional.ofNullable(sharedAssetConfigList.get(0));
     	String onCallNumber = "";
-    	if(sharedAssetConfig.isPresent()) {
-    		SharedAssetConfig config = sharedAssetConfig.get();
-    		onCallNumber = config.getTel();
+    	if(sharedAssetConfigList != null && sharedAssetConfigList.size() > 0) {
+    		onCallNumber = Optional.ofNullable(sharedAssetConfigList.get(0)).map(item -> item.getTel()).orElse("");
     	}
     	return onCallNumber;
     }
