@@ -323,26 +323,40 @@ public class OrgInfoService {
 
     private void exportOrg(OrgInfo orgInfo, List<Map<String, Object>> resultList, final Map<String, OrgInfo> orgInfoMap) {
         Map<String, Object> map = new HashMap<>();
-        if (orgInfo.getOrgType() == 1 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 0)) {
+        if (orgInfo.getOrgType() == 1) {
             map.put("集团", orgInfo.getName());
-        } else if (orgInfo.getOrgType() == 2 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 1)) {
+        } else if (orgInfo.getOrgType() == 2) {
             OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
             map.put("医院", orgInfo.getName());
-        } else if (orgInfo.getOrgType() == 3 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 2)) {
+        } else if (orgInfo.getOrgType() == 3) {
             OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
             map.put("医院", hospitalLevelOrg.getName());
             map.put("院区", orgInfo.getName());
-        } else if ((orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 3)) {
-            OrgInfo siteLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
-            OrgInfo hospitalLevelOrg = orgInfoMap.get(siteLevelOrg.getParentUID());
-            OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
-            map.put("集团", institutionLevelOrg.getName());
-            map.put("医院", hospitalLevelOrg.getName());
-            map.put("院区", siteLevelOrg.getName());
+        } else if (orgInfo.getOrgType() == 4) {
+            if (orgInfo.getOrgLevel() == 0) {
+
+            } else if (orgInfo.getOrgLevel() == 1) {
+                OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                map.put("集团", institutionLevelOrg.getName());
+            } else if (orgInfo.getOrgLevel() == 2) {
+                OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
+                map.put("集团", institutionLevelOrg.getName());
+                map.put("医院", hospitalLevelOrg.getName());
+            } else {
+                OrgInfo siteLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                OrgInfo hospitalLevelOrg = orgInfoMap.get(siteLevelOrg.getParentUID());
+                OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
+                map.put("集团", institutionLevelOrg.getName());
+                map.put("医院", hospitalLevelOrg.getName());
+                map.put("院区", siteLevelOrg.getName());
+            }
+
             map.put("科室", orgInfo.getName());
+
         }
 
         resultList.add(map);
