@@ -448,6 +448,20 @@ public class ExcelDocument {
         }
     }
 
+    public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
+
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            Object value = data.get(key);
+
+            writeCellData(sheet, dataRowNum, index + 1, value);
+        }
+    }
+
     public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, Map<String, Object> data) {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         writeRowData(sheetName, rowKey, dataRowNum, data);
@@ -483,6 +497,21 @@ public class ExcelDocument {
 
     public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
         Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
+    }
+
+    public void writeCellData(Sheet sheet, int rowNum, int colNum, Object value) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow == null) {
             dataRow = sheet.createRow(rowNum - 1);
