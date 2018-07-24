@@ -1,5 +1,6 @@
 package com.ge.apm.view.nurseSite;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,8 +17,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
@@ -73,6 +72,7 @@ public class MaintainController {
     //inner
     private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
     private Date dayDate;
+    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 
 	@PostConstruct
 	protected void init() {
@@ -253,11 +253,27 @@ public class MaintainController {
 			listMaintainData=new ArrayList<NurseSiteMaintain>();
 		}
 		int beforeSize=listMaintainData.size();
+		Date afterDate=data.getScheduleDate();
+		System.out.println(afterDate.toString());
+		boolean add=false;
 		for(int i=0;i<listMaintainData.size();++i){
-			int result=listMaintainData.get(i).getScheduleDate().compareTo(data.getScheduleDate());
-			if(result>0){
-				listMaintainData.add(i+1, data);
-				return;
+			Date tempDate=listMaintainData.get(i).getScheduleDate();
+			System.out.println(tempDate.toString());
+			try {
+				if(sdf.parse(sdf.format(tempDate)).compareTo(sdf.parse(sdf.format(afterDate)))==0){
+					System.out.println("equals");
+					add=true;
+				}
+				else{
+					System.out.println("not equals");
+					if(add){
+						listMaintainData.add(i, data);
+						return;
+					}
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
 			}
 		}
 		int afterSize=listMaintainData.size();
