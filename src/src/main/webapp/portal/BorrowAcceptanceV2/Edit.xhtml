@@ -154,8 +154,22 @@
                             <br/>
                         </h:panelGroup>
                          <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.transferRequest()}" oncomplete="handleSubmit(args, 'transferOrderDialog');" value="#{msg.TransferOrder}" icon="ui-icon-check" />
+                            <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.transferRequest()}" oncomplete="postTransferRequest(xhr, status, args)" value="#{msg.TransferOrder}" icon="ui-icon-check" />
                             <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
+                            <script>
+                                function postTransferRequest(xhr, status, args) {
+                                	if (args.validationFailed) {
+                                        PF('transferOrderDialog').show();
+                                    } else {
+                                        PF('transferOrderDialog').hide();
+                                        var url = args.url;
+                                        if (url == "norespond") {
+                                        } else {
+                                            this.location.href = url;
+                                        }
+                                    }
+                                }
+                            </script>                            
                         </h:panelGroup>
                     </h:form>
                 </p:dialog>
