@@ -8,7 +8,7 @@
 	<ui:define name="content">
 		<h:outputScript name="js/nurseSiteMaintain.js"></h:outputScript>
 		<ui:include src="maintainConfigEdit.xhtml" />
-		
+		<ui:include src="maintainConfigCreate.xhtml" />
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
 				<p:outputLabel class="pageTitle" value="日常维护配置" />
@@ -45,8 +45,8 @@
 				        </p:column>
 				        <f:facet name="{Toolbar}">
 				            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
-				                actionListener="#{maintainConfigController.prepareCreate}" update=":maintainConfigEditDlg"
-				                oncomplete="PF('maintainConfigEditDialog').show()" onclick="NurseSiteMaintain.on()"/>
+				                actionListener="#{maintainConfigController.prepareCreate}" update=":maintainConfigCreateDlg"
+				                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
 				            <p:commandButton id="editButton" actionListener="#{maintainConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
 				                update=":maintainConfigEditDlg" oncomplete="PF('maintainConfigEditDialog').show()"
 				                disabled="#{empty maintainConfigController.selected.id}" onclick="NurseSiteMaintain.on()"/>

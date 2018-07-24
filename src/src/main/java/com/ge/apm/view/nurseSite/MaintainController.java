@@ -1,6 +1,5 @@
 package com.ge.apm.view.nurseSite;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +16,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
+import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
@@ -54,7 +55,7 @@ public class MaintainController {
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
-	private OrgInfo currentClicinalOrgInfo;
+	private List<OrgInfo> listCheckClinicalOrgInfo;
 	//from config default
 	private NurseSiteMaintain nurseSiteMaintain;
 	private List<NurseSiteMaintain> existMaintainData;
@@ -97,11 +98,15 @@ public class MaintainController {
 			ca.add(Calendar.MONTH, 1);
 			end=ca.getTime();
 		}
-		if(currentClicinalOrgInfo==null){
+		if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
 			listData=nurseSiteMaintainService.getDefaultMaintainData(currentUser.getSiteUID(), currentUser.getUid(), start, end);
 		}
 		else{
-			listData=nurseSiteMaintainService.getDataByClinicalOrgUid(currentUser.getSiteUID(), currentClicinalOrgInfo.getUid(), start, end);
+			List<String> listUidTemp=new ArrayList<String>();
+			for(int i=0;i<listCheckClinicalOrgInfo.size();++i){
+				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
+			}
+			listData=nurseSiteMaintainService.getDataByClinicalOrgUid(currentUser.getSiteUID(), listUidTemp, start, end);
 		}
 		return listData;
 	}
@@ -160,6 +165,7 @@ public class MaintainController {
 		}
 		if(listUid.size()>0){
 			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(listUid);
+			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
 	
@@ -553,12 +559,12 @@ public class MaintainController {
 		this.listOrgInfo = listOrgInfo;
 	}
 
-	public OrgInfo getCurrentClicinalOrgInfo() {
-		return currentClicinalOrgInfo;
+	public List<OrgInfo> getListCheckClinicalOrgInfo() {
+		return listCheckClinicalOrgInfo;
 	}
 
-	public void setCurrentClicinalOrgInfo(OrgInfo currentClicinalOrgInfo) {
-		this.currentClicinalOrgInfo = currentClicinalOrgInfo;
+	public void setListCheckClinicalOrgInfo(List<OrgInfo> listCheckClinicalOrgInfo) {
+		this.listCheckClinicalOrgInfo = listCheckClinicalOrgInfo;
 	}
 	
 }

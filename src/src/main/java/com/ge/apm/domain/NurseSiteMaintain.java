@@ -22,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -117,6 +118,12 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Column(name="signature_id")
 	private String signatureId;
+	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
 	
 	@Transient
 	private List<String> showLables;
@@ -287,6 +294,22 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setNeedGetItem(boolean needGetItem) {
 		this.needGetItem = needGetItem;
+	}
+
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
 	}
 
 	@Override
