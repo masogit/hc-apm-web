@@ -4,8 +4,11 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.orginfo.OrgInfoService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +35,8 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
     private UploadedFile file;
     private List<Map> importFailedDataList;
     private OrgInfoController orgInfoController;
+
+    private StreamedContent excelFile;
     
     @Override
     protected void init() {
@@ -64,6 +69,13 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
         orgInfoController = WebUtil.getBean(OrgInfoController.class);
         orgInfoController.buildOrdTree();
     }
+
+    public void exportExcel() throws IOException {
+
+        ExcelDocument doc = service.exportOrg();
+
+        excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "APM_Org_Export.xlsx");
+    }
     
     public UploadedFile getFile() {
         return file;
@@ -84,5 +96,13 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
     @Override
     protected Page<OrgInfo> loadData(PageRequest pageRequest) {
         return super.loadData(pageRequest);
+    }
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
     }
 }
