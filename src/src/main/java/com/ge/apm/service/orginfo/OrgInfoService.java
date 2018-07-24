@@ -112,12 +112,12 @@ public class OrgInfoService {
                 Map<String, String> result = null;
 
                 try {
-//                    ClinicalDepartment depart = new ClinicalDepartment();
 
                     String institutionName = ExcelDocument.getCellStringValue(rowMap.get("集团"));
                     String hospitalName = ExcelDocument.getCellStringValue(rowMap.get("医院"));
                     String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
+                    String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
 
                     if (getLastRow(institutionName, hospitalName, siteName, departName)) break;
 
@@ -126,67 +126,105 @@ public class OrgInfoService {
                     result.put("hospitalName", hospitalName);
                     result.put("siteName", siteName);
                     result.put("departName", departName);
-                    result.put("excelIdex", String.valueOf(dataRow));
+                    result.put("uuid", uuid);
+                    result.put("excelIndex", String.valueOf(dataRow));
 
                     checkRowData(institutionName, hospitalName, siteName, departName);
 
-                    OrgInfo institution = null;
-                    if (!StringUtils.isEmpty(institutionName)) {
-                        institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
-                        if (institution == null) {
-                            institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
-                            orgDao.save(institution);
+                    if (!StringUtils.isEmpty(uuid)) {
+                        //update by existing uuid
+                        OrgInfo found = orgDao.findByUid(uuid);
+                        if (found == null) {
+                            throw new Exception("UUID不存在！");
+                        }
+
+                        //update name if depart name, site name, hospital name, institution name changed
+                        if ((found.getOrgType() == 4 && !found.getName().equals(departName))
+                                || (found.getOrgType() == 3 && !found.getName().equals(siteName))
+                                || (found.getOrgType() == 2 && !found.getName().equals(hospitalName))
+                                || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
+                                ) {
+                            if (found.getOrgType() == 4) {
+                                found.setName(departName);
+                            } else if (found.getOrgType() == 3) {
+                                found.setName(siteName);
+                            } else if (found.getOrgType() == 2) {
+                                found.setName(hospitalName);
+                            } else if (found.getOrgType() == 1) {
+                                found.setName(institutionName);
+                            }
+
+                            orgDao.save(found);
+
+                            message = "更新成功";
+
+                        }
+
+
+                    } else {
+
+                        //insert or update based on the institution name, hospital name, site name, clinical dept name
+                        OrgInfo institution = null;
+                        if (!StringUtils.isEmpty(institutionName)) {
                             institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
-                            message = "导入成功";
+                            if (institution == null) {
+                                institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
+                                orgDao.save(institution);
+                                institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
+                                message = "导入成功";
+                            }
+
+                            clinicalParent = institution;
+                            clinicalOrgLevel = 1;
+
                         }
 
-                        clinicalParent = institution;
-                        clinicalOrgLevel = 1;
-
-                    }
-
-                    OrgInfo hospital = null;
-                    if (!StringUtils.isEmpty(hospitalName)) {
-                        hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
-
-                        if (hospital == null) {
-                            hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
-                            orgDao.save(hospital);
+                        OrgInfo hospital = null;
+                        if (!StringUtils.isEmpty(hospitalName)) {
                             hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
-                            message = "导入成功";
+
+                            if (hospital == null) {
+                                hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
+                                orgDao.save(hospital);
+                                hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
+                                message = "导入成功";
+                            }
+
+                            clinicalParent = hospital;
+                            clinicalOrgLevel = 2;
+
                         }
 
-                        clinicalParent = hospital;
-                        clinicalOrgLevel = 2;
-
-                    }
-
-                    OrgInfo site = null;
-                    if (!StringUtils.isEmpty(siteName)) {
-                        site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
-
-                        if (site == null) {
-                            site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
-                            orgDao.save(site);
+                        OrgInfo site = null;
+                        if (!StringUtils.isEmpty(siteName)) {
                             site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
-                            message = "导入成功";
+
+                            if (site == null) {
+                                site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
+                                orgDao.save(site);
+                                site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
+                                message = "导入成功";
+                            }
+
+                            clinicalParent = site;
+                            clinicalOrgLevel = 3;
                         }
 
-                        clinicalParent = site;
-                        clinicalOrgLevel = 3;
-                    }
+                        if (!StringUtils.isEmpty(departName)) {
+                            OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
 
-                    if (!StringUtils.isEmpty(departName)) {
-                        OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
-
-                        if (depart == null) {
-                            depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
-                            orgDao.save(depart);
-                            message = "导入成功";
+                            if (depart == null) {
+                                depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                                orgDao.save(depart);
+                                message = "导入成功";
 //                            depart = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 4, departName);
+                            }
+
                         }
 
                     }
+
+
 
                     result.put("status", message);
 
@@ -356,9 +394,10 @@ public class OrgInfoService {
             }
 
             map.put("科室", orgInfo.getName());
-            map.put("UUID", orgInfo.getUid());
 
         }
+
+        map.put("UUID", orgInfo.getUid());
 
         resultList.add(map);
 
