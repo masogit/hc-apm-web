@@ -356,6 +356,7 @@ public class OrgInfoService {
             }
 
             map.put("科室", orgInfo.getName());
+            map.put("UUID", orgInfo.getUid());
 
         }
 
