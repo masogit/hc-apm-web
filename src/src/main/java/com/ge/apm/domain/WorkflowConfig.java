@@ -153,6 +153,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "tel_report_end")
     private String telReportEnd;
 
+    @Column(name = "rating_required")
+    private Boolean ratingRequired;// 必须评价
+
     /***
      * 资产编码配置
      */
@@ -665,6 +668,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setMeasuringReminderTimes(Integer measuringReminderTimes) {
         this.measuringReminderTimes = measuringReminderTimes;
+    }
+
+    public Boolean getRatingRequired() {
+        return ratingRequired;
+    }
+
+    public void setRatingRequired(Boolean ratingRequired) {
+        this.ratingRequired = ratingRequired;
     }
 
     @Override
