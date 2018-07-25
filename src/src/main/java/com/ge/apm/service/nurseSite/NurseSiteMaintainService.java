@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.AssetInfoRepository;
@@ -40,7 +41,7 @@ import webapp.framework.dao.SearchFilter;
 /**
  * Created by 212605082 on 2018/5/8.
  */
-@Component
+@Service
 public class NurseSiteMaintainService{
 
 	@Autowired
