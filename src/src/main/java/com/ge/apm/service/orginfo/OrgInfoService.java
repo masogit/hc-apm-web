@@ -123,7 +123,7 @@ public class OrgInfoService {
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
                     String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
 
-                    if (getLastRow(institutionName, hospitalName, siteName, departName)) break;
+                    if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
 
                     result = new HashMap<>();
                     result.put("institutionName", institutionName);
@@ -315,11 +315,12 @@ public class OrgInfoService {
 
     }
 
-    public boolean getLastRow(String institutionName, String hospitalName, String siteName, String clinicalDeptName) throws Exception {
+    private boolean getLastRow(String institutionName, String hospitalName, String siteName, String clinicalDeptName, String uuid) throws Exception {
 
 
         if (StringUtils.isEmpty(institutionName) && StringUtils.isEmpty(hospitalName)
-                && StringUtils.isEmpty(siteName) && StringUtils.isEmpty(clinicalDeptName)) {
+                && StringUtils.isEmpty(siteName) && StringUtils.isEmpty(clinicalDeptName)
+                && StringUtils.isEmpty(uuid)) {
             return true;
         }
 

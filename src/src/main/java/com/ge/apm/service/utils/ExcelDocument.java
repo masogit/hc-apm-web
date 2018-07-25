@@ -566,7 +566,7 @@ public class ExcelDocument {
         clearRow(sheet, rowNum);
     }
 
-    public void clearRow(Sheet sheet, int rowNum) {
+    private void clearRow(Sheet sheet, int rowNum) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow != null) {
             int firstCellNum = dataRow.getFirstCellNum();
