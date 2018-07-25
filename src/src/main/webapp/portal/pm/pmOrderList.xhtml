@@ -222,7 +222,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.batchComplete()}" value="完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmCompleteDialogBatch');"/>
+                    <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrderBatch()}" value="完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmCompleteDialogBatch');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmCompleteDialogBatch').hide()"/>
                 </h:panelGroup>
             </h:panelGroup>

@@ -1291,10 +1291,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
+        selectedMap = new HashMap<String, Boolean>();
     }
 
-    public void batchComplete() {
-       /* List<String> assetIdList = new ArrayList<String>();
+/*    public void batchComplete() {
+       *//* List<String> assetIdList = new ArrayList<String>();
         //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
         selectedMap.forEach((k,v)->{
             if(v==true)
@@ -1305,9 +1306,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             //不能选择"抢单"的来做批量"完成"
             WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
             return;
-        }*/
+        }*//*
         pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
-    }
+    }*/
 
     //已计划-->保养完成
     public void repairPmOrder() {
@@ -1378,7 +1379,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareBatchComplete() {
         this.endTime = null;
         this.totalManHours = null;
-        this.selectedMap = new HashMap();
+     //   this.selectedMap = new HashMap();
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
