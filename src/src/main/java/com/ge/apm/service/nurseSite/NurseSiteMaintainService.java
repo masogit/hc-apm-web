@@ -411,14 +411,16 @@ public class NurseSiteMaintainService{
 			List<AssetInfo> listNew=new ArrayList<AssetInfo>();
 			for(int i=0;i>-1&&i<listCheckAssets.size();++i){
 				AssetInfo assetInfo=listCheckAssets.get(i);
-				if(StringUtils.isEmpty(clinicalUid)){
-					clinicalUid=assetInfo.getClinicalDeptUID();
-					clinicalName=assetInfo.getClinicalDeptName();
-				}
-				if(clinicalUid.equals(assetInfo.getClinicalDeptUID())){
-					listNew.add(assetInfo);
-					listCheckAssets.remove(i);
-					--i;
+				if(assetInfo!=null){
+					if(StringUtils.isEmpty(clinicalUid)){
+						clinicalUid=assetInfo.getClinicalDeptUID();
+						clinicalName=assetInfo.getClinicalDeptName();
+					}
+					if(clinicalUid!=null && clinicalUid.equals(assetInfo.getClinicalDeptUID())){
+						listNew.add(assetInfo);
+						listCheckAssets.remove(i);
+						--i;
+					}
 				}
 			}
 			NurseSiteMaintainConfig newConfig=tempConfig.cloneObj();
