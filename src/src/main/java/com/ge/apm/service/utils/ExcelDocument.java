@@ -551,8 +551,22 @@ public class ExcelDocument {
 
     }
 
+    public void clearRow(int rowNum) {
+        Sheet sheet = workBook.getSheetAt(0);
+        clearRow(sheet, rowNum);
+    }
+
     public void clearRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
+        clearRow(sheet, rowNum);
+    }
+
+    public void clearRow(int sheetIndex, int rowNum) {
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        clearRow(sheet, rowNum);
+    }
+
+    public void clearRow(Sheet sheet, int rowNum) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow != null) {
             int firstCellNum = dataRow.getFirstCellNum();
@@ -564,7 +578,6 @@ public class ExcelDocument {
                 }
             }
         }
-
     }
 
     public void calculateFormula() {
