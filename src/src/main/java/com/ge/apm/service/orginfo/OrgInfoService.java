@@ -335,6 +335,9 @@ public class OrgInfoService {
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
 
+        //remove fake data row in template
+        doc.clearRow(startRow);
+
         for (Map<String, Object> map: resultList) {
 
             doc.writeRowData(0, columnKeys, startRow, map);
