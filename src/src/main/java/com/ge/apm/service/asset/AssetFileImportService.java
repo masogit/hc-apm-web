@@ -193,7 +193,7 @@ public class AssetFileImportService {
                 asset.setLineNum(dataRow);
 
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode)) {
+                if (!StringUtils.isEmpty(inputQrcode) && !inputQrcode.equals(asset.getQrCode())) {
                     asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
