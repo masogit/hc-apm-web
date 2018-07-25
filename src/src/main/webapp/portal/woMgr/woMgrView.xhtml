@@ -245,7 +245,7 @@
                                         <h:outputText value="#{detailItem.serialNum}" />
                                     </p:column>
                                     <p:column headerText="发票号">
-                                        <h:outputText value="#{item.invoiceNum}" />
+                                        <h:outputText value="#{detailItem.invoiceNum}" />
                                     </p:column>
                                     <p:column headerText="质保期">
                                         <h:outputText value="#{detailItem.warrantyDate}">
@@ -270,7 +270,15 @@
                                     <p:column headerText="到货">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
                                     </p:column>
-T
+                                    <p:column headerText="单价(元)">
+                                        <h:outputText value="#{detailItem.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="操作">
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
+                                    </p:column>
+
                                 </p:dataTable>
                             </h:panelGroup>
 

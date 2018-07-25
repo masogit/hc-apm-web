@@ -14,7 +14,11 @@
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}">
                                     <!--<p:ajax listener="#{orgInfoController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>-->
                                 </p:inputText>
-                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
+                                <p:commandButton  icon="ui-icon-location-searching"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" update="orgTree editPanel :growl"/>
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{orgImportController.exportExcel}" update=":growl"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                    <p:fileDownload value="#{orgImportController.excelFile}" />
+                                </p:commandButton>
                             </h:panelGroup>
                             <p:scrollPanel style="height:98%;border: 0" mode="native">
                                 <p:tree id="orgTree"  class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single" selection="#{orgInfoController.selectedNode}" highlight="true">

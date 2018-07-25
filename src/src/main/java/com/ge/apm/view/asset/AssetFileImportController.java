@@ -39,7 +39,7 @@ public class AssetFileImportController {
 
     private UploadedFile file;
 
-//    private Map<String, Map<String, Object>> importOrgMap;
+    private List<Map<String, Object>> importOrgMap;
     private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
@@ -96,10 +96,10 @@ public class AssetFileImportController {
                 return;
             }
 
-//            importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
+            importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
             
-            canbeImported = aiService.checkData(importAssetMap);
+            canbeImported = aiService.checkData(importOrgMap, importAssetMap);
 
             filterErrorRecords();
 
@@ -118,7 +118,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
             filterErrorRecords();
@@ -223,23 +223,22 @@ public class AssetFileImportController {
 
         displayAssets = result;
 
-//        if (importOrgMap == null) return;
-//
-//        Map<String, Map<String, Object>> resultMap = new LinkedHashMap<>();
-//
-//        for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
-//            Map<String, Object> map = entry.getValue();
-//
-//            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-//            if (importStatus == null) continue;
-//
-//            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-//                resultMap.put(entry.getKey(), entry.getValue());
-//            }
-//
-//        }
-//
-//        displayOrgs = resultMap;
+        if (importOrgMap == null) return;
+
+        List<Map<String, Object>> resultMap = new ArrayList<>();
+
+        for (Map<String, Object> map: importOrgMap) {
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                resultMap.add(map);
+            }
+
+        }
+
+        displayOrgs = resultMap;
     }
 
     List<Map<String, Object>> displayAssets;
@@ -254,22 +253,21 @@ public class AssetFileImportController {
 
     }
 
-//    Map<String, Map<String, Object>> displayOrgs;
+    List<Map<String, Object>> displayOrgs;
 
-//    public Map<String, Map<String, Object>> getDisplayOrgs() {
-//
-//        if (displayErrorsOnly) {
-//            return displayOrgs;
-//        } else {
-//            return null;
-//        }
-//
-//    }
+    public List<Map<String, Object>> getDisplayOrgs() {
 
-    //Getter and Setter
-//    public Map<String, Map<String, Object>> getImportOrgMap() {
-//        return importOrgMap;
-//    }
+        if (displayErrorsOnly) {
+            return displayOrgs;
+        } else {
+            return importOrgMap;
+        }
+
+    }
+
+    public List<Map<String, Object>> getImportOrgMap() {
+        return importOrgMap;
+    }
 
     public List<Map<String, Object>> getImportAssetMap() {
         return importAssetMap;

@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -72,22 +73,33 @@ public class AssetFileImportService {
 
     @Autowired
     private AssetInfoRepository assetDao;
+
     @Autowired
     private OrgInfoRepository orgDao;
+
     @Autowired
     private UserAccountRepository userDao;
+
     @Autowired
     private SupplierRepository supplierDao;
+
     @Autowired
     private QrCodeLibRepository qrcodeDao;
+
     @Autowired
     private AssetCreateService assetCreateService;
+
     @Autowired
     private QrCodeService qrCodeService;
+
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+
     @Autowired
     ConfigService configService;
+
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
     private OrgInfo selectedOrgToImport;
 
@@ -99,9 +111,9 @@ public class AssetFileImportService {
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
     private WorkflowConfig workflowConfig;
 
-    public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
+    public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
-        Map<String, Map<String, Object>> result = new LinkedHashMap();
+        List<Map<String, Object>> result = new ArrayList<>();
         int keyRow = 4;
         int dataRow = 5;
 
@@ -115,17 +127,17 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(selectedOrgToImport.getId());
-            org.setParentOrg(selectedOrgToImport);
-            org.setSiteId(selectedOrgToImport.getSiteId());
-
-            org.setParentUID(selectedOrgToImport.getUid());
-            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            org.setTenantUID(selectedOrgToImport.getTenantUID());
-            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            org.setSiteUID(selectedOrgToImport.getSiteUID());
-            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
-            org.setOrgType(4);
+//            org.setHospitalId(selectedOrgToImport.getId());
+//            org.setParentOrg(selectedOrgToImport);
+//            org.setSiteId(selectedOrgToImport.getSiteId());
+//
+//            org.setParentUID(selectedOrgToImport.getUid());
+//            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
+//            org.setTenantUID(selectedOrgToImport.getTenantUID());
+//            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+//            org.setSiteUID(selectedOrgToImport.getSiteUID());
+//            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
+//            org.setOrgType(4);
 
             org.setLineNum(dataRow);
 
@@ -133,7 +145,7 @@ public class AssetFileImportService {
             map.put("org", org);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
-            result.put(orgName, map);
+            result.add(map);
         }
         return result;
     }
@@ -181,7 +193,7 @@ public class AssetFileImportService {
                 asset.setLineNum(dataRow);
 
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode)) {
+                if (!StringUtils.isEmpty(inputQrcode) && !inputQrcode.equals(asset.getQrCode())) {
                     asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
@@ -212,7 +224,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, null);
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, isNewAsset ? 1 : null); //新增资产默认内修
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
@@ -336,27 +348,22 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(List<Map<String, Object>> importAssetMap,
+    public void importData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                orgDao.save((OrgInfo) item.get("org"));
-//                item.put("status", ImportStatus.Created);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.Failure);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            if (orgInfo == null) {
+                importOrgIfNeeded(newOrgInfo.getName());
+                item.put("status", ImportStatus.Created);
+            } else {
+                item.put("status", ImportStatus.Exist);
+            }
+        });
 
         //release qrcode in use in order to exchange qrcode in two different asset
         releaseQRCodeInUse(importAssetMap);
@@ -383,19 +390,14 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "警告:科室为空");
+//                AssetRow.addErrMessage(item, "错误: 科室为空");
+                return;
             } else {
-                OrgInfo orgInfo = getOrgInfoByName(orgName);
 
-                if (orgInfo == null) {
-                    item.put("status", ImportStatus.Failure);
-                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-                    return;
-                } else {
-                    newAsset.setClinicalDeptName(orgName);
-                    newAsset.setClinicalDeptId(orgInfo.getId());
-                    newAsset.setClinicalDeptUID(orgInfo.getUid());
-                }
+                OrgInfo orgInfo = importOrgIfNeeded(orgName);
+                newAsset.setClinicalDeptId(orgInfo.getId());
+                newAsset.setClinicalDeptUID(orgInfo.getUid());
+
             }
 
             //for AssetOwner
@@ -457,28 +459,29 @@ public class AssetFileImportService {
                 newAsset.setClinicalOwnerName(null);
             }
 
-            if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
-                List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
-                if (null == supplierList || supplierList.isEmpty()) {
-                    Supplier newSupplier = new Supplier();
-                    newSupplier.setSupplierT(true);
-                    newSupplier.setSiteId(selectedOrgToImport.getSiteId());
-                    newSupplier.setName(newAsset.getVendor());
-                    newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
-                    newSupplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-                    newSupplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-                    newSupplier.setSiteUID(selectedOrgToImport.getSiteUID());
-                    supplierDao.save(newSupplier);
-                    newAsset.setSupplierId(newSupplier.getId());
-                    newAsset.setVendor(newAsset.getVendor());
-                } else if (supplierList.size() == 1) {
-                    Supplier supplier = supplierList.get(0);
-                    newAsset.setSupplierId(supplier.getId());
-                    newAsset.setVendor(supplier.getName());
-                } else {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
-                    newAsset.setVendor(null);
-                }
+            Supplier supplier;
+            //导入供应商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getVendor())) {
+                supplier = importSupplierIfNeeded(newAsset.getVendor(), newAsset.getVendorTel());
+                newAsset.setSupplierId(supplier.getId());
+            } else {
+                newAsset.setSupplierId(null);
+            }
+
+            ////导入维修商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
+                supplier = importMaintainancerIfNeeded(newAsset.getMaitanance(), newAsset.getMaitananceTel());
+                newAsset.setMaitananceId(supplier.getId().toString());
+            } else {
+                newAsset.setMaitananceId(null);
+            }
+
+            ////导入制造商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getManufacture())) {
+                supplier = importManufacturerIfNeeded(newAsset.getManufacture());
+                newAsset.setManufactureId(supplier.getId().toString());
+            } else {
+                newAsset.setManufactureId(null);
             }
 
             //auto generate financing num
@@ -582,6 +585,98 @@ public class AssetFileImportService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
+
+    }
+
+    private OrgInfo importOrgIfNeeded(String name) {
+
+        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
+
+        if (orgInfo == null) {
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
+            orgInfo = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, name, selectedOrgToImport, selectedOrgToImport.getOrgLevel());
+            orgDao.save(orgInfo);
+        }
+
+        return orgInfo;
+
+    }
+
+    private Supplier importSupplierIfNeeded(String name, String tel) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setSupplierT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTel(tel);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
+            supplier.setSupplierT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    private Supplier importMaintainancerIfNeeded(String name, String tel) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setMaintainerT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTel(tel);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
+            supplier.setMaintainerT(true);
+            if (!StringUtils.isEmpty(tel)) {
+                supplier.setTel(tel);
+            }
+
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    private Supplier importManufacturerIfNeeded(String name) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setManufacturerT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
+            supplier.setManufacturerT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
 
     }
 
@@ -717,27 +812,22 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(List<Map<String, Object>> importAssetMap) {
+    public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         HashSet<Boolean> result = new HashSet<>();
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                item.put("status", ImportStatus.New);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.CheckFail);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
-//                result.add(Boolean.FALSE);
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            if (orgInfo == null) {
+                item.put("status", ImportStatus.New);
+            } else {
+                item.put("status", ImportStatus.Exist);
+            }
+        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
@@ -787,14 +877,14 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "警告:科室为空");
-            } else {
-                OrgInfo orgInfo = getOrgInfoByName(orgName);
-
-                if (orgInfo == null) {
-                    item.put("status", ImportStatus.CheckFail);
-                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-                }
+                AssetRow.addErrMessage(item, "错误: 科室为空");
+//            } else {
+//                OrgInfo orgInfo = getOrgInfoByName(orgName);
+//
+//                if (orgInfo == null) {
+//                    item.put("status", ImportStatus.CheckFail);
+//                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+//                }
             }
 
             //check depart num to avoid duplicate when update
