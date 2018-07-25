@@ -1578,10 +1578,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExportTemplateConfig', '报表模版配置', 'Export template configure', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkOrderExportTemplate', '报表模版', 'WorkOrder Export Template', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('attachmentType', '4', '验收及其他材料', 'Verfication and Other Material', NULL, '-1');
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'nurseSiteMaintainStatus', '检查状态', 'Check Status', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '0', '未检查', 'notchecked', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '1', '废弃', 'notused', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '2', '已通过', 'passed', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '3', '有问题', 'hasIssue', NULL, '-1');
-
 

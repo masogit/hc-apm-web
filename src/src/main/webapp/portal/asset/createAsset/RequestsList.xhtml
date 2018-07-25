@@ -61,7 +61,7 @@
                             <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.name}" sortBy="#{item}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.name}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
                         <p:column headerText="#{msg.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">

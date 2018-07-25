@@ -244,7 +244,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             objectList = dao.findbyClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid());
         }
         else{
-            objectList = dao.find();
+        	objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
         }
         
         

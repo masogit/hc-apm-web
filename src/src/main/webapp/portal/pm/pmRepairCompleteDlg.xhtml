@@ -172,7 +172,7 @@
                     </p:fieldset>
                     <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
                         <p:ajax process="console"  update="@(.rpb) @(.rpt) @(.x3) @(.buttonG)"></p:ajax>
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qualityChecking')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
                     </p:selectOneRadio>
 
                     <!--维修完成 转单 新建工单-->

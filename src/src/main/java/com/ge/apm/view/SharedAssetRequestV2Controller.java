@@ -8,10 +8,13 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -23,6 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +54,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     AssetInfoRepository asiDao = null;
     SharedAssetTypeRepository swapDao = null;
     WorkflowConfigRepository wfCfigDao = null;
+    SharedAssetConfigRepository sharedAssetConfigDao = null;
     String p=null;
     private String operation;
     
@@ -55,6 +62,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Date applyTimeFrom = null;
     private String applyTimeFormatTime = null;
     private String filterApplyTime = null;
+    
+    private UserAccount selectedAssignee;
 
      public String getFilterApplyTime() {
         return filterApplyTime;
@@ -109,6 +118,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.selectedSard = selectedSard;
     }
     
+    public UserAccount getSelectedAssignee() {
+    	return this.selectedAssignee;
+    }
+    
+    public void setSelectedAssignee(UserAccount ua) {
+    	this.selectedAssignee = ua;
+    }
     
     public void prepareCreateSart(){
         selectedSart = new SharedAssetReqType();
@@ -136,6 +152,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
@@ -1663,6 +1680,98 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
+    }
+    
+    public String workOrderRouter() {
+    	String retrunUrl = "";
+    	RequestContext requestContext = RequestContext.getCurrentInstance();
+    	requestContext.addCallbackParam("showNotification", true);
+    	
+    	// Get business hours from database
+    	/*List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+    	Optional<SharedAssetConfig> sharedAssetConfig = Optional.ofNullable(sharedAssetConfigList.get(0));
+    	if(sharedAssetConfig.isPresent()) {
+    		SharedAssetConfig config = sharedAssetConfig.get();
+    		String startHour = config.getStartTime();
+    		String endHour = config.getEndTime();
+    		
+    		ZoneId east8 = ZoneId.of("Asia/Shanghai");
+    		ZonedDateTime zdt = ZonedDateTime.now(east8);
+    		StringBuilder prefix = new StringBuilder();
+    		prefix.append(zdt.getYear());
+    		prefix.append("-");
+    		if(zdt.getMonthValue() < 10) {
+    			prefix.append("0");
+    		}
+    		prefix.append(zdt.getMonthValue());
+    		prefix.append("-");
+    		prefix.append(zdt.getDayOfMonth());
+    		prefix.append(" ");
+
+    		String startTime = prefix.toString() + startHour;
+    		String endTime = prefix.toString() + endHour;
+    		ZonedDateTime startZoneTime = ZonedDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(east8));
+    		ZonedDateTime endZoneTime = ZonedDateTime.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(east8));
+    		if(logger.isDebugEnabled()) {
+    			logger.debug("Now: " + zdt.toString());
+    		}
+    		if(zdt.isBefore(endZoneTime) && zdt.isAfter(startZoneTime)) {
+    			requestContext.addCallbackParam("showNotification", false);
+    			requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+    			retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+    		}
+    	}*/
+    	
+    	ZoneId east8 = ZoneId.of("Asia/Shanghai");
+    	ZonedDateTime nowZDT = ZonedDateTime.now(east8);
+    	ZonedDateTime startZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 8, 0, 0, 0, east8);
+    	ZonedDateTime endZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 20, 0, 0, 0, east8);
+    	if(nowZDT.isAfter(startZoneTime) && nowZDT.isBefore(endZoneTime)) {
+    		requestContext.addCallbackParam("showNotification", false);
+    		requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+    		retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+    	}
+    	return retrunUrl;
+    }
+    
+    public String getOnCallNumber() {
+    	List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+    	String onCallNumber = "";
+    	if(sharedAssetConfigList != null && sharedAssetConfigList.size() > 0) {
+    		onCallNumber = Optional.ofNullable(sharedAssetConfigList.get(0)).map(item -> item.getTel()).orElse("");
+    	}
+    	return onCallNumber;
+    }
+    
+    public void prepareTransferRequest() {
+    	selectedAssignee = new UserAccount();
+    }
+
+    public List getAvailableAssignees() {
+        ResponseEntity<LinkedHashMap> response = sharedAssetService.getAssigneeList();
+        LinkedHashMap respBody = response.getBody();
+        List<LinkedHashMap> rst = null;
+        if("OK".equals(respBody.get("bizStatusCode"))) {
+        	List<LinkedHashMap> assignees = (List) respBody.get("data");
+        	UserAccount user = UserContextService.getCurrentUserAccount();
+        	rst = assignees.stream()
+        						.filter(item -> !user.getUid().equals(item.get("uid")))
+        						.collect(Collectors.toList());
+        }
+        return rst;
+    }
+    
+    public void transferRequest() {
+    	String url = "List.xhtml?faces-redirect=true";
+    	RequestContext requestContext = RequestContext.getCurrentInstance();
+    	try {
+    		sharedAssetService.remoteAssignRequest(selected.getId(), selectedAssignee.getUid());
+    	} catch(Exception ex) {
+    		url = "norespond";
+    		WebUtil.addErrorMessage("转单失败，请返回重新申请！");
+    		ex.printStackTrace();
+    	}
+    	requestContext.addCallbackParam("url", url);
     }
 
 }

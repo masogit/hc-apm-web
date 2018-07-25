@@ -36,7 +36,7 @@ public class SchemaParser {
         for(TableGroup group : schema.getGroups()) {
             rows.add(group.getTitle());
             for (TableItem item : group.getItems()) {
-                if (item == null) {
+                if (item == null || item.getComponent() == null) {
                     continue;
                 }
                 switch (item.getComponent()) {

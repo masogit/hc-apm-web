@@ -37,7 +37,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
 
                         <p:column headerText="EXCEL行数">
-                            <h:outputText value="#{item.excelIdex}" />
+                            <h:outputText value="#{item.excelIndex}" />
                         </p:column>
                         <p:column headerText="#{msg.Institution}">
                             <h:outputText value="#{item.institutionName}" />
@@ -51,6 +51,9 @@
                         <p:column headerText="#{msg.Department}">
                             <h:outputText value="#{item.departName}" />
                         </p:column>
+                        <!--<p:column headerText="UUID">-->
+                            <!--<h:outputText value="#{item.uuid}" />-->
+                        <!--</p:column>-->
                         <p:column headerText="备注">
                             <h:outputText value="#{item.status}" />
                         </p:column>

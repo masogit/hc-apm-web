@@ -164,4 +164,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
     public List<String> getOrgId(@Param("siteUID") String siteUID);
+
+    @Transactional
+    @Modifying
+    @Query(value= "update AssetInfo set clinicalDeptName = ?1 where clinicalDeptUID = ?2 and tenantUID = ?3")
+    public void updateClinicalDeptName(String deptName, String deptUid, String tenantUid);
 }

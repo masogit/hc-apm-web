@@ -118,21 +118,21 @@
 
                             </h:panelGroup>
                         </p:tab>
-                        <!--<p:tab title="部门导入">-->
-                            <!--<p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >-->
-                                <!--<p:column headerText="Excel行数" >-->
-                                    <!--<h:outputText value="#{item.get('org').lineNum}"/>-->
-                                <!--</p:column>-->
-                                <!--<p:column headerText="#{msg.Department}" >-->
-                                    <!--<h:outputText value="#{item.get('org').name}"/>-->
-                                <!--</p:column>-->
-                                <!--<p:column headerText="#{assetFileImportController.isImported? msg.importStatus : '检查结果'}" >-->
-                                    <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/>-->
-                                    <!--<h:outputText value="#{item.get('errmsg')}"/>-->
-                                <!--</p:column>-->
-                            <!--</p:dataTable>-->
+                        <p:tab title="部门导入">
+                            <p:dataTable  value="#{assetFileImportController.displayOrgs}" var="item" >
+                                <p:column headerText="Excel行数" >
+                                    <h:outputText value="#{item.get('org').lineNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Department}" >
+                                    <h:outputText value="#{item.get('org').name}"/>
+                                </p:column>
+                                <p:column headerText="#{assetFileImportController.isImported? msg.importStatus : '检查结果'}" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/>
+                                    <h:outputText value="#{item.get('errmsg')}"/>
+                                </p:column>
+                            </p:dataTable>
 
-                        <!--</p:tab>-->
+                        </p:tab>
                         <!--                        <p:tab title="人员导入">
                                                     <p:dataTable  value="#{assetFileImportController.importUserMap.values()}" var="item" >
                                                         <p:column headerText="#{msg.assetName}"  >
