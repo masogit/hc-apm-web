@@ -139,7 +139,7 @@ public class OrgInfoService {
                         //update by existing uuid
                         OrgInfo found = orgDao.findByUid(uuid);
                         if (found == null) {
-                            throw new Exception("UUID不存在！");
+                            throw new Exception("该组织机构不存在！");
                         }
 
                         //update name if depart name, site name, hospital name, institution name changed
@@ -149,12 +149,24 @@ public class OrgInfoService {
                                 || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
                                 ) {
                             if (found.getOrgType() == 4) {
+                                if (StringUtils.isEmpty(departName)) {
+                                    throw new Exception("科室名称不能为空！");
+                                }
                                 found.setName(departName);
                             } else if (found.getOrgType() == 3) {
+                                if (StringUtils.isEmpty(siteName)) {
+                                    throw new Exception("院区名称不能为空！");
+                                }
                                 found.setName(siteName);
                             } else if (found.getOrgType() == 2) {
+                                if (StringUtils.isEmpty(hospitalName)) {
+                                    throw new Exception("医院名称不能为空！");
+                                }
                                 found.setName(hospitalName);
                             } else if (found.getOrgType() == 1) {
+                                if (StringUtils.isEmpty(institutionName)) {
+                                    throw new Exception("集团名称不能为空！");
+                                }
                                 found.setName(institutionName);
                             }
 
