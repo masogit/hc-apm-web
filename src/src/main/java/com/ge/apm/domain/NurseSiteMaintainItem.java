@@ -120,7 +120,9 @@ public class NurseSiteMaintainItem implements Serializable {
 
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;//使用科室
-	
+    
+    @Column(name="name")
+	private String name;
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
@@ -267,6 +269,14 @@ public class NurseSiteMaintainItem implements Serializable {
 		this.clinicalDeptName = clinicalDeptName;
 	}
 	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public NurseSiteMaintainData getDataValue(String label){
 		if(listData!=null && StringUtils.isNotEmpty(label)){
 			Iterator<NurseSiteMaintainData> it=listData.iterator();
