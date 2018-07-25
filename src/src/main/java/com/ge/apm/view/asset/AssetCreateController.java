@@ -152,14 +152,14 @@ public class AssetCreateController {
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() == null || item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() != null && item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT() == null || item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT() != null && item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
