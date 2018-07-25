@@ -27,7 +27,7 @@ public class AutoCompleteService {
 
     
     public List<Supplier> autoCompleteVendor(String query,List<Supplier> supplierList) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getSupplierT()==null || item.getSupplierT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getSupplierT() != null && item.getSupplierT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -35,7 +35,7 @@ public class AutoCompleteService {
 
     public List<Supplier> autoCompleteMaintainer(String query,List<Supplier> supplierList) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT()==null || item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT() != null && item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -43,7 +43,7 @@ public class AutoCompleteService {
     
     public List<Supplier> autoCompleteManufacture(String query,List<Supplier> supplierList) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT()==null || item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() != null && item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
