@@ -3,7 +3,7 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +22,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ge.apm.service.utils.StringComparator;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -127,6 +125,9 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Transient
 	private List<String> showLables;
+	
+	@Transient
+	private List<NurseSiteMaintainItem> showListNurseSiteMaintainItem;
 	
 	@Transient
 	private boolean needGetItem=true;
@@ -310,6 +311,28 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setClinicalDeptName(String clinicalDeptName) {
 		this.clinicalDeptName = clinicalDeptName;
+	}
+
+	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
+		if(showListNurseSiteMaintainItem==null){
+			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
+		}
+		else{
+			showListNurseSiteMaintainItem.clear();
+		}
+		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
+		return showListNurseSiteMaintainItem;
+	}
+
+	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
+		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
+		if(listNurseSiteMaintainItem==null){
+			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+		}
+		else{
+			listNurseSiteMaintainItem.clear();
+		}
+		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 	}
 
 	@Override
