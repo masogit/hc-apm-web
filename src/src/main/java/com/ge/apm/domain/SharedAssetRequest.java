@@ -103,6 +103,9 @@ public class SharedAssetRequest implements Serializable{
     @Column(name = "type")//类型：正常借还、维修借还、工程师维护
     private String type;
     
+    @Column(name = "owner")
+    private String owner;
+    
     //新增字段（数据权限四个字段）
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -369,7 +372,16 @@ public class SharedAssetRequest implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
-    public String getApplyAssetInfo() {
+    
+    public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public String getApplyAssetInfo() {
         return applyAssetInfo;
     }
 
