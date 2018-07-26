@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="SupplierEditDlg" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
+        <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
             <h:form id="SupplierEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
@@ -36,35 +36,33 @@
                             <label class="label">#{msg.tel}</label>
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
-                       <!-- <h:panelGroup>
-                            <label class="label">供应商类型*</label>
-                            <p:selectOneMenu id="supplierType" value="#{supplierController.selected.supplierType}">
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>-->
-
                         <h:panelGroup class="test1">
                             <label  class="label">类型*</label>
-                                <h:panelGroup>
-                                    <p:selectBooleanCheckbox id="wxs" value="#{supplierController.maintainerT}" itemLabel="维修商">
-                                       <!-- <p:ajax listener="#{supplierController.maintainerTSet()}" update="@this"></p:ajax>-->
-                                    </p:selectBooleanCheckbox>
-                                </h:panelGroup>
-                            <h:panelGroup></h:panelGroup>
-                                <h:panelGroup>
-                                    <p:selectBooleanCheckbox   value="#{supplierController.manufacturerT}" itemLabel="制造商">
-                                       <!-- <p:ajax listener="#{supplierController.manufacturerTSet()}" update="@this"></p:ajax>-->
-                                    </p:selectBooleanCheckbox>
-                                </h:panelGroup>
-                            <h:panelGroup></h:panelGroup>
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox  value="#{supplierController.supplierT}" itemLabel="供应商">
-                                   <!-- <p:ajax listener="#{supplierController.supplierTSet()}" update="@this"></p:ajax>-->
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                <h:panelGrid columns="3">
+                                        <h:panelGrid columns="3">
+                                        <h:panelGroup>
+                                            <h:panelGrid columns="2">
+                                                <p:selectBooleanCheckbox id="wxs" value="#{supplierController.maintainerT}"/>
+                                                <p:outputLabel  value="维修商 " />
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    <h:panelGroup>
+                                        <h:panelGrid columns="2">
+                                            <p:selectBooleanCheckbox   value="#{supplierController.manufacturerT}"/>
+                                            <p:outputLabel value="制造商 " />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                            <h:panelGroup >
+                                                <h:panelGrid columns="2">
+                                                    <p:selectBooleanCheckbox  value="#{supplierController.supplierT}"/>
+                                                    <p:outputLabel value="供应商 " />
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                </h:panelGrid>
                         </h:panelGroup>
-
                     </p:panelGrid>
+
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>
