@@ -47,10 +47,12 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             searchFilters = new ArrayList();
         }
 
-        if (!this.hasFilterOnField("siteUID")) {
+        if(!this.hasFilterOnField("contractType")){
             List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
+        }
 
+        if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
