@@ -426,7 +426,7 @@ public class NurseSiteMaintainService{
 			}
 			NurseSiteMaintainConfig newConfig=tempConfig.cloneObj();
 			if(newConfig!=null){
-				newConfig.setName(originName+"-"+clinicalName);
+				newConfig.setName(originName);
 				newConfig.setClinicalDeptName(clinicalName);
 				newConfig.setClinicalDeptUID(clinicalUid);
 				save(newConfig);
