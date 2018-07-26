@@ -71,6 +71,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         currentUser = UserContextService.getCurrentUserAccount();
 
         attachements = new ArrayList<>();
+
     }
 
     @Override
@@ -92,6 +93,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+
+        if(!this.hasFilterOnField("isValid")){
+            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
         }
 
         if(!this.hasFilterOnField("isDeleted")){
@@ -260,4 +265,5 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     public void setCurrentUser(UserAccount currentUser) {
         this.currentUser = currentUser;
     }
+
 }
