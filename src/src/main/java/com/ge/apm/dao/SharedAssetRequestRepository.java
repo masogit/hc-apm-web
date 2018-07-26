@@ -16,6 +16,12 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
     @Transactional
     @Query("update SharedAssetRequest a set a.state = :state where a.id = :id")
     public void updateState(@Param("id") String id, @Param("state") int state);
+
+    @Modifying
+    @Transactional
+    @Query("update SharedAssetRequest a set a.state = :state, a.owner = :owner where a.id = :id")
+    public void updateStateAndOwner(@Param("id") String id, @Param("state") int state, @Param("owner") String owner);
+
     public List<SharedAssetRequest> findByState(int state);
     
     @Query(value = "select dept_for_shared_asset from workflow_config where site_uid =?1",nativeQuery = true)

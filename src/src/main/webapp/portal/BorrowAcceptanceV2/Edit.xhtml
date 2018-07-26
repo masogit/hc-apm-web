@@ -76,7 +76,7 @@
                             <!--<f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>-->
                             <!--&lt;!&ndash;<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>&ndash;&gt;-->
                         <!--</p:cellEditor>-->
-                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/>
+                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true" requiredMessage="预计借用数不能为空！" minValue="0" maxValue="#{item.applyQty}"/>
                     </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}">
                         <h:outputText value="#{item.remark}"/>
@@ -127,12 +127,16 @@
                     <p:commandButton value="#{msg.transfer}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
                     <script>
                         function openSwapTypeViewWindow3(xhr, status, args) {
-                            var url = args.url;
-                            if (url == "norespond") {
+                        	if(args.validationFailed) {
+                        		
+                        	} else {
+                        		var url = args.url;
+                                if (url == "norespond") {
 
-                            } else {
-                                this.location.href = url;
-                            }
+                                } else {
+                                    this.location.href = url;
+                                }
+                        	}
                         }
 
                     </script>
