@@ -281,7 +281,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         OrgInfo userOrg = orgInfoDao.getByUid(object.getClinicalDeptUid());
         object.setClinicalDeptName(userOrg.getName());
         object.setApplyAssetInfo(null);
-
     }
     
     @Override
@@ -1104,8 +1103,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
         }
         RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(sta == 1) {
+        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+        } 
+        if(sta == 5){
+        	dao.updateState(uid, state);
+        }
         if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
-            dao.updateState(uid, state);
             apdDao.save(sartList);
 
             //调用微服务
@@ -1135,9 +1139,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         int sta = realSAR.getState();
        int state = 8;//2归还待交付状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(sta == 7) {
+        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+        }
+        if(sta == 11) {
+        	dao.updateState(uid, state);
+        }
        if(sta  == 7 || sta == 11){//归还待受理状态
-           dao.updateState(uid, state);
-
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1748,15 +1756,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
     public List getAvailableAssignees() {
-        ResponseEntity<LinkedHashMap> response = sharedAssetService.getAssigneeList();
-        LinkedHashMap respBody = response.getBody();
-        List<LinkedHashMap> rst = null;
-        if("OK".equals(respBody.get("bizStatusCode"))) {
-        	List<LinkedHashMap> assignees = (List) respBody.get("data");
-        	UserAccount user = UserContextService.getCurrentUserAccount();
-        	rst = assignees.stream()
-        						.filter(item -> !user.getUid().equals(item.get("uid")))
-        						.collect(Collectors.toList());
+    	List<LinkedHashMap> rst = null;
+        try {
+        	ResponseEntity<LinkedHashMap> response = sharedAssetService.getAssigneeList();
+            LinkedHashMap respBody = response.getBody();
+            if("OK".equals(respBody.get("bizStatusCode"))) {
+            	List<LinkedHashMap> assignees = (List) respBody.get("data");
+            	UserAccount user = UserContextService.getCurrentUserAccount();
+            	rst = assignees.stream()
+            						.filter(item -> !user.getUid().equals(item.get("uid")))
+            						.collect(Collectors.toList());
+            }
+        } catch (Exception ex) {
+        	ex.printStackTrace();
         }
         return rst;
     }
