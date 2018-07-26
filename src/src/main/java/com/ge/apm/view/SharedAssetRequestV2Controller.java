@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -1734,11 +1735,15 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     	ZonedDateTime nowZDT = ZonedDateTime.now(east8);
     	ZonedDateTime startZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 8, 0, 0, 0, east8);
     	ZonedDateTime endZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 20, 0, 0, 0, east8);
-    	if(nowZDT.isAfter(startZoneTime) && nowZDT.isBefore(endZoneTime)) {
-    		requestContext.addCallbackParam("showNotification", false);
-    		requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
-    		retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
-    	}
+
+    	if(nowZDT.getDayOfWeek() == DayOfWeek.SATURDAY || nowZDT.getDayOfWeek() == DayOfWeek.SUNDAY) {
+        } else {
+            if(nowZDT.isAfter(startZoneTime) && nowZDT.isBefore(endZoneTime)) {
+                requestContext.addCallbackParam("showNotification", false);
+                requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+                retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+            }
+        }
     	return retrunUrl;
     }
     
