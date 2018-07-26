@@ -78,6 +78,37 @@ public class BlobFileService {
         }
 
     }
+    
+    public V2_BlobObject uploadFileString(String str) {
+        String path = "";
+        try {
+            path = fsService.saveFileString(str);
+        } catch (Exception ex) {
+            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+            Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        String token = UserContextService.getAccessToken();
+        if (token == null || token.isEmpty()) {
+            WebUtil.addErrorMessage("do not have premission");
+            return null;
+        }
+        Map<String, Object> fileObject = microService.uploadSingleFile(token, new File(path));
+        fsService.deleteUploadedFile(path);
+        if (null != fileObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobDao.save(blobObject);
+        } else {
+            return null;
+        }
+
+    }
 
     public Boolean deleteBlobFile(V2_BlobObject blobObject) {
         
