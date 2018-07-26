@@ -1089,7 +1089,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(), asset.getSiteUID(), 1);
+            qrCodeService.releaseQrCode(asset.getQrCode(), asset.getSiteUID());
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
