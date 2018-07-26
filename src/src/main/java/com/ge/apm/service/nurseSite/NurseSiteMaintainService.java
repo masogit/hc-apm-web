@@ -1,7 +1,8 @@
 package com.ge.apm.service.nurseSite;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,9 +12,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 
 import webapp.framework.dao.SearchFilter;
@@ -43,7 +48,7 @@ import webapp.framework.dao.SearchFilter;
  */
 @Service
 public class NurseSiteMaintainService{
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainService.class);
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
 	
@@ -70,6 +75,9 @@ public class NurseSiteMaintainService{
 	
 	@Autowired
 	UserAccountRepository userAccountRepository;
+	
+	@Autowired
+	private BlobFileService blobFileService;
 	
 	@Autowired
     private UaaService uaaService;
@@ -403,6 +411,55 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
+	public String saveMaintainSignature(String content,String id){
+		V2_BlobObject blobObject=null;
+		try {
+			blobObject = blobFileService.uploadFileString(content);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+        if (null != blobObject) {
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            blobObject.setBoUuid(id);
+            blobFileService.saveBlobObject(blobObject);
+            return blobObject.getObjectStorageId();
+        }
+        else{
+        	return null;
+        }
+	}
+	
+	public String getMaintainSignature(String signatureId){
+		StreamedContent streamedContent=blobFileService.getBlobObjectByStorageId(signatureId);
+		InputStream input=streamedContent.getStream();
+		byte[]b=new byte[1024];
+		StringBuilder sb=new StringBuilder();
+		String result="";
+		int i=0;
+		try {
+			while((i=input.read(b))>0){
+				String str=new String(b);
+				sb.append(str);
+			}
+			input.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			try {
+				input.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				LOGGER.error(e.getMessage());
+			}
+			LOGGER.error(e.getMessage());
+			return "";
+		}
+		result=sb.toString();
+		return result;
+	}
+	
 	@Transactional
 	public boolean createMaintainConfig(NurseSiteMaintainConfig tempConfig,UserAccount currentUser,List<AssetInfo> listCheckAssets,boolean blnModifyAll){
 		String originName=tempConfig.getName();
@@ -426,7 +483,7 @@ public class NurseSiteMaintainService{
 			}
 			NurseSiteMaintainConfig newConfig=tempConfig.cloneObj();
 			if(newConfig!=null){
-				newConfig.setName(originName);
+				newConfig.setName(originName+"-"+clinicalName);
 				newConfig.setClinicalDeptName(clinicalName);
 				newConfig.setClinicalDeptUID(clinicalUid);
 				save(newConfig);
