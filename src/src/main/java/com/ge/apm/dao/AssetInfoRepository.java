@@ -57,10 +57,10 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
     public List<AssetInfo> findByAccessScope(String siteUID,String userUid);
     
-    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and o.clinical_dept_uid is not null and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and o.clinical_dept_uid is not null and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2 order by o.name_py_code asc",nativeQuery=true)
     public List<AssetInfo> findBySelfScope(String siteUID,String userUid);
 
-    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and o.clinical_dept_uid is not null and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2 and o.clinical_dept_uid=?3 ",nativeQuery=true)
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and o.clinical_dept_uid is not null and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2 and o.clinical_dept_uid=?3 order by o.name_py_code asc",nativeQuery=true)
     public List<AssetInfo> findBySelfClinicalScope(String siteUID,String userUid,String clinicalDeptUid);
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
