@@ -105,16 +105,16 @@
                         <f:facet name="sourceCaption">待选设备</f:facet>
                         <f:facet name="targetCaption">已选设备</f:facet>
                         <p:ajax event="transfer" listener="#{maintainConfigController.onAssetsTransfer}"/>
-                        <p:column>
+                        <p:column style="float: left;width:25%;text-align:left;">
                             <h:outputText value="#{item.name}" />
                         </p:column>
-                        <p:column>
+                        <p:column style="float: left;width:25%;text-align:left;">
                             <h:outputText value="#{item.departNum}" />
                         </p:column>
-                         <p:column>
+                         <p:column style="float: left;width:25%;text-align:left;">
                             <h:outputText value="#{item.clinicalDeptName}" />
                         </p:column>
-                        <p:column>
+                        <p:column style="float: left;width:25%;text-align:left;">
                             <h:outputText value="#{item.functionType}" />
                         </p:column>
                     </p:pickList>
