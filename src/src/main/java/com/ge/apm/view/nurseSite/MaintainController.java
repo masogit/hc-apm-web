@@ -52,6 +52,7 @@ public class MaintainController {
 	private ScheduleModel lazyEventModel;
 	private DefaultScheduleEvent event;
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
+	private List<NurseSiteMaintainConfig> showListNurseSiteMaintainConfig;
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
 	private List<OrgInfo> listCheckClinicalOrgInfo;
@@ -80,10 +81,6 @@ public class MaintainController {
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID(),currentUser.getUid());
-//		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
-//			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
-//			loadMaintainConfig();
-//		}
 		loadUserOrgInfo();
 	}
 	
@@ -367,6 +364,24 @@ public class MaintainController {
 	}
 	
 	public void onClinicalOrgInfoChange(){
+		if(showListNurseSiteMaintainConfig==null){
+			showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
+		}
+		else{
+			showListNurseSiteMaintainConfig.clear();
+		}
+		if(listNurseSiteMaintainConfig!=null){
+			Set<String> setClinicalDeptUid=new HashSet<String>();
+			for(int i=0;i<listCheckClinicalOrgInfo.size();++i){
+				setClinicalDeptUid.add(listCheckClinicalOrgInfo.get(i).getUid());
+			}
+			for(int i=0;i<listNurseSiteMaintainConfig.size();++i){
+				String tempUid=listNurseSiteMaintainConfig.get(i).getClinicalDeptUID();
+				if(setClinicalDeptUid.contains(tempUid)){
+					showListNurseSiteMaintainConfig.add(listNurseSiteMaintainConfig.get(i));
+				}
+			}
+		}
 		loadMaintainData();
 	}
 
@@ -458,7 +473,6 @@ public class MaintainController {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
-		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(currentUser.getSiteUID(),currentUser.getUid(),startBatchDate, endBatchDate);
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			for(int i=0;i<listMaintainData.size();++i){
 				nurseSiteMaintainService.updateMaintainDataStatus(listMaintainData.get(i),true);
@@ -577,6 +591,14 @@ public class MaintainController {
 
 	public void setListCheckClinicalOrgInfo(List<OrgInfo> listCheckClinicalOrgInfo) {
 		this.listCheckClinicalOrgInfo = listCheckClinicalOrgInfo;
+	}
+
+	public List<NurseSiteMaintainConfig> getShowListNurseSiteMaintainConfig() {
+		return showListNurseSiteMaintainConfig;
+	}
+
+	public void setShowListNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> showListNurseSiteMaintainConfig) {
+		this.showListNurseSiteMaintainConfig = showListNurseSiteMaintainConfig;
 	}
 	
 }
