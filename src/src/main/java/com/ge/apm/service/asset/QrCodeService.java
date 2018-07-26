@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
@@ -17,6 +18,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.TimeUtils;
@@ -77,6 +79,9 @@ public class QrCodeService {
 
     @Autowired
     private OrgInfoRepository orgDao;
+    
+    @Autowired
+    private BlobFileService blobObjectService;
 
     public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
         if (tenantUID == null || siteUID == null) {
@@ -632,6 +637,20 @@ public class QrCodeService {
                 qrCodeLibDao.save(qrCodeLib);
             }
 
+        }
+    }
+    
+    public void releaseQrCode(String qrCode, String siteUid) {
+        QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
+        if (qrCodeLib != null) {
+            if (qrCodeLib.getStatus() != 1) {
+                qrCodeLib.setStatus(1);
+                qrCodeLibDao.save(qrCodeLib);
+                List<V2_BlobObject> blobObjectsList=  blobObjectService.findBlobObjectsByBoUid(qrCodeLib.getUid());
+                blobObjectsList.forEach(item->{
+                    blobObjectService.deleteBlobFile(item);
+                });
+            }
         }
     }
 
