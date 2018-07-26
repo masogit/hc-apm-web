@@ -73,6 +73,7 @@ public class MaintainController {
     //inner
     private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
     private Date dayDate;
+    private String signatureContent;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 
 	@PostConstruct
@@ -359,6 +360,16 @@ public class MaintainController {
 		}
 	}
 	
+	public void saveMaintainSignature(){
+		nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
+	}
+	
+	public void getMaintainSignature(){
+		if(StringUtils.isNotEmpty(nurseSiteMaintain.getSignatureId())){
+			signatureContent=nurseSiteMaintainService.getMaintainSignature(nurseSiteMaintain.getSignatureId());
+		}
+	}
+	
 	public void onNurseSiteMaintainConfigChange(){
 		loadMaintainConfig();
 	}
@@ -600,5 +611,12 @@ public class MaintainController {
 	public void setShowListNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> showListNurseSiteMaintainConfig) {
 		this.showListNurseSiteMaintainConfig = showListNurseSiteMaintainConfig;
 	}
-	
+
+	public String getSignatureContent() {
+		return signatureContent;
+	}
+
+	public void setSignatureContent(String signatureContent) {
+		this.signatureContent = signatureContent;
+	}
 }
