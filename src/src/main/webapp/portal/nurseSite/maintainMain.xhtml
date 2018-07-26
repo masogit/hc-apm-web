@@ -72,34 +72,34 @@
                 						<th>
                 							<label class="label">设备型号</label>
                 						</th>
-               							<c:forEach items="#{maintainController.nurseSiteMaintain.showLables}" var="item">
+                						<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item">
                 							<th>
                 								<label class="label">#{item}</label>
                 							</th>
-               							</c:forEach>
+                						</p:repeat>
                 					</tr>
-			                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
-			                   			<tr>
+									<p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
+										<tr>
 			                   				<td>
-			                   					#{item.assetInfo.name}
+			                   					<h:outputText value="#{item2.assetInfo.name}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.departNum}
+			                   					<h:outputText value="#{item2.assetInfo.departNum}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.serialNum}
+			                   					<h:outputText value="#{item2.assetInfo.serialNum}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.functionType}
+			                   					<h:outputText value="#{item2.assetInfo.functionType}"/>
 			                   				</td>
-			                   				<c:forEach items="#{maintainController.nurseSiteMaintain.showLables}" var="item2">
+			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
 			                   					<td>
-					                           	 	<p:selectBooleanCheckbox value="#{item.getDataValue(item2).checkValue}" />
+					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
 			                    				</td>
-											</c:forEach>
+											</p:repeat>
 			                    		</tr>
-									</c:forEach>
-			                   	</table>
+									</p:repeat>
+								</table>
                    			</div>
                    		</div>
 	                   	<h:panelGrid columnClasses="value" columns="1">
