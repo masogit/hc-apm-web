@@ -23,7 +23,7 @@
 						<p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" >
 							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
 							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
-	                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+	                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 	                        <p:column>
 								<h:outputText value="#{t!=null?t.name:'请选择...'}" />
 							</p:column>
