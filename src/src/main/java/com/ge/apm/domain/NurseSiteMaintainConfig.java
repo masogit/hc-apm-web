@@ -101,6 +101,9 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	
 	@Column(name="name")
 	private String name;
+	
+	@Column(name="apply_directly")
+	private Boolean applyDirectly=false;
 
 	public String getId() {
 		return id;
@@ -244,6 +247,20 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 
 	public void setClinicalDeptName(String clinicalDeptName) {
 		this.clinicalDeptName = clinicalDeptName;
+	}
+
+	public Boolean getApplyDirectly() {
+		if(applyDirectly==null){
+			applyDirectly=false;
+		}
+		return applyDirectly;
+	}
+
+	public void setApplyDirectly(Boolean applyDirectly) {
+		if(applyDirectly==null){
+			applyDirectly=false;
+		}
+		this.applyDirectly = applyDirectly;
 	}
 
 	@Override
