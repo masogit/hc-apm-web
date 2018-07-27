@@ -12,12 +12,14 @@ import webapp.framework.dao.SearchFilter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AssetFileImportSupportingService {
 
     public static final String ASSET_CODE_MERGE_THREE = "DFQ";
     public static final String ASSET_CODE_MERGE_TWO = "DF";
+    public static final String OLD_QRCODE_KEY = "old_qrcode";
 
     @Autowired
     private UserAccountRepository userDao;
@@ -33,6 +35,10 @@ public class AssetFileImportSupportingService {
 
     @Autowired
     private AssetInfoRepository assetDao;
+
+    @Autowired
+    private QrCodeService qrCodeService;
+
 
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
 
@@ -238,6 +244,64 @@ public class AssetFileImportSupportingService {
             asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
             asset.setLastModifiedDate(now);
         }
+    }
+
+    /**
+     * check whether qrcode is new or changed
+     * @param assetInfo
+     * @param assetMap
+     * @return
+     */
+    public boolean isQrCodeNewOrChanged(AssetInfo assetInfo, Map<String, Object> assetMap) {
+
+        if (StringUtils.isEmpty(assetInfo.getQrCode())) {
+            throw new IllegalArgumentException("QrCode should not be empty!");
+        }
+
+        if (StringUtils.isEmpty(assetInfo.getUid())) {
+            return true;
+        }
+
+        String oldQrCode = (String)assetMap.get(OLD_QRCODE_KEY);
+
+        if (assetInfo.getQrCode().equals(oldQrCode)) {
+            return false;  //qrCode not changed
+        }
+
+        return true;
+    }
+
+    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, List<Map<String, Object>> importAssetMap) {
+
+        importAssetMap.forEach(item -> {
+            AssetInfo newAsset = (AssetInfo) item.get("asset");
+
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
+            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+            if (StringUtils.isEmpty(oldQrCode)) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
+
+            boolean releaseable = true;
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                if (!exists) {
+                    releaseable = false;
+                }
+            }
+
+            if (releaseable) {
+                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            }
+
+        });
+
     }
 
 }
