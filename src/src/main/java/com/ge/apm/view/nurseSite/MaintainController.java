@@ -309,6 +309,11 @@ public class MaintainController {
 			// TODO: handle exception
 			LOGGER.error("getLables error"+e.getMessage());
 		}
+		initValue();
+	}
+	
+	private void initValue(){
+		signatureContent=null;
 	}
 	
 	public void checkRightAll(){
@@ -361,13 +366,19 @@ public class MaintainController {
 	}
 	
 	public void saveMaintainSignature(){
-		nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
+		if(StringUtils.isNotEmpty(signatureContent)){
+			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
+		}
 	}
 	
 	public void getMaintainSignature(){
 		if(StringUtils.isNotEmpty(nurseSiteMaintain.getSignatureId())){
 			signatureContent=nurseSiteMaintainService.getMaintainSignature(nurseSiteMaintain.getSignatureId());
 		}
+	}
+	
+	public void resetMaintainSignature(){
+		signatureContent=null;
 	}
 	
 	public void onNurseSiteMaintainConfigChange(){

@@ -152,10 +152,11 @@
                 		<h:panelGrid columnClasses="value" columns="1">
 		                	<h:panelGroup>
 								<!-- <img src="/hcapmobjecthubservice/api/apm/objectHub/objects/#{maintainController.nurseSiteMaintain.signatureId}"></img> -->
-								<p:signature style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="true" guideline="true"/>
+								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" guideline="true"/>
 							</h:panelGroup>
 						</h:panelGrid>
-						<p:commandButton value="保存" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();"/>
+						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{empty maintainController.signatureContent}"/>
+						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" rendered="#{empty maintainController.signatureContent}"/>
 						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();"/>
 					</h:form>
                 </p:dialog>
