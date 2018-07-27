@@ -238,5 +238,12 @@ public class AssetRow {
         }
     }
 
+    public static void clearErrMessage(Map<String, Object> item) {
+        if (item.containsKey("errmsg")) {
+            List<String> errMsgs = ((List<String>) item.get("errmsg"));
+            errMsgs.clear();
+        }
+    }
+
 
 }

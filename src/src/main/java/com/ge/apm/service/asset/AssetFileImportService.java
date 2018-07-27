@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -299,14 +298,13 @@ public class AssetFileImportService {
 
             if (orgInfo == null) {
                 supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
-                item.put("status", ImportStatus.Created);
-            } else {
-                item.put("status", ImportStatus.Exist);
             }
+
+            item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
         });
 
         //release qrcode in use in order to exchange qrcode in two different asset
-        releaseQRCodeInUse(importAssetMap);
+        supportingService.releaseOldQRCodeInUse(selectedOrgToImport, importAssetMap);
 
         importAssetMap.forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
@@ -319,6 +317,10 @@ public class AssetFileImportService {
 
             }
 
+            AssetRow.clearErrMessage(item);
+
+            item.put("status", StringUtils.isEmpty(newAsset.getUid()) ? ImportStatus.Created : ImportStatus.Exist);
+
             //check depart num to avoid duplicate when update
             boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
             if (isDuplicate) {
@@ -330,14 +332,12 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
-//                AssetRow.addErrMessage(item, "错误: 科室为空");
+                AssetRow.addErrMessage(item, "错误: 科室为空");
                 return;
             } else {
-
                 OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
                 newAsset.setClinicalDeptId(orgInfo.getId());
                 newAsset.setClinicalDeptUID(orgInfo.getUid());
-
             }
 
             UserAccount userAccount;
@@ -451,78 +451,40 @@ public class AssetFileImportService {
 
             }
 
-            String qrCode = newAsset.getQrCode();
 
-            List<AssetInfo> assetList = getAssetInfos(newAsset);
-            if (null == assetList || assetList.isEmpty()) {
-
-                if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
-                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
-                    if (!"Normal".equals(qrCodeStatus)) {
-                        item.put("status", ImportStatus.Failure);
-                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
-                    }
-
-                    if(createAsset(newAsset,isGeneratePmOrder)){
-                        item.put("status", ImportStatus.Created);
-                    }else{
-                        item.put("status", ImportStatus.Failure);
-                    }
-
-                } else {
-
-                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
-                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
-                        newAsset.setQrCode(newCode.getQrCode());
-                        if(createAsset(newAsset,isGeneratePmOrder)){
-                            item.put("status", ImportStatus.Created);
-                        }else{
-                            item.put("status", ImportStatus.Failure);
-                        }
-                    } else if (isAvailableQrcode(qrCode, item)) {
-                        if(createAsset(newAsset,isGeneratePmOrder)){
-                            item.put("status", ImportStatus.Created);
-                        }else{
-                            item.put("status", ImportStatus.Failure);
-                        }
-                    } else {
-                        item.put("status", ImportStatus.Failure);
-//                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
-                    }
+            //create qr code if needed, make new qrcode in used.
+            if (StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (autoGenerateQrcode) {
+                    QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                    newAsset.setQrCode(newCode.getQrCode());
                 }
-
-
-            } else if (assetList.size() > 1) {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
 
-                if (StringUtils.isEmpty(qrCode)) {
-                    if (autoGenerateQrcode) {
+                boolean changed = supportingService.isQrCodeNewOrChanged(newAsset, item);
+
+                if (changed) {
+                    QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(),newAsset.getSiteUID());
+                    if (qrCodeLib == null) {
                         QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
                         newAsset.setQrCode(newCode.getQrCode());
-                    }
-
-                } else {
-                    String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-                    if (!qrCode.equals(oldQrCode)) {
-
-                        boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
-                        if (!qrCodeUpdated) {
+                    } else {
+                        if (qrCodeLib.getStatus() == 1) {//已发行
+                            qrCodeLib.setStatus(3);//已建档
+                            qrcodeDao.save(qrCodeLib);
+                        } else {
                             item.put("status", ImportStatus.Failure);
-                            AssetRow.addErrMessage(item, "错误: 无效二维码");
+                            AssetRow.addErrMessage(item, "错误: 该二维码已使用！");
                             return;
                         }
 
                     }
                 }
 
-                item.put("status", ImportStatus.Exist);
-                assetDao.save(newAsset);
-
-                assetDepreciationService.saveAssetDerpeciation(newAsset);
-
             }
+
+            //if import status failure, already returned, will not reach here.
+            assetDao.save(newAsset);
+            assetDepreciationService.saveAssetDerpeciation(newAsset);
 
         });
 
@@ -533,27 +495,27 @@ public class AssetFileImportService {
     }
 
 
-    private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
-        if (null == qrcode || qrcode.isEmpty()) {
-            return true;
-        }
-
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
-        if (qrCodeLib == null) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-            return false;
-        }
-        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-            return false;
-        }
-        if (qrCodeLib.getStatus() != 1) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-            return false;
-        }
-
-        return true;
-    }
+//    private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
+//        if (null == qrcode || qrcode.isEmpty()) {
+//            return true;
+//        }
+//
+//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
+//        if (qrCodeLib == null) {
+//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
+//            return false;
+//        }
+//        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
+//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
+//            return false;
+//        }
+//        if (qrCodeLib.getStatus() != 1) {
+//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
@@ -578,21 +540,6 @@ public class AssetFileImportService {
         return hasFailData;
     }
 
-    @Transactional
-    Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
-        if(!assetCreateService.createAsset(asset,isGeneratePmOrder)){
-            return false;
-        }
-        if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
-            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode(),asset.getSiteUID());
-            if (qrCodeLib != null) {
-                qrCodeLib.setStatus(3);
-                qrcodeDao.save(qrCodeLib);
-            }
-        }
-        return true;
-    }
-
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
 
@@ -610,14 +557,6 @@ public class AssetFileImportService {
 
     }
 
-    private List<UserAccount> getUserInfosByName(String userName) {
-        List<SearchFilter> userFilters = new ArrayList<>();
-//        userFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-        userFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        userFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, userName));
-        return userDao.findBySearchFilter(userFilters);
-    }
-
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
@@ -628,11 +567,7 @@ public class AssetFileImportService {
 
             OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
 
-            if (orgInfo == null) {
-                item.put("status", ImportStatus.New);
-            } else {
-                item.put("status", ImportStatus.Exist);
-            }
+            item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
         });
 
         int row = 0;
@@ -641,30 +576,26 @@ public class AssetFileImportService {
 
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
-            List<AssetInfo> assetList = getAssetInfos(newAsset);
-            if (null == assetList || assetList.isEmpty()) {
-
-                if (!StringUtils.isEmpty(newAsset.getUid())) {
-                    //检查是否输入非法UUID
+            if (!StringUtils.isEmpty(newAsset.getUid())) {
+                //检查是否输入非法UUID
+                if (!tenantUID.equals(newAsset.getTenantUID())) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
                     AssetRow.addErrMessage(item, String.format("第%d行错误: 非法UUID！", row));
+                    continue;
+                }
+            }
 
-                } else {
-                    String qrCode = newAsset.getQrCode();
-                    if (isAvailableQrcode(qrCode, item)) {
-                        item.put("status", ImportStatus.New);
-                    } else {
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
+                    boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                    if (!isAvailable) {
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
-//                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                        continue;
                     }
                 }
-
-            } else if (assetList.size() > 1) {
-                item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             }
 
             if (null == newAsset.getAssetGroup()) {
@@ -684,13 +615,6 @@ public class AssetFileImportService {
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
                 AssetRow.addErrMessage(item, "错误: 科室为空");
-//            } else {
-//                OrgInfo orgInfo = getOrgInfoByName(orgName);
-//
-//                if (orgInfo == null) {
-//                    item.put("status", ImportStatus.CheckFail);
-//                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-//                }
             }
 
             //check depart num to avoid duplicate when update
@@ -801,38 +725,7 @@ public class AssetFileImportService {
 
     }
 
-    private void releaseQRCodeInUse(List<Map<String, Object>> importAssetMap) {
 
-        importAssetMap.forEach(item -> {
-            AssetInfo newAsset = (AssetInfo) item.get("asset");
-
-            //if site uid not match, ignore update
-            if (newAsset.getUid() != null) {
-                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-                    return ;
-                }
-
-            }
-
-            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-            if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
-
-            boolean releaseable = true;
-            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-                if (!exists) {
-                    releaseable = false;
-                }
-            }
-
-            if (releaseable) {
-                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
-            }
-
-        });
-
-    }
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -843,6 +736,8 @@ public class AssetFileImportService {
             assetCodeConfig = workflowConfig.getAssetCodeConfig();
         }
     }
+
+
 
 
 
