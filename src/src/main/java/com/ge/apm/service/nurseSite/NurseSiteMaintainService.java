@@ -324,10 +324,13 @@ public class NurseSiteMaintainService{
 		return objStatus;
 	}
 	
-	public void updateMaintainDataStatus(NurseSiteMaintain obj,boolean batchUpdate){
+	public void updateMaintainDataStatus(NurseSiteMaintain obj,boolean batchUpdate,String signatureId){
 		if(batchUpdate){
 			if(obj.getStatus()==0){
 				obj.setStatus(2);
+				if(StringUtils.isNotEmpty(signatureId)){
+					obj.setSignatureId(signatureId);
+				}
 				updateMaintainData(obj,true);
 			}
 		}
@@ -425,27 +428,6 @@ public class NurseSiteMaintainService{
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(id);
             blobFileService.saveBlobObject(blobObject);
-            return blobObject.getObjectStorageId();
-        }
-        else{
-        	return null;
-        }
-	}
-	
-	public String saveMaintainSignature(String content,List<NurseSiteMaintain> listMaintain){
-		V2_BlobObject blobObject=null;
-		try {
-			blobObject = blobFileService.uploadFileString(content);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
-			return null;
-		}
-        if (null != blobObject) {
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-//            blobObject.setBoUuid(id);
-//            blobFileService.saveBlobObject(blobObject);
             return blobObject.getObjectStorageId();
         }
         else{
