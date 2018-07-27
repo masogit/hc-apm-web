@@ -20,7 +20,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
 						<label class="label">请选择配置</label>
-						<p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" >
+						<p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
 							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
 							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
 	                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />

@@ -21,25 +21,8 @@
                     <br/>
                     <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
                     	<label>科室：</label>
-						<!-- <p:selectOneMenu value="#{maintainController.currentClicinalOrgInfo}" var="t" converter="orgInfoConverter">
-							<p:ajax event="change" listener="#{maintainController.onClinicalOrgInfoChange}" update=":maintainForm:maintain"></p:ajax>
-							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
-	                        <f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-	                        <p:column>
-								<h:outputText value="#{t!=null?t.name:'请选择...'}" />
-							</p:column>
-	                    </p:selectOneMenu> -->
-	                    <!-- <p:selectManyMenu value="#{maintainController.listCheckClinicalOrgInfo}" var="t" required="true" converter="orgInfoConverter"
-	                        filter="true" filterMatchMode="contains" showCheckbox="true" style="width:300px;">
-	                        <p:ajax event="change" listener="#{maintainController.onClinicalOrgInfoChange}" update=":maintainForm:maintain"></p:ajax>
-	                        <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
-	                        <f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-	                        <p:column>
-	                            <h:outputText value="#{t!=null?t.name:'请选择...'}" />
-	                        </p:column>
-	                    </p:selectManyMenu> -->
 						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
-							converter="orgInfoConverter" required="false" 
+							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
 							label="------请选择------" 
 							updateLabel="true" showHeader="false">
 							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
@@ -131,7 +114,7 @@
                 				<label>请选择配置: </label>
                 			</h:panelGroup>
                 			<h:panelGroup>
-								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true">
+								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
 									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
 									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
@@ -152,7 +135,7 @@
                 		<h:panelGrid columnClasses="value" columns="1">
 		                	<h:panelGroup>
 								<!-- <img src="/hcapmobjecthubservice/api/apm/objectHub/objects/#{maintainController.nurseSiteMaintain.signatureId}"></img> -->
-								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" guideline="true"/>
+								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
 							</h:panelGroup>
 						</h:panelGrid>
 						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{empty maintainController.signatureContent}"/>
