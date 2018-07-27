@@ -46,17 +46,11 @@
 				<h:panelGroup id="typeValueId">
 					<span id="type1Span" style="#{maintainConfigController.selected.type==1?'display:block;':'display:none;'}">
 						<label class="label">维护频率(次)</label>
-						<!-- <p:selectManyMenu value="#{maintainConfigController.listCheckDate}" var="t" required="#{maintainConfigController.selected.type==1?true:false}" filter="true" filterMatchMode="contains" showCheckbox="true">
-							<f:selectItems value="#{maintainConfigController.checkListHours}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
-							<p:column>
-								<h:outputText value="#{t}时" />
-							</p:column>
-						</p:selectManyMenu> -->
-						<p:inputText value="#{maintainConfigController.perDayCount}" required="#{maintainConfigController.selected.type==1?true:false}"></p:inputText>
+						<p:inputText value="#{maintainConfigController.perDayCount}" required="#{maintainConfigController.selected.type==1?true:false}" requiredMessage="维护频率(次) #{msg.ValidationRequire}"></p:inputText>
 					</span>
 					<span id="type2Span" style="#{maintainConfigController.selected.type==2?'display:block;':'display:none;'}">
 						<label class="label">维护频率</label>
-						<p:selectManyMenu value="#{maintainConfigController.listWeekDay}" var="t" required="#{maintainConfigController.selected.type==2?true:false}" showCheckbox="true">
+						<p:selectManyMenu value="#{maintainConfigController.listWeekDay}" var="t" required="#{maintainConfigController.selected.type==2?true:false}" requiredMessage="维护频率 #{msg.ValidationRequire}" showCheckbox="true">
 							<f:selectItems value="#{maintainConfigController.checkListWeekDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t==2?'星期一':t==3?'星期二':t==4?'星期三':t==5?'星期四':t==6?'星期五':t==7?'星期六':t==1?'星期日':''}" />
@@ -65,7 +59,7 @@
 					</span>
 					<span id="type3Span" style="display:none;">
 						<label class="label">维护频率</label>
-						<p:selectManyMenu value="#{maintainConfigController.listMonthDay}" var="t" required="#{maintainConfigController.selected.type==3?true:false}" filter="true" filterMatchMode="contains" showCheckbox="true">
+						<p:selectManyMenu value="#{maintainConfigController.listMonthDay}" var="t" required="#{maintainConfigController.selected.type==3?true:false}" requiredMessage="维护频率 #{msg.ValidationRequire}" filter="true" filterMatchMode="contains" showCheckbox="true">
 							<f:selectItems value="#{maintainConfigController.checkListMonthDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t}日" />
@@ -73,31 +67,9 @@
 						</p:selectManyMenu>
 					</span>
 				</h:panelGroup>
-				<!-- <h:panelGroup>
-					<label class="label">检查项*</label>
-					<p:inputText value="#{maintainConfigController.selected.checkItems}" required="true" requiredMessage="检查项不能为空" placeholder="请输入检查项并以空格分割"></p:inputText>
-				</h:panelGroup> -->
 			</p:panelGrid>
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-				<!-- <h:panelGroup>
-					<label class="label">科室*</label>
-					<p:selectManyMenu value="#{maintainConfigController.listOrgInfo}" var="t" required="true" converter="orgInfoConverter"
-						filter="true" filterMatchMode="contains" showCheckbox="true" style="width:300px;">
-						<f:selectItems value="#{maintainConfigController.checkListOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-						<p:column>
-							<h:outputText value="#{t.name}" />
-						</p:column>
-					</p:selectManyMenu>
-				</h:panelGroup> -->
 				<h:panelGroup>
-					<!-- <label class="label">检查设备*</label>
-					<p:selectManyMenu value="#{maintainConfigController.listCheckAssets}" var="t" required="true" converter="assetInfoConverter"
-						filter="true" filterMatchMode="contains" showCheckbox="true" style="width:300px;">
-						<f:selectItems value="#{maintainConfigController.checkListAssets}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-						<p:column>
-							<h:outputText value="#{t.name} / #{t.departNum}" />
-						</p:column>
-					</p:selectManyMenu> -->
 					<p:pickList id="AssetsPickList" value="#{maintainConfigController.availableAssets}" var="item"
                                 itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
@@ -137,7 +109,7 @@
                  <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                      <h:panelGroup>
                          <label>#{msg.name} *：</label>
-                         <p:inputText id="name" value="#{maintainConfigController.objCheckItem.name}" required="true"/>
+                         <p:inputText id="name" value="#{maintainConfigController.objCheckItem.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                      </h:panelGroup>
                       <h:panelGroup>
                          <label>备注：</label>
