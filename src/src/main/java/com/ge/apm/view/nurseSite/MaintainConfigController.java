@@ -57,7 +57,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
-  	private boolean blnModifyAll=true;
   	
   	//dropdownlist
   	private Integer perDayCount;
@@ -67,9 +66,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<AssetInfo> checkListAssets;
   	private List<OrgInfo> checkListOrgInfo;
   	private List<String> orgUidList;
-  	private List<String> userUidList;
   	private DualListModel<AssetInfo> availableAssets;
-  	
+  	private boolean filterScopeByClinicalDept=false;
   	private boolean isSaveDisable=true;
   	
     @Override
@@ -79,8 +77,19 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
+        if(orgUidList!=null && orgUidList.size()==1){
+        	OrgInfo tempOrgInfo=nurseSiteMaintainService.findOrgInfoByUid(orgUidList.get(0));
+        	if(tempOrgInfo.getOrgType()!=null && tempOrgInfo.getOrgType()==4){
+        		filterScopeByClinicalDept=true;
+        	}
+        	else{
+        		filterScopeByClinicalDept=false;
+        	}
+        }
+        else if(orgUidList!=null && orgUidList.size()>1){
+        	filterScopeByClinicalDept=true;
+        }
         checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
-        loadUserUidList();
         //test
     }
 
@@ -95,7 +104,15 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        searchFilters.add(new SearchFilter("createBy.uid", SearchFilter.Operator.IN, userUidList, "1*"));
+        if(filterScopeByClinicalDept){
+        	searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*"));
+        }
+        else{
+        	searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        	searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        	searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        	searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
@@ -223,11 +240,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	//当前user的可见范围的orgUid,
-	private void loadUserUidList(){
-		if(orgUidList!=null && orgUidList.size()>0){
-			userUidList=nurseSiteMaintainService.findUserUidListByOrgUids(orgUidList);
-		}
-	}
+//	private void loadUserUidList(){
+//		if(orgUidList!=null && orgUidList.size()>0){
+//			userUidList=nurseSiteMaintainService.findUserUidListByOrgUids(orgUidList);
+//		}
+//	}
 	
 	public boolean checkListCheckAssets(){
 		boolean result=false;
@@ -305,10 +322,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		nurseSiteMaintainConfig.setCheckItems(tempResult);
 		if(isSave){
-			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets,blnModifyAll);
+			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
 		}
 		else{
-			nurseSiteMaintainService.updateMaintainConfig(nurseSiteMaintainConfig,currentUser, listCheckAssets,blnModifyAll);
+			nurseSiteMaintainService.updateMaintainConfig(nurseSiteMaintainConfig,currentUser, listCheckAssets);
 		}
 		return true;
 	}
@@ -516,14 +533,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setSaveDisable(boolean isSaveDisable) {
 		this.isSaveDisable = isSaveDisable;
-	}
-
-	public boolean isBlnModifyAll() {
-		return blnModifyAll;
-	}
-
-	public void setBlnModifyAll(boolean blnModifyAll) {
-		this.blnModifyAll = blnModifyAll;
 	}
 
 	public DualListModel<AssetInfo> getAvailableAssets() {
