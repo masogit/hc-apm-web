@@ -346,30 +346,36 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					if(listAssetInfo==null || listAssetInfo.size()==0){
-						data.setFinancingNum(data.getFinancingNum().toLowerCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					}
-					if(listAssetInfo==null || listAssetInfo.size()==0){
-						data.setFinancingNum(data.getFinancingNum().toUpperCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					}
-					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
-						data.setAssetInfo(listAssetInfo.get(0));
-						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
-						if(order!=null){
-							data.setV2PmOrder(order);
+					try {
+						List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						if(listAssetInfo==null || listAssetInfo.size()==0){
+							data.setFinancingNum(data.getFinancingNum().toLowerCase());
+							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						}
+						if(listAssetInfo==null || listAssetInfo.size()==0){
+							data.setFinancingNum(data.getFinancingNum().toUpperCase());
+							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						}
+						if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
+							data.setAssetInfo(listAssetInfo.get(0));
+							V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
+							if(order!=null){
+								data.setV2PmOrder(order);
+							}
+							else{
+								data.setWarnMessage("工单未找到");
+							}
+						}
+						else if(listAssetInfo!=null && listAssetInfo.size()>1){
+							data.setWarnMessage("找到多台设备");
 						}
 						else{
-							data.setWarnMessage("工单未找到");
+							data.setWarnMessage("设备未找到");
 						}
-					}
-					else if(listAssetInfo!=null && listAssetInfo.size()>1){
-						data.setWarnMessage("找到多台设备");
-					}
-					else{
-						data.setWarnMessage("设备未找到");
+					} catch (Exception e) {
+						// TODO: handle exception
+						LOGGER.error(e.getMessage());
+						data.setWarnMessage("网络异常");
 					}
 				}
 			}
