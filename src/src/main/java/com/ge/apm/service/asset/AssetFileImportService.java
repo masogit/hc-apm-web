@@ -10,7 +10,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -101,6 +100,9 @@ public class AssetFileImportService {
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
+    @Autowired
+    private AssetFileImportSupportingService supportingService;
+
     private OrgInfo selectedOrgToImport;
 
     private String assetCodeConfig;
@@ -127,18 +129,6 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-//            org.setHospitalId(selectedOrgToImport.getId());
-//            org.setParentOrg(selectedOrgToImport);
-//            org.setSiteId(selectedOrgToImport.getSiteId());
-//
-//            org.setParentUID(selectedOrgToImport.getUid());
-//            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
-//            org.setTenantUID(selectedOrgToImport.getTenantUID());
-//            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-//            org.setSiteUID(selectedOrgToImport.getSiteUID());
-//            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
-//            org.setOrgType(4);
-
             org.setLineNum(dataRow);
 
             Map<String, Object> map = new LinkedHashMap();
@@ -358,7 +348,7 @@ public class AssetFileImportService {
             OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
 
             if (orgInfo == null) {
-                importOrgIfNeeded(newOrgInfo.getName());
+                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
                 item.put("status", ImportStatus.Created);
             } else {
                 item.put("status", ImportStatus.Exist);
@@ -394,7 +384,7 @@ public class AssetFileImportService {
                 return;
             } else {
 
-                OrgInfo orgInfo = importOrgIfNeeded(orgName);
+                OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
                 newAsset.setClinicalDeptId(orgInfo.getId());
                 newAsset.setClinicalDeptUID(orgInfo.getUid());
 
@@ -462,7 +452,7 @@ public class AssetFileImportService {
             Supplier supplier;
             //导入供应商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getVendor())) {
-                supplier = importSupplierIfNeeded(newAsset.getVendor(), newAsset.getVendorTel());
+                supplier = supportingService.importSupplierIfNeeded(selectedOrgToImport, newAsset.getVendor(), newAsset.getVendorTel());
                 newAsset.setSupplierId(supplier.getId());
             } else {
                 newAsset.setSupplierId(null);
@@ -470,7 +460,7 @@ public class AssetFileImportService {
 
             ////导入维修商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
-                supplier = importMaintainancerIfNeeded(newAsset.getMaitanance(), newAsset.getMaitananceTel());
+                supplier = supportingService.importMaintainancerIfNeeded(selectedOrgToImport, newAsset.getMaitanance(), newAsset.getMaitananceTel());
                 newAsset.setMaitananceId(supplier.getId().toString());
             } else {
                 newAsset.setMaitananceId(null);
@@ -478,7 +468,7 @@ public class AssetFileImportService {
 
             ////导入制造商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getManufacture())) {
-                supplier = importManufacturerIfNeeded(newAsset.getManufacture());
+                supplier = supportingService.importManufacturerIfNeeded(selectedOrgToImport, newAsset.getManufacture());
                 newAsset.setManufactureId(supplier.getId().toString());
             } else {
                 newAsset.setManufactureId(null);
@@ -588,97 +578,6 @@ public class AssetFileImportService {
 
     }
 
-    private OrgInfo importOrgIfNeeded(String name) {
-
-        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
-
-        if (orgInfo == null) {
-            TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
-            orgInfo = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, name, selectedOrgToImport, selectedOrgToImport.getOrgLevel());
-            orgDao.save(orgInfo);
-        }
-
-        return orgInfo;
-
-    }
-
-    private Supplier importSupplierIfNeeded(String name, String tel) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setSupplierT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
-            supplier.setSupplierT(true);
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
-
-    private Supplier importMaintainancerIfNeeded(String name, String tel) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setMaintainerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
-            supplier.setMaintainerT(true);
-            if (!StringUtils.isEmpty(tel)) {
-                supplier.setTel(tel);
-            }
-
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
-
-    private Supplier importManufacturerIfNeeded(String name) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setManufacturerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
-            supplier.setManufacturerT(true);
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
 
     private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
         if (null == qrcode || qrcode.isEmpty()) {
