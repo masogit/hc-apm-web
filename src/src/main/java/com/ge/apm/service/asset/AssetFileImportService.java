@@ -370,7 +370,7 @@ public class AssetFileImportService {
             }
 
             //check depart num to avoid duplicate when update
-            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 设备编号重复");
@@ -478,7 +478,7 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (needGenerateFinancingNum(newAsset)) {
+            if (supportingService.needGenerateFinancingNum(workflowConfig, newAsset)) {
 
                 //修改的时候不需要生成资产编号
                 financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -639,19 +639,6 @@ public class AssetFileImportService {
         return true;
     }
 
-    private OrgInfo getOrgInfoByName(String name) {
-        List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
-        OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, name));
-        List<OrgInfo> orgInfos = orgDao.findBySearchFilter(OrgInfoFilters);
-        if (orgInfos.size() == 0) {
-            return null;
-        } else {
-            return orgInfos.get(0);
-        }
-    }
-
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
 
@@ -669,46 +656,12 @@ public class AssetFileImportService {
 
     }
 
-    private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
-
-        if (StringUtils.isEmpty(asset.getDepartNum())) {
-            return false;
-        }
-
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        String orgUid = selectedOrgToImport.getUid();
-
-        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-
-        if (null != asset.getUid()) {
-            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, asset.getUid()));
-        }
-
-        List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
-        if (resultList.size() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
     private List<UserAccount> getUserInfosByName(String userName) {
         List<SearchFilter> userFilters = new ArrayList<>();
 //        userFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
         userFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         userFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, userName));
         return userDao.findBySearchFilter(userFilters);
-    }
-
-    private List<Supplier> getSupplierListByName(String supplierName) {
-        List<SearchFilter> supplierFilters = new ArrayList<>();
-        supplierFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        supplierFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, supplierName));
-        supplierFilters.add(new SearchFilter("supplierT", SearchFilter.Operator.EQ, true));
-        return supplierDao.findBySearchFilter(supplierFilters);
     }
 
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
@@ -787,7 +740,7 @@ public class AssetFileImportService {
             }
 
             //check depart num to avoid duplicate when update
-            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
@@ -937,36 +890,6 @@ public class AssetFileImportService {
         }
     }
 
-    private boolean needGenerateFinancingNum(AssetInfo assetInfo) {
 
-        final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
-        final int GENERATE_BY_PREFIX_AND_SEQ = 2;
-
-        if (workflowConfig == null) return false;
-
-        assetCodeConfig = workflowConfig.getAssetCodeConfig();
-
-        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
-            return false;
-        }
-
-        if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
-            String financingNum = assetInfo.getFinancingNum();
-
-            if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
-
-                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
-                    return true;
-                }
-
-            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
-                if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
 }
