@@ -82,6 +82,8 @@ public class MaintainController {
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID(),currentUser.getUid());
+		showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
+		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserOrgInfo();
 	}
 	
@@ -309,10 +311,9 @@ public class MaintainController {
 			// TODO: handle exception
 			LOGGER.error("getLables error"+e.getMessage());
 		}
-		initValue();
 	}
 	
-	private void initValue(){
+	private void initValueAfterEvent(){
 		signatureContent=null;
 	}
 	
@@ -368,6 +369,7 @@ public class MaintainController {
 	public void saveMaintainSignature(){
 		if(StringUtils.isNotEmpty(signatureContent)){
 			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
+			signatureContent=null;
 		}
 	}
 	
@@ -495,11 +497,20 @@ public class MaintainController {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(endBatchDate);
+		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
+		Date tempEndBatchDate=ca.getTime();
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			for(int i=0;i<listMaintainData.size();++i){
-				nurseSiteMaintainService.updateMaintainDataStatus(listMaintainData.get(i),true);
+				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
+				Date tempDate=tempMaintain.getScheduleDate();
+				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<tempEndBatchDate.getTime()){
+					nurseSiteMaintainService.updateMaintainDataStatus(tempMaintain,true);
+				}
 			}
 		}
+		nurseSiteMaintainService.saveMaintainSignature(signatureContent, listMaintainData);
 		nurseSiteMaintainService.save(listMaintainData);
 		addMessage("报告已批量填写");
 		return "maintainMain?faces-redirect=true";
