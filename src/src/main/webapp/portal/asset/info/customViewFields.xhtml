@@ -97,7 +97,7 @@
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'makerShortName')}">
         <h:panelGroup >
-            <label class="label">品牌/制造商简称</label>
+            <label class="label">#{msg.makerShortName}}</label>
             <p:inputText id="makerShortName" value="#{assetInfoDetailController.selected.makerShortName}"/>
         </h:panelGroup>
     </c:if>
@@ -420,7 +420,7 @@
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warranty')}">
         <h:panelGroup>
-            <label class="label">是否对质保到期进行提醒</label>
+            <label class="label">#{msg.isWarrantyNotice}</label>
             <p:selectOneRadio value="#{assetInfoDetailController.selected.warranty}" disabled="true">
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
