@@ -3,12 +3,14 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -180,6 +182,62 @@ public class AssetFileImportSupportingService {
         }
 
         return false;
+    }
+
+
+    public void cleanRelatedFieldsWhenUpdating(AssetInfo asset) {
+        if (asset.getAssetOwnerName() == null) {
+            asset.setAssetOwnerId(null);
+            asset.setAssetOwnerTel(null);
+        }
+        if (asset.getAssetOwnerName2() == null) {
+            asset.setAssetOwnerId2(null);
+            asset.setAssetOwnerTel2(null);
+        }
+        if (asset.getAssetOwnerName3() == null) {
+            asset.setAssetOwnerId3(null);
+            asset.setAssetOwnerTel3(null);
+        }
+        if (asset.getClinicalOwnerName() == null) {
+            asset.setClinicalOwnerId(null);
+            asset.setClinicalOwnerTel(null);
+        }
+        if (asset.getClinicalDeptName() == null) {
+            asset.setClinicalDeptId(null);
+            asset.setClinicalDeptUID(null);
+        }
+        if (asset.getVendor() == null) {
+            asset.setSupplierId(null);
+        }
+
+    }
+
+    public void markDefautValue(OrgInfo selectedOrgToImport, AssetInfo asset, Date now) {
+        if (StringUtils.isEmpty(asset.getUid())) {
+
+
+            asset.setSiteId(selectedOrgToImport.getSiteId());
+            asset.setHospitalId(selectedOrgToImport.getId());
+
+            asset.setTenantUID(selectedOrgToImport.getTenantUID());
+            asset.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            asset.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            asset.setSiteUID(selectedOrgToImport.getSiteUID());
+
+            asset.setIsValid(true);
+            asset.setDeviceStatus(0);
+            asset.setIsDeleted(Boolean.FALSE);
+
+            asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setCreatedDate(now);
+            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setLastModifiedDate(now);
+
+        } else {
+
+            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            asset.setLastModifiedDate(now);
+        }
     }
 
 }
