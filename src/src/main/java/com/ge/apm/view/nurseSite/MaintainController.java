@@ -317,6 +317,10 @@ public class MaintainController {
 		signatureContent=null;
 	}
 	
+	private void initValueBeforeEvent(){
+		signatureContent=null;
+	}
+	
 	public void checkRightAll(){
 		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
 		while(it.hasNext()){
@@ -331,7 +335,7 @@ public class MaintainController {
 	}
 
 	public void saveMaintain() {
-		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false);
+		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false,null);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
 		lazyEventModel.updateEvent(event);
 		addMessage("报告已保存");
@@ -413,10 +417,12 @@ public class MaintainController {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
 		generateNurseSiteMaintainData();
+		initValueBeforeEvent();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		userClickDate=(Date) selectEvent.getObject();
+		initValueBeforeEvent();
 	}
 
 //	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -501,19 +507,28 @@ public class MaintainController {
 		ca.setTime(endBatchDate);
 		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
 		Date tempEndBatchDate=ca.getTime();
+		List<NurseSiteMaintain> listNewNurseSiteMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintainData!=null && listMaintainData.size()>0){
+			String signatureId=null;
+			if(StringUtils.isNotEmpty(signatureContent)){
+				signatureId=nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
+			}
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
 				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<tempEndBatchDate.getTime()){
-					nurseSiteMaintainService.updateMaintainDataStatus(tempMaintain,true);
+					nurseSiteMaintainService.updateMaintainDataStatus(tempMaintain,true,signatureId);
+					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
+			nurseSiteMaintainService.save(listNewNurseSiteMaintain);
+			addMessage("报告已批量填写");
+			return "maintainMain?faces-redirect=true";
 		}
-		nurseSiteMaintainService.saveMaintainSignature(signatureContent, listMaintainData);
-		nurseSiteMaintainService.save(listMaintainData);
-		addMessage("报告已批量填写");
-		return "maintainMain?faces-redirect=true";
+		else{
+			addMessage("报告批量填写失败");
+			return "maintainMain?faces-redirect=false";
+		}
 	}
 
 	public boolean isValideDate() {
