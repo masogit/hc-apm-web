@@ -5,23 +5,27 @@
  */
 package com.ge.apm.service.asset;
 
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.asset.AssetFileAttachmentController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -129,6 +133,10 @@ public class BlobFileService {
     public List<V2_BlobObject> getBlobObjectsByStorageId(String storagedId) {
         return blobDao.findAllByObjectStorageId(storagedId);
     }
+    
+    public List<V2_BlobObject> getBlobObjectsByStorageId(Set<String> storagedId) {
+        return blobDao.findAllByObjectStorageId(storagedId);
+    }
 
     public List<V2_BlobObject> findBlobObjectsByBoUid(String uid){
         return blobDao.findByBoUuid(uid);
@@ -155,6 +163,16 @@ public class BlobFileService {
      */
     public Boolean deleteBlobFilesByStorageId(String objectId) {
         List<V2_BlobObject> objects = getBlobObjectsByStorageId(objectId);
+        for (V2_BlobObject object: objects) {
+            if(!deleteBlobFile(object)){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public Boolean deleteBlobFilesByStorageId(Set<String> setObjectIds) {
+        List<V2_BlobObject> objects = getBlobObjectsByStorageId(setObjectIds);
         for (V2_BlobObject object: objects) {
             if(!deleteBlobFile(object)){
                 return false;
