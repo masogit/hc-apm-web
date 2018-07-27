@@ -124,7 +124,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     List<UserAccount> findByOrgInfoUID(String orgUid);
 
-    UserAccount findByTenantUIDAndName(String tenantUid, String name);
+    UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
 
     @Transactional
     @Modifying
