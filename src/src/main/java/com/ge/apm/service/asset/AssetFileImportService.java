@@ -465,8 +465,8 @@ public class AssetFileImportService {
                 if (changed) {
                     QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(),newAsset.getSiteUID());
                     if (qrCodeLib == null) {
-                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
-                        newAsset.setQrCode(newCode.getQrCode());
+                        qrCodeService.createSpecifiedQrCode(newAsset.getQrCode(), selectedOrgToImport, 3);
+
                     } else {
                         if (qrCodeLib.getStatus() == 1) {//已发行
                             qrCodeLib.setStatus(3);//已建档
