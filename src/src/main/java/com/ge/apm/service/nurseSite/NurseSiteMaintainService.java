@@ -109,7 +109,7 @@ public class NurseSiteMaintainService{
 	}
 	
 	public AssetInfo getAssetInfoByUid(String uid){
-		return assetInfoRepository.getByUid(uid);
+		return assetInfoRepository.getByUid(uid); 
 	}
 	
 	public List<AssetInfo> getListAsset(String siteUid,String userUid){
