@@ -5,7 +5,10 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
@@ -482,29 +484,6 @@ public class AssetFileImportService {
 
     }
 
-
-//    private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
-//        if (null == qrcode || qrcode.isEmpty()) {
-//            return true;
-//        }
-//
-//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
-//        if (qrCodeLib == null) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-//            return false;
-//        }
-//        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-//            return false;
-//        }
-//        if (qrCodeLib.getStatus() != 1) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
     public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
@@ -526,23 +505,6 @@ public class AssetFileImportService {
         }
 
         return hasFailData;
-    }
-
-    private List<AssetInfo> getAssetInfos(AssetInfo asset) {
-
-
-        if (!StringUtils.isEmpty(asset.getUid())) {
-            List<SearchFilter> assetFilters = new ArrayList<>();
-            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
-            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-            List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
-            return tempList;
-        } else {
-            return Collections.emptyList();
-
-        }
-
-
     }
 
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
