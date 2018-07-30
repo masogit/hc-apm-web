@@ -20,7 +20,7 @@
                         <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                		<label class="label">签名*</label>
+                		<label class="label">签名</label>
 						<p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" value="#{maintainController.signatureContent}" required="false" guideline="true" requiredMessage="签名 #{msg.ValidationRequire}"/>
 					</h:panelGroup>
                 </p:panelGrid>

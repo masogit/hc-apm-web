@@ -81,5 +81,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
     public OrgInfo findFirstByParentUIDAndName(String parentUID, String name);
+    
+    @Query(value = "select o.uid from org_info o where (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1) and o.org_type=4",nativeQuery = true)
+    public Set<String> findClinicalDeptOrgUidListByOrgUid(String orgUid);
 
 }

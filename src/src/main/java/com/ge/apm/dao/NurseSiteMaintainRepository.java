@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,12 +18,9 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	public List<NurseSiteMaintain> findByConfigAndStatus(String configId,Integer status);
 	
 	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) order by o.schedule_date asc",nativeQuery=true)
-	public List<NurseSiteMaintain> findDefaultData(List<String> orgUids,Date startDate,Date endDate);
+	public List<NurseSiteMaintain> findDefaultData(Set<String> orgUids,Date startDate,Date endDate);
 	
-	@Query(value="select distinct o.* from nurse_site_maintain o where o.site_uid = ?1 or o.hospital_uid = ?1 or o.institution_uid = ?1 or o.tenant_uid = ?1 and o.schedule_date>=?2 and o.schedule_date<?3 order by o.schedule_date asc",nativeQuery=true)
-	public List<NurseSiteMaintain> findDefaultData(String orgUid,Date startDate,Date endDate);
-	
-	@Query(value="select o.* from nurse_site_maintain o where o.site_uid=?1 and o.schedule_date>=?3 and o.schedule_date<?4 and o.clinical_dept_uid in (?2) order by o.schedule_date asc",nativeQuery=true)
-	public List<NurseSiteMaintain> findDataByClinicalOrgUid(String siteUid,List<String> listOrgUid,Date startDate,Date endDate);
+	@Query(value="select o.* from nurse_site_maintain o where o.schedule_date>=?3 and o.schedule_date<?4 and o.clinical_dept_uid in (?2) order by o.schedule_date asc",nativeQuery=true)
+	public List<NurseSiteMaintain> findDataByClinicalOrgUid(List<String> listOrgUid,Date startDate,Date endDate);
 }
 
