@@ -37,6 +37,7 @@ import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
@@ -82,42 +83,21 @@ public class NurseSiteMaintainService{
 	@Autowired
     private UaaService uaaService;
 	
-	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(List<String> orgUids){
+	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(Set<String> orgUids){
 		return nurseSiteMaintainConfigRepository.findByOrgUids(orgUids);
 	}
 	
-	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUid(String orgUid){
-		return nurseSiteMaintainConfigRepository.findByOrgUid(orgUid);
-	}
 	
 	public NurseSiteMaintainConfig getMaintainConfigById(String id){
 		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 	
-	public List<NurseSiteMaintain> getMaintainData(List<String> orgUids,Date startDate,Date endDate){
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endDate);
-		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		return nurseSiteMaintainRepository.findDefaultData(orgUids,startDate,ca.getTime());
-	}
-	
-	public List<NurseSiteMaintain> getDefaultMaintainData(List<String> orgUids,Date startDate,Date endDate){
+	public List<NurseSiteMaintain> getDefaultMaintainData(Set<String> orgUids,Date startDate,Date endDate){
 		return nurseSiteMaintainRepository.findDefaultData(orgUids, startDate, endDate);
 	}
 	
-	public List<NurseSiteMaintain> getMaintainData(String orgUid,Date startDate,Date endDate){
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endDate);
-		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		return nurseSiteMaintainRepository.findDefaultData(orgUid,startDate,ca.getTime());
-	}
-	
-	public List<NurseSiteMaintain> getDefaultMaintainData(String orgUid,Date startDate,Date endDate){
-		return nurseSiteMaintainRepository.findDefaultData(orgUid, startDate, endDate);
-	}
-	
-	public List<NurseSiteMaintain> getDataByClinicalOrgUid(String siteUid,List<String> listOrgUid,Date startDate,Date endDate){
-		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(siteUid, listOrgUid, startDate, endDate);
+	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
 	}
 	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
@@ -386,11 +366,11 @@ public class NurseSiteMaintainService{
 	}
 	
 	public boolean updateMaintain(NurseSiteMaintain obj,boolean batchUpdate,UserAccount currentUser){
+		Date currentDate=new Date();
 		if(batchUpdate){
 			//insert new record
 			//0：未检查,1:已检查，2:通过，3有问题
 			if(obj.getStatus()==null || obj.getStatus()==0){
-				Date currentDate=new Date();
 				obj.setCheckDate(currentDate);
 				obj.setModifyBy(currentUser);
 				obj.setModifyByUid(currentUser.getUid());
@@ -398,7 +378,6 @@ public class NurseSiteMaintainService{
 			}
 		}
 		else{
-			Date currentDate=new Date();
 			obj.setStatus(1);
 			obj.setCheckDate(currentDate);
 			obj.setModifyBy(currentUser);
@@ -616,6 +595,35 @@ public class NurseSiteMaintainService{
 //		nurseSiteMaintainRepository.delete(listMaintain);
 		deleteMaintain(listMaintain);
 		nurseSiteMaintainRepository.save(listNewMaintain);
+	}
+	
+	public Set<String> findAccessOrgUidListByUserUid(String userUid){
+		Set<String> listResult=new HashSet<String>();
+		List<UserOrgInfo> listUserOrgInfo=userOrgInfoRepository.findOrgUidListByUserUid(userUid);
+		Set<String> listOrgUid=null;
+		if(listUserOrgInfo!=null){
+			if(listUserOrgInfo.size()>1){
+				
+			}
+			else if(listUserOrgInfo.size()==1){
+				UserOrgInfo tempUserOrgInfo=listUserOrgInfo.get(0);
+				if(tempUserOrgInfo.getOrgType()==4){
+					
+				}
+				else{
+					listOrgUid=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(tempUserOrgInfo.getOrgUid());
+				}
+			}
+		}
+		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0){
+			for(int i=0;i<listUserOrgInfo.size();++i){
+				listResult.add(listUserOrgInfo.get(i).getOrgUid());
+			}
+		}
+		if(listOrgUid!=null && listOrgUid.size()>0){
+			listResult.addAll(listOrgUid);
+		}
+		return listResult;
 	}
 	
 //	private void formatExistMaintainDate(){
