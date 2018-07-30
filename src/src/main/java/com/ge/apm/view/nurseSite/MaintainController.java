@@ -505,10 +505,6 @@ public class MaintainController {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endBatchDate);
-		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		Date tempEndBatchDate=ca.getTime();
 		Date currentDate=new Date();
 		List<NurseSiteMaintain> listNewNurseSiteMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintainData!=null && listMaintainData.size()>0){
@@ -519,7 +515,7 @@ public class MaintainController {
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
-				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<tempEndBatchDate.getTime()){
+				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime()){
 					tempMaintain.setCheckDate(currentDate);
 					tempMaintain.setModifyBy(currentUser);
 					tempMaintain.setModifyDate(currentDate);
@@ -588,7 +584,10 @@ public class MaintainController {
 	}
 
 	public void setEndBatchDate(Date endBatchDate) {
-		this.endBatchDate = endBatchDate;
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(endBatchDate);
+		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
+		this.endBatchDate = ca.getTime();
 	}
 
 	public boolean isDeleteDisable() {
