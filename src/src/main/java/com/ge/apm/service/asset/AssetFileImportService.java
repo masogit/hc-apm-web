@@ -79,13 +79,7 @@ public class AssetFileImportService {
     private UserAccountRepository userDao;
 
     @Autowired
-    private SupplierRepository supplierDao;
-
-    @Autowired
     private QrCodeLibRepository qrcodeDao;
-
-    @Autowired
-    private AssetCreateService assetCreateService;
 
     @Autowired
     private QrCodeService qrCodeService;
@@ -97,9 +91,6 @@ public class AssetFileImportService {
     ConfigService configService;
 
     @Autowired
-    private TenantInfoRepository tenantInfoDao;
-
-    @Autowired
     private AssetFileImportSupportingService supportingService;
 
     @Autowired
@@ -108,9 +99,6 @@ public class AssetFileImportService {
     private OrgInfo selectedOrgToImport;
 
     private String assetCodeConfig;
-    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
-    private static final String ASSET_CODE_MERGE_TWO = "DF";
-    private static final String OLD_QRCODE_KEY = "old_qrcode";
 
     private WorkflowConfig workflowConfig;
 
@@ -163,7 +151,7 @@ public class AssetFileImportService {
                     if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception("无效UUID");
 
                     //save old data to compare later
-                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
+                    map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
                 } else {
                     asset = new AssetInfo();
                 }
@@ -626,7 +614,7 @@ public class AssetFileImportService {
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 16) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
@@ -641,7 +629,7 @@ public class AssetFileImportService {
                 } else {
                     newAsset.setFinancingNum(newAsset.getDepartNum());
 
-                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                         newAsset.setQrCode(newAsset.getDepartNum());
                     }
 
