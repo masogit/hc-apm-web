@@ -16,6 +16,9 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
     
     @Query(value = "select o.user_uid from user_org o where o.org_uid in ?1",nativeQuery = true)
     public List<String> findUserUidListByOrgUids(List<String> listUid);
+    
+    @Query(value = "select o.* from user_org o where o.user_uid = ?1",nativeQuery = true)
+    public List<UserOrgInfo> findOrgUidListByUserUid(String userUid);
 
     UserOrgInfo findFirstByUserUidAndOrgUid(String userUid, String orgUid);
 
