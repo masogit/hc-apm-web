@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -65,9 +66,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<MaintainDataPair> checkListMonthDays;
   	private List<AssetInfo> checkListAssets;
   	private List<OrgInfo> checkListOrgInfo;
-  	private List<String> orgUidList;
+  	private Set<String> setOrgUid;
+  	private List<String> listOrgUid;
   	private DualListModel<AssetInfo> availableAssets;
-  	private boolean filterScopeByClinicalDept=false;
   	private boolean isSaveDisable=true;
   	
     @Override
@@ -76,20 +77,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
-        orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
-        if(orgUidList!=null && orgUidList.size()==1){
-        	OrgInfo tempOrgInfo=nurseSiteMaintainService.findOrgInfoByUid(orgUidList.get(0));
-        	if(tempOrgInfo.getOrgType()!=null && tempOrgInfo.getOrgType()==4){
-        		filterScopeByClinicalDept=true;
-        	}
-        	else{
-        		filterScopeByClinicalDept=false;
-        	}
+        setOrgUid = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+        if(setOrgUid!=null){
+        	listOrgUid=new ArrayList<String>();
+        	listOrgUid.addAll(setOrgUid);
         }
-        else if(orgUidList!=null && orgUidList.size()>1){
-        	filterScopeByClinicalDept=true;
-        }
-        checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+        checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUid(setOrgUid);
         //test
     }
 
@@ -104,15 +97,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        if(filterScopeByClinicalDept){
-        	searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*"));
-        }
-        else{
-        	searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        	searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        	searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        	searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
+        //need list or set
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
@@ -238,13 +224,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 	}
-	
-	//当前user的可见范围的orgUid,
-//	private void loadUserUidList(){
-//		if(orgUidList!=null && orgUidList.size()>0){
-//			userUidList=nurseSiteMaintainService.findUserUidListByOrgUids(orgUidList);
-//		}
-//	}
 	
 	public boolean checkListCheckAssets(){
 		boolean result=false;
@@ -549,14 +528,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setListOrgInfo(List<OrgInfo> listOrgInfo) {
 		this.listOrgInfo = listOrgInfo;
-	}
-
-	public List<String> getOrgUidList() {
-		return orgUidList;
-	}
-
-	public void setOrgUidList(List<String> orgUidList) {
-		this.orgUidList = orgUidList;
 	}
 
 	public List<OrgInfo> getCheckListOrgInfo() {

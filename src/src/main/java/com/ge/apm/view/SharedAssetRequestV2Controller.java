@@ -1763,7 +1763,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public List getAvailableAssignees() {
     	List<LinkedHashMap> rst = null;
         try {
-        	ResponseEntity<LinkedHashMap> response = sharedAssetService.getAssigneeList();
+        	ResponseEntity<LinkedHashMap> response = sharedAssetService.getAssigneeList(selected.getId());
             LinkedHashMap respBody = response.getBody();
             if("OK".equals(respBody.get("bizStatusCode"))) {
             	List<LinkedHashMap> assignees = (List) respBody.get("data");

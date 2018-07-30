@@ -75,33 +75,15 @@ public class MaintainController {
     private Date dayDate;
     private String signatureContent;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-    private List<String> orgUidList;
-    boolean filterScopeByClinicalDept=false;
+    private Set<String> orgUidList;
 
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
-		orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
-		if(orgUidList!=null && orgUidList.size()==1){
-        	OrgInfo tempOrgInfo=nurseSiteMaintainService.findOrgInfoByUid(orgUidList.get(0));
-        	if(tempOrgInfo.getOrgType()!=null && tempOrgInfo.getOrgType()==4){
-        		filterScopeByClinicalDept=true;
-        	}
-        	else{
-        		filterScopeByClinicalDept=false;
-        	}
-        }
-        else if(orgUidList!=null && orgUidList.size()>1){
-        	filterScopeByClinicalDept=true;
-        }
-		if(filterScopeByClinicalDept){
-			listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigByOrgUids(orgUidList);
-		}
-		else{
-			listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigByOrgUid(orgUidList.get(0));
-		}
+		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigByOrgUids(orgUidList);
 		showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserOrgInfo();
@@ -126,19 +108,14 @@ public class MaintainController {
 			for(int i=0;i<listCheckClinicalOrgInfo.size();++i){
 				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
 			}
-			listData=nurseSiteMaintainService.getDataByClinicalOrgUid(currentUser.getSiteUID(), listUidTemp, start, end);
+			listData=nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
 		}
 		return listData;
 	}
 	
 	private List<NurseSiteMaintain> findDefaultMaintain(Date startDate,Date endDate){
 		List<NurseSiteMaintain> listResult=null;
-		if(filterScopeByClinicalDept){
-			listResult=nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
-		}
-		else{
-			listResult=nurseSiteMaintainService.getDefaultMaintainData(orgUidList.get(0),startDate,endDate);
-		}
+		listResult=nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
 		return listResult;
 	}
 
@@ -185,17 +162,8 @@ public class MaintainController {
 	}
 	
 	private void loadUserOrgInfo(){
-		Set<String> listUid=new HashSet<String>();
-		Set<UserOrgInfo> setUserOrg=currentUser.getSetUserOrgInfo();
-		if(setUserOrg!=null){
-			Iterator<UserOrgInfo> it=setUserOrg.iterator();
-			while(it.hasNext()){
-				UserOrgInfo userOrgInfo=it.next();
-				listUid.add(userOrgInfo.getOrgUid());
-			}
-		}
-		if(listUid.size()>0){
-			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(listUid);
+		if(orgUidList.size()>0){
+			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
@@ -365,8 +333,10 @@ public class MaintainController {
 	}
 
 	public void saveMaintain() {
+		Date currentDate=new Date();
+		nurseSiteMaintain.setCheckDate(currentDate);
 		nurseSiteMaintain.setModifyBy(currentUser);
-		nurseSiteMaintain.setModifyDate(new Date());
+		nurseSiteMaintain.setModifyDate(currentDate);
 		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false,null);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
 		lazyEventModel.updateEvent(event);
@@ -535,10 +505,7 @@ public class MaintainController {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endBatchDate);
-		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		Date tempEndBatchDate=ca.getTime();
+		Date currentDate=new Date();
 		List<NurseSiteMaintain> listNewNurseSiteMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			String signatureId=null;
@@ -548,7 +515,10 @@ public class MaintainController {
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
-				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<tempEndBatchDate.getTime()){
+				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime()){
+					tempMaintain.setCheckDate(currentDate);
+					tempMaintain.setModifyBy(currentUser);
+					tempMaintain.setModifyDate(currentDate);
 					nurseSiteMaintainService.updateMaintainDataStatus(tempMaintain,true,signatureId);
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
@@ -614,7 +584,10 @@ public class MaintainController {
 	}
 
 	public void setEndBatchDate(Date endBatchDate) {
-		this.endBatchDate = endBatchDate;
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(endBatchDate);
+		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
+		this.endBatchDate = ca.getTime();
 	}
 
 	public boolean isDeleteDisable() {
