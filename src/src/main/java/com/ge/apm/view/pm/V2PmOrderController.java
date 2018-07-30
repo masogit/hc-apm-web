@@ -268,7 +268,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
-        content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qaStatus", pmOrder.getQualityChecking()));
+        content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
         // Coworker List
         List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
         if (coworkers != null) {

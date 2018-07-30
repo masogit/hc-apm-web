@@ -81,22 +81,22 @@ public class HealthApi {
 
       case 0:
         return createResponseBody(category, request,
-          healthService.queryForMaintain(site_id, hospital_id),
-          healthService.queryForOutage(site_id, hospital_id),
-          healthService.queryForWarranty(site_id, hospital_id),
+          healthService.queryForMaintain(tenantUID, siteUID),
+          healthService.queryForOutage(tenantUID, siteUID),
+          healthService.queryForWarranty(tenantUID, siteUID),
           healthService.queryForPm(tenantUID, siteUID),
           healthService.queryForMeterqa(site_id, hospital_id, 2),
           healthService.queryForMeterqa(site_id, hospital_id, 1));
       case 1:
         // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
 
-       return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(site_id, hospital_id), start, limit);
+       return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(tenantUID, siteUID), start, limit);
 
       case 2:
-        return createResponseBody(category, healthService.queryForOutage(site_id, hospital_id), request, start, limit);
+        return createResponseBody(category, healthService.queryForOutage(tenantUID, siteUID), request, start, limit);
 
       case 3:
-        return createResponseBody(healthService.queryForWarranty(site_id, hospital_id), category, request, start, limit);
+        return createResponseBody(healthService.queryForWarranty(tenantUID, siteUID), category, request, start, limit);
 
       case 4:
         return createResponseBody_s(healthService.queryForPm(tenantUID, siteUID), category, request, start, limit);
