@@ -127,7 +127,7 @@
                 		<br/>
                 		<br/>
                 		<p:commandButton id="addButton" validateClient="true" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
-                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
+                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":messages" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
                 	</h:form>
                 </p:dialog>
                 <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名">

@@ -25,7 +25,7 @@
 					</h:panelGroup>
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintainBatchCompleteDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()"/>
                 <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>

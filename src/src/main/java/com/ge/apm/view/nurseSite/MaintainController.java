@@ -498,7 +498,7 @@ public class MaintainController {
 		addMessage("报告已批量生成");
 		return "maintainMain?faces-redirect=true";
 	}
-	public String batchCompleteMaintainData(){
+	public void batchCompleteMaintainData(){
 		if(startBatchDate==null){
 			startBatchDate=new Date();
 		}
@@ -525,11 +525,9 @@ public class MaintainController {
 			}
 			nurseSiteMaintainService.save(listNewNurseSiteMaintain);
 			addMessage("报告已批量填写");
-			return "maintainMain?faces-redirect=true";
 		}
 		else{
 			addMessage("报告批量填写失败");
-			return "maintainMain?faces-redirect=false";
 		}
 	}
 
