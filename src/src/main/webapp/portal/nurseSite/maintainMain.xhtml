@@ -112,18 +112,22 @@
                 </p:dialog>
                 <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
                 	<h:form id="createMaintainForm">
-                		<h:panelGrid columnClasses="value" columns="1">
-                			<h:panelGroup>
+                		<h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                			<h:panelGroup  style="float:left">
                 				<label>请选择配置: </label>
-                			</h:panelGroup>
-                			<h:panelGroup>
 								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
-									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update="currentSequence"></p:ajax>
 									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 			                        <p:column>
 										<h:outputText value="#{t!=null?t.name:'请选择...'}" />
 									</p:column>
+			                    </p:selectOneMenu>
+							</h:panelGroup>
+							<h:panelGroup  style="float:left">
+								<label>请选择班次: </label>
+								<p:selectOneMenu id="currentSequence" value="#{maintainController.selectSequence}" required="true" requiredMessage="班次 #{msg.ValidationRequire}">
+			                        <f:selectItems value="#{maintainController.listSequence}" var="item" itemLabel="#{item}" itemValue="#{item}" />
 			                    </p:selectOneMenu>
 							</h:panelGroup>
                 		</h:panelGrid>

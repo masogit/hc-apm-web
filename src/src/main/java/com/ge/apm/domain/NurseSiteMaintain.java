@@ -108,7 +108,7 @@ public class NurseSiteMaintain implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过，3有问题
+	//0：未检查,1:已检查，2:通过，3有问题,4进行中
 	@Column(name = "status")
 	private Integer status;
 	
@@ -121,6 +121,9 @@ public class NurseSiteMaintain implements Serializable {
 	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
 	@Column(name="signature_source_type")
 	private Integer signatureSourceType=0;
+	
+	@Column(name="sequence")
+	private Integer sequence;
 	
 	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
@@ -325,6 +328,17 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setSignatureSourceType(Integer signatureSourceType) {
 		this.signatureSourceType = signatureSourceType;
+	}
+	
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		if(sequence==null){
+			sequence=1;
+		}
+		this.sequence = sequence;
 	}
 
 	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
