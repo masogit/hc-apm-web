@@ -23,6 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,10 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Column(name="signature_id")
 	private String signatureId;
+	
+	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
+	@Column(name="signature_source_type")
+	private Integer signatureSourceType=0;
 	
 	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
@@ -278,6 +283,7 @@ public class NurseSiteMaintain implements Serializable {
 	}
 
 	public void setSignatureId(String signatureId) {
+		this.signatureSourceType=0;
 		this.signatureId = signatureId;
 	}
 
@@ -311,6 +317,14 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setClinicalDeptName(String clinicalDeptName) {
 		this.clinicalDeptName = clinicalDeptName;
+	}
+
+	public Integer getSignatureSourceType() {
+		return signatureSourceType;
+	}
+
+	public void setSignatureSourceType(Integer signatureSourceType) {
+		this.signatureSourceType = signatureSourceType;
 	}
 
 	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
