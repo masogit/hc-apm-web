@@ -140,7 +140,7 @@
 								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
 							</h:panelGroup>
 							<h:panelGroup rendered="#{maintainController.nurseSiteMaintain.signatureSourceType==1}">
-								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" />
+								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" rendered="#{maintainController.signatureContentWeiXin!=null}" stream="false"/>
 							</h:panelGroup>
 						</h:panelGrid>
 						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{empty maintainController.signatureContent}"/>
