@@ -75,6 +75,7 @@ public class MaintainController {
     private Date dayDate;
     private String signatureContent;
     private StreamedContent signatureContentWeiXin;
+    private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
 
@@ -382,22 +383,27 @@ public class MaintainController {
 		}
 	}
 	
-	public void getMaintainSignature(){
-		if(StringUtils.isNotEmpty(nurseSiteMaintain.getSignatureId())){
-			if(nurseSiteMaintain.getSignatureSourceType()==null){
+	public void getMaintainSignature(String signatureId,Integer signatureSourceType){
+		if(StringUtils.isNotEmpty(signatureId)){
+			if(signatureSourceType==null){
+				blnWebSignatureEidt=true;
 			}
-			else if(nurseSiteMaintain.getSignatureSourceType()==0){
-				signatureContent=nurseSiteMaintainService.getMaintainSignatureWeb(nurseSiteMaintain.getSignatureId());
+			else if(signatureSourceType==0){
+				signatureContent=nurseSiteMaintainService.getMaintainSignatureWeb(signatureId);
+				blnWebSignatureEidt=false;
 			}
-			else if(nurseSiteMaintain.getSignatureSourceType()==1){
-				signatureContentWeiXin=nurseSiteMaintainService.getMaintainSignatureWeiXin(nurseSiteMaintain.getSignatureId());
+			else if(signatureSourceType==1){
+				signatureContentWeiXin=nurseSiteMaintainService.getMaintainSignatureWeiXin(signatureId);
+				blnWebSignatureEidt=false;
 			}
+		}
+		else{
+			blnWebSignatureEidt=true;
 		}
 	}
 	
 	public void resetMaintainSignature(){
 		signatureContent=null;
-		signatureContentWeiXin=null;
 	}
 	
 	public void onNurseSiteMaintainConfigChange(){
@@ -677,5 +683,13 @@ public class MaintainController {
 
 	public void setSignatureContentWeiXin(StreamedContent signatureContentWeiXin) {
 		this.signatureContentWeiXin = signatureContentWeiXin;
+	}
+
+	public boolean isBlnWebSignatureEidt() {
+		return blnWebSignatureEidt;
+	}
+
+	public void setBlnWebSignatureEidt(boolean blnWebSignatureEidt) {
+		this.blnWebSignatureEidt = blnWebSignatureEidt;
 	}
 }
