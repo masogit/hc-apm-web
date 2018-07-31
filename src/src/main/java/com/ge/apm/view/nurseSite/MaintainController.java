@@ -23,6 +23,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,6 @@ import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -74,6 +74,7 @@ public class MaintainController {
     private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
     private Date dayDate;
     private String signatureContent;
+    private StreamedContent signatureContentWeiXin;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
 
@@ -313,10 +314,12 @@ public class MaintainController {
 	
 	private void initValueAfterEvent(){
 		signatureContent=null;
+		signatureContentWeiXin=null;
 	}
 	
 	private void initValueBeforeEvent(){
 		signatureContent=null;
+		signatureContentWeiXin=null;
 	}
 	
 	public void checkRightAll(){
@@ -375,18 +378,26 @@ public class MaintainController {
 	public void saveMaintainSignature(){
 		if(StringUtils.isNotEmpty(signatureContent)){
 			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
-			signatureContent=null;
+			initValueAfterEvent();
 		}
 	}
 	
 	public void getMaintainSignature(){
 		if(StringUtils.isNotEmpty(nurseSiteMaintain.getSignatureId())){
-			signatureContent=nurseSiteMaintainService.getMaintainSignature(nurseSiteMaintain.getSignatureId());
+			if(nurseSiteMaintain.getSignatureSourceType()==null){
+			}
+			else if(nurseSiteMaintain.getSignatureSourceType()==0){
+				signatureContent=nurseSiteMaintainService.getMaintainSignatureWeb(nurseSiteMaintain.getSignatureId());
+			}
+			else if(nurseSiteMaintain.getSignatureSourceType()==1){
+				signatureContentWeiXin=nurseSiteMaintainService.getMaintainSignatureWeiXin(nurseSiteMaintain.getSignatureId());
+			}
 		}
 	}
 	
 	public void resetMaintainSignature(){
 		signatureContent=null;
+		signatureContentWeiXin=null;
 	}
 	
 	public void onNurseSiteMaintainConfigChange(){
@@ -658,5 +669,13 @@ public class MaintainController {
 
 	public void setSignatureContent(String signatureContent) {
 		this.signatureContent = signatureContent;
+	}
+
+	public StreamedContent getSignatureContentWeiXin() {
+		return signatureContentWeiXin;
+	}
+
+	public void setSignatureContentWeiXin(StreamedContent signatureContentWeiXin) {
+		this.signatureContentWeiXin = signatureContentWeiXin;
 	}
 }
