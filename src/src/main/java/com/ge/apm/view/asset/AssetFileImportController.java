@@ -126,7 +126,7 @@ public class AssetFileImportController {
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
                 ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-                hasExportData = aiService.exportFailData(doc, Collections.emptyMap(), importAssetMap);
+                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
             } catch (IOException ex) {
                 Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
