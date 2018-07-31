@@ -457,7 +457,7 @@ public class NurseSiteMaintainService{
         }
 	}
 	
-	public String getMaintainSignature(String signatureId){
+	public String getMaintainSignatureWeb(String signatureId){
 		StreamedContent streamedContent=blobFileService.getBlobObjectByStorageId(signatureId);
 		InputStream input=streamedContent.getStream();
 		byte[]b=new byte[1024];
@@ -483,6 +483,11 @@ public class NurseSiteMaintainService{
 		}
 		result=sb.toString();
 		return result;
+	}
+	
+	public StreamedContent getMaintainSignatureWeiXin(String signatureId){
+		StreamedContent streamedContent=blobFileService.getBlobObjectByStorageId(signatureId);
+		return streamedContent;
 	}
 	
 	@Transactional(isolation=Isolation.READ_COMMITTED)
