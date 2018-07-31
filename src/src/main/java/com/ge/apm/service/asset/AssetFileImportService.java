@@ -484,12 +484,12 @@ public class AssetFileImportService {
 
     }
 
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
+    public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
-        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.values().size());
-        for (Map<String, Object> item : importOrgMap.values()) {
+        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.size());
+        for (Map<String, Object> item : importOrgMap) {
             doc.writeRowData(SHEET_ORG, keyRowOrg, dataRowOrg++, (Map<String, Object>) item.get("rowData"));
             hasFailData = item.get("status").equals(ImportStatus.Failure);
         }
