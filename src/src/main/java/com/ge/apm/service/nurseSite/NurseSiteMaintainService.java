@@ -97,6 +97,10 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainRepository.findDefaultData(orgUids, startDate, endDate);
 	}
 	
+	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids,Date startDate,Date endDate,int status){
+		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate,status);
+	}
+	
 	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid,Date startDate,Date endDate){
 		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
 	}
@@ -390,7 +394,7 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets){
+	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets,Integer sequence){
 		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain=new NurseSiteMaintain();
 		Date currentDate=new Date();
@@ -408,6 +412,9 @@ public class NurseSiteMaintainService{
 		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setModifyDate(currentDate);
 		tempNurseSiteMaintain.setScheduleDate(date);
+		if(sequence!=null){
+			tempNurseSiteMaintain.setSequence(sequence);
+		}
 		tempNurseSiteMaintain.setStatus(0);
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
 		tempNurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
@@ -422,6 +429,9 @@ public class NurseSiteMaintainService{
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
+			if(sequence!=null){
+				tempItem.setSequence(sequence);
+			}
 			tempItem.setName(nurseSiteMaintainConfig.getName());
 			tempItem.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
 			tempItem.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
@@ -597,7 +607,7 @@ public class NurseSiteMaintainService{
 		List<NurseSiteMaintain> listNewMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintain!=null && listMaintain.size()>0){
 			for(int i=0;i<listMaintain.size();++i){
-				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets));
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,null));
 			}
 		}
 //		nurseSiteMaintainRepository.delete(listMaintain);
@@ -632,6 +642,17 @@ public class NurseSiteMaintainService{
 			listResult.addAll(listOrgUid);
 		}
 		return listResult;
+	}
+	
+	public boolean existMaintain(NurseSiteMaintain tempMaintain){
+		Date startDate=tempMaintain.getScheduleDate();
+		Date endDate=tempMaintain.getScheduleDate();
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(endDate);
+		ca.add(Calendar.DATE, 1);
+		endDate=ca.getTime();
+		Boolean result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		return result==null?false:result;
 	}
 	
 //	private void formatExistMaintainDate(){
