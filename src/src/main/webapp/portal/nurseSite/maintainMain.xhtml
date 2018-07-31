@@ -82,6 +82,9 @@
 					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
 			                    				</td>
 											</p:repeat>
+											<td>
+												<p:commandButton id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+											</td>
 			                    		</tr>
 									</p:repeat>
 								</table>
@@ -104,7 +107,7 @@
 	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
 	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
 	                    </p:commandButton>
-	                    <p:commandButton id="openSignature" actionListener="#{maintainController.getMaintainSignature()}" value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+	                    <p:commandButton id="openSignature" actionListener="#{maintainController.getMaintainSignature(maintainController.nurseSiteMaintain.signatureId,maintainController.nurseSiteMaintain.signatureSourceType)}" value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
                    	</h:form>
                 </p:dialog>
                 <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
@@ -133,18 +136,15 @@
                 <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名">
                 	<h:form id="signatureForm">
                 		<h:panelGrid columnClasses="value" columns="1">
-                			<h:panelGroup rendered="#{maintainController.nurseSiteMaintain.signatureSourceType==null}">
-								<p:signature id="signatureContent2" style="width:400px;height:200px" widgetVar="sig2" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
-							</h:panelGroup>
-		                	<h:panelGroup rendered="#{maintainController.nurseSiteMaintain.signatureSourceType==0}">
+		                	<h:panelGroup rendered="#{maintainController.signatureContentWeiXin==null}">
 								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
 							</h:panelGroup>
-							<h:panelGroup rendered="#{maintainController.nurseSiteMaintain.signatureSourceType==1}">
-								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" rendered="#{maintainController.signatureContentWeiXin!=null}" stream="false"/>
+							<h:panelGroup rendered="#{maintainController.signatureContentWeiXin!=null}">
+								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" stream="false"/>
 							</h:panelGroup>
 						</h:panelGrid>
-						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{empty maintainController.signatureContent}"/>
-						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" rendered="#{empty maintainController.signatureContent}"/>
+						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" rendered="#{maintainController.blnWebSignatureEidt}"/>
 						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();"/>
 					</h:form>
                 </p:dialog>
