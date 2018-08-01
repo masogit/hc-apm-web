@@ -20,7 +20,7 @@
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     <br/>
                     <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
-                    	<label>科室：</label>
+                    	<label>请选择科室：</label>
 						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
 							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
 							label="------请选择------" 
@@ -120,7 +120,7 @@
                 			<h:panelGroup  style="float:left">
                 				<label>请选择配置: </label>
 								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
-									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update="currentSequence"></p:ajax>
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":createMaintainForm"></p:ajax>
 									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 			                        <p:column>
