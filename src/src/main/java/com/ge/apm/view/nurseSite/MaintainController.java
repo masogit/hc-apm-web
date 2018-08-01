@@ -150,6 +150,9 @@ public class MaintainController {
 							else if(status==3){
 								tempEvent.setStyleClass("schedule-item-nopass");
 							}
+							else if(status==4){
+								tempEvent.setStyleClass("schedule-item-partialpass");
+							}
 						}
 						tempEvent.setId(UUID.randomUUID().toString());
 						if(lazyEventModel.getEvents().add(tempEvent)){
@@ -532,7 +535,7 @@ public class MaintainController {
 			if(type==1){
 				//value,hours,1-24
 				Integer intTypeValue=Integer.parseInt(typeValue);
-				while(startCalendar.getTimeInMillis()<=endCalendar.getTimeInMillis()){
+				while(startCalendar.getTimeInMillis()<endCalendar.getTimeInMillis()){
 					for(int i=0;i<intTypeValue;++i){
 						Date date=null;
 						try {
@@ -548,7 +551,7 @@ public class MaintainController {
 			}
 			else if(type==2){
 				//weekday,1-7
-				while(startCalendar.getTimeInMillis()<=endCalendar.getTimeInMillis()){
+				while(startCalendar.getTimeInMillis()<endCalendar.getTimeInMillis()){
 					for(int i=0;i<arr.length;++i){
 						try {
 							if(startCalendar.get(Calendar.DAY_OF_WEEK)==Integer.parseInt(arr[i])){
