@@ -45,10 +45,6 @@ public class UserOrgInfo implements Serializable{
     private String orgUid;
     @Column(name = "org_type")
     private Integer orgType;
-    
-    @JoinColumn(name = "user_uid", referencedColumnName = "uid", insertable = false, updatable = false)
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private UserAccount userAccount;
 
     public String getId() {
         return id;
@@ -81,14 +77,6 @@ public class UserOrgInfo implements Serializable{
     public void setOrgType(Integer orgType) {
         this.orgType = orgType;
     }
-
-    public UserAccount getUserAccount() {
-		return userAccount;
-	}
-
-	public void setUserAccount(UserAccount userAccount) {
-		this.userAccount = userAccount;
-	}
 
 	@Override
     public int hashCode() {

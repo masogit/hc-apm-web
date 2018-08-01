@@ -5,7 +5,10 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
@@ -79,13 +81,7 @@ public class AssetFileImportService {
     private UserAccountRepository userDao;
 
     @Autowired
-    private SupplierRepository supplierDao;
-
-    @Autowired
     private QrCodeLibRepository qrcodeDao;
-
-    @Autowired
-    private AssetCreateService assetCreateService;
 
     @Autowired
     private QrCodeService qrCodeService;
@@ -97,9 +93,6 @@ public class AssetFileImportService {
     ConfigService configService;
 
     @Autowired
-    private TenantInfoRepository tenantInfoDao;
-
-    @Autowired
     private AssetFileImportSupportingService supportingService;
 
     @Autowired
@@ -108,9 +101,6 @@ public class AssetFileImportService {
     private OrgInfo selectedOrgToImport;
 
     private String assetCodeConfig;
-    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
-    private static final String ASSET_CODE_MERGE_TWO = "DF";
-    private static final String OLD_QRCODE_KEY = "old_qrcode";
 
     private WorkflowConfig workflowConfig;
 
@@ -163,7 +153,7 @@ public class AssetFileImportService {
                     if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception("无效UUID");
 
                     //save old data to compare later
-                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
+                    map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
                 } else {
                     asset = new AssetInfo();
                 }
@@ -494,35 +484,12 @@ public class AssetFileImportService {
 
     }
 
-
-//    private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
-//        if (null == qrcode || qrcode.isEmpty()) {
-//            return true;
-//        }
-//
-//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
-//        if (qrCodeLib == null) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-//            return false;
-//        }
-//        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-//            return false;
-//        }
-//        if (qrCodeLib.getStatus() != 1) {
-//            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
+    public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
-        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.values().size());
-        for (Map<String, Object> item : importOrgMap.values()) {
+        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.size());
+        for (Map<String, Object> item : importOrgMap) {
             doc.writeRowData(SHEET_ORG, keyRowOrg, dataRowOrg++, (Map<String, Object>) item.get("rowData"));
             hasFailData = item.get("status").equals(ImportStatus.Failure);
         }
@@ -538,23 +505,6 @@ public class AssetFileImportService {
         }
 
         return hasFailData;
-    }
-
-    private List<AssetInfo> getAssetInfos(AssetInfo asset) {
-
-
-        if (!StringUtils.isEmpty(asset.getUid())) {
-            List<SearchFilter> assetFilters = new ArrayList<>();
-            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
-            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-            List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
-            return tempList;
-        } else {
-            return Collections.emptyList();
-
-        }
-
-
     }
 
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
@@ -626,7 +576,7 @@ public class AssetFileImportService {
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 16) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
@@ -641,7 +591,7 @@ public class AssetFileImportService {
                 } else {
                     newAsset.setFinancingNum(newAsset.getDepartNum());
 
-                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                         newAsset.setQrCode(newAsset.getDepartNum());
                     }
 

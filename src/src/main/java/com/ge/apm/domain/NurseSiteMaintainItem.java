@@ -123,6 +123,16 @@ public class NurseSiteMaintainItem implements Serializable {
     
     @Column(name="name")
 	private String name;
+    
+    @Column(name="signature_id")
+	private String signatureId;
+	
+	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
+	@Column(name="signature_source_type")
+	private Integer signatureSourceType=0;
+	
+	@Column(name="sequence")
+	private Integer sequence;
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
@@ -275,6 +285,31 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getSignatureId() {
+		return signatureId;
+	}
+
+	public void setSignatureId(String signatureId) {
+		this.signatureSourceType=0;
+		this.signatureId = signatureId;
+	}
+	
+	public Integer getSignatureSourceType() {
+		return signatureSourceType;
+	}
+
+	public void setSignatureSourceType(Integer signatureSourceType) {
+		this.signatureSourceType = signatureSourceType;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
 	}
 
 	public NurseSiteMaintainData getDataValue(String label){
