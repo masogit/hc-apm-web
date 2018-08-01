@@ -312,6 +312,15 @@
                                 </h:panelGroup>
                             </p:fieldset>
 
+                            <p:fieldset legend="#{fieldMsg.fieldValue('attachmentType', 4)}" rendered="#{assetArrivedListEditController.selected.status eq 3}">
+                                <h:panelGroup >
+                                    <p:dataList id="accessoryFinishedList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                    </p:dataList>
+                                </h:panelGroup>
+                            </p:fieldset>
+
                             <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}" 
                                          selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"

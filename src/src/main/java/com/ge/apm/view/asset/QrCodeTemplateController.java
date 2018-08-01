@@ -81,7 +81,10 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         if (!userContextService.hasRole("SuperAdmin")) {
             if (!hasFilterOnField("siteUID")) {
                 List<String> orgList = getHospitalFileterList().stream().map(item -> item.getUid()).collect(Collectors.toList());
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgList));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgList,"1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgList,"1*2+"));
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgList,"1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgList,"1*2+"));
             }
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
