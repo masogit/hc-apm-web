@@ -528,9 +528,6 @@ public class NurseSiteMaintainService{
 				newConfig.setClinicalDeptUID(clinicalUid);
 				save(newConfig);
 				saveConfigChildren(newConfig,listNew);
-				if(tempConfig.getApplyDirectly()){
-		    		updateUnCheckedMaintainData(newConfig, currentUser, 0, listCheckAssets);
-		    	}
 			}
 		}
 		return true;
@@ -607,7 +604,7 @@ public class NurseSiteMaintainService{
 		List<NurseSiteMaintain> listNewMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintain!=null && listMaintain.size()>0){
 			for(int i=0;i<listMaintain.size();++i){
-				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,null));
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,listMaintain.get(i).getSequence()));
 			}
 		}
 //		nurseSiteMaintainRepository.delete(listMaintain);

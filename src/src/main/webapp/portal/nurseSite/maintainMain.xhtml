@@ -3,7 +3,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 	<ui:define name="head">
@@ -63,9 +62,9 @@
                 								<label class="label">#{item}</label>
                 							</th>
                 						</p:repeat>
-                						<th>
+                						<!-- <th>
                 							<label class="label">查看签名</label>
-                						</th>
+                						</th> -->
                 					</tr>
 									<p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
 										<tr>
@@ -83,12 +82,13 @@
 			                   				</td>
 			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
 			                   					<td>
-					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
+					                           	 	<!-- <p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" /> -->
+					                           	 	<p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox>
 			                    				</td>
 											</p:repeat>
-											<td>
-												<p:commandButton id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
-											</td>
+											<!-- <td>
+												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+											</td> -->
 			                    		</tr>
 									</p:repeat>
 								</table>
@@ -128,9 +128,9 @@
 									</p:column>
 			                    </p:selectOneMenu>
 							</h:panelGroup>
-							<h:panelGroup  style="float:left">
+							<h:panelGroup  id="currentSequence" style="float:left" rendered="#{maintainController.nurseSiteMaintainConfig.type==1}">
 								<label>请选择班次: </label>
-								<p:selectOneMenu id="currentSequence" value="#{maintainController.selectSequence}" required="true" requiredMessage="班次 #{msg.ValidationRequire}">
+								<p:selectOneMenu value="#{maintainController.selectSequence}" required="true" requiredMessage="班次 #{msg.ValidationRequire}">
 			                        <f:selectItems value="#{maintainController.listSequence}" var="item" itemLabel="#{item}" itemValue="#{item}" />
 			                    </p:selectOneMenu>
 							</h:panelGroup>
