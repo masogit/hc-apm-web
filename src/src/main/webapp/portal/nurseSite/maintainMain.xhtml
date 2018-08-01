@@ -20,7 +20,7 @@
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     <br/>
                     <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
-                    	<label>请选择科室：</label>
+                    	<label>科室：</label>
 						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
 							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
 							label="------请选择------" 
@@ -82,8 +82,8 @@
 			                   				</td>
 			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
 			                   					<td>
-					                           	 	<!-- <p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" /> -->
-					                           	 	<p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox>
+					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
+					                           	 	<!-- <p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox> -->
 			                    				</td>
 											</p:repeat>
 											<!-- <td>
