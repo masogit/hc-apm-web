@@ -82,8 +82,8 @@
 			                   				</td>
 			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
 			                   					<td>
-					                           	 	<!-- <p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" /> -->
-					                           	 	<p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox>
+					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
+					                           	 	<!-- <p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox> -->
 			                    				</td>
 											</p:repeat>
 											<!-- <td>
@@ -120,7 +120,7 @@
                 			<h:panelGroup  style="float:left">
                 				<label>请选择配置: </label>
 								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
-									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update="currentSequence"></p:ajax>
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":createMaintainForm"></p:ajax>
 									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 			                        <p:column>
