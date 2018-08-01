@@ -10,7 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,10 @@ public class NurseSiteMaintainData {
 	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonIgnore
     private NurseSiteMaintainItem item;
+	
+	//0:null,1:true,2:false
+	@Transient
+	private Integer checkValueWeb;
 
 	public String getId() {
 		return id;
@@ -83,6 +89,38 @@ public class NurseSiteMaintainData {
 
 	public void setItem(NurseSiteMaintainItem item) {
 		this.item = item;
+	}
+
+	public Integer getCheckValueWeb() {
+		if(this.checkValue==null){
+			this.checkValueWeb=0;
+		}
+		else if(this.checkValue){
+			this.checkValueWeb=1;
+		}
+		else if(!this.checkValue){
+			this.checkValueWeb=2;
+		}
+		return checkValueWeb;
+	}
+
+	//0:null,1:true,2:false
+	public void setCheckValueWeb(Integer checkValueWeb) {
+		if(checkValueWeb!=null){
+			if(checkValueWeb.equals(0)){
+				this.checkValue=null;
+			}
+			else if(checkValueWeb.equals(1)){
+				this.checkValue=true;
+			}
+			else if(checkValueWeb.equals(2)){
+				this.checkValue=false;
+			}
+		}
+		else{
+			this.checkValue=null;
+		}
+		this.checkValueWeb = checkValueWeb;
 	}
 
 	@Override
