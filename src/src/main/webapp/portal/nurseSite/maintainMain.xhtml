@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 	<ui:define name="head">
@@ -62,6 +63,9 @@
                 								<label class="label">#{item}</label>
                 							</th>
                 						</p:repeat>
+                						<th>
+                							<label class="label">查看签名</label>
+                						</th>
                 					</tr>
 									<p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
 										<tr>
