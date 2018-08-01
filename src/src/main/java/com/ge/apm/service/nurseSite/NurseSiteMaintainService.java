@@ -298,7 +298,7 @@ public class NurseSiteMaintainService{
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
 					p.setCheckItem(arr2[j]);
-					p.setCheckValue(false);
+//					p.setCheckValue(false);
 					p.setItem(item);
 					listData.add(p);
 				}

@@ -325,7 +325,6 @@ public class NurseSiteMaintainItem implements Serializable {
 		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
 		tempData.setItem(this);
 		tempData.setCheckItem(label);
-		tempData.setCheckValue(false);
 		this.listData.add(tempData);
 		return tempData;
 	}
