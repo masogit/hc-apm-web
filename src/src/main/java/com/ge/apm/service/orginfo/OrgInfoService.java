@@ -170,6 +170,11 @@ public class OrgInfoService {
                                 found.setName(institutionName);
                             }
 
+                            OrgInfo sameNameOrg = orgDao.findFirstByParentUIDAndNameAndUidIsNot(found.getParentUID(), found.getName(), found.getUid());
+                            if (sameNameOrg != null) {
+                                throw new Exception(found.getName() + "已经存在!");
+                            }
+
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
