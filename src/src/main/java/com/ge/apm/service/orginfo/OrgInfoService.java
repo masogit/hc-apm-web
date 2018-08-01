@@ -180,7 +180,7 @@ public class OrgInfoService {
                                 throw new Exception(name + "已经存在!");
                             }
 
-                            found.setName(institutionName);
+                            found.setName(name);
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
