@@ -72,6 +72,36 @@ public class SharedAssetService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
     }
+
+    public ResponseEntity<LinkedHashMap> borrowByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime) {
+        String url = getGatewayURL(GatewayURL.RENT_SHORTCUT);
+        url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
+        url = url.replace("{assetInfoUID}", assetInfoUID);
+        url = url.replace("{chargingBeginTime}", chargingBeginTime);
+        url = url.replace("{chargingEndTime}", chargingEndTime);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
+        logger.info(JSON.toJSONString(response));
+        return response;
+    }
+
+    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime) {
+        String url = getGatewayURL(GatewayURL.RETURN_SHORTCUT);
+        url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
+        url = url.replace("{assetInfoUID}", assetInfoUID);
+        url = url.replace("{chargingBeginTime}", chargingBeginTime);
+        url = url.replace("{chargingEndTime}", chargingEndTime);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
+        logger.info(JSON.toJSONString(response));
+        return response;
+    }
 }
 
 

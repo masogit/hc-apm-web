@@ -242,10 +242,6 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "active_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activeTime;
-	
-	@JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
-    private Set<UserOrgInfo> setUserOrgInfo;
 
 	@Transient
 	private Integer excelIdex;
@@ -869,13 +865,5 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public String getPinYin() {
 		return getNamePyCode();
-	}
-
-	public Set<UserOrgInfo> getSetUserOrgInfo() {
-		return setUserOrgInfo;
-	}
-
-	public void setSetUserOrgInfo(Set<UserOrgInfo> setUserOrgInfo) {
-		this.setUserOrgInfo = setUserOrgInfo;
 	}
 }
