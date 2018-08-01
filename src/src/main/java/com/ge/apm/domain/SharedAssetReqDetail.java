@@ -141,6 +141,11 @@ public class SharedAssetReqDetail implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyDate;//修改日期
     
+    @Transient
+    private String rentalTime;
+    
+    @Transient
+    private Double totalAmount;
 
     public String getId() {
         return id;
@@ -591,5 +596,21 @@ public class SharedAssetReqDetail implements Serializable{
     public void setClinicalDeptForReturnName(String clinicalDeptForReturnName) {
         this.clinicalDeptForReturnName = clinicalDeptForReturnName;
     }
+
+	public String getRentalTime() {
+		return rentalTime;
+	}
+
+	public void setRentalTime(String rentalTime) {
+		this.rentalTime = rentalTime;
+	}
+
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
 
 }
