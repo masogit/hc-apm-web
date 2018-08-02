@@ -480,12 +480,13 @@ public class TableCreateController extends TieWebSheetBean {
     public void generateExcelTemplateFile() {
         String fname = genExcelTemplateTableName(table);
         try (Workbook wb = new XSSFWorkbook()) {
+            exportedFile = null;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ReportTemplateDocument report = new ReportTemplateDocument(wb, table, "Template");
             report.write(out);
             InputStream doc = new ByteArrayInputStream(out.toByteArray());
             exportedFile = new DefaultStreamedContent(doc, "application/vnd.ms-excel", fname);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(TableCreateController.class.getName()).log(Level.WARNING, "Error happens while generate Excel template", ex);
             WebUtil.addErrorMessage("Excel模版生成失败");
         }

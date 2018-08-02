@@ -514,7 +514,7 @@ public class AssetInstallationController {
     public void onQrCodeChange(){
         if(!Strings.isNullOrEmpty(oldQrCode)){
             //release old qrCode
-            qrCodeService.updateQrCodeStatus(oldQrCode, arrivalListItem.getArrivalList().getSiteUID(), 1);
+            qrCodeService.releaseQrCode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
         }
         if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
             String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());

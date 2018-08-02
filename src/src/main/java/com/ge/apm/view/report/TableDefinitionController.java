@@ -1,10 +1,13 @@
 package com.ge.apm.view.report;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TableDefinitionRepository;
-import java.util.List;
+
+import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.OrgInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -12,8 +15,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.stream.Collectors;
 import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
@@ -25,7 +27,9 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
     private TableDefinitionRepository dao;
 
+    private OrgInfoRepository orgDao;
     private TableDefinitionService templateService;
+    private Map<String, OrgInfo> orgInfoMap;
 
     private UaaService uaaService;
 
@@ -35,10 +39,29 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     protected void init() {
 
         dao = WebUtil.getBean(TableDefinitionRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         templateService = WebUtil.getBean(TableDefinitionService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
+        this.orgInfoMap = populateOrgInfoMap();
+    }
+
+    private Map<String, OrgInfo> populateOrgInfoMap() {
+        Map<String, OrgInfo> mapping = new HashMap<>();
+
+        Set<String> idc = new HashSet<>();
+        for (TableDefinition item : this.getItemList()) {
+            idc.add(item.getSiteUID());
+        }
+        if (!idc.isEmpty()) {
+            List<OrgInfo> orgs = orgDao.findByUids(idc);
+            for (OrgInfo org : orgs) {
+                mapping.put(org.getUid(), org);
+            }
+        }
+
+        return mapping;
     }
 
     @Override
@@ -120,4 +143,11 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
         this.createType = createType;
     }
 
+    public Map<String, OrgInfo> getOrgInfoMap() {
+        return orgInfoMap;
+    }
+
+    public void setOrgInfoMap(Map<String, OrgInfo> orgInfoMap) {
+        this.orgInfoMap = orgInfoMap;
+    }
 }

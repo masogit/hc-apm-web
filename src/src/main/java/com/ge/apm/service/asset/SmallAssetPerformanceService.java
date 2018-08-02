@@ -1,11 +1,6 @@
 package com.ge.apm.service.asset;
 
 import java.io.IOException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
@@ -16,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -26,7 +21,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
@@ -43,7 +38,7 @@ import com.ge.apm.service.utils.ExcelParser;
 /**
  * Created by 212605082 on 2017/11/7.
  */
-@Component
+@Service
 public class SmallAssetPerformanceService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmallAssetPerformanceService.class);
 

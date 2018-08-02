@@ -46,7 +46,7 @@ public class AssetRowTest {
         rowMap.put("功能等级", "1");
         rowMap.put("是否PM", "否");
 
-        AssetRow assetRow = new AssetRow(assetInfo, true, rowMap);
+        AssetRow assetRow = new AssetRow(assetInfo, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
@@ -67,6 +67,7 @@ public class AssetRowTest {
     public void testSetFieldValue_IsOld_Clear_Data() {
 
         AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setUid("uid");
         assetInfo.setAliasName("CT");
         assetInfo.setManufactDate(today);
         assetInfo.setFunctionGroup(1);
@@ -89,7 +90,7 @@ public class AssetRowTest {
         rowMap.put("功能等级", "#");
         rowMap.put("是否PM", "#");
 
-        AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
+        AssetRow assetRow = new AssetRow(assetInfo, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
@@ -109,6 +110,7 @@ public class AssetRowTest {
     public void testSetFieldValue_IsOld_Update_Data() {
 
         AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setUid("uid");
         assetInfo.setAliasName("CT");
         assetInfo.setManufactDate(today);
         assetInfo.setFunctionGroup(1);
@@ -124,7 +126,7 @@ public class AssetRowTest {
         rowMap.put("功能等级", "2");
         rowMap.put("是否PM", "否");
 
-        AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
+        AssetRow assetRow = new AssetRow(assetInfo, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
@@ -145,6 +147,7 @@ public class AssetRowTest {
     public void testSetFieldValue_IsOld_Keep_Old_Data() {
 
         AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setUid("uid");
         assetInfo.setAliasName("CT");
         assetInfo.setManufactDate(today);
         assetInfo.setFunctionGroup(1);
@@ -155,7 +158,7 @@ public class AssetRowTest {
         Map<String, Object> rowMap = new HashMap<>();
 //        rowMap.put("设备别名", "");
 
-        AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
+        AssetRow assetRow = new AssetRow(assetInfo, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
@@ -175,10 +178,11 @@ public class AssetRowTest {
     public void testSetFieldValue_use_default_value() {
 
         AssetInfo assetInfo = new AssetInfo();
+        assetInfo.setUid("uid");
 
         Map<String, Object> rowMap = new HashMap<>();
 
-        AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
+        AssetRow assetRow = new AssetRow(assetInfo, rowMap);
         assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
 
         assertTrue(assetInfo.getIsPm());

@@ -39,6 +39,11 @@ public class FileScanService {
         String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType == null ? "" : fileType).concat(String.valueOf(System.currentTimeMillis()));
         return saveFile(file, folderName, "batchfile").replaceFirst(BATCH_FILE_Folder, "");
     }
+    
+    public String saveFileString(String str) throws Exception{
+    	String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
+        return saveFileString(str, folderName, "file.txt");
+    }
 
     public String saveFile(UploadedFile file, String folderName, String saveFilename) throws Exception {
 
@@ -69,6 +74,19 @@ public class FileScanService {
             throw e;
         }
 
+        return fileName;
+    }
+    
+    public String saveFileString(String str, String folderName, String saveFilename) throws Exception {
+        FileUtils.createFolder(folderName, true);
+        String fileName = folderName.concat(File.separator).concat(saveFilename);
+        try (FileOutputStream out = new FileOutputStream(fileName)) {
+            byte[]b = str.getBytes();
+            out.write(b);
+            out.flush();
+        } catch (Exception e) {
+            throw e;
+        }
         return fileName;
     }
 

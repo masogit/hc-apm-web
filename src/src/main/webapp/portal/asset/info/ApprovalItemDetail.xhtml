@@ -316,8 +316,8 @@
                                 </p:selectOneRadio>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">是否对质保到期进行提醒</label>
-                                <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoApprovalController.selected.warranty}"  disabled="true"/>
+                                <label class="label">#{msg.isWarrantyNotice}</label>
+                                <p:selectBooleanButton title="#{msg.isWarrantyNotice}"    onLabel="是" offLabel="否"  value="#{assetInfoApprovalController.selected.warranty}"  disabled="true"/>
                             </h:panelGroup>
 
 

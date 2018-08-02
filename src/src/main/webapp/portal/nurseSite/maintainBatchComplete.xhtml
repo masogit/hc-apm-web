@@ -19,24 +19,14 @@
                         <label class="label">结束时间*</label>
                         <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                		<label class="label">签名</label>
+						<p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" value="#{maintainController.signatureContent}" required="false" guideline="true" requiredMessage="签名 #{msg.ValidationRequire}"/>
+					</h:panelGroup>
                 </p:panelGrid>
-				<!-- <table>
-               		<c:forEach items="#{maintainController.listCheckItems}" var="item">
-               			<tr>
-               				<td>
-               					<label class="label">#{item.key}</label>
-               				</td>
-               				<c:forEach items="#{item.listSimplePairValue}" var="item2">
-               					<td>
-                					<label class="label">#{item2.key}</label>
-                         	 <p:selectBooleanCheckbox value="#{item2.blnValue}" />
-                				</td>
-							</c:forEach>
-                		</tr>
-					</c:forEach>
-                </table> -->
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()"/>
+                <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>
         </p:dialog>

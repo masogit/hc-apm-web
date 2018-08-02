@@ -15,13 +15,11 @@ public class AssetRow {
     public static final String DELETE_MARK = "#";
 
     private AssetInfo assetInfo;
-    private boolean isNew;
     private Map<String, Object> rowMap;
 
 
-    public AssetRow(AssetInfo assetInfo, boolean isNew, Map<String, Object> rowMap) {
+    public AssetRow(AssetInfo assetInfo, Map<String, Object> rowMap) {
         this.assetInfo = assetInfo;
-        this.isNew = isNew;
         this.rowMap = rowMap;
     }
 
@@ -29,7 +27,8 @@ public class AssetRow {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Method method = AssetInfo.class.getMethod(methodName, String.class);
-            if (isNew) {
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, fieldValueOfString);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -56,7 +55,8 @@ public class AssetRow {
                 fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
             }
             Method method = AssetInfo.class.getMethod(methodName, Integer.class);
-            if (isNew) {
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, fieldValueOfInteger);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -84,7 +84,8 @@ public class AssetRow {
             }
 
             Method method = AssetInfo.class.getMethod(methodName, Double.class);
-            if (isNew) {
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, fieldValueOfDouble);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -115,7 +116,8 @@ public class AssetRow {
             }
 
             Method method = AssetInfo.class.getMethod(methodName, Date.class);
-            if (isNew) {
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, fieldValueOfDate);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -147,7 +149,7 @@ public class AssetRow {
                 selectedOption = defaultValue;
             }
 
-            if (isNew) {
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, selectedOption);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -180,7 +182,8 @@ public class AssetRow {
             }
 
             Method method = AssetInfo.class.getMethod(methodName, Boolean.class);
-            if (isNew) {
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
                 method.invoke(assetInfo, fieldValueOfBoolean);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
@@ -232,6 +235,13 @@ public class AssetRow {
             List<String> c = new ArrayList();
             c.add(comments);
             item.put("errmsg", c);
+        }
+    }
+
+    public static void clearErrMessage(Map<String, Object> item) {
+        if (item.containsKey("errmsg")) {
+            List<String> errMsgs = ((List<String>) item.get("errmsg"));
+            errMsgs.clear();
         }
     }
 

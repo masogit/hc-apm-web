@@ -34,9 +34,14 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-		                      <p:inputText  value="#{relRuleAssetController.queryAsset.manufacture}"  required="false">
+                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" >
+                                 <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                             </p:selectOneMenu>
+		                      <!--<p:inputText  value="#{relRuleAssetController.queryAsset.manufacture}"  required="false">
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
-	                          </p:inputText>
+	                          </p:inputText>-->
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>

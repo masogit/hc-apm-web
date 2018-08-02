@@ -86,7 +86,7 @@
                                     <br/>
                                     <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                                     <br />
-                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false">
+                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false" rendered="#{not empty tableCreateController.table.title}">
                                         <p:fileDownload value="#{tableCreateController.exportedFile}"/>
                                     </p:commandLink>
                                 </h:panelGroup>
@@ -149,11 +149,11 @@
                             	<h:panelGroup>
                             		<p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" style="width:auto;">
 	                                    <f:facet name="sourceCaption">待绑定键值对</f:facet>
- 	                                    <f:facet name="targetCaption">已绑定键值对</f:facet>
-	 									<p:column style="float: left;width:100%;text-align:left;">
-	 										<h:outputText value="#{item}" />
-	 									</p:column>
- 									</p:pickList>
+	                                    <f:facet name="targetCaption">已绑定键值对</f:facet>
+										                  <p:column style="float: left;width:100%;text-align:left;">
+											                  <h:outputText value="#{item}" />
+										                  </p:column>
+									              </p:pickList>
                             	</h:panelGroup>
                             </p:panelGrid>
                         </p:tab>

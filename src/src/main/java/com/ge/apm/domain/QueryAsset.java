@@ -10,6 +10,15 @@ public class QueryAsset {
 	private Integer level;
 	private Integer clinicalDeptId;//使用科室
 	private String brand;//品牌
+	private String manufactureId;//
+
+	public String getManufactureId() {
+		return manufactureId;
+	}
+
+	public void setManufactureId(String manufactureId) {
+		this.manufactureId = manufactureId;
+	}
 
 	public String getBrand() {
 		return brand;
