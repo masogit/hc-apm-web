@@ -86,7 +86,7 @@ public class TableCreateController extends TieWebSheetBean {
     private DualListModel listInstrumentMppingLabels = new DualListModel<>();
     private String instrumentDataLabel;
     private String templateLabel;
-    private static final String SPLIT_STR = " <=> ";
+    private static final String SPLIT_STR = " == ";
 
     // cache for exported file.
     private StreamedContent exportedFile;
