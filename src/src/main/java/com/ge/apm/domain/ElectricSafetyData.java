@@ -648,7 +648,6 @@ public class ElectricSafetyData implements Serializable {
 		this.siteUID = siteUID;
 	}
 	
-	
 	public String getEquipmentElectricLeakage() {
 		return equipmentElectricLeakage;
 	}
