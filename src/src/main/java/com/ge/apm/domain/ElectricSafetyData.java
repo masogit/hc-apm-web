@@ -100,6 +100,11 @@ public class ElectricSafetyData implements Serializable {
 //	8，——》保护接地阻抗参考值（<0.2Ω）
 //	@Column(name = "protect_ground_impedance_ref_val")
 //	private String protectGroundImpedanceRefVal;
+	
+//	21，——》等效设备漏电流（单位：μA）
+	@Column(name="equipment_electric_leakage")
+	private String equipmentElectricLeakage;
+	
 //	23，——》患者漏电流（应用部分加电）（单位：μA）
 	@Column(name = "patient_electric_leakage_app")
 	private String patientElectricLeakage_app;
@@ -642,9 +647,15 @@ public class ElectricSafetyData implements Serializable {
 	public void setSiteUID(String siteUID) {
 		this.siteUID = siteUID;
 	}
+	
+	public String getEquipmentElectricLeakage() {
+		return equipmentElectricLeakage;
+	}
 
-	
-	
+	public void setEquipmentElectricLeakage(String equipmentElectricLeakage) {
+		this.equipmentElectricLeakage = equipmentElectricLeakage;
+	}
+
 	public static Map<String,String> getLabelAttributeMapping(){
 		if(mapLabelAttributes==null){
 			mapLabelAttributes=new HashMap<String,String>();
@@ -653,6 +664,7 @@ public class ElectricSafetyData implements Serializable {
 		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
 		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
 		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流");
+		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
 		return mapLabelAttributes;
 	}
 	

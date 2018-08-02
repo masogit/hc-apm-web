@@ -780,6 +780,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
     }
 
+    public void prepareEditAccDetailonPrice(String itemId){
+        accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+
+        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+
+    }
+
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
             coWorkerDetail = new V2_WorkOrderCoworker();
@@ -797,6 +804,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
 //        detailDao.save(itemDetail);
         cancelWorkdetail();
+    }
+    public void updateAccessPrice(){
+        woService.updateAccessPrice(itemDetail);
     }
 
     public void addCoWokerItem() {

@@ -1,13 +1,13 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -15,10 +15,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -28,8 +28,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 @Entity
 @Table(name = "nurse_site_maintain_config")
-public class NurseSiteMaintainConfig implements Serializable {
-
+public class NurseSiteMaintainConfig implements Serializable,Cloneable {
+	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainConfig.class);
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -68,13 +68,15 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
 	
@@ -84,6 +86,11 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name="check_items_detail",columnDefinition="text")
 	private String checkItemsDetail;
 	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
 	
 	//1:day,2:week,3:month,4:year
 	@Column(name="type")
@@ -94,6 +101,9 @@ public class NurseSiteMaintainConfig implements Serializable {
 	
 	@Column(name="name")
 	private String name;
+	
+	@Column(name="apply_directly")
+	private Boolean applyDirectly=false;
 
 	public String getId() {
 		return id;
@@ -222,6 +232,36 @@ public class NurseSiteMaintainConfig implements Serializable {
 	public void setCheckItemsDetail(String checkItemsDetail) {
 		this.checkItemsDetail = checkItemsDetail;
 	}
+	
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
+	}
+
+	public Boolean getApplyDirectly() {
+		if(applyDirectly==null){
+			applyDirectly=false;
+		}
+		return applyDirectly;
+	}
+
+	public void setApplyDirectly(Boolean applyDirectly) {
+		if(applyDirectly==null){
+			applyDirectly=false;
+		}
+		this.applyDirectly = applyDirectly;
+	}
 
 	@Override
 	public int hashCode() {
@@ -247,5 +287,22 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Override
 	public String toString() {
 		return "NurseSiteMaintainConfig [ id=" + id + " ]";
+	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+	
+	public NurseSiteMaintainConfig cloneObj(){
+		NurseSiteMaintainConfig temp=null;
+		try {
+			temp=(NurseSiteMaintainConfig)this.clone();
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
+		return temp;
 	}
 }

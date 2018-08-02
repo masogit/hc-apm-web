@@ -5,12 +5,14 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -19,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
@@ -81,13 +81,7 @@ public class AssetFileImportService {
     private UserAccountRepository userDao;
 
     @Autowired
-    private SupplierRepository supplierDao;
-
-    @Autowired
     private QrCodeLibRepository qrcodeDao;
-
-    @Autowired
-    private AssetCreateService assetCreateService;
 
     @Autowired
     private QrCodeService qrCodeService;
@@ -99,21 +93,20 @@ public class AssetFileImportService {
     ConfigService configService;
 
     @Autowired
-    private TenantInfoRepository tenantInfoDao;
+    private AssetFileImportSupportingService supportingService;
+
+    @Autowired
+    private AssetDepreciationService assetDepreciationService;
 
     private OrgInfo selectedOrgToImport;
 
     private String assetCodeConfig;
-    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
-    private static final String ASSET_CODE_MERGE_TWO = "DF";
 
-    private final String OLD_QRCODE_KEY = "old_qrcode";
-    private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
     private WorkflowConfig workflowConfig;
 
-    public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
+    public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
-        Map<String, Map<String, Object>> result = new LinkedHashMap();
+        List<Map<String, Object>> result = new ArrayList<>();
         int keyRow = 4;
         int dataRow = 5;
 
@@ -127,25 +120,13 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(selectedOrgToImport.getId());
-            org.setParentOrg(selectedOrgToImport);
-            org.setSiteId(selectedOrgToImport.getSiteId());
-
-            org.setParentUID(selectedOrgToImport.getUid());
-            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            org.setTenantUID(selectedOrgToImport.getTenantUID());
-            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            org.setSiteUID(selectedOrgToImport.getSiteUID());
-            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
-            org.setOrgType(4);
-
             org.setLineNum(dataRow);
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("org", org);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
-            result.put(orgName, map);
+            result.add(map);
         }
         return result;
     }
@@ -164,40 +145,32 @@ public class AssetFileImportService {
             try{
                 Map<String, Object> map = new LinkedHashMap();
 
-                boolean isNewAsset = true; //flag an asset is new or existing.
-
-                AssetInfo asset = new AssetInfo();
+                AssetInfo asset;
 
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
-                    asset.setUid(uuid);
+                    asset = assetDao.findByUid(uuid);
+                    if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception("无效UUID");
+
+                    //save old data to compare later
+                    map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
+                } else {
+                    asset = new AssetInfo();
                 }
+
+                asset.setLineNum(dataRow);
 
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
                 }
 
-                //keep the new finance num to prevent lose its data to use later
-                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-                map.put(NEW_FINANCE_NUM_KEY, financingNum);
-
-                //load asset if it is already existed in db, then update the record
-                List<AssetInfo> assetList = getAssetInfos(asset);
-                if (assetList != null && assetList.size() == 1) {
-                    asset = assetList.get(0);
-                    isNewAsset = false;
-                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
-                }
-
-                asset.setLineNum(dataRow);
-
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode)) {
+                if (!StringUtils.isEmpty(inputQrcode) && !inputQrcode.equals(asset.getQrCode())) {
                     asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
-                AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
+                AssetRow assetRow = new AssetRow(asset, rowMap);
                 assetRow.setFieldStringValue("设备名称", "setName");
                 assetRow.setFieldStringValue("设备编号", "setDepartNum");
                 assetRow.setFieldStringValue("资产编号", "setFinancingNum");
@@ -224,7 +197,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, null);
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
@@ -269,7 +242,7 @@ public class AssetFileImportService {
 
 
 
-                if (isNewAsset) {
+                if (StringUtils.isEmpty(asset.getUid())) {
 
                     //only new asset need to set this
                     asset.setUsageStatus(3); //已建档
@@ -279,38 +252,20 @@ public class AssetFileImportService {
                         asset.setUsageStatus(2); //待审核
                     }
 
-                    asset.setSiteId(selectedOrgToImport.getSiteId());
-                    asset.setHospitalId(selectedOrgToImport.getId());
-
-                    asset.setTenantUID(selectedOrgToImport.getTenantUID());
-                    asset.setHospitalUID(selectedOrgToImport.getHospitalUID());
-                    asset.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-                    asset.setSiteUID(selectedOrgToImport.getSiteUID());
-
-                    asset.setIsValid(true);
-                    asset.setDeviceStatus(0);
-                    asset.setIsDeleted(Boolean.FALSE);
-
-                    asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
-                    asset.setCreatedDate(now);
-                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
-                    asset.setLastModifiedDate(now);
-
                 } else {
-                    cleanRelatedFieldsWhenUpdating(asset);
-
-                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
-                    asset.setLastModifiedDate(now);
+                    supportingService.cleanRelatedFieldsWhenUpdating(asset);
                 }
 
+                supportingService.markDefautValue(selectedOrgToImport, asset, now);
+
                 map.put("asset", asset);
-                map.put("status", isNewAsset ? ImportStatus.New : ImportStatus.Exist);
+                map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 
                 result.add(map);
 
             }catch(Exception e){
-                throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
+                throw new Exception("第"+dataRow+"行数据错误:" + e.getMessage());
             }
         }
 
@@ -321,57 +276,25 @@ public class AssetFileImportService {
         return result;
     }
 
-    private void cleanRelatedFieldsWhenUpdating(AssetInfo asset) {
-        if (asset.getAssetOwnerName() == null) {
-            asset.setAssetOwnerId(null);
-            asset.setAssetOwnerTel(null);
-        }
-        if (asset.getAssetOwnerName2() == null) {
-            asset.setAssetOwnerId2(null);
-            asset.setAssetOwnerTel2(null);
-        }
-        if (asset.getAssetOwnerName3() == null) {
-            asset.setAssetOwnerId3(null);
-            asset.setAssetOwnerTel3(null);
-        }
-        if (asset.getClinicalOwnerName() == null) {
-            asset.setClinicalOwnerId(null);
-            asset.setClinicalOwnerTel(null);
-        }
-        if (asset.getClinicalDeptName() == null) {
-            asset.setClinicalDeptId(null);
-            asset.setClinicalDeptUID(null);
-        }
-        if (asset.getVendor() == null) {
-            asset.setSupplierId(null);
-        }
 
-    }
-
-    public void importData(List<Map<String, Object>> importAssetMap,
+    public void importData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                orgDao.save((OrgInfo) item.get("org"));
-//                item.put("status", ImportStatus.Created);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.Failure);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            if (orgInfo == null) {
+                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
+            }
+
+            item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
+        });
 
         //release qrcode in use in order to exchange qrcode in two different asset
-        releaseQRCodeInUse(importAssetMap);
+        supportingService.releaseOldQRCodeInUse(selectedOrgToImport, importAssetMap);
 
         importAssetMap.forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
@@ -384,8 +307,12 @@ public class AssetFileImportService {
 
             }
 
+            AssetRow.clearErrMessage(item);
+
+            item.put("status", StringUtils.isEmpty(newAsset.getUid()) ? ImportStatus.Created : ImportStatus.Exist);
+
             //check depart num to avoid duplicate when update
-            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 设备编号重复");
@@ -395,78 +322,79 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "警告:科室为空");
+                AssetRow.addErrMessage(item, "错误: 科室为空");
+                return;
             } else {
-
-                OrgInfo orgInfo = importOrgIfNeeded(orgName);
+                OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
                 newAsset.setClinicalDeptId(orgInfo.getId());
                 newAsset.setClinicalDeptUID(orgInfo.getUid());
-
             }
 
+            UserAccount userAccount;
             //for AssetOwner
-            List<UserAccount> userList = getUserInfosByName(newAsset.getAssetOwnerName());
-            if (userList != null && userList.size() == 1) {
-                UserAccount assetOwner = userList.get(0);
-                newAsset.setAssetOwnerId(assetOwner.getId());
-                newAsset.setAssetOwnerTel(assetOwner.getTelephone());
+            if (newAsset.getAssetOwnerName() == null) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
             } else {
-                if (newAsset.getAssetOwnerName() == null) {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
-                } else {
+
+                userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName());
+                if (userAccount == null) {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
-                }
-                newAsset.setAssetOwnerName(null);
-            }
-            //for AssetOwner2
-            userList = getUserInfosByName(newAsset.getAssetOwnerName2());
-            if (userList != null && userList.size() == 1) {
-                UserAccount assetOwner = userList.get(0);
-                newAsset.setAssetOwnerId2(assetOwner.getId());
-                newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
-            } else {
-                if (newAsset.getAssetOwnerName2() == null) {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
+                    newAsset.setAssetOwnerName(null);
                 } else {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                    newAsset.setAssetOwnerId(userAccount.getId());
+                    newAsset.setAssetOwnerTel(userAccount.getTelephone());
                 }
-                newAsset.setAssetOwnerName2(null);
+            }
+
+            //for AssetOwner2
+            if (newAsset.getAssetOwnerName2() == null) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
+            } else {
+                userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName2());
+                if (userAccount == null) {
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                    newAsset.setAssetOwnerName2(null);
+                } else {
+                    newAsset.setAssetOwnerId2(userAccount.getId());
+                    newAsset.setAssetOwnerTel2(userAccount.getTelephone());
+                }
+
             }
 
             //for AssetOwner3
-            userList = getUserInfosByName(newAsset.getAssetOwnerName3());
-            if (userList != null && userList.size() == 1) {
-                UserAccount assetOwner = userList.get(0);
-                newAsset.setAssetOwnerId3(assetOwner.getId());
-                newAsset.setAssetOwnerTel3(assetOwner.getTelephone());
+            if (newAsset.getAssetOwnerName3() == null) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
             } else {
-                if (newAsset.getAssetOwnerName3() == null) {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
-                } else {
+                userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName3());
+                if (userAccount == null) {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
+                    newAsset.setAssetOwnerName3(null);
+                } else {
+                    newAsset.setAssetOwnerId3(userAccount.getId());
+                    newAsset.setAssetOwnerTel3(userAccount.getTelephone());
                 }
-                newAsset.setAssetOwnerName3(null);
+
             }
 
             //for ClinicalOwner
-            userList = getUserInfosByName(newAsset.getClinicalOwnerName());
-            if (userList != null && userList.size() == 1) {
-                UserAccount clinicalOwner = userList.get(0);
-                newAsset.setClinicalOwnerId(clinicalOwner.getId());
-                newAsset.setClinicalOwnerTel(clinicalOwner.getTelephone());
+            if (newAsset.getClinicalOwnerName() == null) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
             } else {
-                if (newAsset.getClinicalOwnerName() == null) {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
-                } else {
+                userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getClinicalOwnerName());
+                if (userAccount == null) {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
+                    newAsset.setClinicalOwnerName(null);
+                } else {
+                    newAsset.setClinicalOwnerId(userAccount.getId());
+                    newAsset.setClinicalOwnerTel(userAccount.getTelephone());
                 }
-                newAsset.setClinicalOwnerName(null);
+
             }
 
             Supplier supplier;
             //导入供应商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getVendor())) {
-                supplier = importSupplierIfNeeded(newAsset.getVendor(), newAsset.getVendorTel());
+                supplier = supportingService.importSupplierIfNeeded(selectedOrgToImport, newAsset.getVendor(), newAsset.getVendorTel());
                 newAsset.setSupplierId(supplier.getId());
             } else {
                 newAsset.setSupplierId(null);
@@ -474,7 +402,7 @@ public class AssetFileImportService {
 
             ////导入维修商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
-                supplier = importMaintainancerIfNeeded(newAsset.getMaitanance(), newAsset.getMaitananceTel());
+                supplier = supportingService.importMaintainancerIfNeeded(selectedOrgToImport, newAsset.getMaitanance(), newAsset.getMaitananceTel());
                 newAsset.setMaitananceId(supplier.getId().toString());
             } else {
                 newAsset.setMaitananceId(null);
@@ -482,7 +410,7 @@ public class AssetFileImportService {
 
             ////导入制造商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getManufacture())) {
-                supplier = importManufacturerIfNeeded(newAsset.getManufacture());
+                supplier = supportingService.importManufacturerIfNeeded(selectedOrgToImport, newAsset.getManufacture());
                 newAsset.setManufactureId(supplier.getId().toString());
             } else {
                 newAsset.setManufactureId(null);
@@ -492,7 +420,7 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (needGenerateFinancingNum(newAsset)) {
+            if (supportingService.needGenerateFinancingNum(workflowConfig, newAsset)) {
 
                 //修改的时候不需要生成资产编号
                 financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -513,76 +441,40 @@ public class AssetFileImportService {
 
             }
 
-            String qrCode = newAsset.getQrCode();
 
-            List<AssetInfo> assetList = getAssetInfos(newAsset);
-            if (null == assetList || assetList.isEmpty()) {
-
-                if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
-                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
-                    if (!"Normal".equals(qrCodeStatus)) {
-                        item.put("status", ImportStatus.Failure);
-                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
-                    }
-
-                    if(createAsset(newAsset,isGeneratePmOrder)){
-                        item.put("status", ImportStatus.Created);
-                    }else{
-                        item.put("status", ImportStatus.Failure);
-                    }
-
-                } else {
-
-                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
-                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
-                        newAsset.setQrCode(newCode.getQrCode());
-                        if(createAsset(newAsset,isGeneratePmOrder)){
-                            item.put("status", ImportStatus.Created);
-                        }else{
-                            item.put("status", ImportStatus.Failure);
-                        }
-                    } else if (isAvailableQrcode(qrCode, item)) {
-                        if(createAsset(newAsset,isGeneratePmOrder)){
-                            item.put("status", ImportStatus.Created);
-                        }else{
-                            item.put("status", ImportStatus.Failure);
-                        }
-                    } else {
-                        item.put("status", ImportStatus.Failure);
-//                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
-                    }
+            //create qr code if needed, make new qrcode in used.
+            if (StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (autoGenerateQrcode) {
+                    QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                    newAsset.setQrCode(newCode.getQrCode());
                 }
-
-
-            } else if (assetList.size() > 1) {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
 
-                if (StringUtils.isEmpty(qrCode)) {
-                    if (autoGenerateQrcode) {
-                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
-                        newAsset.setQrCode(newCode.getQrCode());
-                    }
+                boolean changed = supportingService.isQrCodeNewOrChanged(newAsset, item);
 
-                } else {
-                    String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-                    if (!qrCode.equals(oldQrCode)) {
+                if (changed) {
+                    QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(),newAsset.getSiteUID());
+                    if (qrCodeLib == null) {
+                        qrCodeService.createSpecifiedQrCode(newAsset.getQrCode(), selectedOrgToImport, 3);
 
-                        boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
-                        if (!qrCodeUpdated) {
+                    } else {
+                        if (qrCodeLib.getStatus() == 1) {//已发行
+                            qrCodeLib.setStatus(3);//已建档
+                            qrcodeDao.save(qrCodeLib);
+                        } else {
                             item.put("status", ImportStatus.Failure);
-                            AssetRow.addErrMessage(item, "错误: 无效二维码");
+                            AssetRow.addErrMessage(item, "错误: 该二维码已使用！");
                             return;
                         }
 
                     }
                 }
 
-                item.put("status", ImportStatus.Exist);
-                assetDao.save(newAsset);
-
             }
+
+            //if import status failure, already returned, will not reach here.
+            assetDao.save(newAsset);
+            assetDepreciationService.saveAssetDerpeciation(newAsset);
 
         });
 
@@ -592,126 +484,12 @@ public class AssetFileImportService {
 
     }
 
-    private OrgInfo importOrgIfNeeded(String name) {
-
-        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
-
-        if (orgInfo == null) {
-            TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
-            orgInfo = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, name, selectedOrgToImport, selectedOrgToImport.getOrgLevel());
-            orgDao.save(orgInfo);
-        }
-
-        return orgInfo;
-
-    }
-
-    private Supplier importSupplierIfNeeded(String name, String tel) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setSupplierT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
-            supplier.setSupplierT(true);
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
-
-    private Supplier importMaintainancerIfNeeded(String name, String tel) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setMaintainerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
-            supplier.setMaintainerT(true);
-            if (!StringUtils.isEmpty(tel)) {
-                supplier.setTel(tel);
-            }
-
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
-
-    private Supplier importManufacturerIfNeeded(String name) {
-
-        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
-        if (supplier == null) {
-            supplier = new Supplier();
-            supplier.setManufacturerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
-            supplierDao.save(supplier);
-        }
-
-        if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
-            supplier.setManufacturerT(true);
-            supplierDao.save(supplier);
-        }
-
-        return supplier;
-
-    }
-
-    private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
-        if (null == qrcode || qrcode.isEmpty()) {
-            return true;
-        }
-
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
-        if (qrCodeLib == null) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-            return false;
-        }
-        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-            return false;
-        }
-        if (qrCodeLib.getStatus() != 1) {
-            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-            return false;
-        }
-
-        return true;
-    }
-
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
+    public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
-        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.values().size());
-        for (Map<String, Object> item : importOrgMap.values()) {
+        doc.clearRowsData(SHEET_ORG, 5, 4 + importOrgMap.size());
+        for (Map<String, Object> item : importOrgMap) {
             doc.writeRowData(SHEET_ORG, keyRowOrg, dataRowOrg++, (Map<String, Object>) item.get("rowData"));
             hasFailData = item.get("status").equals(ImportStatus.Failure);
         }
@@ -729,114 +507,18 @@ public class AssetFileImportService {
         return hasFailData;
     }
 
-    @Transactional
-    Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
-        if(!assetCreateService.createAsset(asset,isGeneratePmOrder)){
-            return false;
-        }
-        if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
-            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode(),asset.getSiteUID());
-            if (qrCodeLib != null) {
-                qrCodeLib.setStatus(3);
-                qrcodeDao.save(qrCodeLib);
-            }
-        }
-        return true;
-    }
-
-    private OrgInfo getOrgInfoByName(String name) {
-        List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
-        OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, name));
-        List<OrgInfo> orgInfos = orgDao.findBySearchFilter(OrgInfoFilters);
-        if (orgInfos.size() == 0) {
-            return null;
-        } else {
-            return orgInfos.get(0);
-        }
-    }
-
-    private List<AssetInfo> getAssetInfos(AssetInfo asset) {
-
-
-        if (!StringUtils.isEmpty(asset.getUid())) {
-            List<SearchFilter> assetFilters = new ArrayList<>();
-            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
-            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-            List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
-            return tempList;
-        } else {
-            return Collections.emptyList();
-
-        }
-
-
-    }
-
-    private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
-
-        if (StringUtils.isEmpty(asset.getDepartNum())) {
-            return false;
-        }
-
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        String orgUid = selectedOrgToImport.getUid();
-
-        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-
-        if (null != asset.getUid()) {
-            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, asset.getUid()));
-        }
-
-        List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
-        if (resultList.size() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    private List<UserAccount> getUserInfosByName(String userName) {
-        List<SearchFilter> userFilters = new ArrayList<>();
-//        userFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-        userFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        userFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, userName));
-        return userDao.findBySearchFilter(userFilters);
-    }
-
-    private List<Supplier> getSupplierListByName(String supplierName) {
-        List<SearchFilter> supplierFilters = new ArrayList<>();
-        supplierFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        supplierFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, supplierName));
-        supplierFilters.add(new SearchFilter("supplierT", SearchFilter.Operator.EQ, true));
-        return supplierDao.findBySearchFilter(supplierFilters);
-    }
-
-    public Boolean checkData(List<Map<String, Object>> importAssetMap) {
+    public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         HashSet<Boolean> result = new HashSet<>();
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                item.put("status", ImportStatus.New);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.CheckFail);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
-//                result.add(Boolean.FALSE);
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
+        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
@@ -844,30 +526,26 @@ public class AssetFileImportService {
 
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
-            List<AssetInfo> assetList = getAssetInfos(newAsset);
-            if (null == assetList || assetList.isEmpty()) {
-
-                if (!StringUtils.isEmpty(newAsset.getUid())) {
-                    //检查是否输入非法UUID
+            if (!StringUtils.isEmpty(newAsset.getUid())) {
+                //检查是否输入非法UUID
+                if (!tenantUID.equals(newAsset.getTenantUID())) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
                     AssetRow.addErrMessage(item, String.format("第%d行错误: 非法UUID！", row));
+                    continue;
+                }
+            }
 
-                } else {
-                    String qrCode = newAsset.getQrCode();
-                    if (isAvailableQrcode(qrCode, item)) {
-                        item.put("status", ImportStatus.New);
-                    } else {
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
+                    boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                    if (!isAvailable) {
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
-//                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                        continue;
                     }
                 }
-
-            } else if (assetList.size() > 1) {
-                item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             }
 
             if (null == newAsset.getAssetGroup()) {
@@ -886,18 +564,11 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "警告:科室为空");
-//            } else {
-//                OrgInfo orgInfo = getOrgInfoByName(orgName);
-//
-//                if (orgInfo == null) {
-//                    item.put("status", ImportStatus.CheckFail);
-//                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-//                }
+                AssetRow.addErrMessage(item, "错误: 科室为空");
             }
 
             //check depart num to avoid duplicate when update
-            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
@@ -905,7 +576,7 @@ public class AssetFileImportService {
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 16) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
@@ -920,7 +591,7 @@ public class AssetFileImportService {
                 } else {
                     newAsset.setFinancingNum(newAsset.getDepartNum());
 
-                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                         newAsset.setQrCode(newAsset.getDepartNum());
                     }
 
@@ -1004,38 +675,7 @@ public class AssetFileImportService {
 
     }
 
-    private void releaseQRCodeInUse(List<Map<String, Object>> importAssetMap) {
 
-        importAssetMap.forEach(item -> {
-            AssetInfo newAsset = (AssetInfo) item.get("asset");
-
-            //if site uid not match, ignore update
-            if (newAsset.getUid() != null) {
-                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-                    return ;
-                }
-
-            }
-
-            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-            if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
-
-            boolean releaseable = true;
-            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-                if (!exists) {
-                    releaseable = false;
-                }
-            }
-
-            if (releaseable) {
-                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
-            }
-
-        });
-
-    }
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -1047,36 +687,8 @@ public class AssetFileImportService {
         }
     }
 
-    private boolean needGenerateFinancingNum(AssetInfo assetInfo) {
 
-        final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
-        final int GENERATE_BY_PREFIX_AND_SEQ = 2;
 
-        if (workflowConfig == null) return false;
 
-        assetCodeConfig = workflowConfig.getAssetCodeConfig();
-
-        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
-            return false;
-        }
-
-        if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
-            String financingNum = assetInfo.getFinancingNum();
-
-            if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
-
-                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
-                    return true;
-                }
-
-            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
-                if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
 }

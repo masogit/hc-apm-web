@@ -119,13 +119,17 @@ public class ExcelDocument {
 
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
-        String[] result = new String[keyRow.getLastCellNum()];
+
+        List<String> resultList = new ArrayList<>();
+
         int firstCellNum = keyRow.getFirstCellNum();
         int lastCellNum = keyRow.getLastCellNum();
         for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
-            result[columnIndex] = keyRow.getCell(columnIndex).getStringCellValue();
+            Cell cell = keyRow.getCell(columnIndex);
+            if (cell == null) break;
+            resultList.add(cell.getStringCellValue());
         }
-        return result;
+        return resultList.toArray(new String[]{});
     }
 
     public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
@@ -444,6 +448,20 @@ public class ExcelDocument {
         }
     }
 
+    public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
+
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            Object value = data.get(key);
+
+            writeCellData(sheet, dataRowNum, index + 1, value);
+        }
+    }
+
     public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, Map<String, Object> data) {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         writeRowData(sheetName, rowKey, dataRowNum, data);
@@ -493,6 +511,21 @@ public class ExcelDocument {
 
     }
 
+    public void writeCellData(Sheet sheet, int rowNum, int colNum, Object value) {
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
+    }
+
     public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(rowNum - 1);
@@ -518,8 +551,22 @@ public class ExcelDocument {
 
     }
 
+    public void clearRow(int rowNum) {
+        Sheet sheet = workBook.getSheetAt(0);
+        clearRow(sheet, rowNum);
+    }
+
     public void clearRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
+        clearRow(sheet, rowNum);
+    }
+
+    public void clearRow(int sheetIndex, int rowNum) {
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        clearRow(sheet, rowNum);
+    }
+
+    private void clearRow(Sheet sheet, int rowNum) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow != null) {
             int firstCellNum = dataRow.getFirstCellNum();
@@ -531,7 +578,6 @@ public class ExcelDocument {
                 }
             }
         }
-
     }
 
     public void calculateFormula() {

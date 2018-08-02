@@ -9,8 +9,10 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -62,6 +64,12 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
 	@Column(name = "check_date")
 	private Date checkDate;
+	
+	// scheduleDate
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@Column(name = "schedule_date")
+	private Date scheduleDate;
 
 	@Column(name = "create_by")
 	private String createByUid;
@@ -69,13 +77,15 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
 
@@ -85,12 +95,15 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name="asset_uid")
 	private String assetUid;
 	
-	@JoinColumn(name = "parent_id", referencedColumnName = "id")
+	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@org.hibernate.annotations.ForeignKey(name = "none")
+	@JsonIgnore
     private NurseSiteMaintain nurseSiteMaintain;
 	
-	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private AssetInfo assetInfo;
 	
@@ -102,6 +115,24 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name = "status")
 	private Integer status;
 	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
+    
+    @Column(name="name")
+	private String name;
+    
+    @Column(name="signature_id")
+	private String signatureId;
+	
+	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
+	@Column(name="signature_source_type")
+	private Integer signatureSourceType=0;
+	
+	@Column(name="sequence")
+	private Integer sequence;
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
@@ -216,6 +247,14 @@ public class NurseSiteMaintainItem implements Serializable {
 		this.assetInfo = assetInfo;
 	}
 
+	public Date getScheduleDate() {
+		return scheduleDate;
+	}
+
+	public void setScheduleDate(Date scheduleDate) {
+		this.scheduleDate = scheduleDate;
+	}
+
 	public Set<NurseSiteMaintainData> getListData() {
 		return listData;
 	}
@@ -224,6 +263,55 @@ public class NurseSiteMaintainItem implements Serializable {
 		this.listData = listData;
 	}
 	
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getSignatureId() {
+		return signatureId;
+	}
+
+	public void setSignatureId(String signatureId) {
+		this.signatureSourceType=0;
+		this.signatureId = signatureId;
+	}
+	
+	public Integer getSignatureSourceType() {
+		return signatureSourceType;
+	}
+
+	public void setSignatureSourceType(Integer signatureSourceType) {
+		this.signatureSourceType = signatureSourceType;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
+	}
+
 	public NurseSiteMaintainData getDataValue(String label){
 		if(listData!=null && StringUtils.isNotEmpty(label)){
 			Iterator<NurseSiteMaintainData> it=listData.iterator();
@@ -237,7 +325,6 @@ public class NurseSiteMaintainItem implements Serializable {
 		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
 		tempData.setItem(this);
 		tempData.setCheckItem(label);
-		tempData.setCheckValue(false);
 		this.listData.add(tempData);
 		return tempData;
 	}

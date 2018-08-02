@@ -18,7 +18,17 @@
                 <h:form id="maintainHeaderForm">
                 	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
-                    
+                    <br/>
+                    <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
+                    	<label>科室：</label>
+						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
+							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
+							label="------请选择------" 
+							updateLabel="true" showHeader="false">
+							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
+							<f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
+						</p:selectCheckboxMenu>
+					</h:panelGroup>
                 </h:form>
                 <h:form id="maintainForm">
                     <h:panelGrid columnClasses="value">
@@ -30,7 +40,7 @@
                     </h:panelGrid>
                 </h:form>
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="650" resizable="true" draggable="true">
-                   	<h:form id="maintainDlgTable">
+                   	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
                    		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:600px':''}">
                    			<div class="ui-datatable-tablewrapper">
                    				<table>
@@ -47,34 +57,41 @@
                 						<th>
                 							<label class="label">设备型号</label>
                 						</th>
-               							<c:forEach items="#{maintainController.showLables}" var="item">
+                						<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item">
                 							<th>
                 								<label class="label">#{item}</label>
                 							</th>
-               							</c:forEach>
+                						</p:repeat>
+                						<!-- <th>
+                							<label class="label">查看签名</label>
+                						</th> -->
                 					</tr>
-			                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
-			                   			<tr>
+									<p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
+										<tr>
 			                   				<td>
-			                   					#{item.assetInfo.name}
+			                   					<h:outputText value="#{item2.assetInfo.name}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.departNum}
+			                   					<h:outputText value="#{item2.assetInfo.departNum}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.serialNum}
+			                   					<h:outputText value="#{item2.assetInfo.serialNum}"/>
 			                   				</td>
 			                   				<td>
-			                   					#{item.assetInfo.functionType}
+			                   					<h:outputText value="#{item2.assetInfo.functionType}"/>
 			                   				</td>
-			                   				<c:forEach items="#{maintainController.showLables}" var="item2">
+			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
 			                   					<td>
-					                           	 	<p:selectBooleanCheckbox value="#{item.getDataValue(item2).checkValue}" />
+					                           	 	<p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" />
+					                           	 	<!-- <p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox> -->
 			                    				</td>
-											</c:forEach>
+											</p:repeat>
+											<!-- <td>
+												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+											</td> -->
 			                    		</tr>
-									</c:forEach>
-			                   	</table>
+									</p:repeat>
+								</table>
                    			</div>
                    		</div>
 	                   	<h:panelGrid columnClasses="value" columns="1">
@@ -91,32 +108,53 @@
 	                    </h:panelGrid>
 	                    <p:commandButton id="checkRightButton" value="全部通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
 	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
-	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
+	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
 	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
 	                    </p:commandButton>
+	                    <p:commandButton id="openSignature" actionListener="#{maintainController.getMaintainSignature(maintainController.nurseSiteMaintain.signatureId,maintainController.nurseSiteMaintain.signatureSourceType)}" value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
                    	</h:form>
                 </p:dialog>
                 <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
                 	<h:form id="createMaintainForm">
-                		<h:panelGrid columnClasses="value" columns="1">
-                			<h:panelGroup>
+                		<h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                			<h:panelGroup  style="float:left">
                 				<label>请选择配置: </label>
-                			</h:panelGroup>
-                			<h:panelGroup>
-								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true">
-									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
-			                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":createMaintainForm"></p:ajax>
+									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 			                        <p:column>
-										<h:outputText value="#{t.name}" />
+										<h:outputText value="#{t!=null?t.name:'请选择...'}" />
 									</p:column>
+			                    </p:selectOneMenu>
+							</h:panelGroup>
+							<h:panelGroup  id="currentSequence" style="float:left" rendered="#{maintainController.nurseSiteMaintainConfig.type==1}">
+								<label>请选择班次: </label>
+								<p:selectOneMenu value="#{maintainController.selectSequence}" required="true" requiredMessage="班次 #{msg.ValidationRequire}">
+			                        <f:selectItems value="#{maintainController.listSequence}" var="item" itemLabel="#{item}" itemValue="#{item}" />
 			                    </p:selectOneMenu>
 							</h:panelGroup>
                 		</h:panelGrid>
                 		<br/>
                 		<br/>
-                		<p:commandButton id="addButton" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
-                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
+                		<p:commandButton id="addButton" validateClient="true" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
+                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":messages" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
                 	</h:form>
+                </p:dialog>
+                <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名">
+                	<h:form id="signatureForm">
+                		<h:panelGrid columnClasses="value" columns="1">
+		                	<h:panelGroup rendered="#{maintainController.signatureContentWeiXin==null}">
+								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
+							</h:panelGroup>
+							<h:panelGroup rendered="#{maintainController.signatureContentWeiXin!=null}">
+								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" stream="false"/>
+							</h:panelGroup>
+						</h:panelGrid>
+						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();"/>
+					</h:form>
                 </p:dialog>
                 <ui:include src="maintainBatchCreate.xhtml"/>
                 <ui:include src="maintainBatchComplete.xhtml"/>

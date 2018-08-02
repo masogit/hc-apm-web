@@ -76,7 +76,7 @@
                             <!--<f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>-->
                             <!--&lt;!&ndash;<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>&ndash;&gt;-->
                         <!--</p:cellEditor>-->
-                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/>
+                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true" requiredMessage="预计借用数不能为空！" minValue="0" maxValue="#{item.applyQty}"/>
                     </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}">
                         <h:outputText value="#{item.remark}"/>
@@ -124,19 +124,59 @@
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.Shelve}" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
+                    <p:commandButton value="#{msg.transfer}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
                     <script>
                         function openSwapTypeViewWindow3(xhr, status, args) {
-                            var url = args.url;
-                            if (url == "norespond") {
+                        	if(args.validationFailed) {
+                        		
+                        	} else {
+                        		var url = args.url;
+                                if (url == "norespond") {
 
-                            } else {
-                                this.location.href = url;
-                            }
+                                } else {
+                                    this.location.href = url;
+                                }
+                        	}
                         }
 
                     </script>
                 </h:panelGroup>
             </h:form>
+
+                <p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TransferOrder}">
+                    <h:form id="transferOrderDialogForm" >
+                        <h:panelGroup id="display1">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">可选人员</label>
+                                    <p:selectOneMenu  value="#{sharedAssetRequestV2Controller.selectedAssignee.uid}" required="true" requiredMessage="可选人员#{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{sharedAssetRequestV2Controller.getAvailableAssignees()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <br/>
+                        </h:panelGroup>
+                         <h:panelGroup>
+                            <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.transferRequest()}" oncomplete="postTransferRequest(xhr, status, args)" value="#{msg.TransferOrder}" icon="ui-icon-check" />
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
+                            <script>
+                                function postTransferRequest(xhr, status, args) {
+                                	if (args.validationFailed) {
+                                        PF('transferOrderDialog').show();
+                                    } else {
+                                        PF('transferOrderDialog').hide();
+                                        var url = args.url;
+                                        if (url == "norespond") {
+                                        } else {
+                                            this.location.href = url;
+                                        }
+                                    }
+                                }
+                            </script>                            
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
                 
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
          </div>  

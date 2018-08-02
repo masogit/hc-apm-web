@@ -1,8 +1,6 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,8 +9,10 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -23,6 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ge.apm.service.utils.NurseSiteMaintainItemComparator;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -92,26 +92,53 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name="name")
 	private String name;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid")
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
 	
 	@JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过，3有问题
+	//0：未检查,1:已检查，2:通过，3有问题,4进行中
 	@Column(name = "status")
 	private Integer status;
 	
 	@Column(name="config_id")
 	private String configId;
+	
+	@Column(name="signature_id")
+	private String signatureId;
+	
+	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
+	@Column(name="signature_source_type")
+	private Integer signatureSourceType=0;
+	
+	@Column(name="sequence")
+	private Integer sequence;
+	
+	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//使用科室
+	
+	@Transient
+	private List<String> showLables;
+	
+	@Transient
+	private List<NurseSiteMaintainItem> showListNurseSiteMaintainItem;
+	
+	@Transient
+	private boolean needGetItem=true;
 	
 	public NurseSiteMaintain() {
 		super();
@@ -252,6 +279,88 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setConfigId(String configId) {
 		this.configId = configId;
+	}
+
+	public String getSignatureId() {
+		return signatureId;
+	}
+
+	public void setSignatureId(String signatureId) {
+		this.signatureSourceType=0;
+		this.signatureId = signatureId;
+	}
+
+	public List<String> getShowLables() {
+		return showLables;
+	}
+
+	public void setShowLables(List<String> showLables) {
+		this.showLables = showLables;
+	}
+	
+	public boolean isNeedGetItem() {
+		return needGetItem;
+	}
+
+	public void setNeedGetItem(boolean needGetItem) {
+		this.needGetItem = needGetItem;
+	}
+
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
+	}
+
+	public String getClinicalDeptName() {
+		return clinicalDeptName;
+	}
+
+	public void setClinicalDeptName(String clinicalDeptName) {
+		this.clinicalDeptName = clinicalDeptName;
+	}
+
+	public Integer getSignatureSourceType() {
+		return signatureSourceType;
+	}
+
+	public void setSignatureSourceType(Integer signatureSourceType) {
+		this.signatureSourceType = signatureSourceType;
+	}
+	
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		if(sequence==null){
+			sequence=1;
+		}
+		this.sequence = sequence;
+	}
+
+	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
+		if(showListNurseSiteMaintainItem==null){
+			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
+		}
+		else{
+			showListNurseSiteMaintainItem.clear();
+		}
+		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
+		return showListNurseSiteMaintainItem;
+	}
+
+	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
+		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
+		if(listNurseSiteMaintainItem==null){
+			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+		}
+		else{
+			listNurseSiteMaintainItem.clear();
+		}
+		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 	}
 
 	@Override

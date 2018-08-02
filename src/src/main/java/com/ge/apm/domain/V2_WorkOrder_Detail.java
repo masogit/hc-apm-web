@@ -79,6 +79,8 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date arrivedTime;
 
+    @Column(name="closed_price")
+    private Double closedPrice;
 
     @Column(name = "arrived")
     private Boolean arrived;
@@ -236,6 +238,14 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     public void setArrivedTime(Date arrivedTime) {
         this.arrivedTime = arrivedTime;
+    }
+
+    public Double getClosedPrice() {
+        return closedPrice;
+    }
+
+    public void setClosedPrice(Double closedPrice) {
+        this.closedPrice = closedPrice;
     }
 
     @Override

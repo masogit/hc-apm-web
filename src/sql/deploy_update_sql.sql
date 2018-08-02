@@ -197,3 +197,34 @@ hospital_uid = (select hospital_uid from asset_info where uid = rra.asset_uid),
 institution_uid = (select institution_uid from asset_info where uid = rra.asset_uid)
 where site_uid is null;
 
+--v8.1
+INSERT INTO public.sys_role
+(id, name, role_desc, home_page, created_by, created_date, last_modified_by, last_modified_date)
+VALUES(12, 'ExternalStaff', '维修商医工', '/homeAssetStaff.xhtml', NULL, NULL, NULL, NULL);
+
+
+--v8.1 nurseSiteMaintain
+
+--before deploy project
+drop table public.nurse_site_maintain_data;
+drop table public.nurse_site_maintain_item;
+drop table public.nurse_site_maintain;
+drop table public.nurse_site_maintain_config_item;
+drop table public.nurse_site_maintain_config;
+
+--after deploy project
+CREATE INDEX nurse_site_maintain_item_index
+    ON public.nurse_site_maintain_item USING btree
+    (schedule_date ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+ALTER TABLE public.nurse_site_maintain_item
+    CLUSTER ON nurse_site_maintain_item_index;
+
+CREATE INDEX nurse_site_maintain_index
+    ON public.nurse_site_maintain USING btree
+    (schedule_date ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+ALTER TABLE public.nurse_site_maintain
+    CLUSTER ON nurse_site_maintain_index;

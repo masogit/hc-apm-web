@@ -1,7 +1,8 @@
 package com.ge.apm.service.nurseSite;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,9 +12,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.AssetInfoRepository;
@@ -22,13 +27,20 @@ import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainDataRepository;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 
 import webapp.framework.dao.SearchFilter;
@@ -36,9 +48,9 @@ import webapp.framework.dao.SearchFilter;
 /**
  * Created by 212605082 on 2018/5/8.
  */
-@Component
+@Service
 public class NurseSiteMaintainService{
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainService.class);
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
 	
@@ -58,25 +70,39 @@ public class NurseSiteMaintainService{
 	AssetInfoRepository assetInfoRepository;
 	
 	@Autowired
+	OrgInfoRepository orgInfoRepository;
+	
+	@Autowired
+	UserOrgInfoRepository userOrgInfoRepository;
+	
+	@Autowired
+	UserAccountRepository userAccountRepository;
+	
+	@Autowired
+	private BlobFileService blobFileService;
+	
+	@Autowired
     private UaaService uaaService;
 	
-	public List<NurseSiteMaintainConfig> getMaintainConfigBySiteUid(String siteUid,String userUid){
-		return nurseSiteMaintainConfigRepository.findBySiteUid(siteUid,userUid);
+	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(Set<String> orgUids){
+		return nurseSiteMaintainConfigRepository.findByOrgUids(orgUids);
 	}
+	
 	
 	public NurseSiteMaintainConfig getMaintainConfigById(String id){
 		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 	
-	public List<NurseSiteMaintain> getMaintainData(Date startDate,Date endDate,String siteUid,String userUid){
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endDate);
-		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		return nurseSiteMaintainRepository.findBySiteUidAndDate(startDate,ca.getTime(),siteUid,userUid);
+	public List<NurseSiteMaintain> getDefaultMaintainData(Set<String> orgUids,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDefaultData(orgUids, startDate, endDate);
 	}
 	
-	public List<NurseSiteMaintain> getDefaultMaintainData(String siteUid,String userUid,Date startDate,Date endDate){
-		return nurseSiteMaintainRepository.findDefaultData(siteUid, userUid, startDate, endDate);
+	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids,Date startDate,Date endDate,int status){
+		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate,status);
+	}
+	
+	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
 	}
 	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
@@ -88,11 +114,15 @@ public class NurseSiteMaintainService{
 	}
 	
 	public AssetInfo getAssetInfoByUid(String uid){
-		return assetInfoRepository.getByUid(uid);
+		return assetInfoRepository.getByUid(uid); 
 	}
 	
 	public List<AssetInfo> getListAsset(String siteUid,String userUid){
 		return assetInfoRepository.findBySelfScope(siteUid,userUid);
+	}
+	
+	public List<AssetInfo> getListAssetBySelfClinicalScope(String siteUid,String userUid,String clinicalDeptUid){
+		return assetInfoRepository.findBySelfClinicalScope(siteUid,userUid,clinicalDeptUid);
 	}
 	
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids){
@@ -102,13 +132,36 @@ public class NurseSiteMaintainService{
 	public List<AssetInfo> getListAssetInfoByMaintainConfigParentId(String parentId){
 		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
 	}
+
+	public List<OrgInfo> getListClinicalByUid(List<String> listUid){
+		return orgInfoRepository.findClinicalByUids(listUid);
+	}
+	
+	public List<OrgInfo> getListClinicalByUid(Set<String> listUid){
+		return orgInfoRepository.findClinicalByUids(listUid);
+	}
+	
+	public OrgInfo findOrgInfoByUid(String uid){
+		return orgInfoRepository.getByUid(uid);
+	}
+	
+	public UserAccount getUserAccountByUid(String userUid){
+		return userAccountRepository.getByUid(userUid);
+	}
 	
 	public List<NurseSiteMaintainConfigItem> findByParentId(String parentId){
 		return nurseSiteMaintainConfigItemRepository.findByParentId(parentId);
 	}
 	
-	public boolean canAddMaintainData(Date scheduleDate,String siteUid,String userUid){
-		return nurseSiteMaintainRepository.findBySiteUidAndScheduleDate(scheduleDate, siteUid, userUid)==null?true:false;
+	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId){
+		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId);
+	}
+	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId){
+		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
+	}
+	
+	public List<String> findUserUidListByOrgUids(List<String> orgUids){
+		return userAccountRepository.findUserUidListByOrgUids(orgUids);
 	}
 	
 	public void save(NurseSiteMaintain obj){
@@ -129,10 +182,53 @@ public class NurseSiteMaintainService{
 	public void save(List<NurseSiteMaintain> obj){
 		nurseSiteMaintainRepository.save(obj);
 	}
-	@Transactional
+	
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public boolean deleteMaintain(NurseSiteMaintain maintain){
+//		Set<NurseSiteMaintainItem> listItem=maintain.getListNurseSiteMaintainItem();
+//		if(maintain.isNeedGetItem()){
+//			listItem=findMaintainItemByParentId(maintain.getId());
+//		}
+//		nurseSiteMaintainItemRepository.delete(listItem);
+		if(StringUtils.isNotEmpty(maintain.getSignatureId())){
+			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
+		}
+		nurseSiteMaintainRepository.delete(maintain);
+		return true;
+	}
+	
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public boolean deleteMaintain(List<NurseSiteMaintain> listMaintain){
+		if(listMaintain!=null && listMaintain.size()>0){
+//			Set<String> setParentId=new HashSet<String>();
+			Set<String> setSignatureId=new HashSet<String>();
+			for(int i=0;i<listMaintain.size();++i){
+				NurseSiteMaintain tempMaintain=listMaintain.get(i);
+//				setParentId.add(tempMaintain.getId());
+//				tempMaintain.setListNurseSiteMaintainItem(null);
+				if(StringUtils.isNotEmpty(tempMaintain.getSignatureId())){
+					setSignatureId.add(tempMaintain.getSignatureId());
+				}
+			}
+//			Set<NurseSiteMaintainItem> listItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setParentId);
+			if(setSignatureId.size()>0){
+				blobFileService.deleteBlobFilesByStorageId(setSignatureId);
+			}
+//			nurseSiteMaintainItemRepository.delete(listItem);
+			nurseSiteMaintainRepository.delete(listMaintain);
+		}
+		return true;
+	}
+	
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void saveAndDelete(List<NurseSiteMaintain> obj,List<NurseSiteMaintain> obj2){
-		nurseSiteMaintainRepository.save(obj);
-		nurseSiteMaintainRepository.delete(obj2);
+		if(obj!=null&&obj.size()>0){
+			nurseSiteMaintainRepository.save(obj);
+		}
+		if(obj2!=null && obj2.size()>0){
+//			nurseSiteMaintainRepository.delete(obj2);
+			deleteMaintain(obj2);
+		}
 	}
 	
 	public void save(NurseSiteMaintainConfig obj){
@@ -140,10 +236,8 @@ public class NurseSiteMaintainService{
 	}
 	
 	public void delete(NurseSiteMaintain obj){
-		nurseSiteMaintainRepository.delete(obj);
-	}
-	public void deleteMaintain(List<NurseSiteMaintain> obj){
-		nurseSiteMaintainRepository.delete(obj);
+//		nurseSiteMaintainRepository.delete(obj);
+		deleteMaintain(obj);
 	}
 
 	public void deleteNurseSiteMaintainConfigItem(List<NurseSiteMaintainConfigItem> list){
@@ -204,7 +298,7 @@ public class NurseSiteMaintainService{
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
 					p.setCheckItem(arr2[j]);
-					p.setCheckValue(false);
+//					p.setCheckValue(false);
 					p.setItem(item);
 					listData.add(p);
 				}
@@ -216,39 +310,74 @@ public class NurseSiteMaintainService{
 	
 	private int updateMaintainData(NurseSiteMaintain obj,Boolean defaultValue){
 		Set<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
+		if(obj.isNeedGetItem()){
+			listItem=findMaintainItemByParentId(obj.getId());
+			obj.setListNurseSiteMaintainItem(listItem);
+			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
+			obj.setNeedGetItem(false);
+		}
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-		int status=1;
-		while(it.hasNext()){
-			NurseSiteMaintainItem tempItem=it.next();
-			Set<NurseSiteMaintainData> listData=tempItem.getListData();
-			Iterator<NurseSiteMaintainData> itData=listData.iterator();
-			while(itData.hasNext()){
-				NurseSiteMaintainData tempData=itData.next();
-				Boolean value=tempData.getCheckValue();
-				if(defaultValue!=null){
+		int itemStatus=0;
+		int objStatus=0;
+		while (it.hasNext()) {
+			itemStatus = 0;
+			NurseSiteMaintainItem tempItem = it.next();
+			Set<NurseSiteMaintainData> listData = tempItem.getListData();
+			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			if (defaultValue != null) {
+				// batch update
+				if (defaultValue) {
+					tempItem.setStatus(2);
+				} else {
+					tempItem.setStatus(3);
+				}
+				while (itData.hasNext()) {
+					NurseSiteMaintainData tempData = itData.next();
 					tempData.setCheckValue(defaultValue);
 				}
-				if(value!=null && value==false && (status==1 || status==2)){
-					status=3;
-					if(defaultValue==null){
-						return status;
+			} else {
+				// single,0:未检查，2：已通过，3：有问题，4：进行中
+				while (itData.hasNext()) {
+					NurseSiteMaintainData tempData = itData.next();
+					Boolean value = tempData.getCheckValue();
+					if (value == null) {
+						if (itemStatus == 2) {
+							itemStatus = 4;
+						}
+					} else if (value) {
+						if (itemStatus == 0) {
+							itemStatus = 2;
+						}
+					} else {
+						itemStatus = 3;
+						break;
 					}
 				}
-				if(status!=3){
-					status=2;
+				tempItem.setStatus(itemStatus);
+				if (itemStatus == 0) {
+					if(objStatus==2){
+						objStatus=4;
+					}
+				} else if (itemStatus == 2) {
+					if (objStatus == 0) {
+						objStatus = 2;
+					}
+				} else if (itemStatus == 3) {
+					objStatus = 3;
+				} else if (itemStatus == 4) {
 				}
 			}
 		}
-		return status;
+		return objStatus;
 	}
 	
-	public void updateMaintainDataStatus(NurseSiteMaintain obj,boolean batchUpdate){
-		if(obj.getStatus()==null){
-			obj.setStatus(0);
-		}
+	public void updateMaintainDataStatus(NurseSiteMaintain obj,boolean batchUpdate,String signatureId){
 		if(batchUpdate){
 			if(obj.getStatus()==0){
 				obj.setStatus(2);
+				if(StringUtils.isNotEmpty(signatureId)){
+					obj.setSignatureId(signatureId);
+				}
 				updateMaintainData(obj,true);
 			}
 		}
@@ -258,11 +387,11 @@ public class NurseSiteMaintainService{
 	}
 	
 	public boolean updateMaintain(NurseSiteMaintain obj,boolean batchUpdate,UserAccount currentUser){
+		Date currentDate=new Date();
 		if(batchUpdate){
 			//insert new record
 			//0：未检查,1:已检查，2:通过，3有问题
 			if(obj.getStatus()==null || obj.getStatus()==0){
-				Date currentDate=new Date();
 				obj.setCheckDate(currentDate);
 				obj.setModifyBy(currentUser);
 				obj.setModifyByUid(currentUser.getUid());
@@ -270,7 +399,6 @@ public class NurseSiteMaintainService{
 			}
 		}
 		else{
-			Date currentDate=new Date();
 			obj.setStatus(1);
 			obj.setCheckDate(currentDate);
 			obj.setModifyBy(currentUser);
@@ -280,7 +408,7 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets){
+	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets,Integer sequence){
 		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain=new NurseSiteMaintain();
 		Date currentDate=new Date();
@@ -288,6 +416,8 @@ public class NurseSiteMaintainService{
 		tempNurseSiteMaintain.setInstitutionUID(currentUser.getInstitutionUID());
 		tempNurseSiteMaintain.setHospitalUID(currentUser.getHospitalUID());
 		tempNurseSiteMaintain.setSiteUID(currentUser.getSiteUID());
+		tempNurseSiteMaintain.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
+		tempNurseSiteMaintain.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
 		tempNurseSiteMaintain.setCheckDate(currentDate);
 		tempNurseSiteMaintain.setCreateBy(currentUser);
 		tempNurseSiteMaintain.setCreateByUid(currentUser.getUid());
@@ -296,6 +426,9 @@ public class NurseSiteMaintainService{
 		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setModifyDate(currentDate);
 		tempNurseSiteMaintain.setScheduleDate(date);
+		if(sequence!=null){
+			tempNurseSiteMaintain.setSequence(sequence);
+		}
 		tempNurseSiteMaintain.setStatus(0);
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
 		tempNurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
@@ -309,27 +442,118 @@ public class NurseSiteMaintainService{
 			tempItem.setCreateDate(currentDate);
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
+			tempItem.setScheduleDate(date);
+			if(sequence!=null){
+				tempItem.setSequence(sequence);
+			}
+			tempItem.setName(nurseSiteMaintainConfig.getName());
+			tempItem.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
+			tempItem.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
 			tempItem.setStatus(0);
 		}
 		return tempNurseSiteMaintain;
 	}
 	
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain){
 		save(tempNurseSiteMaintain);
 		return true;
 	}
 	
-	@Transactional
-	public boolean deleteMaintain(NurseSiteMaintain tempNurseSiteMaintain){
-		delete(tempNurseSiteMaintain);
+	public String saveMaintainSignature(String content,String id){
+		V2_BlobObject blobObject=null;
+		try {
+			blobObject = blobFileService.uploadFileString(content);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+        if (null != blobObject) {
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            blobObject.setBoUuid(id);
+            blobFileService.saveBlobObject(blobObject);
+            return blobObject.getObjectStorageId();
+        }
+        else{
+        	return null;
+        }
+	}
+	
+	public String getMaintainSignatureWeb(String signatureId){
+		StreamedContent streamedContent=blobFileService.getBlobObjectByStorageId(signatureId);
+		InputStream input=streamedContent.getStream();
+		byte[]b=new byte[1024];
+		StringBuilder sb=new StringBuilder();
+		String result="";
+		int i=0;
+		try {
+			while((i=input.read(b))>0){
+				String str=new String(b);
+				sb.append(str);
+			}
+			input.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			try {
+				input.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				LOGGER.error(e.getMessage());
+			}
+			LOGGER.error(e.getMessage());
+			return "";
+		}
+		result=sb.toString();
+		return result;
+	}
+	
+	public StreamedContent getMaintainSignatureWeiXin(String signatureId){
+		StreamedContent streamedContent=blobFileService.getBlobObjectByStorageId(signatureId);
+		return streamedContent;
+	}
+	
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public boolean createMaintainConfig(NurseSiteMaintainConfig tempConfig,UserAccount currentUser,List<AssetInfo> listCheckAssets){
+		String originName=tempConfig.getName();
+		while(listCheckAssets.size()>0){
+			String clinicalUid="";
+			String clinicalName="";
+			List<AssetInfo> listNew=new ArrayList<AssetInfo>();
+			for(int i=0;i>-1&&i<listCheckAssets.size();++i){
+				AssetInfo assetInfo=listCheckAssets.get(i);
+				if(assetInfo!=null){
+					if(StringUtils.isEmpty(clinicalUid)){
+						clinicalUid=assetInfo.getClinicalDeptUID();
+						clinicalName=assetInfo.getClinicalDeptName();
+					}
+					if(clinicalUid!=null && clinicalUid.equals(assetInfo.getClinicalDeptUID())){
+						listNew.add(assetInfo);
+						listCheckAssets.remove(i);
+						--i;
+					}
+				}
+			}
+			NurseSiteMaintainConfig newConfig=tempConfig.cloneObj();
+			if(newConfig!=null){
+				newConfig.setName(originName+"-"+clinicalName);
+				newConfig.setClinicalDeptName(clinicalName);
+				newConfig.setClinicalDeptUID(clinicalUid);
+				save(newConfig);
+				saveConfigChildren(newConfig,listNew);
+			}
+		}
 		return true;
 	}
 	
-	@Transactional
-	public boolean saveMaintainConfig(NurseSiteMaintainConfig tempConfig,List<AssetInfo> listCheckAssets){
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public boolean updateMaintainConfig(NurseSiteMaintainConfig tempConfig,UserAccount currentUser,List<AssetInfo> listCheckAssets){
 		save(tempConfig);
 		saveConfigChildren(tempConfig,listCheckAssets);
+		if(tempConfig.getApplyDirectly()){
+    		updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
+    	}
 		return true;
 	}
 	
@@ -352,6 +576,8 @@ public class NurseSiteMaintainService{
 					obj.setCreateDate(tempConfig.getCreateDate());
 					obj.setHospitalUID(tempConfig.getHospitalUID());
 					obj.setInstitutionUID(tempConfig.getInstitutionUID());
+					obj.setClinicalDeptName(tempConfig.getClinicalDeptName());
+					obj.setClinicalDeptUID(tempConfig.getClinicalDeptUID());
 					obj.setModifyBy(tempConfig.getModifyBy());
 					obj.setModifyByUid(tempConfig.getModifyByUid());
 					obj.setModifyDate(tempConfig.getModifyDate());
@@ -370,7 +596,7 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public boolean deleteMaintainConfig(NurseSiteMaintainConfig tempConfig){
 		deleteConfigChildren(tempConfig.getId());
 		delete(tempConfig);
@@ -386,153 +612,58 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	private void updateMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
-		String checkItems=newConfig.getCheckItems();
-		if(StringUtils.isEmpty(checkItems)){
-			return;
-		}
-		if(nurseSiteMaintain.getStatus()!=null && nurseSiteMaintain.getStatus()!=0){
-			return;
-		}
-		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
-		if(listOldNurseSiteMaintainItem==null){
-			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(newConfig, listNewAssetInfo);
-        Date currentDate=new Date();
-        nurseSiteMaintain.setTenantUID(user.getTenantUID());
-        nurseSiteMaintain.setInstitutionUID(user.getInstitutionUID());
-        nurseSiteMaintain.setHospitalUID(user.getHospitalUID());
-        nurseSiteMaintain.setSiteUID(user.getSiteUID());
-        nurseSiteMaintain.setCheckDate(currentDate);
-        nurseSiteMaintain.setCreateBy(user);
-        nurseSiteMaintain.setCreateByUid(user.getUid());
-        nurseSiteMaintain.setCreateDate(currentDate);
-        nurseSiteMaintain.setModifyBy(user);
-        nurseSiteMaintain.setModifyByUid(user.getUid());
-        nurseSiteMaintain.setModifyDate(currentDate);
-//        nurseSiteMaintain.setScheduleDate(date);
-        nurseSiteMaintain.setStatus(0);
-        nurseSiteMaintain.setName(newConfig.getName());
-        nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
-        nurseSiteMaintain.setConfigId(newConfig.getId());
-        Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-        while(it.hasNext()){
-            NurseSiteMaintainItem tempItem=it.next();
-            tempItem.setNurseSiteMaintain(nurseSiteMaintain);
-            tempItem.setCheckDate(currentDate);
-            tempItem.setCreateByUid(user.getUid());
-            tempItem.setCreateDate(currentDate);
-            tempItem.setModifyByUid(user.getUid());
-            tempItem.setModifyDate(currentDate);
-            tempItem.setStatus(0);
-        }
-	}
-	
-	private void mergeMaintainDataBackup(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
-		String checkItems=newConfig.getCheckItems();
-		if(StringUtils.isEmpty(checkItems)){
-			return;
-		}
-		String name=nurseSiteMaintain.getName();
-		String newName="-"+newConfig.getName();
-		if(!name.contains(newName)){
-			nurseSiteMaintain.setName(name+newName);
-		}
-		List<String> listCheckItem=new ArrayList<String>(Arrays.asList(checkItems.split(",")));
-		boolean addCheckItem=false;
-		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
-		if(listOldNurseSiteMaintainItem==null){
-			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		//upload old item
-		Iterator<NurseSiteMaintainItem> itOldItem=listOldNurseSiteMaintainItem.iterator();
-		while(itOldItem.hasNext()){
-			NurseSiteMaintainItem tempOldItem=itOldItem.next();
-			if(addCheckItem==false){
-				Set<NurseSiteMaintainData> listOldData=tempOldItem.getListData();
-				Iterator<NurseSiteMaintainData> itAddCheckItem=listOldData.iterator();
-				while(itAddCheckItem.hasNext()){
-					NurseSiteMaintainData dataAddCheckItem=itAddCheckItem.next();
-					if(!listCheckItem.contains(dataAddCheckItem.getCheckItem())){
-						listCheckItem.add(dataAddCheckItem.getCheckItem());
-					}
-				}
-				addCheckItem=true;
-			}
-			Set<NurseSiteMaintainData> listOldData=tempOldItem.getListData();
-			if(listOldData==null){
-				listOldData=new HashSet<NurseSiteMaintainData>();
-			}
-//			addNurseSiteMaintainData(listCheckItem, listOldData,tempOldItem);
-		}
-		//insert new item
-		if(listNewAssetInfo!=null){
-			for(int j=0;j<listNewAssetInfo.size();++j){
-				String newAssetUid=listNewAssetInfo.get(j).getUid();
-				NurseSiteMaintainItem findOldItem=null;
-				itOldItem=listOldNurseSiteMaintainItem.iterator();
-				while(itOldItem.hasNext()){
-					NurseSiteMaintainItem tempOldItem=itOldItem.next();
-					String oldAssetUid=tempOldItem.getAssetUid();
-					if(newAssetUid.equals(oldAssetUid)){
-						findOldItem=tempOldItem;
-						break;
-					}
-				}
-				if(findOldItem==null){
-					Date date=new Date();
-					NurseSiteMaintainItem tempItem=new NurseSiteMaintainItem();
-					tempItem.setAssetUid(listNewAssetInfo.get(j).getUid());
-					tempItem.setCreateByUid(user.getUid());
-					tempItem.setCreateDate(date);
-					tempItem.setModifyByUid(user.getUid());
-					tempItem.setModifyDate(date);
-					tempItem.setNurseSiteMaintain(nurseSiteMaintain);
-					Set<NurseSiteMaintainData> listNewData=new HashSet<NurseSiteMaintainData>();
-					tempItem.setListData(listNewData);
-					listOldNurseSiteMaintainItem.add(tempItem);
-//					addNurseSiteMaintainData(listCheckItem, tempItem.getListData(),tempItem);
-				}
-			}
-		}
-	}
-	
-	private void addNurseSiteMaintainData(String checkItems,Set<NurseSiteMaintainData> list,NurseSiteMaintainItem item){
-		String []arr=checkItems.split(",");
-		for(int i=0;i<arr.length;++i){
-			boolean contains=false;
-			Iterator<NurseSiteMaintainData> it=list.iterator();
-			while(it.hasNext()){
-				NurseSiteMaintainData data=it.next();
-				if(data.getCheckItem().equals(arr[i])){
-					contains=true;
-					break;
-				}
-			}
-			if(!contains){
-				NurseSiteMaintainData temp=new NurseSiteMaintainData();
-				temp.setCheckItem(arr[i]);
-				temp.setCheckValue(false);
-				temp.setItem(item);
-				list.add(temp);
-			}
-		}
-	}
-	
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void updateUnCheckedMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig,UserAccount currentUser,Integer status,List<AssetInfo> listCheckAssets){
 		List<NurseSiteMaintain> listMaintain=nurseSiteMaintainRepository.findByConfigAndStatus(nurseSiteMaintainConfig.getId(), status);
 		List<NurseSiteMaintain> listNewMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintain!=null && listMaintain.size()>0){
 			for(int i=0;i<listMaintain.size();++i){
-				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets));
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,listMaintain.get(i).getSequence()));
 			}
 		}
-		nurseSiteMaintainRepository.delete(listMaintain);
+//		nurseSiteMaintainRepository.delete(listMaintain);
+		deleteMaintain(listMaintain);
 		nurseSiteMaintainRepository.save(listNewMaintain);
+	}
+	
+	public Set<String> findAccessOrgUidListByUserUid(String userUid){
+		Set<String> listResult=new HashSet<String>();
+		List<UserOrgInfo> listUserOrgInfo=userOrgInfoRepository.findOrgUidListByUserUid(userUid);
+		Set<String> listOrgUid=null;
+		if(listUserOrgInfo!=null){
+			if(listUserOrgInfo.size()>1){
+				
+			}
+			else if(listUserOrgInfo.size()==1){
+				UserOrgInfo tempUserOrgInfo=listUserOrgInfo.get(0);
+				if(tempUserOrgInfo.getOrgType()==4){
+					
+				}
+				else{
+					listOrgUid=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(tempUserOrgInfo.getOrgUid());
+				}
+			}
+		}
+		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0){
+			for(int i=0;i<listUserOrgInfo.size();++i){
+				listResult.add(listUserOrgInfo.get(i).getOrgUid());
+			}
+		}
+		if(listOrgUid!=null && listOrgUid.size()>0){
+			listResult.addAll(listOrgUid);
+		}
+		return listResult;
+	}
+	
+	public boolean existMaintain(NurseSiteMaintain tempMaintain){
+		Date startDate=tempMaintain.getScheduleDate();
+		Date endDate=tempMaintain.getScheduleDate();
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(endDate);
+		ca.add(Calendar.DATE, 1);
+		endDate=ca.getTime();
+		Boolean result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		return result==null?false:result;
 	}
 	
 //	private void formatExistMaintainDate(){

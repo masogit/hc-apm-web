@@ -34,16 +34,21 @@
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
 		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}" disabled="#{generatePmOrdersController.level == null}" >
-		                              <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
+		                              <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.manufacture}"  disabled="#{generatePmOrdersController.level == null}">
+							 <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.manufactureId}" >
+								 <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+								 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+								 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+							 </p:selectOneMenu>
+		                      <!--<p:inputText  value="#{generatePmOrdersController.queryAsset.manufacture}"  disabled="#{generatePmOrdersController.level == null}">
 	                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
-	                          </p:inputText>
+	                          </p:inputText>-->
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>

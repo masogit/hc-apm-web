@@ -5,17 +5,23 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -478,8 +484,43 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private int lineNum;
+    
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_info_id", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
+    
+    @Transient
+    private SharedAssetReqDetail sharedAssetReqDetail;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shared_asset_type", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+    private SharedAssetType sharedAssetType;
+    
+    public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
+		return sharedAssetReqDetailList;
+	}
 
-    public Integer getAssetUsage() {
+	public void setSharedAssetReqDetailList(Set<SharedAssetReqDetail> sharedAssetReqDetailList) {
+		this.sharedAssetReqDetailList = sharedAssetReqDetailList;
+	}
+
+	public SharedAssetReqDetail getSharedAssetReqDetail() {
+		return sharedAssetReqDetail;
+	}
+
+	public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
+		this.sharedAssetReqDetail = sharedAssetReqDetail;
+	}
+	
+	public SharedAssetType getSharedAssetType() {
+		return sharedAssetType;
+	}
+
+	public void setSharedAssetType(SharedAssetType sharedAssetType) {
+		this.sharedAssetType = sharedAssetType;
+	}
+
+	public Integer getAssetUsage() {
         return assetUsage;
     }
 
