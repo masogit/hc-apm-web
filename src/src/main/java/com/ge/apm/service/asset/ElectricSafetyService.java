@@ -388,6 +388,10 @@ public class ElectricSafetyService {
 //			else if(StringUtils.equals(key, "8")){
 //				data.setProtectGroundImpedanceRefVal(strValue);
 //			}
+//			21，——》等效设备漏电流（单位：μA）
+			else if(StringUtils.equals(key, "21")){
+				data.setEquipmentElectricLeakage(strValue.replaceAll("\\+", "").trim());
+			}
 //			23，——》患者漏电流（应用部分加电）（单位：μA）
 			else if(StringUtils.equals(key, "23")){
 				data.setPatientElectricLeakage_app(strValue.replaceAll("\\+", "").trim());
