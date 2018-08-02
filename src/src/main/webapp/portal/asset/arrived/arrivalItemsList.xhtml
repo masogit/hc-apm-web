@@ -28,6 +28,10 @@
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
                         </p:column>
+                        
+                        <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.arrivalList.contractNum}"/>
+                        </p:column>
 
                         <p:column headerText="#{msg.clinicalDeptName}" exportable="false">
                             <f:facet name="header"  >

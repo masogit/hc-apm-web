@@ -280,9 +280,8 @@ public class TableDefinitionService {
             groupItem.getItems().stream().filter(item-> TableItem.ComponentType.Select.equals(item.getComponent()))
                     .filter(item -> tableValue.containsKey(item.getKey()))
                     .forEach(item->{
-                        TableOption option = item.getOptions().stream().filter(optionItem-> Objects.equals(optionItem.getKey(), tableValue.get(item.getKey())))
-                                .findAny().get();
-                        tableValue.put(item.getKey(), option.getValue());
+                        item.getOptions().stream().filter(optionItem -> Objects.equals(optionItem.getKey(), tableValue.get(item.getKey())))
+                                .findAny().ifPresent(option -> tableValue.put(item.getKey(), option.getValue()));
                     });
                 });
         

@@ -1,11 +1,13 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.druid.sql.visitor.functions.Now;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.sharedAsset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparator;
@@ -42,8 +44,12 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +58,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoController extends JpaCRUDController<AssetInfo> {
+	
+	private Logger log = Logger.getLogger(AssetInfoController.class.getName());
 
     private String gbCodeName;
     private static final long serialVersionUID = -1L;
@@ -60,6 +68,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     AssetFileImportService importService;
 
     AssetInfoService assetInfoService;
+    
+    private SharedAssetService sharedAssetService;
 
     private UserAccountRepository userDao;
 
@@ -169,6 +179,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     SupplierController supplierController;
 
     List<Supplier> supplierList = Collections.emptyList();
+    
+    private Date nowDate = new Date();
+    
+    private List<OrgInfo> deptListCanLeaseAsset;
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -248,6 +262,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
+        sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
         pmService = WebUtil.getBean(V2_PmOrderService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
@@ -448,7 +463,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPageAssets = res.getContent();
-//            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+            for(AssetInfo info : currentPageAssets) {
+            	SharedAssetReqDetail reqDetail = selectProperReqDetail(info);
+            	info.setSharedAssetReqDetail(reqDetail);
+            }
             return res;
         }
     }
@@ -1089,7 +1107,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(), asset.getSiteUID(), 1);
+            qrCodeService.releaseQrCode(asset.getQrCode(), asset.getSiteUID());
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
@@ -1978,4 +1996,109 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.ownerList = ownerList;
     }
 
+	public List<String> getOrgUids() {
+		return orgUids;
+	}
+
+	public Date getNowDate() {
+		return nowDate;
+	}
+
+	public void setNowDate(Date nowDate) {
+		this.nowDate = nowDate;
+	}
+	
+	public void prepareForceAllocateAsset(String assetUid) {
+		AssetInfo asset = dao.findByUid(assetUid);
+		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
+		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		asset.setSharedAssetReqDetail(reqDetail);
+		this.selected = asset;
+	}
+	
+	public void prepareForceReturnAsset(String assetUid) {
+		AssetInfo asset = dao.findByUid(assetUid);
+		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
+		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		asset.setSharedAssetReqDetail(reqDetail);
+		this.selected = asset;
+	}
+	
+	public List<OrgInfo> getDeptListCanLeaseAsset() {
+		UserAccount ua = UserContextService.getCurrentUserAccount();
+		return assetInfoService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
+	}
+	
+	public void forceReturnAsset() {
+		if(this.selected != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+			Date chargingBeginTime = selected.getSharedAssetReqDetail().getChargingBeginTime();
+			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
+			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
+			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			try {
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
+				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	public void forceAllocateAsset() {
+		if(this.selected != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+			Date chargingBeginTime = selected.getSharedAssetReqDetail().getChargingBeginTime();
+			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
+			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
+			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			try {
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
+				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	private SharedAssetReqDetail selectProperReqDetail(AssetInfo info) {
+		Date nowDate = new Date();
+    	SharedAssetReqDetail sharedAssetReqDetail = info.getSharedAssetReqDetailList().stream().filter(item -> item.getChargingEndTime() == null || item.getChargingEndTime().compareTo(nowDate) > 0).findFirst().orElse(null);
+    	if(sharedAssetReqDetail != null) {
+    		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
+    		LocalDateTime beginLDT;
+    		Date endTime = sharedAssetReqDetail.getChargingEndTime();
+    		LocalDateTime endLDT;
+
+    		if(endTime != null) {
+    			endLDT = endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    		} else {
+    			endLDT = LocalDateTime.now();
+    		}
+    		
+    		String totalTime = "";
+    		long unit = 1;
+    		long days = 0, hours = 0, minutes = 0;
+    		if(beginTime != null) {
+    			beginLDT = beginTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    			long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+    			days = rentalTimeInMinutes / (24 * 60);
+    			hours = (rentalTimeInMinutes / 60) % 24;
+    			minutes = rentalTimeInMinutes % 60;
+    			unit = days * 24 + hours + minutes / 60;
+    			totalTime = days + "天" + hours + "时" + minutes + "分";
+    		}
+    		
+    		if("1".equals(info.getSharedAssetType().getId())) {
+    			totalTime = "1次";
+    		} else if ("3".equals(info.getSharedAssetType().getId())) {
+    			totalTime = days + "天";
+    			unit = days;
+    		}
+    		sharedAssetReqDetail.setRentalTime(totalTime);
+    		sharedAssetReqDetail.setTotalAmount(unit * info.getSharedAssetType().getUnitPrice());
+    	}
+    	return sharedAssetReqDetail;
+	}
+    
 }

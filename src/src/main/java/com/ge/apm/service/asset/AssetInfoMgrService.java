@@ -66,7 +66,7 @@ public class AssetInfoMgrService {
         }
 
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(), asset.getSiteUID(), 1);
+            qrCodeService.releaseQrCode(asset.getQrCode(), asset.getSiteUID());
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);

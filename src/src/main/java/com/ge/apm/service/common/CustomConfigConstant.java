@@ -95,7 +95,7 @@ public class CustomConfigConstant {
             exportFields.put("上次保养日期", "lastPmDate");
             exportFields.put("上次巡检日期", "lastQaDate");
             exportFields.put("上次计量日期", "lastMeteringDate");
-            exportFields.put("是否对质保到期提醒", "warranty");
+            exportFields.put("是否对维保到期提醒", "warranty");
         }
         return exportFields;
     }

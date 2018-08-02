@@ -5,16 +5,24 @@
  */
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
+import com.ge.apm.domain.bo.parser.SchemaParser;
 import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
+import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
 import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
 import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
+import com.ge.apm.domain.exception.BusinessException;
+import com.ge.apm.domain.pure.TableGroup;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
@@ -56,6 +64,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+
+    private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
+
     V2_PmOrderRepository dao;
     private Double totalManHours;
     private String dptName;
@@ -121,6 +132,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
+    private TableDefinitionService tableService;
 
     // cache for maintenance report
     private StreamedContent maintenanceReport;
@@ -189,16 +201,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     /**
-     * Check whether it is OK to export maintenance report.
+     * Check whether the target is selected.
      *
-     * @return true if the maintenance report can be exported, false otherwise.
+     * @return true if the mantenance report item has been selected, false otherwise.
      */
-    public boolean isExportEnabled() {
-        if (this.selected == null) {
-            return false;
-        }
-        PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-        return !Strings.isNullOrEmpty(rule.getReportStorageId());
+    public boolean isTargetSelected() {
+        return this.selected != null;
     }
 
     /**
@@ -206,10 +214,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      */
     public void doExportMaintenanceReport() {
         if (this.selected != null) {
-            PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-            StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-
+            maintenanceReport = null;
             try {
+                PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
+                if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+                if (Strings.isNullOrEmpty(rule.getReportStorageId())) throw new BusinessException("请先上传保养报告模版!");
+
+                StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
                 Map<String, Object> datas = populateReportContent(selected);
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -220,21 +231,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
                 // render policy for check list
                 template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+                // render policy for audit record
+                template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
                 template.render(datas);
                 template.write(out);
 
                 InputStream doc = new ByteArrayInputStream(out.toByteArray());
                 maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
+            } catch (BusinessException e) {
+                WebUtil.addErrorMessage(e.getMessage());
             } catch (Exception e) {
-                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report");
+                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
                 WebUtil.addErrorMessage("保养报告生成失败");
             }
         }
     }
 
     private Map<String, Object> populateReportContent(V2_PmOrder pmOrder) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-
         Map<String, Object> content = new HashMap<>();
 
         // Device information
@@ -250,24 +263,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
         content.put(MaintenanceTemplate.Maintenance.CREATOR.toString(), pmOrder.getCreatorName());
         content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
-        content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? dateTimeFormatter.print(pmOrder.getPlanTime().getTime()) : "");
-        content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? dateTimeFormatter.print(pmOrder.getEndTime().getTime()) : "");
+        content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? DEFAULT_DAY.print(pmOrder.getPlanTime().getTime()) : "");
+        content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? DEFAULT_DAY.print(pmOrder.getEndTime().getTime()) : "");
         content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
         // Coworker List
         List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
-        if (coworkers != null && coworkers.size() > 0 &&
+        if (coworkers != null) {
+            int count = 0;
+            for (V2_WorkOrderCoworker coworker : coworkers) {
                 // ignore fake empty coworker
-                !(coworkers.size() == 1 && "000".equalsIgnoreCase(coworkers.get(0).getId()))) {
-            V2_WorkOrderCoworker coworker = coworkers.get(0);
-            content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
-            content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
-            if (coworkers.size() > 1) {
-                coworker = coworkers.get(1);
-                content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
-                content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
+                if ("000".equalsIgnoreCase(coworker.getId())) continue;
+                if (count == 0) {
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
+                } else if (count == 1) {
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
+                }
+                count++;
             }
         }
 
@@ -320,7 +336,132 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         content.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), checkListTable);
 
+
+        // Audit Message List
+        List<Map<String, Object>> auditMsgTable = new ArrayList<>();
+        if (this.getServiceRequestMessageList(selected.getId()) != null) {
+            for (ServiceRequestMsg item : this.getServiceRequestMessageList(selected.getId())) {
+                Map<String, Object> auditMsgMap = new HashMap<>();
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.TIME.toString(), item.getSendTime());
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.OWNER.toString(), item.getSenderUserName());
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.INFO.toString(), item.getMessage());
+
+                auditMsgTable.add(auditMsgMap);
+            }
+        }
+        content.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), auditMsgTable);
+
+        if (reportList != null) {
+            for (UnstructuredDataCollection item : reportList) {
+                // ignore invalid data
+                if(item == null || Strings.isNullOrEmpty(item.getBoType())) {
+                    continue;
+                }
+                MaintenanceTemplate.Component tableType;
+                switch (item.getBoType()) {
+                    case "pm-safety-report":
+                        tableType = MaintenanceTemplate.Component.SAFETY_REPORT;
+                        break;
+                    case "pm-performance-report":
+                        tableType = MaintenanceTemplate.Component.PERFORMANCE_REPORT;
+                        break;
+                    default:
+                        continue;
+                }
+                renderDynamicTable(item, content, tableType);
+            }
+        }
         return content;
+    }
+
+    /**
+     * Render Dynamic Table content.
+     *
+     * @param collection data collection
+     * @param content content map
+     */
+    private void renderDynamicTable(UnstructuredDataCollection collection, Map<String, Object> content, MaintenanceTemplate.Component component) {
+        TableDefinition tableDefinition = tableDao.findById(collection.getSchemaId());
+        TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+        List<UnstructuredData> dataList = collection.getData();
+
+        // Get raw data
+        Map<String, Object> rawTableValue = new HashMap<>();
+        dataList.forEach(item -> {
+            try {
+                rawTableValue.put(item.getKey(), item.getValue());
+            } catch(ClassNotFoundException e) {
+                rawTableValue.put(item.getKey(), item.getValueSerialized());
+            }
+        });
+
+        // update select box option values
+        Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
+
+        final String emptyStr = "";
+        final String prefix = component.toString();
+        for(TableGroup group : table.getGroups()) {
+            for(TableItem item : group.getItems()) {
+                if (item == null || item.getComponent() == null) {
+                    continue;
+                }
+                switch (item.getComponent()) {
+                    case Number:
+                        if (item.getResKey() != null) {
+                            try {
+                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
+                            }
+                        }
+                        if (item.getKey() != null) {
+                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                        }
+                        break;
+                    case Label:
+                        if (item.getResKey() != null) {
+                            try {
+                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Switch:
+                        if (item.getKey() != null) {
+                            try {
+                                boolean res = (Boolean) tableValue.getOrDefault(item.getKey(), false);
+                                content.put(wrap(prefix, item.getKey()), res ? "是" : "否");
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Date:
+                        if (item.getKey() != null) {
+                            try {
+                                Date dt = (Date) tableValue.getOrDefault(item.getKey(), null);
+                                content.put(wrap(prefix, item.getKey()), dt == null ? "" : DEFAULT_DAY.print(dt.getTime()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Select:
+                    case Text:
+                    case TextArea:
+                    default:
+                        if (item.getKey() != null) {
+                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private String wrap(String prefix, String key) {
+        return SchemaParser.UNDERSCORE_JOINER.join(prefix, key);
     }
 
     /**
@@ -384,8 +525,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
-                if (item.getId() == k && v == true)
+                if (item.getId() == k && v == true){
                     x3.add(item);
+                }
             });
         });
         //x3存放的是所选中pm工单
@@ -737,6 +879,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        tableService = WebUtil.getBean(TableDefinitionService.class);
         this.selectedMap = new HashMap();
         /*backup  if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) )*/
 
@@ -914,7 +1057,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-        } else if (queryIndex == 31) {//待抢单 dispatch 2是人工派工或抢单模式 3 抢单模式 4是人工派工
+        } else if (queryIndex == 31) {//待抢单 dispatch 2表示人工派工或抢单模式 3表示抢单模式 4表示人工派工
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
             /*  searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList("Assign","Accept")));*/
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
@@ -924,7 +1067,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));*/
-            //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过设备的标签
+            //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过标签的设备
             //打过标签的设备(该标签都和组绑定过)
             List<Integer> tagGroupAssets = getTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
@@ -942,6 +1085,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            //维修责任人数量小于等于1的条件
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
@@ -1074,6 +1218,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         for (V2_PmOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), this.isSelectedCurrentPage);
         }
+        isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
     }
 
     public void onItemSelected() {
@@ -1146,10 +1291,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
+        selectedMap = new HashMap<String, Boolean>();
     }
 
-    public void batchComplete() {
-       /* List<String> assetIdList = new ArrayList<String>();
+/*    public void batchComplete() {
+       *//* List<String> assetIdList = new ArrayList<String>();
         //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
         selectedMap.forEach((k,v)->{
             if(v==true)
@@ -1160,9 +1306,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             //不能选择"抢单"的来做批量"完成"
             WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
             return;
-        }*/
+        }*//*
         pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
-    }
+    }*/
 
     //已计划-->保养完成
     public void repairPmOrder() {
@@ -1233,6 +1379,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareBatchComplete() {
         this.endTime = null;
         this.totalManHours = null;
+     //   this.selectedMap = new HashMap();
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {

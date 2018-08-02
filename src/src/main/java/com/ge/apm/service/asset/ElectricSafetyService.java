@@ -11,14 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
@@ -41,13 +40,12 @@ import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.report.TableDefinitionService;
-import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 /**
  * Created by 212605082 on 2017/11/7.
  */
-@Component
+@Service
 public class ElectricSafetyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElectricSafetyService.class);
     
@@ -348,30 +346,36 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-          List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					if(listAssetInfo==null || listAssetInfo.size()==0){
-						data.setFinancingNum(data.getFinancingNum().toLowerCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					}
-					if(listAssetInfo==null || listAssetInfo.size()==0){
-						data.setFinancingNum(data.getFinancingNum().toUpperCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-					}
-					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
-						data.setAssetInfo(listAssetInfo.get(0));
-						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
-						if(order!=null){
-							data.setV2PmOrder(order);
+					try {
+						List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						if(listAssetInfo==null || listAssetInfo.size()==0){
+							data.setFinancingNum(data.getFinancingNum().toLowerCase());
+							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						}
+						if(listAssetInfo==null || listAssetInfo.size()==0){
+							data.setFinancingNum(data.getFinancingNum().toUpperCase());
+							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+						}
+						if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
+							data.setAssetInfo(listAssetInfo.get(0));
+							V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
+							if(order!=null){
+								data.setV2PmOrder(order);
+							}
+							else{
+								data.setWarnMessage("工单未找到");
+							}
+						}
+						else if(listAssetInfo!=null && listAssetInfo.size()>1){
+							data.setWarnMessage("找到多台设备");
 						}
 						else{
-							data.setWarnMessage("工单未找到");
+							data.setWarnMessage("设备未找到");
 						}
-					}
-					else if(listAssetInfo!=null && listAssetInfo.size()>1){
-						data.setWarnMessage("找到多台设备");
-					}
-					else{
-						data.setWarnMessage("设备未找到");
+					} catch (Exception e) {
+						// TODO: handle exception
+						LOGGER.error(e.getMessage());
+						data.setWarnMessage("网络异常");
 					}
 				}
 			}
@@ -384,6 +388,10 @@ public class ElectricSafetyService {
 //			else if(StringUtils.equals(key, "8")){
 //				data.setProtectGroundImpedanceRefVal(strValue);
 //			}
+//			21，——》等效设备漏电流（单位：μA）
+			else if(StringUtils.equals(key, "21")){
+				data.setEquipmentElectricLeakage(strValue.replaceAll("\\+", "").trim());
+			}
 //			23，——》患者漏电流（应用部分加电）（单位：μA）
 			else if(StringUtils.equals(key, "23")){
 				data.setPatientElectricLeakage_app(strValue.replaceAll("\\+", "").trim());

@@ -27,7 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -45,7 +45,7 @@ import webapp.framework.dao.SearchFilter;
 /**
  * Created by 212605082 on 2017/11/7.
  */
-@Component
+@Service
 public class InventoryOrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryOrderService.class);
 

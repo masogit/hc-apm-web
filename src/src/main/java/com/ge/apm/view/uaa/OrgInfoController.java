@@ -288,7 +288,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 //        return false;
 //    }
 
-    public boolean checkNameDuplicate() {
+    public boolean checkName() {
 
         OrgInfo orgInfo = dao.findFirstByParentUIDAndName(selected.getParentUID(), orgName);
         if (orgInfo != null) {
@@ -317,7 +317,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         //重复增加不被允许
-        boolean isDuplicate = checkNameDuplicate();
+        boolean isDuplicate = checkName();
         if (isDuplicate) return;
 
         assetInfoRepository.updateClinicalName(orgName, selected.getUid());

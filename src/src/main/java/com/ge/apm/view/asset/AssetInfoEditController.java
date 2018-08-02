@@ -414,8 +414,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onBeforeSave(AssetInfo object) {
         if (null != object.getClinicalDeptId()) {
             OrgInfo org = orgDao.findById(object.getClinicalDeptId());
-            object.setClinicalDeptName(org.getName());
-            object.setClinicalDeptUID(org.getUid());
+            if (org != null) {
+                object.setClinicalDeptName(org.getName());
+                object.setClinicalDeptUID(org.getUid());
+            }
 
         } else {
             //clear uid and its name
