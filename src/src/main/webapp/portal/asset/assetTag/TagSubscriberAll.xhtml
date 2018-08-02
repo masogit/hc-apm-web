@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <!-- <div class="ui-g-12 card cardTitle">
+                 <p:outputLabel class="pageTitle" value="消息订阅"/>
+             </div>-->
+
+            <div class="ui-g-12 ">
+                <p:tabView class="ui-g-12" id="scriTab" dynamic="true" cache="false">
+                    <p:tab class="ui-g-12" id="astMsgSub" title="设备消息订阅" >
+                        <ui:include src="AssetSubList.xhtml"/>
+                    </p:tab>
+
+                    <p:tab   class="ui-g-12" title="标签消息订阅" id="tagMsgSub">
+                        <ui:include src="TagSubscribeList.xhtml"/>
+                    </p:tab>
+
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
