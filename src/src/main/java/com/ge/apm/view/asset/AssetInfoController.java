@@ -2012,6 +2012,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		AssetInfo asset = dao.findByUid(assetUid);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		SharedAssetRequest assetRequest = reqDetail.getLeaseRequest();
+		if(assetRequest == null) {
+			assetRequest = new SharedAssetRequest();
+			reqDetail.setLeaseRequest(assetRequest);
+		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
 	}
@@ -2020,6 +2025,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		AssetInfo asset = dao.findByUid(assetUid);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
+		if(assetRequest == null) {
+			assetRequest = new SharedAssetRequest();
+			reqDetail.setReturnRequest(assetRequest);
+		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
 	}
@@ -2037,8 +2047,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
-				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
+				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2053,8 +2063,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
-				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
