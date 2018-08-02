@@ -20,6 +20,7 @@
                 <h:form>
                     <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建排班" title="批量创建排班" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()"/>
                     <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="班次时间设置" title="班次时间设置" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()"/>
+                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="调剂中心值班设置" title="调剂中心值班设置" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()"/>
                 </h:form>
                 <h:form id="workScheduleForm">
                     <p:growl widgetVar="messages" id="messages" showDetail="true" />
@@ -83,6 +84,7 @@
 
                 <ui:include src="workScheduleBatch.xhtml"/>
                 <ui:include src="workScheduleStageConfig.xhtml"/>
+                <ui:include src="sharedAssetConfig.xhtml"/>
             </div>
         </div>
     </ui:define>

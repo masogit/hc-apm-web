@@ -70,25 +70,25 @@ public class MaintenanceTemplate {
             return new MaintenanceTemplate(this);
         }
 
-        public Builder checkList(TableSchema schema) {
-            this.updateData(Component.CHECK_LIST.toString(), schema);
-            return this;
-
-        }
-
         public Builder safetyReport(TableSchema schema) {
-            this.updateData(Component.SAFETY_REPORT.toString(), schema);
+            this.updateData(Component.SAFETY_REPORT, schema);
             return this;
         }
 
         public Builder performanceReport(TableSchema schema) {
-            this.updateData(Component.PERFORMANCE_REPORT.toString(), schema);
+            this.updateData(Component.PERFORMANCE_REPORT, schema);
             return this;
         }
 
-        private void updateData(String key, TableSchema schema) {
-            SchemaParser.Builder builder = new SchemaParser.Builder(schema);
-            this.content.put(key, builder.build().apply());
+        /**
+         * Common Method for Dynamic Table.
+         *
+         * @param component table key
+         * @param schema    poi formatted content
+         */
+        private void updateData(Component component, TableSchema schema) {
+            SchemaParser.Builder builder = new SchemaParser.Builder(component.toString(), schema);
+            this.content.put(component.toString(), builder.build().apply());
         }
     }
 
@@ -110,6 +110,25 @@ public class MaintenanceTemplate {
             this.key = key;
         }
 
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    /**
+     * Fields in audit message table.
+     */
+    public enum AuditMsgInfo {
+        TIME("time"),
+        OWNER("owner"),
+        INFO("info");
+        private final String key;
+
+        AuditMsgInfo(String key) {
+            this.key = key;
+        }
 
         @Override
         public String toString() {

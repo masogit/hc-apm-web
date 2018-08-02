@@ -149,8 +149,14 @@ public class AssetInstallationService {
                         case "asset3":
                             item.setBoSubType("3");
                             break;
+                        case "asset4":
+                            item.setBoSubType("4");
+                            break;
                         default:
                     }
+
+                    // See: YHAAO-2346: ignore verification & other document.
+                    if ("4".equals(item.getBoSubType()) && V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType())) return;
 
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });

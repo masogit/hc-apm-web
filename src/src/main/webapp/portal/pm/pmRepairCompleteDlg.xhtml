@@ -165,7 +165,7 @@
                                             <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
                                         </p:selectOneMenu>
                                         <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
-                                    </h:panelGroup>
+                                    </h:panelGroup>d
                                 </p:panelGrid>
                             </c:forEach>
                         </p:fieldset>
@@ -178,7 +178,7 @@
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup class="buttonG">
                         <p:commandButton class="rpb" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '2'}" actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
-                        <p:commandButton class="rpt" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder,1)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm pmTab:pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
+                        <p:commandButton class="rpt" disabled="#{v2PmOrderController.qaStatus eq '1'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder,1)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm pmTab:pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
 
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
                         <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.accessoryListEmpty()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>

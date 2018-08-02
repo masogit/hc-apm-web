@@ -73,12 +73,14 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TreeNode selectedNode;
     private TenantInfoRepository tenantInfoRepository;
     private OrgInfo selectedOrg;
+    private SupplierRepository supplierDao;
 
     @Override
     protected void init() {
         filterBySite = false;
         dao = WebUtil.getBean(PmOrderRuleRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
         user = UserContextService.getCurrentUserAccount();
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
@@ -541,8 +543,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
         try {
             MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
-            /*
-            //TODO add dynamic table in the next release.
+            // add dynamic table.
             if (selected != null) {
                 TableSchema schema;
                 schema = getTableSchemaById(selected.getSafetyReport());
@@ -554,7 +555,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                     builder.performanceReport(schema);
                 }
             }
-            */
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
@@ -562,7 +562,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             InputStream doc = new ByteArrayInputStream(out.toByteArray());
             this.reportTemplateFile = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report-template.docx");
         } catch (Exception e)  {
-            Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template");
+            Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
             WebUtil.addErrorMessage("Word模版生成失败");
         }
     }
@@ -570,7 +570,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TableSchema getTableSchemaById(String id) {
         TableSchema schema = null;
         if (!Strings.isNullOrEmpty(id)) {
-            TableDefinition definition = templateDao.findById(id);
+            // use base Id to get the latest report.
+            TableDefinition definition = templateDao.findByBaseId(id);
             if (definition != null && !Strings.isNullOrEmpty(definition.getSchema())) {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -632,6 +633,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             this.selected.setReportStorageId(storageId);
             this.dao.save(selected);
         }
+    }
+
+    public List<Supplier> getSupplier(){
+        return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
     }
 
     /**

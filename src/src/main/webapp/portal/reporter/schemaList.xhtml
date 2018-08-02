@@ -37,16 +37,19 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="#{msg.hospitalId}">
+                            <h:outputText value="#{not empty tableDefinitionController.orgInfoMap[item.siteUID] ? tableDefinitionController.orgInfoMap[item.siteUID] : 'NA'}"/>
+                        </p:column>
                         <p:column headerText="说明" >
                             <h:outputText value="#{item.description}"/>
                         </p:column>
-                        <p:column headerText="" >
+                        <p:column headerText="状态" >
                             <h:outputText value="未启用"  rendered="#{empty item.status or item.status eq 'Draft'}"/>
                             <h:outputText value="已发布"  rendered="#{item.status eq 'Released'}"/>
-                            <p:spacer/>
+                        </p:column>
+                        <p:column headerText="" exportable="false">
                             <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{tableDefinitionController.setToUsing(item.id,false)}" update=":SchemaListForm:datalist"  rendered="#{empty item.status or item.status eq 'Draft'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>
                             <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="停止使用" actionListener="#{tableDefinitionController.setToUsing(item.id,true)}" update=":SchemaListForm:datalist"  rendered="#{item.status eq 'Released'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>
-
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="createTable.xhtml?faces-redirect=true" />
