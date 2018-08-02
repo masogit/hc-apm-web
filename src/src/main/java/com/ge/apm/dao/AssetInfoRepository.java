@@ -2,6 +2,8 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.AssetFileAttachment;
 import com.ge.apm.domain.AssetInfo;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +27,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select 1 from AssetInfo o where o.systemId=?1")
     public Integer checkExistsBySystemId(String systemId);
-    
+
     @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true limit 1",nativeQuery=true)
     public AssetInfo getBySystemId(String systemId);
 
     @Query("select o from AssetInfo o where o.qrCode = ?1 and o.siteUID= ?2")
     public AssetInfo getByQrCodeAndSiteUid(String qrCode,String site_uid);
-    
+
     @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status in (1,2,3)")
     public List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID);
 
@@ -40,23 +42,23 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public void updateAssetInfoPmOrderDate(int id, int siteId);
 
     public AssetInfo getById(Integer id);
-    
+
     public AssetInfo getByUid(String uid);
 
     public AssetInfo findByUid(String uid);
-    
+
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and o.siteUID=?2")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
-    
+
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumAccessScope(String financingNum,String siteUID,String userUid);
-    
+
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumSelfScope(String financingNum,String siteUID,String userUid);
-    
+
     @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
     public List<AssetInfo> findByAccessScope(String siteUID,String userUid);
-    
+
     @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and o.clinical_dept_uid is not null and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2 order by o.name_py_code asc",nativeQuery=true)
     public List<AssetInfo> findBySelfScope(String siteUID,String userUid);
 
@@ -107,24 +109,24 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select distinct a.manufacture from asset_info a where a.tenant_uid=?1 and (a.manufacture like concat('%',?2,'%') or a.manufacture_py_code like concat('%',?2,'%')) order by a.manufacture fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctManufacturesByPrefix(String tenantUID, String prefix);
 
-	@Modifying
-	@Transactional
-	@Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
-	public void updateClinicalName(String name, String uid);
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
+    public void updateClinicalName(String name, String uid);
 
 
-	@Modifying
-	@Transactional
-	@Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
-	public void updateStandardCode(String name, String uid);
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
+    public void updateStandardCode(String name, String uid);
 
-	public List<AssetInfo> findByUidIn(List<String> assetUids);
+    public List<AssetInfo> findByUidIn(List<String> assetUids);
 
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and (ai.assetOwnerId = ?2 or ai.assetOwnerId2 = ?2 or ai.assetOwnerId3 = ?2)")
     public List<AssetInfo> getByTenantUIDAndAssetOwner(String tenantUID, Integer assetOwnerId);
 
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and ai.uid in ?2")
-	public List<AssetInfo> findByTenantUidAndUidIn(String tenantUid, List<String> uids);
+    public List<AssetInfo> findByTenantUidAndUidIn(String tenantUid, List<String> uids);
 
     public List<AssetInfo> findByDepartNumAndSiteUID(String num, String siteUID);
     public List<AssetInfo> findByFinancingNumAndSiteUID(String num, String siteUID);
@@ -145,20 +147,20 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
     public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum, @Param("financingNum") String financingNum, @Param("qrCode") String qrCode, @Param("siteUID") String siteUID);
 
-    
+
     @Modifying
     @Query("update AssetInfo ai set ai.inventoryStatus=?2 where ai.id in ?1")
     void updateInventoryStatusAndIdIn(List<Integer> assetIds, Integer ORDER_STATUS_DONE_FINISHED);
 
-    
-   // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
 
-//    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
+    // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
+
+    //    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
 //            + "group by ai.assetOwnerId2,ai.assetOwnerId3,ai.assetOwnerId ordey by totalTimes desc")
     @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
             + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
     public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
-    
+
     @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item b where b.parent_id=?1)",nativeQuery=true)
     public List<AssetInfo> findAssetByMaintainConfigParentId(String configParentId);
 
@@ -169,4 +171,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Query(value= "update AssetInfo set clinicalDeptName = ?1 where clinicalDeptUID = ?2 and tenantUID = ?3")
     public void updateClinicalDeptName(String deptName, String deptUid, String tenantUid);
+
+
+    //给出当前用户能够访问到的资产
+    @Query(value = "select assetinfo0_.* from asset_info assetinfo0_ where assetinfo0_.is_deleted=false and assetinfo0_.is_valid=true and (assetinfo0_.institution_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)or assetinfo0_.hospital_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)  or assetinfo0_.site_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.clinical_dept_uid in(select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.tenant_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid))",nativeQuery = true)
+    public ArrayList<AssetInfo> getUserListByAsset(Integer userId);
+
+
 }
