@@ -54,7 +54,7 @@
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
                        
                         <p:column headerText="借用科室" sortBy="#{item.clinicalDeptUID}">
-                            <h:outputText value="#{item.sharedAssetReqDetail.clinicalDeptName}"/>
+                            <h:outputText value="#{item.sharedAssetReqDetail.clinicalDept.name}"/>
                         </p:column>
 
                         <p:column headerText="设备名称" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
