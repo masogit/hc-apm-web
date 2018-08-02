@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.ge.apm.dao.SharedAssetConfigRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.SharedAssetConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -11,6 +12,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,10 +24,13 @@ import java.util.List;
 public class SharedAssetConfigController {
 
     private SharedAssetConfigRepository dao;
+    private UserAccountRepository userAccountDao;
 
     private UserAccount currentUser;
 
     private SharedAssetConfig sharedAssetConfig;
+
+    private List<UserAccount> userList;
 
     private Date startTime;
     private Date endTime;
@@ -34,8 +39,11 @@ public class SharedAssetConfigController {
     protected void init() {
 
         dao = WebUtil.getBean(SharedAssetConfigRepository.class);
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
+
+        userList = this.loadUserList();
 
         this.loadSharedAssetConfig();
     }
@@ -75,6 +83,22 @@ public class SharedAssetConfigController {
         }
     }
 
+    public List<UserAccount> loadUserList(){
+
+        List<UserAccount> userAccountList = new ArrayList<>();
+        if(currentUser.getOrgLevel() == 0){
+            userAccountList = userAccountDao.findByTenantUIDAndStaffRole(currentUser.getTenantUID());
+        }else if(currentUser.getOrgLevel() == 1){
+            userAccountList = userAccountDao.findByInstitutionUIDAndStaffRole(currentUser.getInstitutionUID());
+        }else if(currentUser.getOrgLevel() == 2){
+            userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
+        }else if(currentUser.getOrgLevel() == 3){
+            userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
+        }
+
+        return userAccountList;
+    }
+
     public SharedAssetConfig getSharedAssetConfig() {
         return sharedAssetConfig;
     }
@@ -97,5 +121,13 @@ public class SharedAssetConfigController {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public List<UserAccount> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<UserAccount> userList) {
+        this.userList = userList;
     }
 }
