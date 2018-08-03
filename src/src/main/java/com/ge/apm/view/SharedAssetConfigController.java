@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.ge.apm.dao.SharedAssetConfigRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.SharedAssetConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -11,8 +12,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2018/7/12.
@@ -22,10 +26,13 @@ import java.util.List;
 public class SharedAssetConfigController {
 
     private SharedAssetConfigRepository dao;
+    private UserAccountRepository userAccountDao;
 
     private UserAccount currentUser;
 
     private SharedAssetConfig sharedAssetConfig;
+
+    private List<UserAccount> userList;
 
     private Date startTime;
     private Date endTime;
@@ -34,8 +41,11 @@ public class SharedAssetConfigController {
     protected void init() {
 
         dao = WebUtil.getBean(SharedAssetConfigRepository.class);
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
+
+        userList = this.loadUserList();
 
         this.loadSharedAssetConfig();
     }
@@ -75,6 +85,32 @@ public class SharedAssetConfigController {
         }
     }
 
+    public List<UserAccount> loadUserList(){
+
+        List<UserAccount> userAccountList = new ArrayList<>();
+        userAccountList = userAccountDao.findByTenantUIDAndRoleName(currentUser.getTenantUID(), "SharedAssetMgmt");
+
+        if(!userAccountList.isEmpty()){
+            if(currentUser.getOrgLevel() != 0){
+                if(currentUser.getOrgLevel() == 1){
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
+                            .collect(Collectors.toList());
+                }else if(currentUser.getOrgLevel() == 2){
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
+                            .collect(Collectors.toList());
+                }else{
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getSiteUID().equals(item.getSiteUID()))
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        return userAccountList;
+    }
+
     public SharedAssetConfig getSharedAssetConfig() {
         return sharedAssetConfig;
     }
@@ -97,5 +133,13 @@ public class SharedAssetConfigController {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public List<UserAccount> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<UserAccount> userList) {
+        this.userList = userList;
     }
 }
