@@ -1,5 +1,5 @@
-/**
- * Copyright 2009-2018 PrimeTek.
+/*
+ * Copyright 2009-2014 PrimeTek.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import javax.el.ValueExpression;
-import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -69,45 +67,10 @@ public class InputNumberRenderer extends InputRenderer {
         String inputId = inputNumber.getClientId(context) + "_hinput";
         String submittedValue = context.getExternalContext().getRequestParameterMap().get(inputId);
 
-        try {
-            if (ComponentUtils.isValueBlank(submittedValue)) {
-                ValueExpression valueExpression = inputNumber.getValueExpression("value");
-                if (valueExpression != null) {
-                    Class<?> type = valueExpression.getType(context.getELContext());
-                    if (type != null && type.isPrimitive() && !ComponentUtils.isValueBlank(inputNumber.getMinValue())) {
-                        // avoid coercion of null or empty string to 0 which may be out of [minValue, maxValue] range
-                        submittedValue = String.valueOf(new BigDecimal(inputNumber.getMinValue()).doubleValue());
-                    }
-                    else if (type != null && type.isPrimitive() && !ComponentUtils.isValueBlank(inputNumber.getMaxValue())) {
-                        // avoid coercion of null or empty string to 0 which may be out of [minValue, maxValue] range
-                        submittedValue = String.valueOf(new BigDecimal(inputNumber.getMaxValue()).doubleValue());
-                    }
-                    else {
-                        submittedValue = "";
-                    }
-                }
-            }
-            else {
-                BigDecimal value = new BigDecimal(submittedValue);
-                if (!ComponentUtils.isValueBlank(inputNumber.getMinValue())) {
-                    BigDecimal min = new BigDecimal(inputNumber.getMinValue());
-                    if (value.compareTo(min) < 0) {
-                        submittedValue = String.valueOf(min.doubleValue());
-                    }
-                }
-                if (!ComponentUtils.isValueBlank(inputNumber.getMaxValue())) {
-                    BigDecimal max = new BigDecimal(inputNumber.getMaxValue());
-                    if (value.compareTo(max) > 0) {
-                        submittedValue = String.valueOf(max.doubleValue());
-                    }
-                }
-            }
-        }
-        catch (NumberFormatException ex) {
-            throw new FacesException("Invalid number", ex);
+        if (submittedValue != null) {
+            inputNumber.setSubmittedValue(submittedValue);
         }
 
-        inputNumber.setSubmittedValue(submittedValue);
     }
 
     @Override
@@ -119,7 +82,7 @@ public class InputNumberRenderer extends InputRenderer {
         if (valueToRender == null) {
             valueToRender = "";
         }
-
+        
         encodeMarkup(context, inputNumber, value, valueToRender);
         encodeScript(context, inputNumber, value, valueToRender);
     }
@@ -132,7 +95,7 @@ public class InputNumberRenderer extends InputRenderer {
         String styleClass = inputNumber.getStyleClass();
         styleClass = styleClass == null ? InputNumber.STYLE_CLASS : InputNumber.STYLE_CLASS + " " + styleClass;
 
-        writer.startElement("span", inputNumber);
+        writer.startElement("span", null);
         writer.writeAttribute("id", clientId, null);
         writer.writeAttribute("class", styleClass, "styleClass");
 
@@ -159,19 +122,19 @@ public class InputNumberRenderer extends InputRenderer {
         if (inputNumber.getOnchange() != null) {
             writer.writeAttribute("onchange", inputNumber.getOnchange(), null);
         }
-
+        
         if (inputNumber.getOnkeydown() != null) {
             writer.writeAttribute("onkeydown", inputNumber.getOnkeydown(), null);
         }
-
+        
         if (inputNumber.getOnkeyup() != null) {
             writer.writeAttribute("onkeyup", inputNumber.getOnkeyup(), null);
         }
 
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
+        if(RequestContext.getCurrentInstance().getApplicationContext().getConfig().isClientSideValidationEnabled()) {
             renderValidationMetadata(context, inputNumber);
         }
-
+        
         writer.endElement("input");
 
     }
@@ -186,7 +149,7 @@ public class InputNumberRenderer extends InputRenderer {
         String inputStyleClass = inputNumber.getInputStyleClass();
 
         String style = inputStyle;
-
+        
         String styleClass = InputText.STYLE_CLASS;
         styleClass = inputNumber.isValid() ? styleClass : styleClass + " ui-state-error";
         styleClass = !inputNumber.isDisabled() ? styleClass : styleClass + " ui-state-disabled";
@@ -213,10 +176,10 @@ public class InputNumberRenderer extends InputRenderer {
         if (!isValueBlank(style)) {
             writer.writeAttribute("style", style, null);
         }
-
+        
         writer.writeAttribute("class", styleClass, null);
 
-        if (RequestContext.getCurrentInstance(context).getApplicationContext().getConfig().isClientSideValidationEnabled()) {
+        if(RequestContext.getCurrentInstance().getApplicationContext().getConfig().isClientSideValidationEnabled()) {
             //renderValidationMetadata(context, inputNumber);
         }
 
@@ -225,7 +188,7 @@ public class InputNumberRenderer extends InputRenderer {
 
     protected void encodeScript(FacesContext context, InputNumber inputNumber, Object value, String valueToRender)
             throws IOException {
-        WidgetBuilder wb = RequestContext.getCurrentInstance(context).getWidgetBuilder();
+        WidgetBuilder wb = RequestContext.getCurrentInstance().getWidgetBuilder();
         wb.initWithDomReady(InputNumber.class.getSimpleName(), inputNumber.resolveWidgetVar(), inputNumber.getClientId());
         wb.attr("disabled", inputNumber.isDisabled())
                 .attr("valueToRender", formatForPlugin(valueToRender, inputNumber, value));
@@ -249,7 +212,6 @@ public class InputNumberRenderer extends InputRenderer {
         String roundMethod = inputNumber.getRoundMethod();
         String decimalPlaces = inputNumber.getDecimalPlaces();
         String emptyValue = inputNumber.getEmptyValue();
-        String lZero = inputNumber.getLeadingZero();
         boolean padControl = inputNumber.isPadControl();
 
         String options = "";
@@ -263,7 +225,6 @@ public class InputNumberRenderer extends InputRenderer {
         options += isValueBlank(roundMethod) ? "" : "mRound:\"" + escapeText(roundMethod) + "\",";
         options += isValueBlank(decimalPlaces) ? "" : "mDec:\"" + escapeText(decimalPlaces) + "\",";
         options += "wEmpty:\"" + escapeText(emptyValue) + "\",";
-        options += "lZero:\"" + escapeText(lZero) + "\",";
         options += "aPad:" + padControl + ",";
 
         //if all options are empty return empty
@@ -290,8 +251,7 @@ public class InputNumberRenderer extends InputRenderer {
                 Object objectToRender;
                 if (value instanceof BigDecimal || doubleValueCheck(valueToRender)) {
                     objectToRender = new BigDecimal(valueToRender);
-                }
-                else {
+                } else {
                     objectToRender = new Double(valueToRender);
                 }
 
@@ -312,7 +272,7 @@ public class InputNumberRenderer extends InputRenderer {
             }
         }
     }
-
+    
     protected boolean doubleValueCheck(String valueToRender) {
         int counter = 0;
         int length = valueToRender.length();
@@ -330,5 +290,5 @@ public class InputNumberRenderer extends InputRenderer {
     protected String getHighlighter() {
         return "inputnumber";
     }
-
+    
 }

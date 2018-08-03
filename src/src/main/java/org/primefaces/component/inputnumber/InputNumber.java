@@ -64,8 +64,7 @@ public class InputNumber extends HtmlInputText implements org.primefaces.compone
 		,emptyValue
 		,inputStyle
 		,inputStyleClass
-		,padControl
-		,leadingZero;
+		,padControl;
 
 		String toString;
 
@@ -177,13 +176,6 @@ public class InputNumber extends HtmlInputText implements org.primefaces.compone
 	}
 	public void setPadControl(boolean _padControl) {
 		getStateHelper().put(PropertyKeys.padControl, _padControl);
-	}
-
-	public java.lang.String getLeadingZero() {
-		return (java.lang.String) getStateHelper().eval(PropertyKeys.leadingZero, "allow");
-	}
-	public void setLeadingZero(java.lang.String _leadingZero) {
-		getStateHelper().put(PropertyKeys.leadingZero, _leadingZero);
 	}
 
 
