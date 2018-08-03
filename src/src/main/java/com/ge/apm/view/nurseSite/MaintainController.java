@@ -256,13 +256,13 @@ public class MaintainController {
 			Integer tempType=nurseSiteMaintainConfig.getType();
 			String tempTypeValue=nurseSiteMaintainConfig.getTypeValue();
 			Integer tempIntTypeValue=null;
+			if(listSequence==null){
+				listSequence=new ArrayList<Integer>();
+			}
+			else{
+				listSequence.clear();
+			}
 			if(tempType!=null && tempType==1){
-				if(listSequence==null){
-					listSequence=new ArrayList<Integer>();
-				}
-				else{
-					listSequence.clear();
-				}
 				tempIntTypeValue=Integer.parseInt(tempTypeValue);
 				if(tempIntTypeValue!=null){
 					for(int i=1;i<=tempIntTypeValue;++i){
