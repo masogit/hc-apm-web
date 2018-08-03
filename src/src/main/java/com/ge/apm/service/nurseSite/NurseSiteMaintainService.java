@@ -446,6 +446,7 @@ public class NurseSiteMaintainService{
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
+			tempItem.setConfigId(nurseSiteMaintainConfig.getId());
 			if(sequence!=null){
 				tempItem.setSequence(sequence);
 			}
