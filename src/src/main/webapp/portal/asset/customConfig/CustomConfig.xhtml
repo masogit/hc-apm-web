@@ -159,7 +159,7 @@
 
                 </h:form>
 
-                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="600"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="650"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
                     <h:form id="AssetFieldsEditForm" >
                         <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -173,8 +173,8 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">可读取角色</label>
-                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}" >
-                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
+                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}">
+                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}" />
                                     </p:selectManyCheckbox>
                                 </h:panelGroup>
                                 <h:panelGroup >
