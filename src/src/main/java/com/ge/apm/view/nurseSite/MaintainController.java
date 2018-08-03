@@ -190,7 +190,14 @@ public class MaintainController {
 		else if(tempNurseSiteMaintain.getStatus()==4){
 			strStatus="进行中";
 		}
-		String str=tempNurseSiteMaintain.getName()+"-"+tempNurseSiteMaintain.getSequence()+"-"+strStatus;
+		
+		String str=tempNurseSiteMaintain.getName();
+		if(tempNurseSiteMaintain.getSequence()==null){
+			str+="-"+strStatus;
+		}
+		else{
+			str+="-"+tempNurseSiteMaintain.getSequence()+"-"+strStatus;
+		}
 		return str;
 	}
 	
