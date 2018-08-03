@@ -146,6 +146,18 @@ public class SharedAssetReqDetail implements Serializable{
     
     @Transient
     private Double totalAmount;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "uid", unique = true, insertable = false, updatable = false)
+    private OrgInfo clinicalDept;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "borrow_id", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+    private SharedAssetRequest leaseRequest;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "return_id", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+    private SharedAssetRequest returnRequest;
 
     public String getId() {
         return id;
@@ -611,6 +623,30 @@ public class SharedAssetReqDetail implements Serializable{
 
 	public void setTotalAmount(Double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public OrgInfo getClinicalDept() {
+		return clinicalDept;
+	}
+
+	public void setClinicalDept(OrgInfo clinicalDept) {
+		this.clinicalDept = clinicalDept;
+	}
+
+	public SharedAssetRequest getLeaseRequest() {
+		return leaseRequest;
+	}
+
+	public void setLeaseRequest(SharedAssetRequest leaseRequest) {
+		this.leaseRequest = leaseRequest;
+	}
+
+	public SharedAssetRequest getReturnRequest() {
+		return returnRequest;
+	}
+
+	public void setReturnRequest(SharedAssetRequest returnRequest) {
+		this.returnRequest = returnRequest;
 	}
 
 }

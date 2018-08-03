@@ -24,7 +24,7 @@
         <hibernate.version>4.2.6.Final</hibernate.version>
         <spring.version>4.2.0.RELEASE</spring.version>
         <spring-security.version>3.1.4.RELEASE</spring-security.version>
-        <primefaces.version>6.0</primefaces.version>
+        <primefaces.version>6.1</primefaces.version>
 
         <hibernate-validator.version>5.3.4.Final</hibernate-validator.version>
         <spring-data-jpa.version>1.5.2.RELEASE</spring-data-jpa.version>
@@ -307,14 +307,6 @@
             <scope>system</scope>
             <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/ultima-theme-1.0.5.jar</systemPath>
         </dependency>
-        <dependency>
-			<groupId>org.primefaces.extensions</groupId>
-			<artifactId>primefaces-extensions</artifactId>
-			<version>6.0.0</version>
-			<scope>system</scope> 
-			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/primefaces-extensions-6.0.0.jar</systemPath> 
-		</dependency>
-		
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

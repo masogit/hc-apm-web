@@ -11,20 +11,27 @@
         <h:form id="sharedAssetConfigForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <label class="label">值班时间*</label>
+                    <label class="label">调剂值班负责人*</label>
+                    <p:selectOneMenu value="#{sharedAssetConfigController.sharedAssetConfig.owner}" style="width:125px" required="true" requiredMessage="人员不能为空">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{sharedAssetConfigController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">正常值班时间*</label>
                     <p:calendar value="#{sharedAssetConfigController.startTime}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
                     -
                     <p:calendar value="#{sharedAssetConfigController.endTime}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">值班电话</label>
-                    <h:inputText  value="#{sharedAssetConfigController.sharedAssetConfig.tel}" />
+                    <label class="label">夜班值班电话*</label>
+                    <h:inputText  value="#{sharedAssetConfigController.sharedAssetConfig.tel}" required="true" requiredMessage="夜班值班电话不能为空"/>
                 </h:panelGroup>
             </p:panelGrid>
 
             <br/>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{sharedAssetConfigController.saveSharedAssetConfig}" update=":growl" icon="ui-icon-check" oncomplete="PF('sharedAssetConfigDialog').hide()"/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{sharedAssetConfigController.saveSharedAssetConfig}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'sharedAssetConfigDialog');"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('sharedAssetConfigDialog').hide()"/>
         </h:form>
     </p:dialog>

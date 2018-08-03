@@ -44,6 +44,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -2012,6 +2014,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		AssetInfo asset = dao.findByUid(assetUid);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		SharedAssetRequest assetRequest = reqDetail.getLeaseRequest();
+		if(assetRequest == null) {
+			assetRequest = new SharedAssetRequest();
+			reqDetail.setLeaseRequest(assetRequest);
+		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
 	}
@@ -2020,6 +2027,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		AssetInfo asset = dao.findByUid(assetUid);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
+		if(assetRequest == null) {
+			assetRequest = new SharedAssetRequest();
+			reqDetail.setReturnRequest(assetRequest);
+		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
 	}
@@ -2037,8 +2049,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
-				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
+				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2053,8 +2065,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr);
-				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr);
+				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2077,26 +2089,41 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     		}
     		
     		String totalTime = "";
-    		long unit = 1;
-    		long days = 0, hours = 0, minutes = 0;
+    		BigDecimal unit = new BigDecimal(1);
+    		long days = 0, hours = 0, minutes = 0, rentalTimeInMinutes = 0;
     		if(beginTime != null) {
     			beginLDT = beginTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    			long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+    			rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
     			days = rentalTimeInMinutes / (24 * 60);
     			hours = (rentalTimeInMinutes / 60) % 24;
     			minutes = rentalTimeInMinutes % 60;
-    			unit = days * 24 + hours + minutes / 60;
+    			unit = new BigDecimal(days * 24 + hours);
+    			unit = unit.add(new BigDecimal(minutes / 60d));
     			totalTime = days + "天" + hours + "时" + minutes + "分";
     		}
     		
-    		if("1".equals(info.getSharedAssetType().getId())) {
+    		String chargeType = info.getSharedAssetType().getChargingType();
+    		switch(chargeType) {
+    		case "1":
     			totalTime = "1次";
-    		} else if ("3".equals(info.getSharedAssetType().getId())) {
+    			break;
+    		case "2":
+    			unit = unit.setScale(0, RoundingMode.UP);
+    			break;
+    		case "3":
     			totalTime = days + "天";
-    			unit = days;
+    			unit = new BigDecimal(days);
+    			break;
+    		case "4":
+    			unit = new BigDecimal(rentalTimeInMinutes / 60d);
+    			unit = unit.setScale(2, RoundingMode.HALF_UP);
+    			break;
+    		default:
+    			unit = new BigDecimal(0);
     		}
     		sharedAssetReqDetail.setRentalTime(totalTime);
-    		sharedAssetReqDetail.setTotalAmount(unit * info.getSharedAssetType().getUnitPrice());
+    		BigDecimal totalAmount = unit.multiply(new BigDecimal(info.getSharedAssetType().getUnitPrice().doubleValue()));
+    		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
     	}
     	return sharedAssetReqDetail;
 	}
