@@ -13,8 +13,10 @@ import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2018/7/12.
@@ -86,14 +88,24 @@ public class SharedAssetConfigController {
     public List<UserAccount> loadUserList(){
 
         List<UserAccount> userAccountList = new ArrayList<>();
-        if(currentUser.getOrgLevel() == 0){
-            userAccountList = userAccountDao.findByTenantUIDAndStaffRole(currentUser.getTenantUID());
-        }else if(currentUser.getOrgLevel() == 1){
-            userAccountList = userAccountDao.findByInstitutionUIDAndStaffRole(currentUser.getInstitutionUID());
-        }else if(currentUser.getOrgLevel() == 2){
-            userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
-        }else if(currentUser.getOrgLevel() == 3){
-            userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
+        userAccountList = userAccountDao.findByTenantUIDAndRoleName(currentUser.getTenantUID(), "SharedAssetMgmt");
+
+        if(!userAccountList.isEmpty()){
+            if(currentUser.getOrgLevel() != 0){
+                if(currentUser.getOrgLevel() == 1){
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
+                            .collect(Collectors.toList());
+                }else if(currentUser.getOrgLevel() == 2){
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
+                            .collect(Collectors.toList());
+                }else{
+                    userAccountList = userAccountList.stream()
+                            .filter(item-> currentUser.getSiteUID().equals(item.getSiteUID()))
+                            .collect(Collectors.toList());
+                }
+            }
         }
 
         return userAccountList;
