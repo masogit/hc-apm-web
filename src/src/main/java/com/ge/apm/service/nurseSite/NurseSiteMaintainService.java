@@ -341,7 +341,7 @@ public class NurseSiteMaintainService{
 					NurseSiteMaintainData tempData = itData.next();
 					Boolean value = tempData.getCheckValue();
 					if (value == null) {
-						if (itemStatus == 2) {
+						if (itemStatus == 2||itemStatus==0) {
 							itemStatus = 4;
 						}
 					} else if (value) {
@@ -365,7 +365,7 @@ public class NurseSiteMaintainService{
 				} else if (itemStatus == 3) {
 					objStatus = 3;
 				} else if (itemStatus == 4) {
-					if(objStatus!=3){
+					if(objStatus==2||objStatus==0){
 						objStatus=4;
 					}
 				}
