@@ -86,6 +86,7 @@ public class AssetCreateController {
     private List<Supplier> supplierList = Collections.emptyList();
     private Map<String, Object> selectedObjectMap = new HashMap();
 
+    private List<AssetInfo> parentAssetList;
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
@@ -126,6 +127,7 @@ public class AssetCreateController {
         }
 
         supplierList = aimService.getSuplierListBySiteUid(createRequest.getTenantUID());
+        parentAssetList = assetMgrService.getParentsAssetsList(assetInfo);
         initGbTree();
 
     }
@@ -151,6 +153,20 @@ public class AssetCreateController {
         }
     }
 
+    public void onParentAssetChange() {
+        AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
+        assetInfo.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
+    }
+    
+    public List<AssetInfo> completeParentAssetId(String query) {
+        if (null == parentAssetList || parentAssetList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
+                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+    }
+    
     public List<Supplier> autoCompleteManufacture(String query) {
         List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() != null && item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
@@ -287,6 +303,7 @@ public class AssetCreateController {
         assetInfo.setClinicalOwnerId(null);
         assetInfo.setClinicalOwnerName(null);
         assetInfo.setClinicalOwnerTel(null);
+        parentAssetList = assetMgrService.getParentsAssetsList(assetInfo);
     }
 
     public void onClinicalOwnerChange() {
@@ -383,10 +400,6 @@ public class AssetCreateController {
         if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 4)) {
             this.assetInfo.setFinancingNum(financingNum);
         }
-    }
-
-    public List<AssetInfo> getParentAssetList() {
-        return assetMgrService.getParentsAssetsList(assetInfo);
     }
 
     //getter and setter
