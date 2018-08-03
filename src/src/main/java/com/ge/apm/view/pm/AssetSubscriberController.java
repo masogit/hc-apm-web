@@ -157,6 +157,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		level2=true;
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
+		queryAsset.setName(null);
+		queryAsset.setAssetGroup(null);
 
 	}
 	@Override
