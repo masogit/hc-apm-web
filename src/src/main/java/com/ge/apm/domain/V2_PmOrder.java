@@ -95,6 +95,8 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
+    @Column(name="int_ext_type")
+    private Integer intExtType;
 
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -541,5 +543,13 @@ public class V2_PmOrder  implements Serializable {
 
     public void setPmType(Integer pmType) {
         this.pmType = pmType;
+    }
+
+    public Integer getIntExtType() {
+        return intExtType;
+    }
+
+    public void setIntExtType(Integer intExtType) {
+        this.intExtType = intExtType;
     }
 }

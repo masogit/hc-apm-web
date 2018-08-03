@@ -98,7 +98,9 @@
 
                             <h:outputText value="#{item.currentStepName}"/>
                         </p:column>
-
+                        <p:column headerText="#{msg.intExtType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                        </p:column>
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
