@@ -279,11 +279,17 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.parentAsset}</label>
-                                        <p:selectOneMenu id="parentAssetList" value="#{assetCreateController.assetInfo.parentAssetId}" >
+<!--                                        <p:selectOneMenu id="parentAssetList" value="#{assetCreateController.assetInfo.parentAssetId}" >
                                             <p:ajax process="@this" />
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetCreateController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
-                                        </p:selectOneMenu>
+                                        </p:selectOneMenu>-->
+
+                                        <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetCreateController.selectedObjectMap['parentAsset']}" completeMethod="#{assetCreateController.completeParentAssetId}"
+                                                        forceSelection="true" var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onParentAssetChange()}"/>
+                                            <p:ajax listener="#{assetCreateController.onParentAssetChange()}" />
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <p:spacer/>
                                     <h:panelGroup >
