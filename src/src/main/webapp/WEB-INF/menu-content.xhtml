@@ -157,7 +157,7 @@
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
                 <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasRole('SiteAdmin')}"/>
 
-                <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberListAll.xhtml"/>
+                <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false}"/>
                 <!--<p:menuitem id="um50" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>-->
