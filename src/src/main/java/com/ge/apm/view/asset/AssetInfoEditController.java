@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
-
+    
     private CustomConfigService ccService;
     private AssetInfoRepository dao;
     private UserCommonService ucService;
@@ -54,7 +54,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private UserAccountRepository userDao;
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
-
+    
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
@@ -72,11 +72,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private TreeNode orgTree;
-
+    
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
-
+    
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -99,10 +99,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
-
+        
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-
+        
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
@@ -129,12 +129,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initGbTree();
         initOrgTree();
     }
-
+    
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
     }
-
+    
     @Override
     public void onBeforeNewObject(AssetInfo object) {
         object.setIsValid(true);
@@ -142,7 +142,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         object.setDeviceStatus(0);
         object.setIsDeleted(false);
     }
-
+    
     private void beforeEdit() {
         if (!StringUtils.isEmpty(selected.getNationalStandardCode())) {
             selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
@@ -158,21 +158,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
         selectedObjectMap.put("manufacture", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
+        selectedObjectMap.put("parentAsset", selected.getParentAssetId()== null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
         parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
-
-
+        
         if (selected.getSupplierId() != null) {
             Supplier supplier = supplierDao.findById(selected.getSupplierId());
             if (supplier != null) {
                 selected.setVendorTel(supplier.getTel());
             }
         }
-
+        
     }
-
+    
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
@@ -187,30 +187,30 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         rootNode.setExpanded(true);
     }
-
+    
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         changeAssetOrg(orgInfo);
         selectedObjectMap.put("selectedOrg", orgInfo);
     }
-
+    
     public List<UserAccount> completeOwnerList(String query) {
-
+        
         if (ownerList == null) {
             return Collections.emptyList();
         }
-
+        
         List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
     }
-
+    
     private void changeAssetOrg(OrgInfo orgInfo) {
         selected.setSiteId(orgInfo.getSiteId());
         selected.setHospitalId(orgInfo.getId());
-
+        
         selected.setTenantUID(orgInfo.getTenantUID());
         selected.setHospitalUID(orgInfo.getHospitalUID());
         selected.setInstitutionUID(orgInfo.getInstitutionUID());
@@ -221,7 +221,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         onClinicalDeptChange();
         parentAssetList.clear();
     }
-
+    
+    public void onParentAssetChange() {
+        AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
+        selected.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
+    }
+    
     public void onOwnerChange(String idx) {
         UserAccount selectedUser = (UserAccount) selectedObjectMap.get(idx);
         switch (idx) {
@@ -247,7 +252,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 break;
         }
     }
-
+    
     public void onSupplierChange(String idx) {
         Supplier supplier = (Supplier) selectedObjectMap.get(idx);
         switch (idx) {
@@ -267,14 +272,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 break;
         }
     }
-
+    
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(assetuid);
         }
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
-
+    
     @Override
     public void onAfterNewObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -288,12 +293,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             });
         }
     }
-
+    
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
-
+    
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
@@ -310,7 +315,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("fail to upload file");
         }
     }
-
+    
     @Transactional
     public String applyChange() {
         if (selected.getUsageStatus() == null) {
@@ -343,7 +348,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
                 return "";
             }
-
+            
             selected.setNationalStandardCode(selectedGb.getCode());
         }
         this.save();
@@ -354,7 +359,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
     }
-
+    
     public String getListPageLink() {
         return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
     }
@@ -363,7 +368,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public String getAssetCodeConfig() {
         return config == null ? null : config.getAssetCodeConfig();
     }
-
+    
     private boolean updateQrCode() {
         QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
         if (qrCodeLib == null) {
@@ -378,7 +383,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage(WebUtil.getMessage("AlreadyUsingQrCode"));
             return false;
         }
-
+        
         QrCodeLib oldQRCodeLib = qrCodeService.findByQrCode(selected.getQrCode(), selected.getSiteUID());
         if (null != oldQRCodeLib) {
             qrCodeService.discardQrCode(qrCode, selected.getSiteUID());
@@ -387,13 +392,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setQrCode(qrCode);
         return true;
     }
-
+    
     public void onFunctionGroupChange() {
         code68List = new ArrayList<>();
         this.selected.setAssetCode68(null);
         this.changeFunctionGroup();
     }
-
+    
     public void changeFunctionGroup() {
         Integer functionGroupId = this.selected.getFunctionGroup();
         if (functionGroupId != null) {
@@ -403,13 +408,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
     }
-
+    
     @Override
     public void prepareEdit() {
         super.prepareEdit();
         changeFunctionGroup();
     }
-
+    
     @Override
     public void onBeforeSave(AssetInfo object) {
         if (null != object.getClinicalDeptId()) {
@@ -418,7 +423,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 object.setClinicalDeptName(org.getName());
                 object.setClinicalDeptUID(org.getUid());
             }
-
+            
         } else {
             //clear uid and its name
             object.setClinicalDeptUID(null);
@@ -460,7 +465,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             object.setLastModifiedDate(now);
         }
     }
-
+    
     public String setValidButton() {
         if (terminate) {
             this.selected.setIsValid(true);
@@ -478,20 +483,20 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         update();
         return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
     }
-
+    
     public Boolean needAssetApproval(String siteUid) {
         if (null != config && config.getNeedInstorageCheck() != null && config.getNeedInstorageCheck()) {
             return false;
         }
         return acService.needAssetApproval(siteUid);
     }
-
+    
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
         onDepartNumChange("qrCode");
     }
-
+    
     public void onDepartNumChange(String fieldName) {
         if (!Strings.isNullOrEmpty(getAssetCodeConfig())) {
             String num = null;
@@ -538,7 +543,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
     }
-
+    
     public void generateFinancialNum() {
         String code = this.selectedGb == null ? null : this.selectedGb.getCode();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -557,7 +562,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
     }
-
+    
     public void updateFinancingNumByNationalStandardCode() {
         if (null != selected && null != selectedGb) {
             String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -572,7 +577,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
     }
-
+    
     public List<String> completeGbName(String prefix) {
         List<String> names = null;
         if (!StringUtils.isEmpty(prefix)) {
@@ -580,7 +585,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         return names;
     }
-
+    
     private void updateSelectedOrgGb(GbCode gbCode) {
         if (gbCode == null || gbCode.getId() == -1) {
             selectedGb = null;
@@ -589,43 +594,52 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             gbCodeName = gbCode.getCode() + "/" + gbCode.getName();
         }
     }
-
+    
     public void initGbTree() {
         TreeNode treeNode = gbCodeService.buildGbTree();
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
     }
-
+    
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
     }
-
+    
     public List<OrgInfo> autoCompleteDept(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();
         }
-
+        
         List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
     }
-
+    
+    public List<AssetInfo> completeParentAssetId(String query) {
+        if (null == parentAssetList || parentAssetList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
+                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+    }
+    
     public List<Supplier> autoCompleteSupplier(String query) {
         return autoCompleteService.autoCompleteVendor(query, supplierList);
     }
-
+    
     public List<Supplier> autoCompleteManufacture(String query) {
         return autoCompleteService.autoCompleteManufacture(query, supplierList);
     }
-
+    
     public List<Supplier> autoCompleteMaintainer(String query) {
         return autoCompleteService.autoCompleteMaintainer(query, supplierList);
     }
-
+    
     public List<String> completeAssetName(String prefix) {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         List<String> names = null;
@@ -637,7 +651,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         names.sort(new PinYinComparator());
         return names;
     }
-
+    
     public List<UserAccount> completeClinicalOwnerList(String query) {
         if (clinicalOwnerList == null) {
             return Collections.emptyList();
@@ -647,19 +661,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         res.sort(new PinYinComparatorByName());
         return res;
     }
-
+    
     public void onClinicalDeptChange() {
         OrgInfo clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
         selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
         selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
         selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
-
+        
         selectedObjectMap.put("clinicalOwner", null);
         onOwnerChange("clinicalOwner");
         parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
     }
-
+    
     public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptUID()) {
             clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
@@ -667,21 +681,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             clinicalOwnerList = Collections.emptyList();
         }
     }
-
+    
     public String submitApproval() {
         selected.setUsageStatus(2);
         return applyChange();
     }
-
+    
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
     }
-
+    
     public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
-
+    
     public boolean needEdit(String fieldKey) {
         return editableFieldsList.contains(fieldKey);
     }
@@ -690,77 +704,77 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public Boolean getTerminate() {
         return terminate;
     }
-
+    
     public CustomConfigObject getCustomConfig() {
         return customConfig;
     }
-
+    
     public List<I18nMessage> getCode68List() {
         return code68List;
     }
-
+    
     public List<AssetInfo> getParentAssetList() {
         return parentAssetList;
     }
-
+    
     public void setParentAssetList(List<AssetInfo> parentAssetList) {
         this.parentAssetList = parentAssetList;
     }
-
+    
     public List<V2_BlobObject> getAttachements() {
         return attachements;
     }
-
+    
     public void setAttachements(List<V2_BlobObject> attachements) {
         this.attachements = attachements;
     }
-
+    
     public String getQrCode() {
         return qrCode;
     }
-
+    
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
     }
-
+    
     public String getGbCodeName() {
         return gbCodeName;
     }
-
+    
     public void setGbCodeName(String gbCodeName) {
         this.gbCodeName = gbCodeName;
     }
-
+    
     public GbCode getSelectedGb() {
         return selectedGb;
     }
-
+    
     public void setSelectedGb(GbCode selectedGb) {
         this.selectedGb = selectedGb;
     }
-
+    
     public TreeNode getOrgTree() {
         return orgTree;
     }
-
+    
     public void setOrgTree(TreeNode orgTree) {
         this.orgTree = orgTree;
     }
-
+    
     public TreeNode getGbTree() {
         return gbTree;
     }
-
+    
     public void setGbTree(TreeNode gbTree) {
         this.gbTree = gbTree;
     }
-
+    
     public Map<String, Object> getSelectedObjectMap() {
         return selectedObjectMap;
     }
-
+    
     public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
         this.selectedObjectMap = selectedObjectMap;
     }
-
+    
 }
