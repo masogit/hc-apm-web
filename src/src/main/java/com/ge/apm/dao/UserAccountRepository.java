@@ -166,4 +166,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value = "select o.uid from user_account o where o.org_uid in ?1",nativeQuery = true)
     public List<String> findUserUidListByOrgUids(List<String> listUid);
+
+    @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
+    List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
 }
