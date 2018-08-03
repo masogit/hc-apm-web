@@ -365,6 +365,9 @@ public class NurseSiteMaintainService{
 				} else if (itemStatus == 3) {
 					objStatus = 3;
 				} else if (itemStatus == 4) {
+					if(objStatus!=3){
+						objStatus=4;
+					}
 				}
 			}
 		}
@@ -443,6 +446,7 @@ public class NurseSiteMaintainService{
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
+			tempItem.setConfigId(nurseSiteMaintainConfig.getId());
 			if(sequence!=null){
 				tempItem.setSequence(sequence);
 			}
