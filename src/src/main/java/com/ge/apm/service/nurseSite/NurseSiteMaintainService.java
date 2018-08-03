@@ -412,6 +412,9 @@ public class NurseSiteMaintainService{
 	}
 	
 	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets,Integer sequence){
+		if(nurseSiteMaintainConfig.getType()!=null && nurseSiteMaintainConfig.getType()==2){
+			sequence=null;
+		}
 		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain=new NurseSiteMaintain();
 		Date currentDate=new Date();
@@ -666,7 +669,14 @@ public class NurseSiteMaintainService{
 		ca.setTime(endDate);
 		ca.add(Calendar.DATE, 1);
 		endDate=ca.getTime();
-		Boolean result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		Boolean result=null;
+		if(tempMaintain.getSequence()!=null){
+			result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		}
+		else{
+			result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId());
+		}
+		
 		return result==null?false:result;
 	}
 	
