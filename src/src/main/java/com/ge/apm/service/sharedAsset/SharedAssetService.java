@@ -73,12 +73,13 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
     }
 
-    public ResponseEntity<LinkedHashMap> borrowByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime) {
+    public ResponseEntity<LinkedHashMap> borrowByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType) {
         String url = getGatewayURL(GatewayURL.RENT_SHORTCUT);
         url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
         url = url.replace("{assetInfoUID}", assetInfoUID);
         url = url.replace("{chargingBeginTime}", chargingBeginTime);
         url = url.replace("{chargingEndTime}", chargingEndTime);
+        url = url.replace("{reqType}", reqType);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
@@ -88,12 +89,13 @@ public class SharedAssetService extends MicroServiceInvoker {
         return response;
     }
 
-    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime) {
+    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType) {
         String url = getGatewayURL(GatewayURL.RETURN_SHORTCUT);
         url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
         url = url.replace("{assetInfoUID}", assetInfoUID);
         url = url.replace("{chargingBeginTime}", chargingBeginTime);
         url = url.replace("{chargingEndTime}", chargingEndTime);
+        url = url.replace("{reqType}", reqType);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
