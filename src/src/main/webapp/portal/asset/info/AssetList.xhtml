@@ -87,7 +87,7 @@
                         </p:column>
                         <c:forEach items="#{assetInfoListController.customedColumns}" var="columnItem" >
                             <c:if test="#{columnItem eq 'name'}">
-                                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.name}"/>
                                 </p:column>
                             </c:if>
