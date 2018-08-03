@@ -298,7 +298,7 @@ public class NurseSiteMaintainService{
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
 					p.setCheckItem(arr2[j]);
-					p.setCheckValue(false);
+//					p.setCheckValue(false);
 					p.setItem(item);
 					listData.add(p);
 				}
@@ -317,42 +317,59 @@ public class NurseSiteMaintainService{
 			obj.setNeedGetItem(false);
 		}
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-		int itemStatus=1;
-		int objStatus=1;
-		while(it.hasNext()){
-			itemStatus=1;
-			NurseSiteMaintainItem tempItem=it.next();
-			Set<NurseSiteMaintainData> listData=tempItem.getListData();
-			Iterator<NurseSiteMaintainData> itData=listData.iterator();
-			if(defaultValue!=null){
-				if(defaultValue){
+		int itemStatus=0;
+		int objStatus=0;
+		while (it.hasNext()) {
+			itemStatus = 0;
+			NurseSiteMaintainItem tempItem = it.next();
+			Set<NurseSiteMaintainData> listData = tempItem.getListData();
+			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			if (defaultValue != null) {
+				// batch update
+				if (defaultValue) {
 					tempItem.setStatus(2);
-				}
-				else{
+				} else {
 					tempItem.setStatus(3);
 				}
-			}
-			while(itData.hasNext()){
-				NurseSiteMaintainData tempData=itData.next();
-				if(defaultValue!=null){
+				while (itData.hasNext()) {
+					NurseSiteMaintainData tempData = itData.next();
 					tempData.setCheckValue(defaultValue);
 				}
-				Boolean value=tempData.getCheckValue();
-				if(value!=null && value==false && (itemStatus==1 || itemStatus==2)){
-					itemStatus=3;
-					objStatus=3;
-					if(defaultValue==null){
+			} else {
+				// single,0:未检查，2：已通过，3：有问题，4：进行中
+				while (itData.hasNext()) {
+					NurseSiteMaintainData tempData = itData.next();
+					Boolean value = tempData.getCheckValue();
+					if (value == null) {
+						if (itemStatus == 2) {
+							itemStatus = 4;
+						}
+					} else if (value) {
+						if (itemStatus == 0) {
+							itemStatus = 2;
+						}
+					} else {
+						itemStatus = 3;
 						break;
 					}
 				}
-				if(itemStatus!=3){
-					itemStatus=2;
+				tempItem.setStatus(itemStatus);
+				if (itemStatus == 0) {
+					if(objStatus==2){
+						objStatus=4;
+					}
+				} else if (itemStatus == 2) {
+					if (objStatus == 0) {
+						objStatus = 2;
+					}
+				} else if (itemStatus == 3) {
+					objStatus = 3;
+				} else if (itemStatus == 4) {
+					if(objStatus!=3){
+						objStatus=4;
+					}
 				}
 			}
-			tempItem.setStatus(itemStatus);
-		}
-		if(objStatus!=3){
-			objStatus=2;
 		}
 		return objStatus;
 	}
@@ -429,6 +446,7 @@ public class NurseSiteMaintainService{
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
+			tempItem.setConfigId(nurseSiteMaintainConfig.getId());
 			if(sequence!=null){
 				tempItem.setSequence(sequence);
 			}
@@ -528,9 +546,6 @@ public class NurseSiteMaintainService{
 				newConfig.setClinicalDeptUID(clinicalUid);
 				save(newConfig);
 				saveConfigChildren(newConfig,listNew);
-				if(tempConfig.getApplyDirectly()){
-		    		updateUnCheckedMaintainData(newConfig, currentUser, 0, listCheckAssets);
-		    	}
 			}
 		}
 		return true;
@@ -607,7 +622,7 @@ public class NurseSiteMaintainService{
 		List<NurseSiteMaintain> listNewMaintain=new ArrayList<NurseSiteMaintain>();
 		if(listMaintain!=null && listMaintain.size()>0){
 			for(int i=0;i<listMaintain.size();++i){
-				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,null));
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets,listMaintain.get(i).getSequence()));
 			}
 		}
 //		nurseSiteMaintainRepository.delete(listMaintain);

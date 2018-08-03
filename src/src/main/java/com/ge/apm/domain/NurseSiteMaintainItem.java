@@ -124,6 +124,9 @@ public class NurseSiteMaintainItem implements Serializable {
     @Column(name="name")
 	private String name;
     
+    @Column(name="config_id")
+	private String configId;
+    
     @Column(name="signature_id")
 	private String signatureId;
 	
@@ -287,6 +290,14 @@ public class NurseSiteMaintainItem implements Serializable {
 		this.name = name;
 	}
 	
+	public String getConfigId() {
+		return configId;
+	}
+
+	public void setConfigId(String configId) {
+		this.configId = configId;
+	}
+
 	public String getSignatureId() {
 		return signatureId;
 	}
@@ -325,7 +336,6 @@ public class NurseSiteMaintainItem implements Serializable {
 		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
 		tempData.setItem(this);
 		tempData.setCheckItem(label);
-		tempData.setCheckValue(false);
 		this.listData.add(tempData);
 		return tempData;
 	}

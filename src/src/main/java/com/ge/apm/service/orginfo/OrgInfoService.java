@@ -148,28 +148,39 @@ public class OrgInfoService {
                                 || (found.getOrgType() == 2 && !found.getName().equals(hospitalName))
                                 || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
                                 ) {
+                            String name = null;
                             if (found.getOrgType() == 4) {
                                 if (StringUtils.isEmpty(departName)) {
                                     throw new Exception("科室名称不能为空！");
                                 }
-                                found.setName(departName);
+                                name = departName;
+//                                found.setName(departName);
                             } else if (found.getOrgType() == 3) {
                                 if (StringUtils.isEmpty(siteName)) {
                                     throw new Exception("院区名称不能为空！");
                                 }
-                                found.setName(siteName);
+                                name = siteName;
+//                                found.setName(siteName);
                             } else if (found.getOrgType() == 2) {
                                 if (StringUtils.isEmpty(hospitalName)) {
                                     throw new Exception("医院名称不能为空！");
                                 }
-                                found.setName(hospitalName);
+                                name = hospitalName;
+//                                found.setName(hospitalName);
                             } else if (found.getOrgType() == 1) {
                                 if (StringUtils.isEmpty(institutionName)) {
                                     throw new Exception("集团名称不能为空！");
                                 }
-                                found.setName(institutionName);
+                                name = institutionName;
+//                                found.setName(institutionName);
                             }
 
+                            OrgInfo sameNameOrg = orgDao.findFirstByParentUIDAndNameAndUidIsNot(found.getParentUID(), name, found.getUid());
+                            if (sameNameOrg != null) {
+                                throw new Exception(name + "已经存在!");
+                            }
+
+                            found.setName(name);
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
