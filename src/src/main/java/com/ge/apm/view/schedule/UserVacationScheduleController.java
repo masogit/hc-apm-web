@@ -7,15 +7,19 @@ import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -34,17 +38,26 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
 
     private UserAccount currentUser;
 
+    private UserContextService userContextService;
     private UserScheduleService userScheduleService;
 
     private Date startDate;
     private Date endDate;
+    private String scheduleDateStage;
+
+    private String queryStr;
+
+    private String auditInfo;
 
     @Override
     protected void init() {
         super.init();
         dao = WebUtil.getBean(UserScheduleRepository.class);
         userScheduleService = WebUtil.getBean(UserScheduleService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+
+        queryStr = WebUtil.getRequestParameter("queryStr") != null ? WebUtil.getRequestParameter("queryStr") : UserSchedule.AuditStatus.PendingApproval.name();
     }
 
     @Override
@@ -54,15 +67,35 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
 
     @Override
     protected Page<UserSchedule> loadData(PageRequest pageRequest) {
-        this.selected = null;
 
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
         }
 
-        searchFilters.add(new SearchFilter("userUID", SearchFilter.Operator.EQ, currentUser.getUid()));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+
+        if(!"All".equals(queryStr)){
+            searchFilters.add(new SearchFilter("auditStatus", SearchFilter.Operator.EQ, queryStr));
+        }
+
+        if(userContextService.hasRole("AssetHead")){
+            if(currentUser.getOrgLevel() != 0){
+                if(currentUser.getOrgLevel() == 1){
+                    searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+                }else if(currentUser.getOrgLevel() == 2){
+                    searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+                }else{
+                    searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+                }
+            }
+        }else{
+            searchFilters.add(new SearchFilter("userUID", SearchFilter.Operator.EQ, currentUser.getUid()));
+        }
+
         searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, SCHEDULE_TYPE_VACATION));
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+        Sort sort = new Sort(Sort.Direction.DESC, "scheduleDate");
+        return dao.findBySearchFilter(this.searchFilters, new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));
     }
 
     public String saveVacation(){
@@ -71,18 +104,40 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
             return "";
         }
 
-        List<LinkedHashMap<String, Date>> resultList = userScheduleService.saveVacation(startDate, endDate);
+        List<LinkedHashMap<String, Date>> resultList = userScheduleService.saveVacation(startDate, endDate, scheduleDateStage);
 
         if(!resultList.isEmpty()){
-            String msg = "";
+            String msg = "无效的休假日期：";
             for (Map<String, Date> msgMap : resultList) {
-                msg += "无效日期：" + msgMap.get("invalidDate") + ";";
+                msg += msgMap.get("invalidDate") + ";";
             }
             WebUtil.addErrorMessage(msg);
             return "";
         }
 
         return "userVacationList?faces-redirect=true";
+    }
+
+    public void approveVacation(boolean isApproved){
+        if(isApproved){
+            this.selected.setAuditStatus(UserSchedule.AuditStatus.Approved.name());
+        }else {
+            this.selected.setAuditStatus(UserSchedule.AuditStatus.NotApproved.name());
+        }
+        this.selected.setLastModifiedBy(currentUser.getLoginName());
+        this.selected.setLastModifiedDate(new Date());
+        userScheduleService.saveVacationSchedule(this.selected);
+    }
+
+    public void validateAudit(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        this.auditInfo = "";
+
+        List<UserSchedule> tempUserScheduleList =  userScheduleService.getUserWorkList(this.selected.getUserAccount(), this.selected.getScheduleDate(), this.selected.getScheduleDateStage());
+        for (UserSchedule us : tempUserScheduleList) {
+            auditInfo += us.getUserAccount().getName() + " " + sdf.format(us.getScheduleDate()) + "有排班记录！";
+            break;
+        }
     }
 
     public boolean isValideDate(){
@@ -100,6 +155,30 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
         }
 
         return true;
+    }
+
+    public String getScheduleDateStageTitle(String scheduleDateStage){
+        String title = "";
+        if(UserSchedule.ScheduleDateStage.ALL.name().equals(scheduleDateStage)){
+            title = "全天";
+        }else if(UserSchedule.ScheduleDateStage.AM.name().equals(scheduleDateStage)){
+            title = "上午";
+        }else if(UserSchedule.ScheduleDateStage.PM.name().equals(scheduleDateStage)){
+            title = "下午";
+        }
+        return title;
+    }
+
+    public String getAuditStatusTitle(String auditStatus){
+        String title = "";
+        if(UserSchedule.AuditStatus.PendingApproval.name().equals(auditStatus)){
+            title = "待审批";
+        }else if(UserSchedule.AuditStatus.Approved.name().equals(auditStatus)){
+            title = "审批通过";
+        }else if(UserSchedule.AuditStatus.NotApproved.name().equals(auditStatus)){
+            title = "审批未通过";
+        }
+        return title;
     }
 
     @Override
@@ -124,5 +203,29 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getQueryStr() {
+        return queryStr;
+    }
+
+    public void setQueryStr(String queryStr) {
+        this.queryStr = queryStr;
+    }
+
+    public String getAuditInfo() {
+        return auditInfo;
+    }
+
+    public void setAuditInfo(String auditInfo) {
+        this.auditInfo = auditInfo;
+    }
+
+    public String getScheduleDateStage() {
+        return scheduleDateStage;
+    }
+
+    public void setScheduleDateStage(String scheduleDateStage) {
+        this.scheduleDateStage = scheduleDateStage;
     }
 }

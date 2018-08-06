@@ -82,11 +82,33 @@
                     </p:dialog>
                 </h:form>
 
+                <p:dialog header="批量排班结果" id="workScheduleResultDlg" widgetVar="workScheduleResultDialog" minHeight="40" appendTo="@this" modal="true" closable="false">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">未创建的排班记录（和休假冲突）</label>
+                            <h:outputText value="#{workScheduleController.resultInfo}" style="color: red"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:commandButton validateClient="true" value="确认" action="#{workScheduleController.resultConfig}" icon="ui-icon-check"/>
+                </p:dialog>
+
                 <ui:include src="workScheduleBatch.xhtml"/>
                 <ui:include src="workScheduleStageConfig.xhtml"/>
                 <ui:include src="sharedAssetConfig.xhtml"/>
             </div>
         </div>
+
+        <script>
+            function batchAfter(xhr, status, args){
+                if(args.flag == "Success"){
+                    location.href = "workSchedule.xhtml";
+                }else if(args.flag == "PartialSuccess"){
+                    PF("workScheduleBatchDialog").hide();
+                    PF("workScheduleResultDialog").show();
+                }
+            }
+        </script>
     </ui:define>
 
 </ui:composition>
