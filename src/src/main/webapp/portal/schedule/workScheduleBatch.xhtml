@@ -39,9 +39,10 @@
 
                 <br/>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{workScheduleController.batchSaveWorkSchedule}" update=":growl" icon="ui-icon-check"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{workScheduleController.batchSaveWorkSchedule}" update=":workScheduleResultDlg :growl" icon="ui-icon-check" oncomplete="batchAfter(xhr, status, args)"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('workScheduleBatchDialog').hide()"/>
             </h:form>
         </p:dialog>
+
     </ui:composition>
 </html>
