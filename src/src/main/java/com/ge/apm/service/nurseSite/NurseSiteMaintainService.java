@@ -341,7 +341,7 @@ public class NurseSiteMaintainService{
 					NurseSiteMaintainData tempData = itData.next();
 					Boolean value = tempData.getCheckValue();
 					if (value == null) {
-						if (itemStatus == 2) {
+						if (itemStatus == 2||itemStatus==0) {
 							itemStatus = 4;
 						}
 					} else if (value) {
@@ -365,7 +365,7 @@ public class NurseSiteMaintainService{
 				} else if (itemStatus == 3) {
 					objStatus = 3;
 				} else if (itemStatus == 4) {
-					if(objStatus!=3){
+					if(objStatus==2||objStatus==0){
 						objStatus=4;
 					}
 				}
@@ -412,6 +412,9 @@ public class NurseSiteMaintainService{
 	}
 	
 	public NurseSiteMaintain createMaintain(Date date,UserAccount currentUser,NurseSiteMaintainConfig nurseSiteMaintainConfig,List<AssetInfo> listCheckAssets,Integer sequence){
+		if(nurseSiteMaintainConfig.getType()!=null && nurseSiteMaintainConfig.getType()==2){
+			sequence=null;
+		}
 		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain=new NurseSiteMaintain();
 		Date currentDate=new Date();
@@ -666,7 +669,14 @@ public class NurseSiteMaintainService{
 		ca.setTime(endDate);
 		ca.add(Calendar.DATE, 1);
 		endDate=ca.getTime();
-		Boolean result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		Boolean result=null;
+		if(tempMaintain.getSequence()!=null){
+			result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId(),tempMaintain.getSequence());
+		}
+		else{
+			result=nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(),startDate,endDate,tempMaintain.getConfigId());
+		}
+		
 		return result==null?false:result;
 	}
 	
