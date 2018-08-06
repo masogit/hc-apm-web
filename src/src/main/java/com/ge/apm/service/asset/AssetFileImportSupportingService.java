@@ -5,7 +5,8 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
@@ -14,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Service
 public class AssetFileImportSupportingService {
 
     public static final String ASSET_CODE_MERGE_THREE = "DFQ";
@@ -40,6 +41,7 @@ public class AssetFileImportSupportingService {
     private QrCodeService qrCodeService;
 
 
+    @Transactional
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
 
         OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
@@ -54,6 +56,7 @@ public class AssetFileImportSupportingService {
 
     }
 
+    @Transactional
     public Supplier importSupplierIfNeeded(OrgInfo selectedOrgToImport, String name, String tel) {
 
         Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
@@ -79,6 +82,7 @@ public class AssetFileImportSupportingService {
 
     }
 
+    @Transactional
     public Supplier importMaintainancerIfNeeded(OrgInfo selectedOrgToImport, String name, String tel) {
 
         Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
@@ -108,6 +112,7 @@ public class AssetFileImportSupportingService {
 
     }
 
+    @Transactional
     public Supplier importManufacturerIfNeeded(OrgInfo selectedOrgToImport, String name) {
 
         Supplier supplier = supplierDao.findFirstByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
@@ -301,6 +306,41 @@ public class AssetFileImportSupportingService {
             }
 
         });
+
+    }
+
+    /**
+     * release qrcode only one asset
+     * @param selectedOrgToImport
+     * @param item
+     */
+    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, Map<String, Object> item) {
+
+        AssetInfo newAsset = (AssetInfo) item.get("asset");
+
+        //if site uid not match, ignore update
+        if (newAsset.getUid() != null) {
+            if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                return ;
+            }
+
+        }
+
+        String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+        if (StringUtils.isEmpty(oldQrCode)) return;
+        if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
+
+        boolean releaseable = true;
+        if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+            boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+            if (!exists) {
+                releaseable = false;
+            }
+        }
+
+        if (releaseable) {
+            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+        }
 
     }
 
