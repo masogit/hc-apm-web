@@ -5,6 +5,7 @@ let info = {
   id: '###', // for debug,
   isHead: false,
   hospitalId: '9',
+  orgId: '23',
 }
 
 const userInfoEl = document.getElementById('user-context')
