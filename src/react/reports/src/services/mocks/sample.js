@@ -12,6 +12,7 @@ import { briefsByType, briefsBySupplier, briefsByDept } from './ProcessAnalysis/
 import { details } from './ProcessAnalysis/details'
 import { grossByDept, grossBySupplier, grossByType } from './ProcessAnalysis/gross'
 import { phaseArrival, phaseRespond, phaseETTR } from './ProcessAnalysis/phase'
+import { Assets as AssetInfo } from './Nurse/assetInfo'
 import { URLs } from '../index.js'
 import { sampleSize } from 'lodash'
 
@@ -197,6 +198,14 @@ export default function (mock) {
       }
     })
 
+  mock.onGet(URLs.Nurse_Assets)
+    .reply(function(config) {
+      info(config.url)
+      return [
+        200,
+        AssetInfo,
+      ]
+    })
   mock.onAny().passThrough()
 
 }

@@ -35,6 +35,8 @@ const URLs = {
   ProcessAnalysis_Gross: '/api/process/gross',
   ProcessAnalysis_Phase: '/api/process/phase',
 
+  Nurse_Assets: '/gateway/hcapmassetservice/api/apm/asset/assetinfos'
+
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -107,7 +109,15 @@ const ProcessAnalysis = {
   }
 }
 
-export { URLs, AssetBrowser, ProcessAnalysis, FailureAnalysis }
+const Nurse = {
+
+  getAssets(clinicalDeptId) {
+    return axios.get(URLs.Nurse_Assets, { clinicalDeptId }).then(_ => _.data)
+  }
+
+}
+
+export { URLs, AssetBrowser, ProcessAnalysis, FailureAnalysis, Nurse }
 
 /* Failure Analysis & Process Analysis */
 const DateFormat = 'YYYY-MM-DD'

@@ -3,6 +3,7 @@ import { Table } from 'antd'
 import { flow } from 'noru-utils/lib'
 import { translate } from 'react-i18next'
 import { connect } from 'dva'
+import { uniqBy } from 'lodash-es'
 import './index.scss'
 
 const Header = () => (
@@ -36,16 +37,24 @@ class AssetTable extends React.Component {
     let { t } = this.props
     return [
       {
-        title: t`设备名称`
+        title: t`设备名称`,
+        dataIndex: 'name',
+        key: 'name',
       },
       {
-        title: t`资产编号`
+        title: t`资产编号`,
+        dataIndex: 'financingNum',
+        key: 'financingNum',
       },
       {
-        title: t`设备分类`
+        title: t`设备分类`,
+        dataIndex: 'assetGroupName',
+        key: 'assetGroupName',
       },
       {
-        title: t`使用科室`
+        title: t`使用科室`,
+        dataIndex: 'clinicalDeptName',
+        key: 'clinicalDeptName',
       },
     ]
   }
@@ -62,8 +71,9 @@ class AssetTable extends React.Component {
 export class AssetOverview extends React.Component {
 
   render() {
-    let { t, assetCount, assets } = this.props
+    let { t, assets } = this.props
 
+    let typeCount = assets.length
     return (
       <div className="asset-overview">
 
@@ -71,7 +81,7 @@ export class AssetOverview extends React.Component {
 
         <div className="asset-overview-content">
           <Header />
-          <Count t={t} all={assets.length} type={20}/>
+          <Count t={t} all={assets.length} type={_.uniqBy(assets, a => a.assetGroup).length}/>
           <AssetTable t={t} data={assets} />
         </div>
 
@@ -83,7 +93,7 @@ export class AssetOverview extends React.Component {
 
 function mapState2Props(state) {
   return {
-    assets: [1,2,3,4,5,6,7,8,9]
+    assets: state.Nurse.assets,
   }
 }
 
