@@ -322,6 +322,15 @@ public class NurseSiteMaintainItem implements Serializable {
 	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
+	
+	public String getSequenceName(){
+		if(sequence==null){
+			return "";
+		}
+		else{
+			return sequence+"";
+		}
+	}
 
 	public NurseSiteMaintainData getDataValue(String label){
 		if(listData!=null && StringUtils.isNotEmpty(label)){
