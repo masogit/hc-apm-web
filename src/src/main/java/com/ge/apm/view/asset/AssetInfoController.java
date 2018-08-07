@@ -2105,7 +2105,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     			unit = unit.add(new BigDecimal(minutes / 60d));
     			totalTime = days + "天" + hours + "时" + minutes + "分";
     		}
-    		
     		String chargeType = item.getSharedAssetType().getChargingType();
     		switch(chargeType) {
     		case "1":
