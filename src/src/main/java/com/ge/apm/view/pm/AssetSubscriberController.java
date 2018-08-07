@@ -89,6 +89,20 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		initAssets();
 	}
 
+	public boolean multiSelect(){
+		//System.out.println(selectedMap);
+		List<Map.Entry<String, Boolean>> collect = selectedMap.entrySet().stream().filter(item -> item.getValue() ==
+				true).collect(Collectors.toList());
+		gaolei
+		String msgId =(String)collect.get(0).getKey();
+		selected=dao.findById(Integer.valueOf(msgId));
+		//如果多于1个被选中
+   	if(selectedMap.entrySet().stream().filter(item->item.getValue()==true).collect(Collectors.toList()).size()>1){
+   		return true;
+   	}
+   else
+   	return false;
+	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
 //yao gai , if suscribe change, it's current useid
@@ -109,9 +123,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
 	public void onSelectAllOfPage() {
-		/*for (V2_PmOrder item : currentPagePmOrders) {
-			selectedMap.put(item.getId(), this.isSelectedCurrentPage);
-		}*/
 		isSelectedCurrentPage = !delMsgList.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
 	}
 
@@ -257,6 +268,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
+
+		selectedMap.entrySet().stream().filter(item->item.getValue()).collect(Collectors.toList());
+
 		if(selected.getLevel0()!=null){
 			level0=selected.getLevel0();
 		}else{
@@ -274,6 +288,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 		if(queryAsset!=null)
 			queryAsset.setName(selected.getAssetInfo().getName());
+
+
 	}
 
 	public boolean requiredCheck(){
