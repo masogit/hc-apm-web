@@ -6,6 +6,7 @@ import com.ge.apm.domain.UserSchedule;
 import com.ge.apm.domain.UserScheduleStageConfig;
 import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -64,6 +65,7 @@ public class WorkScheduleController{
     private Date startTime_pm;
     private Date endTime_pm;
 
+    private String resultInfo;
 
     @PostConstruct
     protected void init() {
@@ -88,12 +90,16 @@ public class WorkScheduleController{
         this.isDisableScheduleDateStage = false;
         this.isDisableScheduleDate = false;
 
+        this.resultInfo = "";
+
     }
 
     private void loadScheduleData(){
         eventModel = new DefaultScheduleModel();
 
         List<SearchFilter> searchFilters = new ArrayList<>();
+
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, UserSchedule.Type.W.name()));
         if(currentUser.getOrgLevel() == 0){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
         }else if(currentUser.getOrgLevel() == 1){
@@ -130,7 +136,12 @@ public class WorkScheduleController{
             tempUserSchedule.setUserUID(this.userUID);
             tempUserSchedule.setScheduleDate(this.scheduleDate);
             tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
+            tempUserSchedule.setCreatedBy(currentUser.getLoginName());
+            tempUserSchedule.setCreatedDate(new Date());
+            tempUserSchedule.setLastModifiedBy(currentUser.getLoginName());
+            tempUserSchedule.setLastModifiedDate(new Date());
 
+            //JSF Schedule model
             tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
             tempEvent.setData(tempUserSchedule);
 
@@ -143,7 +154,10 @@ public class WorkScheduleController{
                 tempUserSchedule.setUserUID(this.userUID);
                 tempUserSchedule.setScheduleDate(event.getStartDate());
                 tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
+                tempUserSchedule.setLastModifiedBy(currentUser.getLoginName());
+                tempUserSchedule.setLastModifiedDate(new Date());
 
+                //JSF Schedule model
                 tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
                 tempEvent.setId(event.getId());
                 tempEvent.setData(tempUserSchedule);
@@ -305,14 +319,34 @@ public class WorkScheduleController{
         addMessage(message);
     }
 
-    public String batchSaveWorkSchedule(){
+    public void batchSaveWorkSchedule(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
         if(this.isValideDate()){
-            userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, batchType, currentUser);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-            return "workSchedule?faces-redirect=true";
+            Map<String, List<UserSchedule>> resultMap = userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, batchType, currentUser);
+
+            List<UserSchedule> successList = resultMap.get(UserScheduleService.BATCH_SUCCESS_LIST);//没有创建成功排班记录
+            List<UserSchedule> failedList = resultMap.get(UserScheduleService.BATCH_FAILED_LIST);//没有创建成功排班记录
+
+            for (UserSchedule us : failedList) {
+                resultInfo += "[" + us.getUserAccount().getName() + sdf.format(us.getScheduleDate()) + this.getShowTitle(us.getScheduleDateStage()) + "]";
+            }
+
+            if("".equals(resultInfo)){
+                requestContext.addCallbackParam("flag", "Success");
+            }else{
+                requestContext.addCallbackParam("flag", "PartialSuccess");
+            }
+
         }else {
-            return "";
+            requestContext.addCallbackParam("flag", "Failed");
         }
+
+    }
+
+    public String resultConfig(){
+        return "workSchedule?faces-redirect=true";
     }
 
     public void saveStageConfig(){
@@ -500,5 +534,13 @@ public class WorkScheduleController{
 
     public void setEndTime_pm(Date endTime_pm) {
         this.endTime_pm = endTime_pm;
+    }
+
+    public String getResultInfo() {
+        return resultInfo;
+    }
+
+    public void setResultInfo(String resultInfo) {
+        this.resultInfo = resultInfo;
     }
 }

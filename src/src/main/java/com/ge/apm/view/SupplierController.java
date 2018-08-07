@@ -1,9 +1,11 @@
 package com.ge.apm.view;
 
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.UserAccount;
 import org.primefaces.context.RequestContext;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
@@ -77,7 +79,16 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         if(!selected.getManufacturerT()){
             selected.setManufacturerT(false);
         }
-
+        UserAccount ua =UserContextService.getCurrentUserAccount();
+        selected.setTenantUID(ua.getTenantUID());
+        selected.setInstitutionUID(ua.getInstitutionUID());
+        selected.setHospitalUID(ua.getHospitalUID());
+        selected.setSiteUID(ua.getSiteUID());
+        if(selected.getCreatedDate()==null)
+          selected.setCreatedDate(new Date());
+        selected.setCreatedBy(ua.getName());
+        selected.setLastModifiedDate(new Date());
+        selected.setLastModifiedBy(ua.getName());
         super.save();
         selected=null;
         maintainerT=null;

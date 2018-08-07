@@ -24,6 +24,7 @@ import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/11/13.
@@ -54,6 +55,9 @@ public class UserScheduleService {
     public final static String BATCH_TYPE_WEEKDAY="WeekDay";   //工作日
     public final static String BATCH_TYPE_WEEKEND="WeekEnd";   //周末
 
+    public final static String BATCH_SUCCESS_LIST="SuccessList";   //批量创建成功LIST
+    public final static String BATCH_FAILED_LIST="FailedList";   //批量创建失败LIST
+
     public void saveWork(List<UserAccount> userAccountList, Date startDate, Date endDate, UserSchedule userSchedule, boolean isBatch){
 
         Instant startDateInstant = startDate.toInstant();
@@ -82,8 +86,8 @@ public class UserScheduleService {
             }
 
             for (UserAccount ua : userAccountList) {
-                UserSchedule tempUserSchedule = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(SCHEDULE_TYPE_WORK, ua.getUid(), Date.from(scheduleDateInstant));
-                if(tempUserSchedule == null){
+                List<UserSchedule> tempUserSchedule = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(SCHEDULE_TYPE_WORK, ua.getUid(), Date.from(scheduleDateInstant));
+                if(tempUserSchedule.isEmpty()){
                     userSchedule.setId(null);
                     userSchedule.setScheduleDate(Date.from(scheduleDateInstant));
                     userSchedule.setUserUID(ua.getUid());
@@ -93,13 +97,13 @@ public class UserScheduleService {
         }
     }
 
-    public List<LinkedHashMap<String, Date>> saveVacation(Date startDate, Date endDate){
+    public List<LinkedHashMap<String, Date>> saveVacation(Date startDate, Date endDate, String scheduleDateStage){
 
         String token = UserContextService.getAccessToken();
         UserScheduleForm usForm = new UserScheduleForm();
         usForm.setStartDate(startDate);
         usForm.setEndDate(endDate);
-        usForm.setScheduleDateStage(SCHEDULE_STAGE_ALL);
+        usForm.setScheduleDateStage(scheduleDateStage);
         usForm.setType(SCHEDULE_TYPE_VACATION);
 
         List<LinkedHashMap<String, Date>> resultList = requestApiService.createUserVacationRequest(token, usForm);
@@ -109,7 +113,10 @@ public class UserScheduleService {
     }
 
     @Transactional
-    public void batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String batchType, UserAccount userAccount){
+    public Map<String, List<UserSchedule>> batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String batchType, UserAccount userAccount){
+        Map<String, List<UserSchedule>> resultMap = new HashedMap();
+        List<UserSchedule> successList = new ArrayList<>();//没有创建成功排班记录
+        List<UserSchedule> failedList = new ArrayList<>();//没有创建成功排班记录
         Instant startDateInstant = startDate.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
@@ -148,7 +155,7 @@ public class UserScheduleService {
                 }
             }
 
-            for (UserAccount ua : userAccountList) {
+            /*for (UserAccount ua : userAccountList) {
                 UserSchedule tempUserSchedule = new UserSchedule();
                 tempUserSchedule.setTenantUID(userAccount.getTenantUID());
                 tempUserSchedule.setInstitutionUID(userAccount.getInstitutionUID());
@@ -181,8 +188,54 @@ public class UserScheduleService {
                     userScheduleDao.save(tempUserSchedule1);
                 }
 
+            }*/
+
+            for (UserAccount ua : userAccountList) {
+
+                if(BATCH_TYPE_WEEKDAY.equals(batchType)) {
+                    if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
+                        successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.TRUE));
+                    }else {
+                        failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE));
+                    }
+                    if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
+                        successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.TRUE));
+                    }else {
+                        failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE));
+                    }
+                }else if(BATCH_TYPE_WEEKEND.equals(batchType)) {
+                    if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
+                        successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.TRUE));
+                    }else {
+                        failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE));
+                    }
+                }
+
             }
+
         }
+
+        resultMap.put(BATCH_SUCCESS_LIST, successList);
+        resultMap.put(BATCH_FAILED_LIST, failedList);
+        return resultMap;
+    }
+
+    //创建排班记录
+    private UserSchedule createWorkSchedule(UserAccount loginUserAccount, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave){
+        UserSchedule userSchedule = new UserSchedule();
+        userSchedule.setTenantUID(loginUserAccount.getTenantUID());
+        userSchedule.setInstitutionUID(loginUserAccount.getInstitutionUID());
+        userSchedule.setHospitalUID(loginUserAccount.getHospitalUID());
+        userSchedule.setSiteUID(loginUserAccount.getSiteUID());
+        userSchedule.setType(UserSchedule.Type.W.name());
+        userSchedule.setUserUID(scheduleUserAccount.getUid());
+        userSchedule.setScheduleDate(scheduleDate);
+        userSchedule.setUserAccount(scheduleUserAccount);
+        userSchedule.setScheduleDateStage(scheduleDateStage);
+        if(isSave){
+            userScheduleDao.save(userSchedule);
+        }
+        return userSchedule;
     }
 
     public void saveScheduleStageConfig(Date startTime_all, Date endTime_all, Date startTime_am, Date endTime_am, Date startTime_pm, Date endTime_pm, UserAccount userAccount){
@@ -247,6 +300,10 @@ public class UserScheduleService {
         return scheduleStageConfigMap;
     }
 
+    public void saveVacationSchedule(UserSchedule us){
+        userScheduleDao.save(us);
+    }
+
     public void deleteUserSchedule(UserSchedule us){
         userScheduleDao.delete(us);
     }
@@ -264,10 +321,12 @@ public class UserScheduleService {
         return sourceLocalDate.isBefore(targetLocalDate);
     }
 
+    //scheduleDateStage中ALL 和AM\PM互斥
     public boolean isValidateWorkSchedule(Date scheduleDate, String scheduleDateStage, UserAccount userAccount){
 
         boolean flag = true;
 
+        //判断排班是否冲突的逻辑
         List<UserSchedule> userScheduleList = userScheduleDao.findByTypeAndScheduleDateAndSiteUID(SCHEDULE_TYPE_WORK, scheduleDate, userAccount.getSiteUID());
 
         int count_all = 0;
@@ -300,19 +359,57 @@ public class UserScheduleService {
         return flag;
     }
 
+    //验证被排班人该天是否有重复的班次
     public boolean isValidateUser(Date scheduleDate, String userUID, String scheduleDateStage, String userScheduleID){
 
-        List<UserSchedule> usList = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(SCHEDULE_TYPE_WORK, userUID, scheduleDate, scheduleDateStage);
+        //判断是否有请假
+        if(this.getUserVacationList(scheduleDate, userUID, scheduleDateStage, UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
 
-        if(!usList.isEmpty()){
-            if(userScheduleID != null && userScheduleID.equals(usList.get(0).getId())){
+            List<UserSchedule> usList = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(SCHEDULE_TYPE_WORK, userUID, scheduleDate, scheduleDateStage);
+
+            if (!usList.isEmpty()) {
+                //区分是新增还是修改，相同ID是修改
+                if (userScheduleID != null && userScheduleID.equals(usList.get(0).getId())) {
+                    return true;
+                }
+                return false;
+            } else {
                 return true;
             }
+        }else{
             return false;
-        }else {
-            return true;
         }
 
+    }
+
+    //scheduleDateStage[ALL:返回用户该时间所有记录，AM:用户该时间AM和ALL的数据记录，返回PM:用户该时间PM和ALL的数据记录],得到用户请假记录
+    private List<UserSchedule> getUserVacationList(Date scheduleDate, String userUID, String scheduleDateStage, String auditStatus){
+        List<UserSchedule> tempUserScheduleList;
+        if(auditStatus != null) {
+            tempUserScheduleList = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndAuditStatus(UserSchedule.Type.V.name(), userUID, scheduleDate, auditStatus);
+        }else {
+            tempUserScheduleList = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.V.name(), userUID, scheduleDate);
+        }
+
+        if(!UserSchedule.ScheduleDateStage.ALL.name().equals(scheduleDateStage)){
+            tempUserScheduleList = tempUserScheduleList.stream()
+                    .filter(item-> Arrays.asList(scheduleDateStage, UserSchedule.ScheduleDateStage.ALL.name()).contains(item.getScheduleDateStage()))
+                    .collect(Collectors.toList());
+        }
+
+        return tempUserScheduleList;
+    }
+
+    //scheduleDateStage[ALL:返回用户该时间所有记录，AM:用户该时间AM和ALL的数据记录，返回PM:用户该时间PM和ALL的数据记录],得到用户排班记录
+    public List<UserSchedule> getUserWorkList(UserAccount userAccount, Date scheduleDate, String scheduleDateStage){
+
+        List<UserSchedule> tempUserScheduleList = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.W.name(), userAccount.getUid(), scheduleDate);
+
+        if(!UserSchedule.ScheduleDateStage.ALL.name().equals(scheduleDateStage)){
+            tempUserScheduleList = tempUserScheduleList.stream().filter(item-> Arrays.asList(scheduleDateStage, UserSchedule.ScheduleDateStage.ALL.name()).contains(item.getScheduleDateStage())).collect(Collectors.toList());
+        }
+
+        return tempUserScheduleList;
     }
 
 }

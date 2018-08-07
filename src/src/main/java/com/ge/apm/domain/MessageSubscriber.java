@@ -3,13 +3,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  *
@@ -31,13 +25,28 @@ public class MessageSubscriber implements Serializable {
     @Basic(optional = false)
     @Column(name = "hospital_id")
     private int hospitalId;
+
+
     @Basic(optional = false)
     @Column(name = "asset_id")
     private int assetId;
+
+
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
+
+
     @Basic(optional = false)
     @Column(name = "subscribe_user_id")
     private int subscribeUserId;
-    
+
+    @JoinColumn(name = "subscribe_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAccount subscriberUser;
+
+
     // receiveMsgMode: 0: no subscribe ; 1:all subscribe 2:partial subscribe
     @Basic(optional = false)
     @Column(name = "receive_msg_mode")
@@ -48,6 +57,43 @@ public class MessageSubscriber implements Serializable {
     @Basic(optional = false)
     @Column(name = "is_receive_chat_msg")
     private boolean isReceiveChatMsg;
+
+    @Basic(optional = true)
+    @Column(name = "level_0")
+    private Boolean level0;
+
+    @Basic(optional = true)
+    @Column(name = "level_1")
+    private Boolean level1;
+
+    @Basic(optional = true)
+    @Column(name = "level_2")
+    private Boolean level2;
+
+    //1 维修事件 2 保养事件 3 合同到期事件
+    @Basic(optional = true)
+    @Column(name = "select_type")
+    private Integer selectType;
+
+
+    @Basic(optional = true)
+    @Column(name = "repair_event")
+    private Boolean repairEvent;
+
+    @Basic(optional = true)
+    @Column(name = "maintain_event")
+    private Boolean maintainEvent;
+    @Basic(optional = true)
+    @Column(name = "contract_due_event")
+    private Boolean contractDueEvent;
+    @Basic(optional = true)
+    @Column(name = "quality_hit")
+    private Boolean qualityHit;
+    @Basic(optional = true)
+    @Column(name = "main_rep_hit")
+    private Boolean mainRepHit;
+
+
 
     public MessageSubscriber() {
     }
@@ -155,5 +201,100 @@ public class MessageSubscriber implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.MessageSubscriber[ id=" + id + " ]";
     }
-    
+
+    public Boolean getLevel0() {
+        return level0;
+    }
+
+    public void setLevel0(Boolean level0) {
+        this.level0 = level0;
+    }
+
+    public Boolean getLevel1() {
+        return level1;
+    }
+
+    public void setLevel1(Boolean level1) {
+        this.level1 = level1;
+    }
+
+    public Boolean getLevel2() {
+        return level2;
+    }
+
+    public void setLevel2(Boolean level2) {
+        this.level2 = level2;
+    }
+
+    public Integer getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(Integer selectType) {
+        this.selectType = selectType;
+    }
+
+    public Boolean getRepairEvent() {
+        return repairEvent;
+    }
+
+    public void setRepairEvent(Boolean repairEvent) {
+        this.repairEvent = repairEvent;
+    }
+
+    public Boolean getMaintainEvent() {
+        return maintainEvent;
+    }
+
+    public void setMaintainEvent(Boolean maintainEvent) {
+        this.maintainEvent = maintainEvent;
+    }
+
+    public Boolean getContractDueEvent() {
+        return contractDueEvent;
+    }
+
+    public void setContractDueEvent(Boolean contractDueEvent) {
+        this.contractDueEvent = contractDueEvent;
+    }
+
+    public Boolean getQualityHit() {
+        return qualityHit;
+    }
+
+    public void setQualityHit(Boolean qualityHit) {
+        this.qualityHit = qualityHit;
+    }
+
+    public Boolean getMainRepHit() {
+        return mainRepHit;
+    }
+
+    public void setMainRepHit(Boolean mainRepHit) {
+        this.mainRepHit = mainRepHit;
+    }
+
+    public UserAccount getSubscriberUser() {
+        return subscriberUser;
+    }
+
+    public void setSubscriberUser(UserAccount subscriberUser) {
+        this.subscriberUser = subscriberUser;
+    }
+
+    public boolean isReceiveTimeoutMsg() {
+        return isReceiveTimeoutMsg;
+    }
+
+    public void setReceiveTimeoutMsg(boolean receiveTimeoutMsg) {
+        isReceiveTimeoutMsg = receiveTimeoutMsg;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
 }

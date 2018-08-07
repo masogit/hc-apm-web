@@ -2073,9 +2073,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 	}
 	
-	private SharedAssetReqDetail selectProperReqDetail(AssetInfo info) {
+	private SharedAssetReqDetail selectProperReqDetail(AssetInfo item) {
 		Date nowDate = new Date();
-    	SharedAssetReqDetail sharedAssetReqDetail = info.getSharedAssetReqDetailList().stream().filter(item -> item.getChargingEndTime() == null || item.getChargingEndTime().compareTo(nowDate) > 0).findFirst().orElse(null);
+    	SharedAssetReqDetail sharedAssetReqDetail = item.getSharedAssetReqDetailList()
+    													.stream()
+    													.filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
+    													.findFirst()
+    													.orElse(null);
     	if(sharedAssetReqDetail != null) {
     		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
     		LocalDateTime beginLDT;
@@ -2101,8 +2105,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     			unit = unit.add(new BigDecimal(minutes / 60d));
     			totalTime = days + "天" + hours + "时" + minutes + "分";
     		}
-    		
-    		String chargeType = info.getSharedAssetType().getChargingType();
+    		String chargeType = item.getSharedAssetType().getChargingType();
     		switch(chargeType) {
     		case "1":
     			totalTime = "1次";
@@ -2121,8 +2124,19 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     		default:
     			unit = new BigDecimal(0);
     		}
+    		
+    		//
+    		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
+    			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
+    			} else {
+    				SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
+    				if(request != null && "1".equals(request.getType())) {
+    					unit = new BigDecimal(0);
+    				}
+    			}
+    		}
     		sharedAssetReqDetail.setRentalTime(totalTime);
-    		BigDecimal totalAmount = unit.multiply(new BigDecimal(info.getSharedAssetType().getUnitPrice().doubleValue()));
+    		BigDecimal totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().doubleValue()));
     		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
     	}
     	return sharedAssetReqDetail;
