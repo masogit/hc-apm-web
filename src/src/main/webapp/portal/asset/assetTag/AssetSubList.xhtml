@@ -25,7 +25,7 @@
 
                     <p:column width="36"  exportable="false">
                         <p:selectBooleanCheckbox  class="selectCheckBox" value="#{assetSubscriberController.selectedMap[item.id]}">
-                            <p:ajax update="@(.delCls)" listener="#{assetSubscriberController.onItemSelected}" />
+                            <p:ajax update="@(.delCls) @(.editCls)" listener="#{assetSubscriberController.onItemSelected}" />
                         </p:selectBooleanCheckbox>
                         <!--<f:facet name="header">
                             <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetSubscriberController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
@@ -52,7 +52,7 @@
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetSubscriberController.prepareCreate}" update="scriTab:AssetSubscribEditDlg scriTab:AssetSubscribEditForm"  oncomplete="PF('AssetSubscribEditDialog').show()"/>
-                        <p:commandButton id="editButton" class ="editCls" actionListener="#{assetSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetSubscribEditDlg" oncomplete="PF('AssetSubscribEditDialog').show()" disabled="#{empty assetSubscriberController.selected}"/>
+                        <p:commandButton id="editButton" class ="editCls" actionListener="#{assetSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetSubscribEditDlg" oncomplete="PF('AssetSubscribEditDialog').show()" disabled="#{empty assetSubscriberController.selected or assetSubscriberController.multiSelect()}"/>
 
                         <!--   <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="删除" actionListener="#{assetSubscriberController.deleteBatch()}" update="scriTab:AssetSubscriberForm"  disabled="#{not assetSubscriberController.isChecked()}">
                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
