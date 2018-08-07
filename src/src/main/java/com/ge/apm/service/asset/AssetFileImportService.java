@@ -345,19 +345,19 @@ public class AssetFileImportService {
             newAsset.setClinicalDeptUID(orgInfo.getUid());
         }
 
-        UserAccount userAccount;
+        List<UserAccount> userAccounts;
         //for AssetOwner
         if (newAsset.getAssetOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
         } else {
 
-            userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName());
-            if (userAccount == null) {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName());
+            if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName(null);
             } else {
-                newAsset.setAssetOwnerId(userAccount.getId());
-                newAsset.setAssetOwnerTel(userAccount.getTelephone());
+                newAsset.setAssetOwnerId(userAccounts.get(0).getId());
+                newAsset.setAssetOwnerTel(userAccounts.get(0).getTelephone());
             }
         }
 
@@ -365,13 +365,13 @@ public class AssetFileImportService {
         if (newAsset.getAssetOwnerName2() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
         } else {
-            userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName2());
-            if (userAccount == null) {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName2());
+            if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName2(null);
             } else {
-                newAsset.setAssetOwnerId2(userAccount.getId());
-                newAsset.setAssetOwnerTel2(userAccount.getTelephone());
+                newAsset.setAssetOwnerId2(userAccounts.get(0).getId());
+                newAsset.setAssetOwnerTel2(userAccounts.get(0).getTelephone());
             }
 
         }
@@ -380,13 +380,13 @@ public class AssetFileImportService {
         if (newAsset.getAssetOwnerName3() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
         } else {
-            userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName3());
-            if (userAccount == null) {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getAssetOwnerName3());
+            if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName3(null);
             } else {
-                newAsset.setAssetOwnerId3(userAccount.getId());
-                newAsset.setAssetOwnerTel3(userAccount.getTelephone());
+                newAsset.setAssetOwnerId3(userAccounts.get(0).getId());
+                newAsset.setAssetOwnerTel3(userAccounts.get(0).getTelephone());
             }
 
         }
@@ -395,13 +395,13 @@ public class AssetFileImportService {
         if (newAsset.getClinicalOwnerName() == null) {
             AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
         } else {
-            userAccount = userDao.findFirstByTenantUIDAndName(tenantUID, newAsset.getClinicalOwnerName());
-            if (userAccount == null) {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getClinicalOwnerName());
+            if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
                 newAsset.setClinicalOwnerName(null);
             } else {
-                newAsset.setClinicalOwnerId(userAccount.getId());
-                newAsset.setClinicalOwnerTel(userAccount.getTelephone());
+                newAsset.setClinicalOwnerId(userAccounts.get(0).getId());
+                newAsset.setClinicalOwnerTel(userAccounts.get(0).getTelephone());
             }
 
         }
