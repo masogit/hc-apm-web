@@ -11,6 +11,7 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -111,10 +112,20 @@ public class ExcelDocument {
         Sheet sheet = workBook.getSheet(sheetName);
         return getKeyRow(sheet, keyRowNum);
     }
+    
+    public String[] getKeyRow(String sheetName, int keyRowNum,int maxColumn) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        return getKeyRow(sheet, keyRowNum,maxColumn);
+    }
 
     public String[] getKeyRow(int sheetIndex, int keyRowNum) {
         Sheet sheet = workBook.getSheetAt(sheetIndex);
         return getKeyRow(sheet, keyRowNum);
+    }
+    
+    public void mergeCell(String sheetName,int firstRow, int lastRow, int firstCol, int lastCol){
+    	Sheet sheet = workBook.getSheet(sheetName);
+    	sheet.addMergedRegion(new CellRangeAddress(firstRow,lastRow,firstCol,lastCol));
     }
 
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
@@ -128,6 +139,24 @@ public class ExcelDocument {
             Cell cell = keyRow.getCell(columnIndex);
             if (cell == null) break;
             resultList.add(cell.getStringCellValue());
+        }
+        return resultList.toArray(new String[]{});
+    }
+    
+    public static String[] getKeyRow(Sheet sheet, int keyRowNum,int lastCellNum) {
+        Row keyRow = sheet.getRow(keyRowNum - 1);
+
+        List<String> resultList = new ArrayList<>();
+
+        int firstCellNum = keyRow.getFirstCellNum();
+        for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
+            Cell cell = keyRow.getCell(columnIndex);
+            if(cell!=null){
+            	resultList.add(cell.getStringCellValue());
+            }
+            else{
+            	resultList.add("");
+            }
         }
         return resultList.toArray(new String[]{});
     }
@@ -447,6 +476,19 @@ public class ExcelDocument {
             writeCellData(sheetName, dataRowNum, index + 1, value);
         }
     }
+    public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, String newKey,Object value) {
+
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            if(key.equals(newKey)){
+            	writeCellData(sheetName, dataRowNum, index + 1, value);
+            	break;
+            }
+        }
+    }
 
     public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
 
@@ -465,6 +507,11 @@ public class ExcelDocument {
     public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, Map<String, Object> data) {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         writeRowData(sheetName, rowKey, dataRowNum, data);
+    }
+    
+    public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, String key,Object value) {
+        String[] rowKey = getKeyRow(sheetName, keyRowNum);
+        writeRowData(sheetName, rowKey, dataRowNum, key,value);
     }
 
     public void writeCellData(Cell cell, Object data) {
