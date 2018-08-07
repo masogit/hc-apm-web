@@ -6,41 +6,49 @@
 package com.ge.apm.service.utils;
 
 import com.monitorjbl.xlsx.StreamingReader;
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
  *
  * @author Quan Tang
  */
-public class ExcelDocumentStreamingReader implements Closeable {
+public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, Cell>> {
 
     Workbook workBook;
+    Sheet sheet;
+    int keyRowNum;
+    String[] columnTitles;
+    Iterator<Row> iterator;
 
-    public ExcelDocumentStreamingReader(String path) throws IOException {
-        this(new FileInputStream(path));
+    public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum) throws IOException {
+        this(new FileInputStream(path), sheetIndex, keyRowNum);
     }
 
-    public ExcelDocumentStreamingReader(InputStream input) {
-        workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
+    public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum) {
+        this.workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
+        this.sheet = workBook.getSheetAt(sheetIndex);
+        this.keyRowNum = keyRowNum;
+        this.iterator = sheet.rowIterator();
+
+        this.columnTitles = getColumnTitles();
+
+
     }
 
-    public String[] getKeyRow(int sheetIndex, int keyRowNum) {
-        Sheet sheet = workBook.getSheetAt(sheetIndex);
+    private String[] getColumnTitles() {
 
         int currentRow = 0;
 
         List<String> resultList = new ArrayList<>();
-        for (Row row : sheet) {
-            if (currentRow == keyRowNum -1) {
+//        Iterator<Row> iterator = sheet.rowIterator();
+        while (iterator.hasNext()) {
+            Row row = iterator.next();
+            if (currentRow == keyRowNum - 1) {
                 for (Cell cell : row) {
                     resultList.add(cell.getStringCellValue());
                 }
@@ -48,308 +56,176 @@ public class ExcelDocumentStreamingReader implements Closeable {
                 break;
             }
 
-
             ++currentRow;
         }
 
-        return resultList.toArray(new String[]{});
+        String[] columnTitles = resultList.toArray(new String[]{});
+
+        return columnTitles;
     }
 
-    public Map<String, String> getStringDataRowMap(int sheetIndex, int keyRowNum, Integer dataRowNum) {
-        String[] rowKey = getKeyRow(sheetIndex, keyRowNum);
-        Sheet sheet = workBook.getSheetAt(sheetIndex);
-        Row dataRow = sheet.getRow(dataRowNum - 1);
-        Map<String, String> dataMap = new LinkedHashMap();
-        if (dataRow == null) {
-            return dataMap;
-        }
-        for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
-            Cell cell = dataRow.getCell(cellIndex);
-            if (cell == null) {
-                continue;
-            }
-            switch (cell.getCellTypeEnum()) {
-                case NUMERIC:
-                    if (DateUtil.isCellDateFormatted(cell)) {
-                        Date date = cell.getDateCellValue();
-                        dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
-                    } else {
-                        dataMap.put(rowKey[cellIndex], new DecimalFormat("###################.#####").format(cell.getNumericCellValue()));
-                    }
-                    break;
-                case BOOLEAN:
-                    dataMap.put(rowKey[cellIndex], (String.valueOf(cell.getBooleanCellValue())));
-                    break;
-                case STRING:
-                case BLANK:
-                    dataMap.put(rowKey[cellIndex], cell.getStringCellValue());
-                    break;
-                case FORMULA:
-                default:
-                    dataMap.put(rowKey[cellIndex], "");
-            }
-        }
-        return dataMap;
-    }
+    @Override
+    public Iterator<Map<String, Cell>> iterator() {
 
-    public Map<String, Object> getDataRowMap(String sheetName, String[] rowKey, Integer dataRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
-        Row dataRow = sheet.getRow(dataRowNum - 1);
-        Map<String, Object> dataMap = new LinkedHashMap();
+//        int currentRow = 0;
 
-        if (dataRow == null) {
-            return dataMap;
-        }
-
-        for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
-            Cell cell = dataRow.getCell(cellIndex);
-            if (cell == null) {
-                continue;
-            }
-            Object v = getCellValue(cell);
-            String rawValue = getRawValue(cell);
-            ValueWrapper wrapper = new ValueWrapper(v, rawValue);
-            dataMap.put(rowKey[cellIndex], wrapper);
-        }
-        return dataMap;
-    }
-
-    public List<Map<String, Object>> getAllDataRows(int sheetIndex, int keyRowNum, int startDataRowNum) {
-
-        Sheet sheet = workBook.getSheetAt(sheetIndex);
-        String[] colKeys = getKeyRow(sheetIndex, keyRowNum);
-        int lastRowNum = sheet.getLastRowNum();
-        List<Map<String, Object>> results = new ArrayList<>(lastRowNum);
-
-        while (true) {
-            Row dataRow = sheet.getRow(startDataRowNum - 1);
-            if (dataRow == null) {
-                break;
-            }
-
-            Map<String, Object> dataMap = new LinkedHashMap();
-            for (int cellIndex = 0; cellIndex < colKeys.length; cellIndex++) {
-                Cell cell = dataRow.getCell(cellIndex);
-                if (cell == null) {
-                    continue;
-                }
-                Object v = getCellValue(cell);
-                String rawValue = getRawValue(cell);
-                ValueWrapper wrapper = new ValueWrapper(v, rawValue);
-
-                dataMap.put(colKeys[cellIndex], wrapper);
-            }
-
-            results.add(dataMap);
-
-            ++startDataRowNum;
-        }
-
-        return results;
-
-    }
-
-//    public Map<String, Object> getDataRowMap(int sheetIndex, Integer keyRowNum, Integer dataRowNum) {
-//        String[] rowKey = getKeyRow(sheetIndex, keyRowNum);
-//        return getDataRowMap(sheetIndex, rowKey, dataRowNum);
-//    }
+//        Iterator<Row> iterator = sheet.rowIterator();
+//        while (iterator.hasNext()) {
+//            iterator.next();
+//            if (currentRow == keyRowNum - 1) {
 //
-//    public Map<String, Object> getDataRowMap(Integer keyRowNum, Integer dataRowNum) {
-//        String sheetName = workBook.getSheetName(0);
-//        return getDataRowMap(sheetName, keyRowNum, dataRowNum);
-//    }
-
-//    public List<Map<String, Object>> getDataMaps(String sheetName, Integer keyRowNum, Integer firstData, Integer lastData) {
-//        List<Map<String, Object>> res = new ArrayList();
-//        for (int row = firstData - 1; row <= lastData - 1; row++) {
-//            Map<String, Object> dataMap = getDataRowMap(sheetName, keyRowNum, row + 1);
-//            if (null != dataMap) {
-//                res.add(dataMap);
+//                break;
 //            }
+//
+//            ++currentRow;
 //        }
-//        return res;
-//    }
+        return new DataIterator(iterator);
+    }
 
-    private Object getCellValue(Cell cell) {
+    public class DataIterator implements Iterator<Map<String, Cell>> {
+
+        Iterator<Row> iterator;
+
+        public DataIterator(Iterator<Row> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public Map<String, Cell> next() {
+
+            Map<String, Cell> map = new HashMap<>();
+
+            Row row = iterator.next();
+
+            int cellIndex = 0;
+            for (Cell cell : row) {
+                if (cellIndex >= columnTitles.length) {
+                    break;
+                }
+
+                String columnTitle = columnTitles[cellIndex];
+                map.put(columnTitle, cell);
+
+                ++cellIndex;
+            }
+            return map;
+        }
+    }
+
+    public String getStringValue(Cell cell) {
         CellType type = cell.getCellTypeEnum();
         switch (type) {
-            case BLANK:
+            case NUMERIC:
+//                return String.valueOf(cell.getNumericCellValue());
+                return ((XSSFCell) cell).getRawValue();
+            case STRING:
+                return cell.getStringCellValue();
+
+            default:
                 return null;
-            case BOOLEAN:
-                return cell.getBooleanCellValue();
+        }
+    }
+
+    public Integer getIntegerValue(Cell cell) {
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
+            case NUMERIC:
+                double numericCellValue = cell.getNumericCellValue();
+                return Double.valueOf(numericCellValue).intValue();
+
+            case STRING:
+                return Integer.valueOf(cell.getStringCellValue());
+
+            default:
+                return null;
+        }
+    }
+
+    public Double getDoubleValue(Cell cell) {
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
+            case NUMERIC:
+                double numericCellValue = cell.getNumericCellValue();
+                return Double.valueOf(numericCellValue);
+
+            case STRING:
+                return Double.valueOf(cell.getStringCellValue());
+
+            default:
+                return null;
+        }
+    }
+
+    public Date getDateValue(Cell cell) {
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
+            case NUMERIC:
+                return cell.getDateCellValue();
+            case STRING:
+                return formatDate(cell.getStringCellValue());
+
+            default:
+                return null;
+        }
+    }
+
+    private Object getObjectValue(Cell cell) {
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
             case NUMERIC:
                 return HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
             case STRING:
                 return cell.getStringCellValue();
-            case FORMULA:
-                return null;
             default:
                 return null;
         }
     }
 
-    private String getRawValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case BLANK:
-                return null;
-            case BOOLEAN:
-                return null;
-            case NUMERIC:
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                    return null;
-                }
+    private Date formatDate(String strDate) {
+        if (strDate == null) return null;
 
-                if (cell instanceof XSSFCell) {
-                    return ((XSSFCell) cell).getRawValue();
-                }
-                if (cell instanceof HSSFCell) {
-                    cell.setCellType(CellType.STRING);
-                    return cell.getStringCellValue();
-                }
-                return null;
-            case STRING:
-                return null;
-            case FORMULA:
-                return null;
-            default:
-                return null;
-        }
-    }
-
-    static public String getCellStringValue(Object value) {
-        ValueWrapper valueWrapper = null;
-        if (value instanceof ValueWrapper) {
-            valueWrapper = (ValueWrapper) value;
-            value = valueWrapper.value;
-        }
-
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return ((String) value).trim();
-        }
-        if (value instanceof Integer) {
-            return valueWrapper.rawValue;
-        }
-        if (value instanceof Double) {
-            return valueWrapper.rawValue;
-        }
-        return value.toString();
-    }
-
-    static public Integer getCellIntegerValue(Object value) {
-
-        ValueWrapper valueWrapper = null;
-        if (value instanceof ValueWrapper) {
-            valueWrapper = (ValueWrapper) value;
-            value = valueWrapper.value;
-        }
-
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return ((String) value).isEmpty() ? null : Integer.parseInt((String) value);
-        }
-        if (value instanceof Integer) {
-            return (Integer) value;
-        }
-        if (value instanceof Double) {
-            return ((Double) value).intValue();
-        }
-        return null;
-    }
-
-    static public Double getCellDoubleValue(Object value) {
-
-        ValueWrapper valueWrapper = null;
-        if (value instanceof ValueWrapper) {
-            valueWrapper = (ValueWrapper) value;
-            value = valueWrapper.value;
-        }
-
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return ((String) value).isEmpty() ? null : Double.parseDouble((String) value);
-        }
-        if (value instanceof Double) {
-            return (Double) value;
-        }
-        if (value instanceof Integer) {
-            return Double.valueOf((Integer) value);
-        }
-        return null;
-    }
-
-    static public Date getCellDateValue(Object value) {
-        ValueWrapper valueWrapper = null;
-        if (value instanceof ValueWrapper) {
-            valueWrapper = (ValueWrapper) value;
-            value = valueWrapper.value;
-        }
-
-        if (value == null) {
-            return null;
-        }
-
-        if (value instanceof Date) {
-            return (Date) value;
-        }
-
-        if (value instanceof String) {
-            String strDate = ((String) value).trim();
-            if (StringUtils.isEmpty(strDate)) {
-                return null;
-            }
-
-            Date res;
-            if (strDate.length() == 10) {
-                String dateFormat = TimeUtils.getDateFormat(strDate);
-                if (dateFormat != null) {
-                    res = TimeUtils.getDateFromStr(strDate, dateFormat);
-                    if (res != null) {
-                        return res;
-                    }
-                }
-                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
-                if (res != null) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
-                if (res != null) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "yyyy/MM/dd");
-                if (res != null) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
-                if (res != null) {
-                    return res;
-                }
-            } else if (strDate.length() == 8) {
-                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
-                if (res != null) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
-                if (res != null) {
-                    return res;
+        Date convertedDate = null;
+        if (strDate.length() == 10) {
+            String dateFormat = TimeUtils.getDateFormat(strDate);
+            if (dateFormat != null) {
+                convertedDate = TimeUtils.getDateFromStr(strDate, dateFormat);
+                if (convertedDate != null) {
+                    return convertedDate;
                 }
             }
-
-            return null;
+            convertedDate = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
+            convertedDate = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
+            convertedDate = TimeUtils.getDateFromStr(strDate, "yyyy/MM/dd");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
+            convertedDate = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
+        } else if (strDate.length() == 8) {
+            convertedDate = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
+            convertedDate = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
+            if (convertedDate != null) {
+                return convertedDate;
+            }
         }
 
         return null;
-    }
-
-    public Object getCellValue(String sheetName, Integer dataRowNum, Integer cellnum) {
-        return workBook.getSheet(sheetName).getRow(dataRowNum - 1).getCell(cellnum - 1);
     }
 
     public InputStream getStream() throws IOException {
@@ -367,17 +243,6 @@ public class ExcelDocumentStreamingReader implements Closeable {
                 //nothing
             }
             workBook = null;
-        }
-    }
-
-    public static class ValueWrapper {
-
-        public Object value;
-        public String rawValue;
-
-        public ValueWrapper(Object value, String rawValue) {
-            this.value = value;
-            this.rawValue = rawValue;
         }
     }
 
