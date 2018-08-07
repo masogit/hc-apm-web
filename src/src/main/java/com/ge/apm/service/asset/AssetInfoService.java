@@ -87,7 +87,9 @@ public class AssetInfoService {
 
     public List<OrgInfo> getOrgDeptList(String siteUid) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        return uaaService.getOrgDeptList(siteUid, user.getUid());
+        List<OrgInfo> orgInfos = uaaService.getOrgDeptList(siteUid, user.getUid());
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+        return orgInfos;
     }
 
     public List<OrgInfo> getClinicalDeptList(String siteUid) {

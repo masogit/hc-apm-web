@@ -445,6 +445,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
+        
+        //1st. if asset belongs to any distribution center
+        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
+        //2nd, check if configuration regarding to shared asset has been created
+        searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNotNull, null));
 
         if (queryIndex == 1) {
             //正常可借用
@@ -2034,11 +2039,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
-	}
-	
-	public List<OrgInfo> getDeptListCanLeaseAsset() {
-		UserAccount ua = UserContextService.getCurrentUserAccount();
-		return assetInfoService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
 	}
 	
 	public void forceReturnAsset() {
