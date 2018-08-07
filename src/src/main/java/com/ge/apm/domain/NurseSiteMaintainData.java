@@ -90,6 +90,19 @@ public class NurseSiteMaintainData {
 	public void setItem(NurseSiteMaintainItem item) {
 		this.item = item;
 	}
+	
+	public String getStrValue(){
+		if(this.checkValue==null){
+			return "";
+		}
+		else if(this.checkValue){
+			return "通过";
+		}
+		else if(!this.checkValue){
+			return "有问题";
+		}
+		return "";
+	}
 
 	public Integer getCheckValueWeb() {
 		if(this.checkValue==null){
