@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="auditVacationDlg" widgetVar="auditVacationDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="请假审批">
+        <h:form id="auditVacationForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userVacationScheduleController.selected != null}">
+
+                <h:panelGroup rendered="#{userVacationScheduleController.auditInfo != ''}">
+                    <label class="label">审批注意信息</label>
+                    <h:outputText value="#{userVacationScheduleController.auditInfo}" style="color: red"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">日期</label>
+                    <p:calendar id="date_edit" value="#{userVacationScheduleController.selected.scheduleDate}" disabled="true" timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">日期类型</label>
+                    <h:outputText value="#{userVacationScheduleController.getScheduleDateStageTitle(userVacationScheduleController.selected.scheduleDateStage)}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">请假人</label>
+                    <h:outputText value="#{userVacationScheduleController.selected.userAccount.name}"/>
+                </h:panelGroup>
+
+            </p:panelGrid>
+            <br/>
+
+            <p:commandButton validateClient="true" value="通过" action="#{userVacationScheduleController.approveVacation(true)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
+            <p:commandButton validateClient="true" value="拒绝" action="#{userVacationScheduleController.approveVacation(false)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('auditVacationDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>
+

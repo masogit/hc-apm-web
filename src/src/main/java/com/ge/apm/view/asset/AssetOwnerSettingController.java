@@ -69,7 +69,7 @@ public class AssetOwnerSettingController {
 
     public void getQueryAssetsList() {
         Page page = aoService.getAssetListEx(queryAsset);
-        sourceAssets = page.getContent();
+        sourceAssets = new ArrayList<AssetInfo>(page.getContent());
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
                 sourceAssets.remove(item);

@@ -228,3 +228,8 @@ CREATE INDEX nurse_site_maintain_index
 
 ALTER TABLE public.nurse_site_maintain
     CLUSTER ON nurse_site_maintain_index;
+
+
+--v8.2
+ALTER TABLE public.v2_service_request ALTER COLUMN requestor_name TYPE varchar(32) USING requestor_name::varchar ;
+ALTER TABLE public.v2_work_order ALTER COLUMN current_person_name TYPE varchar(32) USING current_person_name::varchar ;

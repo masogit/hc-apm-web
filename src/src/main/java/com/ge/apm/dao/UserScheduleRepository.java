@@ -13,7 +13,9 @@ public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedu
 
     public List<UserSchedule> findByTypeAndUserUID(String type, String userUID);
 
-    public UserSchedule findByTypeAndUserUIDAndScheduleDate(String type, String userUID, Date scheduleDate);
+    public List<UserSchedule> findByTypeAndUserUIDAndScheduleDate(String type, String userUID, Date scheduleDate);
+
+    public List<UserSchedule> findByTypeAndUserUIDAndScheduleDateAndAuditStatus(String type, String userUID, Date scheduleDate, String auditStatus);
 
     public List<UserSchedule> findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(String type, String userUID, Date scheduleDate, String scheduleDateStage);
 
