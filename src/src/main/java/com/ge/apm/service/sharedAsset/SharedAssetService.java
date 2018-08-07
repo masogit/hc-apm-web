@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author 212579464
@@ -52,6 +53,7 @@ public class SharedAssetService extends MicroServiceInvoker {
     }
 
     public ResponseEntity<LinkedHashMap> getAssigneeList(String requestId) {
+    	logger.info("RequestId: " + requestId);
         String url = getGatewayURL(GatewayURL.ASSIGNEE_LIST);
         url = url.replace("{requestId}", requestId);
         String token = UserContextService.getAccessToken();
@@ -103,6 +105,20 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
         logger.info(JSON.toJSONString(response));
         return response;
+    }
+    
+    public boolean onDuty() {
+        String url = getGatewayURL(GatewayURL.ALLOCATION_ON_DUTY);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        logger.info(JSON.toJSONString(response));
+        return Optional.ofNullable(response)
+                .map(ResponseEntity::getBody)
+                .map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("onDuty"))
+                .orElse(true);
     }
 }
 
