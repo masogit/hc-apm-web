@@ -156,7 +156,6 @@
                             <c:forEach  items="#{v2PmOrderController.pmCheckItemList}" var="item">
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
-                                        <label class="label" style="word-wrap: break-word">#{item.name}</label>
                                         <p:selectOneMenu  value="#{v2PmOrderController.hmCheck[item.uid].value}">
                                             <p:ajax listener="#{v2PmOrderController.hmCheckSet(item.uid)}"></p:ajax>
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -164,8 +163,7 @@
                                             <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
                                             <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
                                         </p:selectOneMenu>
-                                        <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
-                                    </h:panelGroup>d
+                                    </h:panelGroup>
                                 </p:panelGrid>
                             </c:forEach>
                         </p:fieldset>
