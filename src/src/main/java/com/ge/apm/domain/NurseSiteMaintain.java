@@ -362,6 +362,34 @@ public class NurseSiteMaintain implements Serializable {
 		}
 		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 	}
+	
+	public String getShowTitle() {
+		//0：未检查,1:已检查，2:通过，3有问题
+		String strStatus="未检查";
+		if(getStatus()==null || getStatus()==0){
+		}
+		else if(getStatus()==1){
+			strStatus="已检查";
+		}
+		else if(getStatus()==2){
+			strStatus="通过";
+		}
+		else if(getStatus()==3){
+			strStatus="有问题";
+		}
+		else if(getStatus()==4){
+			strStatus="进行中";
+		}
+		
+		String str=getName();
+		if(getSequence()==null){
+			str+="-"+strStatus;
+		}
+		else{
+			str+="-"+getSequence()+"-"+strStatus;
+		}
+		return str;
+	}
 
 	@Override
 	public int hashCode() {
