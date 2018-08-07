@@ -4,11 +4,13 @@ import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ExcelDocumentGenerator {
 
@@ -46,7 +48,7 @@ public class ExcelDocumentGenerator {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            Workbook workbook = new XSSFWorkbook();
+            Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
 
             //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
@@ -78,7 +80,7 @@ public class ExcelDocumentGenerator {
 
         try {
 
-            Workbook workbook = new XSSFWorkbook();
+            Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
 
             //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
@@ -102,6 +104,31 @@ public class ExcelDocumentGenerator {
         }
 
         return excelDoc;
+
+    }
+
+    public static InputStream getTestDocByInputStream(int rowCount) throws IOException {
+
+        Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
+
+        //build asset list sheet
+        Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
+        buildHeaderRow(assetSheet);
+        buildDataRow(assetSheet, rowCount);
+
+        //build clinical department list sheet
+        Sheet orgSheet = workbook.createSheet(AssetFileImportService.SHEET_ORG);
+        buildClinicalDeptSheet(orgSheet);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        workbook.write(baos);
+        workbook.close();
+
+        byte[] bytes = baos.toByteArray();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+        return bais;
 
     }
 
