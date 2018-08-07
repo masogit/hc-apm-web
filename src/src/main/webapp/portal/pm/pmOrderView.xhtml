@@ -70,6 +70,11 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd"/>
                             </p:outputLabel>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">保养结果</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('qualityChecking',v2PmOrderController.selected.qualityChecking)}"></p:outputLabel>
+                        </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
