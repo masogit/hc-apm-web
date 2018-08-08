@@ -65,6 +65,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private Integer assetCategory;
   	private String functionType;
   	private OrgInfo selectedOrgInfo;
+  	private OrgInfo selectedParentOrgInfo;
   	
   	//dropdownlist
   	private Integer perDayCount;
@@ -73,6 +74,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<MaintainDataPair> checkListMonthDays;
   	private List<AssetInfo> checkListAssets;
   	private List<OrgInfo> checkListOrgInfo;
+  	private List<OrgInfo> checkListParentOrgInfo;
   	private Set<String> setOrgUid;
   	private List<String> listOrgUid;
   	private DualListModel<AssetInfo> availableAssets;
@@ -200,6 +202,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
 		objPairCheckItem.setKey(new Date().getTime()+"");
 	}
+	private void loadParentOrgInfo(){
+		checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(setOrgUid);
+		if(checkListOrgInfo==null){
+			checkListOrgInfo=new ArrayList<OrgInfo>();
+		}
+		else{
+			checkListOrgInfo.clear();
+		}
+		selectedOrgInfo=null;
+	}
 	private void loadMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
 		if(nurseSiteMaintainConfig!=null){
 			Integer type=nurseSiteMaintainConfig.getType();
@@ -236,16 +248,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 		}
 		if(isCreate){
-			checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUid(setOrgUid);
-		}
-		else{
-			if(checkListOrgInfo==null){
-				checkListOrgInfo=new ArrayList<OrgInfo>();
-			}
-			else{
-				checkListOrgInfo.clear();
-			}
-			checkListOrgInfo.add(nurseSiteMaintainService.findOrgInfoByUid(nurseSiteMaintainConfig.getClinicalDeptUID()));
+			loadParentOrgInfo();
 		}
 	}
 	
@@ -255,6 +258,20 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			result=true;
 		}
 		return result;
+	}
+	
+	public void onParentOrgInfoChange(){
+		if(selectedParentOrgInfo!=null){
+			checkListOrgInfo=nurseSiteMaintainService.getListClinicalByUidAndParent(setOrgUid, selectedParentOrgInfo.getUid());
+		}
+		else{
+			if(checkListOrgInfo==null){
+				checkListOrgInfo=new ArrayList<OrgInfo>();
+			}
+			else{
+				checkListOrgInfo.clear();
+			}
+		}
 	}
 	
 	public void onFilterChange(){
@@ -649,6 +666,22 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setListAssetCategory(List<Integer> listAssetCategory) {
 		this.listAssetCategory = listAssetCategory;
+	}
+
+	public OrgInfo getSelectedParentOrgInfo() {
+		return selectedParentOrgInfo;
+	}
+
+	public void setSelectedParentOrgInfo(OrgInfo selectedParentOrgInfo) {
+		this.selectedParentOrgInfo = selectedParentOrgInfo;
+	}
+
+	public List<OrgInfo> getCheckListParentOrgInfo() {
+		return checkListParentOrgInfo;
+	}
+
+	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
+		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
 	
 }

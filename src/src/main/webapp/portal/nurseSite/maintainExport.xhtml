@@ -23,12 +23,21 @@
                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">医院园区</label>
+				<p:selectOneMenu value="#{maintainExportController.selectedParentOrgInfo}" disabled="false" converter="orgInfoConverter">
+					<p:ajax listener="#{maintainExportController.onParentOrgInfoChange}" update=":maintainExportTab:exportDataForm:selectClinicalUid" />
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{maintainExportController.checkListParentOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+				</p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">科室</label>
                 <p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainExportController.listCheckClinicalOrgInfo}" label="------请选择------"
-							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}"
-							showHeader="false" panelStyle="width:250px" updateLabel="true">
-							<f:selectItems value="#{maintainExportController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
-						</p:selectCheckboxMenu>
+					converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}"
+					showHeader="false" panelStyle="width:250px" updateLabel="true">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{maintainExportController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
+				</p:selectCheckboxMenu>
             </h:panelGroup>
         </p:panelGrid>
     </p:fieldset>

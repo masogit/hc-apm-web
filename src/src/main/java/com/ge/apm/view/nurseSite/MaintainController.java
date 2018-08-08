@@ -56,6 +56,8 @@ public class MaintainController {
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
 	private List<OrgInfo> listCheckClinicalOrgInfo;
+	private OrgInfo selectedParentOrgInfo;
+	
 	private List<Integer> listSequence;
 	private Integer selectSequence=1;
 	//from config default
@@ -72,6 +74,7 @@ public class MaintainController {
     private boolean isSaveDisable;
     //show
     private List<OrgInfo> listOrgInfo; 
+    private List<OrgInfo> checkListParentOrgInfo;
     //inner
     private String signatureContent;
     private StreamedContent signatureContentWeiXin;
@@ -88,7 +91,7 @@ public class MaintainController {
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigByOrgUids(orgUidList);
 		showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
-		loadUserOrgInfo();
+		loadUserParentOrgInfo();
 	}
 	
 	private List<NurseSiteMaintain> searchMaintainData(Date start,Date end){
@@ -166,9 +169,18 @@ public class MaintainController {
 		};
 	}
 	
+	private void loadUserParentOrgInfo(){
+		if(orgUidList.size()>0){
+			checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
+			listOrgInfo=new ArrayList<OrgInfo>();
+			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
+		}
+	}
+	
 	private void loadUserOrgInfo(){
 		if(orgUidList.size()>0){
-			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+//			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+			listOrgInfo=nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
@@ -496,6 +508,10 @@ public class MaintainController {
 		}
 		loadMaintainData();
 	}
+	
+	public void onClinicalParentOrgInfoChange(){
+		loadUserOrgInfo();
+	}
 
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
@@ -773,6 +789,22 @@ public class MaintainController {
 
 	public void setSelectSequence(Integer selectSequence) {
 		this.selectSequence = selectSequence;
+	}
+
+	public OrgInfo getSelectedParentOrgInfo() {
+		return selectedParentOrgInfo;
+	}
+
+	public void setSelectedParentOrgInfo(OrgInfo selectedParentOrgInfo) {
+		this.selectedParentOrgInfo = selectedParentOrgInfo;
+	}
+
+	public List<OrgInfo> getCheckListParentOrgInfo() {
+		return checkListParentOrgInfo;
+	}
+
+	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
+		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
 	
 }
