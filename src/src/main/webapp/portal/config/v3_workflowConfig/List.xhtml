@@ -22,7 +22,7 @@
                     rowsPerPageTemplate="20,40,60,90">
 
                     <p:ajax event="rowSelect"  listener= "#{v2_WorkflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
-<!--                     <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/> -->
+                    <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/>
                     
                     <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
                         <h:outputText value="#{v2_WorkflowConfigController.getTenantName(item.tenantUID)}"/>
