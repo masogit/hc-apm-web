@@ -146,6 +146,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Override
     protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+        if(CollectionUtils.isNotEmpty(this.searchFilters)){
+            searchFilters.addAll(this.searchFilters);
+        }
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         return dao.findBySearchFilter(searchFilters, pageRequest);

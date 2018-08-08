@@ -1,5 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -13,7 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -46,6 +51,8 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.NurseSiteMaintainComparator;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService.RenderResult;
 
 import webapp.framework.dao.SearchFilter;
 
@@ -135,6 +142,10 @@ public class NurseSiteMaintainService {
 
 	public List<AssetInfo> getListAssetInfoByMaintainConfigParentId(String parentId) {
 		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
+	}
+	
+	public List<AssetInfo> getListAssetInfoBySearchFilter(List<SearchFilter> listFilter){
+		return assetInfoRepository.findBySearchFilter(listFilter);
 	}
 
 	public List<OrgInfo> getListClinicalByUid(List<String> listUid) {
@@ -373,7 +384,7 @@ public class NurseSiteMaintainService {
 				} else if (itemStatus == 3) {
 					objStatus = 3;
 				} else if (itemStatus == 4) {
-					if (objStatus !=3) {
+					if (objStatus != 3) {
 						objStatus = 4;
 					}
 				}
@@ -685,26 +696,25 @@ public class NurseSiteMaintainService {
 
 		return result == null ? false : result;
 	}
-	
-	public List<Map<String,Object>> parseMaintainToMap(List<NurseSiteMaintain> listMaintain){
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf2=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<Map<String,Object>> listMapResult=new ArrayList<Map<String,Object>>();
-		if(listMaintain!=null && listMaintain.size()>0){
-			for(int i=0;i<listMaintain.size();++i){
-				NurseSiteMaintain tempMaintain=listMaintain.get(i);
-				Map<String,Object> tempMap=new HashMap<String,Object>();
-				Integer status=tempMaintain.getStatus();
-				String statusStr="未检查";
-				if(status==null || status==0){
-					
-				}
-				else if(status==2){
-					statusStr="已通过";
+
+	public List<Map<String, Object>> parseMaintainToMap(List<NurseSiteMaintain> listMaintain) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
+		if (listMaintain != null && listMaintain.size() > 0) {
+			for (int i = 0; i < listMaintain.size(); ++i) {
+				NurseSiteMaintain tempMaintain = listMaintain.get(i);
+				Map<String, Object> tempMap = new HashMap<String, Object>();
+				Integer status = tempMaintain.getStatus();
+				String statusStr = "未检查";
+				if (status == null || status == 0) {
+
+				} else if (status == 2) {
+					statusStr = "已通过";
 				} else if (status == 3) {
-					statusStr="有问题";
+					statusStr = "有问题";
 				} else if (status == 4) {
-					statusStr="进行中";
+					statusStr = "进行中";
 				}
 				tempMap.put("名称", tempMaintain.getShowTitle());
 				tempMap.put("负责人", tempMaintain.getModifyBy().getName());
@@ -717,50 +727,171 @@ public class NurseSiteMaintainService {
 		}
 		return listMapResult;
 	}
-	
-	public List<Map<String,Object>> parseMaintainDetailToMap(List<NurseSiteMaintain> listMaintain){
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf2=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<Map<String,Object>> listMapResult=new ArrayList<Map<String,Object>>();
-		if(listMaintain!=null && listMaintain.size()>0){
-			for(int i=0;i<listMaintain.size();++i){
-				NurseSiteMaintain tempMaintain=listMaintain.get(i);
-				Map<String,Object> tempMap=new HashMap<String,Object>();
-				Integer status=tempMaintain.getStatus();
-				String statusStr="未检查";
-				if(status==null || status==0){
-					
+
+	public byte[] writeMaintainDetailToZip(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) throws IOException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		List<NurseSiteMaintain> copyList = new ArrayList<NurseSiteMaintain>();
+		copyList.addAll(listMaintain);
+		copyList.sort(new NurseSiteMaintainComparator());
+		try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)) {
+			while (copyList.size() > 0) {
+				String dateStr = null;
+				List<NurseSiteMaintain> listNewMaintain = new ArrayList<NurseSiteMaintain>();
+				for (int i = 0; i > -1 && i < copyList.size(); ++i) {
+					NurseSiteMaintain tempMaintain = copyList.get(i);
+					String tempDateStr = sdf.format(tempMaintain.getScheduleDate());
+					if (dateStr == null) {
+						dateStr = tempDateStr;
+					}
+					if (dateStr.equals(tempDateStr)) {
+						listNewMaintain.add(tempMaintain);
+						copyList.remove(i);
+						--i;
+					}
 				}
-				else if(status==2){
-					statusStr="已通过";
-				} else if (status == 3) {
-					statusStr="有问题";
-				} else if (status == 4) {
-					statusStr="进行中";
+				if (listNewMaintain.size() > 0) {
+					ExcelDocument tempDoc = null;
+					try {
+						zout.putNextEntry(new ZipEntry("NurseSiteMaintainDetail-" + dateStr + ".xlsx"));
+						tempDoc = new ExcelDocument(doc.getStream(), ExcelDocument.ExcelType.XLSX);
+						byte[] bytes = writeMaintainDetailToExcel(tempDoc, listNewMaintain);
+						if(bytes!=null){
+							IOUtils.write(bytes, zout);
+						}
+						zout.closeEntry();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						LOGGER.error(e.getMessage());
+					}
 				}
-				tempMap.put("名称", tempMaintain.getShowTitle());
-				tempMap.put("负责人", tempMaintain.getModifyBy().getName());
-				tempMap.put("计划检查日期", sdf.format(tempMaintain.getScheduleDate()));
-				tempMap.put("实际检查日期", sdf2.format(tempMaintain.getCheckDate()));
-				tempMap.put("状态", statusStr);
-				tempMap.put("创建人", tempMaintain.getCreateBy().getName());
-				listMapResult.add(tempMap);
+			}
+			zout.close();
+			return bout.toByteArray();
+		}
+	}
+
+	private byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		listMaintain.sort(new NurseSiteMaintainComparator());
+		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
+		Map<String, String> mapAssetInfo = new HashMap<String, String>();
+		List<String> header = new ArrayList<String>();
+		List<String> secondHeader = new ArrayList<String>();
+		for (int i = 0; i < listMaintain.size(); ++i) {
+			NurseSiteMaintain tempMaintain = listMaintain.get(i);
+			if (tempMaintain.isNeedGetItem()) {
+				tempMaintain.setListNurseSiteMaintainItem(findMaintainItemByParentId(tempMaintain.getId()));
+				tempMaintain.setNeedGetItem(false);
+			}
+			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
+			if (listItem != null && listItem.size() > 0) {
+				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+				while (itItem.hasNext()) {
+					NurseSiteMaintainItem tempItem = itItem.next();
+					if (mapAssetUidMaintainItem.containsKey(tempItem.getAssetUid())) {
+						List<NurseSiteMaintainItem> tempListItem = mapAssetUidMaintainItem.get(tempItem.getAssetUid());
+						tempListItem.add(tempItem);
+					} else {
+						List<NurseSiteMaintainItem> tempListItem = new ArrayList<NurseSiteMaintainItem>();
+						tempListItem.add(tempItem);
+						mapAssetUidMaintainItem.put(tempItem.getAssetUid(), tempListItem);
+						mapAssetInfo.put(tempItem.getAssetUid(), tempItem.getAssetInfo().getName());
+					}
+				}
 			}
 		}
-		return listMapResult;
+		int headerColumnIndex = 1;
+		// int secondHeaderColumnIndex=1;
+		int columnIndex = 1;
+		int rowIndex = 1;
+		int keyRow = 1;
+		int secondKeyRow = 2;
+		if (mapAssetUidMaintainItem.size() > 0) {
+			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
+			while (it.hasNext()) {
+				List<NurseSiteMaintainItem> tempListItem = it.next();
+				if (tempListItem != null && tempListItem.size() > 0) {
+					rowIndex++;
+					columnIndex = 1;
+					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, 1, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
+					headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, 1, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
+					headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, 1, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
+					headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, 1, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
+					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
+					// "班次", doc, secondHeaderColumnIndex,2,false);
+					// secondHeaderColumnIndex=5;
+					for (int i = 0; i < tempListItem.size(); ++i) {
+						NurseSiteMaintainItem tempItem = tempListItem.get(i);
+						Set<NurseSiteMaintainData> listData = tempItem.getListData();
+						if (listData != null && listData.size() > 0) {
+							Iterator<NurseSiteMaintainData> itData = listData.iterator();
+							while (itData.hasNext()) {
+								NurseSiteMaintainData tempData = itData.next();
+								// doc.writeCellData(SHEET_Maintain, rowIndex,
+								// headerColumnIndex++,tempData.getCheckItem()+"-"+
+								// tempItem.getSequence());
+								// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
+								// tempItem.getSequenceName(), doc,
+								// secondHeaderColumnIndex,2,true);
+								String keyName = "";
+								if (tempItem.getSequence() == null) {
+									keyName = tempData.getCheckItem();
+									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, 1, false);
+									doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
+								} else {
+									keyName = tempData.getCheckItem() + "-" + tempItem.getSequenceName();
+									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, 1, false);
+									doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
+								}
+								// doc.writeCellData(SHEET_Maintain, rowIndex,
+								// columnIndex++, tempData.getStrValue());
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			doc.getWorkBook().write(out);
+			return out.toByteArray();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error(e.getMessage());
+			return null;
+		}
 	}
-	
+
+	private int writeExcelSheetHeader(List<String> header, String str, ExcelDocument doc, int headerIndex, int rowIndex, boolean add) {
+		if (header.contains(str)) {
+			if (add) {
+				headerIndex++;
+			}
+			return headerIndex;
+		} else {
+			doc.writeCellData(SHEET_Maintain, rowIndex, headerIndex++, str);
+			header.add(str);
+		}
+		return headerIndex;
+	}
+
 	public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {
 
-        Integer keyRow = 1;
-        Integer dataRow = 2;
+		Integer keyRow = 1;
+		Integer dataRow = 2;
 
-        for (Map<String, Object> item : data) {
-            doc.writeRowData(SHEET_Maintain, keyRow, dataRow++, item);
-        }
+		for (Map<String, Object> item : data) {
+			doc.writeRowData(SHEET_Maintain, keyRow, dataRow++, item);
+		}
 
-        return Boolean.TRUE;
-    }
+		return Boolean.TRUE;
+	}
 
 	// private void formatExistMaintainDate(){
 	// List<Date> tempList=new ArrayList<Date>();

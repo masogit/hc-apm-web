@@ -30,12 +30,6 @@
                                     </p:scrollPanel>
                                 </p:overlayPanel>
                             </h:panelGroup>
-                            <h:panelGroup >
-                                <label class = "label">是否工时必填</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.hourRequired}">
-                                    <p:ajax process="@this" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -122,6 +116,12 @@
                             <h:panelGroup >
                                 <label class = "label">是否必须评价?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ratingRequired}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup >
+                                <label class = "label">是否工时必填?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.hourRequired}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >

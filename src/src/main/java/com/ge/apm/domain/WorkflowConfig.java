@@ -157,7 +157,7 @@ public class WorkflowConfig implements Serializable {
     private Boolean ratingRequired;// 必须评价
 
     @Column(name = "hour_required")
-    private Boolean hourRequired;// 工时必填
+    private Boolean hourRequired = true;// 工时必填
 
     /***
      * 资产编码配置
