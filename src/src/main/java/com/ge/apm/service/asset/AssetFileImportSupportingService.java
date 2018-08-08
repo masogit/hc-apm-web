@@ -63,16 +63,12 @@ public class AssetFileImportSupportingService {
         if (supplier == null) {
             supplier = new Supplier();
             supplier.setSupplierT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+
+            setDefaultValueForSupplier(supplier, selectedOrgToImport, name, tel);
             supplierDao.save(supplier);
         }
 
+        //existing records, update type
         if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
             supplier.setSupplierT(true);
             supplierDao.save(supplier);
@@ -89,16 +85,12 @@ public class AssetFileImportSupportingService {
         if (supplier == null) {
             supplier = new Supplier();
             supplier.setMaintainerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTel(tel);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+
+            setDefaultValueForSupplier(supplier, selectedOrgToImport, name, tel);
             supplierDao.save(supplier);
         }
 
+        //existing records, update type or update telephone
         if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
             supplier.setMaintainerT(true);
             if (!StringUtils.isEmpty(tel)) {
@@ -119,21 +111,40 @@ public class AssetFileImportSupportingService {
         if (supplier == null) {
             supplier = new Supplier();
             supplier.setManufacturerT(true);
-            supplier.setSiteId(selectedOrgToImport.getSiteId());
-            supplier.setName(name);
-            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
-            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+
+            setDefaultValueForSupplier(supplier, selectedOrgToImport, name, null);
             supplierDao.save(supplier);
         }
 
+        //existing records, update type
         if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
             supplier.setManufacturerT(true);
             supplierDao.save(supplier);
         }
 
         return supplier;
+
+    }
+
+    private void setDefaultValueForSupplier(Supplier supplier, OrgInfo selectedOrgToImport, String name, String tel) {
+
+        Date now = new Date();
+
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        supplier.setSiteId(selectedOrgToImport.getSiteId());
+        supplier.setName(name);
+        supplier.setTel(tel);
+
+        supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+        supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+        supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+        supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+
+        supplier.setCreatedBy(userAccount.getLoginName());
+        supplier.setCreatedDate(now);
+        supplier.setLastModifiedBy(userAccount.getLoginName());
+        supplier.setLastModifiedDate(now);
 
     }
 
