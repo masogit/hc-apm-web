@@ -69,6 +69,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	@Override
 	protected void init() {
+        filterBySite = false;
 		user = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -270,6 +271,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
 		List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		if(CollectionUtils.isNotEmpty(this.searchFilters)){
+			searchFilters.addAll(this.searchFilters);
+		}
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
