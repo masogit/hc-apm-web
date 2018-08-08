@@ -199,7 +199,7 @@ public class MessageSubscriber implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.MessageSubscriber[ id=" + id + " ]";
+        return "MessageSubscriber[ id=" + id + " ]";
     }
 
     public Boolean getLevel0() {

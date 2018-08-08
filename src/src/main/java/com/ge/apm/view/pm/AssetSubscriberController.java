@@ -41,7 +41,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private List<AssetInfo> targetAssets;
 	private QueryAsset queryAsset;
 	private RelRuleAssetRepository relRuleAssetRepository;
-	private Map<String, Boolean> selectedMap;
+	private Map<Integer, Boolean> selectedMap;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
 	private List<UserAccount> tenantUserList;
@@ -89,19 +89,36 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		initAssets();
 	}
 
+
+
+	public Integer getTrueOnMap(Map<Integer,Boolean> hm){
+     //  int count =0;
+       for(Map.Entry<Integer,Boolean> entry: hm.entrySet()){
+       	if(entry.getValue()){
+       		return entry.getKey();
+		}
+	   }
+		return null;
+	}
+
+
 	public boolean multiSelect(){
-		//System.out.println(selectedMap);
-		List<Map.Entry<String, Boolean>> collect = selectedMap.entrySet().stream().filter(item -> item.getValue() ==
-				true).collect(Collectors.toList());
-		gaolei
-		String msgId =(String)collect.get(0).getKey();
+		if(selectedMap.isEmpty()){
+			return true;
+		}
+		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
+		if(collect.isEmpty()){
+			return true;
+		}
+		Integer msgId =collect.get(0);
 		selected=dao.findById(Integer.valueOf(msgId));
+		if(selected!=null)
+			assetName =selected.getAssetInfo().getName();
 		//如果多于1个被选中
-   	if(selectedMap.entrySet().stream().filter(item->item.getValue()==true).collect(Collectors.toList()).size()>1){
+   	if(selectedMap.entrySet().stream().filter(item->item.getValue()).collect(Collectors.toList()).size()==1){
+   		return false;
+   		} else
    		return true;
-   	}
-   else
-   	return false;
 	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
@@ -123,6 +140,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
 	public void onSelectAllOfPage() {
+		for(MessageSubscriber msgsbu:delMsgList){
+			selectedMap.put(msgsbu.getId(), this.isSelectedCurrentPage);
+		}
 		isSelectedCurrentPage = !delMsgList.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
 	}
 
@@ -138,7 +158,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}else {
 			dao.delete(delMsgList);
 		}
-
+		selectedMap=new HashMap<Integer,Boolean>();
 	}
 	@Override
 	protected MessageSubscriberRepository getDAO() {
@@ -211,12 +231,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 	}
 	public void onSelect(){
-		System.out.println(selected);
-		assetName =selected.getAssetInfo().getName();
+		selectedSetting();
 	}
 	public boolean isChecked() {
-		Map<String, Boolean> map = this.selectedMap;
-		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+		Map<Integer, Boolean> map = this.selectedMap;
+		for (Map.Entry<Integer, Boolean> entry : map.entrySet()) {
 			if (entry.getValue()) {
 				return true;
 			}
@@ -240,6 +259,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 
 		if(this.getCRUDActionName().equals("新增")) {
+
 			MessageSubscriber msgsub= null;
 			List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
 			for(AssetInfo assetInfo:targetAssets ){
@@ -257,19 +277,35 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
 				msgsubList.add(msgsub);
 			}
-			dao.save(msgsubList);
 
+			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(Collectors.toList());
+			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
+			if(msglist.size()>0){
+				WebUtil.addErrorMessage("不能重复创建相同的设备消息订阅");
+				return;
+			}
+			dao.save(msgsubList);
+			WebUtil.addSuccessMessage("成功创建设备消息订阅");
 			assetName=null;
 		}else{
 			super.save();
 		}
 	}
+public void selectedSetting(){
+	List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
+	if(!collect.isEmpty()){
+		Integer msgId =collect.get(0);
+		selected=dao.findById(Integer.valueOf(msgId));
+		assetName =selected.getAssetInfo().getName();
+	}
+}
+public void cancel(){}
+
 
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-
-		selectedMap.entrySet().stream().filter(item->item.getValue()).collect(Collectors.toList());
+		selectedSetting();
 
 		if(selected.getLevel0()!=null){
 			level0=selected.getLevel0();
@@ -611,11 +647,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		isSelectedCurrentPage = selectedCurrentPage;
 	}
 
-	public Map<String, Boolean> getSelectedMap() {
+	public Map<Integer, Boolean> getSelectedMap() {
 		return selectedMap;
 	}
 
-	public void setSelectedMap(Map<String, Boolean> selectedMap) {
+	public void setSelectedMap(Map<Integer, Boolean> selectedMap) {
 		this.selectedMap = selectedMap;
 	}
 

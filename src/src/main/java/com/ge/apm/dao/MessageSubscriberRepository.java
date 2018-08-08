@@ -14,4 +14,9 @@ public interface MessageSubscriberRepository extends GenericRepository<MessageSu
     public List<MessageSubscriber> getByAssetIdAndReceiveMsgModeIn(Integer assetId, Collection<Integer> c);
     
     public List<MessageSubscriber> getByAssetIdAndReceiveMsgMode(Integer assetId, Integer msgMode);
+
+    @Query(value="select ms.* from message_subscriber ms where ms.asset_id in ?1 and ms.subscribe_user_id=?2",nativeQuery = true)
+    public  List<MessageSubscriber> getMsgListByAssetIdAndUserId(Collection<Integer> assetId, Integer userId);
+
+
 }

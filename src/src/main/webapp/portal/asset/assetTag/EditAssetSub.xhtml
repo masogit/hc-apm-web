@@ -35,22 +35,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <!--<h:panelGroup rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}">
-                        &lt;!&ndash;制造商&ndash;&gt;
-                        <label class ="label">#{msg.manufacture}</label>
-                        <p:selectOneMenu value="#{assetSubscriberController.queryAsset.manufactureId}" >
-                            <p:ajax listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList"  />
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>-->
-                    <!--设备型号-->
-                   <!-- <h:panelGroup rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}">
-                        <label class ="label">#{msg.manufacture}</label>
-                        <p:inputText  value="#{assetSubscriberController.queryAsset.functionType}" disabled="#{assetSubscriberController.CRUDActionName.equals('修改')}"  required="false">
-                            <p:ajax  listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList" />
-                        </p:inputText>
-                    </h:panelGroup>-->
+
                 </p:panelGrid>
                 <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
@@ -121,7 +106,7 @@
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
-                                <p:outputLabel value="维保通知"/>
+                                <p:outputLabel value="维保提醒"/>
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
@@ -133,7 +118,7 @@
 
             </h:panelGroup>
 
-            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm:dataList   :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
+            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{assetSubscriberController.cancel()}" icon="ui-icon-cancel" update="scriTab:TagSubscriberForm" onclick="PF('AssetSubscribEditDialog').hide()"/>
         </h:form>
