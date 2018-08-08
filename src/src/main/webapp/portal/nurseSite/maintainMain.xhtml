@@ -21,10 +21,10 @@
                     <br/>
                     <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
                     	<label>科室：</label>
-						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
+						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}"
 							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
 							label="------请选择------" 
-							updateLabel="true" showHeader="false">
+							updateLabel="true" showHeader="false" panelStyle="width:250px">
 							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
 							<f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
 						</p:selectCheckboxMenu>
