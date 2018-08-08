@@ -80,6 +80,9 @@
         <intercept-url pattern="/portal/analysis/assetPerf**" access="hasAnyRole('SuperAdmin','HospitalHead', 'AssetHead', 'DeptHead')"/> <!-- 绩效分析 -->
         <intercept-url pattern="/portal/analysis/assetForecast**" access="hasAnyRole('SuperAdmin','HospitalHead', 'AssetHead')"/> <!-- 绩效预测 -->
         <intercept-url pattern="/portal/analysis/assetDecision**" access="hasAnyRole('SuperAdmin','HospitalHead', 'AssetHead')"/> <!-- 辅助决策 -->
+        
+        <!-- 护士站 -->
+        <intercept-url pattern="/portal/nurseSite/**" access="hasAnyRole('SuperAdmin','HospitalHead', 'NursingStaff')"/>
 
         <intercept-url pattern="/**/*.xhtml*" access="isAuthenticated()"/>
         <access-denied-handler error-page="/accessdeniedzh.xhtml"/>
