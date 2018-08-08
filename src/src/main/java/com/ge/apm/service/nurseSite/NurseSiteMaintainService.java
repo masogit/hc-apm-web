@@ -155,6 +155,18 @@ public class NurseSiteMaintainService {
 	public List<OrgInfo> getListClinicalByUid(Set<String> listUid) {
 		return orgInfoRepository.findClinicalByUids(listUid);
 	}
+	
+	public List<OrgInfo> getListClinicalByUidAndParent(Set<String> listUid,String parentUid) {
+		return orgInfoRepository.findClinicalByUidsAndParent(listUid,parentUid);
+	}
+	
+	public List<OrgInfo> getListParentSiteByUid(Set<String> listUid) {
+		return orgInfoRepository.findParentSiteByUids(listUid);
+	}
+	
+	public List<OrgInfo> getListSiteByUid(Set<String> listUid) {
+		return orgInfoRepository.findSiteByUids(listUid);
+	}
 
 	public OrgInfo findOrgInfoByUid(String uid) {
 		return orgInfoRepository.getByUid(uid);
