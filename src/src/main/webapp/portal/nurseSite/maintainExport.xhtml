@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:form id="exportDataForm">
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <label class="label">开始时间</label>
+                <p:calendar timeZone="GMT+8" id="startTime" value="#{maintainExportController.startDate}"
+                            pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">截至时间</label>
+                <p:calendar timeZone="GMT+8" id="endTime" value="#{maintainExportController.endDate}"
+                            pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">科室</label>
+                <p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainExportController.listCheckClinicalOrgInfo}" label="------请选择------"
+							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}"
+							showHeader="false" panelStyle="width:250px" updateLabel="true">
+							<f:selectItems value="#{maintainExportController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
+						</p:selectCheckboxMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+    </p:fieldset>
+
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup>
+            <p:commandButton value="预览结果" actionListener="#{maintainExportController.previewData}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true"
+                             update=":growl :maintainExportTab:dataListForm :maintainExportTab:dataListForm:datalist">
+            </p:commandButton>
+        </h:panelGroup>
+    </p:panelGrid>
+</h:form>
+
+<h:form id="dataListForm">
+    <p:dataTable id="datalist" rendered="#{not empty maintainExportController.listMaintainData}"
+                 value="#{maintainExportController.listMaintainData}" var="item"
+                 selection="#{maintainExportController.selectedListMaintain}"
+                 rowKey="#{item.id}" lazy="false" paginator="true" paginatorPosition="both"
+                 paginatorAlwaysVisible="true"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10"
+                 emptyMessage="#{msg.noRecordFound}"
+                 rowsPerPageTemplate="10,20,50">
+        <p:column selectionMode="multiple" style="width:50px;text-align:center" exportable="false"/>
+        <p:column headerText="名称">
+            <h:outputText value="#{item.getShowTitle()}"/>
+        </p:column>
+        <p:column headerText="负责人">
+            <h:outputText value="#{item.modifyBy.name}"/>
+        </p:column>
+        <p:column headerText="计划检查日期">
+            <h:outputText value="#{item.scheduleDate}">
+            	<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="实际检查日期">
+            <h:outputText value="#{item.checkDate}">
+            	<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="状态">
+            <h:outputText value="#{fieldMsg.fieldValue('nurseSiteMaintainStatus', item.status)}"/>
+        </p:column>
+        <p:column headerText="创建人">
+            <h:outputText value="#{item.createBy.name}"/>
+        </p:column>
+       
+        <f:facet name="{Toolbar}">
+            <p:commandButton value="报表全部导出" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl">
+                <p:dataExporter type="xlsx" target="datalist" fileName="nurseSiteMaintain_export" />
+            </p:commandButton>
+            <p:commandButton value="报表选择导出" actionListener="#{maintainExportController.exportSelected()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="详情全部导出"
+                             actionListener="#{maintainExportController.exportAllDetail()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="详情选择导出"
+                             actionListener="#{maintainExportController.exportSelectedDetail()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dataTable>
+</h:form>
+</html>
