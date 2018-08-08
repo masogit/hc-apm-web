@@ -42,19 +42,21 @@ public class MaintainExportController {
 	private List<OrgInfo> listCheckClinicalOrgInfo;
 	private List<NurseSiteMaintain> listMaintainData;
 	private List<NurseSiteMaintain> selectedListMaintain;
+	private OrgInfo selectedParentOrgInfo;
     //show
     private List<OrgInfo> listOrgInfo; 
     private Set<String> orgUidList;
     private StreamedContent exportFile;
     private Date startDate;
     private Date endDate;
+    private List<OrgInfo> checkListParentOrgInfo;
 
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
-		loadUserOrgInfo();
+		loadUserParentOrgInfo();
 	}
 	
 	private void searchMaintainData(Date start,Date end){
@@ -91,9 +93,18 @@ public class MaintainExportController {
 		return listResult;
 	}
 	
+	private void loadUserParentOrgInfo(){
+		if(orgUidList.size()>0){
+			checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
+			listOrgInfo=new ArrayList<OrgInfo>();
+			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
+		}
+	}
+	
 	private void loadUserOrgInfo(){
 		if(orgUidList.size()>0){
-			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+//			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
+			listOrgInfo=nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
@@ -101,6 +112,10 @@ public class MaintainExportController {
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	
+	public void onParentOrgInfoChange(){
+		loadUserOrgInfo();
 	}
 	
 	public void previewData(){
@@ -240,6 +255,22 @@ public class MaintainExportController {
 
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
+	}
+
+	public OrgInfo getSelectedParentOrgInfo() {
+		return selectedParentOrgInfo;
+	}
+
+	public void setSelectedParentOrgInfo(OrgInfo selectedParentOrgInfo) {
+		this.selectedParentOrgInfo = selectedParentOrgInfo;
+	}
+
+	public List<OrgInfo> getCheckListParentOrgInfo() {
+		return checkListParentOrgInfo;
+	}
+
+	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
+		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
 	
 }
