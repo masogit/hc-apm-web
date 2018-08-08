@@ -19,13 +19,22 @@
                 	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     <br/>
-                    <h:panelGroup rendered="#{maintainController.listOrgInfo.size()>0}">
+                    <h:panelGroup>
+                    	<label>医院院区：</label>
+						<p:selectOneMenu value="#{maintainController.selectedParentOrgInfo}" disabled="false" converter="orgInfoConverter">
+							<p:ajax listener="#{maintainController.onClinicalParentOrgInfoChange}" update=":maintainHeaderForm:selectClinicalUid" />
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{maintainController.checkListParentOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+						</p:selectOneMenu>
+					</h:panelGroup>
+                    <h:panelGroup>
                     	<label>科室：</label>
 						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}"
 							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
 							label="------请选择------" 
 							updateLabel="true" showHeader="false" panelStyle="width:250px">
 							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 							<f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
 						</p:selectCheckboxMenu>
 					</h:panelGroup>
