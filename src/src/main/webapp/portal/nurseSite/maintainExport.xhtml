@@ -24,10 +24,9 @@
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">科室</label>
-                <p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainExportController.listCheckClinicalOrgInfo}" multiple="true" filter="true" filterMatchMode="contains"
-							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
-							label="------请选择------" 
-							updateLabel="true" showHeader="false">
+                <p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainExportController.listCheckClinicalOrgInfo}" label="------请选择------"
+							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}"
+							showHeader="false" panelStyle="width:250px" updateLabel="true">
 							<f:selectItems value="#{maintainExportController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
 						</p:selectCheckboxMenu>
             </h:panelGroup>
