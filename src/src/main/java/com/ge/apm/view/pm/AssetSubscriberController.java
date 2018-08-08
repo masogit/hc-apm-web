@@ -275,6 +275,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setQualityHit(selected.getQualityHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
+
 				msgsubList.add(msgsub);
 			}
 

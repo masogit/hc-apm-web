@@ -2,7 +2,13 @@
  */
 package com.ge.apm.domain;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
 
 /**
@@ -93,7 +99,21 @@ public class MessageSubscriber implements Serializable {
     @Column(name = "main_rep_hit")
     private Boolean mainRepHit;
 
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
 
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
 
     public MessageSubscriber() {
     }
@@ -296,5 +316,37 @@ public class MessageSubscriber implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }
