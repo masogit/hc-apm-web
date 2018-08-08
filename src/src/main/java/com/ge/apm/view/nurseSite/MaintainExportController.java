@@ -67,6 +67,12 @@ public class MaintainExportController {
 			ca.add(Calendar.MONTH, 1);
 			end=ca.getTime();
 		}
+		else{
+			Calendar endCa=Calendar.getInstance();
+			endCa.setTime(end);
+			endCa.add(Calendar.DATE, 1);
+			end=endCa.getTime();
+		}
 		if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
 			listMaintainData=findDefaultMaintain(start,end);
 		}
