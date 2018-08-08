@@ -23,7 +23,7 @@
                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
             <h:panelGroup>
-                <label class="label">医院园区</label>
+                <label class="label">医院院区</label>
 				<p:selectOneMenu value="#{maintainExportController.selectedParentOrgInfo}" disabled="false" converter="orgInfoConverter">
 					<p:ajax listener="#{maintainExportController.onParentOrgInfoChange}" update=":maintainExportTab:exportDataForm:selectClinicalUid" />
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
