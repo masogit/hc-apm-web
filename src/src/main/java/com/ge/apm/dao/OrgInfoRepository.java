@@ -49,11 +49,20 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select name from org_info where id=?1",nativeQuery = true)
     public String getDepName(int id);
     
-    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) )",nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) ) order by o.name_py_code asc",nativeQuery = true)
     public List<OrgInfo> findClinicalByUids(List<String> listUid);
     
-    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) )",nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) ) order by o.name_py_code asc",nativeQuery = true)
     public List<OrgInfo> findClinicalByUids(Set<String> listUid);
+    
+    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) ) and o.parent_uid=?2 order by o.name_py_code asc",nativeQuery = true)
+    public List<OrgInfo> findClinicalByUidsAndParent(Set<String> listUid,String parentUid);
+    
+    @Query(value = "select o.* from org_info o where o.uid in (select c.parent_uid from org_info c where c.org_type=4 and (c.uid in (?1) or c.site_uid in (?1) or c.hospital_uid in (?1) or c.institution_uid in (?1) or c.tenant_uid in (?1) )) order by o.name_py_code asc",nativeQuery = true)
+    public List<OrgInfo> findParentSiteByUids(Set<String> listUid);
+    
+    @Query(value = "select o.* from org_info o where o.org_type=3 and (o.uid in (?1) or o.site_uid in (?1) or o.hospital_uid in (?1) or o.institution_uid in (?1) or o.tenant_uid in (?1) ) order by o.name_py_code asc",nativeQuery = true)
+    public List<OrgInfo> findSiteByUids(Set<String> listUid);
     
     public OrgInfo getByUid(String uid);
 

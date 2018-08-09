@@ -10,8 +10,11 @@ import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +23,8 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
+public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> implements Serializable,
+		ServerEventInterface {
 
 
 	private static final long serialVersionUID = 1L;
@@ -46,93 +50,36 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		if(this.getCRUDActionName().equals("修改")){
 			return true; //不可修改
 		}else if(userContextService.hasRole("ITAdmin")){
-				return false;
-			}else
-				{
-					return true;
-				}
-		}
-		public void gongdantuisongxuanxiang(){
-		if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
-			level0=false;
-			level1=false;
-			level2=false;
-		}
-			System.out.println(level0);
-			System.out.println(level1);
-			System.out.println(level2);
-		}
-     public Boolean prioritySetFalse(){
-		/*如果 不推送工单消息 并且 工单超时推送不选 ,返回true,让紧急 重要 一般 变成灰色*/
-		/*if(receiveMsgMode==null){
-			return null;
-		}*/
-         if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
-         	return false;
-		 }else
-		 	return true;
-
-	 }
-	 /*public void gondantuisongxuanxiang(){
-     	if(receiveMsgMode==0 || receiveMsgMode==1){//如果选中"所有.."或"仅.."那么默认 优先级和工单超时都选上
-		  level0=true;
-		  level1=true;
-		  level2=true;
-		  isReceiveTimeoutMsg=true;
-		}
-	 }*/
-	public Boolean priorityShow(){
-		//selected.getReceiveMsgMode() = 2  //不推送消息
-		if(selected.getReceiveMsgMode()!=null && selected.getReceiveMsgMode()==2)
 			return false;
-		if(selectType==1 || (this.getCRUDActionName().equals("修改") && selected.getReceiveMsgMode()!=3))
-             return true;
-		return false;
-	}
-
-	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
-	public void checkSelectedEmpty(){
-		if(selected==null){
-			WebUtil.addErrorMessage("设备消息订阅没有被选中");
+		}else
+		{
+			return true;
 		}
 	}
-	public void setLevelsFalse(){
-		level0=false;
-		level1=false;
-		level2=false;
-	}
-	public void level0Set(){
-		System.out.println(level0);
-	}
-/*	public void level1Set(){level1=this.selected.getLevel1();}
-	public void level2Set(){level2=this.selected.getLevel2();}*/
 
 
-
-// 关注人tentant下的tag
+	// 关注人tentant下的tag
 	public void takeAssetTags(){
 		//获得的是:和标签绑定的用户的院区下的所有标签
 		assetTags =  assetTagRepository.getTagBySite(userAccountRepository.getById(this.selected.getSubscribeUserId()).getSiteUID());
 
 	}
-	public void test(){
-		//System.out.println(selected.getReceiveMsgMode());
-	}
+
 
 	public void cancel(){
 		selected=null;
 	}
 	public boolean requiredCheck(){
-      //不推送工单消息  情况下 必须选工单超时消息
-		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
+		//不推送工单消息  情况下 必须选工单超时消息
+		if(receiveMsgMode==2 && !isReceiveTimeoutMsg){
 			WebUtil.addErrorMessage("务必选择工单超时消息推送");
 			RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
 			return false;
 		}
 
 		//选了工单超时消息 必须选择紧急程度
-		if(isReceiveTimeoutMsg==true && receiveMsgMode==2){
-			if(level0==false && level1==false && level2==false) {
+		if(isReceiveTimeoutMsg && receiveMsgMode==2){
+			if(!level0 && !level1 && !level2) {
 				WebUtil.addErrorMessage("务必选择工单紧急程度");
 				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
 				return false;
@@ -140,7 +87,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		}
 		///
 		if(receiveMsgMode==0 || receiveMsgMode==1){
-			if(level0==false && level1==false && level2==false){
+			if(!level0 && !level1 && !level2){
 				WebUtil.addErrorMessage("务必选择紧急程度");
 				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
 				return false;
@@ -148,7 +95,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		}
 		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
 		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
-			if(level0==true || level1==true || level2==true){
+			if(level0 || level1 || level2){
 				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
 				return false;
 			}
@@ -159,21 +106,6 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		if (!requiredCheck()) {
 			return;
 		}
-
-		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*//*
-		  if(receiveMsgMode==0 || receiveMsgMode==1){
-		  	if(level0==false && level1==false && level2==false){
-		  		WebUtil.addErrorMessage("务必选择紧急程度");
-		  		return;
-			}
-		  }
-		*//*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*//*
-		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
-			if(level0==true || level1==true || level2==true){
-				WebUtil.addErrorMessage("不推送工单和超时消息，不需要选择紧急度");
-				return;
-			}
-		}*/
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
@@ -229,19 +161,19 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
 		}
 		msgModeList=msgModeList.stream().filter(item->!item.getMsgKey().equals("3")).collect((Collectors.toList()));
-			userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		//获取当前租户下的所有用户 --获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
 		modeList =new ArrayList<Integer>();
 	}
 	public String getTagName(Integer tagId){
-            try{
-		return assetTagRepository.findById(tagId).getName();
-            }
-            catch(Exception ex){
-                return "";
-            }
+		try{
+			return assetTagRepository.findById(tagId).getName();
+		}
+		catch(Exception ex){
+			return "";
+		}
 	}
 
 	public String getMsgMode(int msgmode){
@@ -260,7 +192,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	@Override
 	protected Page<AssetTagMsgSubscriber> loadData(PageRequest pageRequest) {
-	//	selected = null;
+		//	selected = null;
 		if(this.searchFilters ==null){
 			searchFilters =  new ArrayList<>();
 		}else{
@@ -289,13 +221,10 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		level1=true;
 		level2=true;
 		isReceiveTimeoutMsg=true;
-
 		this.selected.setReceiveMsgMode(null);
 		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
 
-	List<AssetTagMsgSubscriber> tagUserMode3and1;
-	List<AssetTagMsgSubscriber> tagUserModeEE;
 	List<AssetTagMsgSubscriber> tagUserModeBasic;
 	AssetTagMsgSubscriber currentAtms;
 	@Override
@@ -321,7 +250,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		receiveMsgMode= selected.getReceiveMsgMode();
 		isReceiveTimeoutMsg=selected.getIsReceiveTimeoutMsg();
 		if(se!=null)
-         selectType=se.intValue();
+			selectType=se.intValue();
 
 		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
 		currentAtms=dao.findById(selected.getId());
@@ -352,12 +281,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 
 	public Integer getReceiveMsgMode() {
-		/*if(this.selected!=null && this.selected.getId()!=null)
-		{
-			return  this.selected.getReceiveMsgMode();
-		}else
-*/
-			return receiveMsgMode;
+		return receiveMsgMode;
 	}
 
 	public List<UserAccount> getTenantUserList() {
@@ -381,46 +305,32 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 	private String[] selectedCities2;
 
-	public String[] getSelectedCities2() {
-		return selectedCities2;
-	}
 
-	public void setSelectedCities2(String[] selectedCities2) {
-		this.selectedCities2 = selectedCities2;
-	}
+	private Boolean level0;
+	private Boolean level1;
+	private Boolean level2;
 
-	public List<String> getCities() {
-		return cities;
-	}
-
-	public void setCities(List<String> cities) {
-		this.cities = cities;
-	}
-	private boolean level0;
-	private boolean level1;
-	private boolean level2;
-
-	public boolean isLevel0() {
+	public Boolean getLevel0() {
 		return level0;
 	}
 
-	public void setLevel0(boolean level0) {
+	public void setLevel0(Boolean level0) {
 		this.level0 = level0;
 	}
 
-	public boolean isLevel1() {
+	public Boolean getLevel1() {
 		return level1;
 	}
 
-	public void setLevel1(boolean level1) {
+	public void setLevel1(Boolean level1) {
 		this.level1 = level1;
 	}
 
-	public boolean isLevel2() {
+	public Boolean getLevel2() {
 		return level2;
 	}
 
-	public void setLevel2(boolean level2) {
+	public void setLevel2(Boolean level2) {
 		this.level2 = level2;
 	}
 
