@@ -95,8 +95,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-        if(!this.hasFilterOnField("isValid")){
-            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+        if(!this.hasFilterOnField("status")){
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
         }
 
         if(!this.hasFilterOnField("isDeleted")){
