@@ -138,9 +138,9 @@ public class MaintainExportController {
 		try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            byte[] result= nurseSiteMaintainService.writeMaintainDetailToZip(doc,listMaintainData);
+            byte[] result= nurseSiteMaintainService.writeMaintainDetailToExcel(doc,listMaintainData);
             if (result!=null) {
-                exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "NurseSiteMaintainDetail.zip");
+                exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/vnd.ms-excel", "NurseSiteMaintainDetail.xlsx");
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
@@ -155,9 +155,9 @@ public class MaintainExportController {
 		try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            byte[] result= nurseSiteMaintainService.writeMaintainDetailToZip(doc,selectedListMaintain);
+            byte[] result= nurseSiteMaintainService.writeMaintainDetailToExcel(doc,selectedListMaintain);
             if (result!=null) {
-                exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "NurseSiteMaintainDetail.zip");
+                exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/vnd.ms-excel", "NurseSiteMaintainDetail.xlsx");
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());

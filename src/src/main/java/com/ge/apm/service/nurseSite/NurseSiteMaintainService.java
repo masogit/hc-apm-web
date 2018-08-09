@@ -339,7 +339,7 @@ public class NurseSiteMaintainService {
 		return listMaintainItem;
 	}
 
-	private int updateMaintainData(NurseSiteMaintain obj, Boolean defaultValue) {
+	private int updateMaintainData(NurseSiteMaintain obj, Boolean defaultValue,Date date,UserAccount user) {
 		Set<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
 		if (obj.isNeedGetItem()) {
 			listItem = findMaintainItemByParentId(obj.getId());
@@ -353,6 +353,9 @@ public class NurseSiteMaintainService {
 		while (it.hasNext()) {
 			itemStatus = 0;
 			NurseSiteMaintainItem tempItem = it.next();
+			tempItem.setCheckDate(date);
+			tempItem.setModifyBy(user);
+			tempItem.setModifyByUid(user.getUid());
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			if (defaultValue != null) {
@@ -405,17 +408,17 @@ public class NurseSiteMaintainService {
 		return objStatus;
 	}
 
-	public void updateMaintainDataStatus(NurseSiteMaintain obj, boolean batchUpdate, String signatureId) {
+	public void updateMaintainDataStatus(NurseSiteMaintain obj, boolean batchUpdate, String signatureId,Date date,UserAccount user) {
 		if (batchUpdate) {
 			if (obj.getStatus() == 0) {
 				obj.setStatus(2);
 				if (StringUtils.isNotEmpty(signatureId)) {
 					obj.setSignatureId(signatureId);
 				}
-				updateMaintainData(obj, true);
+				updateMaintainData(obj, true,date,user);
 			}
 		} else {
-			obj.setStatus(updateMaintainData(obj, null));
+			obj.setStatus(updateMaintainData(obj, null,date,user));
 		}
 	}
 
@@ -766,7 +769,7 @@ public class NurseSiteMaintainService {
 					try {
 						zout.putNextEntry(new ZipEntry("NurseSiteMaintainDetail-" + dateStr + ".xlsx"));
 						tempDoc = new ExcelDocument(doc.getStream(), ExcelDocument.ExcelType.XLSX);
-						byte[] bytes = writeMaintainDetailToExcel(tempDoc, listNewMaintain);
+						byte[] bytes = writeMaintainDetailToExcelByDate(tempDoc, listNewMaintain);
 						if(bytes!=null){
 							IOUtils.write(bytes, zout);
 						}
@@ -782,7 +785,7 @@ public class NurseSiteMaintainService {
 		}
 	}
 
-	private byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) {
+	private byte[] writeMaintainDetailToExcelByDate(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		listMaintain.sort(new NurseSiteMaintainComparator());
@@ -878,6 +881,170 @@ public class NurseSiteMaintainService {
 			LOGGER.error(e.getMessage());
 			return null;
 		}
+	}
+	
+	public byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) throws IOException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		listMaintain.sort(new NurseSiteMaintainComparator());
+		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
+		Map<String, String> mapAssetInfo = new HashMap<String, String>();
+		
+		List<String> header = new ArrayList<String>();
+		List<String> secondHeader = new ArrayList<String>();
+		for (int i = 0; i < listMaintain.size(); ++i) {
+			NurseSiteMaintain tempMaintain = listMaintain.get(i);
+			if (tempMaintain.isNeedGetItem()) {
+				tempMaintain.setListNurseSiteMaintainItem(findMaintainItemByParentId(tempMaintain.getId()));
+				tempMaintain.setNeedGetItem(false);
+			}
+			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
+			if (listItem != null && listItem.size() > 0) {
+				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+				while (itItem.hasNext()) {
+					NurseSiteMaintainItem tempItem = itItem.next();
+					if (mapAssetUidMaintainItem.containsKey(tempItem.getAssetUid())) {
+						List<NurseSiteMaintainItem> tempListItem = mapAssetUidMaintainItem.get(tempItem.getAssetUid());
+						tempListItem.add(tempItem);
+					} else {
+						List<NurseSiteMaintainItem> tempListItem = new ArrayList<NurseSiteMaintainItem>();
+						tempListItem.add(tempItem);
+						mapAssetUidMaintainItem.put(tempItem.getAssetUid(), tempListItem);
+						mapAssetInfo.put(tempItem.getAssetUid(), tempItem.getAssetInfo().getName());
+					}
+				}
+			}
+		}
+		int headerColumnIndex = 1;
+		// int secondHeaderColumnIndex=1;
+		int columnIndex = 1;
+		int rowIndex = 5;
+		int keyRow = 1;
+		int realKeyRow=2;
+		int scheduleDateRow=3;
+		int checkDateRow=4;
+		int sequenceRow=5;
+		int secondKeyRow = 2;
+		int dataColumnIndex=5;
+		if (mapAssetUidMaintainItem.size() > 0) {
+			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
+			while (it.hasNext()) {
+				List<NurseSiteMaintainItem> tempListItem = it.next();
+				if (tempListItem != null && tempListItem.size() > 0) {
+					rowIndex++;
+					columnIndex = 1;
+					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
+					headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
+					headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
+					headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
+					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
+					// "班次", doc, secondHeaderColumnIndex,2,false);
+					// secondHeaderColumnIndex=5;
+					for (int i = 0; i < tempListItem.size(); ++i) {
+						NurseSiteMaintainItem tempItem = tempListItem.get(i);
+						Set<NurseSiteMaintainData> listData = tempItem.getListData();
+						if (listData != null && listData.size() > 0) {
+							Iterator<NurseSiteMaintainData> itData = listData.iterator();
+							while (itData.hasNext()) {
+								NurseSiteMaintainData tempData = itData.next();
+								// doc.writeCellData(SHEET_Maintain, rowIndex,
+								// headerColumnIndex++,tempData.getCheckItem()+"-"+
+								// tempItem.getSequence());
+								// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
+								// tempItem.getSequenceName(), doc,
+								// secondHeaderColumnIndex,2,true);
+//								keyName = sdf.format(tempItem.getScheduleDate())+","+tempItem.getCheckDate()+","+tempItem.getSequenceName()+","+tempData.getCheckItem();
+								String keyName = "";
+								if (tempItem.getScheduleDate() != null) {
+									keyName += sdf.format(tempItem.getScheduleDate())+",";
+								}
+								else{
+									keyName+=",";
+								}
+								if(tempItem.getCheckDate()!=null){
+									keyName+=sdf2.format(tempItem.getCheckDate())+",";
+								}
+								else{
+									keyName+=",";
+								}
+								keyName+=tempItem.getSequenceName()+",";
+								if(tempData.getCheckItem()!=null){
+									keyName+=tempData.getCheckItem()+",";
+								}
+								else{
+									keyName+=",";
+								}
+								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
+								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
+								// doc.writeCellData(SHEET_Maintain, rowIndex,
+								// columnIndex++, tempData.getStrValue());
+							}
+						}
+					}
+				}
+			}
+			writeExcelSecondHeader(doc,keyRow,realKeyRow,dataColumnIndex,3,"检查项");
+			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间");
+			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间");
+			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次");
+			doc.removeRow(SHEET_Maintain, keyRow);
+			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
+		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			doc.getWorkBook().write(out);
+			return out.toByteArray();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+	}
+	
+	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label){
+		List<String> listScheduleDate=new ArrayList<String>();
+		String[] headerStrRow=doc.getKeyRow(SHEET_Maintain, keyRow);
+		for(int i=0;i<headerStrRow.length;++i){
+			if(i+1<dataColumnIndex){
+				
+			}
+			else{
+				String tempStr=headerStrRow[i];
+				String[] tempArr=tempStr.split(",");
+				listScheduleDate.add(tempArr[keyRowIndex]);
+			}
+		}
+		doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, 1, dataColumnIndex-1);
+		doc.writeCellData(SHEET_Maintain, scheduleDateRow, 1, label);
+		String originScheduleDate=null;
+		int originScheduleDateColumn=dataColumnIndex;
+		System.out.println(listScheduleDate.toString());
+		for(int i=0;i>-1&&i<listScheduleDate.size();++i){
+			if(originScheduleDate==null){
+				originScheduleDate=listScheduleDate.get(0);
+				dataColumnIndex++;
+				continue;
+			}
+			if(originScheduleDate.equals(listScheduleDate.get(i))){
+				listScheduleDate.remove(i);
+				--i;
+				dataColumnIndex++;
+			}
+			else{
+				doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, originScheduleDateColumn, dataColumnIndex-1);
+				doc.writeCellData(SHEET_Maintain, scheduleDateRow,originScheduleDateColumn,originScheduleDate);
+				originScheduleDate=listScheduleDate.get(i);
+				originScheduleDateColumn=dataColumnIndex;
+				dataColumnIndex++;
+			}
+		}
+		System.out.println(listScheduleDate.toString());
+		doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, originScheduleDateColumn, dataColumnIndex-1);
+		doc.writeCellData(SHEET_Maintain, scheduleDateRow, originScheduleDateColumn, originScheduleDate);
 	}
 
 	private int writeExcelSheetHeader(List<String> header, String str, ExcelDocument doc, int headerIndex, int rowIndex, boolean add) {
