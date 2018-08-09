@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/7/25.
@@ -118,6 +119,7 @@ public class WorkOrderExportService {
             V2_WorkOrder_Step workStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
+            List<V2_WorkOrder> closeWorkOrderList = v2WorkOrderDao.getByAssetIdAndStatusOrderByCloseTimeDesc(workOrder.getAssetId(), 2);
 
             List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(workOrder.getId());
 
@@ -229,7 +231,19 @@ public class WorkOrderExportService {
                 workOrderMap.put("医疗器械子分类", "");
             }
             workOrderMap.put("设备型号", assetInfo.getFunctionType());
-            workOrderMap.put("距上次报修天数", serviceRequest.getNearestSrDays());
+
+            //计算距上次报修天数
+            String nearestWorkDay = "";
+            if(!closeWorkOrderList.isEmpty() && workOrder.getCreatedDate() != null){
+                closeWorkOrderList = closeWorkOrderList.stream().filter(item -> item.getCloseTime() != null && item.getCloseTime().before(workOrder.getCreatedDate())).collect(Collectors.toList());
+                if(!closeWorkOrderList.isEmpty()){
+                    Date closeTime = closeWorkOrderList.get(0).getCloseTime();
+                    int days = (int) ((workOrder.getCreatedDate().getTime() - closeTime.getTime()) / (1000*3600*24));
+                    nearestWorkDay = String.valueOf(days);
+                }
+            }
+            workOrderMap.put("距上次报修天数", nearestWorkDay);
+            //workOrderMap.put("距上次报修天数", serviceRequest.getNearestSrDays());
             workOrderMap.put("停机时间", formatDate(serviceRequest.getConfirmedDownTime()));
             workOrderMap.put("恢复时间", formatDate(serviceRequest.getConfirmedUpTime()));
 
