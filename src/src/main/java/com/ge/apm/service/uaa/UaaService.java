@@ -45,6 +45,9 @@ public class UaaService {
     @Autowired
     WorkflowConfigRepository wfcfigDao;
 
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
+
     private void loadSysRoles(){
         if(sysRoles!=null) return;
             
@@ -68,6 +71,8 @@ public class UaaService {
             url = getDefautHomePage("DeptHead");
         else if(userContextService.hasRole("AssetStaff"))
             url = getDefautHomePage("AssetStaff");
+        else if(userContextService.hasRole("NursingStaff"))
+            url = getDefautHomePage("NursingStaff");
         else
             url = "/home.xhtml";
         
@@ -125,7 +130,39 @@ public class UaaService {
 
         return roleList;
     }
-    
+
+    public List<SysRoleVO> getSysRoleVO(String tenantUID){
+        loadSysRoles();
+        TenantInfo ti = tenantInfoDao.findByuid(tenantUID);
+
+        List<SysRoleVO> sysRoleList = new ArrayList<>();
+        for (SysRole tempSysRole : sysRoles.values()){
+            SysRoleVO srVO = new SysRoleVO();
+            srVO.setId(tempSysRole.getId());
+            srVO.setName(tempSysRole.getName());
+            srVO.setRoleDesc(tempSysRole.getRoleDesc());
+
+            //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+            if(UserContextService.isOnlyLocalITAdmin()){
+                if("ITAdmin".equals(tempSysRole.getName())){
+                    //srVO.setDisable(Boolean.TRUE);
+                    continue;
+                }
+            }
+            //判断租户是否院区隔离
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                if("LocalITAdmin".equals(tempSysRole.getName())){
+                    //srVO.setDisable(Boolean.TRUE);
+                    continue;
+                }
+            }
+
+            sysRoleList.add(srVO);
+        }
+
+        return sysRoleList;
+    }
+
     @Transactional
     public UserAccount loadUserWithUserRoles(int userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -530,7 +567,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     public void clearUserOrgAfterOrgUpdate(String userUid){
         userOrgDao.deleteByUserUid(userUid);
     }
-    
+
     @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
@@ -989,7 +1026,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 
         return null;
     }
-    
+
     // 根据院区UID(siteUID)获取工作流中配置的调剂中心UID列表
     public List<String> getRegulatorUidsBySiteUid(String siteUID) {
         List<WorkflowConfig> workflows = wfcfigDao.findBySiteUID(siteUID);
@@ -1001,7 +1038,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
             logger.debug("getRegulatorUidsBySiteUid siteUID: " + siteUID + ", regulatorUids: " + regulatorUids.stream().collect(Collectors.joining(",")));
         }
         return regulatorUids;
-                
+
     }
 
 }
