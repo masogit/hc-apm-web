@@ -14,7 +14,7 @@
                 <h:panelGroup >
                     <label class="label">关注人</label>
                     <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
-                        <p:ajax  event="change" update="scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
+                        <p:ajax  event="change" update="@(.pickListCls) scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{assetSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>

@@ -82,7 +82,7 @@ public class MessageSubscriber implements Serializable {
     private Integer selectType;
 
 
-    @Basic(optional = true)
+   /* @Basic(optional = true)
     @Column(name = "repair_event")
     private Boolean repairEvent;
 
@@ -91,7 +91,7 @@ public class MessageSubscriber implements Serializable {
     private Boolean maintainEvent;
     @Basic(optional = true)
     @Column(name = "contract_due_event")
-    private Boolean contractDueEvent;
+    private Boolean contractDueEvent;*/
     @Basic(optional = true)
     @Column(name = "quality_hit")
     private Boolean qualityHit;
@@ -254,7 +254,7 @@ public class MessageSubscriber implements Serializable {
         this.selectType = selectType;
     }
 
-    public Boolean getRepairEvent() {
+    /*public Boolean getRepairEvent() {
         return repairEvent;
     }
 
@@ -276,7 +276,7 @@ public class MessageSubscriber implements Serializable {
 
     public void setContractDueEvent(Boolean contractDueEvent) {
         this.contractDueEvent = contractDueEvent;
-    }
+    }*/
 
     public Boolean getQualityHit() {
         return qualityHit;
