@@ -93,7 +93,7 @@ public class NurseSiteMaintainData {
 	
 	public String getStrValue(){
 		if(this.checkValue==null){
-			return "";
+			return "未检查";
 		}
 		else if(this.checkValue){
 			return "通过";
@@ -101,7 +101,7 @@ public class NurseSiteMaintainData {
 		else if(!this.checkValue){
 			return "有问题";
 		}
-		return "";
+		return "未检查";
 	}
 
 	public Integer getCheckValueWeb() {

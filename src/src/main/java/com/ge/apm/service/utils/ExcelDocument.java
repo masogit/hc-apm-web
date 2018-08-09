@@ -125,7 +125,10 @@ public class ExcelDocument {
     
     public void mergeCell(String sheetName,int firstRow, int lastRow, int firstCol, int lastCol){
     	Sheet sheet = workBook.getSheet(sheetName);
-    	sheet.addMergedRegion(new CellRangeAddress(firstRow,lastRow,firstCol,lastCol));
+    	if(firstRow==lastRow && firstCol==lastCol){
+    		return;
+    	}
+    	sheet.addMergedRegion(new CellRangeAddress(firstRow-1,lastRow-1,firstCol-1,lastCol-1));
     }
 
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
