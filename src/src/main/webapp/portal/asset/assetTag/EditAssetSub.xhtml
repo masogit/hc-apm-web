@@ -102,15 +102,28 @@
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.qualityHit}"/>
-                                <p:outputLabel value="质保提醒"/>
+                                <p:outputLabel value="质保/维保提醒"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <h:panelGrid columns="1">
+                                <p:outputLabel value="保养事件: "/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <h:panelGrid columns="1">
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.m}"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+
+
+                        <!--<h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
                                 <p:outputLabel value="维保提醒"/>
                             </h:panelGrid>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                     </h:panelGrid>
                     <!--  <h:panelGrid columns="2">
                           <p:outputLabel value="保养事件" />

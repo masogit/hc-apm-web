@@ -86,9 +86,9 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         selected.setSiteUID(ua.getSiteUID());
         if(selected.getCreatedDate()==null)
           selected.setCreatedDate(new Date());
-        selected.setCreatedBy(ua.getName());
+        selected.setCreatedBy(ua.getLoginName());
         selected.setLastModifiedDate(new Date());
-        selected.setLastModifiedBy(ua.getName());
+        selected.setLastModifiedBy(ua.getLoginName());
         super.save();
         selected=null;
         maintainerT=null;
