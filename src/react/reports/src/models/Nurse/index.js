@@ -11,6 +11,8 @@ export default {
 
   state: {
     assets: [],
+    assetsInMaintain: [],
+    avgResponseTime: [],
   },
 
   reducers: {
@@ -18,17 +20,38 @@ export default {
       return produce(state, state => {
         state.assets = payload
       })
-    }
+    },
+    'set/assetsInMaintain'(state, { payload }) {
+      return produce(state, state => {
+        state.assetsInMaintain = payload
+      })
+    },
+    'set/avgResponseTime'(state, { payload }) {
+      return produce(state, state => {
+        state.avgResponseTime = payload
+      })
+    },
+
   },
 
   effects: {
     *'get/all'({ }, { put }) {
       yield put({ type: 'get/assets' })
+      yield put({ type: 'get/assetsInMaintain' })
+      yield put({ type: 'get/avgResponseTime' })
     },
     *'get/assets'({ }, { put, call, select }) {
       let dept = yield select(state => state.user.info.orgId)
       let { data } = yield call(API.getAssets, dept)
       yield put({ type: 'set/assets', payload: data })
+    },
+    *'get/assetsInMaintain'({ }, { put, call, select }) {
+      let { data } = yield call(API.getAssetsInMaintain)
+      yield put({ type: 'set/assetsInMaintain', payload: data })
+    },
+    *'get/avgResponseTime'({ }, { put, call, select }) {
+      let { data } = yield call(API.getAvgResponseTime)
+      yield put({ type: 'set/avgResponseTime', payload: data })
     }
   },
 
