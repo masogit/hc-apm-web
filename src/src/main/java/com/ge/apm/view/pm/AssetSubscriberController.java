@@ -122,9 +122,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
-//yao gai , if suscribe change, it's current useid
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
-
+		addFilter();
 	}
 
 	public void onItemSelected() {
@@ -269,9 +268,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setLevel0(selected.getLevel0());
 				msgsub.setLevel1(selected.getLevel1());
 				msgsub.setLevel2(selected.getLevel2());
-				msgsub.setRepairEvent(selected.getRepairEvent());
+				/*msgsub.setRepairEvent(selected.getRepairEvent());
 				msgsub.setMaintainEvent(selected.getMaintainEvent());
-				msgsub.setContractDueEvent(selected.getContractDueEvent());
+				msgsub.setContractDueEvent(selected.getContractDueEvent());*/
 				msgsub.setQualityHit(selected.getQualityHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
@@ -281,6 +280,13 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(Collectors.toList());
 			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
+
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getQualityHit()==false && selected.getMainRepHit()==false){
+				WebUtil.addErrorMessage("消息设置不可为空");
+				return;
+			}
+
 			if(msglist.size()>0){
 				WebUtil.addErrorMessage("不能重复创建相同的设备消息订阅");
 				return;
