@@ -126,6 +126,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
 
+    List<UserAccount> findByTenantUIDAndName(String tenantUid, String name);
+
     @Transactional
     @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where tenant_uid = ?1",nativeQuery=true)

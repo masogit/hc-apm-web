@@ -17,6 +17,16 @@ public class UserSchedule implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public enum Type {
+        V, W
+    }
+    public enum ScheduleDateStage {
+        ALL, AM, PM
+    }
+    public enum AuditStatus {
+        PendingApproval, Approved, NotApproved
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -40,6 +50,13 @@ public class UserSchedule implements Serializable {
     @Column(name = "schedule_date_stage")
     private String scheduleDateStage;
 
+    //审核状态[PendingApproved:待审核，Approved:审核通过，NotApproved：审核未通过]
+    @Column(name = "audit_status")
+    private String auditStatus;
+
+    @Column(name = "man_hours")
+    private Integer manHours;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -51,6 +68,22 @@ public class UserSchedule implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate;
 
     @JoinColumn(insertable=false,updatable=false, name = "user_uid", referencedColumnName = "uid")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -135,6 +168,54 @@ public class UserSchedule implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
+
+    public Integer getManHours() {
+        return manHours;
+    }
+
+    public void setManHours(Integer manHours) {
+        this.manHours = manHours;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override

@@ -68,6 +68,44 @@
 					</span>
 				</h:panelGroup>
 			</p:panelGrid>
+			<p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+				<h:panelGroup>
+					<label class="label">设备名称</label>
+					<p:inputText value="#{maintainConfigController.assetInfoName}">
+						<p:ajax  listener="#{maintainConfigController.onFilterChange()}" update=":maintainConfigCreateForm:AssetsPickList" />
+					</p:inputText>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">设备类型</label>
+					<p:selectOneMenu value="#{maintainConfigController.assetCategory}" disabled="false">
+						<p:ajax listener="#{maintainConfigController.onFilterChange()}" update=":maintainConfigCreateForm:AssetsPickList" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{fieldMsg.getFieldValueList('assetCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+					</p:selectOneMenu>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">设备型号</label>
+					<p:inputText value="#{maintainConfigController.functionType}">
+						<p:ajax  listener="#{maintainConfigController.onFilterChange()}" update=":maintainConfigCreateForm:AssetsPickList" />
+					</p:inputText>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">所属院区</label>
+					<p:selectOneMenu value="#{maintainConfigController.selectedParentOrgInfo}" disabled="false" converter="orgInfoConverter">
+						<p:ajax listener="#{maintainConfigController.onParentOrgInfoChange()}" update=":maintainConfigCreateForm:clinicalOrgInfo" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{maintainConfigController.checkListParentOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					</p:selectOneMenu>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">所属科室</label>
+					<p:selectOneMenu id="clinicalOrgInfo" value="#{maintainConfigController.selectedOrgInfo}" disabled="false" converter="orgInfoConverter">
+						<p:ajax listener="#{maintainConfigController.onFilterChange()}" update=":maintainConfigCreateForm:AssetsPickList" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{maintainConfigController.checkListOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					</p:selectOneMenu>
+				</h:panelGroup>
+			</p:panelGrid>
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 				<h:panelGroup>
 					<p:pickList id="AssetsPickList" value="#{maintainConfigController.availableAssets}" var="item"
