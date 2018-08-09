@@ -47,8 +47,8 @@ public class UserCommonService {
     @Autowired
     private TenantInfoRepository tenantInfoRepository;
 
-    public List<UserAccount> getWorkerList(Integer assetId) {
-        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId == null ? 0 : assetId);
+    public List<UserAccount> getWorkerList(Integer assetId,String orgUid) {
+        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId == null ? 0 : assetId,orgUid);
         if (null != res) {
             List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
             List<UserAccount> userList = mapList.stream().map(item -> {

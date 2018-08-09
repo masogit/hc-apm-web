@@ -119,7 +119,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             prepareEdit();
             beforeEdit();
         }
-        ownerList = ucService.getWorkerList(selected.getId());
+        ownerList = ucService.getWorkerList(selected.getId(),"");
         config = configService.findConfigBySite(selected.getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());

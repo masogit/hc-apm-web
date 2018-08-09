@@ -101,7 +101,7 @@ public class AssetOwnerSettingController {
 
     public List<UserAccount> getOwnerList() {
 //        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
-        List<UserAccount> res = userCommonService.getWorkerList(null);
+        List<UserAccount> res = userCommonService.getWorkerList(null,"");
         return res;
     }
 

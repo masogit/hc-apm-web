@@ -975,7 +975,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         if (ownerList == null) {
-            ownerList = ucService.getWorkerList(selected.getId());
+            ownerList = ucService.getWorkerList(selected.getId(),"");
         }
         return ownerList;
     }

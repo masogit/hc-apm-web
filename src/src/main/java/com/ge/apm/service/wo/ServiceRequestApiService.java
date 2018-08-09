@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import webapp.framework.util.StringUtil;
 
 /**
  *
@@ -34,12 +36,15 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
+    public Map<String, Object> getReponserByAsset(String token, Integer assetId,String orgUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
 
         String gatewayURL = getGatewayURL(GatewayURL.GET_RESPONSER_BY_ASSET);
-        String url = gatewayURL.replace("{assetId}", assetid.toString());
+        String url = gatewayURL.replace("{assetId}", assetId.toString());
+        if(StringUtils.isNotEmpty(orgUid)){
+            url = url + "?orgUid=" +orgUid;
+        }
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();

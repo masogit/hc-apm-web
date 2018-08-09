@@ -201,7 +201,7 @@ public class AssetCreateService {
     }
 
     public List<UserAccount> getWorkerList() {
-        return ucService.getWorkerList(0);
+        return ucService.getWorkerList(0,"");
     }
 
     public List<UserAccount> getAssetOwnerList(String deptUid) {
