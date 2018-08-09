@@ -445,6 +445,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
+        
+        //1st. if asset belongs to any distribution center
+        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
+        //2nd, check if configuration regarding to shared asset has been created
+        searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNotNull, null));
 
         if (queryIndex == 1) {
             //正常可借用
@@ -2036,11 +2041,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		this.selected = asset;
 	}
 	
-	public List<OrgInfo> getDeptListCanLeaseAsset() {
-		UserAccount ua = UserContextService.getCurrentUserAccount();
-		return assetInfoService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
-	}
-	
 	public void forceReturnAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -2101,21 +2101,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     			days = rentalTimeInMinutes / (24 * 60);
     			hours = (rentalTimeInMinutes / 60) % 24;
     			minutes = rentalTimeInMinutes % 60;
-    			unit = new BigDecimal(days * 24 + hours);
-    			unit = unit.add(new BigDecimal(minutes / 60d));
     			totalTime = days + "天" + hours + "时" + minutes + "分";
     		}
+
     		String chargeType = item.getSharedAssetType().getChargingType();
     		switch(chargeType) {
     		case "1":
     			totalTime = "1次";
+    			unit = new BigDecimal(1);
     			break;
     		case "2":
+    		    unit = new BigDecimal(rentalTimeInMinutes / 30d);
     			unit = unit.setScale(0, RoundingMode.UP);
     			break;
     		case "3":
-    			totalTime = days + "天";
-    			unit = new BigDecimal(days);
+    			unit = new BigDecimal(rentalTimeInMinutes / (60 * 24d));
+    			unit = unit.setScale(0, RoundingMode.UP);
+    			totalTime = unit.longValue() + "天";
     			break;
     		case "4":
     			unit = new BigDecimal(rentalTimeInMinutes / 60d);
@@ -2124,7 +2126,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     		default:
     			unit = new BigDecimal(0);
     		}
-    		
+
     		//
     		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
     			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
@@ -2136,7 +2138,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     			}
     		}
     		sharedAssetReqDetail.setRentalTime(totalTime);
+
     		BigDecimal totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().doubleValue()));
+            if("2".equals(chargeType)) {
+                totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().longValue() / 2));
+            }
+
     		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
     	}
     	return sharedAssetReqDetail;
