@@ -143,7 +143,7 @@ public class V2_WorkOrderService {
     }
 
     public List<UserAccount> getWorkerList(Integer assetId) {
-        return ucService.getWorkerList(assetId);
+        return ucService.getWorkerList(assetId,"");
     }
     public List<UserAccount> getApproverListByAsset(String assetUid) {
         return ucService.getApproveList(assetUid);

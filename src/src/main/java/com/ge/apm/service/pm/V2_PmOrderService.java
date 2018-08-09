@@ -510,7 +510,7 @@ public class V2_PmOrderService {
         }
     }
     public List<UserAccount> getWorkerList(Integer assetId) {
-        List<UserAccount> workerList = ucService.getWorkerList(assetId);
+        List<UserAccount> workerList = ucService.getWorkerList(assetId,"");
         return workerList;
     }
     public List<UserAccount> getApproveList(String assetUid) {

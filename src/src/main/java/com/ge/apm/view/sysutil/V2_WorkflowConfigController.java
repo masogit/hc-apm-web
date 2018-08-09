@@ -52,7 +52,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<OrgInfo> siteList;
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
-	private UserCommonService ucService;
+	//private UserCommonService ucService;
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
@@ -163,6 +163,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(selected == null || selectedUserOrg == null){
 			return;
 		}
+		dispatchUserList.addAll(userCommonService.getWorkerList(0,selectedUserOrg.getUid()));
+		/*
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
@@ -176,7 +178,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
             }
 		}else{
 			dispatchUserList = userDao.getByTenantUIDStaff(user.getTenantUID());
-		}
+		}*/
 	}
 
 	public void updateApproverList(){
@@ -412,11 +414,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     		 return;
     	}
 
-    	/*if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
 			return;
-		}*/
+		}
 
 /*		if(selected.getId() != null){
     		if(selected.getFormat() != null && newFormat != null){

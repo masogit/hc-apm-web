@@ -159,6 +159,8 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "hour_required")
     private Boolean hourRequired = true;// 工时必填
 
+
+
     /***
      * 资产编码配置
      */
@@ -206,6 +208,29 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "measuring_reminder_times")
     private Integer measuringReminderTimes;//提醒次数
+
+
+    @Column(name="parts_need_sign")
+    private Boolean partsNeedSign; //备件审核是否需要签名
+
+    @Column(name="ack_need_sign")
+    private Boolean ackNeedSign; //验收是否需要签名
+
+    public Boolean getPartsNeedSign() {
+        return partsNeedSign;
+    }
+
+    public void setPartsNeedSign(Boolean partsNeedSign) {
+        this.partsNeedSign = partsNeedSign;
+    }
+
+    public Boolean getAckNeedSign() {
+        return ackNeedSign;
+    }
+
+    public void setAckNeedSign(Boolean ackNeedSign) {
+        this.ackNeedSign = ackNeedSign;
+    }
 
     public Integer getEmergencyTimeoutDispatch() {
         return emergencyTimeoutDispatch;

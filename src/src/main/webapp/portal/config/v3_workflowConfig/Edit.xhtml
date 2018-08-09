@@ -30,6 +30,18 @@
                                     </p:scrollPanel>
                                 </p:overlayPanel>
                             </h:panelGroup>
+                            <h:panelGroup rendered="true">
+                                <label class = "label">备件审核是否需要签名?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.partsNeedSign}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">验收是否需要签名?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ackNeedSign}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
 
