@@ -45,7 +45,8 @@
       transform: none;
     }
 
-    .layout-menu.layout-menu-dark {
+    .layout-menu.layout-menu-dark,
+    .layout-menu.layout-menu-light {
       margin-left: 0;
       width: $menu-width / 3.5;
       overflow-y: hidden;

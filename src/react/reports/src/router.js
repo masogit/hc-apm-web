@@ -11,7 +11,7 @@ const MaintenanceStats = loaderHelper(require('bundle-loader?lazy&name=Maintenan
 const ProcessAnalysis = loaderHelper(require('bundle-loader?lazy&name=ProcessAnalysis!./containers/ProcessAnalysis/App'))
 const StaffPerf = loaderHelper(require('bundle-loader?lazy&name=StaffPerf!./containers/StaffPerf'))
 const ScanDetails = loaderHelper(require('bundle-loader?lazy&name=ScanDetails!./containers/ScanDetails'))
-const Nurse = loaderHelper(require('bundle-loader?lazy&name=ScanDetails!./containers/Nurse'))
+const Nurse = loaderHelper(require('bundle-loader?lazy&name=Nurse!./containers/Nurse'))
 
 export default ({history}) => (
   <Router history={history}>

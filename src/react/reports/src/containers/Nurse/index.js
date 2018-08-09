@@ -4,7 +4,7 @@ import { flow } from 'noru-utils/lib'
 import { translate } from 'react-i18next'
 import { connect } from 'dva'
 import AssetOverview from './components/AssetOverview'
-import MalfunctionAssets from './components/MalfunctionAssets'
+import AssetsInMaintain from './components/AssetsInMaintain'
 import ResponseTime from './components/ResponseTime'
 import './index.scss'
 
@@ -27,7 +27,7 @@ export class Nurse extends React.Component {
           <AssetOverview />
         </Col>
         <Col span="16" className="right-container">
-          <MalfunctionAssets />
+          <AssetsInMaintain />
           <ResponseTime />
         </Col>
       </Row>
