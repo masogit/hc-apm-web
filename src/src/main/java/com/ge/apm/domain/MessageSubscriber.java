@@ -82,16 +82,20 @@ public class MessageSubscriber implements Serializable {
     private Integer selectType;
 
 
-   /* @Basic(optional = true)
+    @Basic(optional = true)
     @Column(name = "repair_event")
     private Boolean repairEvent;
 
     @Basic(optional = true)
-    @Column(name = "maintain_event")
-    private Boolean maintainEvent;
-    @Basic(optional = true)
-    @Column(name = "contract_due_event")
-    private Boolean contractDueEvent;*/
+    @Column(name = "meter_event")
+    private Boolean meterEvent;
+    /*
+		@Basic(optional = true)
+		@Column(name = "maintain_event")
+		private Boolean maintainEvent;
+		@Basic(optional = true)
+		@Column(name = "contract_due_event")
+		private Boolean contractDueEvent;*/
     @Basic(optional = true)
     @Column(name = "quality_hit")
     private Boolean qualityHit;
@@ -348,5 +352,21 @@ public class MessageSubscriber implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Boolean getRepairEvent() {
+        return repairEvent;
+    }
+
+    public void setRepairEvent(Boolean repairEvent) {
+        this.repairEvent = repairEvent;
+    }
+
+    public Boolean getMeterEvent() {
+        return meterEvent;
+    }
+
+    public void setMeterEvent(Boolean meterEvent) {
+        this.meterEvent = meterEvent;
     }
 }
