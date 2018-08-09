@@ -81,6 +81,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private String previousOrgUid;  //used in update
 
+    private List<SysRoleVO> roleListVO;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -194,7 +196,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         	nameValue=((String)nameValue).toLowerCase();
         	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
         }
-        
+
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
         	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
@@ -237,7 +239,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
-        TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
+        /*TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
 
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
@@ -259,10 +261,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 allRoles = uaaService.getSysRoleNames();
             }
 
-        }
+        }*/
 
-
-
+        roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
 
         assignedRoles = new ArrayList<String>();
         for (UserRole userRole : selected.getUserRoleList()) {
@@ -275,6 +276,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (selected == null) {
             return;
         }
+        //如果租户不是院区隔离时，修改用户角色时保证有LocalITAdmin角色的用户，LocalITAdmin角色不丢失
+        TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
+        if((ti.getInsulate() == null || !ti.getInsulate())){
+            List<UserRole> tempUserRole = selected.getUserRoleList().stream().filter(item -> item.getRole().getName().equals("LocalITAdmin")).collect(Collectors.toList());
+            if(!tempUserRole.isEmpty()){
+                this.assignedRoles.add(tempUserRole.get(0).getRole().getRoleDesc());
+            }
+        }
+
+        //如果登陆用户角色是LocalITAdmin，修改用户角色保证有ITAdmin角色的用户，ITAdmin角色不丢失
+        if(UserContextService.isOnlyLocalITAdmin()){
+            List<UserRole> tempUserRole = selected.getUserRoleList().stream().filter(item -> item.getRole().getName().equals("ITAdmin")).collect(Collectors.toList());
+            if(!tempUserRole.isEmpty()){
+                this.assignedRoles.add(tempUserRole.get(0).getRole().getRoleDesc());
+            }
+        }
+
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
         selected.getUserRoleList().clear();
@@ -653,7 +671,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     WebUtil.addSuccessMessage(WebUtil.getMessage("GuestAccountCheckedWarning"));
                 }
             }
-
         }
 
     }
@@ -758,11 +775,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.agree = agree;
     }
 
+    public List<SysRoleVO> getRoleListVO() {
+        return roleListVO;
+    }
+
+    public void setRoleListVO(List<SysRoleVO> roleListVO) {
+        this.roleListVO = roleListVO;
+    }
+
     public void loginAs() {
         if(this.selected==null) return;
-        
+
         UserContextService.setLoginUser(this.selected);
-        
+
         //call microServices to get Access Token...
         try{
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
