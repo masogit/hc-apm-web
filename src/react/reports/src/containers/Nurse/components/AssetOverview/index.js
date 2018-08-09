@@ -5,10 +5,11 @@ import { translate } from 'react-i18next'
 import { connect } from 'dva'
 import { uniqBy } from 'lodash-es'
 import './index.scss'
+import nursePic from '#/assets/nurse.png'
 
 const Header = () => (
   <div className="asset-overview-header">
-    <img src="../../../../assets/nurse.png"/>
+    <img src={nursePic}/>
   </div>
 )
 
