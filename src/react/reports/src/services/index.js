@@ -42,7 +42,12 @@ const URLs = {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  Object.keys(URLs).forEach(k => URLs[k] = '/geapm' + URLs[k])
+  Object.keys(URLs).forEach(k => {
+    // special treatment for legacy api
+    if (URLs[k].indexOf('/api') === 0) {
+      URLs[k] = '/geapm' + URLs[k]
+    }
+  })
 }
 
 const UseMock = true
