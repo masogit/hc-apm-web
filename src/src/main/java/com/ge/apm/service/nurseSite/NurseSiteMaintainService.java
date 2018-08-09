@@ -987,12 +987,13 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
-			writeExcelSecondHeader(doc,keyRow,realKeyRow,dataColumnIndex,3,"检查项");
-			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间");
-			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间");
-			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次");
+			writeExcelSecondHeader(doc,keyRow,realKeyRow,dataColumnIndex,3,"检查项",null);
+			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间",null);
+			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
+			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
 			doc.removeRow(SHEET_Maintain, keyRow);
-			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
+//			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
+			writeExcelHeader(doc,keyRow);
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -1005,7 +1006,16 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label){
+	private void writeExcelHeader(ExcelDocument doc,int keyRow){
+		int headerColumnIndex=1;
+		List<String> header = new ArrayList<String>();
+		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
+	}
+	
+	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label,Integer parentIndex){
 		List<String> listScheduleDate=new ArrayList<String>();
 		String[] headerStrRow=doc.getKeyRow(SHEET_Maintain, keyRow);
 		for(int i=0;i<headerStrRow.length;++i){
@@ -1015,7 +1025,12 @@ public class NurseSiteMaintainService {
 			else{
 				String tempStr=headerStrRow[i];
 				String[] tempArr=tempStr.split(",");
-				listScheduleDate.add(tempArr[keyRowIndex]);
+				if(parentIndex==null){
+					listScheduleDate.add(tempArr[keyRowIndex]);
+				}
+				else{
+					listScheduleDate.add(tempArr[keyRowIndex]+","+tempArr[parentIndex]);
+				}
 			}
 		}
 		doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, 1, dataColumnIndex-1);
@@ -1036,7 +1051,12 @@ public class NurseSiteMaintainService {
 			}
 			else{
 				doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, originScheduleDateColumn, dataColumnIndex-1);
-				doc.writeCellData(SHEET_Maintain, scheduleDateRow,originScheduleDateColumn,originScheduleDate);
+				if(parentIndex==null){
+					doc.writeCellData(SHEET_Maintain, scheduleDateRow,originScheduleDateColumn,originScheduleDate);
+				}
+				else{
+					doc.writeCellData(SHEET_Maintain, scheduleDateRow,originScheduleDateColumn,originScheduleDate.split(",")[0]);
+				}
 				originScheduleDate=listScheduleDate.get(i);
 				originScheduleDateColumn=dataColumnIndex;
 				dataColumnIndex++;
@@ -1044,7 +1064,12 @@ public class NurseSiteMaintainService {
 		}
 		System.out.println(listScheduleDate.toString());
 		doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, originScheduleDateColumn, dataColumnIndex-1);
-		doc.writeCellData(SHEET_Maintain, scheduleDateRow, originScheduleDateColumn, originScheduleDate);
+		if(parentIndex==null){
+			doc.writeCellData(SHEET_Maintain, scheduleDateRow, originScheduleDateColumn, originScheduleDate);
+		}
+		else{
+			doc.writeCellData(SHEET_Maintain, scheduleDateRow, originScheduleDateColumn, originScheduleDate.split(",")[0]);
+		}
 	}
 
 	private int writeExcelSheetHeader(List<String> header, String str, ExcelDocument doc, int headerIndex, int rowIndex, boolean add) {
