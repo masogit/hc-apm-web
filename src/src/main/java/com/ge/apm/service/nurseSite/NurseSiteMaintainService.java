@@ -20,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -889,7 +890,7 @@ public class NurseSiteMaintainService {
 		listMaintain.sort(new NurseSiteMaintainComparator());
 		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
 		Map<String, String> mapAssetInfo = new HashMap<String, String>();
-		
+		Set<String> setSignature=new HashSet<String>();
 		List<String> header = new ArrayList<String>();
 		List<String> secondHeader = new ArrayList<String>();
 		for (int i = 0; i < listMaintain.size(); ++i) {
@@ -913,6 +914,9 @@ public class NurseSiteMaintainService {
 						mapAssetInfo.put(tempItem.getAssetUid(), tempItem.getAssetInfo().getName());
 					}
 				}
+			}
+			if(StringUtils.isNotEmpty(tempMaintain.getSignatureId())){
+				setSignature.add(tempMaintain.getSignatureId());
 			}
 		}
 		int headerColumnIndex = 1;
@@ -997,6 +1001,9 @@ public class NurseSiteMaintainService {
 			doc.removeRow(SHEET_Maintain, keyRow);
 //			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
 			writeExcelHeader(doc,keyRow);
+			if(setSignature.size()>0){
+				writeSignatureToExcel(doc, rowIndex++, 3, 12, setSignature);
+			}
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -1006,6 +1013,24 @@ public class NurseSiteMaintainService {
 			// TODO Auto-generated catch block
 			LOGGER.error(e.getMessage());
 			return null;
+		}
+	}
+	
+	private void writeSignatureToExcel(ExcelDocument doc,int row,int width,int height,Set<String> signatureIds){
+		try {
+			int columnIndex=1;
+			Iterator<String> it=signatureIds.iterator();
+			while(it.hasNext()){
+				String tempSignature=it.next();
+				StreamedContent sc=getMaintainSignatureWeiXin(tempSignature);
+				if(sc!=null){
+					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
+					columnIndex+=width;
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
 		}
 	}
 	
@@ -1040,7 +1065,6 @@ public class NurseSiteMaintainService {
 		doc.writeCellData(SHEET_Maintain, scheduleDateRow, 1, label);
 		String originScheduleDate=null;
 		int originScheduleDateColumn=dataColumnIndex;
-		System.out.println(listScheduleDate.toString());
 		for(int i=0;i>-1&&i<listScheduleDate.size();++i){
 			if(originScheduleDate==null){
 				originScheduleDate=listScheduleDate.get(0);
@@ -1065,7 +1089,6 @@ public class NurseSiteMaintainService {
 				dataColumnIndex++;
 			}
 		}
-		System.out.println(listScheduleDate.toString());
 		doc.mergeCell(SHEET_Maintain, scheduleDateRow, scheduleDateRow, originScheduleDateColumn, dataColumnIndex-1);
 		if(parentIndex==null){
 			doc.writeCellData(SHEET_Maintain, scheduleDateRow, originScheduleDateColumn, originScheduleDate);

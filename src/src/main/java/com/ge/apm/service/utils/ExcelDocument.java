@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -559,6 +560,24 @@ public class ExcelDocument {
 
         writeCellData(cell, value);
 
+    }
+    
+    public int addPicture(InputStream input,int formatType) throws IOException{
+    	byte[]b=IOUtils.toByteArray(input);
+    	int pictureIndex=workBook.addPicture(b, formatType);
+    	input.close();
+    	return pictureIndex;
+    }
+    
+    public void drawPicture(int pictureIndex,String sheetName,int row,int col,double scaleX,double scaleY){
+    	Sheet sheet=workBook.getSheet(sheetName);
+    	Drawing drawing = sheet.createDrawingPatriarch();
+    	CreationHelper helper = workBook.getCreationHelper();
+    	ClientAnchor anchor = helper.createClientAnchor();
+    	anchor.setCol1(col-1);
+        anchor.setRow1(row-1);
+        Picture pict = drawing.createPicture(anchor, pictureIndex);
+        pict.resize(scaleX,scaleY);
     }
 
     public void writeCellData(Sheet sheet, int rowNum, int colNum, Object value) {
