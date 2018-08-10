@@ -4,12 +4,16 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.WorkOrderExportService;
 import com.ge.apm.service.wo.WorkOrderExportTemplateService;
 import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -28,11 +32,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/7/26.
@@ -48,7 +54,8 @@ public class WorkOrderReportExportController implements Serializable {
     private WorkOrderExportService workOrderExportService;
     private WorkOrderPublishRenderService workOrderPublishRenderService;
     private WorkOrderExportTemplateService workOrderExportTemplateService;
-
+    private AssetInfoService assetInfoService;
+    private UserCommonService ucService;
     private StreamedContent exportFile;
 
     private StreamedContent exportPdf;
@@ -83,6 +90,11 @@ public class WorkOrderReportExportController implements Serializable {
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
+    
+    private OrgInfo filterDeptOrg;
+    private List<OrgInfo> clinicalDeptList;
+    private UserAccount filterCurrentOwner;
+    private List<UserAccount> currentOwnerList;
 
     private List<Map<String, Object>> selectedItems;
 
@@ -94,6 +106,8 @@ public class WorkOrderReportExportController implements Serializable {
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
         workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        ucService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
@@ -114,7 +128,27 @@ public class WorkOrderReportExportController implements Serializable {
         isInsulate = isInsulate == null ? false : isInsulate;
 
         initOrgTree();
+        loadClinicalDept();
+        currentOwnerList = ucService.getWorkerList(null,"");
 
+    }
+    
+    public void onClinicalDeptChange(){
+        
+    }
+    public void onCurrentOwnerChange(){
+        
+    }
+    
+    private void loadClinicalDept(){
+        if(null == selectedOrg){
+            clinicalDeptList = Collections.EMPTY_LIST;
+        }else{
+            clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getSiteUID());
+            if(null != filterDeptOrg && !filterDeptOrg.getSiteUID().equals(selectedOrg.getSiteUID()) ){
+                filterDeptOrg = null;
+            }
+        }
     }
 
     private void exportWoData(List<Map<String, Object>> data) {
@@ -201,7 +235,7 @@ public class WorkOrderReportExportController implements Serializable {
                 return;
             }
 
-            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList());
+            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner);
         }
 
     }
@@ -239,7 +273,7 @@ public class WorkOrderReportExportController implements Serializable {
         } else {
             selectedOrg = (OrgInfo) node.getData();
         }
-
+        loadClinicalDept();
     }
 
     public void initOrgTree() {
@@ -256,6 +290,29 @@ public class WorkOrderReportExportController implements Serializable {
         rootNode.setExpanded(true);
 
     }
+    
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
+    public List<UserAccount> completeOwnerList(String query) {
+        
+        if (currentOwnerList == null) {
+            return Collections.emptyList();
+        }
+        
+        List<UserAccount> res = this.currentOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
 
     public void filterSiteByHospital() {
         siteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(this.getCurrentHospitalUID(), 3);
@@ -430,4 +487,21 @@ public class WorkOrderReportExportController implements Serializable {
     public void setExportDocx(StreamedContent exportDocx) {
         this.exportDocx = exportDocx;
     }
+
+    public OrgInfo getFilterDeptOrg() {
+        return filterDeptOrg;
+    }
+
+    public void setFilterDeptOrg(OrgInfo filterDeptOrg) {
+        this.filterDeptOrg = filterDeptOrg;
+    }
+
+    public UserAccount getFilterCurrentOwner() {
+        return filterCurrentOwner;
+    }
+
+    public void setFilterCurrentOwner(UserAccount filterCurrentOwner) {
+        this.filterCurrentOwner = filterCurrentOwner;
+    }
+    
 }

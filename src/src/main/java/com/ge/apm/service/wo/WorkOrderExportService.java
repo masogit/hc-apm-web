@@ -61,7 +61,7 @@ public class WorkOrderExportService {
     UserAccountRepository userAccountDao;
 
     //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
-    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList) {
+    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner) {
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
@@ -82,6 +82,13 @@ public class WorkOrderExportService {
         if (selectedOrg != null && selectedOrg.getOrgLevel() == 3) {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
+        }
+        
+        if(clinicalDept !=null){
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
+        }
+        if(currentOwner !=null){
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
         }
 
         ZoneId zone = ZoneId.systemDefault();
