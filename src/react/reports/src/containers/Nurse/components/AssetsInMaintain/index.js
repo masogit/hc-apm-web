@@ -14,22 +14,27 @@ class MalfunctionTable extends React.Component {
       {
         title: t`设备名称`,
         dataIndex: 'assetName',
+        sorter: true,
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
+        sorter: true,
       },
       {
         title: t`报修日期`,
-        render: record => moment(record.reportDate).format('YYYY-MM-DD HH:mm')
+        render: record => moment(record.reportDate).format('YYYY-MM-DD HH:mm'),
+        sorter: true,
       },
       {
         title: t`报修人`,
         dataIndex: 'reporter',
+        sorter: true,
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDept',
+        sorter: true,
       },
     ]
   }

@@ -36,28 +36,32 @@ const Count = ({ all, type, t }) => (
 
 class AssetTable extends React.Component {
 
-  getCols = () => {
+  getCols = (data) => {
     let { t } = this.props
     return [
       {
         title: t`设备名称`,
         dataIndex: 'name',
         key: 'name',
+        sorter: true,
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
         key: 'financingNum',
+        sorter: true,
       },
       {
         title: t`设备分类`,
         dataIndex: 'assetGroupName',
         key: 'assetGroupName',
+        sorter: true,
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDeptName',
         key: 'clinicalDeptName',
+        sorter: true,
       },
     ]
   }
@@ -65,7 +69,7 @@ class AssetTable extends React.Component {
   render() {
     let { t, data } = this.props
     return (
-      <Table dataSource={data} columns={this.getCols(t)} className="asset-table" pagination={false} />
+      <Table dataSource={data} columns={this.getCols(data)} className="asset-table" pagination={false} />
     )
   }
 }

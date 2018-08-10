@@ -100,6 +100,8 @@ const getOption = (t, data) =>{
   }
 }
 
+const NoData = ({ t }) => <div className="no-data-placeholder"><span><i className="anticon anticon-frown-o"></i>{t`暂无数据`}</span></div>
+
 export class AssetOverview extends React.Component {
 
   render() {
@@ -111,7 +113,10 @@ export class AssetOverview extends React.Component {
         <h1>{t`平均响应时间`}</h1>
 
         <div className="chart-content">
-          <Chart option={getOption(t, avg)} id="avg-response-time-chart"/>
+          { avg.length > 0
+            ? <Chart option={getOption(t, avg)} id="avg-response-time-chart"/>
+            : <NoData t={t}/>
+          }
         </div>
 
       </div>
