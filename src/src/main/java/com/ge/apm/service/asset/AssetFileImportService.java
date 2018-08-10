@@ -105,6 +105,8 @@ public class AssetFileImportService {
 
     private WorkflowConfig workflowConfig;
 
+    private boolean isNeedAudit;
+
     public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         List<Map<String, Object>> result = new ArrayList<>();
@@ -248,7 +250,6 @@ public class AssetFileImportService {
                     //only new asset need to set this
                     asset.setUsageStatus(3); //已建档
 
-                    boolean isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
                     if(isNeedAudit){
                         asset.setUsageStatus(2); //待审核
                     }
@@ -686,8 +687,6 @@ public class AssetFileImportService {
 
     }
 
-
-
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
@@ -696,10 +695,9 @@ public class AssetFileImportService {
         if (workflowConfig != null) {
             assetCodeConfig = workflowConfig.getAssetCodeConfig();
         }
+
+        isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
+
     }
-
-
-
-
 
 }
