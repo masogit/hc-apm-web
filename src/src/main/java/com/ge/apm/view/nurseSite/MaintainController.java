@@ -92,6 +92,7 @@ public class MaintainController {
 		showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
+		setDefaultParentOrgInfo();
 	}
 	
 	private List<NurseSiteMaintain> searchMaintainData(Date start,Date end){
@@ -175,6 +176,11 @@ public class MaintainController {
 			listOrgInfo=new ArrayList<OrgInfo>();
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
+	}
+	
+	private void setDefaultParentOrgInfo(){
+		selectedParentOrgInfo=nurseSiteMaintainService.findOrgInfoByUid(currentUser.getSiteUID());
+		loadUserOrgInfo();
 	}
 	
 	private void loadUserOrgInfo(){
