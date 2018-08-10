@@ -12,18 +12,31 @@ const getOption = (t, data) =>{
     labels.push(d.assetGroupName)
     values.push(d.avgResponseTime)
   })
+  let showDataZoom = data.length > 20
   return {
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: false,
+          show: showDataZoom,
+        },
+      }
+    },
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         type: 'shadow',
       }
     },
+    dataZoom: [{
+      type: 'slider',
+      show: showDataZoom,
+    }],
     grid: {
-      left: '6%',
-      right: '4%',
-      bottom: '8%',
-      top: '8%',
+      left: '8%',
+      right: '8%',
+      bottom: '3%',
+      top: '10%',
       containLabel: true,
     },
     xAxis: {
@@ -64,7 +77,7 @@ const getOption = (t, data) =>{
       barWidth: '60%',
       itemStyle: {
         normal: {
-          barBorderRadius: [100, 100, 0, 0],
+          barBorderRadius: [1000, 1000, 0, 0],
           color: new echarts.graphic.LinearGradient(
             0, 0, 0, 1, [{
                 offset: 0,

@@ -21,5 +21,30 @@ export const avgResponseTime = [
     "assetGroup": 0,
     "assetGroupName": "string1",
     "avgResponseTime": 97
-  }
+  },
+  {
+    "assetGroup": 0,
+    "assetGroupName": "string",
+    "avgResponseTime": 100
+  },
+  {
+    "assetGroup": 0,
+    "assetGroupName": "string1",
+    "avgResponseTime": 97
+  },
+  {
+    "assetGroup": 0,
+    "assetGroupName": "string",
+    "avgResponseTime": 100
+  },
+  {
+    "assetGroup": 0,
+    "assetGroupName": "string1",
+    "avgResponseTime": 97
+  },
+  {
+    "assetGroup": 0,
+    "assetGroupName": "string",
+    "avgResponseTime": 100
+  },
 ]
