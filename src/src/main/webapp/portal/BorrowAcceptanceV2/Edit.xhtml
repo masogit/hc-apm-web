@@ -60,7 +60,7 @@
                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                        rowsPerPageTemplate="20,40,60,90" editable="true" >   
+                        rowsPerPageTemplate="20,50,100,500" editable="true" >   
                     
                     <p:ajax event="rowEdit" listener="#{sharedAssetRequestV2Controller.onRowEditSart}" />
 
@@ -96,7 +96,7 @@
 
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
 
                         <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>

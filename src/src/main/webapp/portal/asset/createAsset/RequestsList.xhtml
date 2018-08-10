@@ -23,7 +23,7 @@
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="filter" listener="#{qrCodeLibCreateController.onFilter}" />
 <!--                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
