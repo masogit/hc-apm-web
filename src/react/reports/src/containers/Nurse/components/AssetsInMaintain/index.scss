@@ -18,7 +18,8 @@
     .asset-table {
       padding: 0 16px;
       flex: 1;
-      overflow: scroll;
+      overflow: auto;
+      overflow-x: hidden;
 
       tr th {
         padding-top: 8px;
