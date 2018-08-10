@@ -102,6 +102,7 @@
                 <p:menuitem id="um306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml"/>
                 <p:menuitem id="um307" value="电气安全数据导入" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml"/>
                 <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
+                <p:menuitem value="报表模版管理" outcome="/portal/pm/pmOrderReportTemplate/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
 				<!-- <p:menuitem id="um402" value="SAPConfig" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml"/>
 				<p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
 				<p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
