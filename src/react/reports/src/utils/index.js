@@ -215,3 +215,11 @@ export function mockRoot (root) {
     isRoot: true
   }
 }
+
+export function strLocaleComparator(a, b) {
+  return (a || '').localeCompare(b)
+}
+
+export function numComparator(a, b) {
+  return a - b
+}

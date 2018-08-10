@@ -4,9 +4,14 @@ import { flow } from 'noru-utils/lib'
 import { translate } from 'react-i18next'
 import { connect } from 'dva'
 import { uniqBy } from 'lodash-es'
-import './index.scss'
 import nursePicBg from '#/assets/bgd.png'
 import nursePic from '#/assets/nurse.png'
+import { strLocaleComparator, numComparator } from '#/utils'
+import './index.scss'
+
+export function getComparator(key, comparator) {
+  return (a, b) => comparator(a[key], b[key])
+}
 
 const Header = () => (
   <div className="asset-overview-header">
@@ -43,25 +48,25 @@ class AssetTable extends React.Component {
         title: t`设备名称`,
         dataIndex: 'name',
         key: 'name',
-        sorter: true,
+        sorter: getComparator('name', strLocaleComparator),
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
         key: 'financingNum',
-        sorter: true,
+        sorter: getComparator('financingNum', strLocaleComparator),
       },
       {
         title: t`设备分类`,
         dataIndex: 'assetGroupName',
         key: 'assetGroupName',
-        sorter: true,
+        sorter: getComparator('assetGroupName', strLocaleComparator),
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDeptName',
         key: 'clinicalDeptName',
-        sorter: true,
+        sorter: getComparator('clinicalDeptName', strLocaleComparator),
       },
     ]
   }
