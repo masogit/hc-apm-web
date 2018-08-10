@@ -172,6 +172,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		isCreate=false;
 		initValues();
 		loadMaintainConfig(this.selected);
+		setDefaultValueForAssetList();
 	}
 	private void initValues(){
 		this.listCheckAssets=new ArrayList<AssetInfo>();
@@ -274,6 +275,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	
+	private void setDefaultValueForAssetList(){
+		onFilterChange();
+	}
+	
 	public void onFilterChange(){
 		boolean search=false;
 		List<SearchFilter> listSearchFilter=new ArrayList<SearchFilter>();
@@ -304,6 +309,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		else{
 			SearchFilter tempFilter=new SearchFilter("clinicalDeptUID",SearchFilter.Operator.EQ,this.selected.getClinicalDeptUID(),"1*");
 			listSearchFilter.add(tempFilter);
+			search=true;
 		}
 		if(search){
 			checkListAssets=nurseSiteMaintainService.getListAssetInfoBySearchFilter(listSearchFilter);
