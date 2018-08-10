@@ -918,12 +918,13 @@ public class NurseSiteMaintainService {
 		int headerColumnIndex = 1;
 		// int secondHeaderColumnIndex=1;
 		int columnIndex = 1;
-		int rowIndex = 5;
+		int rowIndex = 6;
 		int keyRow = 1;
 		int realKeyRow=2;
 		int scheduleDateRow=3;
 		int checkDateRow=4;
 		int sequenceRow=5;
+		int modifyByRow=6;
 		int secondKeyRow = 2;
 		int dataColumnIndex=5;
 		if (mapAssetUidMaintainItem.size() > 0) {
@@ -980,6 +981,7 @@ public class NurseSiteMaintainService {
 								}
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
 								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
+								doc.writeRowData(SHEET_Maintain,keyRow,modifyByRow,keyName,tempItem.getModifyBy().getName());
 								// doc.writeCellData(SHEET_Maintain, rowIndex,
 								// columnIndex++, tempData.getStrValue());
 							}
@@ -991,6 +993,7 @@ public class NurseSiteMaintainService {
 			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
+			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
 			doc.removeRow(SHEET_Maintain, keyRow);
 //			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
 			writeExcelHeader(doc,keyRow);
