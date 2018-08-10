@@ -17,22 +17,6 @@
     <ui:define name="post-script">
       <h:outputScript target="body">
         window.location.hash = '/Nurse';
-        $('.layout-main').css('padding-top', 0);
-        if ($('.layout-menu-static-active').length) {
-          $('#menu-button').click();
-        }
-        if($('.layout-menu-dark').length) {
-          $('.layout-menu-dark').removeClass('layout-menu-dark').addClass('layout-menu-light');
-        }
-        $('[role=menuitem]').on('click', function(e) {
-          if (e.currentTarget.id === 'menuform:um01') { // home page
-            // ?
-          } else {
-            $('#menu-button').click();
-            $('.layout-main').css('padding-top', null);
-            $('.layout-menu-dark').removeClass('layout-menu-light').addClass('layout-menu-dark');
-          }
-        })
       </h:outputScript>
     </ui:define>
 
