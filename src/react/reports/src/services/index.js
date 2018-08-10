@@ -118,8 +118,8 @@ const ProcessAnalysis = {
 
 const Nurse = {
 
-  getAssets(clinicalDeptId) {
-    let params = { clinicalDeptId, page: 0, pageSize: 1000 }
+  getAssets() {
+    let params = { page: 0, pageSize: 1000 }
     return axios.get(URLs.Nurse_Assets, { params }).then(_ => _.data)
   },
 

@@ -41,8 +41,7 @@ export default {
       yield put({ type: 'get/avgResponseTime' })
     },
     *'get/assets'({ }, { put, call, select }) {
-      let dept = yield select(state => state.user.info.orgId)
-      let { data } = yield call(API.getAssets, dept)
+      let { data } = yield call(API.getAssets)
       yield put({ type: 'set/assets', payload: data })
     },
     *'get/assetsInMaintain'({ }, { put, call, select }) {
