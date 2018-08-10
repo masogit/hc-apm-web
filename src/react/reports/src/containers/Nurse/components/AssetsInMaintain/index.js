@@ -4,6 +4,8 @@ import { flow } from 'noru-utils/lib'
 import { translate } from 'react-i18next'
 import { connect } from 'dva'
 import moment from 'moment'
+import { strLocaleComparator, numComparator } from '#/utils'
+import { getComparator } from '../AssetOverview'
 import './index.scss'
 
 class MalfunctionTable extends React.Component {
@@ -14,27 +16,27 @@ class MalfunctionTable extends React.Component {
       {
         title: t`设备名称`,
         dataIndex: 'assetName',
-        sorter: true,
+        sorter: getComparator('assetName', strLocaleComparator),
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
-        sorter: true,
+        sorter: getComparator('financingNum', strLocaleComparator),
       },
       {
         title: t`报修日期`,
         render: record => moment(record.reportDate).format('YYYY-MM-DD HH:mm'),
-        sorter: true,
+        sorter: getComparator('reportDate', (a, b) => moment(a).unix() - moment(b).unix()),
       },
       {
         title: t`报修人`,
         dataIndex: 'reporter',
-        sorter: true,
+        sorter: getComparator('reporter', strLocaleComparator),
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDept',
-        sorter: true,
+        sorter: getComparator('clinicalDept', strLocaleComparator),
       },
     ]
   }

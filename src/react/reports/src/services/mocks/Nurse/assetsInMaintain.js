@@ -8,7 +8,17 @@ export const assetsInMaintain = [
     "reporter": "Trump",
     "assetName": "asset name",
     "clinicalDept": "Dept",
-  }
+  },
+  {
+    "assetInfoId": 0,
+    "assetInfoUID": "string",
+    "financingNum": "string",
+    "reportDate": "2017-08-09T04:41:04.872Z",
+    "stepName": "string",
+    "reporter": "Trump",
+    "assetName": "asset name",
+    "clinicalDept": "Dept",
+  },
 ]
 
 export const avgResponseTime = [
