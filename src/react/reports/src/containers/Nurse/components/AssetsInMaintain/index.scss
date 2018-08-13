@@ -18,8 +18,11 @@
     .asset-table {
       padding: 0 16px;
       flex: 1;
-      overflow: auto;
-      overflow-x: hidden;
+      overflow: hidden;
+
+      table {
+        margin-bottom: 0;
+      }
 
       tr th {
         padding-top: 8px;

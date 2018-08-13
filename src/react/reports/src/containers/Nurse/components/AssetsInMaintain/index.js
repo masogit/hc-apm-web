@@ -10,6 +10,10 @@ import './index.scss'
 
 class MalfunctionTable extends React.Component {
 
+  state = {
+    tableScrollY: 0,
+  }
+
   getCols = () => {
     let { t, assets } = this.props
     return [
@@ -38,13 +42,30 @@ class MalfunctionTable extends React.Component {
         dataIndex: 'clinicalDept',
         sorter: getComparator('clinicalDept', strLocaleComparator),
       },
+      {
+        title: t`状态`,
+        dataIndex: 'stepName',
+        sorter: getComparator('stepName', strLocaleComparator),
+      },
     ]
+  }
+
+  componentDidMount() {
+    let [ table ] = document.getElementsByClassName('asset-in-maintain-table')
+    this.setState({ tableScrollY: table.offsetHeight - 20 })
   }
 
   render() {
     let { t, data } = this.props
+    let { tableScrollY } = this.state
     return (
-      <Table dataSource={data} columns={this.getCols(t)} className="asset-table" pagination={false} />
+      <Table
+        dataSource={data}
+        columns={this.getCols(t)}
+        className="asset-table asset-in-maintain-table"
+        pagination={false}
+        scroll={{ y: tableScrollY }}
+      />
     )
   }
 }

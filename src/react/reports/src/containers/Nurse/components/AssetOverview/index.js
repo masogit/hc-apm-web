@@ -41,6 +41,9 @@ const Count = ({ all, type, t }) => (
 
 class AssetTable extends React.Component {
 
+  state = {
+    tableScrollY: 0,
+  }
   getCols = (data) => {
     let { t } = this.props
     return [
@@ -71,10 +74,21 @@ class AssetTable extends React.Component {
     ]
   }
 
+  componentDidMount() {
+    let [ table ] = document.getElementsByClassName('asset-overview-table')
+    this.setState({ tableScrollY: table.offsetHeight - 20 })
+  }
   render() {
     let { t, data } = this.props
+    let { tableScrollY } = this.state
     return (
-      <Table dataSource={data} columns={this.getCols(data)} className="asset-table" pagination={false} />
+      <Table
+        dataSource={data}
+        columns={this.getCols(data)}
+        className="asset-table asset-overview-table"
+        pagination={false}
+        scroll={{ y: tableScrollY }}
+      />
     )
   }
 }

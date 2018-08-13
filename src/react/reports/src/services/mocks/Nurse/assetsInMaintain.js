@@ -19,6 +19,7 @@ export const assetsInMaintain = [
     "assetName": "asset name",
     "clinicalDept": "Dept",
   },
+
 ]
 
 export const avgResponseTime = [
