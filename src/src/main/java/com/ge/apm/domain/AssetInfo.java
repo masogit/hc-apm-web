@@ -163,6 +163,12 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
     private String assetDeptUID;
+    
+    @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
+    private String assetType;
+    
+    @Column(name = "asset_CDFA_type") // CDFA设备类型
+    private String assetCDFAType;
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -1520,6 +1526,22 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setManufactureId(String manufactureId) {
         this.manufactureId = manufactureId;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetCDFAType() {
+        return assetCDFAType;
+    }
+
+    public void setAssetCDFAType(String assetCDFAType) {
+        this.assetCDFAType = assetCDFAType;
     }
     
     @Override

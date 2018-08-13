@@ -44,6 +44,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
             exportFields.put("院区", "siteUID");
             exportFields.put("使用科室", "clinicalDeptName");
+            exportFields.put("所属科室", "assetDeptName");
             exportFields.put("使用责任人", "clinicalOwnerName");
             exportFields.put(WebUtil.getMessage("clinicalOwnerTel"), "clinicalOwnerTel");
             exportFields.put("制造商", "manufacture");
@@ -116,6 +117,7 @@ public class CustomConfigConstant {
             allFields.put("assetOwnerTel3", WebUtil.getMessage("assetOwnerTel3"));
             allFields.put("siteUID", WebUtil.getMessage("hospitalId"));
             allFields.put("clinicalDeptName", WebUtil.getMessage("clinicalDeptName"));
+            allFields.put("assetDeptName", WebUtil.getMessage("assetDeptName"));
             allFields.put("clinicalOwnerName", WebUtil.getMessage("clinicalOwnerName"));
             allFields.put("clinicalOwnerTel", WebUtil.getMessage("clinicalOwnerTel"));
             allFields.put("manufacture", WebUtil.getMessage("manufacture"));
@@ -179,7 +181,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
-                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "siteUID",
+                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "siteUID","assetDeptName",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor",
                 "maitanance", "maitananceTel", "nationalStandardCode");
     }
