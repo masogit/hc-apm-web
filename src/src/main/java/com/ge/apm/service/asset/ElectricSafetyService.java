@@ -381,7 +381,7 @@ public class ElectricSafetyService {
 			}
 //			1——》1组应用
 			else if(StringUtils.equals(key, "1")){
-				data.setGroupApp(strValue.replaceAll("\\+", "").trim());
+				data.setOneGroupApp(strValue.replaceAll("\\+", "").trim());
 			}
 //			7，——》保护接地阻抗（单位：Ω）
 			else if(StringUtils.equals(key, "7")){
@@ -390,10 +390,6 @@ public class ElectricSafetyService {
 //			8，——》保护接地阻抗参考值（<0.2Ω）
 			else if(StringUtils.equals(key, "8")){
 				data.setProtectGroundImpedanceRefVal(strValue.replaceAll("\\+", "").trim());
-			}
-//			21，——》等效设备漏电流（单位：μA）
-			else if(StringUtils.equals(key, "21")){
-				data.setEquipmentElectricLeakage(strValue.replaceAll("\\+", "").trim());
 			}
 //			21，——》等效设备漏电流（单位：μA）
 			else if(StringUtils.equals(key, "21")){
