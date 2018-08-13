@@ -4,7 +4,7 @@ export const assetsInMaintain = [
     "assetInfoUID": "string",
     "financingNum": "string",
     "reportDate": "2018-08-09T04:41:04.872Z",
-    "stepName": "string",
+    "status": "string",
     "reporter": "Trump",
     "assetName": "asset name",
     "clinicalDept": "Dept",
@@ -14,7 +14,7 @@ export const assetsInMaintain = [
     "assetInfoUID": "string",
     "financingNum": "string",
     "reportDate": "2017-08-09T04:41:04.872Z",
-    "stepName": "string",
+    "status": "string",
     "reporter": "Trump",
     "assetName": "asset name",
     "clinicalDept": "Dept",
@@ -33,29 +33,29 @@ export const avgResponseTime = [
     "assetGroupName": "string1",
     "avgResponseTime": 97
   },
-  {
-    "assetGroup": 0,
-    "assetGroupName": "string",
-    "avgResponseTime": 100
-  },
-  {
-    "assetGroup": 0,
-    "assetGroupName": "string1",
-    "avgResponseTime": 97
-  },
-  {
-    "assetGroup": 0,
-    "assetGroupName": "string",
-    "avgResponseTime": 100
-  },
-  {
-    "assetGroup": 0,
-    "assetGroupName": "string1",
-    "avgResponseTime": 97
-  },
-  {
-    "assetGroup": 0,
-    "assetGroupName": "string",
-    "avgResponseTime": 100
-  },
+  // {
+  //   "assetGroup": 0,
+  //   "assetGroupName": "string",
+  //   "avgResponseTime": 100
+  // },
+  // {
+  //   "assetGroup": 0,
+  //   "assetGroupName": "string1",
+  //   "avgResponseTime": 97
+  // },
+  // {
+  //   "assetGroup": 0,
+  //   "assetGroupName": "string",
+  //   "avgResponseTime": 100
+  // },
+  // {
+  //   "assetGroup": 0,
+  //   "assetGroupName": "string1",
+  //   "avgResponseTime": 97
+  // },
+  // {
+  //   "assetGroup": 0,
+  //   "assetGroupName": "string",
+  //   "avgResponseTime": 100
+  // },
 ]
