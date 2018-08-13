@@ -466,9 +466,7 @@ public class NurseSiteMaintainService {
 		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setModifyDate(currentDate);
 		tempNurseSiteMaintain.setScheduleDate(date);
-		if (sequence != null) {
-			tempNurseSiteMaintain.setSequence(sequence);
-		}
+		tempNurseSiteMaintain.setSequence(sequence);
 		tempNurseSiteMaintain.setStatus(0);
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
 		tempNurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
@@ -484,9 +482,7 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
 			tempItem.setConfigId(nurseSiteMaintainConfig.getId());
-			if (sequence != null) {
-				tempItem.setSequence(sequence);
-			}
+			tempItem.setSequence(sequence);
 			tempItem.setName(nurseSiteMaintainConfig.getName());
 			tempItem.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
 			tempItem.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
@@ -704,8 +700,7 @@ public class NurseSiteMaintainService {
 		endDate = ca.getTime();
 		Boolean result = null;
 		if (tempMaintain.getSequence() != null) {
-			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), startDate, endDate, tempMaintain.getConfigId(),
-					tempMaintain.getSequence());
+			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), startDate, endDate, tempMaintain.getConfigId(),tempMaintain.getSequence());
 		} else {
 			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), startDate, endDate, tempMaintain.getConfigId());
 		}
@@ -855,7 +850,7 @@ public class NurseSiteMaintainService {
 								// tempItem.getSequenceName(), doc,
 								// secondHeaderColumnIndex,2,true);
 								String keyName = "";
-								if (tempItem.getSequence() == null) {
+								if (tempItem.getSequence() == null|| tempItem.getSequence()<0) {
 									keyName = tempData.getCheckItem();
 									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, 1, false);
 									doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
