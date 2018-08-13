@@ -8,6 +8,7 @@ import com.ge.apm.domain.PmOrderReportTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
@@ -17,8 +18,11 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -27,6 +31,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 @ManagedBean
 @ViewScoped
@@ -39,6 +44,7 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
     private PmOrderReportTemplateRepository dao = null;
 
     private BlobFileService blobFileService;
+    private UserCommonService userCommonService;
 
     private OrgInfoRepository orgInfoRepository;
     private TenantInfoRepository tenantInfoRepository;
@@ -46,6 +52,7 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
     private UserAccount user;
     private Boolean isInsulate;
     private OrgInfo selectedUserOrg;
+    private Integer loginUserOrgType;
 
     private UploadedFile file;
     private V2_BlobObject uploadedFileObject;
@@ -53,12 +60,14 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
     protected void init() {
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         blobFileService = WebUtil.getBean(BlobFileService.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
 
         dao = WebUtil.getBean(PmOrderReportTemplateRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 
         user = UserContextService.getCurrentUserAccount();
+        loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
     }
@@ -94,6 +103,12 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
         uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
         uploadedFileObject.setBoUuid(selected.getId());
         blobFileService.saveBlobObject(uploadedFileObject);
+    }
+
+    protected Page<PmOrderReportTemplate> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate, loginUserOrgType);
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     /**
@@ -165,7 +180,7 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
         } catch (IOException e) {
-            WebUtil.addErrorMessage("Fail to download template");
+            WebUtil.addErrorMessage("下载模版失败!");
             logger.warn("fail to get active template.", e);
         }
         return null;
@@ -193,7 +208,7 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
         }
         if (file == null || uploadedFileObject == null) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("File has not been uploaded");
+            WebUtil.addErrorMessage("文件上传失败!");
             return;
         }
         super.save();
