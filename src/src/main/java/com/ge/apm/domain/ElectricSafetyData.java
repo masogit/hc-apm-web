@@ -94,59 +94,67 @@ public class ElectricSafetyData implements Serializable {
 	@Column(name = "last_modified_date")
 	private Date lastModifiedDate;
 	
+//	1——》1组应用
+	@Column(name="one_group_app")
+	private String oneGroupApp;
+	
 //	7，——》保护接地阻抗（单位：Ω）
 	@Column(name = "protect_ground_impedance")
 	private String protectGroundImpedance;
 //	8，——》保护接地阻抗参考值（<0.2Ω）
-//	@Column(name = "protect_ground_impedance_ref_val")
-//	private String protectGroundImpedanceRefVal;
+	@Column(name = "protect_ground_impedance_ref_val")
+	private String protectGroundImpedanceRefVal;
 	
 //	21，——》等效设备漏电流（单位：μA）
 	@Column(name="equipment_electric_leakage")
 	private String equipmentElectricLeakage;
 	
+//	22，——》等效设备漏电流参考值（<1.0mA）
+	@Column(name="equipment_electric_leakage_ref_val")
+	private String equipmentElectricLeakageRefVal;
+	
 //	23，——》患者漏电流（应用部分加电）（单位：μA）
 	@Column(name = "patient_electric_leakage_app")
 	private String patientElectricLeakage_app;
 //	24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
-//	@Column(name = "patient_electric_leakage_ref_val_app")
-//	private String patientElectricLeakageRefVal_app;
+	@Column(name = "patient_electric_leakage_ref_val_app")
+	private String patientElectricLeakageRefVal_app;
 //	25，——》对地漏电流（正常状态）（单位：mA）
 	@Column(name = "ground_electric_leakage_normal")
 	private String groundElectricLeakage_normal;
 //	26，——》对地漏电流（正常状态）参考值（<0.5mA）
-//	@Column(name = "ground_electric_leakage_ref_val_normal")
-//	private String groundElectricLeakageRefVal_normal;
+	@Column(name = "ground_electric_leakage_ref_val_normal")
+	private String groundElectricLeakageRefVal_normal;
 //	27，——》对地漏电流（单一故障状态）（单位：mA）
-//	@Column(name = "ground_electric_leakage_single_error")
-//	private String groundElectricLeakage_singleError;
+	@Column(name = "ground_electric_leakage_single_error")
+	private String groundElectricLeakage_singleError;
 //	28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
-//	@Column(name = "ground_electric_leakage_ref_val_single_error")
-//	private String groundElectricLeakageRefVal_singleError;
+	@Column(name = "ground_electric_leakage_ref_val_single_error")
+	private String groundElectricLeakageRefVal_singleError;
 //	29，——》外壳漏电流（正常状态）（单位：μA）
 	@Column(name = "shell_electric_leakage_normal")
 	private String shellElectricLeakage_normal;
 //	30，——》外壳漏电流（正常状态）参考值（<100μA）
-//	@Column(name = "shell_electric_leakage_ref_val_normal")
-//	private String shellElectricLeakageRefVal_normal;
+	@Column(name = "shell_electric_leakage_ref_val_normal")
+	private String shellElectricLeakageRefVal_normal;
 //	31，——》外壳漏电流（单一故障状态）（单位：μA）
-//	@Column(name = "shell_electric_leakage_single_error")
-//	private String shellElectricLeakage_singleError;
+	@Column(name = "shell_electric_leakage_single_error")
+	private String shellElectricLeakage_singleError;
 //	32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
-//	@Column(name = "shell_electric_leakage_ref_val_single_error")
-//	private String shellElectricLeakageRefVal_singleError;
+	@Column(name = "shell_electric_leakage_ref_val_single_error")
+	private String shellElectricLeakageRefVal_singleError;
 //	33，——》患者漏电流AC（正常状态）（单位：μA）
-//	@Column(name = "patient_electric_leakage_ac_normal")
-//	private String patientElectricLeakageAC_normal;
+	@Column(name = "patient_electric_leakage_ac_normal")
+	private String patientElectricLeakageAC_normal;
 //	34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
-//	@Column(name = "patient_electric_leakage_ref_val_ac_normal")
-//	private String patientElectricLeakageRefValAC_normal;
+	@Column(name = "patient_electric_leakage_ref_val_ac_normal")
+	private String patientElectricLeakageRefValAC_normal;
 //	35，——》患者漏电流AC（单一故障状态）（单位：μA）
-//	@Column(name = "shell_electric_leakage_ac_single_error")
-//	private String shellElectricLeakageAC_singleError;
+	@Column(name = "shell_electric_leakage_ac_single_error")
+	private String shellElectricLeakageAC_singleError;
 //	36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
-//	@Column(name = "shell_electric_leakage_ref_val_ac_single_error")
-//	private String shellElectricLeakageRefValAC_singleError;
+	@Column(name = "shell_electric_leakage_ref_val_ac_single_error")
+	private String shellElectricLeakageRefValAC_singleError;
 //	37，——》患者漏电流DC（正常状态）（单位：μA）
 //	@Column(name = "patient_electric_leakage_dc_normal")
 //	private String patientElectricLeakageDC_normal;
@@ -160,17 +168,17 @@ public class ElectricSafetyData implements Serializable {
 //	@Column(name = "shell_electric_leakage_ref_val_dc_single_error")
 //	private String shellElectricLeakageRefValDC_singleError;
 //	41，——》患者辅助电流AC（正常状态）（单位：μA）
-//	@Column(name = "patient_assis_electric_ac_normal")
-//	private String patientAssisElectricAC_normal;
+	@Column(name = "patient_assis_electric_ac_normal")
+	private String patientAssisElectricAC_normal;
 //	42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
-//	@Column(name = "patient_assis_electric_ref_val_ac_normal")
-//	private String patientAssisElectricRefValAC_normal;
+	@Column(name = "patient_assis_electric_ref_val_ac_normal")
+	private String patientAssisElectricRefValAC_normal;
 //	43，——》患者辅助电流AC（单一故障状态）（单位：μA）
-//	@Column(name = "patient_assis_electric_ac_single_error")
-//	private String patientAssisElectricAC_singleError;
+	@Column(name = "patient_assis_electric_ac_single_error")
+	private String patientAssisElectricAC_singleError;
 //	44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
-//	@Column(name = "patient_assis_electric_ref_val_ac_single_error")
-//	private String patientAssisElectricRefValAC_singleError;
+	@Column(name = "patient_assis_electric_ref_val_ac_single_error")
+	private String patientAssisElectricRefValAC_singleError;
 //	45，——》患者辅助电流DC（正常状态）（单位：μA）
 //	@Column(name = "patient_assis_electric_dc_normal")
 //	private String patientAssisElectricDC_normal;
@@ -281,9 +289,6 @@ public class ElectricSafetyData implements Serializable {
 			this.warnMessage = "duplicate check Type:" + this.checkType + " AND " + checkType;
 		}
 	}
-
-	
-
 	
 	public Integer getCreatedBy() {
 		return createdBy;
@@ -391,221 +396,6 @@ public class ElectricSafetyData implements Serializable {
 	public void setAssetId(Integer assetId) {
 		this.assetId = assetId;
 	}
-//	public String getGroupType() {
-//		return groupType;
-//	}
-//
-//	public void setGroupType(String groupType) {
-//		this.groupType = groupType;
-//	}
-//
-//	public String getProtectGroundImpedanceRefVal() {
-//		return protectGroundImpedanceRefVal;
-//	}
-//
-//	public void setProtectGroundImpedanceRefVal(String protectGroundImpedanceRefVal) {
-//		this.protectGroundImpedanceRefVal = protectGroundImpedanceRefVal;
-//	}
-//
-//	public String getPatientElectricLeakageRefVal_app() {
-//		return patientElectricLeakageRefVal_app;
-//	}
-//
-//	public void setPatientElectricLeakageRefVal_app(String patientElectricLeakageRefVal_app) {
-//		this.patientElectricLeakageRefVal_app = patientElectricLeakageRefVal_app;
-//	}
-//
-//	public String getGroundElectricLeakageRefVal_normal() {
-//		return groundElectricLeakageRefVal_normal;
-//	}
-//
-//	public void setGroundElectricLeakageRefVal_normal(String groundElectricLeakageRefVal_normal) {
-//		this.groundElectricLeakageRefVal_normal = groundElectricLeakageRefVal_normal;
-//	}
-//
-//	public String getGroundElectricLeakage_singleError() {
-//		return groundElectricLeakage_singleError;
-//	}
-//
-//	public void setGroundElectricLeakage_singleError(String groundElectricLeakage_singleError) {
-//		this.groundElectricLeakage_singleError = groundElectricLeakage_singleError;
-//	}
-//
-//	public String getGroundElectricLeakageRefVal_singleError() {
-//		return groundElectricLeakageRefVal_singleError;
-//	}
-//
-//	public void setGroundElectricLeakageRefVal_singleError(String groundElectricLeakageRefVal_singleError) {
-//		this.groundElectricLeakageRefVal_singleError = groundElectricLeakageRefVal_singleError;
-//	}
-//
-//	public String getShellElectricLeakageRefVal_normal() {
-//		return shellElectricLeakageRefVal_normal;
-//	}
-//
-//	public void setShellElectricLeakageRefVal_normal(String shellElectricLeakageRefVal_normal) {
-//		this.shellElectricLeakageRefVal_normal = shellElectricLeakageRefVal_normal;
-//	}
-//
-//	public String getShellElectricLeakage_singleError() {
-//		return shellElectricLeakage_singleError;
-//	}
-//
-//	public void setShellElectricLeakage_singleError(String shellElectricLeakage_singleError) {
-//		this.shellElectricLeakage_singleError = shellElectricLeakage_singleError;
-//	}
-//
-//	public String getShellElectricLeakageRefVal_singleError() {
-//		return shellElectricLeakageRefVal_singleError;
-//	}
-//
-//	public void setShellElectricLeakageRefVal_singleError(String shellElectricLeakageRefVal_singleError) {
-//		this.shellElectricLeakageRefVal_singleError = shellElectricLeakageRefVal_singleError;
-//	}
-//
-//	public String getPatientElectricLeakageAC_normal() {
-//		return patientElectricLeakageAC_normal;
-//	}
-//
-//	public void setPatientElectricLeakageAC_normal(String patientElectricLeakageAC_normal) {
-//		this.patientElectricLeakageAC_normal = patientElectricLeakageAC_normal;
-//	}
-//
-//	public String getPatientElectricLeakageRefValAC_normal() {
-//		return patientElectricLeakageRefValAC_normal;
-//	}
-//
-//	public void setPatientElectricLeakageRefValAC_normal(String patientElectricLeakageRefValAC_normal) {
-//		this.patientElectricLeakageRefValAC_normal = patientElectricLeakageRefValAC_normal;
-//	}
-//
-//	public String getShellElectricLeakageAC_singleError() {
-//		return shellElectricLeakageAC_singleError;
-//	}
-//
-//	public void setShellElectricLeakageAC_singleError(String shellElectricLeakageAC_singleError) {
-//		this.shellElectricLeakageAC_singleError = shellElectricLeakageAC_singleError;
-//	}
-//
-//	public String getShellElectricLeakageRefValAC_singleError() {
-//		return shellElectricLeakageRefValAC_singleError;
-//	}
-//
-//	public void setShellElectricLeakageRefValAC_singleError(String shellElectricLeakageRefValAC_singleError) {
-//		this.shellElectricLeakageRefValAC_singleError = shellElectricLeakageRefValAC_singleError;
-//	}
-//
-//	public String getPatientElectricLeakageDC_normal() {
-//		return patientElectricLeakageDC_normal;
-//	}
-//
-//	public void setPatientElectricLeakageDC_normal(String patientElectricLeakageDC_normal) {
-//		this.patientElectricLeakageDC_normal = patientElectricLeakageDC_normal;
-//	}
-//
-//	public String getPatientElectricLeakageRefValDC_normal() {
-//		return patientElectricLeakageRefValDC_normal;
-//	}
-//
-//	public void setPatientElectricLeakageRefValDC_normal(String patientElectricLeakageRefValDC_normal) {
-//		this.patientElectricLeakageRefValDC_normal = patientElectricLeakageRefValDC_normal;
-//	}
-//
-//	public String getShellElectricLeakageDC_singleError() {
-//		return shellElectricLeakageDC_singleError;
-//	}
-//
-//	public void setShellElectricLeakageDC_singleError(String shellElectricLeakageDC_singleError) {
-//		this.shellElectricLeakageDC_singleError = shellElectricLeakageDC_singleError;
-//	}
-//
-//	public String getShellElectricLeakageRefValDC_singleError() {
-//		return shellElectricLeakageRefValDC_singleError;
-//	}
-//
-//	public void setShellElectricLeakageRefValDC_singleError(String shellElectricLeakageRefValDC_singleError) {
-//		this.shellElectricLeakageRefValDC_singleError = shellElectricLeakageRefValDC_singleError;
-//	}
-//
-//	public String getPatientAssisElectricAC_normal() {
-//		return patientAssisElectricAC_normal;
-//	}
-//
-//	public void setPatientAssisElectricAC_normal(String patientAssisElectricAC_normal) {
-//		this.patientAssisElectricAC_normal = patientAssisElectricAC_normal;
-//	}
-//
-//	public String getPatientAssisElectricRefValAC_normal() {
-//		return patientAssisElectricRefValAC_normal;
-//	}
-//
-//	public void setPatientAssisElectricRefValAC_normal(String patientAssisElectricRefValAC_normal) {
-//		this.patientAssisElectricRefValAC_normal = patientAssisElectricRefValAC_normal;
-//	}
-//
-//	public String getPatientAssisElectricAC_singleError() {
-//		return patientAssisElectricAC_singleError;
-//	}
-//
-//	public void setPatientAssisElectricAC_singleError(String patientAssisElectricAC_singleError) {
-//		this.patientAssisElectricAC_singleError = patientAssisElectricAC_singleError;
-//	}
-//
-//	public String getPatientAssisElectricRefValAC_singleError() {
-//		return patientAssisElectricRefValAC_singleError;
-//	}
-//
-//	public void setPatientAssisElectricRefValAC_singleError(String patientAssisElectricRefValAC_singleError) {
-//		this.patientAssisElectricRefValAC_singleError = patientAssisElectricRefValAC_singleError;
-//	}
-//
-//	public String getPatientAssisElectricDC_normal() {
-//		return patientAssisElectricDC_normal;
-//	}
-//
-//	public void setPatientAssisElectricDC_normal(String patientAssisElectricDC_normal) {
-//		this.patientAssisElectricDC_normal = patientAssisElectricDC_normal;
-//	}
-//
-//	public String getPatientAssisElectricRefValDC_normal() {
-//		return patientAssisElectricRefValDC_normal;
-//	}
-//
-//	public void setPatientAssisElectricRefValDC_normal(String patientAssisElectricRefValDC_normal) {
-//		this.patientAssisElectricRefValDC_normal = patientAssisElectricRefValDC_normal;
-//	}
-//
-//	public String getPatientAssisElectricDC_singleError() {
-//		return patientAssisElectricDC_singleError;
-//	}
-//
-//	public void setPatientAssisElectricDC_singleError(String patientAssisElectricDC_singleError) {
-//		this.patientAssisElectricDC_singleError = patientAssisElectricDC_singleError;
-//	}
-//
-//	public String getPatientAssisElectricRefValDC_singleError() {
-//		return patientAssisElectricRefValDC_singleError;
-//	}
-//
-//	public void setPatientAssisElectricRefValDC_singleError(String patientAssisElectricRefValDC_singleError) {
-//		this.patientAssisElectricRefValDC_singleError = patientAssisElectricRefValDC_singleError;
-//	}
-//
-//	public String getCityVoltage() {
-//		return cityVoltage;
-//	}
-//
-//	public void setCityVoltage(String cityVoltage) {
-//		this.cityVoltage = cityVoltage;
-//	}
-//
-//	public String getCityVoltageRefVal() {
-//		return cityVoltageRefVal;
-//	}
-//
-//	public void setCityVoltageRefVal(String cityVoltageRefVal) {
-//		this.cityVoltageRefVal = cityVoltageRefVal;
-//	}
 	
 	
 	public AssetInfo getAssetInfo() {
@@ -654,6 +444,150 @@ public class ElectricSafetyData implements Serializable {
 
 	public void setEquipmentElectricLeakage(String equipmentElectricLeakage) {
 		this.equipmentElectricLeakage = equipmentElectricLeakage;
+	}
+
+	public String getOneGroupApp() {
+		return oneGroupApp;
+	}
+
+	public void setOneGroupApp(String oneGroupApp) {
+		this.oneGroupApp = oneGroupApp;
+	}
+
+	public String getProtectGroundImpedanceRefVal() {
+		return protectGroundImpedanceRefVal;
+	}
+
+	public void setProtectGroundImpedanceRefVal(String protectGroundImpedanceRefVal) {
+		this.protectGroundImpedanceRefVal = protectGroundImpedanceRefVal;
+	}
+
+	public String getPatientElectricLeakageRefVal_app() {
+		return patientElectricLeakageRefVal_app;
+	}
+
+	public void setPatientElectricLeakageRefVal_app(String patientElectricLeakageRefVal_app) {
+		this.patientElectricLeakageRefVal_app = patientElectricLeakageRefVal_app;
+	}
+
+	public String getGroundElectricLeakageRefVal_normal() {
+		return groundElectricLeakageRefVal_normal;
+	}
+
+	public void setGroundElectricLeakageRefVal_normal(String groundElectricLeakageRefVal_normal) {
+		this.groundElectricLeakageRefVal_normal = groundElectricLeakageRefVal_normal;
+	}
+
+	public String getGroundElectricLeakage_singleError() {
+		return groundElectricLeakage_singleError;
+	}
+
+	public void setGroundElectricLeakage_singleError(String groundElectricLeakage_singleError) {
+		this.groundElectricLeakage_singleError = groundElectricLeakage_singleError;
+	}
+
+	public String getGroundElectricLeakageRefVal_singleError() {
+		return groundElectricLeakageRefVal_singleError;
+	}
+
+	public void setGroundElectricLeakageRefVal_singleError(String groundElectricLeakageRefVal_singleError) {
+		this.groundElectricLeakageRefVal_singleError = groundElectricLeakageRefVal_singleError;
+	}
+
+	public String getShellElectricLeakageRefVal_normal() {
+		return shellElectricLeakageRefVal_normal;
+	}
+
+	public void setShellElectricLeakageRefVal_normal(String shellElectricLeakageRefVal_normal) {
+		this.shellElectricLeakageRefVal_normal = shellElectricLeakageRefVal_normal;
+	}
+
+	public String getShellElectricLeakage_singleError() {
+		return shellElectricLeakage_singleError;
+	}
+
+	public void setShellElectricLeakage_singleError(String shellElectricLeakage_singleError) {
+		this.shellElectricLeakage_singleError = shellElectricLeakage_singleError;
+	}
+
+	public String getShellElectricLeakageRefVal_singleError() {
+		return shellElectricLeakageRefVal_singleError;
+	}
+
+	public void setShellElectricLeakageRefVal_singleError(String shellElectricLeakageRefVal_singleError) {
+		this.shellElectricLeakageRefVal_singleError = shellElectricLeakageRefVal_singleError;
+	}
+
+	public String getPatientElectricLeakageAC_normal() {
+		return patientElectricLeakageAC_normal;
+	}
+
+	public void setPatientElectricLeakageAC_normal(String patientElectricLeakageAC_normal) {
+		this.patientElectricLeakageAC_normal = patientElectricLeakageAC_normal;
+	}
+
+	public String getPatientElectricLeakageRefValAC_normal() {
+		return patientElectricLeakageRefValAC_normal;
+	}
+
+	public void setPatientElectricLeakageRefValAC_normal(String patientElectricLeakageRefValAC_normal) {
+		this.patientElectricLeakageRefValAC_normal = patientElectricLeakageRefValAC_normal;
+	}
+
+	public String getShellElectricLeakageAC_singleError() {
+		return shellElectricLeakageAC_singleError;
+	}
+
+	public void setShellElectricLeakageAC_singleError(String shellElectricLeakageAC_singleError) {
+		this.shellElectricLeakageAC_singleError = shellElectricLeakageAC_singleError;
+	}
+
+	public String getShellElectricLeakageRefValAC_singleError() {
+		return shellElectricLeakageRefValAC_singleError;
+	}
+
+	public void setShellElectricLeakageRefValAC_singleError(String shellElectricLeakageRefValAC_singleError) {
+		this.shellElectricLeakageRefValAC_singleError = shellElectricLeakageRefValAC_singleError;
+	}
+
+	public String getPatientAssisElectricAC_normal() {
+		return patientAssisElectricAC_normal;
+	}
+
+	public void setPatientAssisElectricAC_normal(String patientAssisElectricAC_normal) {
+		this.patientAssisElectricAC_normal = patientAssisElectricAC_normal;
+	}
+
+	public String getPatientAssisElectricRefValAC_normal() {
+		return patientAssisElectricRefValAC_normal;
+	}
+
+	public void setPatientAssisElectricRefValAC_normal(String patientAssisElectricRefValAC_normal) {
+		this.patientAssisElectricRefValAC_normal = patientAssisElectricRefValAC_normal;
+	}
+
+	public String getPatientAssisElectricAC_singleError() {
+		return patientAssisElectricAC_singleError;
+	}
+
+	public void setPatientAssisElectricAC_singleError(String patientAssisElectricAC_singleError) {
+		this.patientAssisElectricAC_singleError = patientAssisElectricAC_singleError;
+	}
+
+	public String getPatientAssisElectricRefValAC_singleError() {
+		return patientAssisElectricRefValAC_singleError;
+	}
+
+	public void setPatientAssisElectricRefValAC_singleError(String patientAssisElectricRefValAC_singleError) {
+		this.patientAssisElectricRefValAC_singleError = patientAssisElectricRefValAC_singleError;
+	}
+
+	public String getEquipmentElectricLeakageRefVal() {
+		return equipmentElectricLeakageRefVal;
+	}
+
+	public void setEquipmentElectricLeakageRefVal(String equipmentElectricLeakageRefVal) {
+		this.equipmentElectricLeakageRefVal = equipmentElectricLeakageRefVal;
 	}
 
 	public static Map<String,String> getLabelAttributeMapping(){
