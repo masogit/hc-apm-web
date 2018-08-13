@@ -15,9 +15,12 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -25,8 +28,6 @@ import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetFileImportController {
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportController.class);
 
     private UploadedFile file;
 
@@ -80,11 +82,10 @@ public class AssetFileImportController {
             return;
         }
 
-        ExcelDocument doc = null;
+        this.file = event.getFile();
 
-        try {
-            this.file = event.getFile();
-            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+        try (ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+
             if(!aiService.checkDocVersion(doc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
                 return;
@@ -103,27 +104,30 @@ public class AssetFileImportController {
 
             filterErrorRecords();
 
-        } catch (IOException ex) {
-            WebUtil.addErrorMessage("File can not be read!");
-            Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("File can not be read!", null);
+            logger.error(e.getMessage(),e);
+
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
-            Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            if (doc != null) {
-                doc.release();
-            }
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage(), null);
+            logger.error(e.getMessage(),e);
         }
     }
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
-            isImported = true;
+            try {
+                aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+                isImported = true;
 
-            filterErrorRecords();
+                filterErrorRecords();
 
 //            downloadImportFailureData();
+            } catch (Exception e) {
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+
 
         }
     }
@@ -135,7 +139,7 @@ public class AssetFileImportController {
             hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
         } catch (IOException ex) {
-            Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 
