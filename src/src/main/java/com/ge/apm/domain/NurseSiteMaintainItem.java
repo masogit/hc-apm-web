@@ -321,7 +321,7 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setSequence(Integer sequence) {
 		if(sequence==null){
-			sequence=-1;
+			sequence=0;
 		}
 		this.sequence = sequence;
 	}
