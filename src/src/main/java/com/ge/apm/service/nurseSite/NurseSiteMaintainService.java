@@ -730,7 +730,12 @@ public class NurseSiteMaintainService {
 				tempMap.put("名称", tempMaintain.getShowTitle());
 				tempMap.put("负责人", tempMaintain.getModifyBy().getName());
 				tempMap.put("计划检查日期", sdf.format(tempMaintain.getScheduleDate()));
-				tempMap.put("实际检查日期", sdf2.format(tempMaintain.getCheckDate()));
+				if(tempMaintain.getCheckDate()!=null){
+					tempMap.put("实际检查日期", sdf2.format(tempMaintain.getCheckDate()));
+				}
+				else{
+					tempMap.put("实际检查日期", "");
+				}
 				tempMap.put("状态", statusStr);
 				tempMap.put("创建人", tempMaintain.getCreateBy().getName());
 				listMapResult.add(tempMap);
@@ -919,7 +924,7 @@ public class NurseSiteMaintainService {
 		int columnIndex = 1;
 		int rowIndex = 6;
 		int keyRow = 1;
-		int realKeyRow=2;
+		int checkNameRow=2;
 		int scheduleDateRow=3;
 		int checkDateRow=4;
 		int sequenceRow=5;
@@ -981,6 +986,7 @@ public class NurseSiteMaintainService {
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
 								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
 								doc.writeRowData(SHEET_Maintain,keyRow,modifyByRow,keyName,tempItem.getModifyBy().getName());
+								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName,tempData.getCheckItem());
 								// doc.writeCellData(SHEET_Maintain, rowIndex,
 								// columnIndex++, tempData.getStrValue());
 							}
@@ -988,7 +994,7 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
-			writeExcelSecondHeader(doc,keyRow,realKeyRow,dataColumnIndex,3,"检查项",null);
+//			writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
 			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
