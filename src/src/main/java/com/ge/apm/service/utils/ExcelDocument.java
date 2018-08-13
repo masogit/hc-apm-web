@@ -25,7 +25,19 @@ import java.util.*;
  *
  * @author 212579464
  */
-public class ExcelDocument {
+public class ExcelDocument implements AutoCloseable{
+
+    @Override
+    public void close() {
+        if (workBook != null) {
+            try {
+                workBook.close();
+            } catch (IOException e) {
+                //nothing
+            }
+            workBook = null;
+        }
+    }
 
     public static enum ExcelType {
         XLS, XLSX
@@ -68,7 +80,6 @@ public class ExcelDocument {
         DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
         DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
 
-        input.close();
     }
 
     public int getLastRowNum(String sheetName, int startRowNum) {
@@ -687,14 +698,7 @@ public class ExcelDocument {
     }
 
     public void release() {
-        if (workBook != null) {
-            try {
-                workBook.close();
-            } catch (IOException e) {
-                //nothing
-            }
-            workBook = null;
-        }
+        close();
     }
 
     public Workbook getWorkBook() {

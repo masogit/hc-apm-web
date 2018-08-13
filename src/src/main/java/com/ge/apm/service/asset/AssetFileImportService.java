@@ -295,14 +295,18 @@ public class AssetFileImportService {
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
         });
 
-        //release qrcode in use in order to exchange qrcode in two different asset
-//        supportingService.releaseOldQRCodeInUse(selectedOrgToImport, importAssetMap);
+        int row = 0;
+        try {
 
-        importAssetMap.forEach(item -> {
+            for (Map<String, Object> item: importAssetMap) {
+                ++row;
+                importOneAsset(item, autoGenerateQrcode);
+            }
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
 
-            importOneAsset(item, autoGenerateQrcode);
-
-        });
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
