@@ -21,31 +21,37 @@ class MalfunctionTable extends React.Component {
         title: t`设备名称`,
         dataIndex: 'assetName',
         sorter: getComparator('assetName', strLocaleComparator),
+        width: '25%',
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
         sorter: getComparator('financingNum', strLocaleComparator),
+        width: '20%',
       },
       {
         title: t`报修日期`,
         render: record => moment(record.reportDate).format('YYYY-MM-DD HH:mm'),
         sorter: getComparator('reportDate', (a, b) => moment(a).unix() - moment(b).unix()),
+        width: '20%',
       },
       {
         title: t`报修人`,
         dataIndex: 'reporter',
         sorter: getComparator('reporter', strLocaleComparator),
+        width: '10%',
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDept',
         sorter: getComparator('clinicalDept', strLocaleComparator),
+        width: '15%',
       },
       {
         title: t`状态`,
-        dataIndex: 'stepName',
-        sorter: getComparator('stepName', strLocaleComparator),
+        dataIndex: 'status',
+        sorter: getComparator('status', strLocaleComparator),
+        width: '10%',
       },
     ]
   }
