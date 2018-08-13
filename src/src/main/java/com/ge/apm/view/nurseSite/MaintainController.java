@@ -210,7 +210,7 @@ public class MaintainController {
 		}
 		
 		String str=tempNurseSiteMaintain.getName();
-		if(tempNurseSiteMaintain.getSequence()==null||tempNurseSiteMaintain.getSequence()<0){
+		if(tempNurseSiteMaintain.getSequence()==null||tempNurseSiteMaintain.getSequence()<=0){
 			str+="-"+strStatus;
 		}
 		else{

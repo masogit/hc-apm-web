@@ -336,7 +336,7 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setSequence(Integer sequence) {
 		if(sequence==null){
-			sequence=-1;
+			sequence=0;
 		}
 		this.sequence = sequence;
 	}
@@ -382,7 +382,7 @@ public class NurseSiteMaintain implements Serializable {
 		}
 		
 		String str=getName();
-		if(getSequence()==null||getSequence()<0){
+		if(getSequence()==null||getSequence()<=0){
 			str+="-"+strStatus;
 		}
 		else{

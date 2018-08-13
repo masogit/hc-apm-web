@@ -850,7 +850,7 @@ public class NurseSiteMaintainService {
 								// tempItem.getSequenceName(), doc,
 								// secondHeaderColumnIndex,2,true);
 								String keyName = "";
-								if (tempItem.getSequence() == null|| tempItem.getSequence()<0) {
+								if (tempItem.getSequence() == null|| tempItem.getSequence()<=0) {
 									keyName = tempData.getCheckItem();
 									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, 1, false);
 									doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
