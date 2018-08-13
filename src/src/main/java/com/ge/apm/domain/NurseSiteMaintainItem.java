@@ -320,11 +320,14 @@ public class NurseSiteMaintainItem implements Serializable {
 	}
 
 	public void setSequence(Integer sequence) {
+		if(sequence==null){
+			sequence=-1;
+		}
 		this.sequence = sequence;
 	}
 	
 	public String getSequenceName(){
-		if(sequence==null){
+		if(sequence==null||sequence<0){
 			return "";
 		}
 		else{
