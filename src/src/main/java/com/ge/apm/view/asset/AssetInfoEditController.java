@@ -154,8 +154,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("assetOwner2", selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2()));
         selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
-        selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID()== null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
-        selectedObjectMap.put("assetDept", selected.getAssetDeptUID()== null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
+        selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
+        selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
         selectedObjectMap.put("manufacture", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
@@ -677,11 +677,25 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 onOwnerChange("clinicalOwner");
                 parentAssetList = aimService.getParentsAssetsList(this.selected);
                 getClinicalOwnerList();
+                if (Strings.isNullOrEmpty(selected.getAssetDeptUID())) {
+                    selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                    selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                    selectedObjectMap.put("assetDept", clinicalDept);
+                }
                 break;
             case "assetDept":
                 clinicalDept = (OrgInfo) selectedObjectMap.get("assetDept");
                 selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
                 selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                if (Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
+                    selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                    selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
+                    selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                    selectedObjectMap.put("clinicalDept", clinicalDept);
+                    onOwnerChange("clinicalOwner");
+                    parentAssetList = aimService.getParentsAssetsList(this.selected);
+                    getClinicalOwnerList();
+                }
                 break;
         }
 
