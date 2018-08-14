@@ -36,12 +36,7 @@
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
-                            <h:panelGroup rendered="true">
-                                <label class = "label">验收是否需要签名?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ackNeedSign}">
-                                    <p:ajax process="@this" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup >
+
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -190,6 +185,12 @@
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class = "label">验收是否需要签名?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ackNeedSign}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
 
