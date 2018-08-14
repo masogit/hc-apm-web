@@ -108,6 +108,12 @@ public class V2_PmOrderService {
     @Autowired
     private ElectricSafetyDataRepository electricSafetyDataRepository;
 
+
+    public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
+        detailDao.save(workOrderDetail);
+    }
+
+
     public PmOrderRule acqPmOrderRule(V2_PmOrder v2PmOrder){
         PmOrderRule pmOrderRule=null;
         int level =  v2PmOrder.getRuleLevel();
