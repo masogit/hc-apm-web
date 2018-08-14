@@ -20,7 +20,6 @@
                             <f:selectItems value="#{tagSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup >
                         <label class="label">设备标签*</label>
                         <p:selectOneMenu id="assetTag" disabled="#{tagSubscriberController.getCRUDActionName().equals('修改')}" value="#{tagSubscriberController.selected.tagId}" required="true" requiredMessage="设备标签不能为空">
