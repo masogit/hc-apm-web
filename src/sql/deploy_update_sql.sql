@@ -233,3 +233,7 @@ ALTER TABLE public.nurse_site_maintain
 --v8.2
 ALTER TABLE public.v2_service_request ALTER COLUMN requestor_name TYPE varchar(32) USING requestor_name::varchar ;
 ALTER TABLE public.v2_work_order ALTER COLUMN current_person_name TYPE varchar(32) USING current_person_name::varchar ;
+
+update asset_info set asset_dept_id=clinical_dept_id , asset_dept_uid=clinical_dept_uid where asset_dept_id is null and asset_dept_uid is null and swap_type_state is null ;
+
+
