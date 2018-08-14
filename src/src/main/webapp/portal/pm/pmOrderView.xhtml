@@ -143,7 +143,9 @@
                             <p:column headerText="到货">
                                 <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
                             </p:column>
-
+                            <p:column headerText="操作">
+                            <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+                            </p:column>
                         </p:dataTable>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{v2PmOrderController.coWorkerList.size()>0}">
@@ -199,7 +201,6 @@
                             </c:forEach>
                         </p:fieldset>
                     </p:fieldset>
-
 
                     <h:panelGroup >
                         <label class="label">保养工单消息</label>
