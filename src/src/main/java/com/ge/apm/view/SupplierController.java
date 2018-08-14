@@ -37,7 +37,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
-        this.filterBySite = true;
+        this.filterBySite = false;
+
     }
 /*
     public void maintainerTSet(){maintainerT=!maintainerT;}
@@ -123,7 +124,9 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public String supplierType;
     @Override
     protected Page<Supplier> loadData(PageRequest pageRequest) {
-        this.setSiteFilter();
+        this.setSearchFilter();
+        searchFilters.add(new SearchFilter("tenantUID",
+                SearchFilter.Operator.EQ,UserContextService.getCurrentUserAccount().getTenantUID()));
      //   this.selected = null;
         boolean nameFilter=false;
         Object nameValue="";
@@ -140,7 +143,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         }
         if(this.hasFilterOnField("supplierType")){
             switch (supplierType){
-                case "1": searchFilters.add(new SearchFilter("supplierT",SearchFilter.Operator.EQ,true));break;
+                case "1": searchFilters.add(new SearchFilter("supplierT"
+                        ,SearchFilter.Operator.EQ,true));break;
                 case "2": searchFilters.add(new SearchFilter("maintainerT",SearchFilter.Operator.EQ,true));break;
                 case "3": searchFilters.add(new SearchFilter("manufacturerT",SearchFilter.Operator.EQ,true));break;
 
