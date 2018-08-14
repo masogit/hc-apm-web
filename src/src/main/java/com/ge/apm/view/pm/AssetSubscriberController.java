@@ -284,7 +284,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
-					WebUtil.addErrorMessage("务必选择紧急消息");
+					WebUtil.addErrorMessage("务必选择紧急程度");
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 					return;
 				}
@@ -304,6 +304,19 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			WebUtil.addSuccessMessage("成功创建设备消息订阅");
 			assetName=null;
 		}else{
+			if(selected.getIsReceiveTimeoutMsg()){
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
+					WebUtil.addErrorMessage("务必选择紧急消息");
+					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+					return;
+				}
+			}
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getQualityHit()==false){
+				WebUtil.addErrorMessage("消息设置不可为空");
+				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				return;
+			}
 			super.save();
 		}
 	}
