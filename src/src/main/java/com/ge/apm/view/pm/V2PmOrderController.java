@@ -24,6 +24,7 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -84,6 +85,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
     Boolean terminate;
+    private PmOrderReportTemplateService pmOrderReportTemplateService;
     private UaaService uaaService;
     private UserContextService userContextService;
     private BlobFileService blobService;
@@ -135,7 +137,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private TableDefinitionService tableService;
     // cache for maintenance report
     private StreamedContent maintenanceReport;
-
+    private UserAccount user;
+    private TenantInfoRepository tenantInfoRepository;
+    Boolean isInsulate;
     private String reportUid; //selected table base uid
 
     public String getHead() {
@@ -220,38 +224,56 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      * Generate maintenance report.
      */
     public void doExportMaintenanceReport() {
-        if (this.selected != null) {
-            maintenanceReport = null;
-            try {
-                PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-                if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
-                if (Strings.isNullOrEmpty(rule.getReportStorageId())) throw new BusinessException("请先上传保养报告模版!");
+        {
+            if (this.selected != null) {
+                maintenanceReport = null;
+                try {
+                    PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
+                    if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+                    InputStream rawTemplate = null;
+                    if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
+                        // get template if the report storage is set.
+                        StreamedContent template = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
+                        rawTemplate = template.getStream();
+                    } else {
+                        // generate template otherwise.
+                        try {
+                            byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+                            InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
+                            rawTemplate = pmOrderReportTemplateService.generateReportTemplateByRule(activeTemplateStream, rule);
+                        } catch (IOException e) {
+                            throw new BusinessException("自动模版生成失败");
+                        }
+                    }
 
-                StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-                Map<String, Object> datas = populateReportContent(selected);
+                    if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                XWPFTemplate template = XWPFTemplate.compile(rawTemplate.getStream());
-                // render policy for accessory information.
-                template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
-                // render policy for maintenance workflow.
-                template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
-                // render policy for check list
-                template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
-                // render policy for audit record
-                template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
-                template.render(datas);
-                template.write(out);
+                    Map<String, Object> datas = populateReportContent(selected);
 
-                InputStream doc = new ByteArrayInputStream(out.toByteArray());
-                maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
-            } catch (BusinessException e) {
-                WebUtil.addErrorMessage(e.getMessage());
-            } catch (Exception e) {
-                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
-                WebUtil.addErrorMessage("保养报告生成失败");
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
+                    // render policy for accessory information.
+                    template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
+                    // render policy for maintenance workflow.
+                    template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
+                    // render policy for check list
+                    template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+                    // render policy for audit record
+                    template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
+                    template.render(datas);
+                    template.write(out);
+
+                    InputStream doc = new ByteArrayInputStream(out.toByteArray());
+                    maintenanceReport = new DefaultStreamedContent(doc, "application/msword", "maintenance-report.docx");
+                } catch (BusinessException e) {
+                    WebUtil.addErrorMessage(e.getMessage());
+                } catch (Exception e) {
+                    Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+                    WebUtil.addErrorMessage("保养报告生成失败");
+                }
             }
         }
+
     }
 
     private Map<String, Object> populateReportContent(V2_PmOrder pmOrder) {
@@ -411,7 +433,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             for(TableItem item : group.getItems()) {
                 if (item == null || item.getComponent() == null) {
                     continue;
-                }//
+                }
                 switch (item.getComponent()) {
                     case Number:
                         if (item.getResKey() != null) {
@@ -882,6 +904,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
@@ -913,6 +937,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
+        user = UserContextService.getCurrentUserAccount();
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
     }
 
     public void submitAppvalPmOrder() {
