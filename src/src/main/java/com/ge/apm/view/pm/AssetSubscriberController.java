@@ -258,7 +258,20 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 
 		if(this.getCRUDActionName().equals("新增")) {
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getQualityHit()==false && selected.getIsReceiveTimeoutMsg()==false){
+				WebUtil.addErrorMessage("消息设置不可为空");
+				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				return;
+			}
 
+			if(selected.getIsReceiveTimeoutMsg()){
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
+					WebUtil.addErrorMessage("务必选择紧急程度");
+					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+					return;
+				}
+			}
 			MessageSubscriber msgsub= null;
 			List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
 			for(AssetInfo assetInfo:targetAssets ){
@@ -274,27 +287,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setQualityHit(selected.getQualityHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
-
 				msgsubList.add(msgsub);
 			}
 
+
 			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(Collectors.toList());
 			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
-
-
-			if(selected.getIsReceiveTimeoutMsg()){
-				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
-					WebUtil.addErrorMessage("务必选择紧急程度");
-					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-					return;
-				}
-			}
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getQualityHit()==false && selected.getMainRepHit()==false){
-				WebUtil.addErrorMessage("消息设置不可为空");
-				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-				return;
-			}
 			if(msglist.size()>0){
 				WebUtil.addErrorMessage("不能重复创建相同的设备消息订阅");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
@@ -302,8 +300,15 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			}
 			dao.save(msgsubList);
 			WebUtil.addSuccessMessage("成功创建设备消息订阅");
+
 			assetName=null;
 		}else{
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getQualityHit()==false){
+				WebUtil.addErrorMessage("消息设置不可为空");
+				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				return;
+			}
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 					WebUtil.addErrorMessage("务必选择紧急消息");
@@ -311,24 +316,18 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getQualityHit()==false){
-				WebUtil.addErrorMessage("消息设置不可为空");
-				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-				return;
-			}
 			super.save();
 		}
 	}
-public void selectedSetting(){
-	List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
-	if(!collect.isEmpty()){
-		Integer msgId =collect.get(0);
-		selected=dao.findById(Integer.valueOf(msgId));
-		assetName =selected.getAssetInfo().getName();
+	public void selectedSetting(){
+		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
+		if(!collect.isEmpty()){
+			Integer msgId =collect.get(0);
+			selected=dao.findById(Integer.valueOf(msgId));
+			assetName =selected.getAssetInfo().getName();
+		}
 	}
-}
-public void cancel(){}
+	public void cancel(){}
 
 
 	@Override

@@ -87,7 +87,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox class="ck5" value="#{assetSubscriberController.selected.isReceiveTimeoutMsg}"/>
+                                <p:selectBooleanCheckbox class="ck5" value="#{assetSubscriberController.selected.isReceiveTimeoutMsg}">
+                                    <p:ajax update="@(.ck5)"></p:ajax>
+                                </p:selectBooleanCheckbox>
                                 <p:outputLabel value="超时消息"/>
                             </h:panelGrid>
                         </h:panelGroup>
