@@ -20,6 +20,6 @@ fi
 echo push 'resources' folder to $SERVER...
 rsync -Pav -e "ssh -i ~/.ssh/$PUB" ./src/main/webapp/resources root@$SERVER:$TARGET
 echo push 'react' folder to $SERVER...
-rsync -Pav -e "ssh -i ~/.ssh/$PUB" ./src/main/webapp/react root@$SERVER:$TARGET
+rsync -Pav -e "ssh -i ~/.ssh/$PUB" ./src/main/webapp/react root@$SERVER:$TARGET --delete
 
 echo done.

@@ -54,11 +54,11 @@ const getOption = (t, data) =>{
     },
     yAxis: {
       name: t`分钟`,
-      nameLocation: 'middle',
-      nameGap: 35,
+      nameGap: 15,
       nameTextStyle: {
         color: '#999',
         fontSize: 15,
+        padding: [0, 40, 0, 0],
       },
       axisLine: {
         show: false

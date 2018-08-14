@@ -58,7 +58,10 @@
                 </h:form>
             </div>
             <div class="ui-g-12 card ">
+
                 <h:form id="importDataForm">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
+                    </p:messages>
                     <h:panelGroup >
                         <p:selectOneRadio id="status" value="#{assetFileImportController.displayErrorsOnly}">
                             <p:ajax event="change" process="@this" update=":importDataForm" listener="#{assetFileImportController.switchAssetCheckStatus}"/>
