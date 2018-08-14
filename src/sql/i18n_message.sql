@@ -1588,3 +1588,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '3', '有问题', 'hasIssue', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainStatus', '4', '进行中', 'hasIssue', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MessageSubscriber', '设备消息订阅', 'Asset Message Subscriber', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, site_id) VALUES ( 'casePriority', '1', '高', 'Normal', '178');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, site_id) VALUES ( 'casePriority', '2', '中', 'Important', '178');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, site_id) VALUES ( 'casePriority', '3', '低', 'Urgent', '178');
