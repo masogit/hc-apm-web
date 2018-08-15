@@ -7,8 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -235,6 +238,7 @@ public class ElectricSafetyService {
 				listData.add(data);
 			}
 		}
+		analysisFinancingNum(listData);
 		return listData;
 	}
 	
@@ -307,6 +311,85 @@ public class ElectricSafetyService {
 //		return newMap;
 //	}
 	
+	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder){
+		Set<String> setFinancingNum=new HashSet<String>();
+		Set<String> setAssetUids=new HashSet<String>();
+		List<AssetInfo> listAssetInfo=null;
+		if(listData!=null && listData.size()>0){
+			for(int i=0;i<listData.size();++i){
+				ElectricSafetyData tempData=listData.get(i);
+				setFinancingNum.add(tempData.getFinancingNum());
+				setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
+				setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+			}
+		}
+		if(setFinancingNum.size()>0){
+			listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(setFinancingNum,user.getSiteUID(),user.getUid());
+		}
+		if(listAssetInfo!=null && listAssetInfo.size()>0){
+			for(int i=0;i<listAssetInfo.size();++i){
+				AssetInfo tempAsset=listAssetInfo.get(i);
+				setAssetUids.add(tempAsset.getUid());
+				if(mapAsset.containsKey(tempAsset.getFinancingNum())){
+					mapAsset.get(tempAsset.getFinancingNum()).add(tempAsset);
+				}
+				else{
+					List<AssetInfo> tempListAsset=new ArrayList<AssetInfo>();
+					tempListAsset.add(tempAsset);
+					mapAsset.put(tempAsset.getFinancingNum(), tempListAsset);
+				}
+			}
+		}
+		if(setAssetUids.size()>0){
+			Set<V2_PmOrder> setV2_PmOrder=v2_PmOrderRepository.findByAssetUids(setAssetUids);
+			if(setV2_PmOrder!=null && setV2_PmOrder.size()>0){
+				Iterator<V2_PmOrder> itV2_PmOrder=setV2_PmOrder.iterator();
+				while(itV2_PmOrder.hasNext()){
+					V2_PmOrder tempPmOrder=itV2_PmOrder.next();
+					mapPmOrder.put(tempPmOrder.getAssetUid(), tempPmOrder);
+				}
+			}
+		}
+	}
+
+	private void analysisFinancingNum(List<ElectricSafetyData> listData) {
+		Map<String,List<AssetInfo>> mapAsset=new HashMap<String,List<AssetInfo>>();
+		Map<String,V2_PmOrder> mapPmOrder=new HashMap<String,V2_PmOrder>();
+		getListAssetInfo(listData,mapAsset,mapPmOrder);
+		if (listData != null && listData.size() > 0) {
+			for (int i = 0; i < listData.size(); ++i) {
+				ElectricSafetyData data = listData.get(i);
+				try {
+					List<AssetInfo> listAssetInfo = mapAsset.get(data.getFinancingNum());
+					if (listAssetInfo == null || listAssetInfo.size() == 0) {
+						data.setFinancingNum(data.getFinancingNum().toLowerCase());
+						listAssetInfo = mapAsset.get(data.getFinancingNum());
+					}
+					if (listAssetInfo == null || listAssetInfo.size() == 0) {
+						data.setFinancingNum(data.getFinancingNum().toUpperCase());
+						listAssetInfo = mapAsset.get(data.getFinancingNum());
+					}
+					if (listAssetInfo != null && listAssetInfo.size() == 1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())) {
+						data.setAssetInfo(listAssetInfo.get(0));
+						V2_PmOrder order = mapPmOrder.get(listAssetInfo.get(0).getUid());
+						if (order != null) {
+							data.setV2PmOrder(order);
+						} else {
+							data.setWarnMessage("工单未找到");
+						}
+					} else if (listAssetInfo != null && listAssetInfo.size() > 1) {
+						data.setWarnMessage("找到多台设备");
+					} else {
+						data.setWarnMessage("设备未找到");
+					}
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					data.setWarnMessage("网络异常");
+				}
+			}
+		}
+	}
+	
 	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyData data){
 		String strValue="";
 		for(String key:map.keySet()){
@@ -346,37 +429,6 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-					try {
-						List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						if(listAssetInfo==null || listAssetInfo.size()==0){
-							data.setFinancingNum(data.getFinancingNum().toLowerCase());
-							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						}
-						if(listAssetInfo==null || listAssetInfo.size()==0){
-							data.setFinancingNum(data.getFinancingNum().toUpperCase());
-							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						}
-						if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
-							data.setAssetInfo(listAssetInfo.get(0));
-							V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
-							if(order!=null){
-								data.setV2PmOrder(order);
-							}
-							else{
-								data.setWarnMessage("工单未找到");
-							}
-						}
-						else if(listAssetInfo!=null && listAssetInfo.size()>1){
-							data.setWarnMessage("找到多台设备");
-						}
-						else{
-							data.setWarnMessage("设备未找到");
-						}
-					} catch (Exception e) {
-						// TODO: handle exception
-						LOGGER.error(e.getMessage());
-						data.setWarnMessage("网络异常");
-					}
 				}
 			}
 //			1——》1组应用
