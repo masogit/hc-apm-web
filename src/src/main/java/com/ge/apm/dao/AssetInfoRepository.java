@@ -1,18 +1,17 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.AssetFileAttachment;
-import com.ge.apm.domain.AssetInfo;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.domain.AssetInfo;
+
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.SearchFilter;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -52,6 +51,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumAccessScope(String financingNum,String siteUID,String userUid);
+    
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num in ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
+    public List<AssetInfo> findByFinancingNumAccessScope(Set<String> setFinancingNum,String siteUID,String userUid);
 
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumSelfScope(String financingNum,String siteUID,String userUid);
