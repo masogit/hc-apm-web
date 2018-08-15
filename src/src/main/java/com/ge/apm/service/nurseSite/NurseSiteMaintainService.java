@@ -409,18 +409,75 @@ public class NurseSiteMaintainService {
 		return objStatus;
 	}
 
-	public void updateMaintainDataStatus(NurseSiteMaintain obj, boolean batchUpdate, String signatureId,Date date,UserAccount user) {
-		if (batchUpdate) {
-			if (obj.getStatus() == 0) {
-				obj.setStatus(2);
-				if (StringUtils.isNotEmpty(signatureId)) {
-					obj.setSignatureId(signatureId);
-				}
-				updateMaintainData(obj, true,date,user);
+	
+	
+	private void completeMaintainData(List<NurseSiteMaintain> listMaintain){
+		Set<String> setParentIds=new HashSet<String>();
+		Set<String> setModifyByUids=new HashSet<String>();
+		Set<NurseSiteMaintainItem> listMaintainItem=null;
+		List<UserAccount> listModifyBy=null;
+		Map<String,Set<NurseSiteMaintainItem>> mapItem=new HashMap<String,Set<NurseSiteMaintainItem>>();
+		Map<String,UserAccount> mapUser=new HashMap<String,UserAccount>();
+		for(int i=0;i<listMaintain.size();++i){
+			NurseSiteMaintain tempMaintain=listMaintain.get(i);
+			if(tempMaintain.isNeedGetItem()){
+				setParentIds.add(tempMaintain.getId());
+				setModifyByUids.add(tempMaintain.getModifyByUid());
 			}
-		} else {
-			obj.setStatus(updateMaintainData(obj, null,date,user));
 		}
+		if(setParentIds.size()>0){
+			listMaintainItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setParentIds);
+		}
+		if(setModifyByUids.size()>0){
+			listModifyBy=userAccountRepository.getByUids(setModifyByUids);
+		}
+		if(listMaintainItem!=null && listMaintainItem.size()>0){
+			Iterator<NurseSiteMaintainItem> itItem=listMaintainItem.iterator();
+			while(itItem.hasNext()){
+				NurseSiteMaintainItem tempItem=itItem.next();
+				String parentId=tempItem.getParentId();
+				if(mapItem.containsKey(parentId)){
+					mapItem.get(parentId).add(tempItem);
+				}
+				else{
+					Set<NurseSiteMaintainItem> tempSetItem=new HashSet<NurseSiteMaintainItem>();
+					tempSetItem.add(tempItem);
+					mapItem.put(tempItem.getParentId(), tempSetItem);
+				}
+			}
+		}
+		if(listModifyBy!=null && listModifyBy.size()>0){
+			for(int i=0;i<listModifyBy.size();++i){
+				UserAccount tempUser=listModifyBy.get(i);
+				mapUser.put(tempUser.getUid(), tempUser);
+			}
+		}
+		for(int i=0;i<listMaintain.size();++i){
+			NurseSiteMaintain tempMaintain=listMaintain.get(i);
+			if(tempMaintain.isNeedGetItem()){
+				tempMaintain.setListNurseSiteMaintainItem(mapItem.get(tempMaintain.getId()));
+				tempMaintain.setModifyBy(mapUser.get(tempMaintain.getModifyByUid()));
+				tempMaintain.setNeedGetItem(false);
+			}
+		}
+	}
+	
+	public void batchUpdateMaintainDataStatus(List<NurseSiteMaintain> listMaintain,String signatureId,Date date,UserAccount user){
+		completeMaintainData(listMaintain);
+		for(int i=0;i<listMaintain.size();++i){
+			NurseSiteMaintain tempMaintain=listMaintain.get(i);
+			if (tempMaintain.getStatus() == 0) {
+				tempMaintain.setStatus(2);
+				if (StringUtils.isNotEmpty(signatureId)) {
+					tempMaintain.setSignatureId(signatureId);
+				}
+				updateMaintainData(tempMaintain,true,date,user);
+			}
+		}
+	}
+	
+	public void updateMaintainDataStatus(NurseSiteMaintain obj, String signatureId,Date date,UserAccount user) {
+		obj.setStatus(updateMaintainData(obj, null,date,user));
 	}
 
 	public boolean updateMaintain(NurseSiteMaintain obj, boolean batchUpdate, UserAccount currentUser) {
@@ -660,7 +717,12 @@ public class NurseSiteMaintainService {
 			}
 		}
 		// nurseSiteMaintainRepository.delete(listMaintain);
-		deleteMaintain(listMaintain);
+		try {
+			deleteMaintain(listMaintain);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
 		nurseSiteMaintainRepository.save(listNewMaintain);
 	}
 

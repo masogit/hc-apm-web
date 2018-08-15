@@ -6,7 +6,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -24,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 @Entity
 @Table(name = "capture_data_messages")
-public class CaptureDataMessages implements Serializable {
+public class CaptureDataMessages extends JHipAbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -52,19 +51,6 @@ public class CaptureDataMessages implements Serializable {
 
 	@Column(name = "content",columnDefinition="text")
 	private String content;
-
-	@Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
-	@Size(max = 32)
-	private String tenantUID;
-
-	@Column(name = "institution_uid", columnDefinition = "CHAR(32)")
-	private String institutionUID;
-
-	@Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
-	private String hospitalUID;
-
-	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
-	private String siteUID;
 
 	@Transient
 	private Integer excelIdex;
@@ -114,39 +100,7 @@ public class CaptureDataMessages implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public String getTenantUID() {
-		return tenantUID;
-	}
-
-	public void setTenantUID(String tenantUID) {
-		this.tenantUID = tenantUID;
-	}
-
-	public String getInstitutionUID() {
-		return institutionUID;
-	}
-
-	public void setInstitutionUID(String institutionUID) {
-		this.institutionUID = institutionUID;
-	}
-
-	public String getHospitalUID() {
-		return hospitalUID;
-	}
-
-	public void setHospitalUID(String hospitalUID) {
-		this.hospitalUID = hospitalUID;
-	}
-
-	public String getSiteUID() {
-		return siteUID;
-	}
-
-	public void setSiteUID(String siteUID) {
-		this.siteUID = siteUID;
-	}
-
+	
 	public Integer getExcelIdex() {
 		return excelIdex;
 	}
