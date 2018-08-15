@@ -105,7 +105,7 @@
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleEditForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
 
-                       <h:panelGroup rendered="#{not empty pmOrderRuleController.selected.id}">
+                       <h:panelGroup rendered="#{(not empty pmOrderRuleController.selected.id) and userContextService.hasRole('AssetHead')}">
                            <!-- hide while creation -->
                            <label class="label">保养模版</label>
                            <p:commandLink value="下载模版示例" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" ajax="false">
