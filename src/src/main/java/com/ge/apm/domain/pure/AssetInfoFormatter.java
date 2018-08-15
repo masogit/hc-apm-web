@@ -1,5 +1,6 @@
 package com.ge.apm.domain.pure;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.I18nMessage;
@@ -18,11 +19,14 @@ public class AssetInfoFormatter {
     private AssetInfo assetInfo;
     private List<OrgInfo> sites;
     private AssetFileImportService importService;
+    private AssetInfoRepository assetDao;
 
-    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites, AssetFileImportService importService) {
+    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
+                              AssetFileImportService importService, AssetInfoRepository assetDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
+        this.assetDao = assetDao;
     }
 
     public Integer getAssetUsage() {
@@ -499,6 +503,17 @@ public class AssetInfoFormatter {
         return assetInfo.getParentAssetId();
     }
 
+    public String getParentAssetName() {
+        if (assetInfo.getParentAssetId() == null) {
+            return null;
+        }
+
+        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        if (parentAsset == null) return null;
+
+        return parentAsset.getDepartNum() + " / " + parentAsset.getName();
+    }
+
     public Integer getInventoryStatus() {
         return assetInfo.getInventoryStatus();
     }
@@ -627,6 +642,7 @@ public class AssetInfoFormatter {
         map.put("设备标准名称", this.getDeviceName());
         map.put("注册证号", this.getRegistrationNo());
         map.put("供应商", this.getVendor());
+        map.put("主设备", this.getParentAssetName());
 
         map.put("医疗器械分类", this.getFunctionGroupAsString());
         map.put("医疗器械子分类", this.getAssetCode68AsString());
