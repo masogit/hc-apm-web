@@ -167,6 +167,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private WorkflowConfigRepository wfCfigDao;
 
     private SharedAssetTypeRepository swapDao;
+
+    private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
     List<String> orgUids;
     List<String> swapUids;
 
@@ -260,6 +263,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         brandDao = WebUtil.getBean(BrandRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
+        sharedAssetReqDetailRepository = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -471,6 +475,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPageAssets = res.getContent();
             for(AssetInfo info : currentPageAssets) {
+                //Since can't use fetch mode in Lazy, so load mapped objects by standalone search
+                SharedAssetType sharedAssetType = findSharedAssetType(info);
+                info.setSharedAssetType(sharedAssetType);
             	SharedAssetReqDetail reqDetail = selectProperReqDetail(info);
             	info.setSharedAssetReqDetail(reqDetail);
             }
@@ -2075,11 +2082,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	private SharedAssetReqDetail selectProperReqDetail(AssetInfo item) {
 		Date nowDate = new Date();
-    	SharedAssetReqDetail sharedAssetReqDetail = item.getSharedAssetReqDetailList()
-    													.stream()
-    													.filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
-    													.findFirst()
-    													.orElse(null);
+        List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
+        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                                                            .filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
+                                                            .findFirst()
+                                                            .orElse(null);
+
     	if(sharedAssetReqDetail != null) {
     		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
     		LocalDateTime beginLDT;
@@ -2148,5 +2156,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     	}
     	return sharedAssetReqDetail;
 	}
+
+	private SharedAssetType findSharedAssetType(AssetInfo assetInfo) {
+        SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+        return sharedAssetType;
+    }
     
 }
