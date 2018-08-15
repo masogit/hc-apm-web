@@ -490,16 +490,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private int lineNum;
-    
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "asset_info_id", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+
+    @Transient
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
     
     @Transient
     private SharedAssetReqDetail sharedAssetReqDetail;
-    
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "shared_asset_type", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+
+    @Transient
     private SharedAssetType sharedAssetType;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
