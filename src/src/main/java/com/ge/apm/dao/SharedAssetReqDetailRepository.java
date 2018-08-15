@@ -26,6 +26,9 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
     
     @Query("select o from SharedAssetReqDetail o  where o.assetInfoId = :assetInfoId and o.state = :state")
     public List<SharedAssetReqDetail> findByAssetInfoAndUid(@Param("assetInfoId") String assetInfoId);
+
+    @Query("select o from SharedAssetReqDetail o  where o.assetInfoId = :assetInfoId")
+    public List<SharedAssetReqDetail> findByAssetInfoUid(@Param("assetInfoId") String assetInfoId);
     
     @Query(value = "select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id =?1 and b.clinical_dept_uid =?2 order by create_date desc LIMIT 1",nativeQuery = true)
     public List<SharedAssetReqDetail> getAssetUid(String assetInfoId, String clinicalDeptUid);
