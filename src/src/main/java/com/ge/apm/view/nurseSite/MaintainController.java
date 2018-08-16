@@ -417,7 +417,7 @@ public class MaintainController {
 
 	public void saveMaintain() {
 		Date currentDate=new Date();
-		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain,null,currentDate,currentUser);
+		nurseSiteMaintainService.updateMaintainData(nurseSiteMaintain,currentDate,currentUser);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
 		lazyEventModel.updateEvent(event);
 		addMessage("报告已保存");
@@ -624,7 +624,7 @@ public class MaintainController {
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.batchUpdateMaintainDataStatus(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
+			nurseSiteMaintainService.batchUpdateMaintainDataAllRight(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
 			nurseSiteMaintainService.save(listNewNurseSiteMaintain);
 			addMessage("报告已批量填写");
 		}
