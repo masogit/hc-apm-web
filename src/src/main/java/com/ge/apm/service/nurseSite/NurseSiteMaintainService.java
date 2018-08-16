@@ -339,8 +339,33 @@ public class NurseSiteMaintainService {
 		}
 		return listMaintainItem;
 	}
+	
+	private void updateMaintainDataAllRight(NurseSiteMaintain obj, Date date,UserAccount user){
+		Set<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
+		if (obj.isNeedGetItem()) {
+			listItem = findMaintainItemByParentId(obj.getId());
+			obj.setListNurseSiteMaintainItem(listItem);
+			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
+			obj.setNeedGetItem(false);
+		}
+		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
+		while (it.hasNext()) {
+			NurseSiteMaintainItem tempItem = it.next();
+			tempItem.setCheckDate(date);
+			tempItem.setModifyBy(user);
+			tempItem.setModifyByUid(user.getUid());
+			Set<NurseSiteMaintainData> listData = tempItem.getListData();
+			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			tempItem.setStatus(2);
+			while (itData.hasNext()) {
+				NurseSiteMaintainData tempData = itData.next();
+				tempData.setCheckValue(true);
+			}
+		}
+		obj.setStatus(2);
+	}
 
-	private int updateMaintainData(NurseSiteMaintain obj, Boolean defaultValue,Date date,UserAccount user) {
+	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
 		Set<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
 		if (obj.isNeedGetItem()) {
 			listItem = findMaintainItemByParentId(obj.getId());
@@ -359,54 +384,41 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyByUid(user.getUid());
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
-			if (defaultValue != null) {
-				// batch update
-				if (defaultValue) {
-					tempItem.setStatus(2);
+			// single,0:未检查，2：已通过，3：有问题，4：进行中
+			while (itData.hasNext()) {
+				NurseSiteMaintainData tempData = itData.next();
+				Boolean value = tempData.getCheckValue();
+				if (value == null) {
+					if (itemStatus == 2) {
+						itemStatus = 4;
+					}
+				} else if (value) {
+					if (itemStatus == 0) {
+						itemStatus = 2;
+					}
 				} else {
-					tempItem.setStatus(3);
+					itemStatus = 3;
+					break;
 				}
-				while (itData.hasNext()) {
-					NurseSiteMaintainData tempData = itData.next();
-					tempData.setCheckValue(defaultValue);
+			}
+			tempItem.setStatus(itemStatus);
+			if (itemStatus == 0) {
+				if (objStatus == 2) {
+					objStatus = 4;
 				}
-			} else {
-				// single,0:未检查，2：已通过，3：有问题，4：进行中
-				while (itData.hasNext()) {
-					NurseSiteMaintainData tempData = itData.next();
-					Boolean value = tempData.getCheckValue();
-					if (value == null) {
-						if (itemStatus == 2) {
-							itemStatus = 4;
-						}
-					} else if (value) {
-						if (itemStatus == 0) {
-							itemStatus = 2;
-						}
-					} else {
-						itemStatus = 3;
-						break;
-					}
+			} else if (itemStatus == 2) {
+				if (objStatus == 0) {
+					objStatus = 2;
 				}
-				tempItem.setStatus(itemStatus);
-				if (itemStatus == 0) {
-					if (objStatus == 2) {
-						objStatus = 4;
-					}
-				} else if (itemStatus == 2) {
-					if (objStatus == 0) {
-						objStatus = 2;
-					}
-				} else if (itemStatus == 3) {
-					objStatus = 3;
-				} else if (itemStatus == 4) {
-					if (objStatus != 3) {
-						objStatus = 4;
-					}
+			} else if (itemStatus == 3) {
+				objStatus = 3;
+			} else if (itemStatus == 4) {
+				if (objStatus != 3) {
+					objStatus = 4;
 				}
 			}
 		}
-		return objStatus;
+		obj.setStatus(objStatus);
 	}
 
 	
@@ -462,7 +474,7 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	public void batchUpdateMaintainDataStatus(List<NurseSiteMaintain> listMaintain,String signatureId,Date date,UserAccount user){
+	public void batchUpdateMaintainDataAllRight(List<NurseSiteMaintain> listMaintain,String signatureId,Date date,UserAccount user){
 		completeMaintainData(listMaintain);
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
@@ -471,13 +483,9 @@ public class NurseSiteMaintainService {
 				if (StringUtils.isNotEmpty(signatureId)) {
 					tempMaintain.setSignatureId(signatureId);
 				}
-				updateMaintainData(tempMaintain,true,date,user);
+				updateMaintainDataAllRight(tempMaintain,date,user);
 			}
 		}
-	}
-	
-	public void updateMaintainDataStatus(NurseSiteMaintain obj, String signatureId,Date date,UserAccount user) {
-		obj.setStatus(updateMaintainData(obj, null,date,user));
 	}
 
 	public boolean updateMaintain(NurseSiteMaintain obj, boolean batchUpdate, UserAccount currentUser) {
