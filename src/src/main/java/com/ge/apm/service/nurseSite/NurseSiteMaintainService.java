@@ -209,11 +209,32 @@ public class NurseSiteMaintainService {
 		nurseSiteMaintainConfigItemRepository.save(obj);
 	}
 
-	public void save(List<NurseSiteMaintain> obj) {
+	public void saveMaintainWithThread(List<NurseSiteMaintain> obj) {
 		for(int i=0;i<obj.size();++i){
-			obj.get(i).setListNurseSiteMaintainItem(null);
+			final NurseSiteMaintain tempMaintain=obj.get(i);
+			Thread thread=new Thread(new Runnable(){
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					nurseSiteMaintainRepository.save(tempMaintain);
+				}
+			});
+			thread.start();
 		}
-		nurseSiteMaintainRepository.save(obj);
+	}
+	
+	public void deleteMaintainWithThread(List<NurseSiteMaintain> obj) {
+		for(int i=0;i<obj.size();++i){
+			final NurseSiteMaintain tempMaintain=obj.get(i);
+			Thread thread=new Thread(new Runnable(){
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					nurseSiteMaintainRepository.delete(tempMaintain);
+				}
+			});
+			thread.start();
+		}
 	}
 
 	@Transactional
@@ -250,7 +271,7 @@ public class NurseSiteMaintainService {
 				blobFileService.deleteBlobFilesByStorageId(setSignatureId);
 			}
 			// nurseSiteMaintainItemRepository.delete(listItem);
-			nurseSiteMaintainRepository.delete(listMaintain);
+			deleteMaintainWithThread(listMaintain);
 		}
 		return true;
 	}
@@ -258,11 +279,11 @@ public class NurseSiteMaintainService {
 	@Transactional
 	public void saveAndDelete(List<NurseSiteMaintain> obj, List<NurseSiteMaintain> obj2) {
 		if (obj != null && obj.size() > 0) {
-			nurseSiteMaintainRepository.save(obj);
+			saveMaintainWithThread(obj);
 		}
 		if (obj2 != null && obj2.size() > 0) {
 			// nurseSiteMaintainRepository.delete(obj2);
-			deleteMaintain(obj2);
+			deleteMaintainWithThread(obj2);
 		}
 	}
 
@@ -279,7 +300,7 @@ public class NurseSiteMaintainService {
 		nurseSiteMaintainConfigItemRepository.delete(list);
 	}
 
-	public void delete(List<NurseSiteMaintainItem> list) {
+	public void deleteMaintainItem(List<NurseSiteMaintainItem> list) {
 		nurseSiteMaintainItemRepository.delete(list);
 	}
 
@@ -727,9 +748,9 @@ public class NurseSiteMaintainService {
 			}
 		}
 		// nurseSiteMaintainRepository.delete(listMaintain);
-		nurseSiteMaintainRepository.save(listNewMaintain);
+		saveMaintainWithThread(listNewMaintain);
 		try {
-			deleteMaintain(listMaintain);
+			deleteMaintainWithThread(listMaintain);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
