@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,9 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.PinYinComparator;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -54,6 +58,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
+	private PmOrderRule pmOrderRule;
+	private String ruleUid;
 
 	@Override
 	protected void init() {
@@ -191,11 +197,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 				}
 				if (level != null) {
 					if (level == 1) {
-						rel.setRuleUID1(pmOrderRuleUID);
+						rel.setRuleUID1(ruleUid);
 					} else if (level == 2) {
-						rel.setRuleUID2(pmOrderRuleUID);
+						rel.setRuleUID2(ruleUid);
 					} else if (level == 3) {
-						rel.setRuleUID(pmOrderRuleUID);
+						rel.setRuleUID(ruleUid);
 					}
 					rels.add(rel);
 				}
@@ -226,6 +232,38 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
 		}
 		return pmOrderRuleRepository.findBySearchFilter(assetFilters);
+	}
+
+	public List<PmOrderRule> getRuleList(String name){
+		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
+		if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
+        }
+		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
+        rules = rules.stream().sorted().collect(Collectors.toList());
+		return rules;
+	}
+
+
+	public void setRuleId(){
+
+	}
+
+	public String getRuleUid() {
+		return ruleUid;
+	}
+
+	public void setRuleUid(String ruleUid) {
+		this.ruleUid = ruleUid;
+	}
+
+	public PmOrderRule getPmOrderRule() {
+		return pmOrderRule;
+	}
+
+	public void setPmOrderRule(PmOrderRule pmOrderRule) {
+		this.pmOrderRule = pmOrderRule;
 	}
 
 	public String getStrDate(Date lastPmDate) {
