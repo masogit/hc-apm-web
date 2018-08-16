@@ -901,8 +901,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ParsingImportFileError', '文件不能解析,请检查模版/数据后重新上传', 'Fail to parse file,please check the tamplate or data!', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('importStatus', 'CheckFail', '数据错误', 'Fail to add', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('importStatus', 'NoAsset', '无匹配设备', 'No Asset found', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '2', '前缀+两位年份+流水号', '主设备和附属设备资产编号的生成规则', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '1', '前缀+国标码+流水号', '前7位为分类代码（即国标码）+后五位（该类设备的累计数量）', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '2', '前缀+年份+流水号+设备数', '主设备和附属设备资产编号的生成规则', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '1', '前缀+国标码+设备数', '前7位为分类代码（即国标码）+后五位（该类设备的累计数量）', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '0', '其他', '其他计算方式', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '3', '前缀+四位年份+流水号', '前缀+年份+流水号', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('contractType', '1', '全保', '全保', NULL, '-1');
