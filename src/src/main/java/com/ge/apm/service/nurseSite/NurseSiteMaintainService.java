@@ -712,18 +712,17 @@ public class NurseSiteMaintainService {
 		List<NurseSiteMaintain> listNewMaintain = new ArrayList<NurseSiteMaintain>();
 		if (listMaintain != null && listMaintain.size() > 0) {
 			for (int i = 0; i < listMaintain.size(); ++i) {
-				listNewMaintain
-						.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
 			}
 		}
 		// nurseSiteMaintainRepository.delete(listMaintain);
+		nurseSiteMaintainRepository.save(listNewMaintain);
 		try {
 			deleteMaintain(listMaintain);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
 		}
-		nurseSiteMaintainRepository.save(listNewMaintain);
 	}
 
 	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
