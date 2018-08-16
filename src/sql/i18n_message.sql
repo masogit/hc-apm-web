@@ -1,4 +1,4 @@
-truncate table i18n_message;
+delete from i18n_message where site_id=-1;
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'logout', '注销', 'Logout', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'login', '登录系统', 'Login', NULL, '-1');
