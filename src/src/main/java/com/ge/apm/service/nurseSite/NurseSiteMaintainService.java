@@ -263,7 +263,7 @@ public class NurseSiteMaintainService {
 		}
 		if (obj2 != null && obj2.size() > 0) {
 			// nurseSiteMaintainRepository.delete(obj2);
-			deleteMaintainWithThread(obj2);
+			deleteMaintain(obj2);
 		}
 	}
 
@@ -730,7 +730,7 @@ public class NurseSiteMaintainService {
 		// nurseSiteMaintainRepository.delete(listMaintain);
 		saveMaintainWithThread(listNewMaintain);
 		try {
-			deleteMaintainWithThread(listMaintain);
+			deleteMaintain(listMaintain);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
