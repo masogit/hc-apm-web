@@ -105,6 +105,9 @@
                             </p:commandButton> -->
                         </f:facet>
                     </p:dataTable>
+
+                    <p:remoteCommand name="rc" update="datalist:editButton datalist:viewButton" immediate="true"/>
+                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
                    
                 </h:form>
             </div>
