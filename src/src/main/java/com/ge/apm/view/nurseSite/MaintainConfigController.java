@@ -3,6 +3,7 @@ package com.ge.apm.view.nurseSite;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -406,11 +407,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public void onAssetsTransfer(TransferEvent event) {
-		for (Object item : event.getItems()) {
+		List<AssetInfo> collection=(List<AssetInfo>) event.getItems();
+		if(collection!=null && collection.size()>0){
 			if (event.isAdd()) {
-				listCheckAssets.add((AssetInfo) item);
+				listCheckAssets.addAll(collection);
 			} else {
-				listCheckAssets.remove((AssetInfo) item);
+				listCheckAssets.removeAll(collection);
 			}
 		}
 		if(listCheckAssets.size()==0){
