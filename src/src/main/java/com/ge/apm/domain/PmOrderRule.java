@@ -1,6 +1,10 @@
 package com.ge.apm.domain;
 
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
+
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,7 +19,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "pm_order_rule")
-public class PmOrderRule implements Serializable{
+public class PmOrderRule implements Serializable,Comparator{
 	private static final long serialVersionUID = -1L;
 
 	@Id
@@ -261,7 +265,21 @@ public class PmOrderRule implements Serializable{
         return hash;
     }
 
-    @Override
+	@Override
+	public int compare(Object o1, Object o2) {
+		try {
+			PmOrderRule r1 = (PmOrderRule)o1;
+			PmOrderRule r2 = (PmOrderRule)o2;
+			String name1 = PinyinHelper.convertToPinyinString(r1.getName(), "", PinyinFormat.WITHOUT_TONE);
+			String name2 = PinyinHelper.convertToPinyinString(r2.getName(), "", PinyinFormat.WITHOUT_TONE);
+			return name1.compareTo(name2);
+		}catch(Exception e) {
+			return 0;
+		}
+	}
+
+
+	@Override
     public boolean equals(Object object) {
         if (!(object instanceof PmOrderRule)) {
             return false;
@@ -272,6 +290,5 @@ public class PmOrderRule implements Serializable{
         }
         return true;
     }
-
 
 }
