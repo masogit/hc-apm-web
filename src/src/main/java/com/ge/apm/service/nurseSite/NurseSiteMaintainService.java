@@ -210,10 +210,13 @@ public class NurseSiteMaintainService {
 	}
 
 	public void save(List<NurseSiteMaintain> obj) {
+		for(int i=0;i<obj.size();++i){
+			obj.get(i).setListNurseSiteMaintainItem(null);
+		}
 		nurseSiteMaintainRepository.save(obj);
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean deleteMaintain(NurseSiteMaintain maintain) {
 		// Set<NurseSiteMaintainItem>
 		// listItem=maintain.getListNurseSiteMaintainItem();
@@ -228,7 +231,7 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean deleteMaintain(List<NurseSiteMaintain> listMaintain) {
 		if (listMaintain != null && listMaintain.size() > 0) {
 			// Set<String> setParentId=new HashSet<String>();
@@ -252,7 +255,7 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public void saveAndDelete(List<NurseSiteMaintain> obj, List<NurseSiteMaintain> obj2) {
 		if (obj != null && obj.size() > 0) {
 			nurseSiteMaintainRepository.save(obj);
@@ -556,7 +559,7 @@ public class NurseSiteMaintainService {
 		return tempNurseSiteMaintain;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain) {
 		save(tempNurseSiteMaintain);
 		return true;
@@ -615,7 +618,7 @@ public class NurseSiteMaintainService {
 		return streamedContent;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean createMaintainConfig(NurseSiteMaintainConfig tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
 		String originName = tempConfig.getName();
 		while (listCheckAssets.size() > 0) {
@@ -648,7 +651,7 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean updateMaintainConfig(NurseSiteMaintainConfig tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
 		save(tempConfig);
 		saveConfigChildren(tempConfig, listCheckAssets);
@@ -697,7 +700,7 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public boolean deleteMaintainConfig(NurseSiteMaintainConfig tempConfig) {
 		deleteConfigChildren(tempConfig.getId());
 		delete(tempConfig);
@@ -714,7 +717,7 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	public void updateUnCheckedMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig, UserAccount currentUser, Integer status, List<AssetInfo> listCheckAssets) {
 		List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findByConfigAndStatus(nurseSiteMaintainConfig.getId(), status);
 		List<NurseSiteMaintain> listNewMaintain = new ArrayList<NurseSiteMaintain>();
