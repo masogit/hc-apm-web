@@ -1,11 +1,11 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.Attribute;
-import org.springframework.data.jpa.repository.JpaRepository;
+import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
 
-public interface AttributeRepository extends JpaRepository<Attribute, String> {
+public interface AttributeRepository extends GenericRepositoryUUID<Attribute> {
 
     List<Attribute> findByName(String name);
 

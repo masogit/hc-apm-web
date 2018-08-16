@@ -1,22 +1,36 @@
 package com.ge.apm.domain;
 
-import com.ge.apm.service.utils.ChineseName;
-import com.ge.apm.service.utils.PinyinUtil;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.sql.Date;
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
 
 @Entity
 @Table(name = "attribute")
 public class Attribute implements ChineseName,Serializable {
 
-    @Id
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @Column(name = "attribute_uid", nullable = false)
     private String attributeUid;
 
@@ -32,6 +46,7 @@ public class Attribute implements ChineseName,Serializable {
 
     @CreatedDate
     @Column(name = "create_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
     @LastModifiedBy
@@ -40,7 +55,12 @@ public class Attribute implements ChineseName,Serializable {
 
     @LastModifiedDate
     @Column(name = "update_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="attribute_uid")
+    private Set<AttrDesc> attrDescSet;
 
     public String getAttributeUid() {
         return attributeUid;
@@ -96,6 +116,14 @@ public class Attribute implements ChineseName,Serializable {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Set<AttrDesc> getAttrDescSet() {
+        return attrDescSet;
+    }
+
+    public void setAttrDescSet(Set<AttrDesc> attrDescSet) {
+        this.attrDescSet = attrDescSet;
     }
 
     @Override
