@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -118,6 +119,18 @@ public class MessageSubscriber implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
 
     public MessageSubscriber() {
     }
@@ -368,5 +381,45 @@ public class MessageSubscriber implements Serializable {
 
     public void setMeterEvent(Boolean meterEvent) {
         this.meterEvent = meterEvent;
+    }
+
+    public boolean isReceiveChatMsg() {
+        return isReceiveChatMsg;
+    }
+
+    public void setReceiveChatMsg(boolean receiveChatMsg) {
+        isReceiveChatMsg = receiveChatMsg;
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
     }
 }
