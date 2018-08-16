@@ -460,6 +460,14 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 
 		}
+		//前缀+年份+流水号不能超过16位
+		int preLength = selected.getPrefix() == null ? 0 : selected.getPrefix().length();
+		int flowNum = selected.getFormat() == null ? 0 : selected.getFormat().length();
+		if(preLength + 4 + flowNum > 16){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("srNumTooLong"));
+			return;
+		}
 
         onBeforeSave(selected);
 
