@@ -253,9 +253,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public void saveAssetSub(){
-		if (!requiredCheck()) {
-			return;
-		}
+//		if (!requiredCheck()) {
+//			return;
+//		}
 
 		if(this.getCRUDActionName().equals("新增")) {
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
@@ -303,12 +303,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 			assetName=null;
 		}else{
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getQualityHit()==false){
-				WebUtil.addErrorMessage("消息设置不可为空");
-				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-				return;
-			}
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 					WebUtil.addErrorMessage("务必选择紧急消息");
@@ -316,6 +310,13 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getQualityHit()==false){
+				WebUtil.addErrorMessage("消息设置不可为空");
+				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				return;
+			}
+
 			super.save();
 		}
 	}
