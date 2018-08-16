@@ -41,6 +41,11 @@
                         <h:outputText value="#{item.assetInfo.name}" />
                     </p:column>
 
+
+                    <p:column headerText="所属科室" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+                    </p:column>
+
                     <p:column headerText="设备编号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>

@@ -2,14 +2,20 @@ package com.ge.apm.view.pm;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -39,13 +45,16 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private DualListModel<AssetInfo> availableAssets;
 	private List<AssetInfo> sourceAssets;
 	private List<AssetInfo> targetAssets;
-	private QueryAsset queryAsset;
+	//private QueryAsset queryAsset;
+	private AssetInfo queryAsset1;
 	private RelRuleAssetRepository relRuleAssetRepository;
 	private Map<Integer, Boolean> selectedMap;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
 	private List<UserAccount> tenantUserList;
 	private AssetInfoRepository assetInfoRepository;
+	private OrgInfo selectedOrg;
+	private AssetTagService assetTagService;
 
 	UserContextService userContextService;
 	MessageSubscriberRepository dao;
@@ -62,33 +71,128 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private Integer loginUserOrgType;
 
 	private Boolean isInsulate;
-	private OrgInfoRepository orgInfoRepository;
+	private OrgInfoRepository orgInfoDao;
 	private Boolean isSelectedCurrentPage = false;
 
 	private int selectType=1;
 	private Boolean isReceiveTimeoutMsg;
 	private List<MessageSubscriber> delMsgList;
+	private UaaService uaaService;
+	private TreeNode orgTree;
+	private TreeNode selectedNode;
+	private List<OrgInfo> clinicalDeptList;
 
 	@Override
 	protected void init() {
 		this.selectedMap = new HashMap();
+		assetTagService = WebUtil.getBean(AssetTagService.class);
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		dao= WebUtil.getBean(MessageSubscriberRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
-		queryAsset = new QueryAsset();
-		queryAsset.setTenantUID(currentUser.getTenantUID());
+		//queryAsset = new QueryAsset();
+		//queryAsset.setTenantUID(currentUser.getTenantUID());
+
 		isInsulate = UserContextService.isInsulate();
-		loginUserOrgType = orgInfoRepository.findByUid(currentUser.getSiteUID()).getOrgType();
+		loginUserOrgType = orgInfoDao.findByUid(currentUser.getSiteUID()).getOrgType();
+		clinicalDeptList = new ArrayList<OrgInfo>();
+
+
+		queryAsset1 = new AssetInfo();
+		queryAsset1.setTenantUID(currentUser.getTenantUID());
+		if(currentUser.getOrgLevel() != 0) {
+			if (currentUser.getOrgLevel() == 1) {
+				queryAsset1.setInstitutionUID(currentUser.getInstitutionUID());
+			} else if (currentUser.getOrgLevel() == 2) {
+				queryAsset1.setHospitalUID(currentUser.getHospitalUID());
+			} else {
+				queryAsset1.setSiteUID(currentUser.getSiteUID());
+			}
+		}
 		initAssets();
+        initOrgTree();
 	}
 
+	@Override
+	public void onBeforeNewObject(MessageSubscriber object) {
+		object.setSiteId(currentUser.getSiteId());
+		object.setHospitalId(currentUser.getHospitalId());
+		object.setTenantUID(currentUser.getTenantUID());
+		object.setInstitutionUID(currentUser.getInstitutionUID());
+		object.setHospitalUID(currentUser.getHospitalUID());
+		object.setSiteUID(currentUser.getSiteUID());
+
+		selectedOrg = null;
+		clinicalDeptList = null;
+
+
+		this.getQueryAssetsList();
+
+
+	}
+
+	public void getQueryAssetsList() {
+		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
+			sourceAssets = assetTagService.getAssetList(queryAsset1);
+
+			sourceAssets = new ArrayList(sourceAssets);
+			sourceAssets.removeAll(targetAssets);
+		}else{
+			sourceAssets = new ArrayList<AssetInfo>();
+		}
+		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+	}
+	public void initOrgTree() {
+		uaaService = WebUtil.getBean(UaaService.class);
+		UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+
+		OrgInfo rootOrg = new OrgInfo();
+		rootOrg.setId(-1);
+		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+		orgTree = new DefaultTreeNode("root",null,null);
+		TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+		rootNode.getChildren().add(treeNode);
+		//rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
+		rootNode.setExpanded(true);
+
+	}
+	public void onSelectTreeNode(NodeSelectEvent event) {
+		queryAsset1.setInstitutionUID(null);
+		queryAsset1.setHospitalUID(null);
+		queryAsset1.setSiteUID(null);
+
+		TreeNode node = event.getTreeNode();
+		OrgInfo orgInfo = (OrgInfo) node.getData();
+		if (orgInfo.getId() == -1) {
+			selectedOrg = null;
+		} else {
+			selectedOrg = (OrgInfo) node.getData();
+		}
+
+		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
+			if(selectedOrg.getOrgLevel() == 1){
+				queryAsset1.setInstitutionUID(selectedOrg.getInstitutionUID());
+				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
+			}else if(selectedOrg.getOrgLevel() == 2){
+				queryAsset1.setHospitalUID(selectedOrg.getHospitalUID());
+				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getHospitalUID(), 4);
+			}else if(selectedOrg.getOrgLevel() == 3){
+				queryAsset1.setSiteUID(selectedOrg.getSiteUID());
+				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getSiteUID(), 4);
+			}
+		}
+
+		this.getQueryAssetsList();
+
+	}
 
 
 	public Integer getTrueOnMap(Map<Integer,Boolean> hm){
@@ -122,8 +226,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
-		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
-		addFilter();
+		//assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
+		orgTree=createSiteOrgTree(userAccountRepository.getById(selected.getSubscribeUserId()).getUid());
+		System.out.println(selectedOrg);
+		selectedOrg=null;
+
+		//addFilter();
 	}
 
 	public void onItemSelected() {
@@ -187,8 +295,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		level2=true;
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
-		queryAsset.setName(null);
-		queryAsset.setAssetGroup(null);
+//		queryAsset.setName(null);
+//		queryAsset.setAssetGroup(null);
 
 	}
 	@Override
@@ -294,7 +402,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(Collectors.toList());
 			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
 			if(msglist.size()>0){
-				WebUtil.addErrorMessage("不能重复创建相同的设备消息订阅");
+				WebUtil.addErrorMessage("不能重复创建相同设备的消息订阅");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
@@ -351,8 +459,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}else{
 			level2=false;
 		}
-		if(queryAsset!=null)
-			queryAsset.setName(selected.getAssetInfo().getName());
+//		if(queryAsset!=null)
+//			queryAsset.setName(selected.getAssetInfo().getName());
 
 
 	}
@@ -371,7 +479,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 		return true;
 	}
-	public void addFilter() {
+	/*public void addFilter() {
+        orgTree=createSiteOrgTree();
 		sourceAssets = getAssetList();
 		targetAssets.forEach((item) -> {
 			if (sourceAssets.contains(item)) {
@@ -379,9 +488,44 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			}
 		});
 		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
-	}
+	}*/
 
-	public List<AssetInfo> getAssetList() {
+	public TreeNode createSiteOrgTree(String userUid) {
+
+		List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(userUid);
+		TreeNode siteTree = buildTree(siteList);
+		expandedByOrgType(siteTree, 2);
+		return siteTree;
+	}
+	private void expandedByOrgType(TreeNode tree, Integer type) {
+		if (tree.getData() != null) {
+			OrgInfo node = (OrgInfo) tree.getData();
+			if (node.getOrgType() > type) {
+				return;
+			}
+		}
+		tree.setExpanded(true);
+		for (TreeNode child : tree.getChildren()) {
+			expandedByOrgType(child, type);
+		}
+
+	}
+	private TreeNode buildTree(List<OrgInfo> orgList) {
+		TreeNode rootNode = new DefaultTreeNode("org", null, null);
+		Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+		for (OrgInfo org : orgList) {
+			if (treeMap.containsKey(org.getParentUID())) {
+				treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+			} else {
+				rootNode.getChildren().add(treeMap.get(org.getUid()));
+			}
+		}
+		TreeNodeUtil.sortTreeNodeByName(rootNode);
+		rootNode.setExpanded(true);
+		return rootNode;
+	}
+/**/
+	/*public List<AssetInfo> getAssetList() {
 		List<AssetInfo> astLIst =assetList;
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			astLIst=	astLIst.stream().filter(item->item.getFunctionType()!=null &&item.getFunctionType().equals(queryAsset.getFunctionType())).collect(Collectors.toList());
@@ -403,25 +547,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		if(!astLIst.isEmpty()){
 			return astLIst;
 		}
-		/*if (!assetFilters.isEmpty()) {
-			if (queryAsset.getRuleStatus() != null) {
-				uids = new ArrayList<>();
-				if (queryAsset.getRuleStatus() == 1) {// 已配置
-					uids = relRuleAssetRepository.findAssetUidsByTenantUID(currentUser.getTenantUID());
-					if (CollectionUtils.isNotEmpty(uids)) {
-						assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-					}
-				} else if (queryAsset.getRuleStatus() == 2) {// 未配置
-					uids = relRuleAssetRepository.findAssetUidsByTenantUID(currentUser.getTenantUID());
-					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
-				}
-			}
-			List<SearchFilter> userFilter = getAssetFilter();
-			assetFilters.addAll(userFilter);
-			return assetInfoRepository.findBySearchFilter(assetFilters);
-		}*/
+
 		return new ArrayList<>();
-	}
+	}*/
 
 	private UserCommonService userCommonService;
 
@@ -501,13 +629,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		this.targetAssets = targetAssets;
 	}
 
-	public QueryAsset getQueryAsset() {
-		return queryAsset;
-	}
 
-	public void setQueryAsset(QueryAsset queryAsset) {
-		this.queryAsset = queryAsset;
-	}
 
 	public RelRuleAssetRepository getRelRuleAssetRepository() {
 		return relRuleAssetRepository;
@@ -574,11 +696,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public OrgInfoRepository getOrgInfoRepository() {
-		return orgInfoRepository;
+		return orgInfoDao;
 	}
 
-	public void setOrgInfoRepository(OrgInfoRepository orgInfoRepository) {
-		this.orgInfoRepository = orgInfoRepository;
+	public void setOrgInfoRepository(OrgInfoRepository orgInfoDao) {
+		this.orgInfoDao = orgInfoDao;
 	}
 	public UserCommonService getUserCommonService() {
 		return userCommonService;
@@ -690,6 +812,82 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void setDelMsgList(List<MessageSubscriber> delMsgList) {
 		this.delMsgList = delMsgList;
+	}
+
+	public AssetInfo getQueryAsset1() {
+		return queryAsset1;
+	}
+
+	public void setQueryAsset1(AssetInfo queryAsset1) {
+		this.queryAsset1 = queryAsset1;
+	}
+
+	public OrgInfo getSelectedOrg() {
+		return selectedOrg;
+	}
+
+	public void setSelectedOrg(OrgInfo selectedOrg) {
+		this.selectedOrg = selectedOrg;
+	}
+
+	public AssetTagService getAssetTagService() {
+		return assetTagService;
+	}
+
+	public void setAssetTagService(AssetTagService assetTagService) {
+		this.assetTagService = assetTagService;
+	}
+
+	public OrgInfoRepository getOrgInfoDao() {
+		return orgInfoDao;
+	}
+
+	public void setOrgInfoDao(OrgInfoRepository orgInfoDao) {
+		this.orgInfoDao = orgInfoDao;
+	}
+
+	public Boolean getSelectedCurrentPage() {
+		return isSelectedCurrentPage;
+	}
+
+	public void setSelectedCurrentPage(Boolean selectedCurrentPage) {
+		isSelectedCurrentPage = selectedCurrentPage;
+	}
+
+	public UaaService getUaaService() {
+		return uaaService;
+	}
+
+	public void setUaaService(UaaService uaaService) {
+		this.uaaService = uaaService;
+	}
+
+	public TreeNode getOrgTree() {
+		return orgTree;
+	}
+
+	public void setOrgTree(TreeNode orgTree) {
+		this.orgTree = orgTree;
+	}
+
+	public TreeNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(TreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	public List<OrgInfo> getClinicalDeptList() {
+		return clinicalDeptList;
+	}
+
+	public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+		this.clinicalDeptList = clinicalDeptList;
+	}
+
+	public void setAssetList(List<AssetInfo> assetList) {
+		this.assetList = assetList;
 	}
 }
 /*
