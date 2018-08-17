@@ -48,7 +48,7 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     
     
     //select asset_id from asset_tag_rule tr, asset_tag_biomed_group tg,biomed_group_user tu  where tr.tag_id=tg.tag_id and tg.biomed_group_id=tu.group_id and asset_id='20915'
-    @Query(value="select id from AssetInfo a where (a.tenantUID in ?1 or a.institutionUID in ?1 or a.hospitalUID in ?1 or a.siteUID in (?1) or a.clinicalDeptUID in (?1)) and "
+    @Query(value="select id from AssetInfo a where (a.tenantUID in ?1 or a.institutionUID in ?1 or a.hospitalUID in ?1 or a.siteUID in (?1) or a.clinicalDeptUID in (?1) or a.assetDeptUID in (?1)) and "
             + " id not in (select tr.assetId from AssetTagRule tr, AssetTagBiomedGroup tg, BiomedGroupUser tu where tr.tagId=tg.tagId and tg.biomedGroupId=tu.groupId)")
     public List<Integer> getAssetsByNoTagGroup(Collection<String> c);
 
