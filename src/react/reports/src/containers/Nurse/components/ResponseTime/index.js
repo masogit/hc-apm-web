@@ -36,7 +36,7 @@ const getOption = (t, data) =>{
       left: '8%',
       right: '8%',
       bottom: '3%',
-      top: '10%',
+      top: '13%',
       containLabel: true,
     },
     xAxis: {
@@ -57,7 +57,6 @@ const getOption = (t, data) =>{
       nameGap: 15,
       nameTextStyle: {
         color: '#999',
-        fontSize: 15,
         padding: [0, 40, 0, 0],
       },
       axisLine: {
