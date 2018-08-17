@@ -2,11 +2,13 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
@@ -24,6 +26,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +40,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Created by 212605082 on 2018/3/7.
  */
 @Entity
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_item")
 public class NurseSiteMaintainItem implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainItem.class);
@@ -110,6 +116,9 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.EAGER)
     private Set<NurseSiteMaintainData> listData;
+	
+	@Transient
+	private List<NurseSiteMaintainData> listCopyData;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
@@ -336,11 +345,17 @@ public class NurseSiteMaintainItem implements Serializable {
 	}
 
 	public NurseSiteMaintainData getDataValue(String label){
-		if(listData!=null && StringUtils.isNotEmpty(label)){
-			Iterator<NurseSiteMaintainData> it=listData.iterator();
-			while(it.hasNext()){
-				NurseSiteMaintainData tempData=it.next();
+		if(listCopyData==null){
+			listCopyData=new ArrayList<NurseSiteMaintainData>();
+		}
+		if(listCopyData.size()==0){
+			listCopyData.addAll(listData);
+		}
+		if(StringUtils.isNotEmpty(label)){
+			for(int i=0;i<listCopyData.size();++i){
+				NurseSiteMaintainData tempData=listCopyData.get(i);
 				if(tempData.getCheckItem().equals(label)){
+					listCopyData.remove(i);
 					return tempData;
 				}
 			}
