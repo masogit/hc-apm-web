@@ -115,20 +115,18 @@ public class AssetFileImportController {
     }
 
     public void importData() {
-        if (null != importAssetMap) {
-            try {
-                aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
-                isImported = true;
+        try {
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+            isImported = true;
 
-                filterErrorRecords();
+            filterErrorRecords();
 
 //            downloadImportFailureData();
-            } catch (Exception e) {
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            }
+        } catch (Exception e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
+            FacesContext.getCurrentInstance().addMessage(null, message);
 
-
+            isImported = true; //disable import button
         }
     }
 
