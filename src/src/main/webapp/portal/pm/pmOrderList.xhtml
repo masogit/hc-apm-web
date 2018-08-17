@@ -72,7 +72,7 @@
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
 
-                        <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>
 
@@ -245,7 +245,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">资产使用科室</label>
+                            <label class="label">资产#{msg.clinicalDeptName}</label>
                             <p:outputLabel id="dptName"  value="#{v2PmOrderController.dptName}" />
                         </h:panelGroup>
                         <h:panelGroup>

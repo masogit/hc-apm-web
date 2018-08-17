@@ -22,7 +22,7 @@
         <p:column headerText="设备类型" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE" sortBy="#{item.assetGroupName}">
             <h:outputText value="#{item.assetGroupName}" />
         </p:column>
-        <p:column headerText="使用科室" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />

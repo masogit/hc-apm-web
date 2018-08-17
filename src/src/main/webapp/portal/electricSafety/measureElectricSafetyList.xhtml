@@ -19,7 +19,7 @@
 		<p:column headerText="制造商序列号" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.serialNum}" />
 		</p:column>
-		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
 		<p:column headerText="工单编号" filterBy="#{item.v2PmOrder.pmNum}" filterMatchMode="LIKE">
