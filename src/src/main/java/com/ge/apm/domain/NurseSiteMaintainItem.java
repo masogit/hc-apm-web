@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
@@ -24,6 +25,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Created by 212605082 on 2018/3/7.
  */
 @Entity
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_item")
 public class NurseSiteMaintainItem implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainItem.class);
