@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AttributeEditDlg" widgetVar="AttributeEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{attributeListController.CRUDActionName}" >
+            <h:form id="AttributeEditForm">
+                <h:panelGroup id="display" rendered="#{attributeListController.selected ne null}">
+
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{attributeListController.selected != null}" style="min-width: 500px;">
+                        <h:panelGroup>
+                            <label class="label">属性名称*</label>
+                            <p:inputText id="loginName" value="#{attributeListController.selected.name}" required="true" requiredMessage="属性名称 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">描述</label>
+                            <p:inputText id="name" value="#{attributeListController.selected.description}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{attributeListController.save}" value="#{msg.Save}" update=":attributeListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AttributeEditDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('AttributeEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
