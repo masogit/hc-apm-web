@@ -991,6 +991,7 @@ public class NurseSiteMaintainService {
 		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
 		Map<String, String> mapAssetInfo = new HashMap<String, String>();
 		Set<String> setSignature=new HashSet<String>();
+		Map<String,Integer> mapCheckItemSequence=new HashMap<String,Integer>();
 		List<String> header = new ArrayList<String>();
 		List<String> secondHeader = new ArrayList<String>();
 		for (int i = 0; i < listMaintain.size(); ++i) {
@@ -1048,6 +1049,7 @@ public class NurseSiteMaintainService {
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
 					// "班次", doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
+					mapCheckItemSequence.clear();
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
 						Set<NurseSiteMaintainData> listData = tempItem.getListData();
@@ -1077,7 +1079,15 @@ public class NurseSiteMaintainService {
 								}
 								keyName+=tempItem.getSequenceName()+",";
 								if(tempData.getCheckItem()!=null){
-									keyName+=tempData.getCheckItem()+",";
+									String checkItemStr=tempData.getCheckItem();
+									if(mapCheckItemSequence.containsKey(checkItemStr)){
+										mapCheckItemSequence.put(checkItemStr, mapCheckItemSequence.get(checkItemStr)+1);
+										keyName+=mapCheckItemSequence.get(checkItemStr)+",";
+									}
+									else{
+										keyName+=checkItemStr+",";
+										mapCheckItemSequence.put(checkItemStr, 1);
+									}
 								}
 								else{
 									keyName+=",";
@@ -1125,7 +1135,7 @@ public class NurseSiteMaintainService {
 				String tempSignature=it.next();
 				StreamedContent sc=getMaintainSignatureWeiXin(tempSignature);
 				if(sc!=null){
-					doc.mergeCell(SHEET_Maintain, row, row+height, columnIndex, columnIndex+width);
+					doc.mergeCell(SHEET_Maintain, row, row+height-1, columnIndex, columnIndex+width-1);
 					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
 					columnIndex+=width;
 				}
