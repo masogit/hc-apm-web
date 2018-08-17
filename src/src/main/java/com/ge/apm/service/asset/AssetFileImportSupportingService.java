@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -356,6 +357,18 @@ public class AssetFileImportSupportingService {
             qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
         }
 
+    }
+
+    public void setAssetDeptId(AssetInfo assetInfo, OrgInfo selectedOrgToImport, Map<String, Object> item) {
+        Map< String, Object> rowMap = (Map<String, Object>) item.get("rowData");
+        String assetDeptName = ExcelDocument.getCellStringValue(rowMap.get("使用科室"));
+        if (!StringUtils.isEmpty(assetDeptName)) {
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), assetDeptName);
+            if (orgInfo != null) {
+                assetInfo.setAssetDeptId(orgInfo.getId());
+                assetInfo.setAssetDeptUID(orgInfo.getUid());
+            }
+        }
     }
 
 }
