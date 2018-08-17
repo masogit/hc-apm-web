@@ -122,7 +122,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.qualityHit}"/>
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.contractDueHit}"/>
                                 <p:outputLabel value="质保/维保提醒"/>
                             </h:panelGrid>
                         </h:panelGroup>
@@ -131,12 +131,25 @@
                     <h:panelGrid columns="2">
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:outputLabel value="保养事件: "/>
+                                <p:outputLabel value="保养事件:"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="计量事件:"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.meterHit}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
