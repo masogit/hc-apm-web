@@ -364,12 +364,19 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 //		if (!requiredCheck()) {
 //			return;
 //		}
-
+		List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
 		if(this.getCRUDActionName().equals("新增")) {
+			if(targetAssets.isEmpty()){
+				WebUtil.addErrorMessage("设备没有选取,请务必选择设备");
+				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				msgsubList = new ArrayList<MessageSubscriber>();
+				return;
+			}
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getQualityHit()==false && selected.getIsReceiveTimeoutMsg()==false){
+					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+				msgsubList = new ArrayList<MessageSubscriber>();
 				return;
 			}
 
@@ -377,11 +384,13 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 					WebUtil.addErrorMessage("务必选择紧急程度");
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+					msgsubList = new ArrayList<MessageSubscriber>();
 					return;
 				}
 			}
+
 			MessageSubscriber msgsub= null;
-			List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
+
 			for(AssetInfo assetInfo:targetAssets ){
 				msgsub= new MessageSubscriber();
 				msgsub.setAssetId(assetInfo.getId());
@@ -389,11 +398,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setLevel0(selected.getLevel0());
 				msgsub.setLevel1(selected.getLevel1());
 				msgsub.setLevel2(selected.getLevel2());
-				/*msgsub.setRepairEvent(selected.getRepairEvent());
-				msgsub.setMaintainEvent(selected.getMaintainEvent());
-				msgsub.setContractDueEvent(selected.getContractDueEvent());*/
-				msgsub.setQualityHit(selected.getQualityHit());
+				//如果紧急程度任选了一个 说明维修事件被选择了
+				if(selected.getLevel0() || selected.getLevel1() ||selected.getLevel2())
+					msgsub.setRepairHit(true);
+				else
+					msgsub.setRepairHit(false);
+				msgsub.setContractDueHit(selected.getContractDueHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
+				msgsub.setMeterHit(selected.getMeterHit());
 				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
 				msgsubList.add(msgsub);
 			}
@@ -419,12 +431,15 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				}
 			}
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getQualityHit()==false){
+					selected.getContractDueHit()==false && selected.getMeterHit()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
-
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false)
+				selected.setRepairHit(false);
+			else
+				selected.setRepairHit(true);
 			super.save();
 		}
 	}
