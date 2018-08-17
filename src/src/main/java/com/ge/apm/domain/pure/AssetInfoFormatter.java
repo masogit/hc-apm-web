@@ -1,6 +1,7 @@
 package com.ge.apm.domain.pure;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.I18nMessage;
@@ -20,13 +21,17 @@ public class AssetInfoFormatter {
     private List<OrgInfo> sites;
     private AssetFileImportService importService;
     private AssetInfoRepository assetDao;
+    private OrgInfoRepository orgDao;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
-                              AssetFileImportService importService, AssetInfoRepository assetDao) {
+                              AssetFileImportService importService,
+                              AssetInfoRepository assetDao,
+                              OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
+        this.orgDao = orgDao;
     }
 
     public Integer getAssetUsage() {
@@ -319,6 +324,18 @@ public class AssetInfoFormatter {
 
     public Integer getAssetDeptId() {
         return assetInfo.getAssetDeptId();
+    }
+
+    public String getAssetDeptUID() {
+        return assetInfo.getAssetDeptUID();
+    }
+
+    public String getAssetDeptName() {
+        if (assetInfo.getAssetDeptUID() == null) return null;
+        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
     }
 
     public Integer getAssetOwnerId() {
@@ -636,7 +653,8 @@ public class AssetInfoFormatter {
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
         map.put("院区", this.getSiteName());
-        map.put("使用科室", this.getClinicalDeptName());
+        map.put("所属科室", this.getClinicalDeptName());
+        map.put("使用科室", this.getAssetDeptName());
         map.put("制造商", this.getManufacture());
         map.put("品牌/制造商简称", this.getMakerShortName());
         map.put("设备标准名称", this.getDeviceName());
