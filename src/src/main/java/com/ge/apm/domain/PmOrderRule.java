@@ -19,7 +19,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "pm_order_rule")
-public class PmOrderRule implements Serializable,Comparator{
+public class PmOrderRule implements Serializable{
 	private static final long serialVersionUID = -1L;
 
 	@Id
@@ -265,7 +265,7 @@ public class PmOrderRule implements Serializable,Comparator{
         return hash;
     }
 
-	@Override
+/*	@Override
 	public int compare(Object o1, Object o2) {
 		try {
 			PmOrderRule r1 = (PmOrderRule)o1;
@@ -276,7 +276,7 @@ public class PmOrderRule implements Serializable,Comparator{
 		}catch(Exception e) {
 			return 0;
 		}
-	}
+	}*/
 
 
 	@Override
