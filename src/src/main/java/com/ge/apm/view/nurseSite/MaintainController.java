@@ -625,7 +625,7 @@ public class MaintainController {
 				}
 			}
 			nurseSiteMaintainService.batchUpdateMaintainDataAllRight(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
-			nurseSiteMaintainService.save(listNewNurseSiteMaintain);
+			nurseSiteMaintainService.saveMaintainWithThread(listNewNurseSiteMaintain);
 			addMessage("报告已批量填写");
 		}
 		else{
