@@ -66,7 +66,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private Boolean important;
 	private Boolean normal;
 	private Boolean overMsg;//超时
-	private Boolean qualityHit;//质保提醒
+	private Boolean contractDueHit;//质保提醒
 	private Boolean matainRepHit;//维保提醒
 	private Integer loginUserOrgType;
 
@@ -779,14 +779,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void setOverMsg(Boolean overMsg) {
 		this.overMsg = overMsg;
-	}
-
-	public Boolean getQualityHit() {
-		return qualityHit;
-	}
-
-	public void setQualityHit(Boolean qualityHit) {
-		this.qualityHit = qualityHit;
 	}
 
 	public Boolean getMatainRepHit() {

@@ -159,7 +159,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         }
     }
 
-    public String getGongyingshangLeixingyy(Supplier supplier){
+    public String getGongyingshangLeixing(Supplier supplier){
      if(supplier==null){
          return "";
      }
