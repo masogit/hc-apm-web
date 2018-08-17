@@ -376,6 +376,7 @@ public class NurseSiteMaintainService {
 			tempItem.setCheckDate(date);
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
+			tempItem.setModifyDate(date);
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			tempItem.setStatus(2);
@@ -385,6 +386,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 		obj.setStatus(2);
+		obj.setCheckDate(date);
+		obj.setModifyBy(user);
+		obj.setModifyByUid(user.getUid());
+		obj.setModifyDate(date);
 	}
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
@@ -404,6 +409,7 @@ public class NurseSiteMaintainService {
 			tempItem.setCheckDate(date);
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
+			tempItem.setModifyDate(date);
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			// single,0:未检查，2：已通过，3：有问题，4：进行中
@@ -441,6 +447,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 		obj.setStatus(objStatus);
+		obj.setCheckDate(date);
+		obj.setModifyBy(user);
+		obj.setModifyByUid(user.getUid());
+		obj.setModifyDate(date);
 	}
 
 	
@@ -501,7 +511,6 @@ public class NurseSiteMaintainService {
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
 			if (tempMaintain.getStatus() == 0) {
-				tempMaintain.setStatus(2);
 				if (StringUtils.isNotEmpty(signatureId)) {
 					tempMaintain.setSignatureId(signatureId);
 				}
