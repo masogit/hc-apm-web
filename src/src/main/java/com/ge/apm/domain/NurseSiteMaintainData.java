@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_data")
 public class NurseSiteMaintainData {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainData.class);

@@ -618,9 +618,6 @@ public class MaintainController {
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
 				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime()){
-					tempMaintain.setCheckDate(currentDate);
-					tempMaintain.setModifyBy(currentUser);
-					tempMaintain.setModifyDate(currentDate);
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
