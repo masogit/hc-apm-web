@@ -178,6 +178,7 @@ public class AssetFileImportSupportingService {
 
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
         final int GENERATE_BY_PREFIX_AND_SEQ = 2;
+        final int GENERATE_BY_PREFIX_AND_FOUR_DIGITS_YEAR_AND_SEQ = 3;
 
         if (workflowConfig == null) return false;
 
@@ -200,6 +201,8 @@ public class AssetFileImportSupportingService {
                 if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
                     return true;
                 }
+            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_FOUR_DIGITS_YEAR_AND_SEQ) {
+                return true;
             }
         }
 
