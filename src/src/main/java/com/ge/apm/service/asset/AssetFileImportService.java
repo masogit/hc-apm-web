@@ -181,7 +181,7 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
                 assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
-                assetRow.setFieldStringValue("使用科室", "setClinicalDeptName");
+                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName");
                 assetRow.setFieldStringValue("制造商", "setManufacture");
                 assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
                 assetRow.setFieldStringValue("设备标准名称", "setDeviceName");
@@ -349,6 +349,8 @@ public class AssetFileImportService {
             newAsset.setClinicalDeptId(orgInfo.getId());
             newAsset.setClinicalDeptUID(orgInfo.getUid());
         }
+
+        supportingService.setAssetDeptId(newAsset, selectedOrgToImport, item);
 
         List<UserAccount> userAccounts;
         //for AssetOwner
@@ -580,7 +582,7 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误: 科室为空");
+                AssetRow.addErrMessage(item, "错误: 所属科室为空");
             }
 
             //check depart num to avoid duplicate when update
@@ -657,7 +659,7 @@ public class AssetFileImportService {
         }
         int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
