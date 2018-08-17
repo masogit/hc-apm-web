@@ -210,11 +210,29 @@ public class NurseSiteMaintainService {
 	}
 
 	public void saveMaintainWithThread(List<NurseSiteMaintain> obj) {
-		nurseSiteMaintainRepository.save(obj);
+		if(obj!=null && obj.size()>0){
+			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
+			for(int i=0;i<obj.size();++i){
+				splitList.add(obj.get(i));
+				if(i%50==0 || i+1>=obj.size()){
+					nurseSiteMaintainRepository.save(splitList);
+					splitList.clear();
+				}
+			}
+		}
 	}
 	
 	public void deleteMaintainWithThread(List<NurseSiteMaintain> obj) {
-		nurseSiteMaintainRepository.delete(obj);
+		if(obj!=null && obj.size()>0){
+			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
+			for(int i=0;i<obj.size();++i){
+				splitList.add(obj.get(i));
+				if(i%50==0 || i+1>=obj.size()){
+					nurseSiteMaintainRepository.delete(splitList);
+					splitList.clear();
+				}
+			}
+		}
 	}
 
 	@Transactional
