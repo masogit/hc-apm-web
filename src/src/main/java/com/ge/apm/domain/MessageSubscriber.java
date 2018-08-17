@@ -84,25 +84,20 @@ public class MessageSubscriber implements Serializable {
 
 
     @Basic(optional = true)
-    @Column(name = "repair_event")
-    private Boolean repairEvent;
+    @Column(name = "repair_hit")
+    private Boolean repairHit;
 
     @Basic(optional = true)
-    @Column(name = "meter_event")
-    private Boolean meterEvent;
-    /*
-		@Basic(optional = true)
-		@Column(name = "maintain_event")
-		private Boolean maintainEvent;
-		@Basic(optional = true)
-		@Column(name = "contract_due_event")
-		private Boolean contractDueEvent;*/
-    @Basic(optional = true)
-    @Column(name = "quality_hit")
-    private Boolean qualityHit;
+    @Column(name = "contract_due_hit")
+    private Boolean contractDueHit;
+
     @Basic(optional = true)
     @Column(name = "main_rep_hit")
     private Boolean mainRepHit;
+
+    @Basic(optional = true)
+    @Column(name = "meter_hit")
+    private Boolean meterHit;
 
     @CreatedBy
     @Column(name = "created_by", nullable = true, length = 50)
@@ -295,13 +290,7 @@ public class MessageSubscriber implements Serializable {
         this.contractDueEvent = contractDueEvent;
     }*/
 
-    public Boolean getQualityHit() {
-        return qualityHit;
-    }
 
-    public void setQualityHit(Boolean qualityHit) {
-        this.qualityHit = qualityHit;
-    }
 
     public Boolean getMainRepHit() {
         return mainRepHit;
@@ -367,20 +356,12 @@ public class MessageSubscriber implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public Boolean getRepairEvent() {
-        return repairEvent;
+    public Boolean getMeterHit() {
+        return meterHit;
     }
 
-    public void setRepairEvent(Boolean repairEvent) {
-        this.repairEvent = repairEvent;
-    }
-
-    public Boolean getMeterEvent() {
-        return meterEvent;
-    }
-
-    public void setMeterEvent(Boolean meterEvent) {
-        this.meterEvent = meterEvent;
+    public void setMeterHit(Boolean meterHit) {
+        this.meterHit = meterHit;
     }
 
     public boolean isReceiveChatMsg() {
@@ -421,5 +402,25 @@ public class MessageSubscriber implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Boolean getRepairHit() {
+        return repairHit;
+    }
+
+    public void setRepairHit(Boolean repairHit) {
+        this.repairHit = repairHit;
+    }
+
+    public Boolean getContractDueHit() {
+        return contractDueHit;
+    }
+
+    public void setContractDueHit(Boolean contractDueHit) {
+        this.contractDueHit = contractDueHit;
     }
 }
