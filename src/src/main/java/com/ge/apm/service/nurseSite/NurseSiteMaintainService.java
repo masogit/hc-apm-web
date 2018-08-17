@@ -1022,13 +1022,13 @@ public class NurseSiteMaintainService {
 		int headerColumnIndex = 1;
 		// int secondHeaderColumnIndex=1;
 		int columnIndex = 1;
-		int rowIndex = 6;
 		int keyRow = 1;
 		int checkNameRow=2;
 		int scheduleDateRow=3;
 		int checkDateRow=4;
 		int sequenceRow=5;
 		int modifyByRow=6;
+		int rowIndex = 7;
 		int secondKeyRow = 2;
 		int dataColumnIndex=5;
 		if (mapAssetUidMaintainItem.size() > 0) {
@@ -1036,7 +1036,6 @@ public class NurseSiteMaintainService {
 			while (it.hasNext()) {
 				List<NurseSiteMaintainItem> tempListItem = it.next();
 				if (tempListItem != null && tempListItem.size() > 0) {
-					rowIndex++;
 					columnIndex = 1;
 					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
@@ -1092,6 +1091,7 @@ public class NurseSiteMaintainService {
 							}
 						}
 					}
+					rowIndex++;
 				}
 			}
 //			writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
@@ -1099,12 +1099,13 @@ public class NurseSiteMaintainService {
 			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
+			if(setSignature.size()>0){
+				writeExcelSheetHeader(header, "签名", doc, 1, rowIndex++, false);
+				writeSignatureToExcel(doc, rowIndex++,dataColumnIndex,3,12, setSignature);
+			}
 			doc.removeRow(SHEET_Maintain, keyRow);
 //			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
 			writeExcelHeader(doc,keyRow);
-			if(setSignature.size()>0){
-				writeSignatureToExcel(doc, rowIndex++, 3, 12, setSignature);
-			}
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -1117,14 +1118,14 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	private void writeSignatureToExcel(ExcelDocument doc,int row,int width,int height,Set<String> signatureIds){
+	private void writeSignatureToExcel(ExcelDocument doc,int row,int columnIndex,int width,int height,Set<String> signatureIds){
 		try {
-			int columnIndex=1;
 			Iterator<String> it=signatureIds.iterator();
 			while(it.hasNext()){
 				String tempSignature=it.next();
 				StreamedContent sc=getMaintainSignatureWeiXin(tempSignature);
 				if(sc!=null){
+					doc.mergeCell(SHEET_Maintain, row, row+height, columnIndex, columnIndex+width);
 					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
 					columnIndex+=width;
 				}
@@ -1136,12 +1137,13 @@ public class NurseSiteMaintainService {
 	}
 	
 	private void writeExcelHeader(ExcelDocument doc,int keyRow){
-		int headerColumnIndex=1;
 		List<String> header = new ArrayList<String>();
-		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
+		writeExcelSheetHeader(header, "护士站日常维护报表", doc, 1, keyRow, false);
+		int headerColumnIndex=1;
+		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow+1, false);
 	}
 	
 	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label,Integer parentIndex){

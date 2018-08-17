@@ -2,9 +2,10 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -115,6 +116,9 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.EAGER)
     private Set<NurseSiteMaintainData> listData;
+	
+	@Transient
+	private List<NurseSiteMaintainData> listCopyData;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
@@ -341,11 +345,17 @@ public class NurseSiteMaintainItem implements Serializable {
 	}
 
 	public NurseSiteMaintainData getDataValue(String label){
-		if(listData!=null && StringUtils.isNotEmpty(label)){
-			Iterator<NurseSiteMaintainData> it=listData.iterator();
-			while(it.hasNext()){
-				NurseSiteMaintainData tempData=it.next();
+		if(listCopyData==null){
+			listCopyData=new ArrayList<NurseSiteMaintainData>();
+		}
+		if(listCopyData.size()==0){
+			listCopyData.addAll(listData);
+		}
+		if(StringUtils.isNotEmpty(label)){
+			for(int i=0;i<listCopyData.size();++i){
+				NurseSiteMaintainData tempData=listCopyData.get(i);
 				if(tempData.getCheckItem().equals(label)){
+					listCopyData.remove(i);
 					return tempData;
 				}
 			}
