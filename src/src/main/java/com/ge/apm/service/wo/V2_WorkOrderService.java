@@ -399,9 +399,10 @@ public class V2_WorkOrderService {
 
         String res = srApi.invokeWorkOrderAction(token, formData, "close", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "关单"));
             if(!Strings.isNullOrEmpty(res)){
                 WebUtil.addErrorMessage(res);
+            }else{
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "关单"));
             }
         }
     }
