@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.jsf.FacesContextUtils;
 
 import com.ge.apm.domain.UserAccount;
+import java.text.MessageFormat;
 import javax.servlet.http.HttpSession;
 
 import webapp.framework.util.StringUtil;
@@ -151,7 +152,7 @@ public class WebUtil implements ApplicationContextAware {
     }
 
     public static String getMessage(String messageKey, Object... obj) {
-        return String.format(getMessage(messageKey), obj);
+        return MessageFormat.format(getMessage(messageKey), obj);
     }
     
     public static String getMessage(String messageKey) {
