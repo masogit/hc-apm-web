@@ -52,28 +52,28 @@ class AssetTable extends React.Component {
         dataIndex: 'name',
         key: 'name',
         sorter: getComparator('name', strLocaleComparator),
-        width: '30%',
+        width: '25%',
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
         key: 'financingNum',
         sorter: getComparator('financingNum', strLocaleComparator),
-        width: '30%',
+        width: '25%',
       },
       {
         title: t`设备分类`,
         dataIndex: 'assetGroupName',
         key: 'assetGroupName',
         sorter: getComparator('assetGroupName', strLocaleComparator),
-        width: '20%',
+        width: '25%',
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDeptName',
         key: 'clinicalDeptName',
         sorter: getComparator('clinicalDeptName', strLocaleComparator),
-        width: '20%',
+        width: '25%',
       },
     ]
   }
