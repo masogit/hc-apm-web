@@ -13,6 +13,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.PinYinComparator;
+import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.apache.commons.collections.CollectionUtils;
@@ -241,7 +242,19 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
         }
 		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
-        rules = rules.stream().sorted().collect(Collectors.toList());
+        rules.sort(new Comparator<PmOrderRule>() {
+			@Override
+			public int compare(PmOrderRule o1, PmOrderRule o2) {
+				try {
+					String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+					String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+					return name1.compareTo(name2);
+				} catch (PinyinException e) {
+					e.printStackTrace();
+					return 0;
+				}
+			}
+		});
 		return rules;
 	}
 
