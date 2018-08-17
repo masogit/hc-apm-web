@@ -677,25 +677,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 onOwnerChange("clinicalOwner");
                 parentAssetList = aimService.getParentsAssetsList(this.selected);
                 getClinicalOwnerList();
-                if (Strings.isNullOrEmpty(selected.getAssetDeptUID())) {
-                    selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
-                    selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
-                    selectedObjectMap.put("assetDept", clinicalDept);
-                }
                 break;
             case "assetDept":
                 clinicalDept = (OrgInfo) selectedObjectMap.get("assetDept");
                 selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
                 selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
-                if (Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
-                    selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
-                    selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
-                    selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
-                    selectedObjectMap.put("clinicalDept", clinicalDept);
-                    onOwnerChange("clinicalOwner");
-                    parentAssetList = aimService.getParentsAssetsList(this.selected);
-                    getClinicalOwnerList();
-                }
                 break;
         }
 
