@@ -86,7 +86,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             logger.info("Invoke WorkOrderAction " + actionName + " has finished " + responseMap.get("data"));
             return (String) responseMap.get("data");
         } else {
-            return null;
+            return this.getResponseFailMessage(response);
         }
     }
 

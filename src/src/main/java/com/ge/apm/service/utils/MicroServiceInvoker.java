@@ -29,17 +29,17 @@ public class MicroServiceInvoker {
 
     @Autowired
     protected RestTemplate template;
-    
+
     @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
-    
+
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     protected String downLoadURL;
-    
+
     public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();
     }
-    
+
     protected Boolean isOkay(ResponseEntity res) {
 
         if (!res.getStatusCode().equals(HttpStatus.OK)) {
@@ -49,12 +49,21 @@ public class MicroServiceInvoker {
 
         return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
     }
-    
-    protected HttpHeaders createHttpHeaders(String token){
+
+    protected String getResponseFailMessage(ResponseEntity res) {
+        if (!res.getStatusCode().equals(HttpStatus.OK)) {
+            return null;
+        }
+        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
+
+        return body.containsKey("message")? String.valueOf(body.get("message")):"";
+    }
+
+    protected HttpHeaders createHttpHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
-        if(null!= token){
+        if (null != token) {
             headers.add("Authorization", token);
         } else {
             logger.error("token doesn't exists!");
