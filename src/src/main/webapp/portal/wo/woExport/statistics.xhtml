@@ -71,7 +71,7 @@
             <p:column headerText="资产名称" rendered="#{workOrderStatisticsController.statisticsType == 'assetName'}">
                 <h:outputText value="#{item.assetName}" />
             </p:column>
-            <p:column headerText="使用科室" rendered="#{workOrderStatisticsController.statisticsType == 'depart' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
+            <p:column headerText="#{msg.clinicalDeptName}" rendered="#{workOrderStatisticsController.statisticsType == 'depart' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
                 <h:outputText value="#{workOrderStatisticsController.getAllorgName(item.clinicalDeptID)}" />
             </p:column>
             <p:column headerText="资产类型" rendered="#{workOrderStatisticsController.statisticsType == 'assetType' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">

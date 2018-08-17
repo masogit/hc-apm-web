@@ -27,7 +27,7 @@
                     <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.name}"/>
                     </p:column>
-                    <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                     </p:column>
 
