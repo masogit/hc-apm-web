@@ -210,11 +210,29 @@ public class NurseSiteMaintainService {
 	}
 
 	public void saveMaintainWithThread(List<NurseSiteMaintain> obj) {
-		nurseSiteMaintainRepository.save(obj);
+		if(obj!=null && obj.size()>0){
+			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
+			for(int i=0;i<obj.size();++i){
+				splitList.add(obj.get(i));
+				if(i%50==0 || i+1>=obj.size()){
+					nurseSiteMaintainRepository.save(splitList);
+					splitList.clear();
+				}
+			}
+		}
 	}
 	
 	public void deleteMaintainWithThread(List<NurseSiteMaintain> obj) {
-		nurseSiteMaintainRepository.delete(obj);
+		if(obj!=null && obj.size()>0){
+			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
+			for(int i=0;i<obj.size();++i){
+				splitList.add(obj.get(i));
+				if(i%50==0 || i+1>=obj.size()){
+					nurseSiteMaintainRepository.delete(splitList);
+					splitList.clear();
+				}
+			}
+		}
 	}
 
 	@Transactional
@@ -358,6 +376,7 @@ public class NurseSiteMaintainService {
 			tempItem.setCheckDate(date);
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
+			tempItem.setModifyDate(date);
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			tempItem.setStatus(2);
@@ -367,6 +386,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 		obj.setStatus(2);
+		obj.setCheckDate(date);
+		obj.setModifyBy(user);
+		obj.setModifyByUid(user.getUid());
+		obj.setModifyDate(date);
 	}
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
@@ -386,6 +409,7 @@ public class NurseSiteMaintainService {
 			tempItem.setCheckDate(date);
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
+			tempItem.setModifyDate(date);
 			Set<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			// single,0:未检查，2：已通过，3：有问题，4：进行中
@@ -423,6 +447,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 		obj.setStatus(objStatus);
+		obj.setCheckDate(date);
+		obj.setModifyBy(user);
+		obj.setModifyByUid(user.getUid());
+		obj.setModifyDate(date);
 	}
 
 	
@@ -483,7 +511,6 @@ public class NurseSiteMaintainService {
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
 			if (tempMaintain.getStatus() == 0) {
-				tempMaintain.setStatus(2);
 				if (StringUtils.isNotEmpty(signatureId)) {
 					tempMaintain.setSignatureId(signatureId);
 				}
@@ -964,6 +991,7 @@ public class NurseSiteMaintainService {
 		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
 		Map<String, String> mapAssetInfo = new HashMap<String, String>();
 		Set<String> setSignature=new HashSet<String>();
+		Map<String,Integer> mapCheckItemSequence=new HashMap<String,Integer>();
 		List<String> header = new ArrayList<String>();
 		List<String> secondHeader = new ArrayList<String>();
 		for (int i = 0; i < listMaintain.size(); ++i) {
@@ -995,13 +1023,13 @@ public class NurseSiteMaintainService {
 		int headerColumnIndex = 1;
 		// int secondHeaderColumnIndex=1;
 		int columnIndex = 1;
-		int rowIndex = 6;
 		int keyRow = 1;
 		int checkNameRow=2;
 		int scheduleDateRow=3;
 		int checkDateRow=4;
 		int sequenceRow=5;
 		int modifyByRow=6;
+		int rowIndex = 7;
 		int secondKeyRow = 2;
 		int dataColumnIndex=5;
 		if (mapAssetUidMaintainItem.size() > 0) {
@@ -1009,7 +1037,6 @@ public class NurseSiteMaintainService {
 			while (it.hasNext()) {
 				List<NurseSiteMaintainItem> tempListItem = it.next();
 				if (tempListItem != null && tempListItem.size() > 0) {
-					rowIndex++;
 					columnIndex = 1;
 					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
@@ -1022,6 +1049,7 @@ public class NurseSiteMaintainService {
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
 					// "班次", doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
+					mapCheckItemSequence.clear();
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
 						Set<NurseSiteMaintainData> listData = tempItem.getListData();
@@ -1051,7 +1079,15 @@ public class NurseSiteMaintainService {
 								}
 								keyName+=tempItem.getSequenceName()+",";
 								if(tempData.getCheckItem()!=null){
-									keyName+=tempData.getCheckItem()+",";
+									String checkItemStr=tempData.getCheckItem();
+									if(mapCheckItemSequence.containsKey(checkItemStr)){
+										mapCheckItemSequence.put(checkItemStr, mapCheckItemSequence.get(checkItemStr)+1);
+										keyName+=mapCheckItemSequence.get(checkItemStr)+",";
+									}
+									else{
+										keyName+=checkItemStr+",";
+										mapCheckItemSequence.put(checkItemStr, 1);
+									}
 								}
 								else{
 									keyName+=",";
@@ -1065,6 +1101,7 @@ public class NurseSiteMaintainService {
 							}
 						}
 					}
+					rowIndex++;
 				}
 			}
 //			writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
@@ -1072,12 +1109,13 @@ public class NurseSiteMaintainService {
 			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
 			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
+			if(setSignature.size()>0){
+				writeExcelSheetHeader(header, "签名", doc, 1, rowIndex++, false);
+				writeSignatureToExcel(doc, rowIndex++,dataColumnIndex,3,12, setSignature);
+			}
 			doc.removeRow(SHEET_Maintain, keyRow);
 //			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
 			writeExcelHeader(doc,keyRow);
-			if(setSignature.size()>0){
-				writeSignatureToExcel(doc, rowIndex++, 3, 12, setSignature);
-			}
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -1090,14 +1128,14 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	private void writeSignatureToExcel(ExcelDocument doc,int row,int width,int height,Set<String> signatureIds){
+	private void writeSignatureToExcel(ExcelDocument doc,int row,int columnIndex,int width,int height,Set<String> signatureIds){
 		try {
-			int columnIndex=1;
 			Iterator<String> it=signatureIds.iterator();
 			while(it.hasNext()){
 				String tempSignature=it.next();
 				StreamedContent sc=getMaintainSignatureWeiXin(tempSignature);
 				if(sc!=null){
+					doc.mergeCell(SHEET_Maintain, row, row+height-1, columnIndex, columnIndex+width-1);
 					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
 					columnIndex+=width;
 				}
@@ -1109,12 +1147,13 @@ public class NurseSiteMaintainService {
 	}
 	
 	private void writeExcelHeader(ExcelDocument doc,int keyRow){
-		int headerColumnIndex=1;
 		List<String> header = new ArrayList<String>();
-		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
+		writeExcelSheetHeader(header, "护士站日常维护报表", doc, 1, keyRow, false);
+		int headerColumnIndex=1;
+		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow+1, false);
 	}
 	
 	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label,Integer parentIndex){

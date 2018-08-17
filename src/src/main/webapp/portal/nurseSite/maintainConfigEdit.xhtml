@@ -129,7 +129,7 @@
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
-				oncomplete="PF('maintainConfigEditDialog').hide();handleSubmit(args, 'maintainConfigEditDialog')" action="#{maintainConfigController.update}" disabled="#{maintainConfigController.saveDisable}"/>
+				oncomplete="PF('maintainConfigEditDialog').hide();handleSubmit(args, 'maintainConfigEditDialog')" action="#{maintainConfigController.update}" disabled="#{maintainConfigController.saveDisable}" timeout="180000"/>
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigEditDialog').hide()" />
 		</h:form>
 	</p:dialog>
