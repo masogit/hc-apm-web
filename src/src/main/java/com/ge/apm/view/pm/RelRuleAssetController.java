@@ -238,6 +238,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	public List<PmOrderRule> getRuleList(String name){
 		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
 		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
 		if(StringUtils.isNotEmpty(name)){
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
         }
