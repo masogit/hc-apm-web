@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +139,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(wo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token, formData, "cancel", workOrderId);
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("Cancel"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
         }
     }
 
@@ -162,7 +163,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token, formData, "assign", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("dispatchWorkOrder"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail",WebUtil.getMessage("dispatchWorkOrder")));
         }
     }
 
@@ -173,7 +174,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token, formData, "ack", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("Acknowledge"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
         }
     }
 
@@ -185,7 +186,7 @@ public class V2_WorkOrderService {
         formData.setConfirmedDownTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedDowntime));
         String res = srApi.invokeWorkOrderAction(token, formData, "updateTime", wo.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("Acknowledge"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
         }
     }
 
@@ -198,7 +199,7 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(String.valueOf(status));
         String res = srApi.invokeWorkOrderAction(token, formData, "ackFailed", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("Acknowledge"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
         }
     }
 
@@ -211,7 +212,7 @@ public class V2_WorkOrderService {
         formData.setFeedbackRating(String.valueOf(rating));
         String res = srApi.invokeWorkOrderAction(token, formData, "rate", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("feedbackComment"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("feedbackComment")));
         }
     }
 
@@ -222,7 +223,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token, formData, "checkIn", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("feedbackComment"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("feedbackComment")));
         }
     }
 
@@ -235,7 +236,7 @@ public class V2_WorkOrderService {
         formData.setTakeTime(takeTime);
         String res = srApi.invokeWorkOrderAction(token, formData, "take", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), WebUtil.getMessage("feedbackComment"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("feedbackComment")));
         }
     }
 
@@ -250,7 +251,7 @@ public class V2_WorkOrderService {
         formData.setDesc(comments);
         String res = srApi.invokeWorkOrderAction(token, formData, "accept", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "接单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "接单"));
         }
         selectedWorkOrder.setCurrentStepId(4);
     }
@@ -266,7 +267,7 @@ public class V2_WorkOrderService {
         formData.setEquipmentTaker(taker);
         String res = srApi.invokeWorkOrderAction(token, formData, "take", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "接单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "接单"));
         }
     }
 
@@ -280,7 +281,7 @@ public class V2_WorkOrderService {
         formData.setAssigneeId(approverUid);
         String res = srApi.invokeWorkOrderAction(token, formData, "approval", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "提交"));
         } else {
             WebUtil.addSuccessMessage("已提交");
         }
@@ -306,7 +307,7 @@ public class V2_WorkOrderService {
 
         String res = srApi.invokeWorkOrderAction(token, formData, approvalType, selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "提交"));
         }
     }
 
@@ -319,7 +320,7 @@ public class V2_WorkOrderService {
         formData.setDesc(comments == null ? "" : comments);
         String res = srApi.invokeWorkOrderAction(token, formData, "reassign", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "转单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "转单"));
         }
     }
 
@@ -351,7 +352,7 @@ public class V2_WorkOrderService {
         formData.setAttachments(attachments);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "保存");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "保存"));
         }
     }
 
@@ -378,7 +379,7 @@ public class V2_WorkOrderService {
 
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "完成");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
         }
     }
 
@@ -398,7 +399,10 @@ public class V2_WorkOrderService {
 
         String res = srApi.invokeWorkOrderAction(token, formData, "close", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "关单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "关单"));
+            if(!Strings.isNullOrEmpty(res)){
+                WebUtil.addErrorMessage(res);
+            }
         }
     }
 
@@ -414,7 +418,7 @@ public class V2_WorkOrderService {
         formData.setAttachments(picList);
         String res = srApi.createWorkOrder(token, formData);
         if (res == null || !res.contains("success")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "创建");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "创建"));
         }
     }
 
