@@ -3,11 +3,9 @@ package com.ge.apm.domain;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -15,36 +13,38 @@ import java.io.Serializable;
 public class AttrDesc implements ChineseName,Serializable {
 
     @Id
-    @Column(name = "attr_desc_uid", nullable = false)
-    private String attrDescUid;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name="id", columnDefinition = "CHAR(32)")
+    private String id;
 
-    //mappedto attribute.attribute_uid
-    @Column(name = "attribute_uid", nullable = false)
-    private String attributeUid;
+    //mappedto attribute.id
+    @Column(name = "attribute_id", columnDefinition = "CHAR(32)", nullable = false)
+    private String attributeId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", columnDefinition = "VARCHAR(64)", nullable = false)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "VARCHAR(255)")
     private String description;
 
     @Column(name = "required", nullable = false)
     private Boolean required;
 
-    public String getAttrDescUid() {
-        return attrDescUid;
+    public String getId() {
+        return id;
     }
 
-    public void setAttrDescUid(String attrDescUid) {
-        this.attrDescUid = attrDescUid;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getAttributeUid() {
-        return attributeUid;
+    public String getAttributeId() {
+        return attributeId;
     }
 
-    public void setAttributeUid(String attributeUid) {
-        this.attributeUid = attributeUid;
+    public void setAttributeId(String attributeId) {
+        this.attributeId = attributeId;
     }
 
     public String getName() {
