@@ -10,12 +10,9 @@
     <ui:composition>
         <div class="ui-g-12 card" >
 
-            <h:form id="pmOrderDetailForm">
+            <h:form id="pmOrderDetailForm" class="pmOrderDetailFormCls">
                 <p:fieldset legend="保养单" rendered="#{not empty v2PmOrderController.selected}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-              <!--  <h:panelGroup>
-
-                </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">资产名</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.assetName}"></p:outputLabel>
@@ -32,10 +29,6 @@
                             <label class="label">保养类型</label>
                             <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
                         </h:panelGroup>
-                       <!-- <h:panelGroup>
-                            <label class="label">保养类型</label>
-                            <p:outputLabel value="#{v2PmOrderController.acquirePmType(v2PmOrderController.selected)}"></p:outputLabel>
-                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.clinicalDeptName}</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
@@ -91,66 +84,67 @@
                         </p:column>
                         <p:column headerText="#{msg.endTime}">
                             <h:outputText value="#{stepItem.endTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-
-                    <h:panelGroup rendered="#{v2PmOrderController.accessoryList.size()>0}">
+                    <c:forEach items="#{v2PmOrderController.currentPagePmOrders}" var="orderItem" varStatus="rowIndex">
+                        <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetail(orderItem.id)}">
                         <label class="label">备件信息</label><!--增加备件-->
-                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetail(orderItem.id)}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.accessory}">
-                                <h:outputText value="#{item.parts}"/>
+                                <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
 
                             <p:column headerText="#{msg.accessoryQuantity}">
-                                <h:outputText value="#{item.apartsQuantity}"/>
+                                <h:outputText value="#{detailItem.apartsQuantity}"/>
                             </p:column>
                             <p:column headerText="#{msg.accessoryPrice}">
-                                <h:outputText value="#{item.partsPrice}">
+                                <h:outputText value="#{detailItem.partsPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="类型">
-                                <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                                <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                             </p:column>
                             <p:column headerText="发票号">
-                                <h:outputText value="#{item.invoiceNum}" />
+                                <h:outputText value="#{detailItem.invoiceNum}" />
                             </p:column>
                             <p:column headerText="序列号">
-                                <h:outputText value="#{item.serialNum}" />
+                                <h:outputText value="#{detailItem.serialNum}" />
                             </p:column>
                             <p:column headerText="质保期">
-                                <h:outputText value="#{item.warrantyDate}">
+                                <h:outputText value="#{detailItem.warrantyDate}">
                                     <f:convertDateTime pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </p:column>
-<!--
-                            <p:column headerText="审批通过">
-                                <h:outputText value="#{item.approved ?'通过':'拒绝'}"/>
-                            </p:column>-->
-
                             <p:column headerText="预计到达时间">
-                                <h:outputText value="#{item.estimatedArriveTime}">
+                                <h:outputText value="#{detailItem.estimatedArriveTime}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="到达确认时间">
-                                <h:outputText value="#{item.arrivedTime}">
+                                <h:outputText value="#{detailItem.arrivedTime}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="到货">
-                                <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
+                                <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" rendered="#{detailItem.id ne '000'}"/>
+                            </p:column>
+                            <p:column headerText="实际价格(元)">
+                                <h:outputText value="#{detailItem.closedPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
                             <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{v2PmOrderController.coWorkerList.size()>0}">
+
+                    <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderCoworker(orderItem.id)}">
                         <label class="label">协作人信息</label>
-                        <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}"  var="item" widgetVar="pmcoworkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="pmcoworkerList" class="uiTransparent coworkcls" value="#{v2PmOrderController.getWorkOrderCoworker(orderItem.id)}"  var="item" widgetVar="pmcoworkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.coworker}">
                                 <h:outputText value="#{item.cowokerUserName}"/>
                             </p:column>
@@ -159,7 +153,7 @@
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
-
+                    </c:forEach>
 
 
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
@@ -212,6 +206,7 @@
                             <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
                         </p:dataList>
                     </h:panelGroup>
+
                 </p:fieldset>
             </h:form>
         </div>

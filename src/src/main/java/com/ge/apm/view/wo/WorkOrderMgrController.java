@@ -5,24 +5,9 @@
  */
 package com.ge.apm.view.wo;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.domain.AssetFaultType;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
@@ -41,7 +26,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -75,6 +63,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
+    private V2_WorkOrderRepository woDao;
     private String locationName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -127,6 +116,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private String selectedApproverUid;
 
+    private WorkflowConfigRepository woConDao;
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -139,6 +129,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
+        woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+
+
 
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -162,7 +156,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         
 
     }
-
+    public Boolean needRating(){
+      /*gl:tbc
+        WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());*/
+        Boolean needRating =  true;//woc.getRatingRequired();
+        //查看是否被评价过
+        Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        //如果配置流里设置过必须评价，并且没有被评价过 返回true即显示需要评价
+        if(needRating &&feedback<1 )
+        {
+            return true;
+        }else
+            return false;
+    }
     @Override
     protected GenericRepositoryUUID<V2_WorkOrder> getDAO() {
         return dao;
@@ -532,9 +538,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
-
+private Boolean hourRequired=false;
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+        //获取当前工单的所属流程配置
+       /*gl:tbc
+        WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        hourRequired=  woc.getHourRequired();*/
+
+        //如果工作流配置了工时必填,则默认工时是0.01
+        if(hourRequired) {
+            this.selectedWorkOrder.setManHours(0.01);
+        }
+
         /* if(selectedWorkOrder.getOtherExpense()==0){
             selectedWorkOrder.setOtherExpense(null);
         }
@@ -553,6 +569,18 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveRepairWorkOrder() {
+        /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        hourRequired=  woc.getHourRequired();*/
+        if(false){
+            this.selectedWorkOrder.setManHours(null);
+        }else{
+          if(this.selectedWorkOrder.getManHours()< 0.01){
+              WebUtil.addErrorMessage("所填工时不能小于0.01");
+              RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+              return;
+          }
+        }
+
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -622,11 +650,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
-        if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
-            WebUtil.addErrorMessage("工时不能小于0.01");
-            RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
-            valid = false;
+
+
+       /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        hourRequired=  woc.getHourRequired();*/
+        if(hourRequired) { //如果工作流配置了工时必填，那么就要jian
+            if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
+                WebUtil.addErrorMessage("工时不能小于0.01");
+                RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+                valid = false;
+            }
         }
+
+
         if (!valid) {
             return;
         }
@@ -666,6 +702,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void closeWorkOrder() {
+
+        WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        Boolean ratingRequired=  woc.getRatingRequired();
+
+
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
     }
