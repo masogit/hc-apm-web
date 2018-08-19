@@ -26,7 +26,7 @@
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.updateAccessPrice()}" value="#{msg.Save}" update="pmTab:pmOrderDetailForm pmTab:pmrepairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmMoreAccDialogPriceDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.updateAccessPrice()}" value="#{msg.Save}" update="@(.pmOrderDetailFormCls) @(.accessCls) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmMoreAccDialogPriceDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmMoreAccDialogPriceDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>

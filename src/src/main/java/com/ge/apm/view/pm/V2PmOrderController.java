@@ -142,6 +142,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     Boolean isInsulate;
     private String reportUid; //selected table base uid
 
+
     public String getHead() {
         return head;
     }
@@ -153,8 +154,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareEditAccDetailonPrice(String itemId){
         accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
     if(!accessoryList.isEmpty())
-        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId
-        )).findAny().get();
+        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
 
@@ -531,7 +531,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //是否全是批量完成
     public boolean isBatchComplete() {
-        //System.out.println(result);
         boolean mark = false;
         List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
@@ -1177,6 +1176,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return pmOrderService.getWorkOrderDetails(woId);
     }
 
+    public List<V2_WorkOrder_Detail> getxx(String woId) {
+        return pmOrderService.getWorkOrderDetails(woId);
+    }
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
@@ -1963,5 +1965,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
+    }
+
+    public List<V2_PmOrder> getCurrentPagePmOrders() {
+        return currentPagePmOrders;
+    }
+
+    public void setCurrentPagePmOrders(List<V2_PmOrder> currentPagePmOrders) {
+        this.currentPagePmOrders = currentPagePmOrders;
     }
 }

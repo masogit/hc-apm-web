@@ -390,6 +390,7 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("待关单");
         formData.setCurrentStepId(6);
         formData.setDesc(comments);
+        formData.setFeedbackRating(String.valueOf(selectedWorkOrder.getFeedbackRating()));
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
