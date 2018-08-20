@@ -626,12 +626,10 @@ public class MaintainController {
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
-				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime()){
+				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime() && tempMaintain.getStatus()==0){
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-//			nurseSiteMaintainService.batchUpdateMaintainDataAllRight(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
-//			nurseSiteMaintainService.saveMaintainWithThread(listNewNurseSiteMaintain);
 			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
 			addMessage("工单已批量填写");
 		}

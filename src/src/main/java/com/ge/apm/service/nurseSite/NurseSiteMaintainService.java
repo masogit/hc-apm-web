@@ -237,7 +237,8 @@ public class NurseSiteMaintainService {
 			for(int i=0;i<obj.size();++i){
 				splitList.add(obj.get(i));
 				if(i%50==0 || i+1>=obj.size()){
-					nurseSiteMaintainRepository.delete(splitList);
+//					nurseSiteMaintainRepository.delete(splitList);
+					nativeDeleteMaintain(splitList);
 					splitList.clear();
 				}
 			}
@@ -289,7 +290,6 @@ public class NurseSiteMaintainService {
 			saveMaintainWithThread(obj);
 		}
 		if (obj2 != null && obj2.size() > 0) {
-			// nurseSiteMaintainRepository.delete(obj2);
 			deleteMaintain(obj2);
 		}
 	}
@@ -299,7 +299,6 @@ public class NurseSiteMaintainService {
 	}
 
 	public void delete(NurseSiteMaintain obj) {
-		// nurseSiteMaintainRepository.delete(obj);
 		deleteMaintain(obj);
 	}
 
@@ -532,39 +531,51 @@ public class NurseSiteMaintainService {
 		Set<String> setMaintainIds=new HashSet<String>();
 		Set<String> setMaintainItemIds=new HashSet<String>();
 		Set<String> setMaintainDataIds=new HashSet<String>();
-		Set<NurseSiteMaintainItem> listItem=null;
-		Set<NurseSiteMaintainData> listData=null;
 		if(listMaintain!=null && listMaintain.size()>0){
 			for(int i=0;i<listMaintain.size();++i){
 				setMaintainIds.add(listMaintain.get(i).getId());
 			}
 		}
 		if(setMaintainIds.size()>0){
-			listItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setMaintainIds);
-		}
-		if(listItem!=null && listItem.size()>0){
-			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
-			while(itItem.hasNext()){
-				setMaintainItemIds.add(itItem.next().getId());
-			}
+			setMaintainItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
 		}
 		if(setMaintainItemIds.size()>0){
-			listData=nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainItemIds);
+			setMaintainDataIds=nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
 		}
-		if(listData!=null && listData.size()>0){
-			Iterator<NurseSiteMaintainData> itData=listData.iterator();
-			while(itData.hasNext()){
-				setMaintainDataIds.add(itData.next().getId());
-			}
-		}
-		if (setMaintainIds.size() > 0) {
-			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		if (setMaintainDataIds.size() > 0) {
+			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
 		}
 		if (setMaintainItemIds.size() > 0) {
 			nurseSiteMaintainItemRepository.completeMaintainItem(setMaintainItemIds, signatureId, user.getUid(), date);
 		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		}
+	}
+	
+	private void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain){
+		Set<String> setMaintainIds=new HashSet<String>();
+		Set<String> setMaintainItemIds=new HashSet<String>();
+		Set<String> setMaintainDataIds=new HashSet<String>();
+		if(listMaintain!=null && listMaintain.size()>0){
+			for(int i=0;i<listMaintain.size();++i){
+				setMaintainIds.add(listMaintain.get(i).getId());
+			}
+		}
+		if(setMaintainIds.size()>0){
+			setMaintainItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+		}
+		if(setMaintainItemIds.size()>0){
+			setMaintainDataIds=nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
+		}
 		if (setMaintainDataIds.size() > 0) {
-			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
+			nurseSiteMaintainDataRepository.deleteMaintainData(setMaintainDataIds);
+		}
+		if (setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainItemRepository.deleteMaintainItem(setMaintainItemIds);
+		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainRepository.deleteMaintain(setMaintainIds);
 		}
 	}
 
@@ -803,14 +814,8 @@ public class NurseSiteMaintainService {
 				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
 			}
 		}
-		// nurseSiteMaintainRepository.delete(listMaintain);
 		saveMaintainWithThread(listNewMaintain);
-		try {
-			deleteMaintain(listMaintain);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
-		}
+		deleteMaintain(listMaintain);
 	}
 
 	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
