@@ -600,7 +600,7 @@ public class MaintainController {
 		addMessage("报告已批量生成");
 		return "maintainMain?faces-redirect=true";
 	}
-	public void batchCompleteMaintainData(){
+	public String batchCompleteMaintainData(){
 		if(startBatchDate==null){
 			startBatchDate=new Date();
 		}
@@ -621,13 +621,15 @@ public class MaintainController {
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.batchUpdateMaintainDataAllRight(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
-			nurseSiteMaintainService.saveMaintainWithThread(listNewNurseSiteMaintain);
+//			nurseSiteMaintainService.batchUpdateMaintainDataAllRight(listNewNurseSiteMaintain,signatureId,currentDate,currentUser);
+//			nurseSiteMaintainService.saveMaintainWithThread(listNewNurseSiteMaintain);
+			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
 			addMessage("报告已批量填写");
 		}
 		else{
 			addMessage("报告批量填写失败");
 		}
+		return "maintainMain?faces-redirect=true";
 	}
 
 	public boolean isValideDate() {
