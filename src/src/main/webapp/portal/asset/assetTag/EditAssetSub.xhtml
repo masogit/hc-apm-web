@@ -89,19 +89,19 @@
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck2" value="#{assetSubscriberController.selected.level0}"/>
-                                <p:outputLabel value="紧急"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','1')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck3" value="#{assetSubscriberController.selected.level1}"/>
-                                <p:outputLabel value="重要"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','2')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck4" value="#{assetSubscriberController.selected.level2}"/>
-                                <p:outputLabel value="一般"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','3')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
