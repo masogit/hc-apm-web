@@ -413,7 +413,13 @@ public class MaintainController {
 	}
 	
 	public void checkRightAll(){
-		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
+		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(nurseSiteMaintain.isNeedGetItem()){
+			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
+			nurseSiteMaintain.setNeedGetItem(false);
+		}
+		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
 			Set<NurseSiteMaintainData> listData=tempItem.getListData();
