@@ -40,8 +40,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "nurse_site_maintain")
-@Cacheable(false)
-@Cache(usage=CacheConcurrencyStrategy.NONE)
 public class NurseSiteMaintain implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintain.class);
 	private static final long serialVersionUID = 1L;
