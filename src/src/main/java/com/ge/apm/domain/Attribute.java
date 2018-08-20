@@ -4,18 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -30,44 +22,54 @@ public class Attribute implements ChineseName,Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-    @Column(name = "attribute_uid", nullable = false)
-    private String attributeUid;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name="id", columnDefinition = "CHAR(32)")
+    private String id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", columnDefinition = "VARCHAR(64)", nullable = false)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "VARCHAR(255)")
     private String description;
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)", nullable = false)
+    private String tenantUid;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)", nullable = false)
+    private String institutionUid;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)", nullable = false)
+    private String hospitalUid;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)", nullable = false)
+    private String siteUid;
 
     @CreatedBy
     @Column(name = "create_by", nullable = false)
     private String createBy;
 
     @CreatedDate
-    @Column(name = "create_date")
+    @Column(name = "create_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
     @LastModifiedBy
-    @Column(name = "update_by", nullable = false)
-    private String updateBy;
+    @Column(name = "last_update_by", nullable = false)
+    private String lastUpdateBy;
 
     @LastModifiedDate
-    @Column(name = "update_date")
+    @Column(name = "last_update_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updateDate;
+    private Date lastUpdateDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name="attribute_uid")
-    private Set<AttrDesc> attrDescSet;
-
-    public String getAttributeUid() {
-        return attributeUid;
+    public String getId() {
+        return id;
     }
 
-    public void setAttributeUid(String attributeUid) {
-        this.attributeUid = attributeUid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -86,6 +88,38 @@ public class Attribute implements ChineseName,Serializable {
         this.description = description;
     }
 
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+    }
+
+    public String getInstitutionUid() {
+        return institutionUid;
+    }
+
+    public void setInstitutionUid(String institutionUid) {
+        this.institutionUid = institutionUid;
+    }
+
+    public String getHospitalUid() {
+        return hospitalUid;
+    }
+
+    public void setHospitalUid(String hospitalUid) {
+        this.hospitalUid = hospitalUid;
+    }
+
+    public String getSiteUid() {
+        return siteUid;
+    }
+
+    public void setSiteUid(String siteUid) {
+        this.siteUid = siteUid;
+    }
+
     public String getCreateBy() {
         return createBy;
     }
@@ -102,28 +136,26 @@ public class Attribute implements ChineseName,Serializable {
         this.createDate = createDate;
     }
 
-    public String getUpdateBy() {
-        return updateBy;
+    public String getLastUpdateBy() {
+        return lastUpdateBy;
     }
 
-    public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy;
+    public void setLastUpdateBy(String lastUpdateBy) {
+        this.lastUpdateBy = lastUpdateBy;
     }
 
-    public Date getUpdateDate() {
-        return updateDate;
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 
-    public Set<AttrDesc> getAttrDescSet() {
-        return attrDescSet;
-    }
-
-    public void setAttrDescSet(Set<AttrDesc> attrDescSet) {
-        this.attrDescSet = attrDescSet;
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
     }
 
     @Override
