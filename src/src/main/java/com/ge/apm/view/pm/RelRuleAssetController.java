@@ -16,6 +16,7 @@ import com.ge.apm.service.utils.PinYinComparator;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -77,7 +78,6 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		queryAsset.setTenantUID(user.getTenantUID());
 		siteUid = user.getSiteUID();
 		initAssets();
-
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
@@ -114,7 +114,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}*/
 		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId()));
+			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
 		}
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
@@ -146,10 +146,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	}
 
 	public List<SearchFilter> getAssetFilter() {
-		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		//filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		return filter;
 	}
 
@@ -236,9 +237,25 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	}
 
 	public List<PmOrderRule> getRuleList(String name){
-		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
-		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
-		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+		/*		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));*/
+		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
+		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+			filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+		}
+/*		if (StringUtils.isNotEmpty(queryAsset.getName())) {
+			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+		}*/
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+			filter.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}
+		if (queryAsset.getAssetGroup() != null) {
+			filter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+		}
+		if (level != null) {
+			filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
+		}
 		if(StringUtils.isNotEmpty(name)){
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
         }
@@ -258,7 +275,6 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		});
 		return rules;
 	}
-
 
 	public void setRuleId(){
 
