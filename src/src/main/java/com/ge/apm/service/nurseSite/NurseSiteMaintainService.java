@@ -1,6 +1,5 @@
 package com.ge.apm.service.nurseSite;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.AssetInfoRepository;
@@ -53,7 +51,6 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.NurseSiteMaintainComparator;
-import com.ge.apm.service.wo.WorkOrderPublishRenderService.RenderResult;
 
 import webapp.framework.dao.SearchFilter;
 
@@ -516,6 +513,46 @@ public class NurseSiteMaintainService {
 				}
 				updateMaintainDataAllRight(tempMaintain,date,user);
 			}
+		}
+	}
+	@Transactional
+	public void batchCompleteMaintain(List<NurseSiteMaintain> listMaintain,String signatureId,Date date,UserAccount user){
+		Set<String> setMaintainIds=new HashSet<String>();
+		Set<String> setMaintainItemIds=new HashSet<String>();
+		Set<String> setMaintainDataIds=new HashSet<String>();
+		Set<NurseSiteMaintainItem> listItem=null;
+		Set<NurseSiteMaintainData> listData=null;
+		if(listMaintain!=null && listMaintain.size()>0){
+			for(int i=0;i<listMaintain.size();++i){
+				setMaintainIds.add(listMaintain.get(i).getId());
+			}
+		}
+		if(setMaintainIds.size()>0){
+			listItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setMaintainIds);
+		}
+		if(listItem!=null && listItem.size()>0){
+			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
+			while(itItem.hasNext()){
+				setMaintainItemIds.add(itItem.next().getId());
+			}
+		}
+		if(setMaintainItemIds.size()>0){
+			listData=nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainItemIds);
+		}
+		if(listData!=null && listData.size()>0){
+			Iterator<NurseSiteMaintainData> itData=listData.iterator();
+			while(itData.hasNext()){
+				setMaintainDataIds.add(itData.next().getId());
+			}
+		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		}
+		if (setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainItemRepository.completeMaintainItem(setMaintainItemIds, signatureId, user.getUid(), date);
+		}
+		if (setMaintainDataIds.size() > 0) {
+			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
 		}
 	}
 

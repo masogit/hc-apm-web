@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.NurseSiteMaintain;
 
@@ -34,5 +36,10 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	
 	@Query(value="select o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) order by o.schedule_date asc",nativeQuery=true)
 	public List<NurseSiteMaintain> findDataByClinicalOrgUid(List<String> listOrgUid,Date startDate,Date endDate);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0, status=2 where id in ?1", nativeQuery = true)
+	void completeMaintain(Set<String> ids,String signature,String modifyUid,Date modifyDate);
 }
 
