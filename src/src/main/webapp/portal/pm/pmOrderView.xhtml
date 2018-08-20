@@ -88,10 +88,9 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-                    <c:forEach items="#{v2PmOrderController.currentPagePmOrders}" var="orderItem" varStatus="rowIndex">
-                        <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetail(orderItem.id)}">
+                        <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
                         <label class="label">备件信息</label><!--增加备件-->
-                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetail(orderItem.id)}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.accessory}">
                                 <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
@@ -142,9 +141,9 @@
                         </p:dataTable>
                     </h:panelGroup>
 
-                    <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderCoworker(orderItem.id)}">
+                    <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderCoworkerON(null)}">
                         <label class="label">协作人信息</label>
-                        <p:dataTable id="pmcoworkerList" class="uiTransparent coworkcls" value="#{v2PmOrderController.getWorkOrderCoworker(orderItem.id)}"  var="item" widgetVar="pmcoworkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="pmcoworkerList" class="uiTransparent coworkcls" value="#{v2PmOrderController.getWorkOrderCoworkerON(null)}"  var="item" widgetVar="pmcoworkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.coworker}">
                                 <h:outputText value="#{item.cowokerUserName}"/>
                             </p:column>
@@ -153,7 +152,6 @@
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
-                    </c:forEach>
 
 
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">

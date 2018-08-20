@@ -744,10 +744,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void savePM() {
         PmOrderActionForm formData = new PmOrderActionForm();
+        if (selectedAsset.getStatus() == 5) {
+            WebUtil.addErrorMessage("所选设备停用,不能保养");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        }
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能保养");
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         }
         if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
@@ -1180,6 +1183,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return pmOrderService.getWorkOrderCoworker(woId);
     }
 
+    public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
+ if(selected!=null)
+        return pmOrderService.getWorkOrderDetails(selected.getId());
+ else
+     return null;
+    }
+
+    public List<V2_WorkOrderCoworker> getWorkOrderCoworkerON(String woId) {
+        if(selected!=null)
+            return pmOrderService.getWorkOrderCoworker(selected.getId());
+        else
+            return null;
+    }
+
+
     public void closePM(V2_PmOrder selectedPmOrder) {
         if (isChecked() == false) {
             pmOrderService.closePM(selectedPmOrder, picList);
@@ -1357,7 +1375,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
         //保养合格的话 去关单
-
         //cancel();
     }
 
