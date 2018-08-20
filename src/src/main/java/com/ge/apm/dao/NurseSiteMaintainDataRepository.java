@@ -1,6 +1,6 @@
 package com.ge.apm.dao;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,6 +20,9 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	
 	@Query(value="select o.* from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
 	public Set<NurseSiteMaintainData> findMaintainDataByParentIds(Set<String> parentIds);
+	
+	@Query(value="select o.* from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
+	public List<NurseSiteMaintainData> findListMaintainDataByParentIds(Set<String> parentIds);
 	
 	@Query(value="select o.id from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
 	public Set<String> findIdsByParentIds(Set<String> parentIds);

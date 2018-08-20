@@ -365,13 +365,11 @@ public class NurseSiteMaintainService {
 	}
 	
 	private void updateMaintainDataAllRight(NurseSiteMaintain obj, Date date,UserAccount user){
-		Set<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
+		Set<NurseSiteMaintainItem> listItem = null;
 		if (obj.isNeedGetItem()) {
-			listItem = findMaintainItemByParentId(obj.getId());
-			obj.setListNurseSiteMaintainItem(listItem);
-			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
-			obj.setNeedGetItem(false);
+			supplementMaintain(obj);
 		}
+		listItem = obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		while (it.hasNext()) {
 			NurseSiteMaintainItem tempItem = it.next();
@@ -393,15 +391,90 @@ public class NurseSiteMaintainService {
 		obj.setModifyByUid(user.getUid());
 		obj.setModifyDate(date);
 	}
+	
+	private void supplementMaintainItem(Set<NurseSiteMaintainItem> listItem){
+		Set<String> setModifyByUids=new HashSet<String>();
+		Set<String> setAssetInfoUids=new HashSet<String>();
+		Set<String> setItemIds=new HashSet<String>();
+		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
+		Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
+		Map<String,Set<NurseSiteMaintainData>> mapData=new HashMap<String,Set<NurseSiteMaintainData>>();
+		List<UserAccount> listModify=null;
+		List<AssetInfo> listAssetInfo=null;
+		List<NurseSiteMaintainData> listData=null;
+		if(listItem!=null && listItem.size()>0){
+			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
+			while(itItem.hasNext()){
+				NurseSiteMaintainItem tempItem=itItem.next();
+				setModifyByUids.add(tempItem.getModifyByUid());
+				setAssetInfoUids.add(tempItem.getAssetUid());
+				setItemIds.add(tempItem.getId());
+			}
+		}
+		if (setModifyByUids.size() > 0) {
+			listModify=userAccountRepository.getByUids(setModifyByUids);
+		}
+		if (setAssetInfoUids.size() > 0) {
+			listAssetInfo=assetInfoRepository.getByUids(setAssetInfoUids);
+		}
+		if (setItemIds.size() > 0) {
+			listData=nurseSiteMaintainDataRepository.findListMaintainDataByParentIds(setItemIds);
+		}
+		if(listModify!=null){
+			for(int i=0;i<listModify.size();++i){
+				UserAccount tempUser=listModify.get(i);
+				mapModifyBy.put(tempUser.getUid(), tempUser);
+			}
+		}
+		if(listAssetInfo!=null){
+			for(int i=0;i<listAssetInfo.size();++i){
+				AssetInfo tempAsset=listAssetInfo.get(i);
+				mapAssetInfo.put(tempAsset.getUid(), tempAsset);
+			}
+		}
+		if(listData!=null){
+			for(int i=0;i<listData.size();++i){
+				NurseSiteMaintainData tempData=listData.get(i);
+				String parentId=tempData.getParentId();
+				if(mapData.containsKey(parentId)){
+					mapData.get(parentId).add(tempData);
+				}
+				else{
+					Set<NurseSiteMaintainData> tempSetData=new HashSet<NurseSiteMaintainData>();
+					tempSetData.add(tempData);
+					mapData.put(parentId, tempSetData);
+				}
+			}
+		}
+		if(listItem!=null && listItem.size()>0){
+			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
+			while(itItem.hasNext()){
+				NurseSiteMaintainItem tempItem=itItem.next();
+				if(StringUtils.isNotEmpty(tempItem.getAssetUid())){
+					tempItem.setAssetInfo(mapAssetInfo.get(tempItem.getAssetUid()));
+				}
+				if(StringUtils.isNotEmpty(tempItem.getModifyByUid())){
+					tempItem.setModifyBy(mapModifyBy.get(tempItem.getModifyByUid()));
+				}
+				tempItem.setListData(mapData.get(tempItem.getId()));
+			}
+		}
+	}
+	
+	public void supplementMaintain(NurseSiteMaintain tempMaintain){
+		Set<NurseSiteMaintainItem> listItem = findMaintainItemByParentId(tempMaintain.getId());
+		tempMaintain.setListNurseSiteMaintainItem(listItem);
+		tempMaintain.setModifyBy(getUserAccountByUid(tempMaintain.getModifyByUid()));
+		tempMaintain.setNeedGetItem(false);
+		supplementMaintainItem(listItem);
+	}
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
-		Set<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
+		Set<NurseSiteMaintainItem> listItem = null;
 		if (obj.isNeedGetItem()) {
-			listItem = findMaintainItemByParentId(obj.getId());
-			obj.setListNurseSiteMaintainItem(listItem);
-			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
-			obj.setNeedGetItem(false);
+			supplementMaintain(obj);
 		}
+		listItem=obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
 		int objStatus = 0;
@@ -467,9 +540,7 @@ public class NurseSiteMaintainService {
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
 			if(tempMaintain.isNeedGetItem()){
-				setParentIds.add(tempMaintain.getId());
-				setModifyByUids.add(tempMaintain.getModifyByUid());
-				tempMaintain.setNeedGetItem(false);
+				supplementMaintain(tempMaintain);
 			}
 		}
 		if(setParentIds.size()>0){
@@ -502,9 +573,7 @@ public class NurseSiteMaintainService {
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
 			if(tempMaintain.isNeedGetItem()){
-				tempMaintain.setListNurseSiteMaintainItem(mapItem.get(tempMaintain.getId()));
-				tempMaintain.setModifyBy(mapUser.get(tempMaintain.getModifyByUid()));
-				tempMaintain.setNeedGetItem(false);
+				supplementMaintain(tempMaintain);
 			}
 		}
 	}
@@ -946,8 +1015,7 @@ public class NurseSiteMaintainService {
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
 			if (tempMaintain.isNeedGetItem()) {
-				tempMaintain.setListNurseSiteMaintainItem(findMaintainItemByParentId(tempMaintain.getId()));
-				tempMaintain.setNeedGetItem(false);
+				supplementMaintain(tempMaintain);
 			}
 			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
@@ -1046,8 +1114,7 @@ public class NurseSiteMaintainService {
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
 			if (tempMaintain.isNeedGetItem()) {
-				tempMaintain.setListNurseSiteMaintainItem(findMaintainItemByParentId(tempMaintain.getId()));
-				tempMaintain.setNeedGetItem(false);
+				supplementMaintain(tempMaintain);
 			}
 			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
