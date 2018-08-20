@@ -1176,9 +1176,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return pmOrderService.getWorkOrderDetails(woId);
     }
 
-    public List<V2_WorkOrder_Detail> getxx(String woId) {
-        return pmOrderService.getWorkOrderDetails(woId);
-    }
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
