@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.service.common.UserCommonService;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
@@ -79,7 +80,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}else{
 			searchFilters = new ArrayList<>();
 		}
-		List<SearchFilter> userFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		List<SearchFilter> userFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
 		searchFilters.addAll(userFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
 			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoByFilter()));
@@ -255,6 +256,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		return filter;
 	}
 	
