@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.UserAccount;
 
 import webapp.framework.dao.GenericRepository;
 
@@ -179,5 +180,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select assetinfo0_.* from asset_info assetinfo0_ where assetinfo0_.is_deleted=false and assetinfo0_.is_valid=true and (assetinfo0_.institution_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)or assetinfo0_.hospital_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)  or assetinfo0_.site_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.clinical_dept_uid in(select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.tenant_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid))",nativeQuery = true)
     public ArrayList<AssetInfo> getUserListByAsset(Integer userId);
 
-
+    @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
+    public List<AssetInfo> getByUids(Set<String> setUids);
 }
