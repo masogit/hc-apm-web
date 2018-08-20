@@ -360,11 +360,7 @@ public class NurseSiteMaintainItem implements Serializable {
 				}
 			}
 		}
-		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
-		tempData.setItem(this);
-		tempData.setCheckItem(label);
-		this.listData.add(tempData);
-		return tempData;
+		return null;
 	}
 
 	@Override
