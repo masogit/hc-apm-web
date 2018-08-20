@@ -4,7 +4,11 @@ import com.ge.apm.domain.AttrDesc;
 import com.ge.apm.domain.Attribute;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.misc.AttributeListService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -13,6 +17,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,6 +31,8 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
 
     private AttributeListService attributeListService;
 
+    private UserAccountService userAccountService;
+
     @Override
     protected GenericRepositoryUUID<Attribute> getDAO() {
         return attributeListService.getAttributeRepository();
@@ -33,13 +41,24 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
     @Override
     protected void init() {
         attributeListService = WebUtil.getBean(AttributeListService.class);
+        userAccountService = WebUtil.getBean(UserAccountService.class);
     }
 
     @Override
     protected Page<Attribute> loadData(PageRequest pageRequest) {
-        Page<Attribute> attributeList = attributeListService.findAllAttribute(pageRequest);
+        if(super.searchFilters == null) {
+            super.searchFilters = new ArrayList<>();
+        }
+        Page<Attribute> attributeList;
+        if(searchFilters == null) {
+            attributeList = attributeListService.findAllAttribute(pageRequest);
+        } else {
+            attributeList = attributeListService.findAttrsBySearchFilters(searchFilters, pageRequest);
+        }
         return attributeList;
     }
+
+
 
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
@@ -63,21 +82,48 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
         super.selected.setLastUpdateDate(now);
     }
 
-    public void onBeforeSave(Attribute attribute) {
-        if(attributeListService.isAttributeExistByName(attribute.getName())) {
+    public void checkAndSave() {
+        if(attributeListService.isAttributeExisted(super.selected)) {
             log.info("Attribute already existed");
+            WebUtil.addErrorMessage("属性已存在");
             return;
+        } else {
+            super.save();
+            WebUtil.addSuccessMessage("属性" + super.selected.getName() + "已成功创建");
         }
     }
 
     public void deleteSelectedAttribute() {
+        attributeListService.deleteAttrDescByAttributeId(super.selected.getId());
         super.delete();
+    }
+
+    public void editAttrDesc(Attribute attribute) {
+        String attributeName = "";
+        try {
+            attributeName = URLEncoder.encode(attribute.getName(), "GBK");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        String pageName = "AttrDescList";
+        StringBuilder parameters = new StringBuilder()
+                .append("action=EditAttrDesc").append("&")
+                .append("selectedId=").append(attribute.getId()).append("&")
+                .append("attrName=").append(attributeName);
+        String url = pageName + ".xhtml?query=" + UrlParamUtil.encodeUrlQueryString(parameters.toString());
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+        requestContext.addCallbackParam("pageName", pageName);
     }
 
     public void onSelectAttribute() {
         log.info("selected: " + super.selected.getId());
         List<AttrDesc> attrDescList = attributeListService.findAttrDescByAttributeId(super.selected.getId());
         attrDescList.stream().map(item -> item.getName()).forEach(System.out::println);
+    }
+
+    public String findUserNameByAccountUid(String uid) {
+        return userAccountService.getLoginNameByUid(uid);
     }
 
 }

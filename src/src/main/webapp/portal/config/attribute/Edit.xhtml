@@ -8,22 +8,22 @@
 
     <ui:composition>
 
-        <p:dialog id="AttributeEditDlg" widgetVar="AttributeEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{attributeListController.CRUDActionName}" >
+        <p:dialog id="AttributeEditDlg" widgetVar="AttributeEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{attributeListController.CRUDActionName}#{attributeListController.selected.name}属性" >
             <h:form id="AttributeEditForm">
                 <h:panelGroup id="display" rendered="#{attributeListController.selected ne null}">
 
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{attributeListController.selected != null}" style="min-width: 500px;">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{attributeListController.selected != null}" style="min-width: 500px;">
                         <h:panelGroup>
-                            <label class="label">属性名称*</label>
+                            <label class="label">名称*: </label>
                             <p:inputText id="loginName" value="#{attributeListController.selected.name}" required="true" requiredMessage="属性名称 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">描述</label>
+                            <label class="label">描述: </label>
                             <p:inputText id="name" value="#{attributeListController.selected.description}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{attributeListController.save}" value="#{msg.Save}" update=":attributeListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AttributeEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{attributeListController.checkAndSave}" value="#{msg.Save}" update=":attributeListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AttributeEditDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('AttributeEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>

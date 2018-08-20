@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -539,5 +535,9 @@ public class UserAccountService {
 		} catch (Exception e) {
 			logger.error("update user error : {}", e.getMessage());
 		}
+	}
+
+	public String getLoginNameByUid(String uid) {
+		return Optional.ofNullable(userAccountRepository.getByUid(uid).getName()).orElse("");
 	}
 }
