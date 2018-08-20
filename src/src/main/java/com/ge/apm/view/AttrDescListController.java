@@ -1,16 +1,23 @@
 package com.ge.apm.view;
 
 import com.ge.apm.domain.AttrDesc;
+import com.ge.apm.domain.Attribute;
 import com.ge.apm.service.misc.AttributeListService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.List;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 @ManagedBean
@@ -21,6 +28,8 @@ public class AttrDescListController extends GenericCRUDUUIDController<AttrDesc> 
 
     private AttributeListService attributeListService;
 
+    private Attribute selectedAttribute;
+
     @Override
     protected GenericRepositoryUUID<AttrDesc> getDAO() {
         return attributeListService.getAttrDescRepository();
@@ -28,21 +37,39 @@ public class AttrDescListController extends GenericCRUDUUIDController<AttrDesc> 
 
     public void init() {
         attributeListService = WebUtil.getBean(AttributeListService.class);
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String encodeStr = WebUtil.getRequestParameter("query");
+
+        selectedAttribute = new Attribute();
+        String attributeId = (String)UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
+        selectedAttribute.setId(attributeId);
+        String attributeName = (String)UrlEncryptController.getValueFromMap(encodeStr, "attrName");
+        try {
+            attributeName = URLDecoder.decode(attributeName, "GBK");
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        selectedAttribute.setName(attributeName);
+
     }
 
     @Override
     protected Page<AttrDesc> loadData(PageRequest pageRequest) {
-        return null;
-    }
+        Page<AttrDesc> result = null;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
 
-    public void prepareCreate(String attributeId) throws InstantiationException, IllegalAccessException {
-        super.prepareCreate();
-        super.selected.setAttributeId(attributeId);
-        super.selected.setRequired(false);
+        if(StringUtils.isNotEmpty(this.selectedAttribute.getId())) {
+            searchFilters.add(new SearchFilter("attributeId", SearchFilter.Operator.EQ, this.selectedAttribute.getId()));
+            result = attributeListService.findAttrDescsBySearchFilters(searchFilters, pageRequest);
+        }
+        return result;
     }
 
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        super.selected.setAttributeId(this.selectedAttribute.getId());
         super.selected.setRequired(false);
     }
 
@@ -53,8 +80,6 @@ public class AttrDescListController extends GenericCRUDUUIDController<AttrDesc> 
     public void onBeforeSave(AttrDesc attrDesc) {
         if(attributeListService.isAttrDescExistByName(attrDesc.getName())) {
             log.info("AttrDesc already existed");
-            WebUtil.addErrorMessage("属性已存在");
-            return;
         }
     }
 
@@ -62,10 +87,8 @@ public class AttrDescListController extends GenericCRUDUUIDController<AttrDesc> 
         super.delete();
     }
 
-    public void onSelectAttrDesc() {
-        if(super.selected != null) {
-            log.info("selected: " + super.selected.getName());
-        }
+    public Attribute getSelectedAttribute() {
+        return this.selectedAttribute;
     }
 
 }

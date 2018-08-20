@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttributeListService {
@@ -24,18 +26,26 @@ public class AttributeListService {
         return attributeRepository.findAll(pageRequest);
     }
 
+    public Page<Attribute> findAttrsBySearchFilters(List<SearchFilter> searchFilters, PageRequest pageRequest) {
+        return attributeRepository.findBySearchFilter(searchFilters, pageRequest);
+    }
+
     public List<AttrDesc> findAttrDescByAttributeId(String attributeId) {
         List<AttrDesc> attrDescList = attrDescRepository.findByAttributeId(attributeId);
         return attrDescList;
     }
 
-    public Boolean isAttributeExistByName(String name) {
-        boolean isExist = false;
-        List<Attribute> attributes = attributeRepository.findByName(name);
+    public Page<AttrDesc> findAttrDescsBySearchFilters(List<SearchFilter> searchFilters, PageRequest pageRequest) {
+        return attrDescRepository.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    public Boolean isAttributeExisted(Attribute attribute) {
+        boolean isExisted = false;
+        List<Attribute> attributes = attributeRepository.findByName(attribute.getName());
         if(attributes != null && attributes.size() > 0) {
-            isExist = true;
+            isExisted = true;
         }
-        return isExist;
+        return isExisted;
     }
 
     public Boolean isAttrDescExistByName(String name) {
@@ -45,6 +55,11 @@ public class AttributeListService {
             isExist = true;
         }
         return isExist;
+    }
+
+
+    public void deleteAttrDescByAttributeId(String attributeId) {
+        this.attrDescRepository.deleteAttrDescByAttributeId(attributeId);
     }
 
     public AttributeRepository getAttributeRepository() {

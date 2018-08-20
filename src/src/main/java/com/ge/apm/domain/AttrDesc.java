@@ -4,6 +4,7 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.w3c.dom.Attr;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -69,6 +70,12 @@ public class AttrDesc implements ChineseName,Serializable {
 
     public void setRequired(Boolean required) {
         this.required = required;
+    }
+
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
     }
 
     @Override

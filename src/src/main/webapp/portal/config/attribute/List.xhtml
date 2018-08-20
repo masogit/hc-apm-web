@@ -22,9 +22,10 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90" >
 
-                        <p:ajax event="rowSelect" listener="#{attributeListController.onSelectAttribute}" update="createButton editButton deleteButton attrDescListForm" />
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+                        <p:ajax event="filter" listener="#{attributeListController.onFilter}" update=":attributeListForm:datalist"/>
 
-                        <p:column headerText="属性名称" sortBy="#{item.name}"  filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="属性名称" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
 
@@ -32,13 +33,17 @@
                             <h:outputText value="#{item.description}"/>
                         </p:column>
                         <p:column headerText="修改人" sortBy="#{item.lastUpdateBy}">
-                            <h:outputText value="#{item.lastUpdateBy}"/>
+                            <h:outputText value="#{attributeListController.findUserNameByAccountUid(item.lastUpdateBy)}"/>
                         </p:column>
 
                         <p:column headerText="修改时间">
                             <h:outputText value="#{item.lastUpdateDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="操作">
+                            <p:commandButton value="编辑子属性" actionListener="#{attributeListController.editAttrDesc(item)}" oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -51,8 +56,22 @@
                     </p:dataTable>
                 </h:form>
                 <ui:include src="Edit.xhtml" />
-                <ui:include src="AttrDescList.xhtml" />
             </div>
         </div>
+        <script>
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                var pageName = args.pageName;
+                this.location.href = args.url;
+
+            }
+        </script>
     </ui:define>
 </ui:composition>

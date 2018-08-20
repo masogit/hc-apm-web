@@ -64,10 +64,6 @@ public class Attribute implements ChineseName,Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name="attribute_id")
-    private Set<AttrDesc> attrDescSet;
-
     public String getId() {
         return id;
     }
@@ -154,14 +150,6 @@ public class Attribute implements ChineseName,Serializable {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public Set<AttrDesc> getAttrDescSet() {
-        return attrDescSet;
-    }
-
-    public void setAttrDescSet(Set<AttrDesc> attrDescSet) {
-        this.attrDescSet = attrDescSet;
     }
 
     public int hashCode() {
