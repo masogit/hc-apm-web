@@ -148,7 +148,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	public List<SearchFilter> getAssetFilter() {
 		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-		//filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		return filter;
