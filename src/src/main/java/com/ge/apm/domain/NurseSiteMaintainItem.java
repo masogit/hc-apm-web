@@ -84,13 +84,13 @@ public class NurseSiteMaintainItem implements Serializable {
 	private String modifyByUid;
 
 	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
 	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
@@ -108,17 +108,20 @@ public class NurseSiteMaintainItem implements Serializable {
     private NurseSiteMaintain nurseSiteMaintain;
 	
 	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private AssetInfo assetInfo;
 	
 	@JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.LAZY)
     private Set<NurseSiteMaintainData> listData;
 	
 	@Transient
 	private List<NurseSiteMaintainData> listCopyData;
+	
+	@Transient
+	private boolean needGetItem=true;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
@@ -161,8 +164,6 @@ public class NurseSiteMaintainItem implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	
 
 	public Date getCreateDate() {
 		return createDate;
@@ -342,6 +343,14 @@ public class NurseSiteMaintainItem implements Serializable {
 		else{
 			return sequence+"";
 		}
+	}
+	
+	public boolean isNeedGetItem() {
+		return needGetItem;
+	}
+
+	public void setNeedGetItem(boolean needGetItem) {
+		this.needGetItem = needGetItem;
 	}
 
 	public NurseSiteMaintainData getDataValue(String label){
