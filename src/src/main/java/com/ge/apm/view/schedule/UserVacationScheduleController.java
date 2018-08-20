@@ -72,30 +72,43 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
             this.searchFilters = new ArrayList<>();
         }
 
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        if (!this.hasFilterOnField("tenantUID")) {
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        }
 
-        if(!"All".equals(queryStr)){
-            searchFilters.add(new SearchFilter("auditStatus", SearchFilter.Operator.EQ, queryStr));
+        if (!this.hasFilterOnField("auditStatus")) {
+            if(!"All".equals(queryStr)){
+                searchFilters.add(new SearchFilter("auditStatus", SearchFilter.Operator.EQ, queryStr));
+            }
         }
 
         if(userContextService.hasRole("AssetHead")){
             if(currentUser.getOrgLevel() != 0){
                 if(currentUser.getOrgLevel() == 1){
-                    searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+                    if (!this.hasFilterOnField("institutionUID")) {
+                        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+                    }
                 }else if(currentUser.getOrgLevel() == 2){
-                    searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+                    if (!this.hasFilterOnField("hospitalUID")) {
+                        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+                    }
                 }else{
-                    searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+                    if (!this.hasFilterOnField("siteUID")) {
+                        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+                    }
                 }
             }
         }else{
-            searchFilters.add(new SearchFilter("userUID", SearchFilter.Operator.EQ, currentUser.getUid()));
+            if (!this.hasFilterOnField("userUID")) {
+                searchFilters.add(new SearchFilter("userUID", SearchFilter.Operator.EQ, currentUser.getUid()));
+            }
         }
 
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, SCHEDULE_TYPE_VACATION));
+        if (!this.hasFilterOnField("type")) {
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, SCHEDULE_TYPE_VACATION));
+        }
 
-        Sort sort = new Sort(Sort.Direction.DESC, "scheduleDate");
-        return dao.findBySearchFilter(this.searchFilters, new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     public String saveVacation(){
