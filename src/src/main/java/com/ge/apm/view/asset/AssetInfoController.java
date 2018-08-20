@@ -2024,6 +2024,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	public void prepareForceAllocateAsset(String assetUid) {
 		AssetInfo asset = dao.findByUid(assetUid);
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		SharedAssetRequest assetRequest = reqDetail.getLeaseRequest();
@@ -2037,6 +2039,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	public void prepareForceReturnAsset(String assetUid) {
 		AssetInfo asset = dao.findByUid(assetUid);
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
