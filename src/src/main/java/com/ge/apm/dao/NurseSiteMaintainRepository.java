@@ -50,5 +50,10 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Modifying
 	@Query(value = "update nurse_site_maintain set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0, status=2 where id in ?1", nativeQuery = true)
 	void completeMaintain(Set<String> ids,String signature,String modifyUid,Date modifyDate);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain where id in ?1", nativeQuery = true)
+	void deleteMaintain(Set<String> ids);
 }
 
