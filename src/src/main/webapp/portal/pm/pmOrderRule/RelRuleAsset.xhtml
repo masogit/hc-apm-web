@@ -37,7 +37,7 @@
                              <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" >
                                  <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                                 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                              </p:selectOneMenu>
 		                      <!--<p:inputText  value="#{relRuleAssetController.queryAsset.manufacture}"  required="false">
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
