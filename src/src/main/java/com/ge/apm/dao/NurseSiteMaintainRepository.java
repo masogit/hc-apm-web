@@ -25,6 +25,15 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) and o.status = ?4 order by o.schedule_date asc",nativeQuery=true)
 	public List<NurseSiteMaintain> findDefaultDataByStatus(Set<String> orgUids,Date startDate,Date endDate,Integer status);
 	
+	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) and o.config_id = ?4 order by o.schedule_date asc",nativeQuery=true)
+	public List<NurseSiteMaintain> findDefaultDataByStatus(Set<String> orgUids,Date startDate,Date endDate,String configId);
+	
+	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) and o.config_id = ?4 and o.status!=0 order by o.schedule_date asc",nativeQuery=true)
+	public List<NurseSiteMaintain> findDefaultDataChecked(Set<String> orgUids,Date startDate,Date endDate,String configId);
+	
+	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) and o.status = ?4 and o.config_id = ?5 order by o.schedule_date asc",nativeQuery=true)
+	public List<NurseSiteMaintain> findDefaultDataByStatus(Set<String> orgUids,Date startDate,Date endDate,Integer status,String configId);
+	
 	@Query(value="select exists(select 1 from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<?3 and o.clinical_dept_uid in (?1) and o.config_id = ?4 and o.sequence = ?5)",nativeQuery=true)
 	public Boolean findExistsDefaultData(Set<String> orgUids,Date startDate,Date endDate,String configId,Integer sequence);
 	

@@ -8,8 +8,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -331,6 +333,19 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isSave) {
+		if(nurseSiteMaintainConfig.getType()==null){
+			addMessage("维护类型不能为空");
+			return false;
+		}
+		if(nurseSiteMaintainConfig.getTypeValue()==null){
+			addMessage("维护频率不能为空");
+			return false;
+		}
+		checkSaveDisable();
+		if(isSaveDisable){
+			addMessage("检查项以及所选设备不能为空");
+			return false;
+		}
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
 			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
@@ -406,6 +421,29 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		return true;
 	}
 	
+	private void addMessage(String str) {
+		FacesMessage message = new FacesMessage(str,null);
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	
+	private void checkSaveDisable(){
+		try {
+			if(listCheckAssets.size()==0){
+				isSaveDisable=true;
+			}
+			else if(listPairCheckItems.size()<2){
+				isSaveDisable=true;
+			}
+			else{
+				isSaveDisable=false;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			isSaveDisable=true;
+			LOGGER.error(e.getMessage());
+		}
+	}
+	
 	public void onAssetsTransfer(TransferEvent event) {
 		List<AssetInfo> collection=(List<AssetInfo>) event.getItems();
 		if(collection!=null && collection.size()>0){
@@ -415,12 +453,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				listCheckAssets.removeAll(collection);
 			}
 		}
-		if(listCheckAssets.size()==0){
-			isSaveDisable=true;
-		}
-		else{
-			isSaveDisable=false;
-		}
+		checkSaveDisable();
 	}
 	
 	public List<MaintainDataPair> getCheckListHours() {
@@ -441,12 +474,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void addCheckListItem(){
 		listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
 		initObjPairCheckItem();
-		if(listPairCheckItems.size()>1){
-			isSaveDisable=false;
-		}
-		else{
-			isSaveDisable=true;
-		}
+		checkSaveDisable();
 	}
 	public void deleteItemDetail(String str){
 		for(int i=0;i<listPairCheckItems.size();++i){
@@ -456,12 +484,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				--i;
 			}
 		}
-		if(listPairCheckItems.size()>1){
-			isSaveDisable=false;
-		}
-		else{
-			isSaveDisable=true;
-		}
+		checkSaveDisable();
 	}
 
 	public List<MaintainDataPair> getCheckListWeekDays() {
@@ -585,9 +608,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			p.setName("");
 			list.add(p);
 			listPairCheckItems=list;
-			if(listPairCheckItems.size()>1){
-				isSaveDisable=false;
-			}
+			checkSaveDisable();
 		}
 		return listPairCheckItems;
 	}
