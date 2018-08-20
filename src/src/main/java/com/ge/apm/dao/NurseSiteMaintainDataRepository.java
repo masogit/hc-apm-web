@@ -21,8 +21,16 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	@Query(value="select o.* from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
 	public Set<NurseSiteMaintainData> findMaintainDataByParentIds(Set<String> parentIds);
 	
+	@Query(value="select o.id from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
+	public Set<String> findIdsByParentIds(Set<String> parentIds);
+	
 	@Transactional
 	@Modifying
 	@Query(value = "update nurse_site_maintain_data set check_value=true where id in ?1", nativeQuery = true)
 	void completeMaintainData(Set<String> ids);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain_data where id in ?1", nativeQuery = true)
+	void deleteMaintainData(Set<String> ids);
 }
