@@ -247,12 +247,6 @@ public class NurseSiteMaintainService {
 
 	@Transactional
 	public boolean deleteMaintain(NurseSiteMaintain maintain) {
-		// Set<NurseSiteMaintainItem>
-		// listItem=maintain.getListNurseSiteMaintainItem();
-		// if(maintain.isNeedGetItem()){
-		// listItem=findMaintainItemByParentId(maintain.getId());
-		// }
-		// nurseSiteMaintainItemRepository.delete(listItem);
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
@@ -475,6 +469,7 @@ public class NurseSiteMaintainService {
 			if(tempMaintain.isNeedGetItem()){
 				setParentIds.add(tempMaintain.getId());
 				setModifyByUids.add(tempMaintain.getModifyByUid());
+				tempMaintain.setNeedGetItem(false);
 			}
 		}
 		if(setParentIds.size()>0){
