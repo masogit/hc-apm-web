@@ -370,13 +370,11 @@ public class MaintainController {
 	
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
-		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		Set<NurseSiteMaintainItem> listItem=null;
 		if(nurseSiteMaintain.isNeedGetItem()){
-			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
-			nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
-			nurseSiteMaintain.setModifyBy(nurseSiteMaintainService.getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
-			nurseSiteMaintain.setNeedGetItem(false);
+			nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
 		}
+		listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(showLables==null){
 			showLables=new ArrayList<String>();
 		}
@@ -414,11 +412,6 @@ public class MaintainController {
 	
 	public void checkRightAll(){
 		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		if(nurseSiteMaintain.isNeedGetItem()){
-			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
-			nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
-			nurseSiteMaintain.setNeedGetItem(false);
-		}
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
