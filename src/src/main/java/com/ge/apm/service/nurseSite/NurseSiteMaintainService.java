@@ -109,6 +109,18 @@ public class NurseSiteMaintainService {
 	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids, Date startDate, Date endDate, int status) {
 		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate, status);
 	}
+	
+	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids, Date startDate, Date endDate, String configId) {
+		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate, configId);
+	}
+	
+	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids, Date startDate, Date endDate,Integer status, String configId) {
+		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate,status,configId);
+	}
+	
+	public List<NurseSiteMaintain> getDefaultMaintainDataChecked(Set<String> orgUids, Date startDate, Date endDate,String configId) {
+		return nurseSiteMaintainRepository.findDefaultDataChecked(orgUids, startDate, endDate,configId);
+	}
 
 	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid, Date startDate, Date endDate) {
 		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
