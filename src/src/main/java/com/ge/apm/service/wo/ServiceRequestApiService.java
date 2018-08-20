@@ -54,6 +54,21 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
+    public ResponseEntity<LinkedHashMap> invokeWorkFlowConfig(String token, Integer assetId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        String gatewayURL = getGatewayURL(GatewayURL.GET_WORKFLOW_CONFIG);
+        String url = gatewayURL.replace("{assetId}", assetId.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if(isOkay(response)){
+            return response;
+        }
+        else{
+            return null;
+        }
+
+    }
+
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());
@@ -75,6 +90,10 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
+
+
+
 
     public String invokeWorkOrderAction(String token, WorkOrderActionForm formData, String actionName, String woId) {
         HttpEntity<WorkOrderActionForm> requestEntity = new HttpEntity<WorkOrderActionForm>(formData, createHttpHeaders(token));
