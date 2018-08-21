@@ -12,6 +12,7 @@ import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -49,6 +50,10 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
         if(super.searchFilters == null) {
             super.searchFilters = new ArrayList<>();
         }
+
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
+        super.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*5+"));
+
         Page<Attribute> attributeList;
         if(searchFilters == null) {
             attributeList = attributeListService.findAllAttribute(pageRequest);
