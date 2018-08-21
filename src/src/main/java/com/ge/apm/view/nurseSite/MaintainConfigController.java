@@ -65,7 +65,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	
   	//input
   	private String assetInfoName;
-  	private Integer assetCategory;
+  	private Integer assetGroup;
   	private String functionType;
   	private OrgInfo selectedOrgInfo;
   	private OrgInfo selectedParentOrgInfo;
@@ -82,7 +82,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listOrgUid;
   	private DualListModel<AssetInfo> availableAssets;
   	private boolean isSaveDisable=true;
-  	private List<Integer> listAssetCategory;
+  	private List<Integer> listAssetGroup;
   	private boolean isCreate=false;
   	
     @Override
@@ -198,7 +198,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			checkListAssets.clear();
 		}
 		this.assetInfoName="";
-		this.assetCategory=null;
+		this.assetGroup=null;
 		this.functionType="";
 		this.selectedOrgInfo=null;
 	}
@@ -290,8 +290,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			listSearchFilter.add(tempFilter);
 			search=true;
 		}
-		if(assetCategory!=null){
-			SearchFilter tempFilter=new SearchFilter("assetCategory",SearchFilter.Operator.EQ,assetCategory,"1*");
+		if(assetGroup!=null){
+			SearchFilter tempFilter=new SearchFilter("assetGroup",SearchFilter.Operator.EQ,assetGroup,"1*");
 			listSearchFilter.add(tempFilter);
 			search=true;
 		}
@@ -333,19 +333,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isSave) {
-		if(nurseSiteMaintainConfig.getType()==null){
-			addMessage("维护类型不能为空");
-			return false;
-		}
-		if(nurseSiteMaintainConfig.getTypeValue()==null){
-			addMessage("维护频率不能为空");
-			return false;
-		}
-		checkSaveDisable();
-		if(isSaveDisable){
-			addMessage("检查项以及所选设备不能为空");
-			return false;
-		}
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
 			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
@@ -429,9 +416,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private void checkSaveDisable(){
 		try {
 			if(listCheckAssets.size()==0){
+				addMessage("已选设备不能为空");
 				isSaveDisable=true;
 			}
 			else if(listPairCheckItems.size()<2){
+				addMessage("检查项不能为空");
 				isSaveDisable=true;
 			}
 			else{
@@ -665,12 +654,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.assetInfoName = assetInfoName;
 	}
 
-	public Integer getAssetCategory() {
-		return assetCategory;
+	public Integer getAssetGroup() {
+		return assetGroup;
 	}
 
-	public void setAssetCategory(Integer assetCategory) {
-		this.assetCategory = assetCategory;
+	public void setAssetGroup(Integer assetGroup) {
+		this.assetGroup = assetGroup;
 	}
 
 	public String getFunctionType() {
@@ -689,12 +678,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.selectedOrgInfo = selectedOrgInfo;
 	}
 
-	public List<Integer> getListAssetCategory() {
-		return listAssetCategory;
+	public List<Integer> getListAssetGroup() {
+		return listAssetGroup;
 	}
 
-	public void setListAssetCategory(List<Integer> listAssetCategory) {
-		this.listAssetCategory = listAssetCategory;
+	public void setListAssetGroup(List<Integer> listAssetGroup) {
+		this.listAssetGroup = listAssetGroup;
 	}
 
 	public OrgInfo getSelectedParentOrgInfo() {

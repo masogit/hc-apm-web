@@ -82,6 +82,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value= "select u.* from user_account u where u.uid in ?1 ",nativeQuery=true)
     public List<UserAccount> getByUids(Set<String> setUids);
+    
+    @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid in ?1 ")
+    public List<UserAccount> getSimpleByUids(Set<String> setUids);
 
     //当前租户下的临时报修人
     //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
