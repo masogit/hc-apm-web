@@ -688,7 +688,6 @@ public class NurseSiteMaintainService {
 		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() == 2) {
 			sequence = null;
 		}
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 		Set<NurseSiteMaintainItem> listItem = loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain = new NurseSiteMaintain();
 		Date currentDate = new Date();
