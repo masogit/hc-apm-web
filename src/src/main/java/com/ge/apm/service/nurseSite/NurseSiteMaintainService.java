@@ -1175,8 +1175,8 @@ public class NurseSiteMaintainService {
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
 					// "班次", doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
-					mapCheckItemSequence.clear();
 					for (int i = 0; i < tempListItem.size(); ++i) {
+						mapCheckItemSequence.clear();
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
 						Set<NurseSiteMaintainData> listData = tempItem.getListData();
 						if (listData != null && listData.size() > 0) {
@@ -1197,18 +1197,13 @@ public class NurseSiteMaintainService {
 								else{
 									keyName+=",";
 								}
-								if(tempItem.getCheckDate()!=null){
-									keyName+=sdf2.format(tempItem.getCheckDate())+",";
-								}
-								else{
-									keyName+=",";
-								}
+								keyName+=tempItem.getConfigId()+",";
 								keyName+=tempItem.getSequenceName()+",";
 								if(tempData.getCheckItem()!=null){
 									String checkItemStr=tempData.getCheckItem();
 									if(mapCheckItemSequence.containsKey(checkItemStr)){
 										mapCheckItemSequence.put(checkItemStr, mapCheckItemSequence.get(checkItemStr)+1);
-										keyName+=mapCheckItemSequence.get(checkItemStr)+",";
+										keyName+=checkItemStr+mapCheckItemSequence.get(checkItemStr)+",";
 									}
 									else{
 										keyName+=checkItemStr+",";
@@ -1221,6 +1216,7 @@ public class NurseSiteMaintainService {
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
 								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
 								doc.writeRowData(SHEET_Maintain,keyRow,modifyByRow,keyName,tempItem.getModifyBy().getName());
+								doc.writeRowData(SHEET_Maintain,keyRow,checkDateRow,keyName,tempItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName,tempData.getCheckItem());
 								// doc.writeCellData(SHEET_Maintain, rowIndex,
 								// columnIndex++, tempData.getStrValue());
@@ -1232,7 +1228,8 @@ public class NurseSiteMaintainService {
 			}
 //			writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
 			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间",null);
-			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
+//			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
+			doc.writeCellData(SHEET_Maintain, checkDateRow, 1, "实际检查时间");
 			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
 			if(setSignature.size()>0){
