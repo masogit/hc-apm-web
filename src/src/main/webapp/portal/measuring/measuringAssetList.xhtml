@@ -16,7 +16,7 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="10" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="10,20,40">
+                             rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm"/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}"/>

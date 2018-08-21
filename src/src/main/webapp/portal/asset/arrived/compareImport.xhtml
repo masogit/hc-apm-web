@@ -22,7 +22,7 @@
                     <p:dataTable id="assetTable" value="#{compareImportController.importAssetMap.values()}" var="item" rows="10" paginator="true" 
                                  selection="#{compareImportController.selectedItem}" rowKey="#{item['RowIndex']}"  selectionMode="single" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="5,10,15" >
+                                 rowsPerPageTemplate="20,50,100,500" >
                         
                         <p:ajax event="rowSelect" listener="#{compareImportController.onSelectedChange}" update=":ItemViewForm"/>
                         <p:column headerText="#{msg.assetName}" >

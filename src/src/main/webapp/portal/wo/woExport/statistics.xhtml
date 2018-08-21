@@ -67,7 +67,7 @@
         <p:dataTable id="datalist_statistics" rendered="#{not empty workOrderStatisticsController.worList}" value="#{workOrderStatisticsController.worList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
-                     rowsPerPageTemplate="10,20,50">
+                     rowsPerPageTemplate="20,50,100,500">
             <p:column headerText="资产名称" rendered="#{workOrderStatisticsController.statisticsType == 'assetName'}">
                 <h:outputText value="#{item.assetName}" />
             </p:column>
