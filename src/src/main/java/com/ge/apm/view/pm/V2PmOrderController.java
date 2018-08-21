@@ -747,10 +747,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (selectedAsset.getStatus() == 5) {
             WebUtil.addErrorMessage("所选设备停用,不能保养");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能保养");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
         if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
