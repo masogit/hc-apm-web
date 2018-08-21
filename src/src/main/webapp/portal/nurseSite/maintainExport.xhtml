@@ -61,7 +61,7 @@
                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10"
                  emptyMessage="#{msg.noRecordFound}"
-                 rowsPerPageTemplate="10,20,50">
+                 rowsPerPageTemplate="20,50,100,500">
         <p:column selectionMode="multiple" style="width:50px;text-align:center" exportable="false"/>
         <p:column headerText="名称">
             <h:outputText value="#{item.getShowTitle()}"/>
