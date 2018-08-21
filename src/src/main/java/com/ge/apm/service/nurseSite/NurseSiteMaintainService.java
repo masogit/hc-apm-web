@@ -462,10 +462,28 @@ public class NurseSiteMaintainService {
 	}
 	
 	public void supplementMaintain(NurseSiteMaintain tempMaintain){
+		Set<String> setModifyByUids=new HashSet<String>();
+		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
+		List<UserAccount> listModify=null;
 		Set<NurseSiteMaintainItem> listItem = findMaintainItemByParentId(tempMaintain.getId());
+		setModifyByUids.add(tempMaintain.getCreateByUid());
+		setModifyByUids.add(tempMaintain.getModifyByUid());
+		if (setModifyByUids.size() > 0) {
+			listModify=userAccountRepository.getSimpleByUids(setModifyByUids);
+		}
+		if(listModify!=null){
+			for(int i=0;i<listModify.size();++i){
+				UserAccount tempUser=listModify.get(i);
+				mapModifyBy.put(tempUser.getUid(), tempUser);
+			}
+		}
 		tempMaintain.setListNurseSiteMaintainItem(listItem);
-		tempMaintain.setModifyBy(getUserAccountByUid(tempMaintain.getModifyByUid()));
-		tempMaintain.setCreateBy(getUserAccountByUid(tempMaintain.getCreateByUid()));
+		if(StringUtils.isNotEmpty(tempMaintain.getModifyByUid())){
+			tempMaintain.setModifyBy(mapModifyBy.get(tempMaintain.getModifyByUid()));
+		}
+		if(StringUtils.isNotEmpty(tempMaintain.getCreateByUid())){
+			tempMaintain.setCreateBy(mapModifyBy.get(tempMaintain.getCreateByUid()));
+		}
 		tempMaintain.setNeedGetItem(false);
 		supplementMaintainItem(listItem);
 	}
