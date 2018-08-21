@@ -48,17 +48,17 @@
                     <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgMode!=3)}">
                         <p:panelGrid  columns="3">
                             <h:panelGroup >
-                                <p:selectBooleanCheckbox class="ck1"  value="#{tagSubscriberController.level0}" itemLabel="紧急">
+                                <p:selectBooleanCheckbox class="ck1"  value="#{tagSubscriberController.level0}" itemLabel="#{fieldMsg.fieldValue('casePriority','1')}">
                                     <!--  <p:ajax event="change"  listener="#{tagSubscriberController.level0Set()}"></p:ajax>-->
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox  value="#{tagSubscriberController.level1}" itemLabel="重要">
+                                <p:selectBooleanCheckbox  value="#{tagSubscriberController.level1}" itemLabel="#{fieldMsg.fieldValue('casePriority','2')}">
                                     <!-- <p:ajax event="change" listener="#{tagSubscriberController.level1Set()}"></p:ajax>-->
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox   value="#{tagSubscriberController.level2}" itemLabel="一般">
+                                <p:selectBooleanCheckbox   value="#{tagSubscriberController.level2}" itemLabel="#{fieldMsg.fieldValue('casePriority','3')}">
                                     <!-- <p:ajax event="change" listener="#{tagSubscriberController.level2Set()}"></p:ajax>-->
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
@@ -69,11 +69,9 @@
                         <p:selectBooleanCheckbox  value="#{tagSubscriberController.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送">
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
-
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:TagSubscriberForm:dataList   :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
-
                 <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{tagSubscriberController.cancel()}" icon="ui-icon-cancel" update="scriTab:TagSubscriberForm" onclick="PF('AssetTagSubscribEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
