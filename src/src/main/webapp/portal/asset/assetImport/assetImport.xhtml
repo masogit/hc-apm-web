@@ -73,7 +73,7 @@
                         <p:tab title="资产导入">
                             <p:dataTable id="assetTable" value="#{assetFileImportController.displayAssets}" var="item" rows="10" paginator="true"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                         rowsPerPageTemplate="5,10,15" >
+                                         rowsPerPageTemplate="20,50,100,500" >
                                 <p:column headerText="Excel行数" >
                                     <h:outputText value="#{item.get('asset').lineNum}"/>
                                 </p:column>

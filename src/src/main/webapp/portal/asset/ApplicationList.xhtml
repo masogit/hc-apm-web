@@ -36,7 +36,7 @@
                               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                               rows="20" emptyMessage="#{msg.noRecordFound}"
-                              rowsPerPageTemplate="20,40,60">
+                              rowsPerPageTemplate="20,50,100,500">
                     <p:ajax event="rowSelect" listener="#{applicationController.onSelectAsset}" update="createButton editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{applicationController.onFilter}" />
                     <p:column headerText="申请科室" filterMatchMode="LIKE">
