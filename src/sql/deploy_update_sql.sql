@@ -233,7 +233,9 @@ ALTER TABLE public.nurse_site_maintain
 --v8.2
 ALTER TABLE public.v2_service_request ALTER COLUMN requestor_name TYPE varchar(32) USING requestor_name::varchar ;
 ALTER TABLE public.v2_work_order ALTER COLUMN current_person_name TYPE varchar(32) USING current_person_name::varchar ;
-update sys_role set home_page = '/homeNurse.xhtml' where name like 'NursingStaff';
 -- 使用 使用科室时添加
 --update asset_info set asset_dept_id=clinical_dept_id , asset_dept_uid=clinical_dept_uid where asset_dept_id is null and asset_dept_uid is null and swap_type_state is null and tenant_UID =?;
 update workflow_config set hour_required = true where hour_required is null;
+
+update sys_role set home_page = '/homeNurse.xhtml' where name like 'NursingStaff';
+ALTER TABLE public.i18n_message DROP CONSTRAINT i18n_message_msg_key;
