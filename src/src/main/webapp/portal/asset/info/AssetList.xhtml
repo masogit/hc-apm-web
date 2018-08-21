@@ -400,7 +400,7 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'lifecycle'}">
                                 <p:column headerText="#{msg.lifecycle}">
-                                    <h:outputText value="#{item.lifecycle}"/>
+                                    <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'depreciationMethod'}">
