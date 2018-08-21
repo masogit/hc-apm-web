@@ -3,6 +3,7 @@ package com.ge.apm.service.nurseSite;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -688,6 +689,7 @@ public class NurseSiteMaintainService {
 		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() == 2) {
 			sequence = null;
 		}
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 		Set<NurseSiteMaintainItem> listItem = loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain = new NurseSiteMaintain();
 		Date currentDate = new Date();
@@ -704,7 +706,12 @@ public class NurseSiteMaintainService {
 		tempNurseSiteMaintain.setModifyBy(currentUser);
 		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setModifyDate(currentDate);
-		tempNurseSiteMaintain.setScheduleDate(date);
+		try {
+			tempNurseSiteMaintain.setScheduleDate(sdf.parse(sdf.format(date)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error(e.getMessage());
+		}
 		tempNurseSiteMaintain.setSequence(sequence);
 		tempNurseSiteMaintain.setStatus(0);
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
