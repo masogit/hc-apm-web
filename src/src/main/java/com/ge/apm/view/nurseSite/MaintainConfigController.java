@@ -333,19 +333,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isSave) {
-		if(nurseSiteMaintainConfig.getType()==null){
-			addMessage("维护类型不能为空");
-			return false;
-		}
-		if(nurseSiteMaintainConfig.getTypeValue()==null){
-			addMessage("维护频率不能为空");
-			return false;
-		}
-		checkSaveDisable();
-		if(isSaveDisable){
-			addMessage("检查项以及所选设备不能为空");
-			return false;
-		}
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
 			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
