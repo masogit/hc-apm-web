@@ -669,7 +669,7 @@ public class AssetFileImportService {
 
         String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
 
-        String sumFormula = String.format("SUM('Asset List'!$AB$7:$AB$%d)", assetList.size() + 6);
+        String sumFormula = String.format("SUM('Asset List'!$AA$7:$AA$%d)", assetList.size() + 6);
 
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
