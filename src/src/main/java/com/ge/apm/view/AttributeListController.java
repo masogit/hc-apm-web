@@ -66,8 +66,8 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
         super.selected.setCreateBy(currentUser.getUid());
         super.selected.setCreateDate(now);
-        super.selected.setLastUpdateBy(currentUser.getUid());
-        super.selected.setLastUpdateDate(now);
+        super.selected.setLastModifiedBy(currentUser.getUid());
+        super.selected.setLastModifiedDate(now);
         super.selected.setTenantUid(currentUser.getTenantUID());
         super.selected.setInstitutionUid(currentUser.getInstitutionUID());
         super.selected.setHospitalUid(currentUser.getHospitalUID());
@@ -78,8 +78,8 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
         super.prepareEdit();
         Date now = new Date();
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
-        super.selected.setLastUpdateBy(currentUser.getUid());
-        super.selected.setLastUpdateDate(now);
+        super.selected.setLastModifiedBy(currentUser.getUid());
+        super.selected.setLastModifiedDate(now);
     }
 
     public void checkAndSave() {
