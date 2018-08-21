@@ -64,8 +64,8 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
         super.prepareCreate();
         Date now = new Date();
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
-        super.selected.setCreateBy(currentUser.getUid());
-        super.selected.setCreateDate(now);
+        super.selected.setCreatedBy(currentUser.getUid());
+        super.selected.setCreatedDate(now);
         super.selected.setLastModifiedBy(currentUser.getUid());
         super.selected.setLastModifiedDate(now);
         super.selected.setTenantUid(currentUser.getTenantUID());

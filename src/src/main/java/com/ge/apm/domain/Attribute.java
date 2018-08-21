@@ -47,13 +47,13 @@ public class Attribute implements ChineseName,Serializable {
     private String siteUid;
 
     @CreatedBy
-    @Column(name = "create_by", columnDefinition = "CHAR(32)", nullable = false)
-    private String createBy;
+    @Column(name = "created_by", columnDefinition = "CHAR(32)", nullable = false)
+    private String createdBy;
 
     @CreatedDate
-    @Column(name = "create_date", nullable = false)
+    @Column(name = "created_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private Date createdDate;
 
     @LastModifiedBy
     @Column(name = "last_modified_by", columnDefinition = "CHAR(32)", nullable = false)
@@ -120,20 +120,20 @@ public class Attribute implements ChineseName,Serializable {
         this.siteUid = siteUid;
     }
 
-    public String getCreateBy() {
-        return createBy;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getLastModifiedBy() {
