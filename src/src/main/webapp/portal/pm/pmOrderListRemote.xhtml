@@ -13,7 +13,7 @@
                 <p:dataTable id="datalist" value="#{v2PmOrderRemController.lazyModel}" var="item" widgetVar="varDataList5" selectionMode="single" selection="#{v2PmOrderRemController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.scheduleDate}" paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                              rows="10" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="10,20,30,90">
+                             rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect" listener="#{v2PmOrderRemController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm"/>
                     <p:ajax event="filter" listener="#{v2PmOrderRemController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>

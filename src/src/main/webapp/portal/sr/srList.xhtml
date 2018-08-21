@@ -47,7 +47,7 @@
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                          rows="10" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="10,20,30,90">
+                                         rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax  event="rowSelect" listener="#{serviceRequestController.onSelectServiceRequest}" update="tabview:WorkOrderEditForm" process="datalist"/>
                                 <p:ajax event="filter" listener="#{serviceRequestController.onFilter}" update="datalist tabview:WorkOrderEditForm"/>
@@ -102,7 +102,7 @@
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                          rows="10" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="10,20,30,90">
+                                         rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax event="rowSelect"  update="tabview:ackDetailForm"/>
                                 <p:ajax event="filter" listener="#{workOrderAckController.onFilter}" update="datalist tabview:ackDetailForm"/>
@@ -156,7 +156,7 @@
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                          rows="10" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="10,20,30,90">
+                                         rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax event="rowSelect"  update="tabview:rateDetailForm"/>
                                 <p:ajax event="filter" listener="#{workOrderRateController.onFilter}" update="datalist tabview:rateDetailForm"/>
