@@ -88,18 +88,15 @@
 
                                     <c:if test="#{orgInfoController.selected.orgType eq 4}">
                                         <h:panelGroup>
-                                            <label class="label">楼</label>
-                                            <p:inputText id="buildingNum" value="#{orgInfoController.selected.buildingNum}"/>
+                                            <p:inputText id="buildingNum" value="#{orgInfoController.selected.buildingNum}"/><h:outputLabel>楼</h:outputLabel>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <label class="label">层</label>
-                                            <p:inputText id="floorNum" value="#{orgInfoController.selected.floorNum}"/>
+                                            <p:inputText id="floorNum" value="#{orgInfoController.selected.floorNum}"/><h:outputLabel>层</h:outputLabel>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <label class="label">其他</label>
-                                            <p:inputText id="other" value="#{orgInfoController.selected.other}"/>
+                                            <h:outputLabel>其他</h:outputLabel><p:inputText id="other" value="#{orgInfoController.selected.other}"/>
                                         </h:panelGroup>
 
                                     </c:if>
