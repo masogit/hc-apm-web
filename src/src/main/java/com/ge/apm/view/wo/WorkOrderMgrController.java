@@ -542,7 +542,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 .map(data -> (Boolean) data.get("hourRequired")).get();
         //如果工作流配置了工时必填,则默认工时是0.01
         if(hourRequired) {
-            this.selectedWorkOrder.setManHours(0.01);
+            this.selectedWorkOrder.setManHours(null);
         }
 
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
@@ -555,12 +555,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void saveRepairWorkOrder() {
         if(hourRequired) {
-            if(this.selectedWorkOrder.getManHours()< 0.01){
+            if (this.selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
-        }
+        }else if(selectedWorkOrder.getManHours()==0.00){
+                selectedWorkOrder.setManHours(null);
+            }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -640,6 +642,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 valid = false;
             }
+        }else if(selectedWorkOrder.getManHours()==0.00){
+            selectedWorkOrder.setManHours(null);
         }
 
 
