@@ -367,9 +367,7 @@ public class MaintainController {
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
 		Set<NurseSiteMaintainItem> listItem=null;
-		if(nurseSiteMaintain.isNeedGetItem()){
-			nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
-		}
+		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
 		listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(showLables==null){
 			showLables=new ArrayList<String>();

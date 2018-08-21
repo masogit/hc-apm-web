@@ -366,9 +366,7 @@ public class NurseSiteMaintainService {
 	
 	private void updateMaintainDataAllRight(NurseSiteMaintain obj, Date date,UserAccount user){
 		Set<NurseSiteMaintainItem> listItem = null;
-		if (obj.isNeedGetItem()) {
-			supplementMaintain(obj);
-		}
+		supplementMaintain(obj);
 		listItem = obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		while (it.hasNext()) {
@@ -462,6 +460,9 @@ public class NurseSiteMaintainService {
 	}
 	
 	public void supplementMaintain(NurseSiteMaintain tempMaintain){
+		if(!tempMaintain.isNeedGetItem()){
+			return;
+		}
 		Set<String> setModifyByUids=new HashSet<String>();
 		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
 		List<UserAccount> listModify=null;
@@ -490,9 +491,7 @@ public class NurseSiteMaintainService {
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
 		Set<NurseSiteMaintainItem> listItem = null;
-		if (obj.isNeedGetItem()) {
-			supplementMaintain(obj);
-		}
+		supplementMaintain(obj);
 		listItem=obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
@@ -558,9 +557,7 @@ public class NurseSiteMaintainService {
 		Map<String,UserAccount> mapUser=new HashMap<String,UserAccount>();
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
-			if(tempMaintain.isNeedGetItem()){
-				supplementMaintain(tempMaintain);
-			}
+			supplementMaintain(tempMaintain);
 		}
 		if(setParentIds.size()>0){
 			listMaintainItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setParentIds);
@@ -591,9 +588,7 @@ public class NurseSiteMaintainService {
 		}
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
-			if(tempMaintain.isNeedGetItem()){
-				supplementMaintain(tempMaintain);
-			}
+			supplementMaintain(tempMaintain);
 		}
 	}
 	
@@ -1033,9 +1028,7 @@ public class NurseSiteMaintainService {
 		List<String> secondHeader = new ArrayList<String>();
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
-			if (tempMaintain.isNeedGetItem()) {
-				supplementMaintain(tempMaintain);
-			}
+			supplementMaintain(tempMaintain);
 			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
 				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
@@ -1132,9 +1125,7 @@ public class NurseSiteMaintainService {
 		List<String> secondHeader = new ArrayList<String>();
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
-			if (tempMaintain.isNeedGetItem()) {
-				supplementMaintain(tempMaintain);
-			}
+			supplementMaintain(tempMaintain);
 			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
 				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
