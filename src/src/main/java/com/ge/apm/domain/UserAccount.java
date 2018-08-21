@@ -866,4 +866,9 @@ public class UserAccount implements ChineseName, Serializable {
 	public String getPinYin() {
 		return getNamePyCode();
 	}
+	
+	public UserAccount(String name,String uid){
+		this.name=name;
+		this.uid=uid;
+	}
 }
