@@ -412,10 +412,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 		if (setModifyByUids.size() > 0) {
-			listModify=userAccountRepository.getByUids(setModifyByUids);
+			listModify=userAccountRepository.getSimpleByUids(setModifyByUids);
 		}
 		if (setAssetInfoUids.size() > 0) {
-			listAssetInfo=assetInfoRepository.getByUids(setAssetInfoUids);
+			listAssetInfo=assetInfoRepository.getSimpleDataByUids(setAssetInfoUids);
 		}
 		if (setItemIds.size() > 0) {
 			listData=nurseSiteMaintainDataRepository.findListMaintainDataByParentIds(setItemIds);
@@ -465,6 +465,7 @@ public class NurseSiteMaintainService {
 		Set<NurseSiteMaintainItem> listItem = findMaintainItemByParentId(tempMaintain.getId());
 		tempMaintain.setListNurseSiteMaintainItem(listItem);
 		tempMaintain.setModifyBy(getUserAccountByUid(tempMaintain.getModifyByUid()));
+		tempMaintain.setCreateBy(getUserAccountByUid(tempMaintain.getCreateByUid()));
 		tempMaintain.setNeedGetItem(false);
 		supplementMaintainItem(listItem);
 	}
