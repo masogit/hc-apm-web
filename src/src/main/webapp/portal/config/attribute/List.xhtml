@@ -20,7 +20,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="10,20,30,90" >
+                                 rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update=":attributeListForm:datalist"/>
@@ -32,12 +32,12 @@
                         <p:column headerText="属性描述" sortBy="#{item.description}">
                             <h:outputText value="#{item.description}"/>
                         </p:column>
-                        <p:column headerText="修改人" sortBy="#{item.lastUpdateBy}">
-                            <h:outputText value="#{attributeListController.findUserNameByAccountUid(item.lastUpdateBy)}"/>
+                        <p:column headerText="修改人" sortBy="#{item.lastModifiedBy}">
+                            <h:outputText value="#{attributeListController.findUserNameByAccountUid(item.lastModifiedBy)}"/>
                         </p:column>
 
                         <p:column headerText="修改时间">
-                            <h:outputText value="#{item.lastUpdateDate}">
+                            <h:outputText value="#{item.lastModifiedDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>

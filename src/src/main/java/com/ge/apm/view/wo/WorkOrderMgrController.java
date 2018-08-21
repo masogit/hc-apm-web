@@ -50,8 +50,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
-    private V2_WorkOrderService woService;
-    private UaaService uaaService;
+    private V2_WorkOrderService woService;    private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
@@ -142,7 +141,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.filterBySite = false;
         this.filterByHospital = false;
     }
-
+    public String getManHourShow(){
+        if(hourRequired){
+            return "工时(小时)*";
+        }else{
+            return "工时(小时)";
+        }
+    }
     private Boolean isRating;
     public Boolean needRating(){
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
@@ -539,11 +544,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
-                .map(data -> (Boolean) data.get("hourRequired")).get();
-        //如果工作流配置了工时必填,则默认工时是0.01
-        if(hourRequired) {
+                .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
             this.selectedWorkOrder.setManHours(null);
-        }
 
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
