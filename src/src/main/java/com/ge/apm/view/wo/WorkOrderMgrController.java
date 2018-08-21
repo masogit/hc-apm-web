@@ -50,8 +50,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
-    private V2_WorkOrderService woService;
-    private UaaService uaaService;
+    private V2_WorkOrderService woService;    private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
@@ -545,7 +544,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
-                .map(data -> (Boolean) data.get("hourRequired")).get();
+                .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
             this.selectedWorkOrder.setManHours(null);
 
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
