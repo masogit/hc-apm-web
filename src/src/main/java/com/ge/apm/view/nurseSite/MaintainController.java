@@ -266,10 +266,6 @@ public class MaintainController {
 			if(userClickDate==null){
 				userClickDate=new Date();
 			}
-			Calendar ca=Calendar.getInstance();
-			int currentHour=ca.get(Calendar.HOUR_OF_DAY);
-			ca.setTime(userClickDate);
-			ca.set(Calendar.HOUR_OF_DAY,currentHour);
 			Integer tempType=nurseSiteMaintainConfig.getType();
 			String tempTypeValue=nurseSiteMaintainConfig.getTypeValue();
 			Integer tempIntTypeValue=null;
@@ -287,7 +283,7 @@ public class MaintainController {
 					}
 				}
 			}
-			nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets,selectSequence);
+			nurseSiteMaintain=nurseSiteMaintainService.createMaintain(userClickDate,currentUser,nurseSiteMaintainConfig,listCheckAssets,selectSequence);
 		}
 	}
 	

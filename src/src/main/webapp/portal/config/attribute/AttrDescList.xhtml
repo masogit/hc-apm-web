@@ -17,7 +17,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="5,10,20,30" >
+                                 rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton attrDescListForm" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update="attrDescList"/>
