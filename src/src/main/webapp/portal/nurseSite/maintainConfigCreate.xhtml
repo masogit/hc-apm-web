@@ -76,11 +76,11 @@
 					</p:inputText>
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">设备类型</label>
-					<p:selectOneMenu value="#{maintainConfigController.assetCategory}" disabled="false">
+					<label class="label">设备分类</label>
+					<p:selectOneMenu value="#{maintainConfigController.assetGroup}" disabled="false">
 						<p:ajax listener="#{maintainConfigController.onFilterChange()}" update=":maintainConfigCreateForm:AssetsPickList" />
 						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-						<f:selectItems value="#{fieldMsg.getFieldValueList('assetCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+						<f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 					</p:selectOneMenu>
 				</h:panelGroup>
 				<h:panelGroup>
