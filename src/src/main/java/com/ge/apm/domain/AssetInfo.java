@@ -1571,4 +1571,11 @@ public class AssetInfo implements ChineseName,Serializable {
 		return getNamePyCode();
 	}
 
+    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
+    	this.name=name;
+    	this.uid=uid;
+    	this.departNum=departNum;
+    	this.serialNum=serialNum;
+    	this.functionType=functionType;
+    }
 }
