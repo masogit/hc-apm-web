@@ -201,6 +201,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.assetGroup=null;
 		this.functionType="";
 		this.selectedOrgInfo=null;
+		this.selectedParentOrgInfo=null;
 	}
 	private void initObjPairCheckItem(){
 		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
