@@ -416,9 +416,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private void checkSaveDisable(){
 		try {
 			if(listCheckAssets.size()==0){
+				addMessage("已选设备不能为空");
 				isSaveDisable=true;
 			}
 			else if(listPairCheckItems.size()<2){
+				addMessage("检查项不能为空");
 				isSaveDisable=true;
 			}
 			else{
