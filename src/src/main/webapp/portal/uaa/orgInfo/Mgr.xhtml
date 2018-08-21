@@ -2,7 +2,8 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui">
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
             <div class="ui-g-12">
 
@@ -54,21 +55,23 @@
                                         <label class="label">类型</label>
                                         <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
                                     </h:panelGroup>
-                                            <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                                <label class="label">设备负责人A</label>
-                                                <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
 
-                                            <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                                <label class="label">设备负责人B</label>
-                                                <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.acShow and false}">
+                                        <label class="label">设备负责人A</label>
+                                        <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{orgInfoController.acShow and false}">
+                                        <label class="label">设备负责人B</label>
+                                        <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+
                                       <!-- </p:panelGrid>-->
                                         <!--gl end-->
 
@@ -77,12 +80,29 @@
                                         <p:inputText id="name" value="#{orgInfoController.orgName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                             <p:ajax listener="#{orgInfoController.checkName()}" process="@this" update=":growl"></p:ajax></p:inputText>
                                     </h:panelGroup>
-                                    <p:spacer></p:spacer>
+
                                     <h:panelGroup>
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}"/>
                                     </h:panelGroup>
-                                    <p:spacer></p:spacer>
+
+                                    <c:if test="#{orgInfoController.selected.orgType eq 4}">
+                                        <h:panelGroup>
+                                            <label class="label">楼</label>
+                                            <p:inputText id="buildingNum" value="#{orgInfoController.selected.buildingNum}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <label class="label">层</label>
+                                            <p:inputText id="floorNum" value="#{orgInfoController.selected.floorNum}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <label class="label">其他</label>
+                                            <p:inputText id="other" value="#{orgInfoController.selected.other}"/>
+                                        </h:panelGroup>
+
+                                    </c:if>
 
                                     <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}" update="orgTree :growl"/>
                                 </p:panelGrid>
