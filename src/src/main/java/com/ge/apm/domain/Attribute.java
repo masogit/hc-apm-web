@@ -47,7 +47,7 @@ public class Attribute implements ChineseName,Serializable {
     private String siteUid;
 
     @CreatedBy
-    @Column(name = "create_by", nullable = false)
+    @Column(name = "create_by", columnDefinition = "CHAR(32)", nullable = false)
     private String createBy;
 
     @CreatedDate
@@ -56,13 +56,13 @@ public class Attribute implements ChineseName,Serializable {
     private Date createDate;
 
     @LastModifiedBy
-    @Column(name = "last_update_by", nullable = false)
-    private String lastUpdateBy;
+    @Column(name = "last_modified_by", columnDefinition = "CHAR(32)", nullable = false)
+    private String lastModifiedBy;
 
     @LastModifiedDate
-    @Column(name = "last_update_date", nullable = false)
+    @Column(name = "last_modified_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdateDate;
+    private Date lastModifiedDate;
 
     public String getId() {
         return id;
@@ -136,20 +136,20 @@ public class Attribute implements ChineseName,Serializable {
         this.createDate = createDate;
     }
 
-    public String getLastUpdateBy() {
-        return lastUpdateBy;
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
-    public void setLastUpdateBy(String lastUpdateBy) {
-        this.lastUpdateBy = lastUpdateBy;
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public int hashCode() {
