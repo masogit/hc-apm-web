@@ -433,6 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void cancel() {
+        confirmedUpDate=null;
         selected = null;
         newServiceRequest = null;
         esTime = null;
@@ -545,8 +546,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
-            this.selectedWorkOrder.setManHours(null);
-
+        if(selectedWorkOrder.getManHours()==0.0){
+            selectedWorkOrder.setManHours(null);
+        }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
@@ -557,12 +559,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void saveRepairWorkOrder() {
         if(hourRequired) {
-            if (this.selectedWorkOrder.getManHours() < 0.01) {
+            if (selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
-        }else if(selectedWorkOrder.getManHours()==0.00){
+        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
                 selectedWorkOrder.setManHours(null);
             }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -659,7 +661,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
-       //gl:tmp woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
