@@ -29,7 +29,12 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费结束时间*</label>
-                            <p:calendar timeZone="GMT+8" id="chargingEndTime" pattern="yyyy/MM/dd HH:mm:ss"  value="#{assetInfoController.selected.sharedAssetReqDetail.chargingEndTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计费结束时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar timeZone="GMT+8" id="chargingEndTime" pattern="yyyy/MM/dd HH:mm:ss"
+                                        value="#{assetInfoController.selected.sharedAssetReqDetail.chargingEndTime}"
+                                        mindate="#{assetInfoController.selected.sharedAssetReqDetail.chargingBeginTime}"
+                                        maxdate="#{assetInfoController.currentDate}"
+                                        showOn="button" showButtonPanel="true" navigator="true" readonlyInput="true"
+                                        locale= "zh" required="true" requiredMessage="计费结束时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                    </p:panelGrid>
                    <h:panelGroup>

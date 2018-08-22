@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface AttributeRepository extends GenericRepositoryUUID<Attribute> {
 
-    List<Attribute> findByName(String name);
+    List<Attribute> findByNameAndTenantUid(String name, String tenantUid);
 
 }

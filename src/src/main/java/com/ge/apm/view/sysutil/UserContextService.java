@@ -165,6 +165,8 @@ public class UserContextService implements Serializable {
             if ("".equals(userName)) {
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
                 userName = UserContext.getUsername(request);
+                if(UserContext.ANONYMOUS_USER.equals(userName))
+                    userName = null;
             }
             if (userName == null) {
                 return null; // user is not logined
@@ -188,26 +190,38 @@ public class UserContextService implements Serializable {
         return userAccount;
     }
     
+    private Boolean flagIsAgentTenant = null;
     public boolean isAgentTenant() {
+        if(flagIsAgentTenant!=null) return flagIsAgentTenant;
+            
         UserAccount user = getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
         if(tenant.getType() != null && tenant.getType() == 1) {
-                return true;
+                flagIsAgentTenant = true;
         }
-        return false;
+        else
+            flagIsAgentTenant = false;
+        
+        return flagIsAgentTenant;
     }
 
     WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
 
+    private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
+        if(flagIsHospitalUser!=null) return flagIsHospitalUser;
+        
         UserAccount loginUser = getLoginUser();
         if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
             //判断医院级别是否有调剂中心
             List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
-            if (list.size() == 0) return false;
+            flagIsHospitalUser = !(list.size() == 0);
         }
-        return true;
+        else
+            flagIsHospitalUser = false;
+        
+        return flagIsHospitalUser;
     }
 
     public int getLoginUserId() {

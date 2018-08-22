@@ -59,6 +59,10 @@ public class MaintainExportController {
 		loadUserParentOrgInfo();
 	}
 	
+	private void initValue(){
+		this.selectedListMaintain=new ArrayList<NurseSiteMaintain>();
+	}
+	
 	private void searchMaintainData(Date start,Date end){
 		Calendar ca=Calendar.getInstance();
 		if(start==null){
@@ -120,6 +124,7 @@ public class MaintainExportController {
 	
 	public void previewData(){
 		searchMaintainData(startDate, endDate);
+		initValue();
 	}
 	
 	public void exportSelected(){
