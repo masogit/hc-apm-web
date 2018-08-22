@@ -529,7 +529,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         isRating=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
-                .map(data -> (Boolean) data.get("ratingRequired")).get();
+                .map(data -> (Boolean) data.get("ratingRequired")).orElse(false);
 
         picList = new ArrayList<V2_BlobObject>();
         attachList = new ArrayList<V2_BlobObject>();
@@ -619,7 +619,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void repairWorkOrder() {
         boolean valid = true;
-        if (confirmedUpDate == null) {
+        if (confirmedUpDate ==
+                null) {
             WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
@@ -641,13 +642,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if(hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("工时不能小于0.01");
-                RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+                RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
                 valid = false;
             }
-        }else if(selectedWorkOrder.getManHours()==0.00){
+        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
             selectedWorkOrder.setManHours(null);
         }
-
 
         if (!valid) {
             return;
@@ -659,7 +659,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
-        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+       //gl:tmp woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
