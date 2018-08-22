@@ -546,11 +546,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
-        if(selectedWorkOrder.getManHours()==0.0){
+        if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
+        currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList =woService.getAttachByBoSubType(selectedWorkOrder.getSrId(),V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -558,15 +558,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveRepairWorkOrder() {
-        if(hourRequired) {
+        if(hourRequired)
+        {
             if (selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
-        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
+        }
+        /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
                 selectedWorkOrder.setManHours(null);
-            }
+            }*/
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
