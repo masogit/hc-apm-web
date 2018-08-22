@@ -22,9 +22,6 @@
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton attrDescListForm" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update="attrDescList"/>
 
-                        <p:column headerText="属性">
-                            <h:outputText value="#{attrDescListController.selectedAttribute.name}" />
-                        </p:column>
                         <p:column headerText="子属性">
                             <h:outputText value="#{attrDesc.name}" sortBy="#{attrDesc.name}"  filterBy="#{attrDesc.name}" filterMatchMode="LIKE"/>
                         </p:column>
@@ -32,7 +29,8 @@
                             <h:outputText value="#{attrDesc.description}"/>
                         </p:column>
                         <p:column headerText="是否必须">
-                            <h:outputText value="必须" rendered="#{attrDesc.required}"/>
+                            <h:outputText value="是" rendered="#{attrDesc.required}"/>
+                            <h:outputText value="否" rendered="#{!attrDesc.required}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{attrDescListController.prepareCreate}" process="@this" update=":AttrDescEditDlg" oncomplete="PF('AttrDescEditDialog').show()" />
@@ -55,7 +53,7 @@
 
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="min-width: 500px;">
                             <h:panelGroup>
-                                <label class="label">属性*</label>
+                                <label class="label">子属性*</label>
                                 <p:inputText id="loginName" value="#{attrDescListController.selected.name}" required="true" requiredMessage="属性名称 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
