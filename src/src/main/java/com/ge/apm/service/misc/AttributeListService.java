@@ -41,7 +41,7 @@ public class AttributeListService {
 
     public Boolean isAttributeExisted(Attribute attribute) {
         boolean isExisted = false;
-        List<Attribute> attributes = attributeRepository.findByName(attribute.getName());
+        List<Attribute> attributes = attributeRepository.findByNameAndTenantUid(attribute.getName(), attribute.getTenantUid());
         if(attributes != null && attributes.size() > 0) {
             isExisted = true;
         }
