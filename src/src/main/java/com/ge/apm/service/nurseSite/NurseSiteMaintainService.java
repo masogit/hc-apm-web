@@ -236,7 +236,7 @@ public class NurseSiteMaintainService {
 			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
 			for(int i=0;i<obj.size();++i){
 				splitList.add(obj.get(i));
-				if(i%50==0 || i+1>=obj.size()){
+				if(i%500==0 || i+1>=obj.size()){
 //					nurseSiteMaintainRepository.delete(splitList);
 					nativeDeleteMaintain(splitList);
 					splitList.clear();
