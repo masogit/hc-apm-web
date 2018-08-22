@@ -16,8 +16,10 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,7 +96,6 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
             return;
         } else {
             super.save();
-            WebUtil.addSuccessMessage("属性" + super.selected.getName() + "已成功创建");
         }
     }
 
