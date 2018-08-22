@@ -565,9 +565,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
-        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
+        }
+        /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
                 selectedWorkOrder.setManHours(null);
-            }
+            }*/
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
