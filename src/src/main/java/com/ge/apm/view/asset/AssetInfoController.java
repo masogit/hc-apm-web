@@ -9,15 +9,13 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.sharedAsset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparator;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
+import javaslang.Tuple2;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -2094,52 +2092,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     	if(sharedAssetReqDetail != null) {
     		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
-    		LocalDateTime beginLDT;
     		Date endTime = sharedAssetReqDetail.getChargingEndTime();
-    		LocalDateTime endLDT;
 
-    		if(endTime != null) {
-    			endLDT = endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    		} else {
-    			endLDT = LocalDateTime.now();
-    		}
-    		
-    		String totalTime = "";
-    		BigDecimal unit = new BigDecimal(1);
-    		long days = 0, hours = 0, minutes = 0, rentalTimeInMinutes = 0;
-    		if(beginTime != null) {
-    			beginLDT = beginTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    			rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
-    			days = rentalTimeInMinutes / (24 * 60);
-    			hours = (rentalTimeInMinutes / 60) % 24;
-    			minutes = rentalTimeInMinutes % 60;
-    			totalTime = days + "天" + hours + "时" + minutes + "分";
-    		}
+            String chargingType = item.getSharedAssetType().getChargingType();
+            Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(beginTime, endTime, chargingType);
+            BigDecimal unit = unitAndTotalTime._1;
+            String totalTime = unitAndTotalTime._2;
 
-    		String chargeType = item.getSharedAssetType().getChargingType();
-    		switch(chargeType) {
-    		case "1":
-    			totalTime = "1次";
-    			unit = new BigDecimal(1);
-    			break;
-    		case "2":
-    		    unit = new BigDecimal(rentalTimeInMinutes / 30d);
-    			unit = unit.setScale(0, RoundingMode.UP);
-    			break;
-    		case "3":
-    			unit = new BigDecimal(rentalTimeInMinutes / (60 * 24d));
-    			unit = unit.setScale(0, RoundingMode.UP);
-    			totalTime = unit.longValue() + "天";
-    			break;
-    		case "4":
-    			unit = new BigDecimal(rentalTimeInMinutes / 60d);
-    			unit = unit.setScale(2, RoundingMode.HALF_UP);
-    			break;
-    		default:
-    			unit = new BigDecimal(0);
-    		}
-
-    		//
     		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
     			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
     			} else {
@@ -2151,11 +2110,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     		}
     		sharedAssetReqDetail.setRentalTime(totalTime);
 
-    		BigDecimal totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().doubleValue()));
-            if("2".equals(chargeType)) {
-                totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().longValue() / 2));
-            }
-
+    		BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetType().getUnitPrice(), chargingType);
     		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
     	}
     	return sharedAssetReqDetail;
@@ -2164,6 +2119,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	private SharedAssetType findSharedAssetType(AssetInfo assetInfo) {
         SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
         return sharedAssetType;
+    }
+
+    private Date currentDate;
+
+    public Date getCurrentDate() {
+        return new Date();
     }
     
 }
