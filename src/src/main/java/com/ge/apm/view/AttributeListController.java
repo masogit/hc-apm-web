@@ -95,7 +95,12 @@ public class AttributeListController extends GenericCRUDUUIDController<Attribute
             WebUtil.addErrorMessage("属性已存在");
             return;
         } else {
-            super.save();
+            if("Create".equals(super.crudActionName)) {
+                super.save();
+            }
+            if("Edit".equals(super.crudActionName)) {
+                super.update();
+            }
         }
     }
 
