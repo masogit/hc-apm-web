@@ -394,16 +394,6 @@ public class MaintainController {
 		}
 	}
 	
-	private void initValueAfterEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
-	}
-	
-	private void initValueBeforeEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
-	}
-	
 	public void checkRightAll(){
 		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
@@ -462,11 +452,12 @@ public class MaintainController {
 	public void saveMaintainSignature(){
 		if(StringUtils.isNotEmpty(signatureContent)){
 			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
-			initValueAfterEvent();
 		}
 	}
 	
 	public void getMaintainSignature(String signatureId,Integer signatureSourceType){
+		signatureContent=null;
+		signatureContentWeiXin=null;
 		if(StringUtils.isNotEmpty(signatureId)){
 			if(signatureSourceType==null){
 				blnWebSignatureEidt=true;
@@ -523,12 +514,10 @@ public class MaintainController {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
 		generateNurseSiteMaintainData();
-		initValueBeforeEvent();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		userClickDate=(Date) selectEvent.getObject();
-		initValueBeforeEvent();
 	}
 
 //	public void onEventMove(ScheduleEntryMoveEvent event) {

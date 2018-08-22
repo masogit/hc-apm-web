@@ -760,7 +760,7 @@ public class NurseSiteMaintainService {
 		int i = 0;
 		try {
 			while ((i = input.read(b)) > 0) {
-				String str = new String(b);
+				String str = new String(b,0,i);
 				sb.append(str);
 			}
 			input.close();
