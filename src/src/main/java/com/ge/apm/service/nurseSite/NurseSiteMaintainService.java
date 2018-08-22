@@ -760,7 +760,7 @@ public class NurseSiteMaintainService {
 		int i = 0;
 		try {
 			while ((i = input.read(b)) > 0) {
-				String str = new String(b);
+				String str = new String(b,0,i);
 				sb.append(str);
 			}
 			input.close();
@@ -1113,11 +1113,7 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	public byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> originListMaintain) throws IOException {
-		if(originListMaintain==null || originListMaintain.size()==0){
-			return null;
-		}
-		List<NurseSiteMaintain> listMaintain=new ArrayList<NurseSiteMaintain>(originListMaintain);
+	public byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) throws IOException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		listMaintain.sort(new NurseSiteMaintainComparator());
