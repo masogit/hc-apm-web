@@ -528,7 +528,9 @@ public class AssetInfoFormatter {
         AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
         if (parentAsset == null) return null;
 
-        return parentAsset.getDepartNum() + " / " + parentAsset.getName();
+        String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
+
+        return departNum + " / " + parentAsset.getName();
     }
 
     public Integer getInventoryStatus() {
