@@ -2165,5 +2165,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
         return sharedAssetType;
     }
+
+    private Date currentDate;
+
+    public Date getCurrentDate() {
+        return new Date();
+    }
     
 }
