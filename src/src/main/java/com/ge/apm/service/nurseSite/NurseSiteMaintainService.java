@@ -1,5 +1,6 @@
 package com.ge.apm.service.nurseSite;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.NurseSiteMaintainComparator;
 
 import webapp.framework.dao.SearchFilter;
@@ -783,6 +786,13 @@ public class NurseSiteMaintainService {
 		StreamedContent streamedContent = blobFileService.getBlobObjectByStorageId(signatureId);
 		return streamedContent;
 	}
+	
+	public StreamedContent getMaintainSignatureWebToStream(String signatureId){
+		String str=getMaintainSignatureWeb(signatureId);
+		DefaultStreamedContent streamedContent=new DefaultStreamedContent();
+		streamedContent.setStream(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(str)));
+		return streamedContent;
+	}
 
 	@Transactional
 	public boolean createMaintainConfig(NurseSiteMaintainConfig tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
@@ -1120,6 +1130,7 @@ public class NurseSiteMaintainService {
 		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
 		Map<String, String> mapAssetInfo = new HashMap<String, String>();
 		Set<String> setSignature=new HashSet<String>();
+		Map<String,Integer> mapSignature=new HashMap<String,Integer>();
 		Map<String,Integer> mapCheckItemSequence=new HashMap<String,Integer>();
 		List<String> header = new ArrayList<String>();
 		List<String> secondHeader = new ArrayList<String>();
@@ -1142,8 +1153,9 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
-			if(StringUtils.isNotEmpty(tempMaintain.getSignatureId()) && tempMaintain.getSignatureSourceType()==1){
+			if(StringUtils.isNotEmpty(tempMaintain.getSignatureId())){
 				setSignature.add(tempMaintain.getSignatureId());
+				mapSignature.put(tempMaintain.getSignatureId(), tempMaintain.getSignatureSourceType());
 			}
 		}
 		int headerColumnIndex = 1;
@@ -1234,7 +1246,7 @@ public class NurseSiteMaintainService {
 			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
 			if(setSignature.size()>0){
 				writeExcelSheetHeader(header, "签名", doc, 1, rowIndex++, false);
-				writeSignatureToExcel(doc, rowIndex++,dataColumnIndex,3,12, setSignature);
+				writeSignatureToExcel(doc, rowIndex++,dataColumnIndex,3,12, setSignature,mapSignature);
 			}
 			doc.removeRow(SHEET_Maintain, keyRow);
 //			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
@@ -1251,12 +1263,19 @@ public class NurseSiteMaintainService {
 		}
 	}
 	
-	private void writeSignatureToExcel(ExcelDocument doc,int row,int columnIndex,int width,int height,Set<String> signatureIds){
+	private void writeSignatureToExcel(ExcelDocument doc,int row,int columnIndex,int width,int height,Set<String> signatureIds,Map<String,Integer> mapSignature){
 		try {
 			Iterator<String> it=signatureIds.iterator();
 			while(it.hasNext()){
 				String tempSignature=it.next();
-				StreamedContent sc=getMaintainSignatureWeiXin(tempSignature);
+				Integer type=mapSignature.get(tempSignature);
+				StreamedContent sc=null;
+				if(type==1){
+					sc=getMaintainSignatureWeiXin(tempSignature);
+				}
+				else if(type==0){
+					sc=getMaintainSignatureWebToStream(tempSignature);
+				}
 				if(sc!=null){
 					doc.mergeCell(SHEET_Maintain, row, row+height-1, columnIndex, columnIndex+width-1);
 					doc.drawPicture(doc.addPicture(sc.getStream(), Workbook.PICTURE_TYPE_JPEG), SHEET_Maintain, row, columnIndex, width, height);
