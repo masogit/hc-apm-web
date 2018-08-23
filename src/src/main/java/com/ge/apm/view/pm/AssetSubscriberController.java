@@ -164,6 +164,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		rootNode.setExpanded(true);
 
 	}
+
+	public String getSelectedAssetName(){
+		AssetInfo assetInfo=assetInfoRepository.getById(selected.getAssetId());
+		return assetInfo.getName();
+	}
 	public void onSelectTreeNode(NodeSelectEvent event) {
 		queryAsset1.setInstitutionUID(null);
 		queryAsset1.setHospitalUID(null);
@@ -372,8 +377,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsubList = new ArrayList<MessageSubscriber>();
 				return;
 			}
+			/* 如果加上合同等消息推送 替换成这个if
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){
+					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				msgsubList = new ArrayList<MessageSubscriber>();
@@ -430,8 +437,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getContractDueHit()==false && selected.getMeterHit()==false){
+			/* 如果加上合同等消息推送 替换成这个if
+			* if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
+					selected.getContractDueHit()==false && selected.getMeterHit()==false)*/
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
