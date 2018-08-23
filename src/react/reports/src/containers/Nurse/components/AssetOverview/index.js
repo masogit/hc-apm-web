@@ -101,7 +101,7 @@ class AssetTable extends React.Component {
 export class AssetOverview extends React.Component {
 
   render() {
-    let { t, assets } = this.props
+    let { t, assets, count } = this.props
 
     let typeCount = assets.length
     return (
@@ -111,7 +111,7 @@ export class AssetOverview extends React.Component {
 
         <div className="asset-overview-content">
           <Header />
-          <Count t={t} all={assets.length} type={_.uniqBy(assets, a => a.assetGroup).length}/>
+          <Count t={t} all={count} type={_.uniqBy(assets, a => a.assetGroup).length}/>
           <AssetTable t={t} data={assets} />
         </div>
 
@@ -124,6 +124,7 @@ export class AssetOverview extends React.Component {
 function mapState2Props(state) {
   return {
     assets: state.Nurse.assets,
+    count: state.Nurse.assetTotalCount,
   }
 }
 
