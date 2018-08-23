@@ -11,6 +11,7 @@ export default {
 
   state: {
     assets: [],
+    assetTotalCount: 0,
     assetsInMaintain: [],
     avgResponseTime: [],
   },
@@ -18,7 +19,8 @@ export default {
   reducers: {
     'set/assets'(state, { payload }) {
       return produce(state, state => {
-        state.assets = payload
+        state.assets = payload.data
+        state.assetTotalCount = payload.rowCount
       })
     },
     'set/assetsInMaintain'(state, { payload }) {
@@ -41,8 +43,8 @@ export default {
       yield put({ type: 'get/avgResponseTime' })
     },
     *'get/assets'({ }, { put, call, select }) {
-      let { data } = yield call(API.getAssets)
-      yield put({ type: 'set/assets', payload: data })
+      let { data, rowCount } = yield call(API.getAssets)
+      yield put({ type: 'set/assets', payload: { data, rowCount } })
     },
     *'get/assetsInMaintain'({ }, { put, call, select }) {
       let { data } = yield call(API.getAssetsInMaintain)
