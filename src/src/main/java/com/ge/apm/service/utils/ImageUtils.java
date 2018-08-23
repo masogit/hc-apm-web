@@ -2,7 +2,9 @@ package com.ge.apm.service.utils;
 
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Base64.Decoder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class ImageUtils {
@@ -21,7 +23,18 @@ public class ImageUtils {
 			// TODO Auto-generated catch block
 			log.error(e.getMessage());
 		}
-		System.out.println("xxx end getBase64");
+		return null;
+	}
+	
+	public static byte[] convertPrimefacesBase64ToByte(String str){
+		if(StringUtils.isNotEmpty(str)){
+			int index=str.indexOf(",");
+			if(index>0){
+				str=str.substring(index+1, str.length());
+				Decoder decoder=Base64.getDecoder();
+				return decoder.decode(str);
+			}
+		}
 		return null;
 	}
 }
