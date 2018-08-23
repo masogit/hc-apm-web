@@ -119,12 +119,12 @@ const ProcessAnalysis = {
 const Nurse = {
 
   getAssets() {
-    let params = { page: 0, pageSize: 1000 }
+    let params = { page: 0, pageSize: 10000000000000 }
     return axios.get(URLs.Nurse_Assets, { params }).then(_ => _.data)
   },
 
   getAssetsInMaintain() {
-    let params = { page: 0, pageSize: 1000 }
+    let params = { page: 0, pageSize: 10000000000000 }
     return axios.get(URLs.Nurse_AssetsInMaintain, { params })
   },
 

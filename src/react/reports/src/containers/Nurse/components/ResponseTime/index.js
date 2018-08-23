@@ -73,7 +73,7 @@ const getOption = (t, data) =>{
     },
     series: [{
       type: 'bar',
-      barMaxWidth: 60,
+      barMaxWidth: 40,
       itemStyle: {
         normal: {
           barBorderRadius: [1000, 1000, 0, 0],
