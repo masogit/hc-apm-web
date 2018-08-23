@@ -428,7 +428,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}else{
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
-					WebUtil.addErrorMessage("务必选择紧急消息");
+					WebUtil.addErrorMessage("务必选择紧急程度");
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 					return;
 				}
