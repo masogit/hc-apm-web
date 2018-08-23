@@ -21,12 +21,12 @@
                     </h:panelGroup>
                     <h:panelGroup>
                 		<label class="label">签名</label>
-						<p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" value="#{maintainController.signatureContent}" required="false" guideline="true" requiredMessage="签名 #{msg.ValidationRequire}"/>
+						<p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" base64Value="#{maintainController.signatureContent}" required="false" guideline="true" requiredMessage="签名 #{msg.ValidationRequire}"/>
 					</h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()" timeout="180000"/>
-                <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent"/>
+                <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" oncomplete="PF('globalSig').clear()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>
         </p:dialog>
