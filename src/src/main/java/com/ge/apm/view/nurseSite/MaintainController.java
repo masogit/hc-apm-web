@@ -76,6 +76,7 @@ public class MaintainController {
     private List<OrgInfo> checkListParentOrgInfo;
     //inner
     private String signatureContent;
+    private StreamedContent signatureContentStream;
     private StreamedContent signatureContentWeiXin;
     private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
@@ -457,12 +458,13 @@ public class MaintainController {
 	public void getMaintainSignature(String signatureId,Integer signatureSourceType){
 		signatureContent=null;
 		signatureContentWeiXin=null;
+		signatureContentStream=null;
 		if(StringUtils.isNotEmpty(signatureId)){
 			if(signatureSourceType==null){
 				blnWebSignatureEidt=true;
 			}
 			else if(signatureSourceType==0){
-				signatureContent=nurseSiteMaintainService.getMaintainSignatureWeb(signatureId);
+				signatureContentStream=nurseSiteMaintainService.getMaintainSignatureWebToStream(signatureId);
 				blnWebSignatureEidt=false;
 			}
 			else if(signatureSourceType==1){
@@ -477,6 +479,7 @@ public class MaintainController {
 	
 	public void resetMaintainSignature(){
 		signatureContent=null;
+		signatureContentStream=null;
 	}
 	
 	public void onNurseSiteMaintainConfigChange(){
@@ -747,6 +750,14 @@ public class MaintainController {
 
 	public void setSignatureContent(String signatureContent) {
 		this.signatureContent = signatureContent;
+	}
+
+	public StreamedContent getSignatureContentStream() {
+		return signatureContentStream;
+	}
+
+	public void setSignatureContentStream(StreamedContent signatureContentStream) {
+		this.signatureContentStream = signatureContentStream;
 	}
 
 	public StreamedContent getSignatureContentWeiXin() {
