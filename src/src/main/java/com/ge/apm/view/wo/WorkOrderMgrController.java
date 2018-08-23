@@ -50,8 +50,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
-    private V2_WorkOrderService woService;
-    private UaaService uaaService;
+    private V2_WorkOrderService woService;    private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
@@ -434,6 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void cancel() {
+        confirmedUpDate=null;
         selected = null;
         newServiceRequest = null;
         esTime = null;
@@ -530,7 +530,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         isRating=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
-                .map(data -> (Boolean) data.get("ratingRequired")).get();
+                .map(data -> (Boolean) data.get("ratingRequired")).orElse(false);
 
         picList = new ArrayList<V2_BlobObject>();
         attachList = new ArrayList<V2_BlobObject>();
@@ -545,11 +545,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
-                .map(data -> (Boolean) data.get("hourRequired")).get();
-            this.selectedWorkOrder.setManHours(null);
-
+                .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
+        if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
+            selectedWorkOrder.setManHours(null);
+        }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
+        currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList =woService.getAttachByBoSubType(selectedWorkOrder.getSrId(),V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -557,15 +558,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveRepairWorkOrder() {
-        if(hourRequired) {
-            if (this.selectedWorkOrder.getManHours() < 0.01) {
+        if(hourRequired)
+        {
+            if (selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
-        }else if(selectedWorkOrder.getManHours()==0.00){
+        }
+        /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
                 selectedWorkOrder.setManHours(null);
-            }
+            }*/
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -620,7 +623,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void repairWorkOrder() {
         boolean valid = true;
-        if (confirmedUpDate == null) {
+        if (confirmedUpDate ==
+                null) {
             WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
@@ -642,13 +646,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if(hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("工时不能小于0.01");
-                RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+                RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
                 valid = false;
             }
-        }else if(selectedWorkOrder.getManHours()==0.00){
+        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
             selectedWorkOrder.setManHours(null);
         }
-
 
         if (!valid) {
             return;
