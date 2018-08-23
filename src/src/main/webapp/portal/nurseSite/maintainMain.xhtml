@@ -48,10 +48,10 @@
                         </p:schedule>
                     </h:panelGrid>
                 </h:form>
-                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="650" resizable="true" draggable="true">
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="700" resizable="true" draggable="true">
                    	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
-                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:600px':''}">
-                   			<div class="ui-datatable-tablewrapper">
+                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:650px':''}">
+                   			<div class="ui-datatable-tablewrapper" style="padding-left:10px;padding-right:10px;">
                    				<table>
                 					<tr>
                 						<th>
