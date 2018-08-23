@@ -366,9 +366,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public void saveAssetSub(){
-//		if (!requiredCheck()) {
-//			return;
-//		}
         MessageSubscriber msgsub= null;
         List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
 		if(this.getCRUDActionName().equals("新增")) {
