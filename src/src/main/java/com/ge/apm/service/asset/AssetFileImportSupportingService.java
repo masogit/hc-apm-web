@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -178,6 +179,7 @@ public class AssetFileImportSupportingService {
 
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
         final int GENERATE_BY_PREFIX_AND_SEQ = 2;
+        final int GENERATE_BY_PREFIX_AND_FOUR_DIGITS_YEAR_AND_SEQ = 3;
 
         if (workflowConfig == null) return false;
 
@@ -200,6 +202,8 @@ public class AssetFileImportSupportingService {
                 if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
                     return true;
                 }
+            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_FOUR_DIGITS_YEAR_AND_SEQ) {
+                return true;
             }
         }
 
@@ -353,6 +357,18 @@ public class AssetFileImportSupportingService {
             qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
         }
 
+    }
+
+    public void setAssetDeptId(AssetInfo assetInfo, OrgInfo selectedOrgToImport, Map<String, Object> item) {
+        Map< String, Object> rowMap = (Map<String, Object>) item.get("rowData");
+        String assetDeptName = ExcelDocument.getCellStringValue(rowMap.get("使用科室"));
+        if (!StringUtils.isEmpty(assetDeptName)) {
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), assetDeptName);
+            if (orgInfo != null) {
+                assetInfo.setAssetDeptId(orgInfo.getId());
+                assetInfo.setAssetDeptUID(orgInfo.getUid());
+            }
+        }
     }
 
 }

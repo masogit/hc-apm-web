@@ -21,7 +21,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax  event="rowSelect" update="viewButton" oncomplete="selectRow();"/>
                         <!--<p:ajax  event="rowSelect" update="viewButton" listener="#{assetInfoApprovalController.onSelectAsset()}"  onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />-->

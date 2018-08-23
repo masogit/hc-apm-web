@@ -48,6 +48,8 @@ import decisionMakingModels from '#/models/DecisionMaking'
 import processAnalysis from '#/models/ProcessAnalysis'
 /* Failure Analysis */
 import failureAnalysis from '#/models/FailureAnalysis'
+/* Nurse station */
+import Nurse from '#/models/Nurse'
 
 
 const historyEngine = useRouterHistory(createHashHistory)({
@@ -97,6 +99,8 @@ decisionMakingModels.forEach(model => app.model(model))
 app.model(processAnalysis)
 /* Failure Analysis */
 app.model(failureAnalysis)
+/* Nurse station */
+app.model(Nurse)
 
 app.router(router)
 

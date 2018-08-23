@@ -2,8 +2,15 @@
  */
 package com.ge.apm.domain;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -77,23 +84,48 @@ public class MessageSubscriber implements Serializable {
 
 
     @Basic(optional = true)
-    @Column(name = "repair_event")
-    private Boolean repairEvent;
+    @Column(name = "repair_hit")
+    private Boolean repairHit;
 
     @Basic(optional = true)
-    @Column(name = "maintain_event")
-    private Boolean maintainEvent;
-    @Basic(optional = true)
-    @Column(name = "contract_due_event")
-    private Boolean contractDueEvent;
-    @Basic(optional = true)
-    @Column(name = "quality_hit")
-    private Boolean qualityHit;
+    @Column(name = "contract_due_hit")
+    private Boolean contractDueHit;
+
     @Basic(optional = true)
     @Column(name = "main_rep_hit")
     private Boolean mainRepHit;
 
+    @Basic(optional = true)
+    @Column(name = "meter_hit")
+    private Boolean meterHit;
 
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
 
     public MessageSubscriber() {
     }
@@ -199,7 +231,7 @@ public class MessageSubscriber implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.MessageSubscriber[ id=" + id + " ]";
+        return "MessageSubscriber[ id=" + id + " ]";
     }
 
     public Boolean getLevel0() {
@@ -234,7 +266,7 @@ public class MessageSubscriber implements Serializable {
         this.selectType = selectType;
     }
 
-    public Boolean getRepairEvent() {
+    /*public Boolean getRepairEvent() {
         return repairEvent;
     }
 
@@ -256,15 +288,9 @@ public class MessageSubscriber implements Serializable {
 
     public void setContractDueEvent(Boolean contractDueEvent) {
         this.contractDueEvent = contractDueEvent;
-    }
+    }*/
 
-    public Boolean getQualityHit() {
-        return qualityHit;
-    }
 
-    public void setQualityHit(Boolean qualityHit) {
-        this.qualityHit = qualityHit;
-    }
 
     public Boolean getMainRepHit() {
         return mainRepHit;
@@ -296,5 +322,105 @@ public class MessageSubscriber implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Boolean getMeterHit() {
+        return meterHit;
+    }
+
+    public void setMeterHit(Boolean meterHit) {
+        this.meterHit = meterHit;
+    }
+
+    public boolean isReceiveChatMsg() {
+        return isReceiveChatMsg;
+    }
+
+    public void setReceiveChatMsg(boolean receiveChatMsg) {
+        isReceiveChatMsg = receiveChatMsg;
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Boolean getRepairHit() {
+        return repairHit;
+    }
+
+    public void setRepairHit(Boolean repairHit) {
+        this.repairHit = repairHit;
+    }
+
+    public Boolean getContractDueHit() {
+        return contractDueHit;
+    }
+
+    public void setContractDueHit(Boolean contractDueHit) {
+        this.contractDueHit = contractDueHit;
     }
 }

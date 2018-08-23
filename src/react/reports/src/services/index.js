@@ -35,10 +35,19 @@ const URLs = {
   ProcessAnalysis_Gross: '/api/process/gross',
   ProcessAnalysis_Phase: '/api/process/phase',
 
+  Nurse_Assets: '/gateway/hcapmassetservice/api/apm/asset/assetinfos',
+  Nurse_AssetsInMaintain: '/gateway/hcapmreportservice/api/apm/report/nurseSite/assetsInMaintain',
+  Nurse_ResponseTime: '/gateway/hcapmreportservice/api/apm/report/nurseSite/avgResponseTime',
+
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  Object.keys(URLs).forEach(k => URLs[k] = '/geapm' + URLs[k])
+  Object.keys(URLs).forEach(k => {
+    // special treatment for legacy api
+    if (URLs[k].indexOf('/api') === 0) {
+      URLs[k] = '/geapm' + URLs[k]
+    }
+  })
 }
 
 const UseMock = true
@@ -107,7 +116,25 @@ const ProcessAnalysis = {
   }
 }
 
-export { URLs, AssetBrowser, ProcessAnalysis, FailureAnalysis }
+const Nurse = {
+
+  getAssets() {
+    let params = { page: 0, pageSize: 1000 }
+    return axios.get(URLs.Nurse_Assets, { params }).then(_ => _.data)
+  },
+
+  getAssetsInMaintain() {
+    let params = { page: 0, pageSize: 1000 }
+    return axios.get(URLs.Nurse_AssetsInMaintain, { params })
+  },
+
+  getAvgResponseTime() {
+    return axios.get(URLs.Nurse_ResponseTime)
+  },
+
+}
+
+export { URLs, AssetBrowser, ProcessAnalysis, FailureAnalysis, Nurse }
 
 /* Failure Analysis & Process Analysis */
 const DateFormat = 'YYYY-MM-DD'

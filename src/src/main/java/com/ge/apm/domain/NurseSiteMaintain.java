@@ -9,10 +9,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -23,7 +21,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,16 +89,10 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name="name")
 	private String name;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@org.hibernate.annotations.ForeignKey(name = "none")
-	@JsonBackReference
+	@Transient
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@org.hibernate.annotations.ForeignKey(name = "none")
-	@JsonBackReference
+	@Transient
 	private UserAccount modifyBy;
 	
 	@JsonIgnore
@@ -336,7 +327,7 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setSequence(Integer sequence) {
 		if(sequence==null){
-			sequence=1;
+			sequence=0;
 		}
 		this.sequence = sequence;
 	}
@@ -382,7 +373,7 @@ public class NurseSiteMaintain implements Serializable {
 		}
 		
 		String str=getName();
-		if(getSequence()==null){
+		if(getSequence()==null||getSequence()<=0){
 			str+="-"+strStatus;
 		}
 		else{

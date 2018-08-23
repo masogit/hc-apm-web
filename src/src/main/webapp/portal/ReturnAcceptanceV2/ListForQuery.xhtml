@@ -54,7 +54,7 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                     rows="20" emptyMessage="#{msg.noRecordFound}" 
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
                     
 <!--                    <p:ajax event="rowSelect" update="" 
                             listener="#{sharedAssetReqDetailForQueryController.onSelectE}" 
@@ -125,10 +125,10 @@
                             <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="使用时长">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getUseTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getUseCost(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
                                 <f:convertNumber pattern="0.00"/>
                             </h:outputText>
                         </p:column>

@@ -40,6 +40,7 @@
         <intercept-url pattern="/homeAssetHead**" access="hasAnyRole('SuperAdmin','AssetHead')"/>
         <intercept-url pattern="/homeAssetStaff**" access="hasAnyRole('SuperAdmin','AssetStaff')"/>
         <intercept-url pattern="/homeDeptHead**" access="hasAnyRole('SuperAdmin','DeptHead')"/>
+        <intercept-url pattern="/homeNurse**" access="hasAnyRole('SuperAdmin','NursingStaff')"/>
 
         <!-- 系统管理 -->
         <intercept-url pattern="/portal/uaa/biomedGroup/List.xhtml**" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/><!-- 维修管理员群组管理 -->

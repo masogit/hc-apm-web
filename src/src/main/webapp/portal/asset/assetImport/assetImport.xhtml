@@ -58,7 +58,10 @@
                 </h:form>
             </div>
             <div class="ui-g-12 card ">
+
                 <h:form id="importDataForm">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
+                    </p:messages>
                     <h:panelGroup >
                         <p:selectOneRadio id="status" value="#{assetFileImportController.displayErrorsOnly}">
                             <p:ajax event="change" process="@this" update=":importDataForm" listener="#{assetFileImportController.switchAssetCheckStatus}"/>
@@ -70,7 +73,7 @@
                         <p:tab title="资产导入">
                             <p:dataTable id="assetTable" value="#{assetFileImportController.displayAssets}" var="item" rows="10" paginator="true"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                         rowsPerPageTemplate="5,10,15" >
+                                         rowsPerPageTemplate="20,50,100,500" >
                                 <p:column headerText="Excel行数" >
                                     <h:outputText value="#{item.get('asset').lineNum}"/>
                                 </p:column>

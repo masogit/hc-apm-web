@@ -8,71 +8,78 @@
 
 <ui:composition>
     <!--新增 标签关注/修改 标签关注-->
-    <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1000" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName} 设备关注">
+    <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName}设备关注">
         <h:form id="AssetSubscribEditForm">
             <h:panelGroup id="display" rendered="#{assetSubscriberController.selected != null}">
                 <h:panelGroup >
                     <label class="label">关注人</label>
                     <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
-                        <p:ajax  event="change" update="scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
+                        <p:ajax  event="change" update="@(.tree) @(.pickListCls) scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{assetSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-                <p:panelGrid columns="4" layout="grid">
-                    <h:panelGroup >
-                        <label class ="label">#{msg.assetName}</label>
-                        <p:inputText  value="#{assetSubscriberController.queryAsset.name}" disabled="#{assetSubscriberController.CRUDActionName.equals('修改')}"  required="false">
-                            <p:ajax  listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList" />
-                        </p:inputText>
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}">
+
+                <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" legend="设备选择">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup  >
                         <!--设备分类-->
                         <label class ="label">#{msg.assetGroup}</label>
-                        <p:selectOneMenu value="#{assetSubscriberController.queryAsset.assetGroup}" disabled="false" >
-                            <p:ajax  listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList" />
+                        <p:selectOneMenu value="#{assetSubscriberController.queryAsset1.assetGroup}" disabled="false" >
+                            <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <!--<h:panelGroup rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}">
-                        &lt;!&ndash;制造商&ndash;&gt;
-                        <label class ="label">#{msg.manufacture}</label>
-                        <p:selectOneMenu value="#{assetSubscriberController.queryAsset.manufactureId}" >
-                            <p:ajax listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList"  />
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>-->
-                    <!--设备型号-->
-                   <!-- <h:panelGroup rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}">
-                        <label class ="label">#{msg.manufacture}</label>
-                        <p:inputText  value="#{assetSubscriberController.queryAsset.functionType}" disabled="#{assetSubscriberController.CRUDActionName.equals('修改')}"  required="false">
-                            <p:ajax  listener="#{assetSubscriberController.addFilter()}" update="AssetsPickList" />
-                        </p:inputText>
-                    </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">#{msg.hospitalId}</label>
+                            <p:inputText id="selectedOrgName" value="#{assetSubscriberController.selectedOrg==null ? '': assetSubscriberController.selectedOrg.name}" readonly="true"/>
+                            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetSubscriberController.orgTree}" selection="#{assetSubscriberController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update="scriTab:AssetSubscribEditForm:selectedOrgName, scriTab:AssetSubscribEditForm:AssetsPickList, scriTab:AssetSubscribEditForm:clinicalDeptName" listener="#{assetSubscriberController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">所属科室</label>
+                            <p:selectOneMenu id="clinicalDeptName" value="#{assetSubscriberController.queryAsset1.clinicalDeptId}">
+                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{assetSubscriberController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                 </p:panelGrid>
-                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
+                    <!--<h:panelGroup gaolei>-->
+                <p:pickList width="70" rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
                             required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
                     <f:facet name="sourceCaption">待选设备</f:facet>
                     <f:facet name="targetCaption">已选设备</f:facet>
                     <p:ajax event="transfer" listener="#{assetSubscriberController.onAssetsTransfer}" />
-                    <p:column style="float: left;width:25%;">
+                    <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.name}" />
                     </p:column>
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.departNum}" />
                     </p:column>
-                    <p:column style="float: left;width:25%;">
+                    <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.clinicalDeptName}" />
                     </p:column>
-                    <p:column>
+                    <!--<p:column>
                         <h:outputText value="#{item.functionType}" />
-                    </p:column>
+                    </p:column>-->
                 </p:pickList>
-
-
+                    <!--</h:panelGroup>-->
+                </p:fieldset>
                 <p:fieldset legend="消息设置">
                     <h:panelGrid columns="5" id="grid">
                         <h:panelGroup>
@@ -83,30 +90,32 @@
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck2" value="#{assetSubscriberController.selected.level0}"/>
-                                <p:outputLabel value="紧急"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','1')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck3" value="#{assetSubscriberController.selected.level1}"/>
-                                <p:outputLabel value="重要"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','2')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox class="ck4" value="#{assetSubscriberController.selected.level2}"/>
-                                <p:outputLabel value="一般"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','3')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox class="ck5" value="#{assetSubscriberController.selected.isReceiveTimeoutMsg}"/>
+                                <p:selectBooleanCheckbox class="ck5" value="#{assetSubscriberController.selected.isReceiveTimeoutMsg}">
+                                    <p:ajax update="@(.ck5)"></p:ajax>
+                                </p:selectBooleanCheckbox>
                                 <p:outputLabel value="超时消息"/>
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
 
-                    <h:panelGrid columns="3">
+                   <!-- <h:panelGrid columns="2">
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:outputLabel value="合同到期: "/>
@@ -114,26 +123,43 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.qualityHit}"/>
-                                <p:outputLabel value="质保提醒"/>
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.contractDueHit}"/>
+                                <p:outputLabel value="质保/维保提醒"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="保养事件:"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
-                                <p:outputLabel value="维保通知"/>
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
-                    <!--  <h:panelGrid columns="2">
-                          <p:outputLabel value="保养事件" />
-                      </h:panelGrid>-->
+
+                    <h:panelGrid columns="2">
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="计量事件:"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.meterHit}"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                    </h:panelGrid>-->
                 </p:fieldset>
                 <br/>
 
             </h:panelGroup>
 
-            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm:dataList   :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
+            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{assetSubscriberController.cancel()}" icon="ui-icon-cancel" update="scriTab:TagSubscriberForm" onclick="PF('AssetSubscribEditDialog').hide()"/>
         </h:form>

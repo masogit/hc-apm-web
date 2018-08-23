@@ -7,8 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -235,6 +238,7 @@ public class ElectricSafetyService {
 				listData.add(data);
 			}
 		}
+		analysisFinancingNum(listData);
 		return listData;
 	}
 	
@@ -307,6 +311,85 @@ public class ElectricSafetyService {
 //		return newMap;
 //	}
 	
+	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder){
+		Set<String> setFinancingNum=new HashSet<String>();
+		Set<String> setAssetUids=new HashSet<String>();
+		List<AssetInfo> listAssetInfo=null;
+		if(listData!=null && listData.size()>0){
+			for(int i=0;i<listData.size();++i){
+				ElectricSafetyData tempData=listData.get(i);
+				setFinancingNum.add(tempData.getFinancingNum());
+				setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
+				setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+			}
+		}
+		if(setFinancingNum.size()>0){
+			listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(setFinancingNum,user.getSiteUID(),user.getUid());
+		}
+		if(listAssetInfo!=null && listAssetInfo.size()>0){
+			for(int i=0;i<listAssetInfo.size();++i){
+				AssetInfo tempAsset=listAssetInfo.get(i);
+				setAssetUids.add(tempAsset.getUid());
+				if(mapAsset.containsKey(tempAsset.getFinancingNum())){
+					mapAsset.get(tempAsset.getFinancingNum()).add(tempAsset);
+				}
+				else{
+					List<AssetInfo> tempListAsset=new ArrayList<AssetInfo>();
+					tempListAsset.add(tempAsset);
+					mapAsset.put(tempAsset.getFinancingNum(), tempListAsset);
+				}
+			}
+		}
+		if(setAssetUids.size()>0){
+			Set<V2_PmOrder> setV2_PmOrder=v2_PmOrderRepository.findByAssetUids(setAssetUids);
+			if(setV2_PmOrder!=null && setV2_PmOrder.size()>0){
+				Iterator<V2_PmOrder> itV2_PmOrder=setV2_PmOrder.iterator();
+				while(itV2_PmOrder.hasNext()){
+					V2_PmOrder tempPmOrder=itV2_PmOrder.next();
+					mapPmOrder.put(tempPmOrder.getAssetUid(), tempPmOrder);
+				}
+			}
+		}
+	}
+
+	private void analysisFinancingNum(List<ElectricSafetyData> listData) {
+		Map<String,List<AssetInfo>> mapAsset=new HashMap<String,List<AssetInfo>>();
+		Map<String,V2_PmOrder> mapPmOrder=new HashMap<String,V2_PmOrder>();
+		getListAssetInfo(listData,mapAsset,mapPmOrder);
+		if (listData != null && listData.size() > 0) {
+			for (int i = 0; i < listData.size(); ++i) {
+				ElectricSafetyData data = listData.get(i);
+				try {
+					List<AssetInfo> listAssetInfo = mapAsset.get(data.getFinancingNum());
+					if (listAssetInfo == null || listAssetInfo.size() == 0) {
+						data.setFinancingNum(data.getFinancingNum().toLowerCase());
+						listAssetInfo = mapAsset.get(data.getFinancingNum());
+					}
+					if (listAssetInfo == null || listAssetInfo.size() == 0) {
+						data.setFinancingNum(data.getFinancingNum().toUpperCase());
+						listAssetInfo = mapAsset.get(data.getFinancingNum());
+					}
+					if (listAssetInfo != null && listAssetInfo.size() == 1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())) {
+						data.setAssetInfo(listAssetInfo.get(0));
+						V2_PmOrder order = mapPmOrder.get(listAssetInfo.get(0).getUid());
+						if (order != null) {
+							data.setV2PmOrder(order);
+						} else {
+							data.setWarnMessage("工单未找到");
+						}
+					} else if (listAssetInfo != null && listAssetInfo.size() > 1) {
+						data.setWarnMessage("找到多台设备");
+					} else {
+						data.setWarnMessage("设备未找到");
+					}
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					data.setWarnMessage("网络异常");
+				}
+			}
+		}
+	}
+	
 	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyData data){
 		String strValue="";
 		for(String key:map.keySet()){
@@ -346,163 +429,139 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-					try {
-						List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						if(listAssetInfo==null || listAssetInfo.size()==0){
-							data.setFinancingNum(data.getFinancingNum().toLowerCase());
-							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						}
-						if(listAssetInfo==null || listAssetInfo.size()==0){
-							data.setFinancingNum(data.getFinancingNum().toUpperCase());
-							listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
-						}
-						if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
-							data.setAssetInfo(listAssetInfo.get(0));
-							V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
-							if(order!=null){
-								data.setV2PmOrder(order);
-							}
-							else{
-								data.setWarnMessage("工单未找到");
-							}
-						}
-						else if(listAssetInfo!=null && listAssetInfo.size()>1){
-							data.setWarnMessage("找到多台设备");
-						}
-						else{
-							data.setWarnMessage("设备未找到");
-						}
-					} catch (Exception e) {
-						// TODO: handle exception
-						LOGGER.error(e.getMessage());
-						data.setWarnMessage("网络异常");
-					}
 				}
 			}
-			
+//			1——》1组应用
+			else if(StringUtils.equals(key, "1")){
+				data.setOneGroupApp(strValue.replaceAll("\\+", "").trim());
+			}
 //			7，——》保护接地阻抗（单位：Ω）
 			else if(StringUtils.equals(key, "7")){
 				data.setProtectGroundImpedance(strValue.replaceAll("\\+", "").trim());
 			}
 //			8，——》保护接地阻抗参考值（<0.2Ω）
-//			else if(StringUtils.equals(key, "8")){
-//				data.setProtectGroundImpedanceRefVal(strValue);
-//			}
+			else if(StringUtils.equals(key, "8")){
+				data.setProtectGroundImpedanceRefVal(strValue.replaceAll("\\+", "").trim());
+			}
 //			21，——》等效设备漏电流（单位：μA）
 			else if(StringUtils.equals(key, "21")){
 				data.setEquipmentElectricLeakage(strValue.replaceAll("\\+", "").trim());
+			}
+//			22，——》等效设备漏电流参考值（<1.0mA）
+			else if(StringUtils.equals(key, "22")){
+				data.setEquipmentElectricLeakageRefVal(strValue.replaceAll("\\+", "").trim());
 			}
 //			23，——》患者漏电流（应用部分加电）（单位：μA）
 			else if(StringUtils.equals(key, "23")){
 				data.setPatientElectricLeakage_app(strValue.replaceAll("\\+", "").trim());
 			}
 //			24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
-//			else if(StringUtils.equals(key, "24")){
-//				data.setPatientElectricLeakageRefVal_app(strValue);
-//			}
+			else if(StringUtils.equals(key, "24")){
+				data.setPatientElectricLeakageRefVal_app(strValue.replaceAll("\\+", "").trim());
+			}
 //			25，——》对地漏电流（正常状态）（单位：mA）
 			else if(StringUtils.equals(key, "25")){
 				data.setGroundElectricLeakage_normal(strValue.replaceAll("\\+", "").trim());
 			}
 //			26，——》对地漏电流（正常状态）参考值（<0.5mA）
-//			else if(StringUtils.equals(key, "26")){
-//				data.setGroundElectricLeakageRefVal_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "26")){
+				data.setGroundElectricLeakageRefVal_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			27，——》对地漏电流（单一故障状态）（单位：mA）
-//			else if(StringUtils.equals(key, "27")){
-//				data.setGroundElectricLeakage_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "27")){
+				data.setGroundElectricLeakage_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
-//			else if(StringUtils.equals(key, "28")){
-//				data.setGroundElectricLeakageRefVal_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "28")){
+				data.setGroundElectricLeakageRefVal_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			29，——》外壳漏电流（正常状态）（单位：μA）
 			else if(StringUtils.equals(key, "29")){
 				data.setShellElectricLeakage_normal(strValue.replaceAll("\\+", "").trim());
 			}
 //			30，——》外壳漏电流（正常状态）参考值（<100μA）
-//			else if(StringUtils.equals(key, "30")){
-//				data.setShellElectricLeakageRefVal_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "30")){
+				data.setShellElectricLeakageRefVal_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			31，——》外壳漏电流（单一故障状态）（单位：μA）
-//			else if(StringUtils.equals(key, "31")){
-//				data.setShellElectricLeakage_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "31")){
+				data.setShellElectricLeakage_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
-//			else if(StringUtils.equals(key, "32")){
-//				data.setShellElectricLeakageRefVal_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "32")){
+				data.setShellElectricLeakageRefVal_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			33，——》患者漏电流AC（正常状态）（单位：μA）
-//			else if(StringUtils.equals(key, "33")){
-//				data.setPatientElectricLeakageAC_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "33")){
+				data.setPatientElectricLeakageAC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
-//			else if(StringUtils.equals(key, "34")){
-//				data.setPatientElectricLeakageRefValAC_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "34")){
+				data.setPatientElectricLeakageRefValAC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			35，——》患者漏电流AC（单一故障状态）（单位：μA）
-//			else if(StringUtils.equals(key, "35")){
-//				data.setShellElectricLeakageAC_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "35")){
+				data.setShellElectricLeakageAC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
-//			else if(StringUtils.equals(key, "36")){
-//				data.setShellElectricLeakageRefValAC_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "36")){
+				data.setShellElectricLeakageRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			37，——》患者漏电流DC（正常状态）（单位：μA）
 //			else if(StringUtils.equals(key, "37")){
-//				data.setPatientElectricLeakageDC_normal(strValue);
+//				data.setPatientElectricLeakageDC_normal(strValue.replaceAll("\\+", "").trim());
 //			}
 //			38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
 //			else if(StringUtils.equals(key, "38")){
-//				data.setPatientElectricLeakageRefValDC_normal(strValue);
+//				data.setPatientElectricLeakageRefValDC_normal(strValue.replaceAll("\\+", "").trim());
 //			}
 //			39，——》患者漏电流DC（单一故障状态）（单位：μA）
 //			else if(StringUtils.equals(key, "39")){
-//				data.setShellElectricLeakageDC_singleError(strValue);
+//				data.setShellElectricLeakageDC_singleError(strValue.replaceAll("\\+", "").trim());
 //			}
 //			40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
 //			else if(StringUtils.equals(key, "40")){
-//				data.setShellElectricLeakageRefValDC_singleError(strValue);
+//				data.setShellElectricLeakageRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
 //			}
 //			41，——》患者辅助电流AC（正常状态）（单位：μA）
-//			else if(StringUtils.equals(key, "41")){
-//				data.setPatientAssisElectricAC_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "41")){
+				data.setPatientAssisElectricAC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
-//			else if(StringUtils.equals(key, "42")){
-//				data.setPatientAssisElectricRefValAC_normal(strValue);
-//			}
+			else if(StringUtils.equals(key, "42")){
+				data.setPatientAssisElectricRefValAC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			43，——》患者辅助电流AC（单一故障状态）（单位：μA）
-//			else if(StringUtils.equals(key, "43")){
-//				data.setPatientAssisElectricAC_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "43")){
+				data.setPatientAssisElectricAC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
-//			else if(StringUtils.equals(key, "44")){
-//				data.setPatientAssisElectricRefValAC_singleError(strValue);
-//			}
+			else if(StringUtils.equals(key, "44")){
+				data.setPatientAssisElectricRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			45，——》患者辅助电流DC（正常状态）（单位：μA）
 //			else if(StringUtils.equals(key, "45")){
-//				data.setPatientAssisElectricDC_normal(strValue);
+//				data.setPatientAssisElectricDC_normal(strValue.replaceAll("\\+", "").trim());
 //			}
 //			46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
 //			else if(StringUtils.equals(key, "46")){
-//				data.setPatientAssisElectricRefValDC_normal(strValue);
+//				data.setPatientAssisElectricRefValDC_normal(strValue.replaceAll("\\+", "").trim());
 //			}
 //			47，——》患者辅助电流DC（单一故障状态）（单位：μA）
 //			else if(StringUtils.equals(key, "47")){
-//				data.setPatientAssisElectricDC_singleError(strValue);
+//				data.setPatientAssisElectricDC_singleError(strValue.replaceAll("\\+", "").trim());
 //			}
 //			48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
 //			else if(StringUtils.equals(key, "48")){
-//				data.setPatientAssisElectricRefValDC_singleError(strValue);
+//				data.setPatientAssisElectricRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
 //			}
 //			51，——》市电电压实际值
 //			else if(StringUtils.equals(key, "51")){
-//				data.setCityVoltage(strValue);
+//				data.setCityVoltage(strValue.replaceAll("\\+", "").trim());
 //			}
 //			52，——》市电电压参考值（230V）
 //			else if(StringUtils.equals(key, "52")){
-//				data.setCityVoltageRefVal(strValue);
+//				data.setCityVoltageRefVal(strValue.replaceAll("\\+", "").trim());
 //			}
 			map.put(key, strValue);
 		}

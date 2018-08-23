@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,6 +77,9 @@ public class AssetInfoDetailController {
     }
     
     public OrgInfo getOrgInfoByUid(String uid) {
+        if(Strings.isNullOrEmpty(uid)){
+            return null;
+        }
         return orgDao.getByUid(uid);
     }
 

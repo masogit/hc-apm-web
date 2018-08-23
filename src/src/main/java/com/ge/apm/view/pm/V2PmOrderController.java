@@ -24,6 +24,7 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -84,6 +85,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
     Boolean terminate;
+    private PmOrderReportTemplateService pmOrderReportTemplateService;
     private UaaService uaaService;
     private UserContextService userContextService;
     private BlobFileService blobService;
@@ -133,11 +135,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private I18nMessageRepository i18nMessageRepository;
     private String head;
     private TableDefinitionService tableService;
-
     // cache for maintenance report
     private StreamedContent maintenanceReport;
-
+    private UserAccount user;
+    private TenantInfoRepository tenantInfoRepository;
+    Boolean isInsulate;
     private String reportUid; //selected table base uid
+
 
     public String getHead() {
         return head;
@@ -145,6 +149,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setHead(String head) {
         this.head = head;
+    }
+
+    public void prepareEditAccDetailonPrice(String itemId){
+        accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+    if(!accessoryList.isEmpty())
+        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+
     }
 
     public void arrivalTimeSet() {
@@ -213,38 +224,56 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      * Generate maintenance report.
      */
     public void doExportMaintenanceReport() {
-        if (this.selected != null) {
-            maintenanceReport = null;
-            try {
-                PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-                if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
-                if (Strings.isNullOrEmpty(rule.getReportStorageId())) throw new BusinessException("请先上传保养报告模版!");
+        {
+            if (this.selected != null) {
+                maintenanceReport = null;
+                try {
+                    PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
+                    if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+                    InputStream rawTemplate = null;
+                    if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
+                        // get template if the report storage is set.
+                        StreamedContent template = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
+                        rawTemplate = template.getStream();
+                    } else {
+                        // generate template otherwise.
+                        try {
+                            byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+                            InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
+                            rawTemplate = pmOrderReportTemplateService.generateReportTemplateByRule(activeTemplateStream, rule);
+                        } catch (IOException e) {
+                            throw new BusinessException("自动模版生成失败");
+                        }
+                    }
 
-                StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-                Map<String, Object> datas = populateReportContent(selected);
+                    if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                XWPFTemplate template = XWPFTemplate.compile(rawTemplate.getStream());
-                // render policy for accessory information.
-                template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
-                // render policy for maintenance workflow.
-                template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
-                // render policy for check list
-                template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
-                // render policy for audit record
-                template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
-                template.render(datas);
-                template.write(out);
+                    Map<String, Object> datas = populateReportContent(selected);
 
-                InputStream doc = new ByteArrayInputStream(out.toByteArray());
-                maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
-            } catch (BusinessException e) {
-                WebUtil.addErrorMessage(e.getMessage());
-            } catch (Exception e) {
-                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
-                WebUtil.addErrorMessage("保养报告生成失败");
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
+                    // render policy for accessory information.
+                    template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
+                    // render policy for maintenance workflow.
+                    template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
+                    // render policy for check list
+                    template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+                    // render policy for audit record
+                    template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
+                    template.render(datas);
+                    template.write(out);
+
+                    InputStream doc = new ByteArrayInputStream(out.toByteArray());
+                    maintenanceReport = new DefaultStreamedContent(doc, "application/msword", "maintenance-report.docx");
+                } catch (BusinessException e) {
+                    WebUtil.addErrorMessage(e.getMessage());
+                } catch (Exception e) {
+                    Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+                    WebUtil.addErrorMessage("保养报告生成失败");
+                }
             }
         }
+
     }
 
     private Map<String, Object> populateReportContent(V2_PmOrder pmOrder) {
@@ -502,7 +531,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //是否全是批量完成
     public boolean isBatchComplete() {
-        //System.out.println(result);
         boolean mark = false;
         List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
@@ -716,10 +744,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void savePM() {
         PmOrderActionForm formData = new PmOrderActionForm();
+        if (selectedAsset.getStatus() == 5) {
+            WebUtil.addErrorMessage("所选设备停用,不能保养");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能保养");
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
         if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
@@ -875,6 +908,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
@@ -906,6 +941,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
+        user = UserContextService.getCurrentUserAccount();
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
     }
 
     public void submitAppvalPmOrder() {
@@ -1051,6 +1089,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
 
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
@@ -1145,6 +1184,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
+
+    public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
+ if(selected!=null)
+        return pmOrderService.getWorkOrderDetails(selected.getId());
+ else
+     return null;
+    }
+
+    public List<V2_WorkOrderCoworker> getWorkOrderCoworkerON(String woId) {
+        if(selected!=null)
+            return pmOrderService.getWorkOrderCoworker(selected.getId());
+        else
+            return null;
+    }
+
 
     public void closePM(V2_PmOrder selectedPmOrder) {
         if (isChecked() == false) {
@@ -1323,7 +1377,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
         //保养合格的话 去关单
-
         //cancel();
     }
 
@@ -1464,7 +1517,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         //   cancelWorkdetail();
     }
-
+    public void updateAccessPrice(){
+        pmOrderService.updateAccessPrice(itemDetail);
+    }
     public void cancelWorkdetail() {
         itemDetail = null;
         coWorkerDetail = null;
@@ -1926,5 +1981,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
+    }
+
+    public List<V2_PmOrder> getCurrentPagePmOrders() {
+        return currentPagePmOrders;
+    }
+
+    public void setCurrentPagePmOrders(List<V2_PmOrder> currentPagePmOrders) {
+        this.currentPagePmOrders = currentPagePmOrders;
     }
 }

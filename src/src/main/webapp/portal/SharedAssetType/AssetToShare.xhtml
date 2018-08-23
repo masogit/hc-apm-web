@@ -40,7 +40,7 @@
                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
-                         rowsPerPageTemplate="20,40,90,200">
+                         rowsPerPageTemplate="20,50,100,500">
 
                         <!--<p:ajax  event="rowSelect" oncomplete="PF('AssetEditDialog').show()" update="AssetEditDlg"/>-->
                         <p:ajax event="filter" listener="#{sharedAssetInfoController.onFilter}" oncomplete="rc2()"/>

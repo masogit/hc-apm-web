@@ -2,17 +2,16 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -24,6 +23,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Created by 212605082 on 2018/3/7.
  */
 @Entity
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_item")
 public class NurseSiteMaintainItem implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainItem.class);
@@ -77,16 +80,10 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@org.hibernate.annotations.ForeignKey(name = "none")
-	@JsonBackReference
+	@Transient
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@org.hibernate.annotations.ForeignKey(name = "none")
-	@JsonBackReference
+	@Transient
 	private UserAccount modifyBy;
 
 	@Column(name="parent_id", insertable = false, updatable = false)
@@ -95,21 +92,23 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name="asset_uid")
 	private String assetUid;
 	
-	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	@JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonIgnore
     private NurseSiteMaintain nurseSiteMaintain;
 	
-	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@org.hibernate.annotations.ForeignKey(name = "none")
-	@JsonBackReference
+	@Transient
 	private AssetInfo assetInfo;
 	
 	@JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.LAZY)
     private Set<NurseSiteMaintainData> listData;
+	
+	@Transient
+	private List<NurseSiteMaintainData> listCopyData;
+	
+	@Transient
+	private boolean needGetItem=true;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
@@ -152,8 +151,6 @@ public class NurseSiteMaintainItem implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	
 
 	public Date getCreateDate() {
 		return createDate;
@@ -320,33 +317,51 @@ public class NurseSiteMaintainItem implements Serializable {
 	}
 
 	public void setSequence(Integer sequence) {
+		if(sequence==null){
+			sequence=0;
+		}
 		this.sequence = sequence;
 	}
 	
 	public String getSequenceName(){
-		if(sequence==null){
+		if(sequence==null||sequence<0){
 			return "";
 		}
 		else{
 			return sequence+"";
 		}
 	}
+	
+	public boolean isNeedGetItem() {
+		return needGetItem;
+	}
+
+	public void setNeedGetItem(boolean needGetItem) {
+		this.needGetItem = needGetItem;
+	}
 
 	public NurseSiteMaintainData getDataValue(String label){
-		if(listData!=null && StringUtils.isNotEmpty(label)){
-			Iterator<NurseSiteMaintainData> it=listData.iterator();
-			while(it.hasNext()){
-				NurseSiteMaintainData tempData=it.next();
+		if(listCopyData==null){
+			listCopyData=new ArrayList<NurseSiteMaintainData>();
+		}
+		if(listCopyData.size()==0){
+			listCopyData.addAll(listData);
+		}
+		if(StringUtils.isNotEmpty(label)){
+			for(int i=0;i<listCopyData.size();++i){
+				NurseSiteMaintainData tempData=listCopyData.get(i);
+				System.out.println(label);
+				System.out.println(tempData.getCheckItem());
+				System.out.println(tempData.getCheckItem().equals(label));
 				if(tempData.getCheckItem().equals(label)){
+					listCopyData.remove(i);
 					return tempData;
 				}
 			}
 		}
-		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
-		tempData.setItem(this);
-		tempData.setCheckItem(label);
-		this.listData.add(tempData);
-		return tempData;
+		NurseSiteMaintainData tempResult=new NurseSiteMaintainData();
+		tempResult.setCheckItem("");
+		return tempResult;
 	}
 
 	@Override

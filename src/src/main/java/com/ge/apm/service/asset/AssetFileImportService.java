@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
-    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.3";
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.4";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -104,6 +104,8 @@ public class AssetFileImportService {
     private String assetCodeConfig;
 
     private WorkflowConfig workflowConfig;
+
+    private boolean isNeedAudit;
 
     public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -179,7 +181,7 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
                 assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
-                assetRow.setFieldStringValue("使用科室", "setClinicalDeptName");
+                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName");
                 assetRow.setFieldStringValue("制造商", "setManufacture");
                 assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
                 assetRow.setFieldStringValue("设备标准名称", "setDeviceName");
@@ -248,7 +250,6 @@ public class AssetFileImportService {
                     //only new asset need to set this
                     asset.setUsageStatus(3); //已建档
 
-                    boolean isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
                     if(isNeedAudit){
                         asset.setUsageStatus(2); //待审核
                     }
@@ -294,14 +295,18 @@ public class AssetFileImportService {
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
         });
 
-        //release qrcode in use in order to exchange qrcode in two different asset
-//        supportingService.releaseOldQRCodeInUse(selectedOrgToImport, importAssetMap);
+        int row = 0;
+        try {
 
-        importAssetMap.forEach(item -> {
+            for (Map<String, Object> item: importAssetMap) {
+                ++row;
+                importOneAsset(item, autoGenerateQrcode);
+            }
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
 
-            importOneAsset(item, autoGenerateQrcode);
-
-        });
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
@@ -344,6 +349,8 @@ public class AssetFileImportService {
             newAsset.setClinicalDeptId(orgInfo.getId());
             newAsset.setClinicalDeptUID(orgInfo.getUid());
         }
+
+        supportingService.setAssetDeptId(newAsset, selectedOrgToImport, item);
 
         List<UserAccount> userAccounts;
         //for AssetOwner
@@ -575,7 +582,7 @@ public class AssetFileImportService {
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误: 科室为空");
+                AssetRow.addErrMessage(item, "错误: 所属科室为空");
             }
 
             //check depart num to avoid duplicate when update
@@ -652,7 +659,7 @@ public class AssetFileImportService {
         }
         int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
@@ -662,7 +669,7 @@ public class AssetFileImportService {
 
         String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
 
-        String sumFormula = String.format("SUM('Asset List'!$Z$7:$Z$%d)", assetList.size() + 6);
+        String sumFormula = String.format("SUM('Asset List'!$AA$7:$AA$%d)", assetList.size() + 6);
 
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
@@ -686,8 +693,6 @@ public class AssetFileImportService {
 
     }
 
-
-
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
@@ -696,10 +701,9 @@ public class AssetFileImportService {
         if (workflowConfig != null) {
             assetCodeConfig = workflowConfig.getAssetCodeConfig();
         }
+
+        isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
+
     }
-
-
-
-
 
 }

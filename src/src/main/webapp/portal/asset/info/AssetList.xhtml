@@ -56,7 +56,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,90,200">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
@@ -117,21 +117,19 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
-<!--                            <c:if test="#{columnItem eq 'clinicalDeptName'}">
-                                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                            <c:if test="#{columnItem eq 'assetDeptName'}">
+                                <p:column headerText="#{msg.assetDeptName}"  width="100">
                                     <f:facet name="header">
-                                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                        <p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>
-                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.selectedObjectMap['clinicalDept']}" 
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5"
-                                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
-                                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoListController.onClinicalDeptFilter}"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptFilter2}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.fileterAssetDeptOrgName}" 
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5" >
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
-                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                    <h:outputText value="#{assetInfoListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                                 </p:column>
-                            </c:if>-->
+                            </c:if>
                             <c:if test="#{columnItem eq 'clinicalDeptName'}">
                                 <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                                     <f:facet name="header">
@@ -402,7 +400,7 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'lifecycle'}">
                                 <p:column headerText="#{msg.lifecycle}">
-                                    <h:outputText value="#{item.lifecycle}"/>
+                                    <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'depreciationMethod'}">

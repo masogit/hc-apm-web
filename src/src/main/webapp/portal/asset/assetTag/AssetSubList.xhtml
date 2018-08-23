@@ -20,18 +20,18 @@
                               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                               rows="20" emptyMessage="#{msg.noRecordFound}"
-                              rowsPerPageTemplate="20,40,60">
-                    <p:ajax event="rowSelect"  update="@(.editCls) @(.delCls)" listener="#{assetSubscriberController.onSelect()}"/>
-
+                              rowsPerPageTemplate="20,50,100,500">
+                   <!-- <p:ajax event="rowSelect"  update="@(.editCls) @(.delCls)" listener="#{assetSubscriberController.onSelect()}"/>-->
+                    <p:ajax event="filter" listener="#{assetSubscriberController.onFilter}" />
                     <p:column width="36"  exportable="false">
                         <p:selectBooleanCheckbox  class="selectCheckBox" value="#{assetSubscriberController.selectedMap[item.id]}">
-                            <p:ajax update="@(.delCls)" listener="#{assetSubscriberController.onItemSelected}" />
+                            <p:ajax update="@(.selectCheckBoxHeader) @(.delCls) @(.editCls)" listener="#{assetSubscriberController.onItemSelected}" />
                         </p:selectBooleanCheckbox>
-                        <!--<f:facet name="header">
-                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetSubscriberController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
-                                <p:ajax  listener="#{assetSubscriberController.onSelectAllOfPage}"/>
+                        <f:facet name="header">
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetSubscriberController.isSelectedCurrentPage}"  class="selectCheckBoxHeader">
+                                <p:ajax update="@(.selectCheckBox)  @(.delCls)" listener="#{assetSubscriberController.onSelectAllOfPage}"/>
                             </p:selectBooleanCheckbox>
-                        </f:facet>-->
+                        </f:facet>
                     </p:column>
                     <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
                         <h:outputText value="#{item.subscriberUser.name}" />
@@ -39,6 +39,11 @@
 
                     <p:column headerText="设备" filterMatchMode="LIKE" filterBy="#{item.assetInfo.name}" sortBy="#{item.assetInfo.name}">
                         <h:outputText value="#{item.assetInfo.name}" />
+                    </p:column>
+
+
+                    <p:column headerText="所属科室" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                     </p:column>
 
                     <p:column headerText="设备编号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
@@ -52,12 +57,7 @@
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetSubscriberController.prepareCreate}" update="scriTab:AssetSubscribEditDlg scriTab:AssetSubscribEditForm"  oncomplete="PF('AssetSubscribEditDialog').show()"/>
-                        <p:commandButton id="editButton" class ="editCls" actionListener="#{assetSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetSubscribEditDlg" oncomplete="PF('AssetSubscribEditDialog').show()" disabled="#{empty assetSubscriberController.selected}"/>
-
-                        <!--   <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="删除" actionListener="#{assetSubscriberController.deleteBatch()}" update="scriTab:AssetSubscriberForm"  disabled="#{not assetSubscriberController.isChecked()}">
-                               <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                           </p:commandButton>-->
-
+                        <p:commandButton id="editButton" class ="editCls" actionListener="#{assetSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetSubscribEditDlg" oncomplete="PF('AssetSubscribEditDialog').show()" disabled="#{assetSubscriberController.multiSelect()}"/>
 
                         <p:commandButton id="deleteButton" process="@this" class="btn delCls" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{assetSubscriberController.delete}" update="scriTab:AssetSubscriberForm:dataList" disabled="#{not assetSubscriberController.isChecked()}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

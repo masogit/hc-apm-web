@@ -383,6 +383,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         checkFilters.clear();
         checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
         checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
         checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
         checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));

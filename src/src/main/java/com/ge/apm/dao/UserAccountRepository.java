@@ -1,17 +1,18 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.UserInfo;
 import java.util.Collection;
-
 import java.util.List;
-import javax.persistence.QueryHint;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserInfo;
+
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
@@ -78,6 +79,12 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //@Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and r.role_id=3 and institution_uid=?1 ",nativeQuery=true)
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
+    
+    @Query(value= "select u.* from user_account u where u.uid in ?1 ",nativeQuery=true)
+    public List<UserAccount> getByUids(Set<String> setUids);
+    
+    @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid in ?1 ")
+    public List<UserAccount> getSimpleByUids(Set<String> setUids);
 
     //当前租户下的临时报修人
     //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)

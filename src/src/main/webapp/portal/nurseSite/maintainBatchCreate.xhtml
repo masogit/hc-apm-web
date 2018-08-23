@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="maintainBatchDlg" widgetVar="maintainBatchDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量生成保养工单">
+        <p:dialog id="maintainBatchDlg" widgetVar="maintainBatchDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量生成日常维护工单">
             <h:form id="maintainBatchForm">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
@@ -33,7 +33,7 @@
 
                 <br/>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintainBatchDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintainBatchDialog').hide()" timeout="180000"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchDialog').hide()"/>
             </h:form>
         </p:dialog>

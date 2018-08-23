@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,11 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.PinYinComparator;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -54,6 +60,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
+	private PmOrderRule pmOrderRule;
+	private String ruleUid;
 
 	@Override
 	protected void init() {
@@ -70,7 +78,6 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		queryAsset.setTenantUID(user.getTenantUID());
 		siteUid = user.getSiteUID();
 		initAssets();
-
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
@@ -107,7 +114,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}*/
 		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId()));
+			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
 		}
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
@@ -139,10 +146,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	}
 
 	public List<SearchFilter> getAssetFilter() {
-		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		return filter;
 	}
 
@@ -191,11 +199,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 				}
 				if (level != null) {
 					if (level == 1) {
-						rel.setRuleUID1(pmOrderRuleUID);
+						rel.setRuleUID1(ruleUid);
 					} else if (level == 2) {
-						rel.setRuleUID2(pmOrderRuleUID);
+						rel.setRuleUID2(ruleUid);
 					} else if (level == 3) {
-						rel.setRuleUID(pmOrderRuleUID);
+						rel.setRuleUID(ruleUid);
 					}
 					rels.add(rel);
 				}
@@ -226,6 +234,66 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
 		}
 		return pmOrderRuleRepository.findBySearchFilter(assetFilters);
+	}
+
+	public List<PmOrderRule> getRuleList(String name){
+		/*		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));*/
+		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
+		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+			filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+		}
+/*		if (StringUtils.isNotEmpty(queryAsset.getName())) {
+			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+		}*/
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+			filter.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}
+		if (queryAsset.getAssetGroup() != null) {
+			filter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+		}
+		if (level != null) {
+			filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
+		}
+		if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
+        }
+		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
+        rules.sort(new Comparator<PmOrderRule>() {
+			@Override
+			public int compare(PmOrderRule o1, PmOrderRule o2) {
+				try {
+					String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+					String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+					return name1.compareTo(name2);
+				} catch (PinyinException e) {
+					e.printStackTrace();
+					return 0;
+				}
+			}
+		});
+		return rules;
+	}
+
+	public void setRuleId(){
+
+	}
+
+	public String getRuleUid() {
+		return ruleUid;
+	}
+
+	public void setRuleUid(String ruleUid) {
+		this.ruleUid = ruleUid;
+	}
+
+	public PmOrderRule getPmOrderRule() {
+		return pmOrderRule;
+	}
+
+	public void setPmOrderRule(PmOrderRule pmOrderRule) {
+		this.pmOrderRule = pmOrderRule;
 	}
 
 	public String getStrDate(Date lastPmDate) {
