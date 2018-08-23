@@ -1142,7 +1142,7 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
-			if(StringUtils.isNotEmpty(tempMaintain.getSignatureId())){
+			if(StringUtils.isNotEmpty(tempMaintain.getSignatureId()) && tempMaintain.getSignatureSourceType()==1){
 				setSignature.add(tempMaintain.getSignatureId());
 			}
 		}
