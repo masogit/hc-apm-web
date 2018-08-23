@@ -239,7 +239,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	public List<PmOrderRule> getRuleList(String name){
 		/*		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
 		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));*/
-		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+		List<SearchFilter> filter = new ArrayList<>();//userCommonService.getUserLogicFilters(loginUserOrgType,user);
+		filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
