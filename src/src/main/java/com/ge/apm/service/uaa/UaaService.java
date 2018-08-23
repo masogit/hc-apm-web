@@ -63,7 +63,9 @@ public class UaaService {
     public String getUserDefaultHomePage(UserAccount user){
         String url;
         UserContextService userContextService = (UserContextService) WebUtil.getBean(UserContextService.class);
-        if(userContextService.hasRole("HospitalHead"))
+        if(userContextService.hasRole("NursingStaff"))
+            url = getDefautHomePage("NursingStaff");
+        else if(userContextService.hasRole("HospitalHead"))
             url = getDefautHomePage("HospitalHead");
         else if(userContextService.hasRole("AssetHead"))
             url = getDefautHomePage("AssetHead");
@@ -71,8 +73,6 @@ public class UaaService {
             url = getDefautHomePage("DeptHead");
         else if(userContextService.hasRole("AssetStaff"))
             url = getDefautHomePage("AssetStaff");
-        else if(userContextService.hasRole("NursingStaff"))
-            url = getDefautHomePage("NursingStaff");
         else
             url = "/home.xhtml";
         
