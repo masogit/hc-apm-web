@@ -62,7 +62,6 @@ public class MaintainController {
 	private Integer selectSequence=1;
 	//from config default
 	private NurseSiteMaintain nurseSiteMaintain;
-	private List<NurseSiteMaintain> existMaintainData;
 	private List<NurseSiteMaintain> listMaintainData;
 	private Date initStartDate;
 	private Date initEndDate;
@@ -92,6 +91,7 @@ public class MaintainController {
 		showListNurseSiteMaintainConfig=new ArrayList<NurseSiteMaintainConfig>();
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
+		setDefaultParentOrgInfo();
 	}
 	
 	private List<NurseSiteMaintain> searchMaintainData(Date start,Date end){
@@ -177,6 +177,11 @@ public class MaintainController {
 		}
 	}
 	
+	private void setDefaultParentOrgInfo(){
+		selectedParentOrgInfo=nurseSiteMaintainService.findOrgInfoByUid(currentUser.getSiteUID());
+		loadUserOrgInfo();
+	}
+	
 	private void loadUserOrgInfo(){
 		if(orgUidList.size()>0){
 //			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
@@ -204,7 +209,7 @@ public class MaintainController {
 		}
 		
 		String str=tempNurseSiteMaintain.getName();
-		if(tempNurseSiteMaintain.getSequence()==null){
+		if(tempNurseSiteMaintain.getSequence()==null||tempNurseSiteMaintain.getSequence()<=0){
 			str+="-"+strStatus;
 		}
 		else{
@@ -261,10 +266,6 @@ public class MaintainController {
 			if(userClickDate==null){
 				userClickDate=new Date();
 			}
-			Calendar ca=Calendar.getInstance();
-			int currentHour=ca.get(Calendar.HOUR_OF_DAY);
-			ca.setTime(userClickDate);
-			ca.set(Calendar.HOUR_OF_DAY,currentHour);
 			Integer tempType=nurseSiteMaintainConfig.getType();
 			String tempTypeValue=nurseSiteMaintainConfig.getTypeValue();
 			Integer tempIntTypeValue=null;
@@ -282,7 +283,7 @@ public class MaintainController {
 					}
 				}
 			}
-			nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets,selectSequence);
+			nurseSiteMaintain=nurseSiteMaintainService.createMaintain(userClickDate,currentUser,nurseSiteMaintainConfig,listCheckAssets,selectSequence);
 		}
 	}
 	
@@ -291,17 +292,28 @@ public class MaintainController {
         listMaintainData.add(tempNurseSiteMaintain);
 	}
 	
-	private void findExistMaintainData(){
-		existMaintainData=nurseSiteMaintainService.getDefaultMaintainDataByStatus(orgUidList,startBatchDate,endBatchDate,0);
-		if(existMaintainData!=null && existMaintainData.size()>0){
-			for(int i=0;i>-1&&i<existMaintainData.size();++i){
-				NurseSiteMaintain temp=existMaintainData.get(i);
-				if(!temp.getConfigId().equals(nurseSiteMaintainConfig.getId())){
-					existMaintainData.remove(i);
+	private List<NurseSiteMaintain> getMaintainDataNeedToRemove(List<NurseSiteMaintain> listSave){
+		List<NurseSiteMaintain> existMaintainDataNoCheck=nurseSiteMaintainService.getDefaultMaintainDataByStatus(orgUidList,startBatchDate,endBatchDate,0,nurseSiteMaintainConfig.getId());
+		List<NurseSiteMaintain> existMaintainDataChecked=nurseSiteMaintainService.getDefaultMaintainDataChecked(orgUidList,startBatchDate,endBatchDate,nurseSiteMaintainConfig.getId());
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+		Set<String> setCheckedMaintainStr=new HashSet<String>();
+		if(existMaintainDataChecked!=null && existMaintainDataChecked.size()>0){
+			for(int i=0;i<existMaintainDataChecked.size();++i){
+				NurseSiteMaintain tempMaintain=existMaintainDataChecked.get(i);
+				setCheckedMaintainStr.add(sdf.format(tempMaintain.getScheduleDate())+tempMaintain.getSequence());
+			}
+		}
+		if(listSave!=null && listSave.size()>0){
+			for(int i=0;i>-1 && i<listSave.size();++i){
+				NurseSiteMaintain tempMaintain=listSave.get(i);
+				String str=sdf.format(tempMaintain.getScheduleDate())+tempMaintain.getSequence();
+				if(setCheckedMaintainStr.contains(str)){
+					listSave.remove(i);
 					--i;
 				}
 			}
 		}
+		return existMaintainDataNoCheck;
 	}
 	
 //	private void afterBatchCreateMaintain(List<NurseSiteMaintain> listCreate,List<NurseSiteMaintain> listExist){
@@ -354,13 +366,8 @@ public class MaintainController {
 	
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
+		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
 		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		if(nurseSiteMaintain.isNeedGetItem()){
-			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
-			nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
-			nurseSiteMaintain.setModifyBy(nurseSiteMaintainService.getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
-			nurseSiteMaintain.setNeedGetItem(false);
-		}
 		if(showLables==null){
 			showLables=new ArrayList<String>();
 		}
@@ -386,18 +393,9 @@ public class MaintainController {
 		}
 	}
 	
-	private void initValueAfterEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
-	}
-	
-	private void initValueBeforeEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
-	}
-	
 	public void checkRightAll(){
-		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
+		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
 			Set<NurseSiteMaintainData> listData=tempItem.getListData();
@@ -411,13 +409,10 @@ public class MaintainController {
 
 	public void saveMaintain() {
 		Date currentDate=new Date();
-		nurseSiteMaintain.setCheckDate(currentDate);
-		nurseSiteMaintain.setModifyBy(currentUser);
-		nurseSiteMaintain.setModifyDate(currentDate);
-		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false,null);
+		nurseSiteMaintainService.updateMaintainData(nurseSiteMaintain,currentDate,currentUser);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
 		lazyEventModel.updateEvent(event);
-		addMessage("报告已保存");
+		addMessage("工单已保存");
 	}
 	
 	public void createMaintain() {
@@ -431,7 +426,7 @@ public class MaintainController {
 //		ca.set(Calendar.HOUR_OF_DAY,currentHour);
 		nurseSiteMaintain=nurseSiteMaintainService.createMaintain(userClickDate,currentUser,nurseSiteMaintainConfig,listCheckAssets,selectSequence);
 		if(nurseSiteMaintainService.existMaintain(nurseSiteMaintain)){
-			addMessage("报告已存在");
+			addMessage("工单已存在");
 			return;
 		}
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
@@ -439,7 +434,7 @@ public class MaintainController {
 //		event.setData(nurseSiteMaintain);
 //		lazyEventModel.addEvent(event);
 		insertMaintain(nurseSiteMaintain);
-		addMessage("报告已创建");
+		addMessage("工单已创建");
 	}
 
 	public void deleteMaintain() {
@@ -448,7 +443,7 @@ public class MaintainController {
 				nurseSiteMaintain=(NurseSiteMaintain) event.getData();
 				nurseSiteMaintainService.deleteMaintain(nurseSiteMaintain);
 				listMaintainData.remove(nurseSiteMaintain);
-				addMessage("报告已删除");
+				addMessage("工单已删除");
 			}
 		}
 	}
@@ -456,11 +451,12 @@ public class MaintainController {
 	public void saveMaintainSignature(){
 		if(StringUtils.isNotEmpty(signatureContent)){
 			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
-			initValueAfterEvent();
 		}
 	}
 	
 	public void getMaintainSignature(String signatureId,Integer signatureSourceType){
+		signatureContent=null;
+		signatureContentWeiXin=null;
 		if(StringUtils.isNotEmpty(signatureId)){
 			if(signatureSourceType==null){
 				blnWebSignatureEidt=true;
@@ -517,12 +513,10 @@ public class MaintainController {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
 		generateNurseSiteMaintainData();
-		initValueBeforeEvent();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		userClickDate=(Date) selectEvent.getObject();
-		initValueBeforeEvent();
 	}
 
 //	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -553,7 +547,6 @@ public class MaintainController {
 		Calendar endCalendar=Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
 		if(StringUtils.isNotEmpty(typeValue)){
-			findExistMaintainData();
 			String arr[]=typeValue.split(",");
 			if(type==1){
 				//value,hours,1-24
@@ -591,13 +584,13 @@ public class MaintainController {
 			}
 		}
 		if(listMaintainData.size()>0){
-//			afterBatchCreateMaintain(listMaintainData,existMaintainData);
-			nurseSiteMaintainService.saveAndDelete(listMaintainData,existMaintainData);
+			List<NurseSiteMaintain> listRemoveMain=getMaintainDataNeedToRemove(listMaintainData);
+			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
 		}
-		addMessage("报告已批量生成");
+		addMessage("工单已批量生成");
 		return "maintainMain?faces-redirect=true";
 	}
-	public void batchCompleteMaintainData(){
+	public String batchCompleteMaintainData(){
 		if(startBatchDate==null){
 			startBatchDate=new Date();
 		}
@@ -614,20 +607,17 @@ public class MaintainController {
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
-				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime()){
-					tempMaintain.setCheckDate(currentDate);
-					tempMaintain.setModifyBy(currentUser);
-					tempMaintain.setModifyDate(currentDate);
-					nurseSiteMaintainService.updateMaintainDataStatus(tempMaintain,true,signatureId);
+				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime() && tempMaintain.getStatus()==0){
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.save(listNewNurseSiteMaintain);
-			addMessage("报告已批量填写");
+			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			addMessage("工单已批量填写");
 		}
 		else{
-			addMessage("报告批量填写失败");
+			addMessage("未找到符合条件的工单");
 		}
+		return "maintainMain?faces-redirect=true";
 	}
 
 	public boolean isValideDate() {

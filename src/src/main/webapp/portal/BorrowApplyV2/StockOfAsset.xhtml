@@ -48,7 +48,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90" >
+                                 rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="editButton viewButton"/>
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
@@ -62,6 +62,9 @@
                         </p:column>
                         <p:column headerText="设备编号" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="调剂设备名称">
+                            <h:outputText value="#{item.sharedAssetType.swapName}"/>
                         </p:column>
 
                         <p:column headerText="计费开始时间">
@@ -105,6 +108,9 @@
                             </p:commandButton> -->
                         </f:facet>
                     </p:dataTable>
+
+                    <p:remoteCommand name="rc" update="datalist:editButton datalist:viewButton" immediate="true"/>
+                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
                    
                 </h:form>
             </div>

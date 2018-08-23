@@ -18,6 +18,9 @@ public enum GatewayURL {
     CREATE_WORK_ORDER("/hcapmassetservice/api/apm/asset/workOrders"),
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
+
+    GET_WORKFLOW_CONFIG("/hcapmassetservice/api/apm/asset/workflowConfig/{assetId}"),
+
     // Send Message to Wechat
     SEND_WECHAT_MSG("/hcapmgateway/wechat/message"),
     // Asset Installation process

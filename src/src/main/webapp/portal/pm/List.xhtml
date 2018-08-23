@@ -31,7 +31,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="3" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="3,5,10,15">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect"  listener="#{pmOrderController.prepareEdit()}"  update="createButton deleteButton PmOrderEditForm"/>
                         <p:ajax event="filter" listener="#{pmOrderController.onFilter}" oncomplete="rc();"/>

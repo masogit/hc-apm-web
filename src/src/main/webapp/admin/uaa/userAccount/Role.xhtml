@@ -22,7 +22,8 @@
                                 <p:outputLabel value="#{msg.AssignRole}" for="roleNames" />
                                 <p:selectManyCheckbox id="roleNames" value="#{userAccountController.assignedRoles}" layout="pageDirection" valueChangeListener="#{userAccountController.roleChangeListener}">
                                     <p:ajax update="@this"/>
-                                    <f:selectItems value="#{userAccountController.allRoles}" />
+                                    <f:selectItems value="#{userAccountController.roleListVO}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.roleDesc}" itemDisabled="#{roleItem.disable}" />
+                                    <!--<f:selectItems value="#{userAccountController.allRoles}" />-->
                                 </p:selectManyCheckbox>
                             </p:panelGrid>
                         </p:tab>

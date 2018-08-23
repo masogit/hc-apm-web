@@ -257,7 +257,7 @@
                     </p:panelGrid>
                     <h:panelGroup id="advanceSetting">
                         <p:fieldset legend="上下限设置"  rendered="#{'RangeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <h:outputText id="RangeRuleComments" value="合格: 下限#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}上限" />
+                            <h:outputText id="RangeRuleComments" value="正常: 下限#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}上限" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label ">计算结果Key*</label>
@@ -284,15 +284,15 @@
                                 <h:panelGroup >
                                     <label class="label">结果标识</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="合格/不合格" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="合格/过高/过低" itemValue="#{'resIdentify_2'}"/>
+                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="正常/过高/过低" itemValue="#{'resIdentify_2'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="范围上下限"  rendered="#{'ScopeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <h:outputText id="ScopeRuleComments" value="合格: (1-下限范围)*标准值#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}(1+上限范围)*标准值" />
+                            <h:outputText id="ScopeRuleComments" value="正常: (1-下限范围)*标准值#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}(1+上限范围)*标准值" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label">计算结果Key*</label>
@@ -325,15 +325,15 @@
                                 <h:panelGroup >
                                     <label class="label">结果标识</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="合格/不合格" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="合格/过高/过低" itemValue="#{'resIdentify_2'}"/>
+                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="正常/过高/过低" itemValue="#{'resIdentify_2'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="设定值校验"  rendered="#{'VerifyRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label"> 合格: 偏差下限范围≤|Y-X|/X≤偏差上限范围 ; 误差下限范围≤|Y-Z|/Z≤误差上限范围</p>
+                            <p class="label"> 正常: 偏差下限范围≤|Y-X|/X≤偏差上限范围 ; 误差下限范围≤|Y-Z|/Z≤误差上限范围</p>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label">计算结果Key*</label>
@@ -374,15 +374,15 @@
                                 <h:panelGroup >
                                     <label class="label">结果标识</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="合格/不合格" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="合格/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
+                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="正常/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="偏差校验"  rendered="#{'DeltaRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label">合格: |Y-Z|≤最大偏差 </p>
+                            <p class="label">正常: |Y-Z|≤最大偏差 </p>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label">计算结果Key*</label>
@@ -403,8 +403,8 @@
                                 <h:panelGroup >
                                     <label class="label">结果标识</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="合格/不合格" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="合格/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
+                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="正常/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 

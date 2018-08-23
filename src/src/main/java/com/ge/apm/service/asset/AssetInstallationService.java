@@ -210,7 +210,7 @@ public class AssetInstallationService {
     }
 
     public List<UserAccount> getWorkerList() {
-        return ucService.getWorkerList(0);
+        return ucService.getWorkerList(0,"");
     }
 
     public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {

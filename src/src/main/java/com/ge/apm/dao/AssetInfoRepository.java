@@ -1,18 +1,18 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.AssetFileAttachment;
-import com.ge.apm.domain.AssetInfo;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.UserAccount;
+
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.SearchFilter;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -52,6 +52,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumAccessScope(String financingNum,String siteUID,String userUid);
+    
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num in ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
+    public List<AssetInfo> findByFinancingNumAccessScope(Set<String> setFinancingNum,String siteUID,String userUid);
 
     @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumSelfScope(String financingNum,String siteUID,String userUid);
@@ -177,5 +180,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select assetinfo0_.* from asset_info assetinfo0_ where assetinfo0_.is_deleted=false and assetinfo0_.is_valid=true and (assetinfo0_.institution_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)or assetinfo0_.hospital_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)  or assetinfo0_.site_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.clinical_dept_uid in(select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.tenant_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid))",nativeQuery = true)
     public ArrayList<AssetInfo> getUserListByAsset(Integer userId);
 
-
+    @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
+    public List<AssetInfo> getByUids(Set<String> setUids);
+    
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType) from AssetInfo u where u.uid in ?1 ")
+    public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
 }

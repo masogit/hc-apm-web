@@ -163,6 +163,12 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
     private String assetDeptUID;
+    
+    @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
+    private String assetType;
+    
+    @Column(name = "asset_CDFA_type") // CDFA设备类型
+    private String assetCDFAType;
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -484,16 +490,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private int lineNum;
-    
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_info_id", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+
+    @Transient
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
     
     @Transient
     private SharedAssetReqDetail sharedAssetReqDetail;
-    
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "shared_asset_type", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+
+    @Transient
     private SharedAssetType sharedAssetType;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
@@ -1521,6 +1525,22 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setManufactureId(String manufactureId) {
         this.manufactureId = manufactureId;
     }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetCDFAType() {
+        return assetCDFAType;
+    }
+
+    public void setAssetCDFAType(String assetCDFAType) {
+        this.assetCDFAType = assetCDFAType;
+    }
     
     @Override
     public int hashCode() {
@@ -1551,4 +1571,11 @@ public class AssetInfo implements ChineseName,Serializable {
 		return getNamePyCode();
 	}
 
+    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
+    	this.name=name;
+    	this.uid=uid;
+    	this.departNum=departNum;
+    	this.serialNum=serialNum;
+    	this.functionType=functionType;
+    }
 }

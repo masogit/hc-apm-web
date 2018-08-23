@@ -8,8 +8,10 @@ package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -20,6 +22,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -249,6 +252,18 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
     public void setDao(SharedAssetReqDetailRepository dao) {
         this.dao = dao;
+    }
+
+    public String getRentalTime(Date chargingBeginTime,Date chargingEndTime,String chargingType) {
+        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(chargingBeginTime, chargingEndTime, chargingType);
+        return chargingUnitAndTotalTime._2;
+    }
+
+    public Double getTotalAmount(Date chargingBeginTime,Date chargingEndTime,String chargingType,Double unitPrice) {
+        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(chargingBeginTime, chargingEndTime, chargingType);
+        BigDecimal unit = chargingUnitAndTotalTime._1;
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, unitPrice, chargingType);
+        return totalAmount.doubleValue();
     }
 
 }

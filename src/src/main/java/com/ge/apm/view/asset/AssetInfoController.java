@@ -9,15 +9,13 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.sharedAsset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparator;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
+import javaslang.Tuple2;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -167,6 +165,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private WorkflowConfigRepository wfCfigDao;
 
     private SharedAssetTypeRepository swapDao;
+
+    private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
     List<String> orgUids;
     List<String> swapUids;
 
@@ -260,6 +261,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         brandDao = WebUtil.getBean(BrandRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
+        sharedAssetReqDetailRepository = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -471,6 +473,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPageAssets = res.getContent();
             for(AssetInfo info : currentPageAssets) {
+                //Since can't use fetch mode in Lazy, so load mapped objects by standalone search
+                SharedAssetType sharedAssetType = findSharedAssetType(info);
+                info.setSharedAssetType(sharedAssetType);
             	SharedAssetReqDetail reqDetail = selectProperReqDetail(info);
             	info.setSharedAssetReqDetail(reqDetail);
             }
@@ -975,7 +980,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         if (ownerList == null) {
-            ownerList = ucService.getWorkerList(selected.getId());
+            ownerList = ucService.getWorkerList(selected.getId(),"");
         }
         return ownerList;
     }
@@ -2017,6 +2022,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	public void prepareForceAllocateAsset(String assetUid) {
 		AssetInfo asset = dao.findByUid(assetUid);
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		SharedAssetRequest assetRequest = reqDetail.getLeaseRequest();
@@ -2030,6 +2037,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	public void prepareForceReturnAsset(String assetUid) {
 		AssetInfo asset = dao.findByUid(assetUid);
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
@@ -2075,59 +2084,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	
 	private SharedAssetReqDetail selectProperReqDetail(AssetInfo item) {
 		Date nowDate = new Date();
-    	SharedAssetReqDetail sharedAssetReqDetail = item.getSharedAssetReqDetailList()
-    													.stream()
-    													.filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
-    													.findFirst()
-    													.orElse(null);
+        List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
+        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                                                            .filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
+                                                            .findFirst()
+                                                            .orElse(null);
+
     	if(sharedAssetReqDetail != null) {
     		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
-    		LocalDateTime beginLDT;
     		Date endTime = sharedAssetReqDetail.getChargingEndTime();
-    		LocalDateTime endLDT;
 
-    		if(endTime != null) {
-    			endLDT = endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    		} else {
-    			endLDT = LocalDateTime.now();
-    		}
-    		
-    		String totalTime = "";
-    		BigDecimal unit = new BigDecimal(1);
-    		long days = 0, hours = 0, minutes = 0, rentalTimeInMinutes = 0;
-    		if(beginTime != null) {
-    			beginLDT = beginTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    			rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
-    			days = rentalTimeInMinutes / (24 * 60);
-    			hours = (rentalTimeInMinutes / 60) % 24;
-    			minutes = rentalTimeInMinutes % 60;
-    			totalTime = days + "天" + hours + "时" + minutes + "分";
-    		}
+            String chargingType = item.getSharedAssetType().getChargingType();
+            Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(beginTime, endTime, chargingType);
+            BigDecimal unit = unitAndTotalTime._1;
+            String totalTime = unitAndTotalTime._2;
 
-    		String chargeType = item.getSharedAssetType().getChargingType();
-    		switch(chargeType) {
-    		case "1":
-    			totalTime = "1次";
-    			unit = new BigDecimal(1);
-    			break;
-    		case "2":
-    		    unit = new BigDecimal(rentalTimeInMinutes / 30d);
-    			unit = unit.setScale(0, RoundingMode.UP);
-    			break;
-    		case "3":
-    			unit = new BigDecimal(rentalTimeInMinutes / (60 * 24d));
-    			unit = unit.setScale(0, RoundingMode.UP);
-    			totalTime = unit.longValue() + "天";
-    			break;
-    		case "4":
-    			unit = new BigDecimal(rentalTimeInMinutes / 60d);
-    			unit = unit.setScale(2, RoundingMode.HALF_UP);
-    			break;
-    		default:
-    			unit = new BigDecimal(0);
-    		}
-
-    		//
     		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
     			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
     			} else {
@@ -2139,14 +2110,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     		}
     		sharedAssetReqDetail.setRentalTime(totalTime);
 
-    		BigDecimal totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().doubleValue()));
-            if("2".equals(chargeType)) {
-                totalAmount = unit.multiply(new BigDecimal(item.getSharedAssetType().getUnitPrice().longValue() / 2));
-            }
-
+    		BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetType().getUnitPrice(), chargingType);
     		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
     	}
     	return sharedAssetReqDetail;
 	}
+
+	private SharedAssetType findSharedAssetType(AssetInfo assetInfo) {
+        SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+        return sharedAssetType;
+    }
+
+    private Date currentDate;
+
+    public Date getCurrentDate() {
+        return new Date();
+    }
     
 }

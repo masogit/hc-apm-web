@@ -97,6 +97,18 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "site_id")
     private Integer siteId;
 
+    @Size(max = 32)
+    @Column(name = "building_num")
+    private String buildingNum;
+
+    @Size(max = 32)
+    @Column(name = "floor_num")
+    private String floorNum;
+
+    @Size(max = 32)
+    @Column(name = "other")
+    private String other;
+
     @Transient
     private int lineNum;
 
@@ -339,5 +351,29 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public String getPinYin() {
         return namePyCode;
+    }
+
+    public String getBuildingNum() {
+        return buildingNum;
+    }
+
+    public void setBuildingNum(String buildingNum) {
+        this.buildingNum = buildingNum;
+    }
+
+    public String getFloorNum() {
+        return floorNum;
+    }
+
+    public void setFloorNum(String floorNum) {
+        this.floorNum = floorNum;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
     }
 }

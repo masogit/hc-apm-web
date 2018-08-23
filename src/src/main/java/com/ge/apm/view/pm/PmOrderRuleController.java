@@ -1,17 +1,12 @@
 package com.ge.apm.view.pm;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.bo.MaintenanceTemplate;
-import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,9 +24,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
@@ -47,6 +39,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private UserAccountRepository userAccountRepository;
     private PmOrderRuleItemRepository pmOrderRuleItemRepository;
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
+    private PmOrderReportTemplateService pmOrderReportTemplateService;
     private List<Integer> ids = new ArrayList<>();
     private String filterPmRuleStatus;
     private String filterPmRuleLevel;
@@ -85,6 +78,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
+        pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -145,7 +139,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Override
     protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+        List<SearchFilter> searchFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
         if(CollectionUtils.isNotEmpty(this.searchFilters)){
             searchFilters.addAll(this.searchFilters);
         }
@@ -545,51 +539,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx");
 
         try {
-            MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
-            // add dynamic table.
-            if (selected != null) {
-                TableSchema schema;
-                schema = getTableSchemaById(selected.getSafetyReport());
-                if (schema != null) {
-                    builder.safetyReport(schema);
-                }
-                schema = getTableSchemaById(selected.getPerformanceReport());
-                if (schema != null) {
-                    builder.performanceReport(schema);
-                }
-            }
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
-            template.write(out);
-            InputStream doc = new ByteArrayInputStream(out.toByteArray());
-            this.reportTemplateFile = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report-template.docx");
+            InputStream doc = pmOrderReportTemplateService.generateReportTemplateByRule(stream, selected);
+            this.reportTemplateFile = new DefaultStreamedContent(doc, "application/msword", "maintenance-report-template.docx");
         } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
             WebUtil.addErrorMessage("Word模版生成失败");
         }
-    }
-
-    private TableSchema getTableSchemaById(String id) {
-        TableSchema schema = null;
-        if (!Strings.isNullOrEmpty(id)) {
-            // use base Id to get the latest report.
-            TableDefinition definition = templateDao.findByBaseId(id);
-            if (definition != null && !Strings.isNullOrEmpty(definition.getSchema())) {
-                try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    schema = objectMapper.readValue(definition.getSchema(), TableSchema.class);
-                } catch (JsonParseException e) {
-                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while parsing schema in table definition", e);
-                } catch (JsonMappingException e) {
-                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Wrong Json mapping", e);
-                } catch (IOException e) {
-                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Bad IO while parsing Json", e);
-                }
-            }
-        }
-
-        return schema;
     }
 
     /**

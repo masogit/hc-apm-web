@@ -1,10 +1,9 @@
 package com.ge.apm.domain;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -12,7 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_data")
 public class NurseSiteMaintainData {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainData.class);
@@ -41,9 +43,8 @@ public class NurseSiteMaintainData {
 	@Column(name="check_value")
 	private Boolean checkValue;
 	
-	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	@JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonIgnore
     private NurseSiteMaintainItem item;
 	
@@ -93,7 +94,7 @@ public class NurseSiteMaintainData {
 	
 	public String getStrValue(){
 		if(this.checkValue==null){
-			return "";
+			return "未检查";
 		}
 		else if(this.checkValue){
 			return "通过";
@@ -101,7 +102,7 @@ public class NurseSiteMaintainData {
 		else if(!this.checkValue){
 			return "有问题";
 		}
-		return "";
+		return "未检查";
 	}
 
 	public Integer getCheckValueWeb() {

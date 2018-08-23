@@ -27,7 +27,7 @@
                             <label class="label">计费开始时间*</label>
                             <p:calendar timeZone="GMT+8" id="chargingBeginTime" pattern="yyyy/MM/dd HH:mm:ss"  value="#{assetInfoController.selected.sharedAssetReqDetail.chargingBeginTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计费开始时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="false">
                             <label class="label">计费结束时间</label>
                             <p:calendar timeZone="GMT+8" id="chargingEndTime" pattern="yyyy/MM/dd HH:mm:ss" value="#{assetInfoController.selected.sharedAssetReqDetail.chargingEndTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false"></p:calendar>
                         </h:panelGroup>

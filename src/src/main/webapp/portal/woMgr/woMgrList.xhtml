@@ -38,7 +38,7 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                              rows="10" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="10,20,30,90" >
+                             rowsPerPageTemplate="20,50,100,500" >
 
                     <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
                     <p:ajax event="filter" listener="#{workOrderMgrController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
@@ -58,7 +58,7 @@
                     <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
-                    <p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                     </p:column>
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
@@ -120,7 +120,7 @@
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
                         <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
                     </p:column>
-                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                         <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                     </p:column>
 
@@ -259,6 +259,8 @@
                     PF('ActiveDlg').show();
                 }
             }
+
+
         </script>
 
 

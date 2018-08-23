@@ -102,6 +102,7 @@
                 <p:menuitem id="um306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml"/>
                 <p:menuitem id="um307" value="电气安全数据导入" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml"/>
                 <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
+                <p:menuitem value="报表模版管理" outcome="/portal/pm/pmOrderReportTemplate/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
 				<!-- <p:menuitem id="um402" value="SAPConfig" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml"/>
 				<p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
 				<p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
@@ -172,6 +173,7 @@
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml"/>
                 <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml"/>
+                <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin')}"/>

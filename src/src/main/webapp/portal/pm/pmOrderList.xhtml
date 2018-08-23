@@ -21,10 +21,8 @@
 
                         <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=31" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff')}"  />
 
-                        <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
                         <p:commandButton value="已计划"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=0" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
                         <p:commandButton value="待审核"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=8" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')}"/>
-                       <!-- <p:commandButton value="待关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}"  rendered="#{userContextService.hasRole('AssetStaff')}" />-->
                         <p:commandButton value="已关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"  />
 
                     </h:panelGrid>
@@ -35,9 +33,9 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="10,20,30,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm pmTab:pmOrderDetailForm:pmcoworkerList @(.btn-export-maintenance-report)"/>
+                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
 
                         <p:column width="36" rendered="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31}" exportable="false">
@@ -72,7 +70,7 @@
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
 
-                        <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>
 
@@ -182,9 +180,10 @@
                         </f:facet>
                     </p:dataTable>
                 </h:form>
-               <ui:include  src="pmOrderView.xhtml"/>
+                <ui:include  src="pmOrderView.xhtml"/>
                 <ui:include src="pmRepairCompleteDlg.xhtml"/>
                 <ui:include src="pmApproveDlg.xhtml"/>
+                <ui:include src="pmMoreAccDialogPrice.xhtml"/>
 
             </div>
        <!-- </div>-->
@@ -244,7 +243,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">资产使用科室</label>
+                            <label class="label">资产#{msg.clinicalDeptName}</label>
                             <p:outputLabel id="dptName"  value="#{v2PmOrderController.dptName}" />
                         </h:panelGroup>
                         <h:panelGroup>

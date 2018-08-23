@@ -3,12 +3,15 @@ package com.ge.apm.view.nurseSite;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -62,7 +65,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	
   	//input
   	private String assetInfoName;
-  	private Integer assetCategory;
+  	private Integer assetGroup;
   	private String functionType;
   	private OrgInfo selectedOrgInfo;
   	private OrgInfo selectedParentOrgInfo;
@@ -79,7 +82,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listOrgUid;
   	private DualListModel<AssetInfo> availableAssets;
   	private boolean isSaveDisable=true;
-  	private List<Integer> listAssetCategory;
+  	private List<Integer> listAssetGroup;
   	private boolean isCreate=false;
   	
     @Override
@@ -172,6 +175,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		isCreate=false;
 		initValues();
 		loadMaintainConfig(this.selected);
+		setDefaultValueForAssetList();
 	}
 	private void initValues(){
 		this.listCheckAssets=new ArrayList<AssetInfo>();
@@ -194,9 +198,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			checkListAssets.clear();
 		}
 		this.assetInfoName="";
-		this.assetCategory=null;
+		this.assetGroup=null;
 		this.functionType="";
 		this.selectedOrgInfo=null;
+		this.selectedParentOrgInfo=null;
 	}
 	private void initObjPairCheckItem(){
 		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
@@ -274,6 +279,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	
+	private void setDefaultValueForAssetList(){
+		onFilterChange();
+	}
+	
 	public void onFilterChange(){
 		boolean search=false;
 		List<SearchFilter> listSearchFilter=new ArrayList<SearchFilter>();
@@ -282,8 +291,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			listSearchFilter.add(tempFilter);
 			search=true;
 		}
-		if(assetCategory!=null){
-			SearchFilter tempFilter=new SearchFilter("assetCategory",SearchFilter.Operator.EQ,assetCategory,"1*");
+		if(assetGroup!=null){
+			SearchFilter tempFilter=new SearchFilter("assetGroup",SearchFilter.Operator.EQ,assetGroup,"1*");
 			listSearchFilter.add(tempFilter);
 			search=true;
 		}
@@ -304,6 +313,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		else{
 			SearchFilter tempFilter=new SearchFilter("clinicalDeptUID",SearchFilter.Operator.EQ,this.selected.getClinicalDeptUID(),"1*");
 			listSearchFilter.add(tempFilter);
+			search=true;
 		}
 		if(search){
 			checkListAssets=nurseSiteMaintainService.getListAssetInfoBySearchFilter(listSearchFilter);
@@ -399,20 +409,39 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		return true;
 	}
 	
+	private void addMessage(String str) {
+		FacesMessage message = new FacesMessage(str,null);
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	
+	private void checkSaveDisable(){
+		try {
+			if(listCheckAssets.size()==0){
+				isSaveDisable=true;
+			}
+			else if(listPairCheckItems.size()<2){
+				isSaveDisable=true;
+			}
+			else{
+				isSaveDisable=false;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			isSaveDisable=true;
+			LOGGER.error(e.getMessage());
+		}
+	}
+	
 	public void onAssetsTransfer(TransferEvent event) {
-		for (Object item : event.getItems()) {
+		List<AssetInfo> collection=(List<AssetInfo>) event.getItems();
+		if(collection!=null && collection.size()>0){
 			if (event.isAdd()) {
-				listCheckAssets.add((AssetInfo) item);
+				listCheckAssets.addAll(collection);
 			} else {
-				listCheckAssets.remove((AssetInfo) item);
+				listCheckAssets.removeAll(collection);
 			}
 		}
-		if(listCheckAssets.size()==0){
-			isSaveDisable=true;
-		}
-		else{
-			isSaveDisable=false;
-		}
+		checkSaveDisable();
 	}
 	
 	public List<MaintainDataPair> getCheckListHours() {
@@ -433,12 +462,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void addCheckListItem(){
 		listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
 		initObjPairCheckItem();
-		if(listPairCheckItems.size()>1){
-			isSaveDisable=false;
-		}
-		else{
-			isSaveDisable=true;
-		}
+		checkSaveDisable();
 	}
 	public void deleteItemDetail(String str){
 		for(int i=0;i<listPairCheckItems.size();++i){
@@ -448,12 +472,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				--i;
 			}
 		}
-		if(listPairCheckItems.size()>1){
-			isSaveDisable=false;
-		}
-		else{
-			isSaveDisable=true;
-		}
+		checkSaveDisable();
 	}
 
 	public List<MaintainDataPair> getCheckListWeekDays() {
@@ -577,9 +596,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			p.setName("");
 			list.add(p);
 			listPairCheckItems=list;
-			if(listPairCheckItems.size()>1){
-				isSaveDisable=false;
-			}
+			checkSaveDisable();
 		}
 		return listPairCheckItems;
 	}
@@ -636,12 +653,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.assetInfoName = assetInfoName;
 	}
 
-	public Integer getAssetCategory() {
-		return assetCategory;
+	public Integer getAssetGroup() {
+		return assetGroup;
 	}
 
-	public void setAssetCategory(Integer assetCategory) {
-		this.assetCategory = assetCategory;
+	public void setAssetGroup(Integer assetGroup) {
+		this.assetGroup = assetGroup;
 	}
 
 	public String getFunctionType() {
@@ -660,12 +677,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.selectedOrgInfo = selectedOrgInfo;
 	}
 
-	public List<Integer> getListAssetCategory() {
-		return listAssetCategory;
+	public List<Integer> getListAssetGroup() {
+		return listAssetGroup;
 	}
 
-	public void setListAssetCategory(List<Integer> listAssetCategory) {
-		this.listAssetCategory = listAssetCategory;
+	public void setListAssetGroup(List<Integer> listAssetGroup) {
+		this.listAssetGroup = listAssetGroup;
 	}
 
 	public OrgInfo getSelectedParentOrgInfo() {

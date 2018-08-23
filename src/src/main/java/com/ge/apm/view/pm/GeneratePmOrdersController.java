@@ -1,6 +1,7 @@
 package com.ge.apm.view.pm;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,8 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -281,7 +284,19 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public List<Supplier> getSupplier(){
-		return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
+		List<Supplier> suppliers = supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
+		suppliers.sort(new Comparator<Supplier>() {
+			@Override
+			public int compare(Supplier o1, Supplier o2) {
+				try{
+					return PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE).compareTo(
+							PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE));
+				}catch(Exception e){
+					return 0;
+				}
+			}
+		});
+		return suppliers;
 	}
 
 	public void setQueryAsset(QueryAsset queryAsset) {

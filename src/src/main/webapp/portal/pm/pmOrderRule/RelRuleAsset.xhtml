@@ -37,7 +37,7 @@
                              <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" >
                                  <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                                 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                              </p:selectOneMenu>
 		                      <!--<p:inputText  value="#{relRuleAssetController.queryAsset.manufacture}"  required="false">
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
@@ -102,24 +102,34 @@
                     <br/> <br/>
                     <p:commandButton id ="hidden1" value="hello1" style="display:none"/>
                     <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    		<h:panelGroup >
+                        <h:panelGroup >
                               <label class="label">#{msg.ruleLevel}*</label>
                               <p:selectOneMenu id="ruleLevel" value="#{relRuleAssetController.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
 	                            	<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="PmOrderRule" />
 	                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                             <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
-                          </h:panelGroup>
-                            
-                    		<h:panelGroup >
-                       		<label class="label">#{msg.PmOrderRule}*</label>
-                               <p:selectOneMenu id="pmOrderRule" value="#{relRuleAssetController.pmOrderRuleUID}"  
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.PmOrderRule}*</label>
+                            <p:autoComplete id="SelectedPmOrderRule" value="#{relRuleAssetController.ruleUid}" dropdown="true" scrollHeight="300" rendered="#{relRuleAssetController.level > 0}"
+                                            forceSelection="true" required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}" completeMethod="#{relRuleAssetController.getRuleList}"
+                                            var="t" itemLabel="#{t.name}" itemValue="#{t.uid}">
+                                    <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.setRuleId()}"/>
+                                    <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
+                            </p:autoComplete>
+                        </h:panelGroup>
+
+                        <!-- <h:panelGroup >
+                              <label class="label">#{msg.PmOrderRule}*</label>
+                               <p:selectOneMenu id="pmOrderRule" value="#{relRuleAssetController.pmOrderRuleUID}"
                                required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}"  rendered="#{relRuleAssetController.level > 0}">
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                  <!--  <f:selectItems value="#{fieldMsg.getFieldValueList('deviceType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/> -->
+                                  &lt;!&ndash;  <f:selectItems value="#{fieldMsg.getFieldValueList('deviceType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/> &ndash;&gt;
                                    <f:selectItems value="#{relRuleAssetController.getPmOrderRuleList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
                     </p:panelGrid>
                     <br/> <br/>

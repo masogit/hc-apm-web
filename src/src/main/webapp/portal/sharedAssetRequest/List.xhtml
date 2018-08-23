@@ -22,7 +22,7 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect" update="createButton  deleteButton" listener="#{sharedAssetRequestNewController.onRowEdit()}" oncomplete="openViewWindow(xhr, status, args)"/>
                     <p:ajax event="filter" listener="#{sharedAssetRequestNewController.onFilter}" update="createButton  deleteButton"/>

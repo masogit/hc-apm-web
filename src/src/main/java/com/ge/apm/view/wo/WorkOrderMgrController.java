@@ -5,43 +5,26 @@
  */
 package com.ge.apm.view.wo;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.domain.AssetFaultType;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -67,14 +50,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
-    private V2_WorkOrderService woService;
-    private UaaService uaaService;
+    private V2_WorkOrderService woService;    private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
+    private V2_WorkOrderRepository woDao;
     private String locationName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -86,14 +69,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private AssetInfo selectedAsset;
     private String assetStatus;
-
     private Integer currentStatus = 1;
-
     private Boolean needConfirmTime = false;
-
     private String cancelReason;
     private String stepFileter;
-
     //for details form
     private List<V2_WorkOrder_Detail> accessoryList;
     private List<V2_WorkOrderCoworker> coWorkerList;
@@ -121,13 +100,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     private String requestAssetUid;
     private String queryAssetUid;
-
     private List<V2_WorkOrder_Detail> approvedDetails;
     private Map<String, Boolean> selectedMap;
-
     private String selectedApproverUid;
+    private ServiceRequestApiService serviceRequestApiService;
+    private WorkflowConfigRepository woConDao;
+    private String token;
 
     protected void init() {
+        token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -139,7 +120,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-
+        woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+        serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -157,12 +140,29 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         this.filterBySite = false;
         this.filterByHospital = false;
-
-        
-        
-
     }
-
+    public String getManHourShow(){
+        if(hourRequired){
+            return "工时(小时)*";
+        }else{
+            return "工时(小时)";
+        }
+    }
+    private Boolean isRating;
+    public Boolean needRating(){
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                selectedWorkOrder.getAssetId());
+        isRating =  Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("ratingRequired")).get();
+        //查看是否被评价过
+        Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        //如果配置流里设置过必须评价，并且没有被评价过 返回true即显示需要评价
+        if(isRating &&feedback<1 )
+        {
+            return true;
+        }else
+            return false;
+    }
     @Override
     protected GenericRepositoryUUID<V2_WorkOrder> getDAO() {
         return dao;
@@ -394,6 +394,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
@@ -432,6 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void cancel() {
+        confirmedUpDate=null;
         selected = null;
         newServiceRequest = null;
         esTime = null;
@@ -446,7 +448,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = null;
         attachList=null;
         selectedAsset = null;
-//        requestAssetUid = null;
+//      requestAssetUid = null;
         locationName = null;
     }
 
@@ -457,7 +459,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = getServiceRequestPicList(selected.getSrId(), 2,null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);// gaolei to xiuggai
+        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);
 
 
         attachList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_DOCS);
@@ -517,34 +519,38 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             }
             selectedMap.put(item.getId(), item.getApproved());
         });
-
     }
 
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
         return approvedDetails == null ? null : approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
     }
 
-    public void prepareCloseOrder(String woid) {
-        selectedWorkOrder = dao.findById(woid);
+    public void prepareCloseOrder(String woId) {
+        prepareAct(woId);
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                selectedWorkOrder.getAssetId());
+        isRating=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("ratingRequired")).orElse(false);
+
         picList = new ArrayList<V2_BlobObject>();
         attachList = new ArrayList<V2_BlobObject>();
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
-
+    private Boolean hourRequired;
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
-        /* if(selectedWorkOrder.getOtherExpense()==0){
-            selectedWorkOrder.setOtherExpense(null);
-        }
-        if(selectedWorkOrder.getManHours()==0){
+        //获取当前工单的所属流程配置
+
+       ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                selectedWorkOrder.getAssetId());
+        hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
+        if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
             selectedWorkOrder.setManHours(null);
         }
-        if(selectedWorkOrder.getExternalExpense()==0){
-            selectedWorkOrder.setExternalExpense(null);
-        }*/
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
+        currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList =woService.getAttachByBoSubType(selectedWorkOrder.getSrId(),V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -552,6 +558,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveRepairWorkOrder() {
+        if(hourRequired)
+        {
+            if (selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours() < 0.01) {
+                WebUtil.addErrorMessage("所填工时不能小于0.01");
+                RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+                return;
+            }
+        }
+        /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
+                selectedWorkOrder.setManHours(null);
+            }*/
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -606,7 +623,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void repairWorkOrder() {
         boolean valid = true;
-        if (confirmedUpDate == null) {
+        if (confirmedUpDate ==
+                null) {
             WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
@@ -621,11 +639,20 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
-        if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
-            WebUtil.addErrorMessage("工时不能小于0.01");
-            RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
-            valid = false;
+
+
+       /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        hourRequired=  woc.getHourRequired();*/
+        if(hourRequired) { //如果工作流配置了工时必填，那么就要jian
+            if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
+                WebUtil.addErrorMessage("工时不能小于0.01");
+                RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
+                valid = false;
+            }
+        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
+            selectedWorkOrder.setManHours(null);
         }
+
         if (!valid) {
             return;
         }
@@ -665,7 +692,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void closeWorkOrder() {
-        woService.closeWorkOrder(selectedWorkOrder, comments, picList);
+        Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+           if(isRating && feedback<1){
+               WebUtil.addErrorMessage("请务必给予评价");
+               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
+               return;
+           }else {
+               woService.closeWorkOrder(selectedWorkOrder, comments, picList);
+           }
         cancel();
     }
 
@@ -700,7 +734,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            WebUtil.addErrorMessage("所选设备没有所属科室,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {

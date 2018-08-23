@@ -24,11 +24,11 @@
                     <p:dataTable id="datalist" value="#{userVacationScheduleController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{userVacationScheduleController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.scheduleDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" update="deleteButton approveButton"/>
                         <p:ajax event="filter" listener="#{userVacationScheduleController.onFilter}" />
@@ -56,7 +56,7 @@
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{userVacationScheduleController.delete}" update=":userVacationScheduleListForm:datalist" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus=='Approved'}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton id="approveButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审批" actionListener="#{userVacationScheduleController.validateAudit}" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus!='PendingApproval'}" update=":auditVacationDlg" oncomplete="PF('auditVacationDialog').show()"/>
+                            <p:commandButton id="approveButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审批" actionListener="#{userVacationScheduleController.validateAudit}" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus!='PendingApproval' || !userContextService.hasRole('AssetHead')}" update=":auditVacationDlg" oncomplete="PF('auditVacationDialog').show()"/>
                         </f:facet>
 
                     </p:dataTable>

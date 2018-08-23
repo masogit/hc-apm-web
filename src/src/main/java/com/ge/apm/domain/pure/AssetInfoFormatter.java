@@ -1,5 +1,7 @@
 package com.ge.apm.domain.pure;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.I18nMessage;
@@ -18,11 +20,18 @@ public class AssetInfoFormatter {
     private AssetInfo assetInfo;
     private List<OrgInfo> sites;
     private AssetFileImportService importService;
+    private AssetInfoRepository assetDao;
+    private OrgInfoRepository orgDao;
 
-    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites, AssetFileImportService importService) {
+    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
+                              AssetFileImportService importService,
+                              AssetInfoRepository assetDao,
+                              OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
+        this.assetDao = assetDao;
+        this.orgDao = orgDao;
     }
 
     public Integer getAssetUsage() {
@@ -317,6 +326,18 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetDeptId();
     }
 
+    public String getAssetDeptUID() {
+        return assetInfo.getAssetDeptUID();
+    }
+
+    public String getAssetDeptName() {
+        if (assetInfo.getAssetDeptUID() == null) return null;
+        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
+    }
+
     public Integer getAssetOwnerId() {
         return assetInfo.getAssetOwnerId();
     }
@@ -499,6 +520,19 @@ public class AssetInfoFormatter {
         return assetInfo.getParentAssetId();
     }
 
+    public String getParentAssetName() {
+        if (assetInfo.getParentAssetId() == null) {
+            return null;
+        }
+
+        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        if (parentAsset == null) return null;
+
+        String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
+
+        return departNum + " / " + parentAsset.getName();
+    }
+
     public Integer getInventoryStatus() {
         return assetInfo.getInventoryStatus();
     }
@@ -621,12 +655,14 @@ public class AssetInfoFormatter {
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
         map.put("院区", this.getSiteName());
-        map.put("使用科室", this.getClinicalDeptName());
+        map.put("所属科室", this.getClinicalDeptName());
+        map.put("使用科室", this.getAssetDeptName());
         map.put("制造商", this.getManufacture());
         map.put("品牌/制造商简称", this.getMakerShortName());
         map.put("设备标准名称", this.getDeviceName());
         map.put("注册证号", this.getRegistrationNo());
         map.put("供应商", this.getVendor());
+        map.put("主设备", this.getParentAssetName());
 
         map.put("医疗器械分类", this.getFunctionGroupAsString());
         map.put("医疗器械子分类", this.getAssetCode68AsString());

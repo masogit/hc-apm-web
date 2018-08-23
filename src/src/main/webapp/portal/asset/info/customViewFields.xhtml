@@ -71,6 +71,12 @@
             <p:inputText id="hospitalId" value="#{assetInfoDetailController.getOrgInfoByUid(assetInfoDetailController.selected.siteUID).name}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetDeptName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetDeptName}</label>
+            <p:inputText value="#{assetInfoDetailController.getOrgInfoByUid(assetInfoDetailController.selected.assetDeptUID).name}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'clinicalDeptName')}">
         <h:panelGroup >
             <label class="label">#{msg.clinicalDeptName}</label>
