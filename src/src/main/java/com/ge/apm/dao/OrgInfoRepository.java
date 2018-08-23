@@ -99,4 +99,6 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
 
+    public int countByParentUIDAndUidIsNot(String parentUid, String uid);
+
 }
