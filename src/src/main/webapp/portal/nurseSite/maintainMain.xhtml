@@ -154,14 +154,15 @@
                 	<h:form id="signatureForm">
                 		<h:panelGrid columnClasses="value" columns="1">
 		                	<h:panelGroup rendered="#{maintainController.signatureContentWeiXin==null}">
-								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="true"/>
+								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" base64Value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{maintainController.signatureContentStream==null}"/>
+								<p:graphicImage value="#{maintainController.signatureContentStream}" stream="false" rendered="#{maintainController.signatureContentStream!=null}"></p:graphicImage>
 							</h:panelGroup>
 							<h:panelGroup rendered="#{maintainController.signatureContentWeiXin!=null}">
 								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" stream="false"/>
 							</h:panelGroup>
 						</h:panelGrid>
 						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{maintainController.blnWebSignatureEidt}"/>
-						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update=":signatureForm:signatureContent" oncomplete="PF('sig').clear()" rendered="#{maintainController.blnWebSignatureEidt}"/>
 						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();"/>
 					</h:form>
                 </p:dialog>
