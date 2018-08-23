@@ -130,7 +130,7 @@ public class WorkOrderReportExportController implements Serializable {
         initOrgTree();
         loadClinicalDept();
         currentOwnerList = ucService.getWorkerList(null,"");
-        currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()));
+        currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()).stream().filter(item-> !currentOwnerList.contains(item)).collect(Collectors.toList()));
         
     }
     
