@@ -103,4 +103,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public int countByParentUIDAndUidIsNot(String parentUid, String uid);
 
+    public int countByParentUIDAndOrgType(String parentUid, int orgType);
+
+
+
 }
