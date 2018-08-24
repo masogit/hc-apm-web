@@ -132,6 +132,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         initGbTree();
         initOrgTree();
+
+        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+        if (parentClinicalCount > 0) {
+            //如果存在大科室，则显示树结构
+            initClinicalOrgTree();
+        }
     }
 
     @Override
