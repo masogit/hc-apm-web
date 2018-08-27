@@ -9,6 +9,7 @@ import java.util.*;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.dao.UserOrgInfoRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -78,6 +79,9 @@ public class UserAccountService {
 	
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
+
+	@Autowired
+	UserOrgInfoRepository userOrgDao;
 
 	public List<UserAccount> getUserAccount() {
 		return userAccountMapper.getAllUser();
@@ -539,5 +543,22 @@ public class UserAccountService {
 
 	public String getLoginNameByUid(String uid) {
 		return Optional.ofNullable(userAccountRepository.getByUid(uid).getName()).orElse("");
+	}
+
+	@Transactional
+	public void updateUserOrg(String userUid, Set<OrgInfo> selectedOrgList) {
+
+		userOrgDao.deleteByUserUid(userUid);
+
+		List<UserOrgInfo> userOrgList = new ArrayList();
+		for (OrgInfo selectedOrg : selectedOrgList) {
+			UserOrgInfo userOrg = new UserOrgInfo();
+			userOrg.setOrgType(selectedOrg.getOrgType());
+			userOrg.setOrgUid(selectedOrg.getUid());
+			userOrg.setUserUid(userUid);
+			userOrgList.add(userOrg);
+		}
+
+		userOrgDao.save(userOrgList);
 	}
 }

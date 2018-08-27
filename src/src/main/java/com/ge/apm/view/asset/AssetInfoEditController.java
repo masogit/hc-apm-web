@@ -6,6 +6,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -54,6 +55,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private UserAccountRepository userDao;
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
+    private OrgInfoTreeService orgInfoTreeService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -72,6 +74,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private TreeNode orgTree;
+    private TreeNode clinicalOrgTree;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
@@ -99,6 +102,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -128,6 +132,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         initGbTree();
         initOrgTree();
+
+        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+        if (parentClinicalCount > 0) {
+            //如果存在大科室，则显示树结构
+            initClinicalOrgTree();
+        }
     }
 
     @Override
@@ -187,6 +197,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             rootNode.getChildren().add(treeNode);
         }
         rootNode.setExpanded(true);
+    }
+
+    public void initClinicalOrgTree() {
+        OrgInfo siteOrg = (OrgInfo) selectedObjectMap.get("selectedOrg");
+        if (siteOrg != null) {
+            List<OrgInfo> clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(siteOrg.getSiteUID());
+            clinicalOrgTree = orgInfoTreeService.buildHierachyClinicalDept(siteOrg.getSiteUID(), clinicalDeptList);
+
+        }
+
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
