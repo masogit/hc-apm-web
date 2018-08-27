@@ -75,6 +75,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode gbTree;
     private TreeNode orgTree;
     private TreeNode clinicalOrgTree;
+    private boolean hierachyClinicalSupport = false;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
@@ -129,15 +130,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
-        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+
         initGbTree();
         initOrgTree();
 
-        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
-        if (parentClinicalCount > 0) {
-            //如果存在大科室，则显示树结构
-            initClinicalOrgTree();
-        }
+        updateClinicalDeptOnSiteChange();
+
     }
 
     @Override
@@ -216,6 +214,20 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
     }
 
+    public void onSelectClinicalDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("clinicalDept", orgInfo);
+    }
+
+    public void onSelectAssetDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("assetDept", orgInfo);
+    }
+
     public List<UserAccount> completeOwnerList(String query) {
 
         if (ownerList == null) {
@@ -237,12 +249,29 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setInstitutionUID(orgInfo.getInstitutionUID());
         selected.setSiteUID(orgInfo.getSiteUID());
         config = configService.findConfigBySite(selected.getSiteUID());
-        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+
+        updateClinicalDeptOnSiteChange();
+
         selectedObjectMap.put("clinicalDept", null);
         onAssetDeptChange("clinicalDept");
         selectedObjectMap.put("assetDept", null);
         onAssetDeptChange("assetDept");
         parentAssetList.clear();
+    }
+
+    private void updateClinicalDeptOnSiteChange() {
+
+        //later support hierachy clinical dept
+//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+        int parentClinicalCount = 0;
+        if (parentClinicalCount > 0) {
+            //如果存在大科室，则显示树结构
+            hierachyClinicalSupport = true;
+            initClinicalOrgTree();
+        } else {
+            hierachyClinicalSupport = false;
+            clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+        }
     }
 
     public void onParentAssetChange() {
@@ -810,4 +839,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectedObjectMap = selectedObjectMap;
     }
 
+    public boolean isHierachyClinicalSupport() {
+        return hierachyClinicalSupport;
+    }
+
+    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
+        this.hierachyClinicalSupport = hierachyClinicalSupport;
+    }
+
+    public TreeNode getClinicalOrgTree() {
+        return clinicalOrgTree;
+    }
+
+    public void setClinicalOrgTree(TreeNode clinicalOrgTree) {
+        this.clinicalOrgTree = clinicalOrgTree;
+    }
 }
