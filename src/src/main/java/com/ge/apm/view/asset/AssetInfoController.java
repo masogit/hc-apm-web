@@ -2050,9 +2050,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+			    if(assetDept != null) {
+			        selected.setAssetDeptUID(assetDept.getUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2066,9 +2070,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+            OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+			    if(assetDept != null) {
+                    selected.setAssetDeptUID(assetDept.getUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2093,7 +2101,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             String totalTime = unitAndTotalTime._2;
 
     		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
-    			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
+    			if(this.getOrgUids().contains(item.getAssetDeptUID())) {
     			} else {
     				SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
     				if(request != null && "1".equals(request.getType())) {
