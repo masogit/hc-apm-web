@@ -22,7 +22,7 @@
                             <label class="label">借用科室*</label>
                             <p:autoComplete dropdown="true" value="#{assetInfoController.filterOrgName}"
                                             required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoController.autoCompleteDeptName}" size="5">
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoController.autoCompleteDeptName}" size="8">
                                 <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" event="itemSelect"/>
                                 <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" />
                             </p:autoComplete>
