@@ -25,7 +25,6 @@ import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableItem;
-import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -246,6 +245,8 @@ public class TableDefinitionService {
     }
 
     public TableDefinition updateJSONTemplate(TableDefinition selectedTableDefinition, String tableString) {
+        String operator = UserContextService.getCurrentUserAccount().getUid();
+        Date operationTime = new Date();
         //模版下有记录
         TableDefinition newTemplate = new TableDefinition();
         newTemplate.setName(selectedTableDefinition.getName());
@@ -256,16 +257,16 @@ public class TableDefinitionService {
         newTemplate.setInstitutionUID(selectedTableDefinition.getInstitutionUID());
         newTemplate.setHospitalUID(selectedTableDefinition.getHospitalUID());
         newTemplate.setSiteUID(selectedTableDefinition.getSiteUID());
-        newTemplate.setCreatedDate(new Date());
-        newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+        newTemplate.setCreatedDate(operationTime);
+        newTemplate.setCreatedBy(operator);
         newTemplate.setStatus(selectedTableDefinition.getStatus());
         newTemplate.setExcelStorageId(selectedTableDefinition.getExcelStorageId());
         newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
         newTemplate.setSchema(tableString);
         templateDao.save(newTemplate);
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
-        selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-        selectedTableDefinition.setLastModifiedDate(new Date());
+        selectedTableDefinition.setLastModifiedBy(operator);
+        selectedTableDefinition.setLastModifiedDate(operationTime);
         templateDao.save(selectedTableDefinition);
         return newTemplate;
     }
