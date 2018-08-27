@@ -73,6 +73,14 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">版本</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selectedVersion}" >
+                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
+                                <p:ajax listener="#{tenantInfoController.onVersionChange}"></p:ajax>
+                                <f:selectItems value="#{tenantInfoController.listVersions}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="#{msg.isEnabled}" value="#{tenantInfoController.selected.isEnabled}"/>
                         </h:panelGroup>
