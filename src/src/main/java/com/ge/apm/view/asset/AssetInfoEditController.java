@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
-import com.ge.apm.service.asset.CustomConfigService;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
@@ -76,6 +75,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode orgTree;
     private TreeNode clinicalOrgTree;
     private boolean hierachyClinicalSupport = false;
+
+    private boolean assetGroupSecondarySupport = false;
+    private List<I18nMessage> assetGroupSecondaryList;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
@@ -135,6 +137,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initOrgTree();
 
         updateClinicalDeptOnSiteChange();
+
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
+
+        if (assetGroupSecondarySupport) {
+            onAssetGroupChange();
+        }
+
 
     }
 
@@ -443,6 +454,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
         selected.setQrCode(qrCode);
         return true;
+    }
+
+    public void onAssetGroupChange() {
+
+        if (!assetGroupSecondarySupport) return;
+
+        if (this.selected.getAssetGroup() == null) {
+            this.assetGroupSecondaryList = Collections.emptyList();
+        } else {
+            String msgType = "assetGroupSecondary_" + this.selected.getAssetGroup();
+            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, UserContextService.getCurrentUserAccount().getSiteId());
+        }
+
     }
 
     public void onFunctionGroupChange() {
@@ -853,5 +877,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setClinicalOrgTree(TreeNode clinicalOrgTree) {
         this.clinicalOrgTree = clinicalOrgTree;
+    }
+
+    public boolean isAssetGroupSecondarySupport() {
+        return assetGroupSecondarySupport;
+    }
+
+    public void setAssetGroupSecondarySupport(boolean assetGroupSecondarySupport) {
+        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondaryList() {
+        return assetGroupSecondaryList;
+    }
+
+    public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
+        this.assetGroupSecondaryList = assetGroupSecondaryList;
     }
 }
