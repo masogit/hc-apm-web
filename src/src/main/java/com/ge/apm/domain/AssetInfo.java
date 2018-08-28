@@ -158,6 +158,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
 
+    @Column(name = "asset_group_secondary")
+    private Integer assetGroupSecondary;//设备分类2级
+
     @Column(name = "asset_dept_id")
     private Integer assetDeptId;//所属设备科
 
@@ -1541,7 +1544,15 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAssetCDFAType(String assetCDFAType) {
         this.assetCDFAType = assetCDFAType;
     }
-    
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
