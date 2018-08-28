@@ -117,6 +117,11 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetGroupSecondary'}">
+                                <p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondary}">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary',item.assetGroup)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'assetDeptName'}">
                                 <p:column headerText="#{msg.assetDeptName}"  width="100">
                                     <f:facet name="header">
