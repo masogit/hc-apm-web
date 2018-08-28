@@ -125,10 +125,10 @@
                             <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="使用时长">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item)}"/>
                         </p:column>
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
                                 <f:convertNumber pattern="0.00"/>
                             </h:outputText>
                         </p:column>
