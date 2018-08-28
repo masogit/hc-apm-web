@@ -9,6 +9,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.ServiceRequestApiService;
@@ -44,7 +46,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
 
     V2_WorkOrderRepository dao;
 
@@ -106,8 +108,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private ServiceRequestApiService serviceRequestApiService;
     private WorkflowConfigRepository woConDao;
     private String token;
+    private AutoCompleteService autoCompleteService;
 
+    private AssetInfoMgrService aimService;
+    private List<Supplier> supplierList = new ArrayList<Supplier>();
+    private Map<String, Object> selectedObjectMap = new HashMap();
     protected void init() {
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -140,7 +147,25 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         this.filterBySite = false;
         this.filterByHospital = false;
+        /*autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        if(selected==null){
+            selected= new V2_WorkOrder();
+        }
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());*/
     }
+
+
+//    private void beforeEdit(){
+//        selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
+//    }
+public void onSupplierChange(String idx) {
+    Supplier supplier = (Supplier) selectedObjectMap.get(idx);
+    switch (idx) {
+        case "supplier":
+            itemDetail.setSupplier(supplier.getName());
+            break;
+    }
+}
     public String getManHourShow(){
         if(hourRequired){
             return "工时(小时)*";
@@ -149,6 +174,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
     }
     private Boolean isRating;
+    public List<Supplier> autoCompleteSupplier(String query) {
+        return autoCompleteService.autoCompleteVendor(query, supplierList);
+    }
+
     public Boolean needRating(){
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
@@ -812,6 +841,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
+        supplierList=aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
     }
 
     public void prepareEditAccDetailonPrice(String itemId){
