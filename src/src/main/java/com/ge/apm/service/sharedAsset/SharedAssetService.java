@@ -85,6 +85,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        logger.info("Request URL: " + url);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
         logger.info(JSON.toJSONString(response));
@@ -101,6 +102,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        logger.info("Request URL: " + url);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
         logger.info(JSON.toJSONString(response));
