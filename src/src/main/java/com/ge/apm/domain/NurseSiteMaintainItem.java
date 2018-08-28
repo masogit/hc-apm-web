@@ -356,7 +356,9 @@ public class NurseSiteMaintainItem implements Serializable {
 				}
 			}
 		}
-		return null;
+		NurseSiteMaintainData tempResult=new NurseSiteMaintainData();
+		tempResult.setCheckItem("");
+		return tempResult;
 	}
 
 	@Override

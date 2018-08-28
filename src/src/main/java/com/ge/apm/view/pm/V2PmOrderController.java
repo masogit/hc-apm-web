@@ -590,7 +590,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         untest = (UnstructuredData) hmCheck.get(key);
     }
 
-    private String qaStatus = "0";
+    private String qaStatus = "1";
 
     public void onQaStatusChange() {
     }
