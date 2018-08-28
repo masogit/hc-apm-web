@@ -76,6 +76,7 @@ public class MaintainController {
     private List<OrgInfo> checkListParentOrgInfo;
     //inner
     private String signatureContent;
+    private StreamedContent signatureContentStream;
     private StreamedContent signatureContentWeiXin;
     private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
@@ -366,9 +367,8 @@ public class MaintainController {
 	
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
-		Set<NurseSiteMaintainItem> listItem=null;
 		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
-		listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(showLables==null){
 			showLables=new ArrayList<String>();
 		}
@@ -392,16 +392,6 @@ public class MaintainController {
 			// TODO: handle exception
 			LOGGER.error("getLables error"+e.getMessage());
 		}
-	}
-	
-	private void initValueAfterEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
-	}
-	
-	private void initValueBeforeEvent(){
-		signatureContent=null;
-		signatureContentWeiXin=null;
 	}
 	
 	public void checkRightAll(){
@@ -462,17 +452,19 @@ public class MaintainController {
 	public void saveMaintainSignature(){
 		if(StringUtils.isNotEmpty(signatureContent)){
 			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent,nurseSiteMaintain.getId()));
-			initValueAfterEvent();
 		}
 	}
 	
 	public void getMaintainSignature(String signatureId,Integer signatureSourceType){
+		signatureContent=null;
+		signatureContentWeiXin=null;
+		signatureContentStream=null;
 		if(StringUtils.isNotEmpty(signatureId)){
 			if(signatureSourceType==null){
 				blnWebSignatureEidt=true;
 			}
 			else if(signatureSourceType==0){
-				signatureContent=nurseSiteMaintainService.getMaintainSignatureWeb(signatureId);
+				signatureContentStream=nurseSiteMaintainService.getMaintainSignatureWebToStream(signatureId);
 				blnWebSignatureEidt=false;
 			}
 			else if(signatureSourceType==1){
@@ -487,6 +479,7 @@ public class MaintainController {
 	
 	public void resetMaintainSignature(){
 		signatureContent=null;
+		signatureContentStream=null;
 	}
 	
 	public void onNurseSiteMaintainConfigChange(){
@@ -523,12 +516,10 @@ public class MaintainController {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
 		generateNurseSiteMaintainData();
-		initValueBeforeEvent();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		userClickDate=(Date) selectEvent.getObject();
-		initValueBeforeEvent();
 	}
 
 //	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -759,6 +750,14 @@ public class MaintainController {
 
 	public void setSignatureContent(String signatureContent) {
 		this.signatureContent = signatureContent;
+	}
+
+	public StreamedContent getSignatureContentStream() {
+		return signatureContentStream;
+	}
+
+	public void setSignatureContentStream(StreamedContent signatureContentStream) {
+		this.signatureContentStream = signatureContentStream;
 	}
 
 	public StreamedContent getSignatureContentWeiXin() {

@@ -300,9 +300,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		level2=true;
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
-//		queryAsset.setName(null);
-//		queryAsset.setAssetGroup(null);
-
 	}
 	@Override
 	protected Page<MessageSubscriber> loadData(PageRequest pageRequest) {
@@ -366,10 +363,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public void saveAssetSub(){
-//		if (!requiredCheck()) {
-//			return;
-//		}
-		List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
+        MessageSubscriber msgsub= null;
+        List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
 		if(this.getCRUDActionName().equals("新增")) {
 			if(targetAssets.isEmpty()){
 				WebUtil.addErrorMessage("设备没有选取,请务必选择设备");
@@ -395,8 +390,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
-
-			MessageSubscriber msgsub= null;
 
 			for(AssetInfo assetInfo:targetAssets ){
 				msgsub= new MessageSubscriber();
