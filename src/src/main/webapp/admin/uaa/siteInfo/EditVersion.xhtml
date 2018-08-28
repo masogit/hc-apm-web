@@ -31,7 +31,7 @@
                             <label class="label">设备档案</label>
                             <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetMDM}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="false">
+                        <h:panelGroup>
                             <label class="label">维修管理(不含排班管理)</label>
                             <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" />
                         </h:panelGroup>
@@ -55,7 +55,7 @@
                             <label class="label">知识文档</label>
                             <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetKnowledgeBaseMgmt}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="false">
+                        <h:panelGroup>
                             <label class="label">护士站</label>
                             <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnNurseSite}" />
                         </h:panelGroup>
