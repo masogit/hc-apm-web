@@ -39,7 +39,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroupSecondary')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetGroupSecondary}<span style="color:red">*</span></label>
-            <p:selectOneMenu id="assetGroupSecondary" value="#{assetInfoEditController.selected.assetGroupSecondary}" required="true" requiredMessage="#{msg.assetGroupSecondary} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}" class="assetGroupChange">
+            <p:selectOneMenu id="assetGroupSecondary" value="#{assetInfoEditController.selected.assetGroupSecondary}" required="#{assetInfoEditController.customConfig.assetFields['assetGroupSecondary'].required}" requiredMessage="#{msg.assetGroupSecondary} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroupSecondary')}" class="assetGroupChange">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{assetInfoEditController.assetGroupSecondaryList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
