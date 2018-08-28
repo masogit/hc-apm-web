@@ -40,6 +40,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -183,9 +184,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     List<Supplier> supplierList = Collections.emptyList();
     
-    private Date nowDate = new Date();
-    
     private List<OrgInfo> deptListCanLeaseAsset;
+
+    private String filterOrgName;
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -445,22 +446,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
         
         //1st. if asset belongs to any distribution center
-        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
         //2nd, check if configuration regarding to shared asset has been created
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNotNull, null));
 
         if (queryIndex == 1) {
             //正常可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
         } else if(queryIndex == 2){
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
@@ -2012,14 +2013,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		return orgUids;
 	}
 
-	public Date getNowDate() {
-		return nowDate;
-	}
-
-	public void setNowDate(Date nowDate) {
-		this.nowDate = nowDate;
-	}
-	
 	public void prepareForceAllocateAsset(String assetUid) {
 		AssetInfo asset = dao.findByUid(assetUid);
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
@@ -2057,9 +2050,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+			    if(assetDept != null) {
+			        selected.setAssetDeptUID(assetDept.getUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2073,9 +2070,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+            OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+			    if(assetDept != null) {
+                    selected.setAssetDeptUID(assetDept.getUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2100,7 +2101,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             String totalTime = unitAndTotalTime._2;
 
     		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
-    			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
+    			if(this.getOrgUids().contains(item.getAssetDeptUID())) {
     			} else {
     				SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
     				if(request != null && "1".equals(request.getType())) {
@@ -2125,6 +2126,37 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public Date getCurrentDate() {
         return new Date();
+    }
+
+    public String getFilterOrgName() {
+        return filterOrgName;
+    }
+
+    public void setFilterOrgName(String filterOrgName) {
+        this.filterOrgName = filterOrgName;
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if(clinicalDeptList == null) {
+            clinicalDeptList = assetInfoService.getOrgDeptList(this.selected.getSiteUID());
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+            || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterOrgName = (String) ((SelectEvent) event).getObject();
+            return;
+        } else {
+            if (!Strings.isNullOrEmpty(filterOrgName) && !clinicalDeptList.stream().anyMatch(item -> filterOrgName.equals(item.getName()))) {
+                filterOrgName = "";
+            }
+        }
+
     }
     
 }

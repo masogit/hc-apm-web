@@ -1,5 +1,6 @@
 package com.ge.apm.view;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -124,7 +125,9 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public String supplierType;
     @Override
     protected Page<Supplier> loadData(PageRequest pageRequest) {
-        this.setSearchFilter();
+        if(this.searchFilters ==null){
+            searchFilters =  new ArrayList<>();
+        }
         searchFilters.add(new SearchFilter("tenantUID",
                 SearchFilter.Operator.EQ,UserContextService.getCurrentUserAccount().getTenantUID()));
      //   this.selected = null;
