@@ -19,13 +19,14 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">借用科室*</label>
-                            <p:autoComplete dropdown="true" value="#{assetInfoController.filterOrgName}"
+                            <label class="label">借用科室: </label>
+                            <!-- <p:autoComplete disabled="true" dropdown="true" value="#{assetInfoController.filterOrgName}"
                                             required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoController.autoCompleteDeptName}" size="8">
-                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" event="itemSelect"/>
-                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" />
-                            </p:autoComplete>
+                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" event="itemSelect"/>
+                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}"/>
+                            </p:autoComplete> -->
+                            <h:outputText value="#{assetInfoController.selected.sharedAssetReqDetail.clinicalDept.name}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费开始时间*</label>
