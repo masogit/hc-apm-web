@@ -87,8 +87,8 @@
         </p:column>
        
         <f:facet name="{Toolbar}">
-            <p:commandButton value="报表全部导出" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl">
-                <p:dataExporter type="xlsx" target="datalist" fileName="nurseSiteMaintain_export" />
+            <p:commandButton value="报表全部导出" actionListener="#{maintainExportController.exportAll()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
             </p:commandButton>
             <p:commandButton value="报表选择导出" actionListener="#{maintainExportController.exportSelected()}" icon="ui-icon-arrowthick-1-s" ajax="false" validateClient="true" update=":growl">
                 <p:fileDownload value="#{maintainExportController.exportFile}"/>
