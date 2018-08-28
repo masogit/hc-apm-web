@@ -31,8 +31,8 @@
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetGroupSecondary')}">
         <h:panelGroup >
-            <label class="label">#{msg.assetGroup}</label>
-            <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroupSecondary', assetInfoDetailController.selected.assetGroupSecondary)}" readonly="true"/>
+            <label class="label">#{msg.assetGroupSecondary}</label>
+            <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(assetInfoDetailController.selected.assetGroup), assetInfoDetailController.selected.assetGroupSecondary)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerName')}">
