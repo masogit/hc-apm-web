@@ -17,11 +17,15 @@
                                 <f:selectItem itemLabel="维修" itemValue="1" />
                                 <f:selectItem itemLabel="补登记" itemValue="2" />
                             </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">借用科室*</label>
-                            <p:selectOneMenu  id="clinicalDeptUid" value="#{assetInfoController.selected.clinicalDeptUID}" required="true" requiredMessage="请选择科室">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{assetInfoService.getOrgDeptList(assetInfoController.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                            </p:selectOneMenu>
+                            <p:autoComplete dropdown="true" value="#{assetInfoController.filterOrgName}"
+                                            required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoController.autoCompleteDeptName}" size="8">
+                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" event="itemSelect"/>
+                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" update=":forceAllocateAssetDialogForm" />
+                            </p:autoComplete>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费开始时间*</label>
