@@ -119,7 +119,7 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'assetGroupSecondary'}">
                                 <p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondary}">
-                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary',item.assetGroup)}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(item.assetGroup), item.assetGroupSecondary)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetDeptName'}">
