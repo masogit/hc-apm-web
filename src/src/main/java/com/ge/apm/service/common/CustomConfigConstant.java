@@ -109,6 +109,7 @@ public class CustomConfigConstant {
             allFields.put("name", WebUtil.getMessage("name"));
             allFields.put("aliasName", WebUtil.getMessage("aliasName"));
             allFields.put("assetGroup", WebUtil.getMessage("assetGroup"));
+            allFields.put("assetGroupSecondary", WebUtil.getMessage("assetGroupSecondary"));
             allFields.put("assetOwnerName", WebUtil.getMessage("assetOwnerName"));
             allFields.put("assetOwnerTel", WebUtil.getMessage("assetOwnerTel"));
             allFields.put("assetOwnerName2", WebUtil.getMessage("assetOwnerName2"));
