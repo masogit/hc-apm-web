@@ -68,6 +68,9 @@ public class SharedAssetInfoUtils {
             unitPrice = 0d;
         }
         BigDecimal totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
+        if("2".equals(reqDetail.getChargingType())) {
+            totalAmount = unit.multiply(new BigDecimal(unitPrice.longValue() / 2));
+        }
         return totalAmount;
     }
 }
