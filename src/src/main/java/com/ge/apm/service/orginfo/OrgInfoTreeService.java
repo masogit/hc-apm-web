@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OrgInfoTreeService {
@@ -55,6 +53,25 @@ public class OrgInfoTreeService {
         }
 
         return rootNode;
+    }
+
+    public Set<String> collectChildClinicalDept(String parentUid) {
+        Set<String> orgUidSet = new HashSet<>();
+        collectChildClinicalDept(parentUid, orgUidSet);
+
+        return orgUidSet;
+    }
+
+    public void collectChildClinicalDept(String parentUid, Set<String> clinicalDeptSet) {
+
+        clinicalDeptSet.add(parentUid);
+
+        List<OrgInfo> orgInfos = orgDao.findByParentUID(parentUid);
+
+        for (OrgInfo orgInfo: orgInfos) {
+            collectChildClinicalDept(orgInfo.getUid(), clinicalDeptSet);
+        }
+
     }
 
 }
