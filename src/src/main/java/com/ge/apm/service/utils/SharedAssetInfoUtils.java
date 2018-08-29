@@ -1,6 +1,9 @@
 package com.ge.apm.service.utils;
 
+import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetRequest;
 import javaslang.Tuple2;
+import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,13 +14,13 @@ import java.util.Date;
 
 public class SharedAssetInfoUtils {
 
-    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(Date beginDate, Date endDate, String chargingType) {
+    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(SharedAssetReqDetail reqDetail) {
         Tuple2<BigDecimal, String> result = null;
         LocalDateTime beginLDT;
         LocalDateTime endLDT;
 
-        if(endDate != null) {
-            endLDT = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(reqDetail.getChargingEndTime() != null) {
+            endLDT = reqDetail.getChargingEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         } else {
             endLDT = LocalDateTime.now();
         }
@@ -25,8 +28,8 @@ public class SharedAssetInfoUtils {
         String totalTime = "";
         BigDecimal unit = new BigDecimal(1);
         long days = 0, hours = 0, minutes = 0, rentalTimeInMinutes = 0;
-        if(beginDate != null) {
-            beginLDT = beginDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(reqDetail.getChargingBeginTime() != null) {
+            beginLDT = reqDetail.getChargingBeginTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
             days = rentalTimeInMinutes / (24 * 60);
             hours = (rentalTimeInMinutes / 60) % 24;
@@ -34,7 +37,7 @@ public class SharedAssetInfoUtils {
             totalTime = days + "天" + hours + "时" + minutes + "分";
         }
 
-        switch(chargingType) {
+        switch(reqDetail.getChargingType()) {
             case "1":
                 totalTime = "1次";
                 unit = new BigDecimal(1);
@@ -59,12 +62,13 @@ public class SharedAssetInfoUtils {
         return result;
     }
 
-    public static BigDecimal getTotalAmount(BigDecimal unit, Double unitPrice, String chargingType) {
+    public static BigDecimal getTotalAmount(BigDecimal unit, SharedAssetReqDetail reqDetail) {
+        Double unitPrice = reqDetail.getUnitPrice();
         if(unitPrice == null) {
             unitPrice = 0d;
         }
         BigDecimal totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
-        if("2".equals(chargingType)) {
+        if("2".equals(reqDetail.getChargingType())) {
             totalAmount = unit.multiply(new BigDecimal(unitPrice.longValue() / 2));
         }
         return totalAmount;
