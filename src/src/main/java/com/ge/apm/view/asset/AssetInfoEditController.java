@@ -6,6 +6,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -23,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
-import com.ge.apm.service.asset.CustomConfigService;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
@@ -54,6 +54,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private UserAccountRepository userDao;
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
+    private OrgInfoTreeService orgInfoTreeService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -72,6 +73,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private TreeNode orgTree;
+    private TreeNode clinicalOrgTree;
+//    private boolean hierachyClinicalSupport = false;
+
+    private boolean assetGroupSecondarySupport = false;
+    private List<I18nMessage> assetGroupSecondaryList;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
@@ -99,6 +105,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -125,9 +132,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
-        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+
         initGbTree();
         initOrgTree();
+
+        updateClinicalDeptOnSiteChange();
+
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
+
+        if (assetGroupSecondarySupport) {
+            onAssetGroupChange();
+        }
+
+
     }
 
     @Override
@@ -189,11 +208,46 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         rootNode.setExpanded(true);
     }
 
+    public void initClinicalOrgTree() {
+        OrgInfo siteOrg = (OrgInfo) selectedObjectMap.get("selectedOrg");
+        if (siteOrg != null) {
+            List<OrgInfo> clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(siteOrg.getSiteUID());
+            clinicalOrgTree = orgInfoTreeService.buildHierachyClinicalDept(siteOrg.getSiteUID(), clinicalDeptList);
+
+            OrgInfo clinicalDept = orgDao.findByUid(selected.getClinicalDeptUID());
+            selectedObjectMap.put("clinicalDept", clinicalDept);
+
+            OrgInfo assetDept = orgDao.findByUid(selected.getAssetDeptUID());
+            selectedObjectMap.put("assetDept", assetDept);
+        }
+
+    }
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-        changeAssetOrg(orgInfo);
+
         selectedObjectMap.put("selectedOrg", orgInfo);
+
+        changeAssetOrg(orgInfo);
+    }
+
+    public void onSelectClinicalDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("clinicalDept", orgInfo);
+
+        onAssetDeptChange("clinicalDept");
+    }
+
+    public void onSelectAssetDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("assetDept", orgInfo);
+
+        onAssetDeptChange("assetDept");
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -217,12 +271,29 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setInstitutionUID(orgInfo.getInstitutionUID());
         selected.setSiteUID(orgInfo.getSiteUID());
         config = configService.findConfigBySite(selected.getSiteUID());
-        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+
+        updateClinicalDeptOnSiteChange();
+
         selectedObjectMap.put("clinicalDept", null);
         onAssetDeptChange("clinicalDept");
         selectedObjectMap.put("assetDept", null);
         onAssetDeptChange("assetDept");
         parentAssetList.clear();
+    }
+
+    private void updateClinicalDeptOnSiteChange() {
+
+        //later support hierachy clinical dept
+//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+////        int parentClinicalCount = 0;
+//        if (parentClinicalCount > 0) {
+//            //如果存在大科室，则显示树结构
+//            hierachyClinicalSupport = true;
+//            initClinicalOrgTree();
+//        } else {
+//            hierachyClinicalSupport = false;
+            clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
+//        }
     }
 
     public void onParentAssetChange() {
@@ -394,6 +465,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
         selected.setQrCode(qrCode);
         return true;
+    }
+
+    public void onAssetGroupChange() {
+
+        if (!assetGroupSecondarySupport) return;
+
+        if (this.selected.getAssetGroup() == null) {
+            this.assetGroupSecondaryList = Collections.emptyList();
+        } else {
+            String msgType = "assetGroupSecondary_" + this.selected.getAssetGroup();
+            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, UserContextService.getCurrentUserAccount().getSiteId());
+        }
+
     }
 
     public void onFunctionGroupChange() {
@@ -709,6 +793,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
 
+    public boolean needShow(String fieldKey) {
+
+        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageStatusFields().contains(fieldKey)) return true;
+
+        return false;
+    }
+
     public boolean needEdit(String fieldKey) {
         return editableFieldsList.contains(fieldKey);
     }
@@ -790,4 +886,35 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectedObjectMap = selectedObjectMap;
     }
 
+//    public boolean isHierachyClinicalSupport() {
+//        return hierachyClinicalSupport;
+//    }
+//
+//    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
+//        this.hierachyClinicalSupport = hierachyClinicalSupport;
+//    }
+
+    public TreeNode getClinicalOrgTree() {
+        return clinicalOrgTree;
+    }
+
+    public void setClinicalOrgTree(TreeNode clinicalOrgTree) {
+        this.clinicalOrgTree = clinicalOrgTree;
+    }
+
+    public boolean isAssetGroupSecondarySupport() {
+        return assetGroupSecondarySupport;
+    }
+
+    public void setAssetGroupSecondarySupport(boolean assetGroupSecondarySupport) {
+        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondaryList() {
+        return assetGroupSecondaryList;
+    }
+
+    public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
+        this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
 }

@@ -324,6 +324,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setName(orgName);
         selected.setNameEn(orgNameEn);
 
+        if (selected.getOrgType() == 4) {
+            OrgInfo parentOrg = selected.getParentOrg();
+            if (parentOrg != null && parentOrg.getOrgType() == 4) {
+                parentOrg.setOrgType(5); //大科室
+                dao.save(parentOrg);
+            }
+        }
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
         initWorkflowConfig();
@@ -358,6 +365,21 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void deleteSelectedOrg() {
         if (canDelete()) {
+
+            //如果是科室，重新设置大科室，小科室
+            if (selected.getOrgType() == 4) {
+                OrgInfo parentOrg = selected.getParentOrg();
+                if (parentOrg != null && parentOrg.getOrgType() == 5) {
+
+                    int otherChildsCount = dao.countByParentUIDAndUidIsNot(parentOrg.getUid(), selected.getUid());
+                    if (otherChildsCount == 0) { //only one child
+                        parentOrg.setOrgType(4); //大科室
+                        dao.save(parentOrg);
+                    }
+
+                }
+            }
+
             super.delete();
             buildOrdTree();
         }
@@ -464,7 +486,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateDepartmentDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() == 4) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null;
     }
 
     public UserAccount getUserAccount() {
