@@ -38,37 +38,42 @@
                         <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <!--xxxxxxxzssssssssssssssssssssss-->
-                    <!--<h:panelGroup>-->
-                    <!--<label class="label">实际价格</label>-->
-                    <!--&lt;!&ndash; <p:inputText value="#{v2PmOrderController.itemDetail.invoiceNum}"/>&ndash;&gt;-->
-                    <!--</h:panelGroup>-->
-                    <!--<h:panelGroup>-->
-                    <!--<label class="label">维修合同号</label>-->
-                    <!--&lt;!&ndash; <p:inputText value="#{v2PmOrderController.itemDetail.invoiceNum}"/>&ndash;&gt;-->
-                    <!--</h:panelGroup>-->
-
+                    <h:panelGroup>
+                    <label class="label">发票号</label>
+                     <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                    <label class="label">维修合同号</label>
+                     <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
+                    </h:panelGroup>
+                    <!--value="#{workOrderMgrController.selectedObjectMap['supplier']}"-->
                     <h:panelGroup>
                         <label class="label">供应商字段</label>
-                        <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300"
-                                        forceSelection="true"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
-                                        completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange('supplier')}"/>
-                            <p:ajax listener="#{workOrderMgrController.onSupplierChange('supplier')}" />
+                        <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300"
+                                        forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
+                                        completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
+                            <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
                         </p:autoComplete>
-                        <!-- <p:inputText value="#{v2PmOrderController.itemDetail.invoiceNum}"/>-->
+                        <!-- <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>-->
                     </h:panelGroup>
 
-                    <!--<h:panelGroup>-->
-                    <!--<label class="label">开票时间</label>-->
-                    <!--&lt;!&ndash; <p:inputText value="#{v2PmOrderController.itemDetail.invoiceNum}"/>&ndash;&gt;-->
-                    <!--</h:panelGroup>-->
+                    <h:panelGroup>
+                    <label class="label">开票时间</label>
+                        <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
 
                     <p:column headerText="到货">
                         <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
                             <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>
                         </p:selectBooleanButton>
+                        <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                            <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
+                        </p:selectBooleanButton>
                     </p:column>
-
+                    <h:panelGroup>
+                        <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>

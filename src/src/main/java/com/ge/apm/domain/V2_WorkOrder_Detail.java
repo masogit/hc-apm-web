@@ -106,6 +106,13 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name="comment", length = 500)
     private String comment;
 
+    @Column(name="contract_num")
+    private String contractNum;
+
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @Column(name = "invoice_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date invoiceTime;
 
     public String getInvoiceNum() {
         return invoiceNum;
@@ -290,6 +297,22 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getContractNum() {
+        return contractNum;
+    }
+
+    public void setContractNum(String contractNum) {
+        this.contractNum = contractNum;
+    }
+
+    public Date getInvoiceTime() {
+        return invoiceTime;
+    }
+
+    public void setInvoiceTime(Date invoiceTime) {
+        this.invoiceTime = invoiceTime;
     }
 
     @Override
