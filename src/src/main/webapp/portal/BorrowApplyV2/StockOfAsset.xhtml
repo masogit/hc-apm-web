@@ -96,8 +96,8 @@
                         </p:column>
                         
                         <p:column headerText="#{msg.Actions}">
-	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item.uid)}" rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceAllocateAssetDialog" oncomplete="PF('forceAllocateAssetDialog').show()"/>
-	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item.uid)}" rendered="#{(item.status == 1 || item.status == 3) and (!item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceReturnAssetDialog" oncomplete="PF('forceReturnAssetDialog').show()"/>
+	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item)}" rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceAllocateAssetDialog" oncomplete="PF('forceAllocateAssetDialog').show()"/>
+	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item)}" rendered="#{(item.status == 1 || item.status == 3) and (!item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceReturnAssetDialog" oncomplete="PF('forceReturnAssetDialog').show()"/>
 	                    </p:column>
                         
                         <f:facet name="{Toolbar}">
