@@ -34,7 +34,7 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" >
+                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" style="max-width: 200px">
                                  <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                  <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
