@@ -74,7 +74,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode gbTree;
     private TreeNode orgTree;
     private TreeNode clinicalOrgTree;
-    private boolean hierachyClinicalSupport = false;
+//    private boolean hierachyClinicalSupport = false;
 
     private boolean assetGroupSecondarySupport = false;
     private List<I18nMessage> assetGroupSecondaryList;
@@ -284,16 +284,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private void updateClinicalDeptOnSiteChange() {
 
         //later support hierachy clinical dept
-        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
-//        int parentClinicalCount = 0;
-        if (parentClinicalCount > 0) {
-            //如果存在大科室，则显示树结构
-            hierachyClinicalSupport = true;
-            initClinicalOrgTree();
-        } else {
-            hierachyClinicalSupport = false;
-            clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        }
+//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+////        int parentClinicalCount = 0;
+//        if (parentClinicalCount > 0) {
+//            //如果存在大科室，则显示树结构
+//            hierachyClinicalSupport = true;
+//            initClinicalOrgTree();
+//        } else {
+//            hierachyClinicalSupport = false;
+            clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
+//        }
     }
 
     public void onParentAssetChange() {
@@ -886,13 +886,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectedObjectMap = selectedObjectMap;
     }
 
-    public boolean isHierachyClinicalSupport() {
-        return hierachyClinicalSupport;
-    }
-
-    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
-        this.hierachyClinicalSupport = hierachyClinicalSupport;
-    }
+//    public boolean isHierachyClinicalSupport() {
+//        return hierachyClinicalSupport;
+//    }
+//
+//    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
+//        this.hierachyClinicalSupport = hierachyClinicalSupport;
+//    }
 
     public TreeNode getClinicalOrgTree() {
         return clinicalOrgTree;
