@@ -126,8 +126,8 @@
                                 <p:column headerText="#{msg.assetDeptName}"  width="100">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetDeptName}"/><br/>
-                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.fileterAssetDeptOrgName}" 
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5" >
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" converter="orgInfoColumnFilterConverter"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                             <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
