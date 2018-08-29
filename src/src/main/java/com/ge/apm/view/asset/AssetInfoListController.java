@@ -446,10 +446,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (filterClinicalDeptOrg != null && filterClinicalDeptOrg.getId() != null) {
             if (filterClinicalDeptOrg.getOrgType() == 4) {
-                clinicalDeptOrgUidSet = new HashSet<>();
-                clinicalDeptOrgUidSet.add(filterClinicalDeptOrg.getUid());
-            } else {
-                //大科室
+//                clinicalDeptOrgUidSet = new HashSet<>();
+//                clinicalDeptOrgUidSet.add(filterClinicalDeptOrg.getUid());
+//            } else {
+//                //大科室
                 clinicalDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterClinicalDeptOrg.getUid());
 
             }
