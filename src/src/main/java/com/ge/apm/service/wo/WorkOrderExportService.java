@@ -121,7 +121,8 @@ public class WorkOrderExportService {
             AssetInfo assetInfo = assetInfoDao.findById(workOrder.getAssetId());
             V2_ServiceRequest serviceRequest = serviceRequestDao.findOne(workOrder.getSrId());
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
-            V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 3);
+            V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 2);
+            V2_WorkOrder_Step sendStep_2 = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 3);
             V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeAsc(workOrder.getId(), 4);
             V2_WorkOrder_Step workStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
@@ -150,7 +151,9 @@ public class WorkOrderExportService {
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
             if (sendStep != null) {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
-                workOrderMap.put("派工时间", formatDate(sendStep.getStartTime()));
+            }
+            if(sendStep_2 != null){
+                workOrderMap.put("派工时间", formatDate(sendStep_2.getStartTime()));
             }
             workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()) : "");
             workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()) : "");
