@@ -56,10 +56,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     //选定科室过滤
 //    private String fileterOrgName;
-    private String fileterAssetDeptOrgName;
+//    private String fileterAssetDeptOrgName;
     private OrgInfo filterClinicalDeptOrg;
+    private OrgInfo filterAssetDeptOrg;
 
     private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> assetDeptOrgUidSet;
     //复选的设备
     private Map<String, Boolean> selectedMap;
 
@@ -170,12 +172,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 
-        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
-            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
+//        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
+//            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
+//            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
+//        } else {
+//            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+//        }
 
 //        if (!Strings.isNullOrEmpty(fileterOrgName)) {
 //            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.EQ, fileterOrgName, "1*"));
@@ -183,11 +185,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
 //        }
 
+        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+
+
 
         if (null != selectSite) {
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
@@ -449,13 +459,17 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
-        if (event instanceof SelectEvent) {
-            fileterAssetDeptOrgName = (String) ((SelectEvent) event).getObject();
-            return;
-        } else {
-            if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterAssetDeptOrgName.equals(item.getName()))) {
-                fileterAssetDeptOrgName = "";
+        if (filterAssetDeptOrg != null && filterAssetDeptOrg.getId() != null) {
+            if (filterAssetDeptOrg.getOrgType() == 4) {
+                assetDeptOrgUidSet = new HashSet<>();
+                assetDeptOrgUidSet.add(filterAssetDeptOrg.getUid());
+            } else {
+                //大科室
+                assetDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterAssetDeptOrg.getUid());
+
             }
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
 
     }
@@ -563,13 +577,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //        this.fileterOrgName = fileterOrgName;
 //    }
 
-    public String getFileterAssetDeptOrgName() {
-        return fileterAssetDeptOrgName;
-    }
-
-    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
-        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
-    }
+//    public String getFileterAssetDeptOrgName() {
+//        return fileterAssetDeptOrgName;
+//    }
+//
+//    public void setFileterAssetDeptOrgName(String filterAssetDeptOrgName) {
+//        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
+//    }
 
     public OrgInfo getFilterClinicalDeptOrg() {
         return filterClinicalDeptOrg;
@@ -577,5 +591,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFilterClinicalDeptOrg(OrgInfo filterClinicalDeptOrg) {
         this.filterClinicalDeptOrg = filterClinicalDeptOrg;
+    }
+
+    public OrgInfo getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
+    }
+
+    public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
     }
 }
