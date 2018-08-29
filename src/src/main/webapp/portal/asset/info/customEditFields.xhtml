@@ -126,7 +126,7 @@
             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
-                        <p:ajax process="@this" event="select" update="@(.SiteUIDChange) :AssetInfoEditForm:buttonGroup :AssetInfoEditForm:assetDeptMultiple :AssetInfoEditForm:clinicalDeptMultiple"
+                        <p:ajax process="@this" event="select" update="@(.SiteUIDChange) :AssetInfoEditForm:buttonGroup"
                                 listener="#{assetInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                         <p:ajax process="@this" event="expand"/>
                         <p:ajax process="@this" event="collapse"/>
@@ -141,69 +141,28 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetDeptName')}" >
 
-        <h:panelGroup id="assetDeptMultiple">
-            <h:panelGroup rendered="#{!assetInfoEditController.hierachyClinicalSupport}" >
-                <label class="label">#{msg.assetDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required? '*':''}</span></label>
-                <p:autoComplete dropdown="true" value="#{assetInfoEditController.selectedObjectMap['assetDept']}"  readonly="#{!assetInfoEditController.needEdit('assetDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
-                                scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required}" requiredMessage="#{msg.assetDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange clinicalDeptNameChange">
-                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
-                    <!--<p:ajax listener="#{assetInfoEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>-->
-                </p:autoComplete>
-            </h:panelGroup>
-            <h:panelGroup rendered="#{assetInfoEditController.hierachyClinicalSupport}">
-                <label class="label">#{msg.assetDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required? '*':''}</span></label>
-                <p:inputText id="selectedAssetOrgName" value="#{assetInfoEditController.selectedObjectMap['assetDept']}" readonly="true" class="SiteUIDChange"/>
-                <p:commandButton id="btnAssetDeptOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id or !assetInfoEditController.needEdit('assetDeptName')}"/>
-                <p:overlayPanel id="popupAssetDeptPanel" widgetVar="varPanelAssetDeptOrg" for="btnAssetDeptOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
-                    <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="assetDeptOrgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.clinicalOrgTree}" var="node" selectionMode="single">
-                            <p:ajax process="@this" event="select" update="@(.SiteUIDChange) @(.clinicalDeptNameChange) :AssetInfoEditForm:buttonGroup :AssetInfoEditForm:assetDeptMultiple"
-                                    listener="#{assetInfoEditController.onSelectAssetDeptTreeNode}" oncomplete="PF('varPanelAssetDeptOrg').hide();"/>
-                            <p:ajax process="@this" event="expand"/>
-                            <p:ajax process="@this" event="collapse"/>
-
-                            <p:treeNode type="org">
-                                <h:outputText value="#{node}"/>
-                            </p:treeNode>
-                        </p:tree>
-                    </p:scrollPanel>
-                </p:overlayPanel>
-            </h:panelGroup>
+        <h:panelGroup>
+            <label class="label">#{msg.assetDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required? '*':''}</span></label>
+            <p:autoComplete dropdown="true" value="#{assetInfoEditController.selectedObjectMap['assetDept']}"  readonly="#{!assetInfoEditController.needEdit('assetDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required}" requiredMessage="#{msg.assetDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
+                <!--<p:ajax listener="#{assetInfoEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>-->
+            </p:autoComplete>
         </h:panelGroup>
 
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'clinicalDeptName')}" >
-        <h:panelGroup id="clinicalDeptMultiple">
-            <h:panelGroup rendered="#{!assetInfoEditController.hierachyClinicalSupport}" >
-                <label class="label">#{msg.clinicalDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required? '*':''}</span></label>
-                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"  readonly="#{!assetInfoEditController.needEdit('clinicalDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
-                                scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required}" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange clinicalDeptNameChange">
-                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
-                    <!--<p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />-->
-                </p:autoComplete>
-            </h:panelGroup>
-            <h:panelGroup rendered="#{assetInfoEditController.hierachyClinicalSupport}">
-                <label class="label">#{msg.clinicalDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required? '*':''}</span></label>
-                <p:inputText id="selectedClinicalOrgName" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}" readonly="true" class="SiteUIDChange"/>
-                <p:commandButton id="btnClinicalDeptOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id or !assetInfoEditController.needEdit('clinicalDeptName')}"/>
-                <p:overlayPanel id="popupClinicalDeptPanel" widgetVar="varPanelClinicalDeptOrg" for="btnClinicalDeptOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
-                    <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="clinicalDeptOrgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.clinicalOrgTree}" var="node" selectionMode="single">
-                            <p:ajax process="@this" event="select" update="@(.SiteUIDChange) @(.clinicalDeptNameChange) :AssetInfoEditForm:buttonGroup :AssetInfoEditForm:clinicalDeptMultiple"
-                                    listener="#{assetInfoEditController.onSelectClinicalDeptTreeNode}" oncomplete="PF('varPanelClinicalDeptOrg').hide();"/>
-                            <p:ajax process="@this" event="expand"/>
-                            <p:ajax process="@this" event="collapse"/>
-
-                            <p:treeNode type="org">
-                                <h:outputText value="#{node}"/>
-                            </p:treeNode>
-                        </p:tree>
-                    </p:scrollPanel>
-                </p:overlayPanel>
-            </h:panelGroup>
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required? '*':''}</span></label>
+            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"  readonly="#{!assetInfoEditController.needEdit('clinicalDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required}" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
+                <!--<p:ajax listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />-->
+            </p:autoComplete>
         </h:panelGroup>
+
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'clinicalOwnerName')}" >
         <h:panelGroup>
