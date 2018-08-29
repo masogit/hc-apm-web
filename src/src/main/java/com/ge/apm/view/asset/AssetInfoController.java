@@ -2025,7 +2025,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
-		generateVoucher(asset);
 	}
 	
 	public void prepareForceReturnAsset(AssetInfo asset) {
@@ -2040,7 +2039,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
-        generateVoucher(asset);
 	}
 
 	public void generateVoucher(AssetInfo asset) {
