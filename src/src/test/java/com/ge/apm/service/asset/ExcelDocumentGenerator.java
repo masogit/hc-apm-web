@@ -4,75 +4,34 @@ import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ExcelDocumentGenerator {
 
     public static String[] headerTitles = {
-            "设备编号",
-            "设备名称",
-            "设备别名",
-            "维修负责人",
-            "维修负责人2",
-            "维修负责人3",
-            "使用科室",
-            "制造商",
-            "品牌/制造商简称",
-            "设备标准名称",
-            "注册证号",
-            "供应商",
-            "医疗器械分类",
-            "医疗器械子分类",
-            "设备分类",
-            "功能等级",
-            "设备型号",
-            "制造商序列号",
-            "SystemID/厂商报修ID",
-            "2010国家编码",
-            "资产编号",
-            "条码",
-            "IT系统编号",
-            "采购价格",
-            "最终残值",
-            "折旧算法",
-            "使用年限",
-            "出厂日期",
-            "采购日期",
-            "到货日期",
-            "启用日期",
-            "质保日期",
-            "维保截止日期",
-            "报废日期",
-            "上次维护日期",
-            "上次计量日期",
-            "上次质检日期",
-            "维护商",
-            "维护商电话",
-            "二维码",
-            "安装位置编码",
-            "安装位置",
-            "使用责任人",
-            "备注",
-            "用途分类",
-            "资金来源",
-            "风险等级",
-            "计量等级",
-            "计量项目类别",
-            "是否急救设备",
-            "是否进口设备",
-            "使用状态"
+            "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "院区", "使用科室", "制造商", "品牌/制造商简称",
+            "设备标准名称", "注册证号", "供应商", "医疗器械分类", "医疗器械子分类", "设备分类", "功能等级", "维修类型", "设备型号", "制造商序列号",
+            "SystemID/厂商报修ID", "2010国家编码", "资产编号", "条码", "IT系统编号", "采购价格", "最终残值", "折旧算法", "使用年限",
+            "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期",
+            "维修商", "维修商电话", "二维码", "安装位置编码", "安装位置", "使用责任人", "备注",
+            "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "是否急救设备", "是否进口设备", "当前状态",
+            "是否PM", "是否盘点", "UUID"
     };
 
     public static String[] defaultRowData = {
-            "SBBH0001",
-            "TEST Asset",
-            "其他类",
-            "ZCBH0001",
-            "1111111111111111"
+            "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "院区", "使用科室", "制造商", "品牌/制造商简称",
+            "设备标准名称", "注册证号", "供应商", "医疗器械分类", "医疗器械子分类", "设备分类", "功能等级", "维修类型", "设备型号", "制造商序列号",
+            "SystemID/厂商报修ID", "2010国家编码", "资产编号", "条码", "IT系统编号", "采购价格", "最终残值", "折旧算法", "使用年限",
+            "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期",
+            "维修商", "维修商电话", "二维码", "安装位置编码", "安装位置", "使用责任人", "备注",
+            "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "是否急救设备", "是否进口设备", "当前状态",
+            "是否PM", "是否盘点", "UUID"
     };
 
     public static String orgHeaderTitle = "部门名称";
@@ -89,7 +48,7 @@ public class ExcelDocumentGenerator {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            Workbook workbook = new XSSFWorkbook();
+            Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
 
             //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
@@ -121,7 +80,7 @@ public class ExcelDocumentGenerator {
 
         try {
 
-            Workbook workbook = new XSSFWorkbook();
+            Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
 
             //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
@@ -145,6 +104,31 @@ public class ExcelDocumentGenerator {
         }
 
         return excelDoc;
+
+    }
+
+    public static InputStream getTestDocByInputStream(int rowCount) throws IOException {
+
+        Workbook workbook = new SXSSFWorkbook(new XSSFWorkbook());
+
+        //build asset list sheet
+        Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
+        buildHeaderRow(assetSheet);
+        buildDataRow(assetSheet, rowCount);
+
+        //build clinical department list sheet
+        Sheet orgSheet = workbook.createSheet(AssetFileImportService.SHEET_ORG);
+        buildClinicalDeptSheet(orgSheet);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        workbook.write(baos);
+        workbook.close();
+
+        byte[] bytes = baos.toByteArray();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+        return bais;
 
     }
 

@@ -10,11 +10,11 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="借还维护-借用"/>
+                <p:outputLabel class="pageTitle" value="借还维护"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="SharedAssetRequestEditForm">
-                    <p:fieldset legend="借用维护信息" style="margin-bottom:20px">
+                    <p:fieldset legend="借还维护信息" style="margin-bottom:20px">
                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestNewController.selected != null}">
 <!--                            <h:panelGroup>
                                 <label class='label'>#{msg.clinicalDeptName}</label>
@@ -62,7 +62,7 @@
                         <br/>
                      </p:fieldset>
                         
-                     <p:fieldset legend="借用维护明细信息" style="margin-bottom:20px">
+                     <p:fieldset legend="借还维护明细信息" style="margin-bottom:20px">
                              <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
                                            <label class='label'>批量输入</label>
@@ -86,21 +86,21 @@
                                         <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" action="#{sharedAssetRequestNewController.getAssetInfo(sharedAssetRequestNewController.selected.msgBeginTime,sharedAssetRequestNewController.selected.msgEndTime,sharedAssetRequestNewController.selected.msgAccepter,sharedAssetRequestNewController.selected.clinicalDeptUid)}" update="datalist,confirm"/>
                                     </h:panelGroup>
                              </p:panelGrid>
-                             <p:dataTable id="datalist" value="#{sharedAssetReqDetailController.lazyModel}" var="item" widgetVar="varDataList"
-                               selectionMode="single" selection="#{sharedAssetReqDetailController.selected}"
+                         <p:dataTable id="datalist" value="#{sharedAssetRequestNewController.selected.sardList}" var="item" widgetVar="varDataList"
+                               selectionMode="single" selection="#{sharedAssetRequestNewController.selectedSard}"
                                lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                rows="20" emptyMessage="#{msg.noRecordFound}"
-                               rowsPerPageTemplate="20,40,60,90">
+                               rowsPerPageTemplate="20,50,100,500">
 
                                <p:ajax event="rowSelect"  listener="#{sharedAssetRequestNewController.prepareEditSard}" update=":EditDlg,editButton" oncomplete="PF('EditDialog').show()"/>
                                <p:ajax event="filter" listener="#{sharedAssetReqDetailController.onFilter}" />
-                               <p:column headerText="设备编号" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                               <p:column headerText="设备编号" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{item.assetNumber}"/>
                                </p:column>
-                               <p:column headerText="调剂设备名称" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                               <p:column headerText="调剂设备名称" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{sharedAssetReqDetailController.getSwapName(item.sharedAssetTypeId)}"/>
                                </p:column>
 <!--                               <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
@@ -109,18 +109,12 @@
                                <p:column headerText="#{msg.state}" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
                                    <h:outputText value="#{item.state}"/>
                                </p:column>-->
-                               <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" filterBy="#{item.chargingBeginTime}" filterMatchMode="GTE">
-                                   <f:facet name="filter">
-                                       <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
-                                   </f:facet>
+                               <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}">
                                    <h:outputText value="#{item.chargingBeginTime}">
                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                    </h:outputText>
                                </p:column>
-                               <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}" filterBy="#{item.chargingEndTime}" filterMatchMode="GTE">
-                                   <f:facet name="filter">
-                                       <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
-                                   </f:facet>
+                               <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}">
                                    <h:outputText value="#{item.chargingEndTime}">
                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                    </h:outputText>
@@ -128,20 +122,22 @@
                                <p:column headerText="单价" sortBy="#{item.unitPrice}" >
                                     <h:outputText value="#{item.unitPrice}"/>
                                </p:column>
-                               <p:column headerText="计价方式" sortBy="#{item.chargingType}">
-                                    <h:outputText value="#{item.chargingType}"/>
-                               </p:column>
+                             <p:column headerText="计价方式" sortBy="#{item.chargingType}">
+                                 <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
+                             </p:column>
                                <p:column headerText="费用" sortBy="#{item.cost}" >
-                                    <h:outputText value="#{item.cost}"/>
+                                   <h:outputText value="#{item.cost}">
+                                       <f:convertNumber pattern="0.00"/>
+                                   </h:outputText>
                                </p:column>
                                <p:column headerText="备注" sortBy="#{item.remark}" >
                                     <h:outputText value="#{item.remark}"/>
                                </p:column>
-                               <p:column headerText="删除">
+<!--                               <p:column headerText="删除" >
                                 <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestNewController.deleteBy(item.id)}"  update="datalist">
                                       <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>
-                                </p:column>
+                                </p:column>-->
                                <f:facet name="{Toolbar}">
                                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                        <p:dataExporter type="xls" target="datalist" fileName="SharedAssetReqDetail_export"/>
@@ -154,7 +150,7 @@
                            </p:dataTable>
                      </p:fieldset>
 <!--                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestNewController.save}" value="#{msg.Save}" action="List?faces-redirect=true"/>-->
-                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认借用" rendered="#{sharedAssetRequestNewController.selected.state == null}" >
+                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认"  >
                        <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                      </p:commandButton>
 <!--                     <p:commandButton id="confirmcancel" validateClient="true" actionListener="#{sharedAssetRequestNewController.cancel()}" action="List?faces-redirect=true" value="取消借用" rendered="#{sharedAssetRequestNewController.selected.state == '1'}" >

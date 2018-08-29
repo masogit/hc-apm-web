@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+
+    <div class="ui-g clearfix">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="设备消息订阅"/>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id ="AssetSubscriberForm" style="margin-top: 20px;">
+
+                <p:dataTable  class="dt" id="dataList" value="#{assetSubscriberController.lazyModel}" var="item" widgetVar="varDataListAsset" selectionMode="single" selection="#{assetSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                              rows="20" emptyMessage="#{msg.noRecordFound}"
+                              rowsPerPageTemplate="20,50,100,500">
+                   <!-- <p:ajax event="rowSelect"  update="@(.editCls) @(.delCls)" listener="#{assetSubscriberController.onSelect()}"/>-->
+                    <p:ajax event="filter" listener="#{assetSubscriberController.onFilter}" />
+                    <p:column width="36"  exportable="false">
+                        <p:selectBooleanCheckbox  class="selectCheckBox" value="#{assetSubscriberController.selectedMap[item.id]}">
+                            <p:ajax update="@(.selectCheckBoxHeader) @(.delCls) @(.editCls)" listener="#{assetSubscriberController.onItemSelected}" />
+                        </p:selectBooleanCheckbox>
+                        <f:facet name="header">
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetSubscriberController.isSelectedCurrentPage}"  class="selectCheckBoxHeader">
+                                <p:ajax update="@(.selectCheckBox)  @(.delCls)" listener="#{assetSubscriberController.onSelectAllOfPage}"/>
+                            </p:selectBooleanCheckbox>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+                        <h:outputText value="#{item.subscriberUser.name}" />
+                    </p:column>
+
+                    <p:column headerText="设备" filterMatchMode="LIKE" filterBy="#{item.assetInfo.name}" sortBy="#{item.assetInfo.name}">
+                        <h:outputText value="#{item.assetInfo.name}" />
+                    </p:column>
+
+
+                    <p:column headerText="所属科室" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+                    </p:column>
+
+                    <p:column headerText="设备编号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
+                        <h:outputText value="#{item.assetInfo.departNum}"/>
+                    </p:column>
+
+                    <p:column headerText="设备型号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.functionType}" sortBy="#{item.assetInfo.functionType}">
+                        <h:outputText value="#{item.assetInfo.functionType}" />
+                    </p:column>
+
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetSubscriberController.prepareCreate}" update="scriTab:AssetSubscribEditDlg scriTab:AssetSubscribEditForm"  oncomplete="PF('AssetSubscribEditDialog').show()"/>
+                        <p:commandButton id="editButton" class ="editCls" actionListener="#{assetSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetSubscribEditDlg" oncomplete="PF('AssetSubscribEditDialog').show()" disabled="#{assetSubscriberController.multiSelect()}"/>
+
+                        <p:commandButton id="deleteButton" process="@this" class="btn delCls" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{assetSubscriberController.delete}" update="scriTab:AssetSubscriberForm:dataList" disabled="#{not assetSubscriberController.isChecked()}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="EditAssetSub.xhtml"/>
+        </div>
+    </div>
+
+</ui:composition>
+</html>

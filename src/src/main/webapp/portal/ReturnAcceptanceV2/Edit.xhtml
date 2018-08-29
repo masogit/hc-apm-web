@@ -20,7 +20,8 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"/>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"/>-->
                             <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
@@ -29,7 +30,7 @@
                             <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class='label'>虚拟电话网</label>
+                            <label class='label'>虚拟网电话</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}"/>
                             <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
@@ -53,7 +54,7 @@
                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                        rowsPerPageTemplate="20,40,60,90">   
+                        rowsPerPageTemplate="20,50,100,500">   
                 
                         <p:column headerText="设备名称" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.swapName}"/>
@@ -76,7 +77,7 @@
                     
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">   
+                    rowsPerPageTemplate="20,50,100,500">   
                 
                         <p:column headerText="设备名称" sortBy="#{item.assetName}" >
                             <h:outputText value="#{item.assetName}"/>
@@ -101,10 +102,20 @@
                 
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.AcceptR}"  update="IouEditForm" action="List?faces-redirect=true" value="确认受理" icon="ui-icon-check" />
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.ShelveR}" action="List?faces-redirect=true" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7}"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.AcceptR}"  update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
+                    <!--<p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.ShelveR}" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7}"/>-->
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
-                              
+                    <script>
+                        function openSwapTypeViewWindow3(xhr, status, args) {
+                            var url = args.url;
+                            if (url == "norespond") {
+
+                            } else {
+                                this.location.href = url;
+                            }
+                        }
+
+                    </script>
                 </h:panelGroup>
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>

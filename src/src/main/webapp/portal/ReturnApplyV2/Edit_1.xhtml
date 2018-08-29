@@ -16,15 +16,15 @@
             <div class="ui-g-12 card">
             
             <h:form id="IouEditForm">
-                
-                    
+
                 <p:fieldset legend="归还申请信息" style="margin-bottom:20px">
                         
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                             <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         
@@ -54,8 +54,7 @@
                     </p:panelGrid>
                         
                 </p:fieldset>
-              
-                
+
                 <p:fieldset legend="归还申请明细" style="margin-bottom:20px">
                     <p:dataTable id="datalistDetail" value="#{sharedAssetReqTypeController.lazyModel}" var="item" widgetVar="varDataListDetail"
                         selectionMode="single" selection="#{sharedAssetReqTypeController.selected}"
@@ -64,7 +63,7 @@
                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                        rowsPerPageTemplate="20,40,60,90" editable="true">   
+                        rowsPerPageTemplate="20,50,100,500" editable="true">   
                              
                         <p:ajax event="rowEdit" listener="#{sharedAssetReqTypeController.onCellEditRegist}" />
                         <p:ajax event="rowSelect" />
@@ -74,7 +73,7 @@
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
                         <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                            <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId)}"/>
+                            <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                         </p:column>
                         <p:column headerText="申请归还数" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.applyQty}"/>
@@ -92,52 +91,39 @@
                     
                     </p:dataTable>
                 </p:fieldset>
-                
-                
-                         
+
                 <p:fieldset  legend="归还设备" style="margin-bottom:20px"  rendered="#{sharedAssetRequestV2Controller.selected.state  eq 2 or sharedAssetRequestV2Controller.selected.state  eq 3   or sharedAssetRequestV2Controller.selected.state  eq 6}" >
                     <p:dataTable id="datalistOperation" value="#{sharedAssetReqDetailV2Controller.lazyModel}" var="item" widgetVar="varDataListdetail"
                     selectionMode="single" selection="#{sharedAssetReqDetailV2Controller.selected}"
                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                    
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">   
+                    rowsPerPageTemplate="20,50,100,500">   
                              
-                
                         <p:column headerText="设备名称" sortBy="#{item.assetName}" >
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        
-                        
+
                         <p:column headerText="设备编号" sortBy="#{item.assetNumber}" >
                             <h:outputText value="#{item.assetNumber}"/>
                         </p:column>
-                        
-                        
-                        
+
                         <p:column headerText="状态" sortBy="#{item.state}" >
                             <h:outputText value="借用中" rendered="#{item.state eq '0'}"></h:outputText> 
                             <h:outputText value="已归还" rendered="#{item.state eq '1'}"></h:outputText> 
-                        
                         </p:column>
                         
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}">
                             
                             <h:outputText value="#{item.chargingBeginTime}" />
                         </p:column>
-                    
-                    
-
-
                       <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="IouApplyDetail_export"/>
                         </p:commandButton>
-                     
-                    </f:facet>  
+                    </f:facet>
                     
                     </p:dataTable>
                 </p:fieldset>
@@ -150,7 +136,7 @@
                     
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90" >   
+                    rowsPerPageTemplate="20,50,100,500" >   
                 
                         <p:column headerText="设备名称" sortBy="#{item.assetName}">
                             <h:outputText value="#{item.assetName}"/>
@@ -164,6 +150,11 @@
                         </p:column>-->
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
                             <h:outputText value="#{item.chargingBeginTime}">
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}">
+                            <h:outputText value="#{item.chargingEndTime}">
                                 <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
@@ -184,27 +175,19 @@
                     </f:facet>  -->
                         <p:columnGroup type="footer">
                             <p:row>
-                                <p:column footerText="总费用: " colspan="3" style="text-align:right"/>
+                                <p:column footerText="总费用: " colspan="4" style="text-align:right"/>
                                 <p:column footerText="¥#{sharedAssetRequestV2Controller.total}" />
                             </p:row>
                         </p:columnGroup>
                     </p:dataTable>
                    
                 </p:fieldset>
-                
-                
-                
+
                 <h:panelGroup id="display">
                     <br/>
-                    
-                    
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmitR}" action="List?faces-redirect=true" value="确认归还" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 9}"/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refersR}" action="List?faces-redirect=true" value="取消归还" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7 or sharedAssetRequestV2Controller.selected.state  eq 8 or sharedAssetRequestV2Controller.selected.state  eq 11 }" />
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
-
-         
-                    
-                              
                 </h:panelGroup>
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>

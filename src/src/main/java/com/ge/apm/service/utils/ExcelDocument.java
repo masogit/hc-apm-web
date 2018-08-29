@@ -5,12 +5,16 @@
  */
 package com.ge.apm.service.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -21,7 +25,19 @@ import java.util.*;
  *
  * @author 212579464
  */
-public class ExcelDocument {
+public class ExcelDocument implements AutoCloseable{
+
+    @Override
+    public void close() {
+        if (workBook != null) {
+            try {
+                workBook.close();
+            } catch (IOException e) {
+                //nothing
+            }
+            workBook = null;
+        }
+    }
 
     public static enum ExcelType {
         XLS, XLSX
@@ -64,7 +80,6 @@ public class ExcelDocument {
         DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
         DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
 
-        input.close();
     }
 
     public int getLastRowNum(String sheetName, int startRowNum) {
@@ -109,21 +124,56 @@ public class ExcelDocument {
         Sheet sheet = workBook.getSheet(sheetName);
         return getKeyRow(sheet, keyRowNum);
     }
+    
+    public String[] getKeyRow(String sheetName, int keyRowNum,int maxColumn) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        return getKeyRow(sheet, keyRowNum,maxColumn);
+    }
 
     public String[] getKeyRow(int sheetIndex, int keyRowNum) {
         Sheet sheet = workBook.getSheetAt(sheetIndex);
         return getKeyRow(sheet, keyRowNum);
     }
+    
+    public void mergeCell(String sheetName,int firstRow, int lastRow, int firstCol, int lastCol){
+    	Sheet sheet = workBook.getSheet(sheetName);
+    	if(firstRow==lastRow && firstCol==lastCol){
+    		return;
+    	}
+    	sheet.addMergedRegion(new CellRangeAddress(firstRow-1,lastRow-1,firstCol-1,lastCol-1));
+    }
 
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
-        String[] result = new String[keyRow.getLastCellNum()];
+
+        List<String> resultList = new ArrayList<>();
+
         int firstCellNum = keyRow.getFirstCellNum();
         int lastCellNum = keyRow.getLastCellNum();
         for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
-            result[columnIndex] = keyRow.getCell(columnIndex).getStringCellValue();
+            Cell cell = keyRow.getCell(columnIndex);
+            if (cell == null) break;
+            resultList.add(cell.getStringCellValue());
         }
-        return result;
+        return resultList.toArray(new String[]{});
+    }
+    
+    public static String[] getKeyRow(Sheet sheet, int keyRowNum,int lastCellNum) {
+        Row keyRow = sheet.getRow(keyRowNum - 1);
+
+        List<String> resultList = new ArrayList<>();
+
+        int firstCellNum = keyRow.getFirstCellNum();
+        for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
+            Cell cell = keyRow.getCell(columnIndex);
+            if(cell!=null){
+            	resultList.add(cell.getStringCellValue());
+            }
+            else{
+            	resultList.add("");
+            }
+        }
+        return resultList.toArray(new String[]{});
     }
 
     public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
@@ -145,7 +195,7 @@ public class ExcelDocument {
                         Date date = cell.getDateCellValue();
                         dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
                     } else {
-                        dataMap.put(rowKey[cellIndex], new DecimalFormat("##############.#####").format(cell.getNumericCellValue()));
+                        dataMap.put(rowKey[cellIndex], new DecimalFormat("###################.#####").format(cell.getNumericCellValue()));
                     }
                     break;
                 case BOOLEAN:
@@ -441,10 +491,42 @@ public class ExcelDocument {
             writeCellData(sheetName, dataRowNum, index + 1, value);
         }
     }
+    public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, String newKey,Object value) {
+
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            if(key.equals(newKey)){
+            	writeCellData(sheetName, dataRowNum, index + 1, value);
+            	break;
+            }
+        }
+    }
+
+    public void writeRowData(int sheetIndex, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
+
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            Object value = data.get(key);
+
+            writeCellData(sheet, dataRowNum, index + 1, value);
+        }
+    }
 
     public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, Map<String, Object> data) {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         writeRowData(sheetName, rowKey, dataRowNum, data);
+    }
+    
+    public void writeRowData(String sheetName, Integer keyRowNum, Integer dataRowNum, String key,Object value) {
+        String[] rowKey = getKeyRow(sheetName, keyRowNum);
+        writeRowData(sheetName, rowKey, dataRowNum, key,value);
     }
 
     public void writeCellData(Cell cell, Object data) {
@@ -468,7 +550,7 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
-            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
             cell.setCellValue((Double) data);
         }
@@ -490,6 +572,55 @@ public class ExcelDocument {
         writeCellData(cell, value);
 
     }
+    
+    public int addPicture(InputStream input,int formatType) throws IOException{
+    	byte[]b=IOUtils.toByteArray(input);
+    	int pictureIndex=workBook.addPicture(b, formatType);
+    	input.close();
+    	return pictureIndex;
+    }
+    
+    public void drawPicture(int pictureIndex,String sheetName,int row,int col,double scaleX,double scaleY){
+    	Sheet sheet=workBook.getSheet(sheetName);
+    	Drawing drawing = sheet.createDrawingPatriarch();
+    	CreationHelper helper = workBook.getCreationHelper();
+    	ClientAnchor anchor = helper.createClientAnchor();
+    	anchor.setCol1(col-1);
+        anchor.setRow1(row-1);
+        Picture pict = drawing.createPicture(anchor, pictureIndex);
+        pict.resize(scaleX,scaleY);
+    }
+
+    public void writeCellData(Sheet sheet, int rowNum, int colNum, Object value) {
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
+    }
+
+    public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        cell.setCellFormula(formula);
+
+    }
 
     public void removeRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
@@ -500,8 +631,22 @@ public class ExcelDocument {
 
     }
 
+    public void clearRow(int rowNum) {
+        Sheet sheet = workBook.getSheetAt(0);
+        clearRow(sheet, rowNum);
+    }
+
     public void clearRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
+        clearRow(sheet, rowNum);
+    }
+
+    public void clearRow(int sheetIndex, int rowNum) {
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        clearRow(sheet, rowNum);
+    }
+
+    private void clearRow(Sheet sheet, int rowNum) {
         Row dataRow = sheet.getRow(rowNum - 1);
         if (dataRow != null) {
             int firstCellNum = dataRow.getFirstCellNum();
@@ -512,6 +657,15 @@ public class ExcelDocument {
                     cell.setCellType(CellType.BLANK);
                 }
             }
+        }
+    }
+
+    public void calculateFormula() {
+
+        if (documentType.equals(ExcelType.XLS)) {
+            HSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
+        } else if (documentType.equals(ExcelType.XLSX)) {
+            XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
         }
 
     }
@@ -544,14 +698,7 @@ public class ExcelDocument {
     }
 
     public void release() {
-        if (workBook != null) {
-            try {
-                workBook.close();
-            } catch (IOException e) {
-                //nothing
-            }
-            workBook = null;
-        }
+        close();
     }
 
     public Workbook getWorkBook() {

@@ -53,12 +53,6 @@ public class LoginController extends LoginService {
 
     private String plainPassword;
 
-    private HttpServletRequest request;
-
-    private HttpServletResponse response;
-
-    private Authentication authentication;
-
     private Boolean agree = false;
 
     private List<String> items;
@@ -122,12 +116,16 @@ public class LoginController extends LoginService {
     }
     
     @Override
-    protected void afterLogin() {
+    protected void afterLogin(String userName,String password) {
         // called after user logined.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.processAfterLogin();
         isSuccess = true;
         UserAccount user = userContextService.getLoginUser();
+
+        //in order to get token for deactive user
+        saveSession(user,userName,password);
+
         String saltedPassword = null;
         try {
             byte[] salt = Digests.decodeHex(user.getPwdSalt());
@@ -141,10 +139,38 @@ public class LoginController extends LoginService {
         if (user.getPassword().equals(saltedPassword)) {
             WebUtil.redirectTo("/resetPassword2.xhtml");
         } else {
-
             String str = userContextService.getUserDefaultHomePage();
-            System.out.println(str);
+            //System.out.println(str);
             WebUtil.redirectTo(str);
+        }
+    }
+
+    @Transactional
+    public void saveSession(UserAccount user,String userName,String password){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
+        UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
+        if(user.getIsActive()){
+            try{
+                String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
+                request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }else{
+            user.setIsActive(true);
+            dao.save(user);
+            try{
+                String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
+                request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            user.setIsActive(false);
+            dao.save(user);
         }
     }
     
@@ -153,7 +179,7 @@ public class LoginController extends LoginService {
         return userContextService.getUserDefaultHomePage();
     }
 
-    public void login(){
+/*    public void login(){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
@@ -199,9 +225,9 @@ public class LoginController extends LoginService {
             }
             afterActive(userName);
         }
-    }
+    }*/
 
-    public void afterActive(String userName){
+/*    public void afterActive(String userName){
         WebApplicationContext contextForWeb = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
         MicroServiceUtil msUtil = contextForWeb.getBean(MicroServiceUtil.class);
         saveToContext(this.request,this.response,this.authentication);
@@ -209,9 +235,9 @@ public class LoginController extends LoginService {
         updateLoginStatus(userName, true);
         String accessToken = msUtil.getAuthenticateByUserPassword(userName,plainPassword);
         request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
-    }
+    }*/
 
-    @Transactional
+/*    @Transactional
     public void confirmActivation(){
        UserAccount loginUser = UserContext.getCurrentLoginUser();//UserContextService.getCurrentUserAccount();
        UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
@@ -232,14 +258,14 @@ public class LoginController extends LoginService {
             tenant.setActiveTime(new Date());
             tenantInfoRepository.save(tenant);
             dao.updateMembersStatus(loginUser.getTenantUID());
-/*            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
+*//*            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
 
-            }*/
+            }*//*
         }
 
         afterActive(loginUser.getLoginName());
         WebUtil.addSuccessMessage("激活成功！");
-    }
+    }*/
 
 
 	public Boolean getIsSuccess() {
@@ -249,30 +275,6 @@ public class LoginController extends LoginService {
 	public void setIsSuccess(Boolean isSuccess) {
 		this.isSuccess = isSuccess;
 	}
-
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-
-    public HttpServletResponse getResponse() {
-        return response;
-    }
-
-    public void setResponse(HttpServletResponse response) {
-        this.response = response;
-    }
-
-    public Authentication getAuthentication() {
-        return authentication;
-    }
-
-    public void setAuthentication(Authentication authentication) {
-        this.authentication = authentication;
-    }
 
     public Boolean getAgree() {
         return agree;

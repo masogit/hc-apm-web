@@ -39,7 +39,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "asset_info_id")
     private String assetInfoId;//资产设备id
     
-    @Column(name = "shared_asset_type_id")
+    @Column(name = "shared_asset_type")
     private String sharedAssetTypeId;//调剂设备id 
     
     @Column(name = "asset_number")
@@ -76,7 +76,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "count_qty")
     private Integer countQty;//计费数量
     
-    @Column(name = "cost")
+    @Column(name = "cost",columnDefinition = "decimal(11,2)")
     private Double cost;//费用
     
     @Column(name = "accepter")
@@ -141,6 +141,23 @@ public class SharedAssetReqDetail implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyDate;//修改日期
     
+    @Transient
+    private String rentalTime;
+    
+    @Transient
+    private Double totalAmount;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "uid", unique = true, insertable = false, updatable = false)
+    private OrgInfo clinicalDept;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "borrow_id", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+    private SharedAssetRequest leaseRequest;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "return_id", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
+    private SharedAssetRequest returnRequest;
 
     public String getId() {
         return id;
@@ -591,5 +608,45 @@ public class SharedAssetReqDetail implements Serializable{
     public void setClinicalDeptForReturnName(String clinicalDeptForReturnName) {
         this.clinicalDeptForReturnName = clinicalDeptForReturnName;
     }
+
+	public String getRentalTime() {
+		return rentalTime;
+	}
+
+	public void setRentalTime(String rentalTime) {
+		this.rentalTime = rentalTime;
+	}
+
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public OrgInfo getClinicalDept() {
+		return clinicalDept;
+	}
+
+	public void setClinicalDept(OrgInfo clinicalDept) {
+		this.clinicalDept = clinicalDept;
+	}
+
+	public SharedAssetRequest getLeaseRequest() {
+		return leaseRequest;
+	}
+
+	public void setLeaseRequest(SharedAssetRequest leaseRequest) {
+		this.leaseRequest = leaseRequest;
+	}
+
+	public SharedAssetRequest getReturnRequest() {
+		return returnRequest;
+	}
+
+	public void setReturnRequest(SharedAssetRequest returnRequest) {
+		this.returnRequest = returnRequest;
+	}
 
 }

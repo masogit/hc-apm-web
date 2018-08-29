@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -67,6 +68,9 @@ public class InventoryIssue implements Serializable {
             joinColumns = @JoinColumn(name = "inventory_issue_id"),
             inverseJoinColumns = @JoinColumn(name = "inventory_check_list_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)))
     private Set<InventoryCheckList> inventoryCheckLists = new HashSet();
+    
+    @Transient
+    private String inventoryCheckListItems;
 
     public String getId() {
         return id;
@@ -155,4 +159,26 @@ public class InventoryIssue implements Serializable {
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
+
+	public String getInventoryCheckListItems() {
+		String temp="";
+		inventoryCheckListItems="";
+		if(inventoryCheckLists!=null && inventoryCheckLists.size()>0){
+			for(InventoryCheckList obj: inventoryCheckLists){
+				temp=obj.getItem();
+				if(StringUtils.isNotEmpty(temp)){
+					inventoryCheckListItems+=temp+",";
+				}
+			}
+			if(inventoryCheckListItems.length()>0){
+				inventoryCheckListItems=inventoryCheckListItems.substring(0, inventoryCheckListItems.length()-1);
+			}
+		}
+		return inventoryCheckListItems;
+	}
+
+	public void setInventoryCheckListItems(String inventoryCheckListItems) {
+		this.inventoryCheckListItems = inventoryCheckListItems;
+	}
+    
 }

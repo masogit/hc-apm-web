@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="PmOrderRuleItemSaveAsDlg" widgetVar="PmOrderRuleItemSaveAsDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
+        <p:dialog id="PmOrderRuleItemSaveAsDlg" widgetVar="PmOrderRuleItemSaveAsDlg" width="650" height="250" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
             <h:form id="PmOrderRuleItemSaveAsForm">
                 <h:panelGroup id="display" class="PmOrderRuleItemSaveAsDlg">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.pmRuleCheckItem != null}">
@@ -22,7 +22,8 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label>项目内容 ：</label>
-                            <p:inputText id="remark" value="#{pmOrderRuleController.pmRuleCheckItem.remark}" />
+                            <!--<p:inputText id="remark" value="#{pmOrderRuleController.pmRuleCheckItem.remark}" />-->
+                            <p:inputTextarea id="remark" value="#{pmOrderRuleController.pmRuleCheckItem.remark}" cols="80" />
                         </h:panelGroup>
                         <!--<h:panelGroup>
                             <label>项目类别 ：</label>

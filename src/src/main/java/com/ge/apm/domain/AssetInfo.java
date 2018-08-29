@@ -2,29 +2,50 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import com.alibaba.druid.util.StringUtils;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
 
 /**
- *
  * @author 212547631
  */
 @Entity
 @Table(name = "asset_info")
-public class AssetInfo implements Serializable {
+public class AssetInfo implements ChineseName,Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -32,10 +53,10 @@ public class AssetInfo implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+
     @Column(columnDefinition = "CHAR(32)")
     private String uid;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
@@ -46,6 +67,9 @@ public class AssetInfo implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+
+    @Column(name = "name_py_code")
+    private String namePyCode;
 
     @Size(max = 64)
     @Column(name = "alias_name")
@@ -63,6 +87,10 @@ public class AssetInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;//制造商
+    
+    @Size(max = 64)
+    @Column(name = "manufacture_id")
+    private String manufactureId;//制造商Id
 
     @Size(max = 64)
     @Column(name = "vendor")
@@ -70,6 +98,12 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "supplier_id")
     private Integer supplierId; //供应商Id =Supplier.id
+
+    @Transient
+    private String vendorTel;//供应商电话
+
+    @Column(name = "maitanance_id")
+    private String maitananceId;
 
     @Size(max = 64)
     @Column(name = "maitanance")
@@ -114,7 +148,7 @@ public class AssetInfo implements Serializable {
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//使用科室
 
-    @Column(name = "clinical_dept_uid" , columnDefinition = "CHAR(32)")
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
 
     @Size(max = 64)
@@ -124,8 +158,20 @@ public class AssetInfo implements Serializable {
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
 
+    @Column(name = "asset_group_secondary")
+    private Integer assetGroupSecondary;//设备分类2级
+
     @Column(name = "asset_dept_id")
     private Integer assetDeptId;//所属设备科
+
+    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
+    private String assetDeptUID;
+    
+    @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
+    private String assetType;
+    
+    @Column(name = "asset_CDFA_type") // CDFA设备类型
+    private String assetCDFAType;
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -175,7 +221,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
-    private Date lastPmDate;//上次维护日期
+    private Date lastPmDate;//上次保养日期
 
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
@@ -183,7 +229,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
-    private Date lastQaDate;//上次质检日期
+    private Date lastQaDate;//上次巡检日期
 
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)
@@ -211,7 +257,7 @@ public class AssetInfo implements Serializable {
     @Size(max = 256)
     @Column(name = "qr_code")
     private String qrCode;//二维码
-    
+
     @Column(name = "asset_owner_id2")
     private Integer assetOwnerId2;//维修负责人2
 
@@ -235,7 +281,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "dispatch_mode")
     private Integer dispatchMode;//派工模式
-    
+
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "purchase_price")
     private Double purchasePrice;//采购价格(元)
@@ -293,7 +339,7 @@ public class AssetInfo implements Serializable {
     //医疗器械子分类
     @Column(name = "asset_code68")
     private Integer assetCode68;
-    
+
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;//备注
@@ -306,8 +352,8 @@ public class AssetInfo implements Serializable {
     @Basic(optional = false)
     @NotNull
     private Integer hospitalId;
-    
-    @JoinColumn(insertable=false,updatable=false, name = "hospital_id", referencedColumnName = "id")
+
+    @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo hospital;
@@ -323,7 +369,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
     @Column(name = "asset_category")
     private Integer assetCategory;
@@ -335,6 +381,10 @@ public class AssetInfo implements Serializable {
     //资金来源[1:科研,2:教学,3:医疗,4:干保]
     @Column(name = "capital_source")
     private Integer capitalSource;
+    
+  //资金来源[1:自有资金,2:合资公司资金]
+    @Column(name = "capital_source2")
+    private Integer capitalSource2;
 
     //风险等级[1:1类A,2:1类B,3:2类,4:3类]
     @Column(name = "risk_grade")
@@ -392,6 +442,12 @@ public class AssetInfo implements Serializable {
     @Column(name = "repair_form")
     private Integer repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
 
+    @Column(name = "is_pm")
+    private Boolean isPm = Boolean.TRUE;//是否保养
+
+    @Column(name = "is_checked")
+    private Boolean isChecked = Boolean.TRUE;//是否盘点
+
 //    public Integer getAssetCategory() {
 //        return assetCategory;
 //    }
@@ -415,10 +471,10 @@ public class AssetInfo implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
-    
-    @Column(name="ib_status")
+
+    @Column(name = "ib_status")
     private Integer ibStatus;
-    
+
     @Column(name = "ge_device_type")
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
 
@@ -429,7 +485,49 @@ public class AssetInfo implements Serializable {
     @Column(name = "swap_type_state")//调剂设备状态（"0"：正常，"1"：借用中）
     private String swapTypeState;
 
-    public Integer getAssetUsage() {
+    @Column(name = "manufacture_py_code")
+    private String manufacturePyCode;
+
+    @Column(name = "clinical_dept_name_py_code")
+    private String clinicalDeptNamePyCode;
+
+    @Transient
+    private int lineNum;
+
+    @Transient
+    private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
+    
+    @Transient
+    private SharedAssetReqDetail sharedAssetReqDetail;
+
+    @Transient
+    private SharedAssetType sharedAssetType;
+    
+    public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
+		return sharedAssetReqDetailList;
+	}
+
+	public void setSharedAssetReqDetailList(Set<SharedAssetReqDetail> sharedAssetReqDetailList) {
+		this.sharedAssetReqDetailList = sharedAssetReqDetailList;
+	}
+
+	public SharedAssetReqDetail getSharedAssetReqDetail() {
+		return sharedAssetReqDetail;
+	}
+
+	public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
+		this.sharedAssetReqDetail = sharedAssetReqDetail;
+	}
+	
+	public SharedAssetType getSharedAssetType() {
+		return sharedAssetType;
+	}
+
+	public void setSharedAssetType(SharedAssetType sharedAssetType) {
+		this.sharedAssetType = sharedAssetType;
+	}
+
+	public Integer getAssetUsage() {
         return assetUsage;
     }
 
@@ -445,7 +543,15 @@ public class AssetInfo implements Serializable {
         this.capitalSource = capitalSource;
     }
 
-    public Integer getRiskGrade() {
+    public Integer getCapitalSource2() {
+		return capitalSource2;
+	}
+
+	public void setCapitalSource2(Integer capitalSource2) {
+		this.capitalSource2 = capitalSource2;
+	}
+
+	public Integer getRiskGrade() {
         return riskGrade;
     }
 
@@ -617,17 +723,17 @@ public class AssetInfo implements Serializable {
 
     @PrePersist
     public void initializeUid() {
-        if (uid==null) {
+        if (uid == null) {
             uid = UUID.randomUUID().toString().replace("-", "");
         }
-        if(isDeleted == null){
+        if (isDeleted == null) {
             isDeleted = false;
         }
-        if (supplierId==null) {
-            supplierId = -1;
-        }
+//        if (supplierId == null) {
+//            supplierId = -1;
+//        }
     }
-    
+
     public String getUid() {
         return uid;
     }
@@ -666,6 +772,10 @@ public class AssetInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        if (!StringUtils.isEmpty(name)) {
+            this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getAliasName() {
@@ -722,6 +832,10 @@ public class AssetInfo implements Serializable {
 
     public void setManufacture(String manufacture) {
         this.manufacture = manufacture;
+        if (!StringUtils.isEmpty(manufacture)) {
+            this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getVendor() {
@@ -730,6 +844,14 @@ public class AssetInfo implements Serializable {
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
+    }
+
+    public String getVendorTel() {
+        return vendorTel;
+    }
+
+    public void setVendorTel(String vendorTel) {
+        this.vendorTel = vendorTel;
     }
 
     public String getMaitanance() {
@@ -748,9 +870,13 @@ public class AssetInfo implements Serializable {
         this.maitananceTel = maitananceTel;
     }
 
-    public String getNationalStandardCode() { return nationalStandardCode; }
+    public String getNationalStandardCode() {
+        return nationalStandardCode;
+    }
 
-    public void setNationalStandardCode(String nationalStandardCode) { this.nationalStandardCode = nationalStandardCode; }
+    public void setNationalStandardCode(String nationalStandardCode) {
+        this.nationalStandardCode = nationalStandardCode;
+    }
 
     public String getSerialNum() {
         return serialNum;
@@ -822,6 +948,9 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
+        if (!StringUtils.isEmpty(clinicalDeptName)) {
+            this.clinicalDeptNamePyCode = PinyinUtil.getShortPinyin(clinicalDeptName).toLowerCase();
+        }
     }
 
     public Integer getAssetGroup() {
@@ -993,16 +1122,16 @@ public class AssetInfo implements Serializable {
     }
 
     public Double getLifecycleInYear() {
-    	if(lifecycle == null){
-    		return null;
-    	}
-        return new Double(lifecycle)/12.0;
+        if (lifecycle == null) {
+            return null;
+        }
+        return new Double(lifecycle) / 12.0;
     }
 
     public void setLifecycleInYear(Double lifecycle) {
-    	if(lifecycle == null){
+        if (lifecycle == null) {
             this.lifecycle = null;
-    	} else {
+        } else {
             this.lifecycle = new Double(lifecycle * 12).intValue();
         }
 
@@ -1327,7 +1456,103 @@ public class AssetInfo implements Serializable {
     public void setGeDeviceType(Integer geDeviceType) {
         this.geDeviceType = geDeviceType;
     }
-    
+
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
+    }
+
+    public String getManufacturePyCode() {
+        return manufacturePyCode;
+    }
+
+    public void setManufacturePyCode(String manufacturePyCode) {
+        this.manufacturePyCode = manufacturePyCode;
+    }
+
+    public String getClinicalDeptNamePyCode() {
+        return clinicalDeptNamePyCode;
+    }
+
+    public void setClinicalDeptNamePyCode(String clinicalDeptNamePyCode) {
+        this.clinicalDeptNamePyCode = clinicalDeptNamePyCode;
+    }
+
+    public String getAssetDeptUID() {
+        return assetDeptUID;
+    }
+
+    public void setAssetDeptUID(String assetDeptUID) {
+        this.assetDeptUID = assetDeptUID;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
+    }
+
+    public String getMaitananceId() {
+        return maitananceId;
+    }
+
+    public void setMaitananceId(String maitananceId) {
+        this.maitananceId = maitananceId;
+    }
+
+   public Boolean getIsPm() {
+        return isPm;
+    }
+
+    public void setIsPm(Boolean isPm) {
+        this.isPm = isPm;
+    }
+
+    public Boolean getIsChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(Boolean isChecked) {
+        this.isChecked = isChecked;
+    }
+
+    public String getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(String manufactureId) {
+        this.manufactureId = manufactureId;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetCDFAType() {
+        return assetCDFAType;
+    }
+
+    public void setAssetCDFAType(String assetCDFAType) {
+        this.assetCDFAType = assetCDFAType;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1353,4 +1578,15 @@ public class AssetInfo implements Serializable {
         return name;
     }
     
+    public String getPinYin() {
+		return getNamePyCode();
+	}
+
+    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
+    	this.name=name;
+    	this.uid=uid;
+    	this.departNum=departNum;
+    	this.serialNum=serialNum;
+    	this.functionType=functionType;
+    }
 }

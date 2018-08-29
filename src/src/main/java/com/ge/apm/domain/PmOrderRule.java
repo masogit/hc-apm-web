@@ -1,6 +1,10 @@
 package com.ge.apm.domain;
 
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
+
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
@@ -53,6 +57,15 @@ public class PmOrderRule implements Serializable{
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
+
+	@Column(name="institution_uid",columnDefinition = "CHAR(32)")
+	private String institutionUID;
+
+	@Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+	private String hospitalUID;
+
+	@Column(name="site_uid",columnDefinition = "CHAR(32)")
+	private String siteUID;
     
     @Column(name = "status")
     private Integer status;//0、待审核 1、已审核
@@ -65,6 +78,12 @@ public class PmOrderRule implements Serializable{
     
     @Column(name = "performance_report")
 	private String performanceReport;//性能报告
+
+	@Column(name = "report_storage_id")
+	private String reportStorageId; // 报告模版
+
+	@Column(name = "report_template_name")
+	private String reportTemplateName; // 报告模版名称
     
     @Column(name = "remark")
     private String remark;//备注
@@ -202,6 +221,42 @@ public class PmOrderRule implements Serializable{
 	public void setCheckListUID(String checkListUID) {
 		this.checkListUID = checkListUID;
 	}
+	public String getReportStorageId() {
+		return reportStorageId;
+	}
+	public void setReportStorageId(String reportStorageId) {
+		this.reportStorageId = reportStorageId;
+	}
+	public String getReportTemplateName() {
+		return reportTemplateName;
+	}
+	public void setReportTemplateName(String reportTemplateName) {
+		this.reportTemplateName = reportTemplateName;
+	}
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
+	}
 	
     @Override
     public int hashCode() {
@@ -210,7 +265,21 @@ public class PmOrderRule implements Serializable{
         return hash;
     }
 
-    @Override
+/*	@Override
+	public int compare(Object o1, Object o2) {
+		try {
+			PmOrderRule r1 = (PmOrderRule)o1;
+			PmOrderRule r2 = (PmOrderRule)o2;
+			String name1 = PinyinHelper.convertToPinyinString(r1.getName(), "", PinyinFormat.WITHOUT_TONE);
+			String name2 = PinyinHelper.convertToPinyinString(r2.getName(), "", PinyinFormat.WITHOUT_TONE);
+			return name1.compareTo(name2);
+		}catch(Exception e) {
+			return 0;
+		}
+	}*/
+
+
+	@Override
     public boolean equals(Object object) {
         if (!(object instanceof PmOrderRule)) {
             return false;
@@ -221,4 +290,5 @@ public class PmOrderRule implements Serializable{
         }
         return true;
     }
+
 }

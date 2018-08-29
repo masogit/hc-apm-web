@@ -16,6 +16,7 @@ import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CompareImportService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
@@ -39,6 +40,7 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -63,9 +65,11 @@ public class CompareImportController {
     private UserAccountRepository userDao;
 
     private QrCodeService qrCodeService;
-    
+
     private AssetInfoRepository assetDao;
-    
+
+    private ConfigService configService;
+
     private byte[] fileContents;
 
     @PostConstruct
@@ -75,6 +79,7 @@ public class CompareImportController {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -550,25 +555,33 @@ public class CompareImportController {
 //                }
 
         }
-        
-        if(canUpdate){
-            if(assetDao.save(selectedAsset)==null){
+
+        if (canUpdate) {
+            if (assetDao.save(selectedAsset) == null) {
                 WebUtil.addErrorMessage("更新失败");
-            }else{
+            } else {
                 WebUtil.addSuccessMessage("更新成功");
             }
-        }else{
+        } else {
             WebUtil.addErrorMessage("不能更新");
             selectedAsset = assetDao.findByUid(selectedAsset.getUid());
         }
     }
-    
-    public void instorage(ArrivalListItem item){
-        if(ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())){
+
+    @Transactional
+    public void instorage(ArrivalListItem item) {
+        if (ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())) {
             item.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
+            if (configService.isNeedAssetApprover(item.getArrivalList().getSiteUID())) {
+                //待审核
+                AssetInfo instorageAsset = assetDao.findByUid(item.getAssetUID());
+                instorageAsset.setUsageStatus(3);
+                assetDao.save(instorageAsset);
+            }
             ciService.updateArrivalListItem(item);
+
             WebUtil.addSuccessMessage("入库成功");
-        }else{
+        } else {
             WebUtil.addErrorMessage("不能更新");
         }
     }
@@ -603,10 +616,10 @@ public class CompareImportController {
     }
 
     public Boolean compareDouble(String keyOfMap, Double value) {
-        if (Strings.isNullOrEmpty((String) selectedItem.get(keyOfMap))){
-            return value==null || value==0.0;
+        if (Strings.isNullOrEmpty((String) selectedItem.get(keyOfMap))) {
+            return value == null || value == 0.0;
         }
-        if(null ==value){
+        if (null == value) {
             return false;
         }
         try {

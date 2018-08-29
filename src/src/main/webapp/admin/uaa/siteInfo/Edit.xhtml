@@ -57,11 +57,11 @@
                                 <f:selectItem itemLabel="tw" itemValue="tw"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="true">
+                        <!--<h:panelGroup rendered="true">
                             <label class="label">#{msg.manhourPrice}*</label>
                             <p:inputText id="manhourPrice" value="#{tenantInfoController.selected.manhourPrice}" />
                         </h:panelGroup>
-                        <!--<h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="#{msg.isEnabled}" value="#{tenantInfoController.selected.isEnabled}" />
                         </h:panelGroup>-->
@@ -70,6 +70,14 @@
                             <p:selectOneMenu value="#{tenantInfoController.selected.type}" >
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">版本</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selectedVersion}" >
+                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
+                                <p:ajax listener="#{tenantInfoController.onVersionChange}"></p:ajax>
+                                <f:selectItems value="#{tenantInfoController.listVersions}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>

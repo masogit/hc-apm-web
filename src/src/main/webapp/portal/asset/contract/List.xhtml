@@ -21,7 +21,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{assetContractController.onSelectedChange}" update="createButton deleteButton :AssetContractEditForm"/>
                         <p:ajax event="filter" listener="#{assetContractController.onFilter}" oncomplete="rc();"/>
@@ -36,7 +36,8 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItems value="#{assetContractController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <!--<f:selectItems value="#{fieldMsg.getFieldValueList('contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>

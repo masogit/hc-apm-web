@@ -24,6 +24,7 @@
                     <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=7"  disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                     <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
                     <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=9"  disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
+                    <p:commandButton value="全部"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" rendered="true" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
 <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
                     <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
                     <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
@@ -37,7 +38,7 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                              rows="10" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="10,20,30,90" >
+                             rowsPerPageTemplate="20,50,100,500" >
 
                     <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
                     <p:ajax event="filter" listener="#{workOrderMgrController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
@@ -57,7 +58,7 @@
                     <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
-                    <p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                     </p:column>
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
@@ -91,35 +92,35 @@
                         <h:outputText value="#{item.currentPersonName}"/>
                     </p:column>-->
                     <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                        <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.comment)}"/>
+                        <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.Cancel}" rendered="#{workOrderMgrController.queryIndex==1}">
+                    <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
                         <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                     </p:column>
-                    <p:column headerText="#{msg.dispatchWorkOrder}" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
                         <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                     </p:column>
-                    <p:column headerText="#{msg.takeOrtrans}" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
                         <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                         <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                     </p:column>
-                    <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
                         <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                         <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
 
                         <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
                     </p:column>
-                    <p:column headerText="审批" rendered="#{workOrderMgrController.queryIndex==10}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
                         <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                     </p:column>
-                    <p:column headerText="#{msg.Acknowledge}" rendered="#{workOrderMgrController.queryIndex==5}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
                         <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
                     </p:column>
-                    <p:column headerText="#{msg.feedback}" rendered="#{workOrderMgrController.queryIndex eq 6}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
                         <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
                     </p:column>
-                    <p:column headerText="#{msg.closeWo}" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}">
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                         <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                     </p:column>
 
@@ -138,11 +139,15 @@
             <ui:include src="newOrderDialog.xhtml"/>
             <ui:include src="toCloseDlg.xhtml"/>
             <ui:include src="approveDlg.xhtml"/>
+            <ui:include src="moreAccDialogPrice.xhtml"/>
+
+
+
         </div>
 
         <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
             <h:form id="dispatchDialogForm" >
-                <h:panelGroup id="display" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
+                <h:panelGroup id="display4" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.WorkOrderAssignee}*</label>
@@ -150,12 +155,12 @@
                                 <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">#{msg.intExtType}*</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
@@ -243,7 +248,7 @@
         </p:dialog>
 
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 if (requestAssetUid != "") {
                     createSR();
@@ -254,6 +259,8 @@
                     PF('ActiveDlg').show();
                 }
             }
+
+
         </script>
 
 

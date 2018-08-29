@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public class TableResultReportService {
 
-    static final Double MINIMUM = .00001;
+    public static final Double MINIMUM = .00001;
 
     /**
      *
@@ -32,31 +32,19 @@ public class TableResultReportService {
             group.getItems().stream().filter(item -> !Strings.isNullOrEmpty(item.getResKey()) && item.getExp() != null).forEach(item -> {
                 switch (item.getExp().get("rule")) {
                     case "RangeRule": {
-                        String res = getResultForRangeRule(tableValue, item);
-                        if (res != null) {
-                            resMap.put(item.getResKey(), res);
-                        }
+                        resMap.put(item.getResKey(), getResultForRangeRule(tableValue, item));
                         break;
                     }
                     case "ScopeRule": {
-                        String res = getResultForScopeRule(tableValue, item);
-                        if (res != null) {
-                            resMap.put(item.getResKey(), res);
-                        }
+                        resMap.put(item.getResKey(), getResultForScopeRule(tableValue, item));
                         break;
                     }
                     case "VerifyRule": {
-                        String res = getResultForVerifyRule(tableValue, item);
-                        if (res != null) {
-                            resMap.put(item.getResKey(), res);
-                        }
+                        resMap.put(item.getResKey(), getResultForVerifyRule(tableValue, item));
                         break;
                     }
                     case "DeltaRule": {
-                        String res = getResultForDeltaVerifyRule(tableValue, item);
-                        if (res != null) {
-                            resMap.put(item.getResKey(), res);
-                        }
+                        resMap.put(item.getResKey(), getResultForDeltaVerifyRule(tableValue, item));
                         break;
                     }
                 }
@@ -67,7 +55,9 @@ public class TableResultReportService {
 
     /**
      * 计算相对误差是否超限 合格: 偏差下限范围*FS<|Y-X|/X\<偏差上限范围 误差下限范围*FS<|Y-Z|/Z<误差上限范围
-     * @param tableValue
+     * @
+     *
+     * param tableValue
      * @param tableItem
      * @return
      */
@@ -83,11 +73,11 @@ public class TableResultReportService {
         Double delta = x == 0 ? y - x : (y - x) / x;
         Double mu = z == 0 ? y - z : (y - z) / z;
 
-        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0) / 100 ;
-        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100 ;
+        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0) / 100;
+        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100;
 
-        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0) / 100 ;
-        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0) / 100 ;
+        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0) / 100;
+        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0) / 100;
 
         if (delta < deltaMin || delta > deltaMax) {
             return getReturnValue((String) tableItem.getExp().get("resIdentify"), "DeltaException");
@@ -142,7 +132,7 @@ public class TableResultReportService {
                 norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("minPercent"))).orElse(0.0) / 100));
         Double max = Math.max(norm + Optional.ofNullable(toDouble(tableItem.getExp().get("max"))).orElse(0.0),
                 norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("maxPercent"))).orElse(0.0) / 100));
-        
+
         if (value < min + ("GT".equals(tableItem.getExp().get("minCompare")) ? MINIMUM : 0 - MINIMUM)) {
             return getReturnValue((String) tableItem.getExp().get("resIdentify"), "Low");
         }

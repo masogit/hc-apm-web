@@ -8,7 +8,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Logger;
 import org.primefaces.expression.SearchExpressionResolver;
-import org.primefaces.expression.SearchExpressionResolverFactory;
 
 /**
  *
@@ -21,7 +20,6 @@ public class IdFuzzyResolver implements SearchExpressionResolver {
     
     private static final Map<String, UIComponent> ID_MAP = new HashMap<String, UIComponent>();
 
-    @Override
     public UIComponent resolveComponent(FacesContext context, UIComponent source, UIComponent last, String expression) {
         UIComponent result = ID_MAP.get(expression);
         if(result!=null ) return result;
@@ -74,6 +72,11 @@ public class IdFuzzyResolver implements SearchExpressionResolver {
     }
 
     public static void registerResolver() {
-        SearchExpressionResolverFactory.registerResolver(PREFIX, new IdFuzzyResolver());
+        //SearchExpressionResolverFactory.registerResolver(PREFIX, new IdFuzzyResolver());
+    }
+
+    @Override
+    public UIComponent resolveComponent(FacesContext fc, UIComponent uic, UIComponent uic1, String string, int i) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

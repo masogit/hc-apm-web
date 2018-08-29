@@ -8,30 +8,50 @@
 
 <ui:composition>
 
-    <p:dialog id="ActiveDlg" widgetVar="ActiveDlg" width="450" height="220" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="欢迎登陆APM管理平台！" closable="false">
+    <p:dialog id="ActiveDlg" widgetVar="ActiveDlg" width="650" height="480" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="欢迎登陆APM管理平台！" closable="false">
         <h:form id = "ActiveForm">
-            <p:fieldset id="changePassword" legend="用户首次登陆激活" style="margin-top:20px;">
+            <p:fieldset id="changePassword" legend="用户首次登陆激活" >
+                <!--<p:inputTextarea readonly="true" cols="10" rows="5">
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+
+                </p:inputTextarea>-->
+                <!--<h:outputText value="#{userAccountController.protocol}"/>-->
+                <p:scrollPanel style="width:580px;height:300px" mode="native">
+                    <!--<p>#{userAccountController.protocol}</p>-->
+                    <p>为明确双方的权利和义务， 用户启用本服务前，须仔细阅读本协议服务条款。</p>
+                    <p>当您勾选选择“已阅读相关用户协议并确认激活账号”，即表示您已经达成本协议，承诺并遵守本协议的规定， 正式激活用户账号，同意并接受全部服务条款及条件。</p>
+                    <p>用户在使用本服务时，应当遵守《中华人民共和国宪法》、《中华人民共和国刑法》、《中华人民共和国民法通则》、《中华人民共和国合同法》、《中华人民共和国著作权法》、《中华人民共和国电信条例》、《互联网信息服务管理办法》、《互联网电子公告服务管理规定》、《计算机信息网络国际互联网安全保护管理办法》等相关规定。用户不得利用达观科技服务产品从事违反法律法规、政策以及侵犯他人合法权益的行为，包括但不限于下列行为：</p>
+                    <p> 1.1 利用服务产品发表、传送、传播、储存反对宪法所确定的基本原则的、危害国家安全、国家统一、社会稳定的、煽动民族仇恨、民族歧视、破坏民族团结的内容，或侮辱诽谤、色情、暴力、引起他人不安及任何违反国家法律法规政策的内容或者设置含有上述内容的网名、角色名。</p>
+                    <p> 1.2 利用本服务发表、传送、传播、储存侵害他人知识产权、商业机密、肖像权、隐私权等合法权利或其他道德上令人反感的内容。</p>
+                    <p> 1.3 进行任何危害计算机网络安全的行为，包括但不限于：使用未经许可的数据或进入未经许可的服务器/帐户; 未经允许进入公众计算机网络或者他人计算机系统并删除、修改、增加存储信息; 未经许可，企图探查、扫描、测试本“软件”系统或网络的弱点或其它实施破坏网络安全的行为;企图干涉、破坏本“软件”系统或网站的正常运行，故意传播恶意程序或病毒以及其他破坏干扰正常网络信息服务的行为;伪造TCP/IP数据包名称或部分名称;自行或利用其他软件对达观科技提供产品进行反向破解等违法行为。</p>
+                    <p> 1.4 进行任何诸如发布广告、推广信息、销售商品的行为，或者进行任何非法的侵害达观科技利益的行为。</p>
+                    <p> 1.5 进行其他任何违法以及侵犯其他个人、公司、社会团体、组织的合法权益的行为或者法律、行政法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他行为</p>
+                </p:scrollPanel>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <!--<h3 style="margin-top:0px"></h3>   <a href='http://www.baidu.com'>用户协议</a>   -->
-                    <p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>
+                    <!--<p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>-->
                     <p:selectManyCheckbox id="basic" value="#{userAccountController.items}">
                         <p:ajax update="ActiveForm" listener="#{userAccountController.updateAgree()}"/>
                         <f:selectItem itemLabel="我已阅读相关用户协议并确认激活账号" itemValue="1" />
                     </p:selectManyCheckbox>
                 </p:panelGrid>
             </p:fieldset>
-
             <p:commandButton value="激活" actionListener="#{userAccountController.confirmActivation()}" icon="ui-icon-home"
                              oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!userAccountController.agree}"/>
             &nbsp;&nbsp;
-            <!--action="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"-->
             <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
         </h:form>
 
     </p:dialog>
 
     <script>
-        window.onload = function () {
+        activeFunction = function () {
             var isActive = "#{userContextService.isActive()}";
             if(isActive == '1'){
                 PF('ActiveDlg').show();

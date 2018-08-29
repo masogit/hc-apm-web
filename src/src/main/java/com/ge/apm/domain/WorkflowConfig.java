@@ -1,13 +1,8 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.Date;
+import javax.persistence.*;
 
 /**
  *
@@ -17,6 +12,8 @@ import javax.persistence.Table;
 @Table(name = "workflow_config")
 public class WorkflowConfig implements Serializable {
 
+    public enum AssetCodeConfigType { DFQ , DF} 
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -94,9 +91,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name="asset_approver" ,columnDefinition = "CHAR(32)")
     private String assetApprover;
     
+    //设备编码组合  [null:不需要, DFQ:资产编号,设备编号,二维码 ,DF:资产编号,设备编号]
+    @Column(name="asset_code_config")
+    private String assetCodeConfig;
+    
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
-
 
     
     @Column(name = "warranty_remind_times")
@@ -105,8 +105,13 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "dept_for_shared_asset",columnDefinition = "CHAR(32)")
     private String deptForSharedAsset;
 
+    @Column(name = "wo_manhour_price")
+    private Double woManhourPrice;
 
     /****for pm *****/
+    @Column(name = "pm_manhour_price")
+    private Double pmManhourPrice;
+
     @Column(name="pm_simplify")
     private Boolean pmSimplify; // 简化保养
 
@@ -139,6 +144,149 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "need_instorage_check")
     private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
+
+    @Column(name = "is_tel_report")
+    private Boolean isTelReport; // 电话报修
+
+    @Column(name = "tel_report_start")
+    private String telReportStart;
+    @Column(name = "tel_report_end")
+    private String telReportEnd;
+
+    @Column(name = "rating_required")
+    private Boolean ratingRequired;// 必须评价
+
+    @Column(name = "hour_required")
+    private Boolean hourRequired = true;// 工时必填
+
+
+
+    /***
+     * 资产编码配置
+     */
+
+    @Column(name = "generate_method")
+    private Integer generateMethod;//资产编码生成方式 1、国标码+设备数 2、
+
+    @Column(name="format")
+    private String format;//初始流水号
+
+    @Column(name = "asset_seria_num_level")
+    private Integer assetSeriaNumLevel;//资产编码level 租户：4 集团：3，医院：2 院区：1
+
+    private String prefix;//国标码前缀
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    /***
+     * 紧急工单配置
+     */
+
+    @Column(name = "emergency_timeout_dispatch")
+    private Integer emergencyTimeoutDispatch;
+
+    @Column(name = "emergency_timeout_accept")
+    private Integer emergencyTimeoutAccept;
+
+    @Column(name = "emergency_timeout_close")
+    private Integer emergencyTimeoutClose;
+
+    @Column(name="emergency_max_message_count")
+    private Integer emergencyMaxMessageCount;//推送消息的次数上限
+
+    /***
+     * 计量提醒配置
+     */
+    @Column(name="measuring_remind_days")
+    private Integer measuringRemindDays;//计量提前通知时间，单位：天
+
+    @Column(name = "measuring_reminder_times")
+    private Integer measuringReminderTimes;//提醒次数
+
+
+    @Column(name="parts_need_sign")
+    private Boolean partsNeedSign; //备件审核是否需要签名
+
+    @Column(name="ack_need_sign")
+    private Boolean ackNeedSign; //验收是否需要签名
+
+    public Boolean getPartsNeedSign() {
+        return partsNeedSign;
+    }
+
+    public void setPartsNeedSign(Boolean partsNeedSign) {
+        this.partsNeedSign = partsNeedSign;
+    }
+
+    public Boolean getAckNeedSign() {
+        return ackNeedSign;
+    }
+
+    public void setAckNeedSign(Boolean ackNeedSign) {
+        this.ackNeedSign = ackNeedSign;
+    }
+
+    public Integer getEmergencyTimeoutDispatch() {
+        return emergencyTimeoutDispatch;
+    }
+
+    public void setEmergencyTimeoutDispatch(Integer emergencyTimeoutDispatch) {
+        this.emergencyTimeoutDispatch = emergencyTimeoutDispatch;
+    }
+
+    public Integer getEmergencyTimeoutAccept() {
+        return emergencyTimeoutAccept;
+    }
+
+    public void setEmergencyTimeoutAccept(Integer emergencyTimeoutAccept) {
+        this.emergencyTimeoutAccept = emergencyTimeoutAccept;
+    }
+
+    public Integer getEmergencyTimeoutClose() {
+        return emergencyTimeoutClose;
+    }
+
+    public void setEmergencyTimeoutClose(Integer emergencyTimeoutClose) {
+        this.emergencyTimeoutClose = emergencyTimeoutClose;
+    }
+
+    public Integer getEmergencyMaxMessageCount() {
+        return emergencyMaxMessageCount;
+    }
+
+    public void setEmergencyMaxMessageCount(Integer emergencyMaxMessageCount) {
+        this.emergencyMaxMessageCount = emergencyMaxMessageCount;
+    }
+
+    public Integer getAssetSeriaNumLevel() {
+        return assetSeriaNumLevel;
+    }
+
+    public void setAssetSeriaNumLevel(Integer assetSeriaNumLevel) {
+        this.assetSeriaNumLevel = assetSeriaNumLevel;
+    }
+
+    public Integer getGenerateMethod() {
+        return generateMethod;
+    }
+
+    public void setGenerateMethod(Integer generateMethod) {
+        this.generateMethod = generateMethod;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
 
     public Integer getPmReminderTimes() {
         return pmReminderTimes;
@@ -407,15 +555,10 @@ public class WorkflowConfig implements Serializable {
     }
 
     public Integer getTimeoutDispatch() {
-    	
-    	
         return timeoutDispatch;
     }
 
     public void setTimeoutDispatch(Integer timeoutDispatch) {
-    	
-    	System.out.println("***************"+timeoutDispatch);
-    			
         this.timeoutDispatch = timeoutDispatch;
     }
 
@@ -489,6 +632,86 @@ public class WorkflowConfig implements Serializable {
 
     public void setNeedInstorageCheck(Boolean needInstorageCheck) {
         this.needInstorageCheck = needInstorageCheck;
+    }
+
+    public String getAssetCodeConfig() {
+        return assetCodeConfig;
+    }
+
+    public void setAssetCodeConfig(String assetCodeConfig) {
+        this.assetCodeConfig = assetCodeConfig;
+    }
+
+    public Double getWoManhourPrice() {
+        return woManhourPrice;
+    }
+
+    public void setWoManhourPrice(Double woManhourPrice) {
+        this.woManhourPrice = woManhourPrice;
+    }
+
+    public Double getPmManhourPrice() {
+        return pmManhourPrice;
+    }
+
+    public void setPmManhourPrice(Double pmManhourPrice) {
+        this.pmManhourPrice = pmManhourPrice;
+    }
+
+    public Boolean getIsTelReport() {
+        return isTelReport;
+    }
+
+    public void setIsTelReport(Boolean telReport) {
+        isTelReport = telReport;
+    }
+
+    public String getTelReportStart() {
+        return telReportStart;
+    }
+
+    public void setTelReportStart(String telReportStart) {
+        this.telReportStart = telReportStart;
+    }
+
+    public String getTelReportEnd() {
+        return telReportEnd;
+    }
+
+    public void setTelReportEnd(String telReportEnd) {
+        this.telReportEnd = telReportEnd;
+    }
+
+    public Integer getMeasuringRemindDays() {
+        return measuringRemindDays;
+    }
+
+    public void setMeasuringRemindDays(Integer measuringRemindDays) {
+        this.measuringRemindDays = measuringRemindDays;
+    }
+
+    public Integer getMeasuringReminderTimes() {
+        return measuringReminderTimes;
+    }
+
+    public void setMeasuringReminderTimes(Integer measuringReminderTimes) {
+        this.measuringReminderTimes = measuringReminderTimes;
+    }
+
+    public Boolean getRatingRequired() {
+        return ratingRequired;
+    }
+
+    public void setRatingRequired(Boolean ratingRequired) {
+        this.ratingRequired = ratingRequired;
+    }
+
+    public Boolean getHourRequired() {
+        return hourRequired;
+    }
+
+    public void setHourRequired(Boolean hourRequired) {
+        this.hourRequired = hourRequired;
     }
 
     @Override

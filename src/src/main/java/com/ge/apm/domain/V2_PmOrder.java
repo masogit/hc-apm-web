@@ -65,7 +65,8 @@ public class V2_PmOrder  implements Serializable {
     @Size(max = 256)
     @Column(name = "comments")
     private String comments;
-
+    @Column(name="pm_type")
+    private Integer pmType;
     @Column(name = "asset_id")
     @Basic(optional = false)
     @NotNull
@@ -94,6 +95,8 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
+    @Column(name="int_ext_type")
+    private Integer intExtType;
 
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -167,8 +170,7 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="clinical_dept_id")
     private String clinicalDeptId;
     @Column(name="quality_checking")
-    private String qualityChecking;
-
+    private String qualityChecking; //默认是合格
     @Column(name="approval_status")
     private String approvalStatus;
 
@@ -533,5 +535,21 @@ public class V2_PmOrder  implements Serializable {
 
     public void setSimplify(Boolean simplify) {
         this.simplify = simplify;
+    }
+
+    public Integer getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(Integer pmType) {
+        this.pmType = pmType;
+    }
+
+    public Integer getIntExtType() {
+        return intExtType;
+    }
+
+    public void setIntExtType(Integer intExtType) {
+        this.intExtType = intExtType;
     }
 }

@@ -43,7 +43,7 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
 
                     <!-- <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/> -->
                     <!-- <p:ajax event="filter" listener="#{tubeDataController.onFilter}" update="createButton editButton viewButton deleteButton"/> -->
@@ -89,7 +89,7 @@
                             <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
                         </f:facet>
                         <h:outputText value="#{item.inputDate}">
-                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                            <f:convertDateTime pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="预计报警时间">

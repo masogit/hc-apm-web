@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="SupplierEditDlg" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{supplierController.CRUDActionName} #{msg.Supplier}">
+        <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
             <h:form id="SupplierEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
@@ -36,14 +36,49 @@
                             <label class="label">#{msg.tel}</label>
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
+                        <h:panelGroup class="test1">
+                            <label  class="label">类型*</label>
+                                <h:panelGrid columns="3">
+                                        <h:panelGrid columns="3">
+                                        <h:panelGroup>
+                                            <h:panelGrid columns="2">
+                                                <p:selectBooleanCheckbox id="wxs" value="#{supplierController.maintainerT}"/>
+                                                <p:outputLabel  value="维修商 " />
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    <h:panelGroup>
+                                        <h:panelGrid columns="2">
+                                            <p:selectBooleanCheckbox   value="#{supplierController.manufacturerT}"/>
+                                            <p:outputLabel value="制造商 " />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                            <h:panelGroup >
+                                                <h:panelGrid columns="2">
+                                                    <p:selectBooleanCheckbox  value="#{supplierController.supplierT}"/>
+                                                    <p:outputLabel value="供应商 " />
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                </h:panelGrid>
+                        </h:panelGroup>
                     </p:panelGrid>
+
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{supplierController.save}" value="#{msg.Save}" update=":SupplierListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
-                    &nbsp;&nbsp;
+                    <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
+        <script>
+function  handleToSubmit(xhr,status,args) {
+    if(args.spType){
+        $('#SupplierEditForm\\:wxs').addClass("ui-state-error");
+    }else{
+       // handleSubmit(args, 'SupplierEditDlg');
+        PF('SupplierEditDialog').hide();
+    }
+}
 
+        </script>
     </ui:composition>
 </html>

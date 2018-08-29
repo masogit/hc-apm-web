@@ -58,8 +58,8 @@ function GetDonutChartRow(label, value) {
 
 const TWO_DAY = 48 * 3600
 function HumanizeDurationLabel(value) {
-  let unit = value > TWO_DAY ? 'd' : 'h'
-  return humanize(value, unit)
+  let units = value > TWO_DAY ? ['d', 'h'] : ['h', 'm']
+  return humanize(value, units, true)
 }
 
 function GetDistance(ball, gross) {
@@ -371,6 +371,13 @@ export class App extends Component<void, Props, void> {
   componentWillMount() {
     this.initDistributionMax()
     this.props.init()
+  }
+
+  componentWillUnmount() {
+    EventBus.removeEventListener('process-analysis-brief-data', this.mountBriefData )
+    EventBus.removeEventListener('process-analysis-detail-data', this.mountDetailData )
+    EventBus.removeEventListener('process-analysis-gross-data', this.mountGrossData )
+    EventBus.removeEventListener('process-analysis-phase-data', this.mountPhaseData )
   }
 
   componentWillReceiveProps(nextProps) {

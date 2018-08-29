@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <!--<ui:define name="head">
+        <h:outputStylesheet name="css/woSchedule.css"/>
+        <h:outputScript name="js/woSchedule.js"/>
+    </ui:define>-->
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="排班管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form>
+                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建排班" title="批量创建排班" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()"/>
+                    <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="班次时间设置" title="班次时间设置" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()"/>
+                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="调剂中心值班设置" title="调剂中心值班设置" update=":sharedAssetConfigDlg" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()"/>
+                </h:form>
+                <h:form id="workScheduleForm">
+                    <p:growl widgetVar="messages" id="messages" showDetail="true" />
+
+                    <h:panelGrid columnClasses="value">
+                        <h3>排班日历</h3>
+                        <p:schedule id="workSchedule" value="#{workScheduleController.eventModel}" widgetVar="workSchedule" timeZone="GMT+8" centerHeaderTemplate="title" rightHeaderTemplate="" tooltip="true">
+                            <p:ajax event="dateSelect" listener="#{workScheduleController.onDateSelect}" update="workScheduleDialog" oncomplete="PF('workScheduleDialog').show();" />
+                            <p:ajax event="eventSelect" listener="#{workScheduleController.onEventSelect}" update="workScheduleDialog" oncomplete="PF('workScheduleDialog').show();" />
+                            <!--<p:ajax event="eventMove" listener="#{workScheduleController.onEventMove}" update="messages" />
+                            <p:ajax event="eventResize" listener="#{workScheduleController.onEventResize}" update="messages" />-->
+                        </p:schedule>
+                    </h:panelGrid>
+
+                    <p:dialog id="workScheduleDialog" widgetVar="workScheduleDialog" header="排班明细" showEffect="clip" hideEffect="clip">
+
+                        <h:panelGroup>
+                            <label class="label">日期*</label>
+                            <p:calendar id="date_new" rendered="#{!workScheduleController.disableScheduleDate}" value="#{workScheduleController.scheduleDate}" timeZone="GMT+8" pattern="yyyy-MM-dd" mode="inline" navigator="true">
+                                <p:ajax event="dateSelect" listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                            </p:calendar>
+                            <p:calendar id="date_edit" rendered="#{workScheduleController.disableScheduleDate}" value="#{workScheduleController.scheduleDate}" disabled="true" timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+                        </h:panelGroup>
+                        <br/>
+                        <br/>
+                        <h:panelGroup>
+                            <label class="label">人员*</label>
+                            <p:selectOneMenu value="#{workScheduleController.userUID}" style="width:125px" required="true" requiredMessage="人员不能为空">
+                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{workScheduleController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <br/>
+                        <br/>
+                        <h:panelGroup>
+                            <label class="label">班次*</label>
+                            <!--<p:selectOneRadio value="#{workScheduleController.scheduleDateStage}" disabled="#{workScheduleController.disableScheduleDateStage}" required="true" requiredMessage="班次不能为空">
+                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <f:selectItem itemLabel="全天" itemValue="ALL" />
+                                <f:selectItem itemLabel="早班" itemValue="AM" />
+                                <f:selectItem itemLabel="晚班" itemValue="PM" />
+                            </p:selectOneRadio>-->
+                            <p:selectOneMenu value="#{workScheduleController.scheduleDateStage}" style="width:125px" required="true" disabled="#{workScheduleController.disableScheduleDateStage}" requiredMessage="班次不能为空">
+                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="全天" itemValue="ALL" />
+                                <f:selectItem itemLabel="早班" itemValue="AM" />
+                                <f:selectItem itemLabel="晚班" itemValue="PM" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <br/>
+                        <br/>
+                        <p:commandButton id="addButton" value="保存" validateClient="true" actionListener="#{workScheduleController.addSchedule}" update="messages" disabled="#{workScheduleController.disableSave}" oncomplete="PF('workSchedule').update();PF('workScheduleDialog').hide();" />
+                        <p:commandButton id="deleteButton" value="删除" actionListener="#{workScheduleController.deleteSchedule}" disabled="#{workScheduleController.disableDelete}" oncomplete="PF('workSchedule').update();PF('workScheduleDialog').hide();" >
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+
+                    </p:dialog>
+                </h:form>
+
+                <p:dialog header="批量排班结果" id="workScheduleResultDlg" widgetVar="workScheduleResultDialog" minHeight="40" appendTo="@this" modal="true" closable="false">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">未创建的排班记录（和休假冲突）</label>
+                            <h:outputText value="#{workScheduleController.resultInfo}" style="color: red"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:commandButton validateClient="true" value="确认" action="#{workScheduleController.resultConfig}" icon="ui-icon-check"/>
+                </p:dialog>
+
+                <ui:include src="workScheduleBatch.xhtml"/>
+                <ui:include src="workScheduleStageConfig.xhtml"/>
+                <ui:include src="sharedAssetConfig.xhtml"/>
+            </div>
+        </div>
+
+        <script>
+            function batchAfter(xhr, status, args){
+                if(args.flag == "Success"){
+                    location.href = "workSchedule.xhtml";
+                }else if(args.flag == "PartialSuccess"){
+                    PF("workScheduleBatchDialog").hide();
+                    PF("workScheduleResultDialog").show();
+                }
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>

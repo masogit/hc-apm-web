@@ -91,15 +91,17 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         queryBiomedGroup.setTenantUID(currentUser.getTenantUID());
         queryAsset.setTenantUID(currentUser.getTenantUID());
 
-        if(currentUser.getOrgLevel() == 1){
-            queryBiomedGroup.setInstitutionUID(currentUser.getInstitutionUID());
-            queryAsset.setInstitutionUID(currentUser.getInstitutionUID());
-        }else if(currentUser.getOrgLevel() == 2){
-            queryBiomedGroup.setHospitalUID(currentUser.getHospitalUID());
-            queryAsset.setHospitalUID(currentUser.getHospitalUID());
-        }else{
-            queryBiomedGroup.setSiteUID(currentUser.getSiteUID());
-            queryAsset.setSiteUID(currentUser.getSiteUID());
+        if(currentUser.getOrgLevel() != 0) {
+            if (currentUser.getOrgLevel() == 1) {
+                queryBiomedGroup.setInstitutionUID(currentUser.getInstitutionUID());
+                queryAsset.setInstitutionUID(currentUser.getInstitutionUID());
+            } else if (currentUser.getOrgLevel() == 2) {
+                queryBiomedGroup.setHospitalUID(currentUser.getHospitalUID());
+                queryAsset.setHospitalUID(currentUser.getHospitalUID());
+            } else {
+                queryBiomedGroup.setSiteUID(currentUser.getSiteUID());
+                queryAsset.setSiteUID(currentUser.getSiteUID());
+            }
         }
 
         this.getQueryBiomedGroupList();

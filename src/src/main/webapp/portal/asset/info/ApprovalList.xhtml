@@ -21,7 +21,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax  event="rowSelect" update="viewButton" oncomplete="selectRow();"/>
                         <!--<p:ajax  event="rowSelect" update="viewButton" listener="#{assetInfoApprovalController.onSelectAsset()}"  onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />-->
@@ -76,7 +76,7 @@
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton rendered="true" id="viewButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审核" disabled="#{empty assetInfoApprovalController.selected}" action="#{assetInfoApprovalController.checkItem()}" />
+                            <p:commandButton rendered="false" id="viewButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审核" disabled="#{empty assetInfoApprovalController.selected}" action="#{assetInfoApprovalController.checkItem()}" />
 
                         </f:facet>
                     </p:dataTable>

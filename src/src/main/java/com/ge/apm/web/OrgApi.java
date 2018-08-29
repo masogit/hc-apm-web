@@ -69,4 +69,16 @@ public class OrgApi {
       .getOrElse(ResponseEntity.badRequest().body(ImmutableMap.of("error", "on getting login user profile")));
   }
 
+  @RequestMapping(path = "/allOrg", method = RequestMethod.GET)
+  @ResponseBody
+  public Object requestAllOrg(HttpServletRequest request) {
+    return orgService.getAllOrg(UserContext.getCurrentLoginUser().getTenantUID());
+  }
+
+  @RequestMapping(path = "/dept", method = RequestMethod.GET)
+  @ResponseBody
+  public Object requestDept(HttpServletRequest request, Integer orgId) {
+    return orgService.getDept(orgId);
+  }
+
 }

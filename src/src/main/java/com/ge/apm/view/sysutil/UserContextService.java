@@ -35,6 +35,16 @@ public class UserContextService implements Serializable {
 
     private UserAccount userAccount = null;
 
+    public static void setLoginUser(UserAccount user) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        userContextService.userAccount = user;
+        userContextService.isDispatcher = null;
+        userContextService.isPmDispatcher = null;
+        userContextService.isAssetApprover = null;
+        userContextService.needAssetApproval = null;
+        userContextService.needInstorageCheck = null;
+    }
+
     public void processAfterLogin() {
         getLoginUser();
     }
@@ -44,7 +54,8 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserLoginName() {
-        return UserContext.getUsername();
+        if (userAccount == null) return "";
+        else return userAccount.getLoginName();
     }
 
     public String getUserName() {
@@ -82,7 +93,10 @@ public class UserContextService implements Serializable {
     }
 
     public static List<String> getRoles() {
-        return UserContext.getRoles();
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount user = userContextService.getLoginUser();
+        
+        return user.getRoleNames();
     }
 
     public boolean hasRole(String role) {
@@ -90,10 +104,13 @@ public class UserContextService implements Serializable {
     }
 
     public boolean hasAnyRole(String roleList) {
+        UserAccount user = getLoginUser();
+        List<String> userRoles = user.getRoleNames();
+
         String[] roles = roleList.split(",");
         for (String role : roles) {
             role = role.trim();
-            boolean roleAllowed = UserContextService.checkRole(role);
+            boolean roleAllowed = userRoles.contains(role);
             if (roleAllowed) {
                 return true;
             }
@@ -103,10 +120,13 @@ public class UserContextService implements Serializable {
     }
 
     public boolean hasNotAnyRole(String roleList) {
+        UserAccount user = getLoginUser();
+        List<String> userRoles = user.getRoleNames();
+
         String[] roles = roleList.split(",");
         for (String role : roles) {
             role = role.trim();
-            boolean roleAllowed = UserContext.getRoles().contains(role);
+            boolean roleAllowed = userRoles.contains(role);
             if (roleAllowed) {
                 return false;
             }
@@ -116,7 +136,10 @@ public class UserContextService implements Serializable {
     }
 
     public static boolean checkRole(String role) {
-        if (UserContextService.isSuperAdmin()) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount user = userContextService.getLoginUser();
+
+        if (user.getIsSuperAdmin()) {
             return true;
         } else if ("SuperAdmin".equals(role)) {
             return false;
@@ -125,26 +148,35 @@ public class UserContextService implements Serializable {
 //        if (UserContextService.isSiteAdmin()) return true;
 //        else if ("SiteAdmin".equals(role)) return false;
         if ("SiteAdmin".equals(role)) {
-            return UserContextService.isSiteAdmin();
+            return user.getIsSiteAdmin();
         }
 
-        if (UserContextService.isLocalAdmin()) {
+        if (user.getIsLocalAdmin()) {
             return true;
         } else if ("LocalAdmin".equals(role)) {
             return false;
         }
-        return UserContext.getRoles().contains(role);
+        return user.getRoleNames().contains(role);
     }
 
     public UserAccount getLoginUser() {
         if (userAccount == null) {
             String userName = getUserLoginName();
+            if ("".equals(userName)) {
+                HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+                userName = UserContext.getUsername(request);
+                if(UserContext.ANONYMOUS_USER.equals(userName))
+                    userName = null;
+            }
             if (userName == null) {
                 return null; // user is not logined
             }
+            
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
-            userAccount = dao.getByLoginName(getUserLoginName());
-        } else {
+            userAccount = dao.getByLoginName(userName);
+        }
+/*
+        else {
             // check if user has switch account by WeChat Client
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             String userName = UserContext.getUsername(request);
@@ -153,18 +185,42 @@ public class UserContextService implements Serializable {
                 userAccount = WebUtil.getUserAccountFromRequest();
             }
         }
+*/
 
         return userAccount;
     }
     
+    private Boolean flagIsAgentTenant = null;
     public boolean isAgentTenant() {
-    		UserAccount user = getLoginUser();
-    		TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-    		TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-    		if(tenant.getType() != null && tenant.getType() == 1) {
-    			return true;
-    		}
-    		return false;
+        if(flagIsAgentTenant!=null) return flagIsAgentTenant;
+            
+        UserAccount user = getLoginUser();
+        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        if(tenant.getType() != null && tenant.getType() == 1) {
+                flagIsAgentTenant = true;
+        }
+        else
+            flagIsAgentTenant = false;
+        
+        return flagIsAgentTenant;
+    }
+
+    WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+
+    private Boolean flagIsHospitalUser = null;
+    public boolean isHospitalUser(){
+        if(flagIsHospitalUser!=null) return flagIsHospitalUser;
+
+        flagIsHospitalUser = true;
+        UserAccount loginUser = getLoginUser();
+        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
+            //判断医院级别是否有调剂中心
+            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
+            if(list.size() == 0) flagIsHospitalUser = false;
+        }
+        
+        return flagIsHospitalUser;
     }
 
     public int getLoginUserId() {
@@ -369,9 +425,12 @@ public class UserContextService implements Serializable {
     }
 
     public static boolean isOnlyLocalITAdmin() {
-
-        if(UserContext.getRoles().contains("LocalITAdmin")){
-            if(UserContext.getRoles().contains("ITAdmin") || isSuperAdmin()){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount user = userContextService.getLoginUser();
+        List<String> userRoles = user.getRoleNames();
+        
+        if(userRoles.contains("LocalITAdmin")){
+            if(userRoles.contains("ITAdmin") || isSuperAdmin()){
                 return false;
             }else{
                 return true;
@@ -379,7 +438,16 @@ public class UserContextService implements Serializable {
         }else{
             return false;
         }
-
     }
 
+    public static boolean isInsulate() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount user = userContextService.getLoginUser();
+        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        if(tenant.getInsulate() != null && tenant.getInsulate()) {
+            return true;
+        }
+        return false;
+    }
 }

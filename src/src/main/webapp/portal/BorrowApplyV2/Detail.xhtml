@@ -346,7 +346,7 @@
                                     </p:inputText>
                                 </h:panelGroup>
 								<h:panelGroup >
-	                                <label class="label">是否对质保到期进行提醒</label>
+	                                <label class="label">#{msg.isWarrantyNotice}</label>
 		                            <p:selectOneRadio value="#{assetInfoController.selected.warranty}" disabled="true">
 	                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                    		<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
@@ -550,14 +550,14 @@
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
                         <!--<p:barcode value="#{assetInfoController.selected.qrCode}" type="qr" height="200" format="png"/>-->
-                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode)}" />
+                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode,assetInfoController.selected.siteUID)}" />
                     </p:tab>
                 </p:tabView>
             </h:form>
 
-            <!--<h:panelGroup >-->
+            <h:panelGroup >
                 <!--<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>-->
-            <!--</h:panelGroup>-->
+            </h:panelGroup>
         </div>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
@@ -575,7 +575,7 @@
             });
         </script>
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 $(".jqplot-table-legend").css("display", "none");
             }
             function showthis(pic) {

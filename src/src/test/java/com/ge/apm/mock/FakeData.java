@@ -2,11 +2,8 @@ package com.ge.apm.mock;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetFileImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 import java.security.NoSuchAlgorithmException;
@@ -46,6 +43,8 @@ public class FakeData {
 
     @Autowired
     I18nMessageRepository i18nDao;
+
+    public static final String DEFAULT_SITE_NAME = "Site A";
 
 //    @Autowired
 //    PlatformTransactionManager transactionManager;
@@ -124,10 +123,10 @@ public class FakeData {
             if (orgHospitalA == null) throw new IllegalStateException("Hospital A not found!");
         }
 
-        String siteA = "Site A";
-        OrgInfo orgSiteA = orgInfoDao.findByTenantUIDAndName(tenantInfo.getUid(), siteA);
+//        String siteA = "Site A";
+        OrgInfo orgSiteA = orgInfoDao.findByTenantUIDAndName(tenantInfo.getUid(), DEFAULT_SITE_NAME);
         if (orgSiteA == null) {
-            orgSiteA = buildOrgSite(siteA, orgHospitalA);
+            orgSiteA = buildOrgSite(DEFAULT_SITE_NAME, orgHospitalA);
             orgInfoDao.save(orgSiteA);
             orgSiteA = orgInfoDao.getByUid(orgSiteA.getUid());
 
@@ -238,7 +237,7 @@ public class FakeData {
         OrgInfo orgInfo = new OrgInfo();
         orgInfo.initializeUid();
 
-        orgInfo.setOrgLevel(4);
+        orgInfo.setOrgLevel(3);
         orgInfo.setOrgType(4);
         orgInfo.setName(name);
 
@@ -261,24 +260,24 @@ public class FakeData {
         }
         OrgInfo orgInfo = orgInfoList.get(0);
 
-        UserAccount userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+        UserAccount userAccount = userAccountDao.findFirstByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
         if (userAccount == null) {
             userAccount = buildUserAccount("自动化测试人员", "tel-1", orgInfo);
             userAccountDao.save(userAccount);
 
-            userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+            userAccount = userAccountDao.findFirstByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
             assert userAccount != null;
 
         }
         this.userAccount = userAccount;
 
-        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员2");
+        userAccount = userAccountDao.findFirstByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员2");
         if (userAccount == null) {
             userAccount = buildUserAccount("自动化测试人员2", "tel-2", orgInfo);
             userAccountDao.save(userAccount);
         }
 
-        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员3");
+        userAccount = userAccountDao.findFirstByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员3");
         if (userAccount == null) {
             userAccount = buildUserAccount("自动化测试人员3", "tel-3", orgInfo);
             userAccountDao.save(userAccount);

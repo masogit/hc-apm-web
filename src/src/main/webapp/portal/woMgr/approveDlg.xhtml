@@ -10,7 +10,7 @@
             <h:form id="approveDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:fieldset legend="费用明细" >
-                        <p:dataTable  id="accessList123" value="#{workOrderMgrController.approvedDetails}" var="item" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable  id="accessList123" value="#{workOrderMgrController.getNeedApprovalDetails()}" var="item" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <!--<p:column selectionMode="multiple" style="text-align:center;color: #000!important"/>-->
                             <p:column >
                                 <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
@@ -58,17 +58,26 @@
                     </p:fieldset>
                     <h:panelGroup>
                         <label class="label">备注</label>
-                        <p:inputTextarea value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                        <p:inputTextarea id="comment" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approveDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
                         <!--<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approveDialog');"/>-->
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
 
                 </h:panelGroup>
             </h:form>
+            <script>
+                function handleComplete(xhr, status, args) {
+                    if (args.needComents) {
+                        $('#woTab\\:approveDialogForm\\:comment').addClass("ui-state-error");
+                    } else {
+                        handleSubmit(args, 'approveDialog');
+                    }
+                }
+            </script>
         </p:dialog>
     </ui:composition>
 </html>

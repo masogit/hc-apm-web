@@ -124,8 +124,22 @@
                         </p:panelGrid>
 
                     </p:fieldset>
+
+                    <p:fieldset  legend="评价">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup >
+                                <label id="rateId" class="label">#{msg.feedbackRating}</label>
+                                <p:rating value="#{workOrderMgrController.rating}" cancel="false"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.feedbackComment}</label>
+                                <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.closeWorkOrder}" value="#{msg.closeWo}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.closeWorkOrder}" value="#{msg.closeWo}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleClose(xhr, status, args);"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
                     </h:panelGroup>
 
@@ -133,5 +147,19 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
+
+        <script type="text/javascript">
+            function handleClose(xhr,status,args){
+                var valid =true;
+                 if(args.isRate){
+                 $('#woTab\\:toCloseDialogForm\\:rateId').addClass("ui-state-error")
+                         valid=false
+                     }
+
+                if(valid){
+                    handleSubmit(args,'toCloseDialog')
+                }
+            }
+        </script>
     </ui:composition>
 </html>

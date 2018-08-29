@@ -1,5 +1,7 @@
 package com.ge.apm.domain.pure;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.I18nMessage;
@@ -16,11 +18,20 @@ import java.util.Map;
 public class AssetInfoFormatter {
 
     private AssetInfo assetInfo;
+    private List<OrgInfo> sites;
     private AssetFileImportService importService;
+    private AssetInfoRepository assetDao;
+    private OrgInfoRepository orgDao;
 
-    public AssetInfoFormatter(AssetInfo assetInfo, AssetFileImportService importService) {
+    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
+                              AssetFileImportService importService,
+                              AssetInfoRepository assetDao,
+                              OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
+        this.sites = sites;
         this.importService = importService;
+        this.assetDao = assetDao;
+        this.orgDao = orgDao;
     }
 
     public Integer getAssetUsage() {
@@ -195,6 +206,16 @@ public class AssetInfoFormatter {
         return assetInfo.getSiteId();
     }
 
+    public String getSiteName() {
+        for (OrgInfo orgInfo: sites) {
+            if (this.getSiteUID().equals(orgInfo.getUid())) {
+                return orgInfo.getName();
+            }
+        }
+
+        return null;
+    }
+
     public String getName() {
         return assetInfo.getName();
     }
@@ -303,6 +324,18 @@ public class AssetInfoFormatter {
 
     public Integer getAssetDeptId() {
         return assetInfo.getAssetDeptId();
+    }
+
+    public String getAssetDeptUID() {
+        return assetInfo.getAssetDeptUID();
+    }
+
+    public String getAssetDeptName() {
+        if (assetInfo.getAssetDeptUID() == null) return null;
+        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
     }
 
     public Integer getAssetOwnerId() {
@@ -487,6 +520,19 @@ public class AssetInfoFormatter {
         return assetInfo.getParentAssetId();
     }
 
+    public String getParentAssetName() {
+        if (assetInfo.getParentAssetId() == null) {
+            return null;
+        }
+
+        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        if (parentAsset == null) return null;
+
+        String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
+
+        return departNum + " / " + parentAsset.getName();
+    }
+
     public Integer getInventoryStatus() {
         return assetInfo.getInventoryStatus();
     }
@@ -608,12 +654,15 @@ public class AssetInfoFormatter {
         map.put("维修负责人", this.getAssetOwnerName());
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
-        map.put("使用科室", this.getClinicalDeptName());
+        map.put("院区", this.getSiteName());
+        map.put("所属科室", this.getClinicalDeptName());
+        map.put("使用科室", this.getAssetDeptName());
         map.put("制造商", this.getManufacture());
         map.put("品牌/制造商简称", this.getMakerShortName());
         map.put("设备标准名称", this.getDeviceName());
         map.put("注册证号", this.getRegistrationNo());
         map.put("供应商", this.getVendor());
+        map.put("主设备", this.getParentAssetName());
 
         map.put("医疗器械分类", this.getFunctionGroupAsString());
         map.put("医疗器械子分类", this.getAssetCode68AsString());
@@ -648,12 +697,12 @@ public class AssetInfoFormatter {
         map.put("质保日期", this.getFactoryWarrantyDate());
         map.put("维保截止日期", this.getWarrantyDate());
         map.put("报废日期", this.getTerminateDate());
-        map.put("上次维护日期", this.getLastPmDate());
+        map.put("上次保养日期", this.getLastPmDate());
         map.put("上次计量日期", this.getLastMeteringDate());
-        map.put("上次质检日期", this.getLastQaDate());
+        map.put("上次巡检日期", this.getLastQaDate());
 
-        map.put("维护商", this.getMaitanance());
-        map.put("维护商电话", this.getMaitananceTel());
+        map.put("维修商", this.getMaitanance());
+        map.put("维修商电话", this.getMaitananceTel());
         map.put("二维码", this.getQrCode());
         map.put("安装位置编码", this.getLocationCode());
         map.put("安装位置", this.getLocationName());
@@ -670,6 +719,8 @@ public class AssetInfoFormatter {
         map.put("是否进口设备", this.getImportEquipmentAsString());
         map.put("当前状态", this.getStatusAsString());
         map.put("核算类别", this.getAccountingCategoryAsString());
+        map.put("是否PM", assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
+        map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
 
         map.put("UUID", this.getUid());
 

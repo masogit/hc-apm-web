@@ -24,16 +24,16 @@
                     <p:dataTable id="datalist" value="#{qrCodeLibController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{qrCodeLibController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.issueDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" update="viewButton"/>
                         <p:ajax event="filter" listener="#{qrCodeLibController.onFilter}" />
 
-                        <p:column headerText="租户" sortBy="#{item.siteId}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" >
+                        <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" >
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}">
                                     <p:ajax  listener="#{qrCodeLibController.onTenantFilterChange}" update="hospitalIdSelect_list" />
@@ -41,9 +41,9 @@
                                     <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{qrCodeLibController.getSiteName(item.siteId)}"/>
+                            <h:outputText value="#{qrCodeLibController.getTenantName(item.tenantUID)}"/>
                         </p:column>
-                        <p:column headerText="医院" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                        <p:column headerText="医院" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
                             <f:facet name="filter">
                                 <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeLibController.siteUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

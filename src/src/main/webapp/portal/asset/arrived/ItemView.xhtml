@@ -70,10 +70,6 @@
                             <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.agent}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.arrivalListClassCode}</label>
-                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.classCode}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
                             <label class="label">#{msg.creatorUID}</label>
                             <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.arrivalList.creatorUID).name}" />
                         </h:panelGroup>

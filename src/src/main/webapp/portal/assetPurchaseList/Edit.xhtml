@@ -28,7 +28,7 @@
                              </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">使用科室</label>
+                                <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:selectOneMenu id="clinicaleptinname" value="#{assetPurchaseListController.selected.clinicalDeptUid}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoService.getOrgDeptList(assetPurchaseListController.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+		<div class="ui-g">
+			<!-- <div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="电气安全数据导入" />
+			</div> -->
+			<div class="ui-g-12 card">
+				<h:form enctype="multipart/form-data">
+					<p:fieldset legend="批量导入电气安全数据" id="uploaderContainer">
+						<p:panelGrid columns="1" layout="grid"
+							styleClass="ui-panelgrid-blank form-group">
+							<p:fileUpload
+								fileUploadListener="#{measureElectricSafetyController.handleFileUpload}"
+								mode="advanced" dragDropSupport="false" multiple="false"
+								auto="true" invalidFileMessage="只支持ps格式的文件"
+								invalidSizeMessage="文件大小不得超过5M" update=":measureElectricSafetyTab:dataListForm"
+								sizeLimit="5242880" allowTypes="/(\.|\/)(ps|PS)$/"
+								label="添加" cancelLabel="取消" uploadLabel="确认上传" />
+							<p:growl id="messages" showDetail="true" />
+						</p:panelGrid>
+						<h:panelGroup>
+							<p>说明</p>
+							<p>
+								1. <a href="APM_Electric_Safety_Template.ps" title="download">#{msg.downloadTemplateFile}</a>
+							</p>
+							<p>2. 文件中填入要导入的电气安全数据</p>
+							<p>3. 上传文件进行导入</p>
+						</h:panelGroup>
+					</p:fieldset>
+				</h:form>
+			</div>
+
+			<div class="ui-g-12 card">
+				<h:form id="dataListForm">
+					<p:fieldset legend="电气安全数据导入预览">
+						<p:dataTable id="datalistId"
+							rendered="#{not empty measureElectricSafetyController.dataList}"
+							value="#{measureElectricSafetyController.dataList}" var="item"
+							lazy="false" paginator="true" paginatorPosition="both"
+							paginatorAlwaysVisible="true"
+							paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+							currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+							pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+							rowsPerPageTemplate="20,50,100,500" selection="#{measureElectricSafetyController.selectedItems}" rowKey="#{item.lineIndex}">
+							<p:column selectionMode="multiple" style="width:32px;text-align:center" />
+							<p:column headerText="设备名称">
+								<h:outputText value="#{item.assetInfo.name}" />
+							</p:column>
+							<p:column headerText="制造商序列号">
+								<h:outputText value="#{item.assetInfo.serialNum}" />
+							</p:column>
+							<p:column headerText="#{msg.clinicalDeptName}">
+								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+							</p:column>
+							<p:column headerText="工单编号">
+								<h:outputText value="#{item.v2PmOrder.pmNum}" />
+							</p:column>
+							<p:column headerText="计划完成时间">
+								<h:outputText value="#{item.v2PmOrder.planTime}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="资产编号">
+								<h:outputText value="#{item.financingNum}" />
+							</p:column>
+							<p:column headerText="保护接地阻抗">
+								<h:outputText value="#{item.protectGroundImpedance}" />
+							</p:column>
+							<p:column headerText="患者漏电流">
+								<h:outputText value="#{item.patientElectricLeakage_app}" />
+							</p:column>
+							<p:column headerText="对地漏电流">
+								<h:outputText value="#{item.groundElectricLeakage_normal}" />
+							</p:column>
+							<p:column headerText="外壳漏电流">
+								<h:outputText value="#{item.shellElectricLeakage_normal}" />
+							</p:column>
+							<p:column headerText="设备漏电流">
+								<h:outputText value="#{item.equipmentElectricLeakage}" />
+							</p:column>
+							<!-- <p:column headerText="设备类别">
+								<h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}" />
+							</p:column> -->
+							<p:column headerText="检测仪时间">
+								<h:outputText value="#{item.checkDate}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="存储器时间">
+								<h:outputText value="#{item.storageDate}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+							<!-- <p:column headerText="检测类型">
+								<h:outputText value="#{item.checkType}" />
+							</p:column> -->
+							<!-- <p:column headerText="应用组数">
+								<h:outputText value="#{item.groupType}" />
+							</p:column> -->
+							
+							<p:column headerText="警告信息">
+								<h:outputText value="#{item.warnMessage}" />
+							</p:column>
+							<f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalistId" fileName="Electric_Safety_Export"/>
+                                </p:commandButton>
+                                <p:commandButton actionListener="#{measureElectricSafetyController.importSelectedItem}" value="#{msg.Import}" update="datalistId :growl,:measureElectricSafetyTab:measureElectricSafetyListForm" icon="ui-icon-check" />
+                            </f:facet>
+						</p:dataTable>
+					</p:fieldset>
+				</h:form>
+			</div>
+		</div>
+</html>

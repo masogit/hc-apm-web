@@ -23,14 +23,15 @@ export default {
   },
   effects: {
     *['data/get']({ payload }, { put, call, select }) {
-      const { from, to, groupby, dept, type, supplier, rltgrp, start, limit, cursor } = yield select(state => {
+      const { from, to, groupby, hospital, dept, type, supplier, rltgrp, start, limit, cursor } = yield select(state => {
         const filters = state.MaintenanceCost_filters
         const groupby = filters.groupBy
         const { dept, assetType: type, supplier, target: rltgrp, cursor } = filters
         const { from, to } = filters.range
         const start = 0
         const limit = 10
-        const res = { from, to, groupby, dept, type, supplier, rltgrp, start, limit, cursor}
+        const hospital = state.depts.selectedHospital
+        const res = { from, to, groupby, dept, type, supplier, rltgrp, start, limit, cursor, hospital }
         if (res[groupby] === undefined) res[groupby] = cursor[0]
         return res
       })
@@ -72,10 +73,10 @@ export default {
       } else {
         try {
           const data = yield Promise.all([
-            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from, to, groupby, dept, type, supplier, rltgrp: 'acyman'}}),
-            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from, to, groupby, dept, type, supplier, rltgrp: 'mtpm'}}),
-            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from: moment(from).subtract(1, 'year').format('YYYY-MM-DD'), to: moment(to).subtract(1, 'year').format('YYYY-MM-DD'), groupby, dept, type, supplier, rltgrp: 'acyman'}}),
-            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from: moment(from).subtract(1, 'year').format('YYYY-MM-DD'), to: moment(to).subtract(1, 'year').format('YYYY-MM-DD'), groupby, dept, type, supplier, rltgrp: 'mtpm'}})
+            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from, to, groupby, hospital, dept, type, supplier, rltgrp: 'acyman'}}),
+            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from, to, groupby, hospital, dept, type, supplier, rltgrp: 'mtpm'}}),
+            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from: moment(from).subtract(1, 'year').format('YYYY-MM-DD'), to: moment(to).subtract(1, 'year').format('YYYY-MM-DD'), groupby, hospital, dept, type, supplier, rltgrp: 'acyman'}}),
+            fetchData(API_HOST + '/ma', {data: {threshold, items}, params: {from: moment(from).subtract(1, 'year').format('YYYY-MM-DD'), to: moment(to).subtract(1, 'year').format('YYYY-MM-DD'), groupby, hospital, dept, type, supplier, rltgrp: 'mtpm'}})
           ])
           yield put({
             type: 'data/get/succeeded',

@@ -13,10 +13,27 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" width="750" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.orgId}*</label>
+                            <p:inputText id="selectedUserOrgName" value="#{pmOrderRuleController.getOrgFullName(pmOrderRuleController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                            <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{pmOrderRuleController.orgTree}" selection="#{pmOrderRuleController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update=":PmOrderRuleApproveForm" listener="#{pmOrderRuleController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetName} *</label>
                             <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
@@ -31,7 +48,11 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                            </p:selectOneMenu>
+                             <!--<p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>-->
                         </h:panelGroup>
                         <h:panelGroup >
                              <label class ="label">#{msg.functionType}</label>
@@ -56,13 +77,13 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     
-                     <p:panelGrid id="report" columns="2"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                     <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
 		                   			<p:ajax update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
+	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
 	                       </p:selectOneMenu>
 	                        <h:outputText style="display:none" id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
 	                        &nbsp;&nbsp;
@@ -74,7 +95,7 @@
 	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
 	                     		<p:ajax  update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                        	</p:selectOneMenu>
                                         <h:outputText style="display:none" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;
@@ -124,7 +145,7 @@
                     oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
                     &nbsp;&nbsp;
                    <!--  immediate="true"  -->
-                    <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
+                    <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()"  update = ":PmOrderRuleListForm:datalist"/>
                       &nbsp;&nbsp;
                       <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="审核" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" 

@@ -26,6 +26,8 @@ public class PmOrderActionForm {
     String comments;
     String pmOrderId;
     Integer pmType;
+    String applyTime;
+
 
 //V2_WorkOrder_Coworker[] coworkes //optional
     public String getPmOrderId() {
@@ -163,5 +165,12 @@ public class PmOrderActionForm {
     public void setPmType(Integer pmType) {
         this.pmType = pmType;
     }
-    
+
+    public String getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(String applyTime) {
+        this.applyTime = applyTime;
+    }
 }

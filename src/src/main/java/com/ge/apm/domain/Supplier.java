@@ -2,26 +2,33 @@
  */
 package com.ge.apm.domain;
 
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.io.Serializable;
+import java.util.Date;
+import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
  * @author 212547631
  */
 @Entity
 @Table(name = "supplier")
-public class Supplier implements Serializable {
+public class Supplier implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -29,6 +36,10 @@ public class Supplier implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
+    @Column(columnDefinition = "CHAR(32)")
+    private String uid;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
@@ -38,6 +49,8 @@ public class Supplier implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Column(name = "name_py_code")
+    private String namePyCode;
     @Size(max = 32)
     @Column(name = "city")
     private String city;
@@ -53,6 +66,8 @@ public class Supplier implements Serializable {
     @Size(max = 16)
     @Column(name = "tel")
     private String tel;
+    @Column(name = "supplier_type")
+    private String supplierType;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -64,6 +79,39 @@ public class Supplier implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @Column(name = "supplier_t")
+    private Boolean supplierT;
+
+    @Column(name = "maintainer_t")
+    private Boolean maintainerT;
+
+    @Column(name = "manufacturer_t")
+    private Boolean manufacturerT;
+
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
+
+    @PrePersist
+    public void initializeUid() {
+        if (uid == null) {
+            uid = UUID.randomUUID().toString().replace("-", "");
+        }
+    }
 
     public String getTenantUID() {
         return tenantUID;
@@ -122,6 +170,7 @@ public class Supplier implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = name == null ? null : PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getCity() {
@@ -164,6 +213,54 @@ public class Supplier implements Serializable {
         this.tel = tel;
     }
 
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
+    }
+
+    public String getSupplierType() {
+        return supplierType;
+    }
+
+    public void setSupplierType(String supplierType) {
+        this.supplierType = supplierType;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public Boolean getSupplierT() {
+        return supplierT;
+    }
+
+    public void setSupplierT(Boolean supplierT) {
+        this.supplierT = supplierT;
+    }
+
+    public Boolean getMaintainerT() {
+        return maintainerT;
+    }
+
+    public void setMaintainerT(Boolean maintainerT) {
+        this.maintainerT = maintainerT;
+    }
+
+    public Boolean getManufacturerT() {
+        return manufacturerT;
+    }
+
+    public void setManufacturerT(Boolean manufacturerT) {
+        this.manufacturerT = manufacturerT;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -189,4 +286,40 @@ public class Supplier implements Serializable {
         return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
     }
 
+    @Override
+    public String getPinYin() {
+        return namePyCode;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 }

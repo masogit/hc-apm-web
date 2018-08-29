@@ -9,7 +9,7 @@
         <div class="ui-g">
             <div class="ui-g-12">
 				<div class="ui-g-12 card cardTitle">
-                	<p:outputLabel class="pageTitle" value="#{msg.V3_WorkFlowConfig}"/>
+                	<p:outputLabel class="pageTitle" value="#{msg.SystemConfig}"/>
             	</div>
             <h:form id="V2_WorkflowConfigListForm">
                 <p:dataTable id="datalist" value="#{v2_WorkflowConfigController.lazyModel}" var="item" widgetVar="varDataList"
@@ -19,10 +19,10 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect"  listener= "#{v2_WorkflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
-<!--                     <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/> -->
+                    <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/>
                     
                     <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
                         <h:outputText value="#{v2_WorkflowConfigController.getTenantName(item.tenantUID)}"/>

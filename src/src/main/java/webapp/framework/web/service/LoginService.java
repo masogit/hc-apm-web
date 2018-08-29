@@ -112,7 +112,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		return plainPassword;
 	}
 
-	protected void afterLogin() {
+	protected void afterLogin(String userName,String password) {
 
 	}
 
@@ -277,10 +277,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-			afterLogin();
+			afterLogin(userName,originPwd);
 			updateLoginStatus(userName, true);
-			String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
-			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
+			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
 			// redirects to the home page
 			/*
 			 * FacesContext context = FacesContext.getCurrentInstance();

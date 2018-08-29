@@ -1,18 +1,25 @@
 package com.ge.apm.view.wo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.wo.WorkOrderExportService;
+import com.ge.apm.service.wo.WorkOrderExportTemplateService;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
+import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -20,58 +27,44 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
-
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.wo.WorkOrderExportService;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.mapper.DefaultMapper;
-
-import webapp.framework.web.WebUtil;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/7/26.
  */
 @ManagedBean
 @ViewScoped
-public class WorkOrderReportExportController implements Serializable{
+public class WorkOrderReportExportController implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2591740986699150398L;
+    private static final long serialVersionUID = -2591740986699150398L;
 
-	private WorkOrderExportService workOrderExportService;
+    protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderReportExportController.class);
 
+    private WorkOrderExportService workOrderExportService;
+    private WorkOrderPublishRenderService workOrderPublishRenderService;
+    private WorkOrderExportTemplateService workOrderExportTemplateService;
+    private AssetInfoService assetInfoService;
+    private UserCommonService ucService;
     private StreamedContent exportFile;
-    
+
     private StreamedContent exportPdf;
 
-    private UserAccount currentUser;
+    private StreamedContent exportDocx;
 
+    private UserAccount currentUser;
     private OrgInfoRepository orgDao;
+    private TenantInfoRepository tenantInfoRepository;
 
     private List<OrgInfo> institutionList;
     private List<OrgInfo> hospitalList;
@@ -98,12 +91,23 @@ public class WorkOrderReportExportController implements Serializable{
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
     
+    private OrgInfo filterDeptOrg;
+    private List<OrgInfo> clinicalDeptList;
+    private UserAccount filterCurrentOwner;
+    private List<UserAccount> currentOwnerList;
+
     private List<Map<String, Object>> selectedItems;
+
+    private Boolean isInsulate;
 
     @PostConstruct
     protected void init() {
-
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
+        workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
+        workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        ucService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
@@ -120,146 +124,141 @@ public class WorkOrderReportExportController implements Serializable{
         isStatusClose = Boolean.TRUE;
         isStatusCancel = Boolean.TRUE;
 
+        isInsulate = tenantInfoRepository.findByuid(currentUser.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
+
         initOrgTree();
-
-    }    
+        loadClinicalDept();
+        currentOwnerList = ucService.getWorkerList(null,"");
+        currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()).stream().filter(item-> !currentOwnerList.contains(item)).collect(Collectors.toList()));
+        
+    }
     
+    public void onClinicalDeptChange(){
+        
+    }
+    public void onCurrentOwnerChange(){
+        
+    }
+    
+    private void loadClinicalDept(){
+        if(null == selectedOrg){
+            clinicalDeptList = Collections.EMPTY_LIST;
+        }else{
+            clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getSiteUID());
+            if(null != filterDeptOrg && !filterDeptOrg.getSiteUID().equals(selectedOrg.getSiteUID()) ){
+                filterDeptOrg = null;
+            }
+        }
+    }
 
-    private void exportWoData(List<Map<String,Object>> data){
+    private void exportWoData(List<Map<String, Object>> data) {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/APM_WorkOrder_Template.xlsx");
-//          InputStream stream = this.file.getInputstream();
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            //Boolean exportFlag = workOrderExportService.exportData(doc, workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList()));
             Boolean exportFlag = workOrderExportService.exportData(doc, data);
-            if(exportFlag){
+            if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "WorkOrderData.xlsx");
             }
         } catch (IOException ex) {
             Logger.getLogger(WorkOrderReportExportController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void exportAllWo()
-    {
-    	exportWoData(workOrderList);
-    }
-    
-    public void exportSelectedWo()
-    {
-    	exportWoData(selectedItems);
+
+    public void exportAllWo() {
+        exportWoData(workOrderList);
     }
 
-    public void exportAllWoPdf()
-    {
-    	export2Pdf(workOrderList);
+    public void exportSelectedWo() {
+        exportWoData(selectedItems);
     }
-    
-    public void exportSelectedWoPdf()
-    {
-    	export2Pdf(selectedItems);
+
+    public void exportAllWoPdf() {
+        export2Pdf(workOrderList);
     }
-    
-    private void export2Pdf(List<Map<String,Object>> data) 
-    {
-		try 
-		{
-			String woXml = getWoXml(data);
-			
-			File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/pdf/wo2fo.xsl").getPath());
-			
-			File conf = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/pdf/fop.xml").getPath());
-			
-			FopFactory fopFactory = FopFactory.newInstance(conf);
-			FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-			
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			TransformerFactory factory = TransformerFactory.newInstance();
-            try 
-            {
-				Transformer transformer = factory.newTransformer(new StreamSource(xsl));
-				Source src = new StreamSource(new StringReader(woXml));
-                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
-                Result res = new SAXResult(fop.getDefaultHandler());
-                transformer.transform(src, res);
-			}
-            finally 
-            {
-                exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, "WorkOrderDetails.pdf");
+
+    public void exportSelectedWoPdf() {
+        export2Pdf(selectedItems);
+    }
+
+    private void export2Pdf(List<Map<String, Object>> data) {
+        WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.renderPdf(data);
+        exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
+    }
+
+    public void exportAllWoDocx() {
+        export2Docx(workOrderList);
+    }
+
+    public void exportSelectedWoDocx() {
+        export2Docx(selectedItems);
+    }
+
+    private void export2Docx(List<Map<String, Object>> data) {
+        exportDocx = null;
+        if (data.isEmpty()) {
+            WebUtil.addErrorMessage("未选中的需要导出的记录");
+            return;
+        }
+        try {
+            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
+            WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
+            exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
+        } catch (IOException e) {
+            logger.error("Fail to export work orders", e);
+            WebUtil.addErrorMessage("导出失败");
+        }
+    }
+
+
+    public void previewData(ActionEvent actionEvent) {
+
+        this.selectedItems = null;
+
+        if (null == startTime && null == endTime && null == closedStartTime && null == closedEndTime) {
+            showMsgBox("报修时间范围和关单时间范围需任填一组（最早时间/最晚时间）");
+            return;
+        } else {
+            if ((null != startTime && null == endTime)) {
+                showMsgBox("请选择最晚报修时间");
+                return;
             }
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-    }
-    
-    private String getWoXml(List<Map<String,Object>> data)
-    {
-    	XStream xStream = new XStream(new DomDriver());
-        xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
-        xStream.alias("List", List.class);
-        xStream.alias("map", HashedMap.class);
-    	
-    	return xStream.toXML(data);
-    }
-    
-    public void previewData(ActionEvent actionEvent){
-        //workOrderList =                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
-        if(null == startTime && null == endTime && null == closedStartTime && null == closedEndTime)
-        {
-        	showMsgBox("报修时间范围和关单时间范围需任填一组（最早时间/最晚时间）");
-        	return;
+            if ((null == startTime && null != endTime)) {
+                showMsgBox("请选择最早报修时间");
+                return;
+            }
+            if (null != closedStartTime && null == closedEndTime) {
+                showMsgBox("请选择最晚关单时间");
+                return;
+            }
+            if (null == closedStartTime && null != closedEndTime) {
+                showMsgBox("请选择最早关单时间");
+                return;
+            }
+
+            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner);
         }
-        else
-        {
-        	if((null != startTime && null == endTime))
-        	{
-        		showMsgBox("请选择最晚报修时间");
-        		return;
-        	}
-        	if((null == startTime && null != endTime))
-        	{
-        		showMsgBox("请选择最早报修时间");
-        		return;
-        	}
-        	if(null != closedStartTime && null == closedEndTime)
-        	{
-        		showMsgBox("请选择最晚关单时间");
-        		return;
-        	}
-        	if(null == closedStartTime && null != closedEndTime)
-        	{
-        		showMsgBox("请选择最早关单时间");
-        		return;
-        	}
-        	
-            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList());
-        }
-       
-   }
-    
-    private void showMsgBox(String msg)
-    {
-    	FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, msg,  null);
+
+    }
+
+    private void showMsgBox(String msg) {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
-    private List<Integer> getStatusList(){
+    private List<Integer> getStatusList() {
         List<Integer> statusList = new ArrayList<>();
-        if(isStatusOpen){
+        if (isStatusOpen) {
             statusList.add(1);
         }
-        if(isStatusClose){
+        if (isStatusClose) {
             statusList.add(2);
         }
-        if(isStatusCancel){
+        if (isStatusCancel) {
             statusList.add(3);
         }
 
-        if(statusList.isEmpty()){
+        if (statusList.isEmpty()) {
             //当工单状态没有选择时
             statusList.add(-999);
         }
@@ -275,7 +274,7 @@ public class WorkOrderReportExportController implements Serializable{
         } else {
             selectedOrg = (OrgInfo) node.getData();
         }
-
+        loadClinicalDept();
     }
 
     public void initOrgTree() {
@@ -286,14 +285,37 @@ public class WorkOrderReportExportController implements Serializable{
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root",null,null);
-        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.getChildren().add(treeNode);
         rootNode.setExpanded(true);
 
     }
+    
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
+    public List<UserAccount> completeOwnerList(String query) {
+        
+        if (currentOwnerList == null) {
+            return Collections.emptyList();
+        }
+        
+        List<UserAccount> res = this.currentOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
 
-    public void filterSiteByHospital(){
+    public void filterSiteByHospital() {
         siteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(this.getCurrentHospitalUID(), 3);
     }
 
@@ -368,24 +390,24 @@ public class WorkOrderReportExportController implements Serializable{
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
-    
+
     public Date getClosedStartTime() {
-		return closedStartTime;
-	}
+        return closedStartTime;
+    }
 
-	public void setClosedStartTime(Date closedStartTime) {
-		this.closedStartTime = closedStartTime;
-	}
+    public void setClosedStartTime(Date closedStartTime) {
+        this.closedStartTime = closedStartTime;
+    }
 
-	public Date getClosedEndTime() {
-		return closedEndTime;
-	}
+    public Date getClosedEndTime() {
+        return closedEndTime;
+    }
 
-	public void setClosedEndTime(Date closedEndTime) {
-		this.closedEndTime = closedEndTime;
-	}
+    public void setClosedEndTime(Date closedEndTime) {
+        this.closedEndTime = closedEndTime;
+    }
 
-	public Boolean getStatusOpen() {
+    public Boolean getStatusOpen() {
         return isStatusOpen;
     }
 
@@ -408,8 +430,8 @@ public class WorkOrderReportExportController implements Serializable{
     public void setStatusCancel(Boolean statusCancel) {
         isStatusCancel = statusCancel;
     }
-    
-	public List<Map<String, Object>> getWorkOrderList() {
+
+    public List<Map<String, Object>> getWorkOrderList() {
         return workOrderList;
     }
 
@@ -442,20 +464,45 @@ public class WorkOrderReportExportController implements Serializable{
     }
 
 
-	public List<Map<String, Object>> getSelectedItems() {
-		return selectedItems;
-	}
+    public List<Map<String, Object>> getSelectedItems() {
+        return selectedItems;
+    }
 
 
-	public void setSelectedItems(List<Map<String, Object>> selectedItems) {
-		this.selectedItems = selectedItems;
-	}
+    public void setSelectedItems(List<Map<String, Object>> selectedItems) {
+        this.selectedItems = selectedItems;
+    }
 
-	public StreamedContent getExportPdf() {
-		return exportPdf;
-	}
+    public StreamedContent getExportPdf() {
+        return exportPdf;
+    }
 
-	public void setExportPdf(StreamedContent exportPdf) {
-		this.exportPdf = exportPdf;
-	}
+    public void setExportPdf(StreamedContent exportPdf) {
+        this.exportPdf = exportPdf;
+    }
+
+    public StreamedContent getExportDocx() {
+        return exportDocx;
+    }
+
+    public void setExportDocx(StreamedContent exportDocx) {
+        this.exportDocx = exportDocx;
+    }
+
+    public OrgInfo getFilterDeptOrg() {
+        return filterDeptOrg;
+    }
+
+    public void setFilterDeptOrg(OrgInfo filterDeptOrg) {
+        this.filterDeptOrg = filterDeptOrg;
+    }
+
+    public UserAccount getFilterCurrentOwner() {
+        return filterCurrentOwner;
+    }
+
+    public void setFilterCurrentOwner(UserAccount filterCurrentOwner) {
+        this.filterCurrentOwner = filterCurrentOwner;
+    }
+    
 }

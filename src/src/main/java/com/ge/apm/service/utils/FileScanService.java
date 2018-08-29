@@ -23,10 +23,10 @@ public class FileScanService {
 
     private static Long TIME_OUT = 5000l;
 
-    @Value("#{urlProperties.FileScanFolder}")
+    @Value("#{systemEnvironment['FILE_SCAN_FOLDER'] ?: urlProperties.FileScanFolder}")
     private String FILE_SCAN_FOLDER;
 
-    @Value("#{urlProperties.BatchFileFolder}")
+    @Value("#{systemEnvironment['BATCH_FILE_FOLDER'] ?: urlProperties.BatchFileFolder}")
     private String BATCH_FILE_Folder;
 
     //save for file scan
@@ -38,6 +38,11 @@ public class FileScanService {
     public String saveBatchUploadedFile(UploadedFile file, String fileType) throws Exception {
         String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType == null ? "" : fileType).concat(String.valueOf(System.currentTimeMillis()));
         return saveFile(file, folderName, "batchfile").replaceFirst(BATCH_FILE_Folder, "");
+    }
+    
+    public String saveFileString(String str) throws Exception{
+    	String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
+        return saveFileString(str, folderName, "file.txt");
     }
 
     public String saveFile(UploadedFile file, String folderName, String saveFilename) throws Exception {
@@ -69,6 +74,19 @@ public class FileScanService {
             throw e;
         }
 
+        return fileName;
+    }
+    
+    public String saveFileString(String str, String folderName, String saveFilename) throws Exception {
+        FileUtils.createFolder(folderName, true);
+        String fileName = folderName.concat(File.separator).concat(saveFilename);
+        try (FileOutputStream out = new FileOutputStream(fileName)) {
+            byte[]b = str.getBytes();
+            out.write(b);
+            out.flush();
+        } catch (Exception e) {
+            throw e;
+        }
         return fileName;
     }
 

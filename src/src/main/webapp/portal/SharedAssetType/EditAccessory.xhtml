@@ -8,17 +8,17 @@
 
     <ui:composition>
 
-        <p:dialog id="SharedAssetTypeAccesssoryEditDlg" widgetVar="SharedAssetTypeAccesssoryEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetTypeController.CRUDActionName} #{msg.SharedAssetTypeAccesssory}">
+        <p:dialog id="SharedAssetTypeAccesssoryEditDlg" widgetVar="SharedAssetTypeAccesssoryEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetTypeController.CRUDActionName} 附件">
             <h:form id="SharedAssetTypeAccesssoryEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetTypeController.selected != null}">
                         <h:panelGroup styleClass="md-inputfield">
-                            <p:inputText id="name" value="#{sharedAssetTypeController.selectedAccessory.name}" />
+                            <p:inputText id="name" value="#{sharedAssetTypeController.selectedAccessory.name}" required="true" requiredMessage="附件名称 #{msg.ValidationRequire}"/>
                             <label>#{msg.name}</label>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.save}" value="#{msg.Save}" update="display,:SharedAssetTypeAccesssoryEditDlg, :SwapTypeEditForm:dataAccessory, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SharedAssetTypeAccesssoryEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.saveAccessory}" value="#{msg.Save}" update="display, SwapTypeEditForm" icon="ui-icon-check" oncomplete="PF('SharedAssetTypeAccesssoryEditDialog').hide()"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetTypeAccesssoryEditDialog').hide()"/>
                 </h:panelGroup>
