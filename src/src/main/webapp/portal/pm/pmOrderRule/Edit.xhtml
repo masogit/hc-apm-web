@@ -50,13 +50,24 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                            <p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                            <p:autoComplete id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" dropdown="true" scrollHeight="300"
+                                            forceSelection="true" required="false" requiredMessage="" completeMethod="#{pmOrderRuleController.getSupplier}"
+                                            var="t" itemLabel="#{t}" itemValue="#{t}">
+                                <p:ajax process="@this" event="itemSelect" listener="#{pmOrderRuleController.setNothing()}"/>
+                                <p:ajax process="@this" listener="#{pmOrderRuleController.setNothing()}"/>
+                            </p:autoComplete>
+                            <!--<p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" style="max-width: 200px">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item" itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                            </p:selectOneMenu>-->
+                        </h:panelGroup>
+                <!--        <h:panelGroup >
+                            <label class ="label">#{msg.manufacture}</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" style="max-width: 200px">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
                             </p:selectOneMenu>
-                            <!--<p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>-->
-
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup >
                             <label class ="label">#{msg.functionType}</label>
                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="false" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
