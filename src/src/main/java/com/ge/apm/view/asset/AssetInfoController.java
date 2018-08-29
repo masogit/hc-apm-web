@@ -2013,8 +2013,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		return orgUids;
 	}
 
-	public void prepareForceAllocateAsset(String assetUid) {
-		AssetInfo asset = dao.findByUid(assetUid);
+	public void prepareForceAllocateAsset(AssetInfo asset) {
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2026,10 +2025,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
+		generateVoucher(asset);
 	}
 	
-	public void prepareForceReturnAsset(String assetUid) {
-		AssetInfo asset = dao.findByUid(assetUid);
+	public void prepareForceReturnAsset(AssetInfo asset) {
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2041,7 +2040,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		}
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
+        generateVoucher(asset);
 	}
+
+	public void generateVoucher(AssetInfo asset) {
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
+        SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
+        reqDetail = (reqDetail == null) ? this.findLatestReqDetail(asset) : reqDetail;
+        if(reqDetail != null) {
+            asset.setSharedAssetReqDetail(reqDetail);
+            this.selected = asset;
+            SharedAssetInfoUtils.fillData2Voucher(asset);
+        }
+    }
 	
 	public void forceReturnAsset() {
 		if(this.selected != null) {
@@ -2092,30 +2104,59 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                                                             .orElse(null);
 
     	if(sharedAssetReqDetail != null) {
-    		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
-    		Date endTime = sharedAssetReqDetail.getChargingEndTime();
-
-            String chargingType = item.getSharedAssetType().getChargingType();
-            Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetReqDetail);
-            BigDecimal unit = unitAndTotalTime._1;
-            String totalTime = unitAndTotalTime._2;
-
-    		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
-    			if(this.getOrgUids().contains(item.getAssetDeptUID())) {
-    			} else {
-    				SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
-    				if(request != null && "1".equals(request.getType())) {
-    					unit = new BigDecimal(0);
-    				}
-    			}
-    		}
-    		sharedAssetReqDetail.setRentalTime(totalTime);
-
-    		BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetReqDetail);
-    		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
+            calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
     	}
     	return sharedAssetReqDetail;
 	}
+
+	private SharedAssetReqDetail findLatestReqDetail(AssetInfo item) {
+        List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
+        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                                                            .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
+                                                                if(o1.getChargingEndTime() == null) {
+                                                                        return -1;
+                                                                    } else if(o2.getChargingEndTime() == null) {
+                                                                        return 1;
+                                                                    } else {
+                                                                        if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
+                                                                            return 1;
+                                                                        } else {
+                                                                            return -1;
+                                                                        }
+                                                                    }
+                                                            })
+                                                            .findFirst()
+                                                            .orElse(null);
+        if(sharedAssetReqDetail != null) {
+            calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
+        }
+        return sharedAssetReqDetail;
+    }
+
+	private SharedAssetReqDetail calcChargingByAssetReqDetail(AssetInfo item, SharedAssetReqDetail sharedAssetReqDetail) {
+        Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
+        Date endTime = sharedAssetReqDetail.getChargingEndTime();
+
+        String chargingType = item.getSharedAssetType().getChargingType();
+        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetReqDetail);
+        BigDecimal unit = unitAndTotalTime._1;
+        String totalTime = unitAndTotalTime._2;
+
+        if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
+            if(this.getOrgUids().contains(item.getAssetDeptUID())) {
+            } else {
+                SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
+                if(request != null && "1".equals(request.getType())) {
+                    unit = new BigDecimal(0);
+                }
+            }
+        }
+        sharedAssetReqDetail.setRentalTime(totalTime);
+
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetReqDetail);
+        sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
+        return sharedAssetReqDetail;
+    }
 
 	private SharedAssetType findSharedAssetType(AssetInfo assetInfo) {
         SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
