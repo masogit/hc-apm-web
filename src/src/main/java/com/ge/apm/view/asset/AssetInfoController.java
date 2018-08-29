@@ -2046,14 +2046,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	public void forceReturnAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-			Date chargingBeginTime = selected.getSharedAssetReqDetail().getChargingBeginTime();
-			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
+			SharedAssetReqDetail reqDetail = selected.getSharedAssetReqDetail();
+			Date chargingBeginTime = reqDetail.getChargingBeginTime();
+			Date chargingEndTime = reqDetail.getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
-			OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-			    if(assetDept != null) {
-			        selected.setAssetDeptUID(assetDept.getUid());
+			    if(reqDetail.getClinicalDeptUid() != null) {
+			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
                     sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
                 }
