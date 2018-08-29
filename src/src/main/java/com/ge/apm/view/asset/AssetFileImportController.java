@@ -5,28 +5,30 @@
  */
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetSeriaNumConfigRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webapp.framework.web.WebUtil;
+
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-
-import com.ge.apm.view.sysutil.UserContextService;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
-import webapp.framework.web.WebUtil;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -35,43 +37,55 @@ import webapp.framework.web.WebUtil;
 @ManagedBean
 @ViewScoped
 public class AssetFileImportController {
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportController.class);
 
     private UploadedFile file;
 
-    private Map<String, Map<String, Object>> importOrgMap;
-    private Map<String, Map<String, Object>> importAssetMap;
+    private List<Map<String, Object>> importOrgMap;
+    private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
-    private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
+
+    private UaaService uaaService;
+
+    private OrgInfoRepository orgDao;
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
     
     private Boolean canbeImported = false;
     private Boolean autoGenerateQrcode = true;
-    private Boolean autoGenerateFinancingNum;
     private Boolean isGeneratePmOrder;
 
     private StreamedContent exportFile;
 
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private OrgInfo selectedOrg;
+
+    private boolean displayErrorsOnly;
+
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetFileImportService.class);
-        assetSeriaNumConfigRepository = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
-        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-        Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
-
-        autoGenerateFinancingNum = configuredCount > 0L;
+        initOrgTree();
 
     }
 
     public void uploadDataFile(FileUploadEvent event) {
-        ExcelDocument doc = null;
 
-        try {
-            this.file = event.getFile();
-            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+        if (selectedOrg == null) {
+            WebUtil.addErrorMessage("请先选择所属院区！");
+            return;
+        }
+
+        this.file = event.getFile();
+
+        try (ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+
             if(!aiService.checkDocVersion(doc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
                 return;
@@ -86,35 +100,44 @@ public class AssetFileImportController {
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
             
-            canbeImported = aiService.checkData(importOrgMap,importAssetMap);
+            canbeImported = aiService.checkData(importOrgMap, importAssetMap);
 
-        } catch (IOException ex) {
-            WebUtil.addErrorMessage("File can not be read!");
-            Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
+            filterErrorRecords();
+
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("File can not be read!", null);
+            logger.error(e.getMessage(),e);
+
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
-            Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            if (doc != null) {
-                doc.release();
-            }
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage(), null);
+            logger.error(e.getMessage(),e);
         }
     }
 
     public void importData() {
-        if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum,isGeneratePmOrder);
+        try {
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
-            try {
-                InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
-//                InputStream stream = this.file.getInputstream();
-                ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
-            } catch (IOException ex) {
-                Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            filterErrorRecords();
+
+//            downloadImportFailureData();
+        } catch (Exception e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+
+            isImported = true; //disable import button
+        }
+    }
+
+    public void downloadImportFailureData() {
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
         }
     }
 
@@ -125,7 +148,7 @@ public class AssetFileImportController {
     
     public Integer getAssetErrorCounts(){
         if(null!=importAssetMap && !importAssetMap.isEmpty()){
-           return Integer.parseInt(String.valueOf(importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+           return Integer.parseInt(String.valueOf(importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
         }else{
             return 0;
         }
@@ -135,25 +158,125 @@ public class AssetFileImportController {
         if(null == importAssetMap) {
             return null;
         }
-        List<String> errors = importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
-                .map(item -> item.getValue().get("errmsg").toString()).collect(Collectors.toList());
+        List<String> errors = importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
+                .map(item -> item.get("errmsg").toString()).collect(Collectors.toList());
         return errors;
     }
     
-    public Integer getOrgErrorCounts(){
-        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
-           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
-        }else{
-            return 0;
+//    public Integer getOrgErrorCounts(){
+//        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
+//           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+//        }else{
+//            return 0;
+//        }
+//    }
+
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
         }
+        rootNode.setExpanded(true);
+
     }
 
-    //Getter and Setter
-    public Map<String, Map<String, Object>> getImportOrgMap() {
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        if (orgInfo == null || orgInfo.getId() == -1) {
+            selectedOrg = null;
+        } else {
+            selectedOrg = orgInfo;
+        }
+
+        if (selectedOrg != null) {
+            aiService.setSelectedOrgToImport(selectedOrg);
+        }
+
+    }
+
+    public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
+
+        filterErrorRecords();
+    }
+
+    public void filterErrorRecords() {
+
+        if (!displayErrorsOnly) return;
+
+        if (importAssetMap == null) return;
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Map<String, Object> map: importAssetMap) {
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                result.add(map);
+            }
+
+        }
+
+        displayAssets = result;
+
+        if (importOrgMap == null) return;
+
+        List<Map<String, Object>> resultMap = new ArrayList<>();
+
+        for (Map<String, Object> map: importOrgMap) {
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                resultMap.add(map);
+            }
+
+        }
+
+        displayOrgs = resultMap;
+    }
+
+    List<Map<String, Object>> displayAssets;
+
+    public List<Map<String, Object>> getDisplayAssets() {
+
+        if (displayErrorsOnly) {
+            return displayAssets;
+        } else {
+            return importAssetMap;
+        }
+
+    }
+
+    List<Map<String, Object>> displayOrgs;
+
+    public List<Map<String, Object>> getDisplayOrgs() {
+
+        if (displayErrorsOnly) {
+            return displayOrgs;
+        } else {
+            return importOrgMap;
+        }
+
+    }
+
+    public List<Map<String, Object>> getImportOrgMap() {
         return importOrgMap;
     }
 
-    public Map<String, Map<String, Object>> getImportAssetMap() {
+    public List<Map<String, Object>> getImportAssetMap() {
         return importAssetMap;
     }
 
@@ -189,14 +312,6 @@ public class AssetFileImportController {
         this.autoGenerateQrcode = autoGenerateQrcode;
     }
 
-    public Boolean getAutoGenerateFinancingNum() {
-        return autoGenerateFinancingNum;
-    }
-
-    public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
-        this.autoGenerateFinancingNum = autoGenerateFinancingNum;
-    }
-
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
     }
@@ -204,5 +319,48 @@ public class AssetFileImportController {
     public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
-    
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public boolean isDisplayErrorsOnly() {
+        return displayErrorsOnly;
+    }
+
+    public void setDisplayErrorsOnly(boolean displayErrorsOnly) {
+        this.displayErrorsOnly = displayErrorsOnly;
+    }
+
+    public boolean isEmpty() {
+        return (importAssetMap == null || importAssetMap.isEmpty());
+    }
+
+    public String getSelectedOrgName() {
+        if (selectedOrg == null) {
+            return "";
+        } else {
+            return selectedOrg.getName();
+        }
+    }
 }

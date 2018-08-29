@@ -1,6 +1,8 @@
 package com.ge.apm.web;
 
 import com.ge.apm.dao.AssetFaultTypeRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.HealthService;
 import com.google.common.collect.ImmutableList;
@@ -36,6 +38,9 @@ public class HealthApi {
   
   @Autowired
   AssetFaultTypeRepository assetTypeRepository;
+
+  @Autowired
+  private TenantInfoRepository tenantInfoDao;
   
   private static final String redirect_1 = "/portal/woMgr/workOrderList.xhtml";
   private static final String redirect_2 = "/portal/asset/info/List.xhtml?assetStatus=2";
@@ -55,10 +60,16 @@ public class HealthApi {
                                                             @Min(0) @RequestParam(value = "start", required = false, defaultValue = "0") Integer start) {
 
     UserAccount user = UserContext.getCurrentLoginUser();
-    int site_id = user.getSiteId();
-    int hospital_id = user.getHospitalId();
+    Integer site_id = user.getSiteId();
+    Integer hospital_id = user.getHospitalId();
     String tenantUID = user.getTenantUID();
     String siteUID = user.getSiteUID();
+
+   TenantInfo tempTenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+   if(tempTenantInfo.getInsulate() != null && tempTenantInfo.getInsulate()){
+       hospital_id = null;
+       siteUID = null;
+   }
 
     if (Option.of(category).isEmpty())
       category = 0;
@@ -70,22 +81,22 @@ public class HealthApi {
 
       case 0:
         return createResponseBody(category, request,
-          healthService.queryForMaintain(site_id, hospital_id),
-          healthService.queryForOutage(site_id, hospital_id),
-          healthService.queryForWarranty(site_id, hospital_id),
+          healthService.queryForMaintain(tenantUID, siteUID),
+          healthService.queryForOutage(tenantUID, siteUID),
+          healthService.queryForWarranty(tenantUID, siteUID),
           healthService.queryForPm(tenantUID, siteUID),
           healthService.queryForMeterqa(site_id, hospital_id, 2),
           healthService.queryForMeterqa(site_id, hospital_id, 1));
       case 1:
         // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
 
-       return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(site_id, hospital_id), start, limit);
+       return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(tenantUID, siteUID), start, limit);
 
       case 2:
-        return createResponseBody(category, healthService.queryForOutage(site_id, hospital_id), request, start, limit);
+        return createResponseBody(category, healthService.queryForOutage(tenantUID, siteUID), request, start, limit);
 
       case 3:
-        return createResponseBody(healthService.queryForWarranty(site_id, hospital_id), category, request, start, limit);
+        return createResponseBody(healthService.queryForWarranty(tenantUID, siteUID), category, request, start, limit);
 
       case 4:
         return createResponseBody_s(healthService.queryForPm(tenantUID, siteUID), category, request, start, limit);

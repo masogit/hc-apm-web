@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<h:outputScript name="js/nurseSiteMaintain.js"></h:outputScript>
+		<ui:include src="maintainConfigEdit.xhtml" />
+		<ui:include src="maintainConfigCreate.xhtml" />
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="日常维护配置" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="maintainConfigListForm">
+				    <p:dataTable id="datalist" value="#{maintainConfigController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+				        selection="#{maintainConfigController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+				        rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+				        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+				        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+				
+				        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+				        <p:ajax event="filter" listener="#{maintainConfigController.onFilter}" />
+				
+				        <p:column headerText="配置名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+				            <h:outputText value="#{item.name}" />
+				        </p:column>
+				        <p:column headerText="创建人" filterBy="#{item.createBy}" filterMatchMode="EQ">
+				            <h:outputText value="#{item.createBy.name}" />
+				        </p:column>
+				        <p:column headerText="创建日期">
+				            <h:outputText value="#{item.createDate}" >
+				                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+				            </h:outputText>
+				        </p:column>
+				        <p:column headerText="修改人" filterBy="#{item.modifyBy}" filterMatchMode="LIKE">
+				            <h:outputText value="#{item.modifyBy.name}" />
+				        </p:column>
+				        <p:column headerText="修改日期">
+				            <h:outputText value="#{item.modifyDate}" >
+				                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+				            </h:outputText>
+				        </p:column>
+				        <f:facet name="{Toolbar}">
+				            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+				                actionListener="#{maintainConfigController.prepareCreate}" update=":maintainConfigCreateDlg"
+				                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
+				            <p:commandButton id="editButton" actionListener="#{maintainConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+				                update=":maintainConfigEditDlg" oncomplete="PF('maintainConfigEditDialog').show()"
+				                disabled="#{empty maintainConfigController.selected.id}" onclick="NurseSiteMaintain.on()"/>
+				            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+				                actionListener="#{maintainConfigController.delete}" update=":maintainConfigListForm:datalist"
+				                disabled="#{empty maintainConfigController.selected.id}">
+				                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+				            </p:commandButton>
+				        </f:facet>
+				    </p:dataTable>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -2,1241 +2,896 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-
-import webapp.framework.web.mvc.ServerEventInterface;
-import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
-public class AssetInfoEditController {
+public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
-//    private String gbCodeName;
-//    private static final long serialVersionUID = -1L;
-//
-//    AssetInfoRepository dao = null;
-//
-//    OrgInfoRepository orgInfoRepository;
-//
-//    private UserAccountRepository userDao;
-//
-//    private QrCodeLibRepository qrcodeDao;
-//
-//    private BrandRepository brandDao;
-//
-//    private boolean resultStatus;
-//
-//    private UserAccount clinicalOwner;
-//
-//    private Supplier supplier;
-//
-//    private Brand brand;
-//
-//    private StreamedContent zipFile;
-//
-//    private UserAccount owner;
-//    private UserAccount owner2;
-//    private UserAccount owner3;
-//    //    private List<UserAccount> ownerList;
-//    private List<OrgInfo> ownerOrgList;
-//
-//    private List<V2_BlobObject> attachements;
-//
-//    private BlobFileService blobService;
-//
-//    private UaaService uuaService;
-//
-//    private OrgInfoRepository orgDao;
-//
-//    private BlobObjectRepository blobDao;
-//
-//    private String operation;
-//
-//    private AssetDepreciationService assetDepreciationService;
-//    private V2_PmOrderService pmService;
-//
-//    private QrCodeService qrCodeService;
-//    private UserCommonService ucService;
-//
-//    private String oneSearchStr;
-//    private String qrCode;
-//    Boolean terminate;
-//    private Integer assetId;
-//
-//    private List<AssetInfo> parentAssetList;
-//    private List<I18nMessage> code68List;
-//    private I18nMessageRepository i18nDao;
-//
-//    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
-//
-//    private String selectedSiteUID;
-//
-//    private String measuring;
-//
-//    private Boolean isGeneratePmOrder;
-//
-//    private List<UserAccount> ownerList;
-//    private GbCodeService gbCodeService;
-//    private GbCodeRepository gbDao;
-//    public List<GbForm> gbFormList = new ArrayList<GbForm>();
-//
-//    private Map<String, Boolean> selectedMap;
-//
-//    private List<AssetInfo> currentPageAssets;
-//
-//    private Boolean isSelectedCurrentPage = false;
-//
-//    private OrgInfo selectSite;
+    private CustomConfigService ccService;
+    private AssetInfoRepository dao;
+    private UserCommonService ucService;
+    private BlobFileService blobService;
+    private QrCodeService qrCodeService;
+    private AssetInfoMgrService aimService;
+    private AssetCreateService acService;
+    private GbCodeService gbCodeService;
+    private UaaService uaaService;
+    private AssetDepreciationService assetDepreciationService;
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    private I18nMessageRepository i18nDao;
+    private OrgInfoRepository orgDao;
+    private GbCodeRepository gbDao;
+    private AssetInfoService assetInfoService;
+    private SupplierController supplierController;
+    private UserAccountRepository userDao;
+    private SupplierRepository supplierDao;
+    private AutoCompleteService autoCompleteService;
+    private OrgInfoTreeService orgInfoTreeService;
 
-//    protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
-//        setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
-//
-//        owner = selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId());
-//        owner2 = selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2());
-//        owner3 = selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3());
-//
-//        if (null != selected.getClinicalOwnerId()) {
-//            clinicalOwner = userDao.findById(selected.getClinicalOwnerId());
-//        }
-//
-//        if (null != selected.getSupplierId()) {
-//            SupplierRepository supplierDao = WebUtil.getBean(SupplierRepository.class);
-//            supplier = supplierDao.findById(selected.getSupplierId());
-//        }
-//
-//        qrCode = selected.getQrCode();
-//
-//        selectedOrg = orgInfoRepository.getByUid(selected.getSiteUID());
-//
-//        setSelectedSiteUID(selected.getSiteUID());
-//    }
-//    private boolean showDialog = false;
+    private Boolean terminate = false;
+    private CustomConfigObject customConfig;
+    private List<AssetInfo> parentAssetList;
+    private List<OrgInfo> clinicalDeptList;
+    private List<UserAccount> ownerList;
+    private List<I18nMessage> code68List;
+    private List<Supplier> supplierList = Collections.emptyList();
+    private List<UserAccount> clinicalOwnerList;
+    private List<V2_BlobObject> attachements;
+    private ConfigService configService;
+    private boolean resultStatus;
+    private WorkflowConfig config;
+    private String qrCode;
+    private String gbCodeName;
+    private GbCode selectedGb;
+    private TreeNode gbTree;
+    private TreeNode orgTree;
+    private TreeNode clinicalOrgTree;
+    private boolean hierachyClinicalSupport = false;
 
-//    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
-//        showDialog = true;
-//
-//        this.selected = null;
-//        this.selectedNode = null;
-//        // this.selectedAsset = null;
-//
-//        this.callingController = callingController;
-//        this.updateViewIDs = updateViewIDs;
-//        UaaService uaaService = WebUtil.getBean(UaaService.class);
-//
-//    }
+    private boolean assetGroupSecondarySupport = false;
+    private List<I18nMessage> assetGroupSecondaryList;
 
-    @PostConstruct
+    private Map<String, Object> selectedObjectMap = new HashMap();
+    private List<String> readableFieldsList;
+    private List<String> editableFieldsList;
+
+    @Override
     protected void init() {
-//        dao = WebUtil.getBean(AssetInfoRepository.class);
-//        userDao = WebUtil.getBean(UserAccountRepository.class);
-//        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
-//        blobDao = WebUtil.getBean(BlobObjectRepository.class);
-//        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-//        orgDao = WebUtil.getBean(OrgInfoRepository.class);
-//        brandDao = WebUtil.getBean(BrandRepository.class);
-//        uuaService = WebUtil.getBean(UaaService.class);
-//        qrCodeService = WebUtil.getBean(QrCodeService.class);
-//        blobService = WebUtil.getBean(BlobFileService.class);
-//        assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
-//        pmService = WebUtil.getBean(V2_PmOrderService.class);
-//        terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
-//        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-//        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-//        ucService = WebUtil.getBean(UserCommonService.class);
-//        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
-//        gbCodeService = WebUtil.getBean(GbCodeService.class);
-//        gbDao = WebUtil.getBean(GbCodeRepository.class);
-//        this.filterBySite = false;
-//        this.selectedMap = new HashMap();
-//
-//        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-//        String encodeStr = request.getParameter("str");
-//        this.measuring = request.getParameter("measuring");
-//        String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-//        // String actionName = WebUtil.getRequestParameter("actionName");
-//        if ("Create".equalsIgnoreCase(actionName)) {
-//            try {
-//                prepareCreate();
-//                selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-//                updateSelectedOrg(selectedOrg);
-//            } catch (InstantiationException | IllegalAccessException ex) {
-//                Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        } else if ("View".equalsIgnoreCase(actionName)) {
-//            // setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
-//            String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-//            if (terminateStr != null) {
-//                terminate = Boolean.parseBoolean(terminateStr);
-//            }
-//            setSelectedByUrlParam(encodeStr, "selectedid");
-//            prepareView();
-//        } else if ("Edit".equalsIgnoreCase(actionName)) {
-//            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
-//            String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-//            if (terminateStr != null) {
-//                terminate = Boolean.parseBoolean(terminateStr);
-//            }
-//            setSelectedByUrlParam(encodeStr, "selectedid");
-//            if (!StringUtils.isEmpty(selected.getNationalStandardCode())) {
-//                selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
-//                if (null != selectedGb) {
-//                    gbCodeName = selectedGb.getCode() + "/" + selectedGb.getName();
-//                }
-//            }
-//            prepareEdit();
-//        }
-//
-//        ownerOrgList = uuaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
-//        if (searchFilters == null) {
-//            searchFilters = new ArrayList<SearchFilter>();
-//        }
-//        if (this.selected != null) {
-//            initOrgTree();
-//        }
-//        initGbTree();
+        dao = WebUtil.getBean(AssetInfoRepository.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
+        configService = WebUtil.getBean(ConfigService.class);
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        ucService = WebUtil.getBean(UserCommonService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
+        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        qrCodeService = WebUtil.getBean(QrCodeService.class);
+        acService = WebUtil.getBean(AssetCreateService.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
+        gbCodeService = WebUtil.getBean(GbCodeService.class);
+        gbDao = WebUtil.getBean(GbCodeRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+
+        if ("Create".equalsIgnoreCase(actionName)) {
+            try {
+                prepareCreate();
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if ("Edit".equalsIgnoreCase(actionName)) {
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            setSelected(Integer.parseInt(selectedId));
+            String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
+            terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
+            prepareEdit();
+            beforeEdit();
+        }
+        ownerList = ucService.getWorkerList(selected.getId(), "");
+        config = configService.findConfigBySite(selected.getSiteUID());
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
+        initGbTree();
+        initOrgTree();
+
+        updateClinicalDeptOnSiteChange();
+
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
+
+        if (assetGroupSecondarySupport) {
+            onAssetGroupChange();
+        }
+
 
     }
 
-//    public Boolean getTerminate() {
-//        return terminate;
-//    }
-//
-//    public void setTerminate(Boolean terminate) {
-//        this.terminate = terminate;
-//    }
-//
-//    @Override
-//    protected AssetInfoRepository getDAO() {
-//        return dao;
-//    }
+    @Override
+    protected AssetInfoRepository getDAO() {
+        return dao;
+    }
 
+    @Override
+    public void onBeforeNewObject(AssetInfo object) {
+        object.setIsValid(true);
+        object.setStatus(1);
+        object.setDeviceStatus(0);
+        object.setIsDeleted(false);
+    }
 
-//    public void onSelectSiteTreeNode(NodeSelectEvent event) {
-//        selectSite = (OrgInfo) event.getTreeNode().getData();
-//        searchFilters.removeAll(searchFilters.stream().filter(item->"siteUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) ||
-//                    "institutionUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) || 
-//                    "hospitalUID".equals(item.fieldName)&&"1*".equals(item.conditionPath)).collect(Collectors.toList()));
-//        if (selectSite != null && selectSite.getId() > 0) {
-//            if(selectSite.getOrgType()==1){
-//                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
-//            }else if(selectSite.getOrgType()==2){
-//                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
-//            }else if(selectSite.getOrgType()==3){
-//                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
-//            }
-//        }
-//    }
+    private void beforeEdit() {
+        if (!StringUtils.isEmpty(selected.getNationalStandardCode())) {
+            selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
+            if (null != selectedGb) {
+                gbCodeName = selectedGb.getCode() + "/" + selectedGb.getName();
+            }
+        }
+        selectedObjectMap.put("assetOwner", selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId()));
+        selectedObjectMap.put("assetOwner2", selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2()));
+        selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
+        selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
+        selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
+        selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
+        selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
+        selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
+        selectedObjectMap.put("manufacture", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
+        selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
+        selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
+        qrCode = selected.getQrCode();
+        parentAssetList = aimService.getParentsAssetsList(this.selected);
+        getClinicalOwnerList();
 
-//    public void exportQrCode() throws Exception {
-//        List<AssetInfo> exportList = getExportList();
-//        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
-//        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
-//    }
-//
-//    public void onSelectAllOfPage() {
-//        for (AssetInfo item : currentPageAssets) {
-//            selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
-//        }
-//    }
-//
-//    public void onItemSelected() {
-//        isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-//    }
-//
-//    public List<AssetInfo> getExportList() {
-//        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-//        return assetUids.isEmpty() ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUids);
-//    }
-//
-//    public void onSelectAsset() throws IOException {
-//        String url = "actionName=View&selectedid="
-//                + selected.getId().toString()
-//                + "&asset_name=" + selected.getName()
-//                + "&terminate=" + this.terminate;
-//        url = "Detail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-//
-//        //FacesContext.getCurrentInstance().getExternalContext().redirect(url);
-//        RequestContext requestContext = RequestContext.getCurrentInstance();
-//        requestContext.addCallbackParam("url", url);
-//    }
-//
-//    public String getViewPage(String pageName, String actionName) {
-//        operation = pageName + "?actionName=" + actionName + "&selectedid=" + selected.getId();
-//        return operation;
-//    }
-//
-//    public String getDetailPage() {
-//        operation = "Detail.xhtml?actionName=View&selectedid=" + selected.getId()
-//                + "&asset_name=" + selected.getName();
-//        return operation;
-//    }
-//
-//    public String getDetailPage(String assetId, String assetName) {
-//        operation = "Detail.xhtml?actionName=View&selectedid=" + assetId
-//                + "&asset_name=" + assetName
-//                + "&terminate=" + this.terminate;
-//        return UrlEncryptController.encodeUrlParam(operation);
-//    }
-//
-//    public String getEditPage(String assetId, String assetName) {
-//        operation = "Create.xhtml?actionName=Edit&selectedid=" + assetId
-//                + "&asset_name=" + assetName
-//                + "&terminate=" + this.terminate;
-//        return UrlEncryptController.encodeUrlParam(operation);
-//    }
-//
-//    public void assembleMaintainData() {
-//        operation = "/portal/woMgr/woMgrList?faces-redirect=true&assetUID=" + selected.getUid();
-//    }
-//
-//    public void assembleMaintainList() {
-//        operation = "/portal/woMgr/woMgrList?faces-redirect=true";
-//    }
-//
-//    public String getContractListLink() {
-//        return "/portal/asset/contract/List?assetId=" + selected.getId();
-//    }
-//
-//    public String getContractAddLink() {
-//        return "/portal/asset/contract/List?assetId=" + selected.getId() + "&actionName=Create";
-//    }
-//
-//    @Override
-//    public void onBeforeNewObject(AssetInfo object) {
-//        object.setSiteId(UserContextService.getSiteId());
-//        object.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
-//        object.setIsValid(true);
-//        object.setStatus(1);
-//        object.setDeviceStatus(0);
-//        object.setIsDeleted(false);
-//
-//        object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-//        object.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
-//        object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
-//        object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
-//    }
-//
-//    @Override
-//    public void onBeforeSave(AssetInfo object) {
-//        if (null != object.getClinicalDeptId()) {
-//            OrgInfo org = orgDao.findById(object.getClinicalDeptId());
-//            object.setClinicalDeptName(org.getName());
-//
-//            object.setTenantUID(org.getTenantUID());
-//            object.setHospitalUID(org.getHospitalUID());
-//            object.setInstitutionUID(org.getInstitutionUID());
-//            object.setSiteUID(org.getSiteUID());
-//            object.setClinicalDeptUID(org.getUid());
-//        } else {
-//            //clear uid and its name
-//            object.setClinicalDeptUID(null);
-//            object.setClinicalDeptName(null);
-//        }
-//        DateTime temp;
-//        if (null != object.getManufactDate()) {
-//            temp = new DateTime(object.getManufactDate());
-//            object.setManufactDate(temp.plusHours(12).toDate());
-//        }
-//        if (null != object.getPurchaseDate()) {
-//            temp = new DateTime(object.getPurchaseDate());
-//            object.setPurchaseDate(temp.plusHours(12).toDate());
-//        }
-//        if (null != object.getArriveDate()) {
-//            temp = new DateTime(object.getArriveDate());
-//            object.setArriveDate(temp.plusHours(12).toDate());
-//        }
-//        if (null != object.getInstallDate()) {
-//            temp = new DateTime(object.getInstallDate());
-//            object.setInstallDate(temp.plusHours(12).toDate());
-//        }
-//        if (null != object.getWarrantyDate()) {
-//            temp = new DateTime(object.getWarrantyDate());
-//            object.setWarrantyDate(temp.plusHours(12).toDate());
-//        }
-//        if (null != object.getTerminateDate()) {
-//            temp = new DateTime(object.getTerminateDate());
-//            object.setTerminateDate(temp.plusHours(12).toDate());
-//        }
-//    }
-//
-//    @Override
-//    public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
-//        resultStatus = isOK;
-//    }
-//
-//    @Override
-//    public void onAfterNewObject(AssetInfo object, boolean isOK) {
-//        resultStatus = isOK;
-//        if (isOK) {
-//            attachements.forEach(item -> {
-//                if (item.getBoId() == null) {
-//                    item.setBoId(object.getId());
-//                    item.setBoUuid(object.getUid());
-//                    blobDao.save(item);
-//                }
-//            });
-//        }
-//    }
-//
-//    @Override
-//    public void onAfterDeleteObject(AssetInfo object, boolean isOK) {
-//        resultStatus = isOK;
-//    }
-//
-//    public void renewQrcode() {
-//        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
-//        qrCode = qrcodeLib.getQrCode();
-//    }
-//
-//    private boolean updateQrCode() {
-//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode);
-//        if (qrCodeLib == null) {
-//            WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
-//            return false;
-//        }
-//        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
-//            WebUtil.addErrorMessage(WebUtil.getMessage("WrongHospitalQRCode"));
-//            return false;
-//        }
-//        if (qrCodeLib.getStatus() != 1) {
-//            WebUtil.addErrorMessage(WebUtil.getMessage("AlreadyUsingQrCode"));
-//            return false;
-//        }
-//
-//        QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode());
-//        if (null != oldQRCodeLib) {
-//            qrCodeService.discardQrCode(qrCode);
-//        }
-//        qrCodeLib.setStatus(3);
-//        qrcodeDao.save(qrCodeLib);
-//        selected.setQrCode(qrCode);
-//        return true;
-//    }
-//
-//    @Transactional
-//    public String applyChange() {
-//        if (!isTimeValidate()) {
-//            return "";
-//        }
-//        if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
-//            selected.setQrCode(null);
-//        } else {
-//            if (!qrCode.equals(selected.getQrCode())) {
-//                if (!updateQrCode()) {
-//                    qrCode = "";
-//                    return "";
-//                }
-//            }
-//
-//        }
-//        if (null != gbCodeName) {
-//            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
-//            if (null == gbCode) {
-//                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
-//                return "";
-//            }
-//
-//            selected.setNationalStandardCode(selectedGb.getCode());
-//        }
-//
-//        Boolean isNew = selected.hashCode() == 0;
-//        this.save();
-//        assetDepreciationService.saveAssetDerpeciation(selected);
-//        if (isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
-//            pmService.createPMrequest(selected.getUid(), null);
-//        }
-//        if (resultStatus) {
-//            return getListPageLink();
-//        } else {
-//            return "";
-//        }
-//    }
+        if (selected.getSupplierId() != null) {
+            Supplier supplier = supplierDao.findById(selected.getSupplierId());
+            if (supplier != null) {
+                selected.setVendorTel(supplier.getTel());
+            }
+        }
 
-//    public String getListPageLink() {
-//        return "List?faces-redirect=true" + (this.isTerminate() ? "&terminate=true" : "");
-//    }
-//
-//    public String setValidButton() {
-//        if (terminate) {
-//            this.selected.setIsValid(true);
-//            this.selected.setTerminateDate(null);
-//        } else {
-//            int workOrdersNum = dao.fetchCurrentWorkOrders(selected.getId());
-//            if (workOrdersNum > 0) {
-//                WebUtil.addErrorMessage("当前设备存在未完成工单，不能报废！");
-//                return null;
-//            } else {
-//                this.selected.setIsValid(false);
-//                this.selected.setTerminateDate(new Date());
-//            }
-//        }
-//        update();
-//        return "List?faces-redirect=true" + (terminate ? "&terminate=true" : "");
-//    }
-//
-//    public UserAccount getOwner() {
-//        return owner;
-//    }
-//
-//    public List<OrgInfo> getOwnerOrgList() {
-//        return ownerOrgList;
-//    }
-//
-//    public void setOwner(UserAccount owner) {
-//        this.owner = owner;
-//    }
-//
-//    public void onOwnerChange() {
-//        if (null != owner) {
-//            selected.setAssetOwnerId(owner.getId());
-//            selected.setAssetOwnerName(owner.getName());
-//            selected.setAssetOwnerTel(owner.getTelephone());
-//        } else {
-//            selected.setAssetOwnerId(null);
-//            selected.setAssetOwnerName(null);
-//            selected.setAssetOwnerTel(null);
-//        }
-//
-//        if (null != owner2) {
-//            selected.setAssetOwnerId2(owner2.getId());
-//            selected.setAssetOwnerName2(owner2.getName());
-//            selected.setAssetOwnerTel2(owner2.getTelephone());
-//        } else {
-//            selected.setAssetOwnerId2(null);
-//            selected.setAssetOwnerName2(null);
-//            selected.setAssetOwnerTel2(null);
-//        }
-//
-//        if (null != owner3) {
-//            selected.setAssetOwnerId3(owner3.getId());
-//            selected.setAssetOwnerName3(owner3.getName());
-//            selected.setAssetOwnerTel3(owner3.getTelephone());
-//        } else {
-//            selected.setAssetOwnerId3(null);
-//            selected.setAssetOwnerName3(null);
-//            selected.setAssetOwnerTel3(null);
-//        }
-//
-//    }
-//
-//    public void onClinicalDeptChange() {
-//        this.clinicalOwner = null;
-//        selected.setClinicalOwnerId(null);
-//        selected.setClinicalOwnerName(null);
-//        selected.setClinicalOwnerTel(null);
-//
-//        if (null != selected.getClinicalDeptId()) {
-//            OrgInfo org = orgDao.findById(selected.getClinicalDeptId());
-//            selected.setClinicalDeptName(org.getName());
-//            selected.setClinicalDeptUID(org.getUid());
-//        } else {
-//            selected.setClinicalDeptName(null);
-//            selected.setClinicalDeptUID(null);
-//        }
-//
-//        onAssetGroupChange();
-//    }
-//
-//    public void onClinicalOwnerChange() {
-//        if (null != clinicalOwner) {
-//            selected.setClinicalOwnerId(clinicalOwner.getId());
-//            selected.setClinicalOwnerName(clinicalOwner.getName());
-//            selected.setClinicalOwnerTel(clinicalOwner.getTelephone());
-//        } else {
-//            selected.setClinicalOwnerId(null);
-//            selected.setClinicalOwnerName(null);
-//            selected.setClinicalOwnerTel(null);
-//        }
-//    }
-//
-//    public void onSupplierChange() {
-//        if (null != supplier) {
-//            selected.setSupplierId(supplier.getId());
-//            selected.setVendor(supplier.getName());
-//        }
-//    }
-//
-//    public void onBrandChange() {
-//        if (null != brand) {
-//            selected.setBrand(brandDao.findById(brand.getId()));
-//        }
-//    }
-//
-//    public void handleFileUpload(FileUploadEvent event) {
-//
-//        V2_BlobObject blobObject = blobService.uploadFile(event);
-//        if (null != blobObject) {
-//            String type = event.getComponent().getId();
-//            type = type.substring(type.indexOf("type") + 4);
-//            attachements.add(blobObject);
-//            blobObject.setBoId(selected.getId());
-//            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-//            blobObject.setBoSubType(type);
-//            blobObject.setBoUuid(selected.getUid());
-//            blobDao.save(blobObject);
-//            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-//        } else {
-//            WebUtil.addErrorMessage("fail to upload file");
-//        }
-//
-//    }
-//
-//    public List<V2_BlobObject> getAttachList(String assetuid, String type) {
-//        if (attachements == null || attachements.isEmpty()) {
-//            List<SearchFilter> sfs = new ArrayList();
-//            //sfs.addAll(this.searchFilters);
-//            sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, assetuid));
-//            attachements = blobDao.findBySearchFilter(sfs);
-//        }
-//        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
-//    }
-//
-//    public void removeAttachmentById(String blobId) {
-//        blobService.deleteBlobFileById(blobId);
-//        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
-//    }
-//
-//    public String getHospitalName(String siteUid) {
-//        OrgInfo org = orgDao.getByUid(siteUid);
-//        return org == null ? "" : org.getName();
-//    }
-//
-//    public void onHospitalChange() {
-//        OrgInfo org = orgDao.getByUid(selected.getSiteUID());
-//        selected.setInstitutionUID(org.getInstitutionUID());
-//        selected.setHospitalUID(org.getHospitalUID());
-//        this.owner = null;
-//    }
-//
-//    public List<UserAccount> getOwnerList() {
-//        if (ownerList == null) {
-//            ownerList = getEmptyAccountList();
-//            List<UserAccount> workerList = ucService.getWorkerList(selected.getId());
-//            if (null != workerList) {
-//                ownerList.addAll(workerList);
-//            }
-//        }
-//        return ownerList;
-//    }
-//
-//    private List<UserAccount> getEmptyAccountList() {
-//        List<UserAccount> accountList = new ArrayList();
-//        UserAccount emptyValue = new UserAccount();
-//        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
-//        accountList.add(emptyValue);
-//        return accountList;
-//    }
-//
-//    public List<UserAccount> getClinicalOwnerList() {
-//        List<UserAccount> accountList = getEmptyAccountList();
-//        if (null != selected.getClinicalDeptId()) {
-//            accountList.addAll(userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId()));
-//        }
-//        return accountList;
-//    }
+    }
 
-//    public String getQrCodeImageBase64() {
-//        return qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
-//    }
-//
-//    public boolean isTimeValidate() {
-//        String message = WebUtil.getMessage("shouldEarly"); //"{0} must before {1}!";
-//        AssetInfo input = this.selected;
-//        boolean isError = false;
-//
-//        if (null != input.getManufactDate() && null != input.getPurchaseDate() && input.getManufactDate().after(input.getPurchaseDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("manufactDate"), WebUtil.getMessage("purchaseDate")));
-//        }
-//
-//        if (null != input.getArriveDate() && null != input.getPurchaseDate() && input.getPurchaseDate().after(input.getArriveDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("purchaseDate"), WebUtil.getMessage("arriveDate")));
-//        }
-//
-//        if (null != input.getArriveDate() && null != input.getInstallDate() && input.getArriveDate().after(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("arriveDate"), WebUtil.getMessage("installDate")));
-//        }
-//        if (null != input.getWarrantyDate() && null != input.getInstallDate() && input.getWarrantyDate().before(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("warrantyDate")));
-//        }
-//        if (null != input.getTerminateDate() && null != input.getInstallDate() && input.getTerminateDate().before(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("terminateDate")));
-//        }
-//        if (null != input.getLastPmDate() && null != input.getInstallDate() && input.getLastPmDate().before(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("lastPmDate")));
-//        }
-//        if (null != input.getLastMeteringDate() && null != input.getInstallDate() && input.getLastMeteringDate().before(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("lastMeteringDate")));
-//        }
-//        if (null != input.getLastQaDate() && null != input.getInstallDate() && input.getLastQaDate().before(input.getInstallDate())) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("lastQaDate")));
-//        }
-//
-//        return !isError;
-//    }
-//
-//    private String filterAssetStatus = null;
-//
-//    public String getFilterAssetStatus() {
-//        return filterAssetStatus;
-//    }
-//
-//    public void setFilterAssetStatus(String filterAssetStatus) {
-//        this.filterAssetStatus = filterAssetStatus;
-//    }
-//
-//
-//    public void deleteAsset(AssetInfo asset) {
-//        ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
-//        List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
-//        if (srlist != null && !srlist.isEmpty()) {
-//            WebUtil.addErrorMessage("该设备有工单存在,不能删除");
-//            return;
-//        }
-//        if (asset.getQrCode() != null) {
-//            qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
-//        }
-//        asset.setIsDeleted(true);
-//        asset.setIsValid(false);
-//        asset.setQrCode(null);
-//        dao.save(asset);
-//    }
-//
-//    private String filterWarrantyDate = null;
-//
-//    public String getFilterWarrantyDate() {
-//        return filterWarrantyDate;
-//    }
-//
-//    public void setFilterWarrantyDate(String filterWarrantyDate) {
-//        this.filterWarrantyDate = filterWarrantyDate;
-//    }
-//
-//    private Date varWarrantyDateTo = null;
-//    private String warrantyFormatTime = null;
-//
-//    public Date getVarWarrantyDateTo() {
-//        return varWarrantyDateTo;
-//    }
-//
-//    public void setVarWarrantyDateTo(Date varWarrantyDateTo) {
-//        this.varWarrantyDateTo = varWarrantyDateTo;
-//    }
-//
-//    public String getWarrantyFormatTime() {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-//        if (varWarrantyDateTo == null) {
-//            return warrantyFormatTime;
-//        } else {
-//            return "~" + sdf.format(varWarrantyDateTo);
-//        }
-//    }
-//
-//    public void setWarrantyFormatTime(String warrantyFormatTime) {
-//        this.warrantyFormatTime = warrantyFormatTime;
-//    }
-//
-//    public String getOperation() {
-//        return operation;
-//    }
-//
-//    public void setOperation(String operation) {
-//        this.operation = operation;
-//    }
-//
-//    public Boolean isTerminate() {
-//        if (null != selected) {
-//            return !selected.getIsValid();
-//        }
-//        return terminate;
-//    }
-//
-//    public UserAccount getClinicalOwner() {
-//        return clinicalOwner;
-//    }
-//
-//    public void setClinicalOwner(UserAccount clinicalOwner) {
-//        this.clinicalOwner = clinicalOwner;
-//    }
-//
-//    public Supplier getSupplier() {
-//        return supplier;
-//    }
-//
-//    public void setSupplier(Supplier supplier) {
-//        this.supplier = supplier;
-//    }
-//
-//    public Brand getBrand() {
-//        return brand;
-//    }
-//
-//    public void setBrand(Brand brand) {
-//        this.brand = brand;
-//    }
-//
-//    public UserAccount getOwner2() {
-//        return owner2;
-//    }
-//
-//    public void setOwner2(UserAccount owner2) {
-//        this.owner2 = owner2;
-//    }
-//
-//    public UserAccount getOwner3() {
-//        return owner3;
-//    }
-//
-//    public void setOwner3(UserAccount owner3) {
-//        this.owner3 = owner3;
-//    }
-//
-//    public String getQrCode() {
-//        return qrCode;
-//    }
-//
-//    public void setQrCode(String qrCode) {
-//        this.qrCode = qrCode;
-//    }
-//
-//    public String getOrgName(Integer orgId) {
-//        OrgInfo org = orgDao.findById(orgId);
-//        if (org != null) {
-//            return org.getName();
-//        }
-//        return null;
-//    }
-//
-//    public String getSiteOrgName(String siteUID) {
-//        OrgInfo org = orgDao.getByUid(siteUID);
-//        if (org != null) {
-//            return org.getName();
-//        }
-//        return null;
-//    }
-//
-//    public String getAssetDetailTitle() {
-//        return terminate ? WebUtil.getMessage("TerminateAssetInfoDetail") : WebUtil.getMessage("AssetInfoDetail");
-//    }
-//
-//    public String getAssetEditTitle() {
-//        return terminate ? WebUtil.getMessage("TerminateAssetInfo") : WebUtil.getMessage("AssetInfo");
-//    }
-//
-//    public String getAssetListTitle() {
-//        return terminate ? WebUtil.getMessage("TerminateAssetInfo") : WebUtil.getMessage("AssetInfo");
-//    }
-//
-//    public String getButtonName() {
-//        return terminate ? WebUtil.getMessage("ActiveAsset") : WebUtil.getMessage("InactiveAsset");
-//    }
-//
-//    public void onAssetGroupChange() {
-//
-//        List<SearchFilter> assetFilters = new ArrayList<>();
-//        if (this.selected.getAssetGroup() != null) {
-//            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
-//            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
-//
-//            if (this.selected.getClinicalDeptUID() != null) {
-//                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
-//            }
-//
-//            if (this.selected.getSiteUID() != null) {
-//                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
-//            }
-//
-//            parentAssetList = dao.findBySearchFilter(assetFilters);
-//        } else {
-//            parentAssetList = new ArrayList<>();
-//        }
-//
-//    }
-//
-//    public void onFunctionGroupChange() {
-//        code68List = new ArrayList<>();
-//        this.selected.setAssetCode68(null);
-//
-//        this.changeFunctionGroup();
-//    }
-//
-//    public void changeFunctionGroup() {
-//        Integer functionGroupId = this.selected.getFunctionGroup();
-//        if (functionGroupId != null) {
-//            I18nMessage functionGroup = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", functionGroupId.toString());
-//            if (functionGroup != null) {
-//                code68List = i18nDao.getByMsgType(functionGroup.getMsgKey());
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public void prepareEdit() {
-//        super.prepareEdit();
-//
-//        onAssetGroupChange();
-//
-//        changeFunctionGroup();
-//    }
-//
-//    public List<AssetInfo> getParentAssetList() {
-//        return parentAssetList;
-//    }
-//
-//    public void setParentAssetList(List<AssetInfo> parentAssetList) {
-//        this.parentAssetList = parentAssetList;
-//    }
-//
-//    public String getParentAssetName() {
-//        if (this.selected.getParentAssetId() != null) {
-//            AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
-//            if (assetInfo != null) {
-//                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
-//            }
-//        }
-//        return "";
-//    }
-//
-//    public String getParentAssetNameByAssetId(int assetId) {
-//        AssetInfo ai = dao.findById(assetId);
-//        if (ai.getParentAssetId() != null) {
-//            AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
-//            if (assetInfo != null) {
-//                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
-//            }
-//        }
-//        return "";
-//    }
-//
-//    public List<I18nMessage> getCode68List() {
-//        return code68List;
-//    }
-//
-//    public void setCode68List(List<I18nMessage> code68List) {
-//        this.code68List = code68List;
-//    }
-//
-//    public StreamedContent getZipFile() {
-//        return zipFile;
-//    }
-//
-//    public void setZipFile(StreamedContent zipFile) {
-//        this.zipFile = zipFile;
-//    }
-//
-//    public String getOneSearchStr() {
-//        return oneSearchStr;
-//    }
-//
-//    public List<Brand> getBrandList() {
-//        return brandDao.find();
-//    }
-//
-//    public Integer getAssetId() {
-//        return assetId;
-//    }
-//
-//    public void setAssetId(Integer assetId) {
-//        this.assetId = assetId;
-//    }
-//
-//    private TreeNode orgTree;
-//    private TreeNode gbTree;
-//
-//    private TreeNode selectedNode;
-//    private TreeNode selectedGbNode;
-//
-//    private GbCode selectedGb;
-//    private OrgInfo selectedOrg;
-//
-//    private UaaService uaaService = WebUtil.getBean(UaaService.class);
-//
-//    public TreeNode getSelectedGbNode() {
-//        return selectedGbNode;
-//    }
-//
-//    public void setSelectedGbNode(TreeNode selectedGbNode) {
-//        this.selectedGbNode = selectedGbNode;
-//    }
-//
-//    public TreeNode getGbTree() {
-//        return gbTree;
-//    }
-//
-//    public void setGbTree(TreeNode gbTree) {
-//        this.gbTree = gbTree;
-//    }
-//
-//    public TreeNode getOrgTree() {
-//        return orgTree;
-//    }
-//
-//    public OrgInfo getSelectedOrg() {
-//        return selectedOrg;
-//    }
-//
-//    public TreeNode getSelectedNode() {
-//        return selectedNode;
-//    }
-//
-//    public void setSelectedNode(TreeNode selectedNode) {
-//        this.selectedNode = selectedNode;
-//    }
-//
-//    public void onSelectTreeNode(NodeSelectEvent event) {
-//        TreeNode node = event.getTreeNode();
-//        OrgInfo orgInfo = (OrgInfo) node.getData();
-//
-//        updateSelectedOrg(orgInfo);
-//
-//        onAssetGroupChange();
-//
-//    }
-//
-//    public void onSelectGbTreeNode(NodeSelectEvent event) {
-//        TreeNode node = event.getTreeNode();
-//        GbCode gbCode = (GbCode) node.getData();
-//        updateSelectedOrgGb(gbCode);
-//
-////联动更新
-//        if (null != selectedGb) {
-//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-//                    this.selectedGb.getCode(),
-//                    this.selected.getSiteUID()
-//            );
-//            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-//                this.selected.setFinancingNum(financingNum);
-//            }
-//
-//        }
-//
-//    }
-//
-//    private void updateSelectedOrg(OrgInfo orgInfo) {
-//
-//        if (orgInfo == null || orgInfo.getId() == -1) {
-//            selectedOrg = null;
-//
-//            selected.setTenantUID(null);
-//            selected.setInstitutionUID(null);
-//            selected.setHospitalUID(null);
-//            selected.setSiteUID(null);
-//
-//            setSelectedSiteUID(null);
-//        } else {
-//            selectedOrg = orgInfo;
-//
-//            selected.setTenantUID(selectedOrg.getTenantUID());
-//            selected.setInstitutionUID(selectedOrg.getInstitutionUID());
-//            selected.setHospitalUID(selectedOrg.getHospitalUID());
-//            selected.setSiteUID(selectedOrg.getSiteUID());
-//
-//            setSelectedSiteUID(selectedOrg.getUid());
-//        }
-//
-//    }
-//
-//    private void updateSelectedOrgGb(GbCode gbCode) {
-//        if (gbCode == null || gbCode.getId() == -1) {
-//            selectedGb = null;
-//        } else {
-//            selectedGb = gbCode;
-//            gbCodeName = gbCode.getCode() + "/" + gbCode.getName();
-//        }
-//
-//    }
-//
-//    public void initGbTree() {
-//        TreeNode treeNode = gbCodeService.buildGbTree();
-//        gbTree = new DefaultTreeNode("root", null, null);
-//        gbTree.getChildren().add(treeNode);
-//        treeNode.setExpanded(true);
-//    }
-//
-//    public void initOrgTree() {
-//        UserAccount loginUser = UserContextService.getCurrentUserAccount();
-//
-//        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
-////        orgTree = new DefaultTreeNode("root",null,null);
-////        orgTree.getChildren().add(treeNode);
-////        orgTree.setExpanded(true);
-//
-//        OrgInfo rootOrg = new OrgInfo();
-//        rootOrg.setId(-1);
-//        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-//        orgTree = new DefaultTreeNode("root", null, null);
-//        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-//        if (null != treeNode) {
-//            rootNode.getChildren().add(treeNode);
-//        }
-//        rootNode.setExpanded(true);
-//
-//    }
-//
-//    public void updateFinancingNumByNationalStandardCode() {
-//        if (null != selected && null != selectedGb) {
-//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-//                    this.selectedGb.getCode(),
-//                    this.selected.getSiteUID()
-//            );
-//            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-//                this.selected.setFinancingNum(financingNum);
-//            }
-//        }
-//
-//    }
-//
-//    public void discard(AssetInfo asset) {
-//        if (asset != null && asset.getUsageStatus() == 3) {
-//            asset.setUsageStatus(4);
-//            this.selected = dao.save(asset);
-//            WebUtil.addSuccessMessage("报废成功！");
-//        } else {
-//            WebUtil.addSuccessMessage("只能报废待报废状态的资产！");
-//        }
-//    }
-//
-//    public void readyForDiscard(AssetInfo asset) {
-//        if (asset != null && asset.getUsageStatus() == 2) {
-//            asset.setUsageStatus(3);
-//            this.selected = dao.save(asset);
-//            WebUtil.addSuccessMessage("已将状态修改为待报废！");
-//        } else {
-//            WebUtil.addSuccessMessage("只能待报废停用状态的资产！");
-//        }
-//    }
-//
-//    public String getSelectedSiteUID() {
-//        return selectedSiteUID;
-//    }
-//
-//    public void setSelectedSiteUID(String selectedSiteUID) {
-//        this.selectedSiteUID = selectedSiteUID;
-//    }
-//
-//    public List<String> completeAssetName(String prefix) {
-//        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-//        List<String> names = null;
-//        if (StringUtils.isEmpty(prefix)) {
-//            names = dao.findDistinctAssetNames(tenantUID);
-//        } else {
-//            names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
-//        }
-//
-//        return names;
-//
-//    }
-//
-//    public List<String> completeGbName(String prefix) {
-//        List<String> names = null;
-//        if (!StringUtils.isEmpty(prefix)) {
-//            names = gbDao.findGbCodeByPrefix(prefix);
-//        }
-//        return names;
-//
-//    }
-//
-//    public GbCode getSelectedGb() {
-//        return selectedGb;
-//    }
-//
-//    public void setSelectedGb(GbCode selectedGb) {
-//        this.selectedGb = selectedGb;
-//
-//    }
-//
-//    public Boolean getIsGeneratePmOrder() {
-//        return isGeneratePmOrder;
-//    }
-//
-//    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
-//        this.isGeneratePmOrder = isGeneratePmOrder;
-//    }
-//
-//    public void cancleWarranty(Integer assetId) {
-//        AssetInfo ai = dao.findById(assetId);
-//        if (ai != null) {
-//            ai.setWarranty(false);
-//            dao.save(ai);
-//        }
-//    }
-//
-//    public String getGbCodeName() {
-//        return gbCodeName;
-//    }
-//
-//    public void setGbCodeName(String gbCodeName) {
-//
-//        this.gbCodeName = gbCodeName;
-//    }
-//
-//    public Map<String, Boolean> getSelectedMap() {
-//        return selectedMap;
-//    }
-//
-//    public void setSelectedMap(Map<String, Boolean> selectedMap) {
-//        this.selectedMap = selectedMap;
-//    }
-//
-//    public Boolean getIsSelectedCurrentPage() {
-//        return isSelectedCurrentPage;
-//    }
-//
-//    public void setIsSelectedCurrentPage(Boolean isSelectedCurrentPage) {
-//        this.isSelectedCurrentPage = isSelectedCurrentPage;
-//    }
-//
-//    public OrgInfo getSelectSite() {
-//        return selectSite;
-//    }
-//
-//    public void setSelectSite(OrgInfo selectSite) {
-//        this.selectSite = selectSite;
-//    }
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+    }
 
+    public void initClinicalOrgTree() {
+        OrgInfo siteOrg = (OrgInfo) selectedObjectMap.get("selectedOrg");
+        if (siteOrg != null) {
+            List<OrgInfo> clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(siteOrg.getSiteUID());
+            clinicalOrgTree = orgInfoTreeService.buildHierachyClinicalDept(siteOrg.getSiteUID(), clinicalDeptList);
 
+        }
 
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        changeAssetOrg(orgInfo);
+        selectedObjectMap.put("selectedOrg", orgInfo);
+    }
+
+    public void onSelectClinicalDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("clinicalDept", orgInfo);
+    }
+
+    public void onSelectAssetDeptTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedObjectMap.put("assetDept", orgInfo);
+    }
+
+    public List<UserAccount> completeOwnerList(String query) {
+
+        if (ownerList == null) {
+            return Collections.emptyList();
+        }
+
+        List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    private void changeAssetOrg(OrgInfo orgInfo) {
+        selected.setSiteId(orgInfo.getSiteId());
+        selected.setHospitalId(orgInfo.getId());
+
+        selected.setTenantUID(orgInfo.getTenantUID());
+        selected.setHospitalUID(orgInfo.getHospitalUID());
+        selected.setInstitutionUID(orgInfo.getInstitutionUID());
+        selected.setSiteUID(orgInfo.getSiteUID());
+        config = configService.findConfigBySite(selected.getSiteUID());
+
+        updateClinicalDeptOnSiteChange();
+
+        selectedObjectMap.put("clinicalDept", null);
+        onAssetDeptChange("clinicalDept");
+        selectedObjectMap.put("assetDept", null);
+        onAssetDeptChange("assetDept");
+        parentAssetList.clear();
+    }
+
+    private void updateClinicalDeptOnSiteChange() {
+
+        //later support hierachy clinical dept
+//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
+        int parentClinicalCount = 0;
+        if (parentClinicalCount > 0) {
+            //如果存在大科室，则显示树结构
+            hierachyClinicalSupport = true;
+            initClinicalOrgTree();
+        } else {
+            hierachyClinicalSupport = false;
+            clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+        }
+    }
+
+    public void onParentAssetChange() {
+        AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
+        selected.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
+    }
+
+    public void onOwnerChange(String idx) {
+        UserAccount selectedUser = (UserAccount) selectedObjectMap.get(idx);
+        switch (idx) {
+            case "assetOwner":
+                selected.setAssetOwnerId(null == selectedUser ? null : selectedUser.getId());
+                selected.setAssetOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setAssetOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "assetOwner2":
+                selected.setAssetOwnerId2(null == selectedUser ? null : selectedUser.getId());
+                selected.setAssetOwnerName2(null == selectedUser ? null : selectedUser.getName());
+                selected.setAssetOwnerTel2(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "assetOwner3":
+                selected.setAssetOwnerId3(null == selectedUser ? null : selectedUser.getId());
+                selected.setAssetOwnerName3(null == selectedUser ? null : selectedUser.getName());
+                selected.setAssetOwnerTel3(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+            case "clinicalOwner":
+                selected.setClinicalOwnerId(null == selectedUser ? null : selectedUser.getId());
+                selected.setClinicalOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setClinicalOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
+        }
+    }
+
+    public void onSupplierChange(String idx) {
+        Supplier supplier = (Supplier) selectedObjectMap.get(idx);
+        switch (idx) {
+            case "supplier":
+                selected.setSupplierId(supplier == null ? null : supplier.getId());
+                selected.setVendor(supplier == null ? null : supplier.getName());
+                selected.setVendorTel(supplier == null ? null : supplier.getTel());
+                break;
+            case "maintainer":
+                selected.setMaitananceId(supplier == null ? null : supplier.getId().toString());
+                selected.setMaitanance(supplier == null ? null : supplier.getName());
+                selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
+                break;
+            case "manufacture":
+                selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
+                selected.setManufacture(supplier == null ? null : supplier.getName());
+                break;
+        }
+    }
+
+    public List<V2_BlobObject> getAttachList(String assetuid, String type) {
+        if (attachements == null) {
+            attachements = blobService.findBlobObjectsByBoUid(assetuid);
+        }
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void onAfterNewObject(AssetInfo object, boolean isOK) {
+        resultStatus = isOK;
+        if (isOK) {
+            attachements.forEach(item -> {
+                if (item.getBoId() == null) {
+                    item.setBoId(object.getId());
+                    item.setBoUuid(object.getUid());
+                    blobService.saveBlobObject(item);
+                }
+            });
+        }
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            attachements.add(blobObject);
+            blobObject.setBoId(selected.getId());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    @Transactional
+    public String applyChange() {
+        if (selected.getUsageStatus() == null) {
+            selected.setUsageStatus(3);
+        }
+        if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
+            selected.setQrCode(null);
+        } else {
+            if (!qrCode.equals(selected.getQrCode())) {
+                if ("DFQ".equals(getAssetCodeConfig())) {
+                    QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
+                    if (qrCodeLib == null) {
+                        if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
+                            WebUtil.addErrorMessage("二维码不正确");
+                            return "";
+                        };
+                    }
+                    qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
+                    selected.setQrCode(null);
+                }
+                if (!updateQrCode()) {
+                    qrCode = "";
+                    return "";
+                }
+            }
+        }
+        if (null != gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+            if (null == gbCode) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                return "";
+            }
+
+            selected.setNationalStandardCode(selectedGb.getCode());
+        }
+        this.save();
+        assetDepreciationService.saveAssetDerpeciation(selected);
+        if (resultStatus) {
+            return getListPageLink();
+        } else {
+            return "";
+        }
+    }
+
+    public String getListPageLink() {
+        return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+    }
+
+    //三码合一设置
+    public String getAssetCodeConfig() {
+        return config == null ? null : config.getAssetCodeConfig();
+    }
+
+    private boolean updateQrCode() {
+        QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
+        if (qrCodeLib == null) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
+            return false;
+        }
+        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("WrongHospitalQRCode"));
+            return false;
+        }
+        if (qrCodeLib.getStatus() != 1) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("AlreadyUsingQrCode"));
+            return false;
+        }
+
+        QrCodeLib oldQRCodeLib = qrCodeService.findByQrCode(selected.getQrCode(), selected.getSiteUID());
+        if (null != oldQRCodeLib) {
+            qrCodeService.discardQrCode(qrCode, selected.getSiteUID());
+        }
+        qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
+        selected.setQrCode(qrCode);
+        return true;
+    }
+
+    public void onAssetGroupChange() {
+
+        if (!assetGroupSecondarySupport) return;
+
+        if (this.selected.getAssetGroup() == null) {
+            this.assetGroupSecondaryList = Collections.emptyList();
+        } else {
+            String msgType = "assetGroupSecondary_" + this.selected.getAssetGroup();
+            this.assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId(msgType, UserContextService.getCurrentUserAccount().getSiteId());
+        }
+
+    }
+
+    public void onFunctionGroupChange() {
+        code68List = new ArrayList<>();
+        this.selected.setAssetCode68(null);
+        this.changeFunctionGroup();
+    }
+
+    public void changeFunctionGroup() {
+        Integer functionGroupId = this.selected.getFunctionGroup();
+        if (functionGroupId != null) {
+            I18nMessage functionGroup = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", functionGroupId.toString());
+            if (functionGroup != null) {
+                code68List = i18nDao.getByMsgType(functionGroup.getMsgKey());
+            }
+        }
+    }
+
+    @Override
+    public void prepareEdit() {
+        super.prepareEdit();
+        changeFunctionGroup();
+    }
+
+    @Override
+    public void onBeforeSave(AssetInfo object) {
+        if (null != object.getClinicalDeptId()) {
+            OrgInfo org = orgDao.findById(object.getClinicalDeptId());
+            if (org != null) {
+                object.setClinicalDeptName(org.getName());
+                object.setClinicalDeptUID(org.getUid());
+            }
+
+        } else {
+            //clear uid and its name
+            object.setClinicalDeptUID(null);
+            object.setClinicalDeptName(null);
+        }
+        DateTime temp;
+        if (null != object.getManufactDate()) {
+            temp = new DateTime(object.getManufactDate());
+            object.setManufactDate(temp.plusHours(12).toDate());
+        }
+        if (null != object.getPurchaseDate()) {
+            temp = new DateTime(object.getPurchaseDate());
+            object.setPurchaseDate(temp.plusHours(12).toDate());
+        }
+        if (null != object.getArriveDate()) {
+            temp = new DateTime(object.getArriveDate());
+            object.setArriveDate(temp.plusHours(12).toDate());
+        }
+        if (null != object.getInstallDate()) {
+            temp = new DateTime(object.getInstallDate());
+            object.setInstallDate(temp.plusHours(12).toDate());
+        }
+        if (null != object.getWarrantyDate()) {
+            temp = new DateTime(object.getWarrantyDate());
+            object.setWarrantyDate(temp.plusHours(12).toDate());
+        }
+        if (null != object.getTerminateDate()) {
+            temp = new DateTime(object.getTerminateDate());
+            object.setTerminateDate(temp.plusHours(12).toDate());
+        }
+        Date now = new Date();
+        if (object.getId() == null) {
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setCreatedDate(now);
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
+        } else {
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
+        }
+    }
+
+    public String setValidButton() {
+        if (terminate) {
+            this.selected.setIsValid(true);
+            this.selected.setTerminateDate(null);
+        } else {
+            int workOrdersNum = dao.fetchCurrentWorkOrders(selected.getId());
+            if (workOrdersNum > 0) {
+                WebUtil.addErrorMessage("当前设备存在未完成工单，不能报废！");
+                return null;
+            } else {
+                this.selected.setIsValid(false);
+                this.selected.setTerminateDate(new Date());
+            }
+        }
+        update();
+        return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+    }
+
+    public Boolean needAssetApproval(String siteUid) {
+        if (null != config && config.getNeedInstorageCheck() != null && config.getNeedInstorageCheck()) {
+            return false;
+        }
+        return acService.needAssetApproval(siteUid);
+    }
+
+    public void renewQrcode() {
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
+        qrCode = qrcodeLib.getQrCode();
+        onDepartNumChange("qrCode");
+    }
+
+    public void onDepartNumChange(String fieldName) {
+        if (!Strings.isNullOrEmpty(getAssetCodeConfig())) {
+            String num = null;
+            switch (getAssetCodeConfig()) {
+                case "DFQ":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            break;
+                        case "qrCode":
+                            num = qrCode;
+                            break;
+                        default:
+                    }
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
+                        qrCode = num.substring(0, 16);
+                        selected.setFinancingNum(qrCode);
+                        selected.setDepartNum(qrCode);
+                        WebUtil.addErrorMessage("二维码超长,最大16位");
+                    } else {
+                        qrCode = num;
+                        selected.setFinancingNum(num);
+                        selected.setDepartNum(num);
+                    }
+                    break;
+                case "DF":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
+
+    public void generateFinancialNum() {
+        String code = this.selectedGb == null ? null : this.selectedGb.getCode();
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                this.selected.getId(),
+                code,
+                this.selected.getSiteUID(),
+                this.selected.getParentAssetId(),
+                this.selected.getFinancingNum()
+        );
+        if (financingNum != null) {
+            if (financingNum.startsWith("error:")) {
+                WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            } else {
+                this.selected.setFinancingNum(financingNum);
+                onDepartNumChange("financingNum");
+            }
+        }
+    }
+
+    public void updateFinancingNumByNationalStandardCode() {
+        if (null != selected && null != selectedGb) {
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
+                    this.selectedGb.getCode(),
+                    this.selected.getSiteUID(),
+                    null,
+                    null
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+                this.selected.setFinancingNum(financingNum);
+            }
+        }
+    }
+
+    public List<String> completeGbName(String prefix) {
+        List<String> names = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            names = gbDao.findGbCodeByPrefix(prefix);
+        }
+        return names;
+    }
+
+    private void updateSelectedOrgGb(GbCode gbCode) {
+        if (gbCode == null || gbCode.getId() == -1) {
+            selectedGb = null;
+        } else {
+            selectedGb = gbCode;
+            gbCodeName = gbCode.getCode() + "/" + gbCode.getName();
+        }
+    }
+
+    public void initGbTree() {
+        TreeNode treeNode = gbCodeService.buildGbTree();
+        gbTree = new DefaultTreeNode("root", null, null);
+        gbTree.getChildren().add(treeNode);
+        treeNode.setExpanded(true);
+    }
+
+    public void onSelectGbTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        GbCode gbCode = (GbCode) node.getData();
+        updateSelectedOrgGb(gbCode);
+    }
+
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<AssetInfo> completeParentAssetId(String query) {
+        if (null == parentAssetList || parentAssetList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
+                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+    }
+
+    public List<Supplier> autoCompleteSupplier(String query) {
+        return autoCompleteService.autoCompleteVendor(query, supplierList);
+    }
+
+    public List<Supplier> autoCompleteManufacture(String query) {
+        return autoCompleteService.autoCompleteManufacture(query, supplierList);
+    }
+
+    public List<Supplier> autoCompleteMaintainer(String query) {
+        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
+    }
+
+    public List<String> completeAssetName(String prefix) {
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        List<String> names = null;
+        if (StringUtils.isEmpty(prefix)) {
+            names = dao.findDistinctAssetNames(tenantUID);
+        } else {
+            names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
+        }
+        names.sort(new PinYinComparator());
+        return names;
+    }
+
+    public List<UserAccount> completeClinicalOwnerList(String query) {
+        if (clinicalOwnerList == null) {
+            return Collections.emptyList();
+        };
+        List<UserAccount> res = this.clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public void onAssetDeptChange(String idx) {
+        OrgInfo clinicalDept = null;
+        switch (idx) {
+            case "clinicalDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
+                selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
+                selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                selectedObjectMap.put("clinicalOwner", null);
+                onOwnerChange("clinicalOwner");
+                parentAssetList = aimService.getParentsAssetsList(this.selected);
+                getClinicalOwnerList();
+                break;
+            case "assetDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("assetDept");
+                selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                break;
+        }
+
+    }
+
+    public void getClinicalOwnerList() {
+        if (null != selected.getClinicalDeptUID()) {
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
+        } else {
+            clinicalOwnerList = Collections.emptyList();
+        }
+    }
+
+    public String submitApproval() {
+        selected.setUsageStatus(2);
+        return applyChange();
+    }
+
+    @Override
+    public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
+        resultStatus = isOK;
+    }
+
+    public boolean needShow(String itemKey, String fieldKey) {
+        return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
+    }
+
+    public boolean needEdit(String fieldKey) {
+        return editableFieldsList.contains(fieldKey);
+    }
+
+//getter and setter
+    public Boolean getTerminate() {
+        return terminate;
+    }
+
+    public CustomConfigObject getCustomConfig() {
+        return customConfig;
+    }
+
+    public List<I18nMessage> getCode68List() {
+        return code68List;
+    }
+
+    public List<AssetInfo> getParentAssetList() {
+        return parentAssetList;
+    }
+
+    public void setParentAssetList(List<AssetInfo> parentAssetList) {
+        this.parentAssetList = parentAssetList;
+    }
+
+    public List<V2_BlobObject> getAttachements() {
+        return attachements;
+    }
+
+    public void setAttachements(List<V2_BlobObject> attachements) {
+        this.attachements = attachements;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public String getGbCodeName() {
+        return gbCodeName;
+    }
+
+    public void setGbCodeName(String gbCodeName) {
+        this.gbCodeName = gbCodeName;
+    }
+
+    public GbCode getSelectedGb() {
+        return selectedGb;
+    }
+
+    public void setSelectedGb(GbCode selectedGb) {
+        this.selectedGb = selectedGb;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getGbTree() {
+        return gbTree;
+    }
+
+    public void setGbTree(TreeNode gbTree) {
+        this.gbTree = gbTree;
+    }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+
+    public boolean isHierachyClinicalSupport() {
+        return hierachyClinicalSupport;
+    }
+
+    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
+        this.hierachyClinicalSupport = hierachyClinicalSupport;
+    }
+
+    public TreeNode getClinicalOrgTree() {
+        return clinicalOrgTree;
+    }
+
+    public void setClinicalOrgTree(TreeNode clinicalOrgTree) {
+        this.clinicalOrgTree = clinicalOrgTree;
+    }
+
+    public boolean isAssetGroupSecondarySupport() {
+        return assetGroupSecondarySupport;
+    }
+
+    public void setAssetGroupSecondarySupport(boolean assetGroupSecondarySupport) {
+        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondaryList() {
+        return assetGroupSecondaryList;
+    }
+
+    public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
+        this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
 }

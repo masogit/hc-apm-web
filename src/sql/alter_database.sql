@@ -211,4 +211,3 @@ alter table arrival_list_item alter column asset_code68 type integer using asset
 
 INSERT INTO "i18n_message" VALUES (5626, 'label', 'ProcessAnalysis', '维修流程分析','Process Analysis',null,-1);
 INSERT INTO "i18n_message" VALUES (5627, 'label', 'MaintenanceCost', '维修成本分析','Maintenance Cost',null,-1);
-

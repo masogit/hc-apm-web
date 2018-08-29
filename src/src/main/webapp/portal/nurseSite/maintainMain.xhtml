@@ -1,0 +1,175 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+	<ui:define name="head">
+        <h:outputStylesheet name="css/inspection.css" />
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="护士站日常维护"/>
+            </div>
+            <div class="ui-g-12 card">
+            	<p:growl widgetVar="messages" id="messages" showDetail="true" />
+                <h:form id="maintainHeaderForm">
+                	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
+                    <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
+                    <br/>
+                    <h:panelGroup>
+                    	<label>医院院区：</label>
+						<p:selectOneMenu value="#{maintainController.selectedParentOrgInfo}" disabled="false" converter="orgInfoConverter">
+							<p:ajax listener="#{maintainController.onClinicalParentOrgInfoChange}" update=":maintainHeaderForm:selectClinicalUid" />
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{maintainController.checkListParentOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+						</p:selectOneMenu>
+					</h:panelGroup>
+                    <h:panelGroup>
+                    	<label>科室：</label>
+						<p:selectCheckboxMenu id="selectClinicalUid" value="#{maintainController.listCheckClinicalOrgInfo}"
+							converter="orgInfoConverter" required="false" requiredMessage="科室 #{msg.ValidationRequire}" 
+							label="------请选择------" 
+							updateLabel="true" showHeader="false" panelStyle="width:250px">
+							<p:ajax update=":maintainForm:maintain" listener="#{maintainController.onClinicalOrgInfoChange}"></p:ajax>
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item!=null?item.name:'请选择...'}" itemValue="#{item}" />
+						</p:selectCheckboxMenu>
+					</h:panelGroup>
+                </h:form>
+                <h:form id="maintainForm">
+                    <h:panelGrid columnClasses="value">
+                    	 <h3>-</h3>
+                        <p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title" rightHeaderTemplate="" tooltip="true">
+                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();"/>
+                            <p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();" />
+                        </p:schedule>
+                    </h:panelGrid>
+                </h:form>
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="700" resizable="true" draggable="true">
+                   	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
+                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:650px':''}">
+                   			<div class="ui-datatable-tablewrapper" style="padding-left:10px;padding-right:10px;">
+                   				<table>
+                					<tr>
+                						<th>
+                							<label class="label">名称</label>
+                						</th>
+                						<th>
+                							<label class="label">设备编号</label>
+                						</th>
+                						<th>
+                							<label class="label">制造商序列号</label>
+                						</th>
+                						<th>
+                							<label class="label">设备型号</label>
+                						</th>
+                						<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item">
+                							<th>
+                								<label class="label">#{item}</label>
+                							</th>
+                						</p:repeat>
+                						<!-- <th>
+                							<label class="label">查看签名</label>
+                						</th> -->
+                					</tr>
+									<p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
+										<tr>
+			                   				<td>
+			                   					<h:outputText value="#{item2.assetInfo.name}"/>
+			                   				</td>
+			                   				<td>
+			                   					<h:outputText value="#{item2.assetInfo.departNum}"/>
+			                   				</td>
+			                   				<td>
+			                   					<h:outputText value="#{item2.assetInfo.serialNum}"/>
+			                   				</td>
+			                   				<td>
+			                   					<h:outputText value="#{item2.assetInfo.functionType}"/>
+			                   				</td>
+			                   				<p:repeat value="#{maintainController.nurseSiteMaintain.showLables}" var="item3">
+			                   					<td>
+					                           	 	<!-- <p:selectBooleanCheckbox value="#{item2.getDataValue(item3).checkValue}" /> -->
+					                           	 	<p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox>
+			                    				</td>
+											</p:repeat>
+											<!-- <td>
+												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+											</td> -->
+			                    		</tr>
+									</p:repeat>
+								</table>
+                   			</div>
+                   		</div>
+	                   	<h:panelGrid columnClasses="value" columns="1">
+	                   		<h:panelGroup>
+	                   			<label>负责人: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.modifyBy.name}"></h:outputText>
+	                   		</h:panelGroup>
+	                   		<h:panelGroup>
+	                   			<label>检测时间: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.checkDate}">
+	                   				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
+	                   			</h:outputText>
+	                   		</h:panelGroup>
+	                    </h:panelGrid>
+	                    <p:commandButton id="checkRightButton" value="全部通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
+	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
+	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
+	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+	                    </p:commandButton>
+	                    <p:commandButton id="openSignature" actionListener="#{maintainController.getMaintainSignature(maintainController.nurseSiteMaintain.signatureId,maintainController.nurseSiteMaintain.signatureSourceType)}" value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+                   	</h:form>
+                </p:dialog>
+                <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
+                	<h:form id="createMaintainForm">
+                		<h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                			<h:panelGroup  style="float:left">
+                				<label>请选择配置: </label>
+								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":createMaintainForm"></p:ajax>
+									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+			                        <f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+			                        <p:column>
+										<h:outputText value="#{t!=null?t.name:'请选择...'}" />
+									</p:column>
+			                    </p:selectOneMenu>
+							</h:panelGroup>
+							<h:panelGroup  id="currentSequence" style="float:left" rendered="#{maintainController.nurseSiteMaintainConfig.type==1}">
+								<label>请选择班次: </label>
+								<p:selectOneMenu value="#{maintainController.selectSequence}" required="true" requiredMessage="班次 #{msg.ValidationRequire}">
+			                        <f:selectItems value="#{maintainController.listSequence}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+			                    </p:selectOneMenu>
+							</h:panelGroup>
+                		</h:panelGrid>
+                		<br/>
+                		<br/>
+                		<p:commandButton id="addButton" validateClient="true" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
+                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":messages" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
+                	</h:form>
+                </p:dialog>
+                <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名">
+                	<h:form id="signatureForm">
+                		<h:panelGrid columnClasses="value" columns="1">
+		                	<h:panelGroup rendered="#{maintainController.signatureContentWeiXin==null}">
+								<p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sig" base64Value="#{maintainController.signatureContent}" required="false" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{maintainController.signatureContentStream==null}"/>
+								<p:graphicImage value="#{maintainController.signatureContentStream}" stream="false" rendered="#{maintainController.signatureContentStream!=null}"></p:graphicImage>
+							</h:panelGroup>
+							<h:panelGroup rendered="#{maintainController.signatureContentWeiXin!=null}">
+								<p:graphicImage value="#{maintainController.signatureContentWeiXin}" stream="false"/>
+							</h:panelGroup>
+						</h:panelGrid>
+						<p:commandButton value="确认" actionListener="#{maintainController.saveMaintainSignature()}" oncomplete="PF('signatureDlg').hide();" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update=":signatureForm:signatureContent" oncomplete="PF('sig').clear()" rendered="#{maintainController.blnWebSignatureEidt}"/>
+						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();"/>
+					</h:form>
+                </p:dialog>
+                <ui:include src="maintainBatchCreate.xhtml"/>
+                <ui:include src="maintainBatchComplete.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

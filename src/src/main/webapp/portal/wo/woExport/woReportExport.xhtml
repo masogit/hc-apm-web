@@ -107,7 +107,7 @@
                     <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}" value="#{workOrderReportExportController.workOrderList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="10,20,50">
+                                 rowsPerPageTemplate="20,50,100,500">
                         <p:column headerText="报修单号">
                             <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank"><h:outputText value="#{item.报修单号}" /></a>
                         </p:column>

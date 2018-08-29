@@ -1,17 +1,18 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.UserInfo;
 import java.util.Collection;
-
 import java.util.List;
-import javax.persistence.QueryHint;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserInfo;
+
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
@@ -78,10 +79,20 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //@Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and r.role_id=3 and institution_uid=?1 ",nativeQuery=true)
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
+    
+    @Query(value= "select u.* from user_account u where u.uid in ?1 ",nativeQuery=true)
+    public List<UserAccount> getByUids(Set<String> setUids);
+    
+    @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid in ?1 ")
+    public List<UserAccount> getSimpleByUids(Set<String> setUids);
 
-    //当前租户下的肥临时报修人
+    //当前租户下的临时报修人
     //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
-    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  r.role_id=3 and tenant_uid=?1 ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  r.role_id=3 and tenant_uid=?1",nativeQuery=true)
+    public List<UserAccount> getByTenantUIDStaff(String tenantUID);
+
+    //获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
+    @Query(value= "select * from user_account u join user_role r on u.id=r.user_id  left join sys_role sr on sr.id = r.role_Id  where u.id > 0 and  (sr.name !='Guest' or sr.name !='ClinicalStaff' or sr.name !='ActivationPerson') and tenant_uid=?1",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
     
     public List<UserAccount> getByOrgInfoUID(String orgUID);
@@ -93,8 +104,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
-    @Query("select u from UserAccount u where u.orgInfoId=?1 and u.id not in (select r.userId from UserRole r where r.roleId=9)")
-    List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(int orgId);
+    @Query("select u from UserAccount u where u.orgInfoUID=?1 and u.id not in (select r.userId from UserRole r where r.roleId=9)")
+    List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(String orgInfoUID);
 
     //subscirber with tag=-999 under  this assetInfo.site_UID
     @Query(value="select ua.* from asset_tag at,asset_tag_biomed_group atbg,biomed_group bg,biomed_group_user bgu,user_account ua where at.id=-999  and at.id=atbg.tag_id and atbg.biomed_group_id=bg.id and bgu.group_id=bg.id and bgu.user_id=ua.id and ua.site_uid=?1",nativeQuery=true)
@@ -120,12 +131,19 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     List<UserAccount> findByOrgInfoUID(String orgUid);
 
-    UserAccount findByTenantUIDAndName(String tenantUid, String name);
+    UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
+
+    List<UserAccount> findByTenantUIDAndName(String tenantUid, String name);
 
     @Transactional
     @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where tenant_uid = ?1",nativeQuery=true)
     public void updateMembersStatus(String tenantUid);
+
+    @Transactional
+    @Modifying
+    @Query(value= "update user_account set active_time = null,is_active = false where tenant_uid = ?1 and id not in(select user_id from user_role where role_id = 9)",nativeQuery=true)
+    public void deactiveTenantMembersStatus(String tenantUid);
 
     @Transactional
     @Modifying
@@ -137,4 +155,27 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Modifying
     @Query(value= "update user_account set active_time= null,is_active=false where id = ?1",nativeQuery=true)
     public void deactiveTemporaryUser(Integer userId);
+
+
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and site_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffBySiteUID(String siteUID);
+
+    //    @Query(value= "select * from user_account where id > 0 and hospital_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and hospital_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByHospitalUID(String hospitalUID);
+
+    //@Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and institution_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByInstitutionUID(String InsitiUID);
+
+    //当前租户下的肥临时报修人
+    //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByTenantUID(String tenantUID);
+    
+    @Query(value = "select o.uid from user_account o where o.org_uid in ?1",nativeQuery = true)
+    public List<String> findUserUidListByOrgUids(List<String> listUid);
+
+    @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
+    List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
 }

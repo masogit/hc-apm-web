@@ -64,7 +64,7 @@ class Person{
         return result;
     }
 }
-public class MyTest extends BaseJunit4Test{
+public class MyTest{
     @Test
     @Transactional
     public void removeDuplicationByProperty()throws Exception{
@@ -75,7 +75,7 @@ public class MyTest extends BaseJunit4Test{
         Person p5 = new Person(5l, "胶布虫");
 
         List<Person> persons = Arrays.asList(p1, p2, p3, p4, p5, p5, p1, p2, p2);
-        persons.stream().filter(distinctByKey(p -> p.getName())).forEach(p -> System.out.println(p));
+      //  persons.stream().filter(distinctByKey(p -> p.getName())).forEach(p -> System.out.println(p));
         persons=  persons.stream().filter(distinctByKey(p -> p.getName())).collect(toList());
        System.out.println("---->"+persons);
     }

@@ -203,7 +203,7 @@ public class QRCodeUtil {
         QRCodeUtil.encode(content, null, output, false);
     }
 
-/*    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         String logoFile = "c:/Temp/logo.jpg";//GE logo
         String backGroundPath = "c:/Temp/background.png";//图片背景
@@ -212,18 +212,18 @@ public class QRCodeUtil {
 //		QRCodeUtil.encode(text, logoFile, "c:/Temp", true);
 
         //    批量生成
-        String srcFolder = "c:/Temp/170707";
+        String srcFolder = "c:/Temp/180419";
         String[] files = new File(srcFolder).list();
         for (String item : files) {
             System.out.println(item);
-            qrCodeBatchJob(srcFolder + File.separator + item, logoFile, backGroundPath, prefix,100);
+            qrCodeBatchJob(srcFolder + File.separator + item, logoFile, backGroundPath, prefix,1000);
         }
 //        BufferedImage image = QRCodeUtil.createImage(prefix + "1703307223655922", logoFile, true);
 //        BufferedImage img = addBackground(backGroundPath, image, 472, "1703307223655922");
 //        ImageIO.write(img, FORMAT_NAME, new File("c:/Temp/" + text + ".jpg"));
 //        
 //        
-    }*/
+    }
 
     private static BufferedImage addBackground(String bgPath, BufferedImage innerImg, int size, String text) throws IOException {
 
@@ -329,15 +329,15 @@ public class QRCodeUtil {
         return zipName;
 	}
 	
-	public static void main(String[] args) throws Exception {
-		List<String> codes = new ArrayList<String>();
-		codes.add(UUID.randomUUID().toString());
-		codes.add(UUID.randomUUID().toString());
-		codes.add(UUID.randomUUID().toString());
-		codes.add(UUID.randomUUID().toString());
-		codes.add(UUID.randomUUID().toString());
-		codes.add(UUID.randomUUID().toString());
-		generateQrCodes(codes, 1, 2,1);
-	}
+//	public static void main(String[] args) throws Exception {
+//		List<String> codes = new ArrayList<String>();
+//		codes.add(UUID.randomUUID().toString());
+//		codes.add(UUID.randomUUID().toString());
+//		codes.add(UUID.randomUUID().toString());
+//		codes.add(UUID.randomUUID().toString());
+//		codes.add(UUID.randomUUID().toString());
+//		codes.add(UUID.randomUUID().toString());
+//		generateQrCodes(codes, 1, 2,1);
+//	}
 
 }

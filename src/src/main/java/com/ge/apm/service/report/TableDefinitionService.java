@@ -5,28 +5,34 @@
  */
 package com.ge.apm.service.report;
 
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UnstructuredData;
-import com.ge.apm.domain.UnstructuredDataCollection;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.pure.TableItem;
-import com.ge.apm.domain.pure.TableSchema;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.primefaces.model.UploadedFile;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.dao.UnstructuredDataRepository;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.domain.UnstructuredDataCollection;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import java.util.Objects;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -41,7 +47,12 @@ public class TableDefinitionService {
     @Autowired
     private UnstructuredDataCollectionRepository udcDao;
     @Autowired
+    private UnstructuredDataRepository udDao;
+    @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private V2_PmOrderService v2PmOrderService;
+    
 
     public Integer getCountByTemplate(String templateId) {
         return udcDao.getCountByTemplate(templateId);
@@ -87,6 +98,15 @@ public class TableDefinitionService {
         return templateDao.findById(templateId);
     }
 
+    public TableDefinition getReleasedTemplateById(String templateId) {
+        TableDefinition template = templateDao.findById(templateId);
+        return TableDefinition.TableDefinitionStatus.Released.toString().equals(template.getStatus()) ? template : getTemplateByBaseId(template.getBaseId());
+    }
+
+    public TableDefinition getTemplateByBaseId(String BaseId) {
+        return templateDao.findByBaseId(BaseId);
+    }
+
     public void deleteTemplate(TableDefinition tableDefinition) {
         if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
@@ -107,12 +127,17 @@ public class TableDefinitionService {
         return template == null ? "" : template.getSchema();
     }
 
+    public String getTableSchema(String tableId) {
+        TableDefinition template = Strings.isNullOrEmpty(tableId) ? null : templateDao.findById(tableId);
+        return template == null ? "" : template.getSchema();
+    }
+
     public Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         return TableResultReportService.getRuleResultData(tableValue, table);
     }
 
     @Transactional
-    public void updateExcelTemplate(TableDefinition selectedTableDefinition, V2_BlobObject blobObject) {
+    public TableDefinition updateExcelTemplate(TableDefinition selectedTableDefinition, V2_BlobObject blobObject) {
         if (getCountByTemplate(selectedTableDefinition.getId()) > 0) {
             //模版下有记录
             TableDefinition newTemplate = new TableDefinition();
@@ -127,59 +152,82 @@ public class TableDefinitionService {
             newTemplate.setCreatedDate(new Date());
             newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             newTemplate.setStatus(selectedTableDefinition.getStatus());
-            newTemplate.setExcelStorageId(blobObject.getObjectStorageId());
+            newTemplate.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
             newTemplate.setSchema(selectedTableDefinition.getSchema());
-            templateDao.save(newTemplate);
+            newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
+            newTemplate = templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
             selectedTableDefinition.setLastModifiedDate(new Date());
             templateDao.save(selectedTableDefinition);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-            blobObject.setBoSubType("Excel");
-            blobObject.setBoUuid(selectedTableDefinition.getId());
-            blobService.saveBlobObject(blobObject);
-        } else {
-            //模版下无记录
-            
-            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
-                selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
-                selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-                selectedTableDefinition.setLastModifiedDate(new Date());
-                templateDao.save(selectedTableDefinition);
+            if (null != blobObject) {
                 blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
                 blobObject.setBoSubType("Excel");
                 blobObject.setBoUuid(selectedTableDefinition.getId());
                 blobService.saveBlobObject(blobObject);
+            }
+            return newTemplate;
+        } else {
+            //模版下无记录
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
+                selectedTableDefinition.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
+                selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+                selectedTableDefinition.setLastModifiedDate(new Date());
+                selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                if (null != blobObject) {
+                    blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    blobObject.setBoSubType("Excel");
+                    blobObject.setBoUuid(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(blobObject);
+                }
             } else {
                 WebUtil.addErrorMessage("更新失败");
-            };
+            }
+
+            return selectedTableDefinition;
         }
 
     }
 
     public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {
-        List<UnstructuredData> dataList = report.getData();
-        Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
-        tableValue.entrySet().forEach(item -> {
-            UnstructuredData dataItem = dataMap.get(item.getKey());
-            if (null == dataItem) {
-                dataItem = new UnstructuredData();
-                dataItem.setCollectionId(report.getId());
-                dataItem.setKey(item.getKey());
-                dataItem.setValue(item.getValue());
-                dataList.add(dataItem);
-            } else {
-                dataItem.setValue(item.getValue());
-            }
-        });
+        final String reportId = report.getId();
+        List<UnstructuredData> dataList = udDao.findByCollectionId(reportId);
+        if(dataList!=null){
+        	Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
+        	if(tableValue!=null){
+        		tableValue.entrySet().forEach(item -> {
+        			if(item!=null && item.getKey()!=null){
+        				UnstructuredData dataItem = dataMap.get(item.getKey());
+                        Object value = item.getValue();
+                        if (item.getKey().contains("_res") && item.getValue()!=null) {
+                            switch ((String) item.getValue()) {
+                                case "合格":
+                                case "正常":
+                                    value = "Normal";
+                                default:
+                            }
+                        }
+                        if (null == dataItem) {
+                            dataItem = new UnstructuredData();
+                            dataItem.setCollectionId(reportId);
+                            dataItem.setKey(item.getKey());
+                            dataItem.setValue(value);
+                            dataList.add(dataItem);
+                        } else {
+                            dataItem.setValue(value);
+                        }
+        			}
+                });
+        	}
+        }
         report.setData(dataList);
         report.setCreatedDate(new Date());
-        udcDao.save(report);
+        v2PmOrderService.saveReport(report);
     }
 
     public void submitReport(UnstructuredDataCollection report) {
         report.setStatus(UnstructuredDataCollection.Status.Archived.toString());
-        udcDao.save(report);
+        v2PmOrderService.saveReport(report);
     }
 
     public void deleteReport(String reportId) {
@@ -195,5 +243,48 @@ public class TableDefinitionService {
         } else {
             udcDao.delete(report);
         }
+    }
+
+    public TableDefinition updateJSONTemplate(TableDefinition selectedTableDefinition, String tableString) {
+        //模版下有记录
+        TableDefinition newTemplate = new TableDefinition();
+        newTemplate.setName(selectedTableDefinition.getName());
+        newTemplate.setAssetGroup(selectedTableDefinition.getAssetGroup());
+        newTemplate.setBaseId(Strings.isNullOrEmpty(selectedTableDefinition.getBaseId()) ? selectedTableDefinition.getId() : selectedTableDefinition.getBaseId());
+        newTemplate.setDescription(selectedTableDefinition.getDescription());
+        newTemplate.setTenantUID(selectedTableDefinition.getTenantUID());
+        newTemplate.setInstitutionUID(selectedTableDefinition.getInstitutionUID());
+        newTemplate.setHospitalUID(selectedTableDefinition.getHospitalUID());
+        newTemplate.setSiteUID(selectedTableDefinition.getSiteUID());
+        newTemplate.setCreatedDate(new Date());
+        newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+        newTemplate.setStatus(selectedTableDefinition.getStatus());
+        newTemplate.setExcelStorageId(selectedTableDefinition.getExcelStorageId());
+        newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
+        newTemplate.setSchema(tableString);
+        templateDao.save(newTemplate);
+        selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
+        selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+        selectedTableDefinition.setLastModifiedDate(new Date());
+        templateDao.save(selectedTableDefinition);
+        return newTemplate;
+    }
+
+    public Map<String, Object> changSelectFommDataByJSON(TableDefinition tableDefinition, Map<String, Object> tableValue) {
+        
+        TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+        if(null == table.getGroups() || table.getGroups().isEmpty()){
+            return tableValue;
+        }
+        table.getGroups().stream().filter(groupItem-> null!= groupItem.getItems()).forEach(groupItem-> {
+            groupItem.getItems().stream().filter(item-> TableItem.ComponentType.Select.equals(item.getComponent()))
+                    .filter(item -> tableValue.containsKey(item.getKey()))
+                    .forEach(item->{
+                        item.getOptions().stream().filter(optionItem -> Objects.equals(optionItem.getKey(), tableValue.get(item.getKey())))
+                                .findAny().ifPresent(option -> tableValue.put(item.getKey(), option.getValue()));
+                    });
+                });
+        
+        return tableValue;
     }
 }

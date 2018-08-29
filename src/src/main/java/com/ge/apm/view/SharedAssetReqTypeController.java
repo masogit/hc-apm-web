@@ -7,10 +7,8 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetReqType;
+import com.ge.apm.domain.*;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
-import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.RowEditEvent;
@@ -145,18 +143,10 @@ public class SharedAssetReqTypeController extends GenericCRUDUUIDController<Shar
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
-            System.out.println(userOrg.getUid());
-            objectList = typeDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-            if(objectList.size()==0){
-                return 0; 
-            }
-            else{
-                return typeDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid).size();
-            }
+            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            objectList = typeDao.findbyBorrowQty(user.getOrgInfoUID(),Uid);
+            return objectList.size();
         }
     }
     

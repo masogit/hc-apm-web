@@ -1,8 +1,9 @@
 import { ranges } from '#/constants'
-import { IsHead, getOrgId } from '#/utils'
+import { IsHead, getOrgId, getHospitalId } from '#/utils'
 
 const isHead = IsHead()
 const orgId = getOrgId()
+const hospitalId = getHospitalId()
 
 export default {
   namespace: 'ScanDetails_filters',
@@ -12,11 +13,16 @@ export default {
       to: ranges.oneYear.end.format('YYYY-MM-DD')
     },
     dept: orgId,
-    hospital: undefined,
+    hospital: hospitalId,
     cursor: {}
   },
   effects: {
     *['field/set'](_, { select, put }) {
+      if (_.payload.key === 'hospital') {
+        yield put({ type: 'depts/update/selectedHospital', payload: _.payload.value })
+        yield put({ type: 'depts/get/depts', payload: _.payload.value })
+        yield put({ type: 'field/set', payload: { key: 'dept', value: undefined } })
+      }
       yield put({type: 'briefs/data/get'})
       yield put({type: 'assets/page/reset'})
       yield put({type: 'assets/data/get'})
@@ -41,7 +47,7 @@ export default {
         yield put({type: 'steps/page/reset'})
         yield put({type: 'steps/data/get'})
       }
-    }
+    },
   },
   reducers: {
     ['field/set'](state, { payload: { key, value } }) {

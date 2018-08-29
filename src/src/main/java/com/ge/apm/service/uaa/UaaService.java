@@ -34,12 +34,19 @@ public class UaaService {
     public static final String ASSET = "asset";
     public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
-    
+    public static final String TEMP_STAFF = "仅报修权限账号";
+
     @Autowired
     OrgInfoRepository orgInfoDao;
 
     @Autowired
+    UserOrgInfoRepository userOrgDao;
+
+    @Autowired
     WorkflowConfigRepository wfcfigDao;
+
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -56,7 +63,9 @@ public class UaaService {
     public String getUserDefaultHomePage(UserAccount user){
         String url;
         UserContextService userContextService = (UserContextService) WebUtil.getBean(UserContextService.class);
-        if(userContextService.hasRole("HospitalHead"))
+        if(userContextService.hasRole("NursingStaff"))
+            url = getDefautHomePage("NursingStaff");
+        else if(userContextService.hasRole("HospitalHead"))
             url = getDefautHomePage("HospitalHead");
         else if(userContextService.hasRole("AssetHead"))
             url = getDefautHomePage("AssetHead");
@@ -121,7 +130,39 @@ public class UaaService {
 
         return roleList;
     }
-    
+
+    public List<SysRoleVO> getSysRoleVO(String tenantUID){
+        loadSysRoles();
+        TenantInfo ti = tenantInfoDao.findByuid(tenantUID);
+
+        List<SysRoleVO> sysRoleList = new ArrayList<>();
+        for (SysRole tempSysRole : sysRoles.values()){
+            SysRoleVO srVO = new SysRoleVO();
+            srVO.setId(tempSysRole.getId());
+            srVO.setName(tempSysRole.getName());
+            srVO.setRoleDesc(tempSysRole.getRoleDesc());
+
+            //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+            if(UserContextService.isOnlyLocalITAdmin()){
+                if("ITAdmin".equals(tempSysRole.getName())){
+                    //srVO.setDisable(Boolean.TRUE);
+                    continue;
+                }
+            }
+            //判断租户是否院区隔离
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                if("LocalITAdmin".equals(tempSysRole.getName())){
+                    //srVO.setDisable(Boolean.TRUE);
+                    continue;
+                }
+            }
+
+            sysRoleList.add(srVO);
+        }
+
+        return sysRoleList;
+    }
+
     @Transactional
     public UserAccount loadUserWithUserRoles(int userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -143,15 +184,20 @@ public class UaaService {
 
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userRoleDao.deleteByUserAccount(userAccount.getId());
         
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
-        if((!newRoleNames.contains("临时报修帐号")) && (userAccount.getUserRoleNames().contains("临时报修帐号"))){
-            deactiveTemporaryUser(userAccount.getId());
+        if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
+            TenantInfo tenant = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            if(tenant.getIsEnabled() == null || (!tenant.getIsEnabled())){
+                deactiveTemporaryUser(userAccount.getId());
+            }
         }
-        if(newRoleNames.contains("临时报修帐号")){
+        if(newRoleNames.contains(TEMP_STAFF)){
             activeTemporaryUser(userAccount.getId());
+
         }
         if(newRoleNames.isEmpty()){
             newRoleNames.add("临床科室人员");
@@ -352,7 +398,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
        // if(treeNode.getParent()!=null) {
             OrgInfo orgInfo = (OrgInfo) treeNode.getData();
 
-            if (orgInfo.getName().contains(keyWords)) {
+            if (orgInfo.getName().contains(keyWords) || (orgInfo.getNamePyCode() != null && orgInfo.getNamePyCode().contains(keyWords))) {
                 treeNodeMap.put(orgInfo.getUid(), treeNode);
                 //如果找到 xx机构 就将其包括其父节点到到根节点都放到 treeNodeMap中
                 buidUpFromNodeYuanQu(treeNodeMap, treeNode);
@@ -443,6 +489,40 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         return root;
     }
 
+    public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
+        List<OrgInfo> orgList = null;
+        orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
+        TreeNode root  = new DefaultTreeNode("root", null, null);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        for(OrgInfo org: orgList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+            treeMapG.put(org.getUid(),node);
+        }
+        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            if(org.getParentUID()!=null){
+                TreeNode parentNode = treeMap.get(org.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+
+        if(treeMap.get(siteUID)!=null){
+            root.getChildren().add(treeMap.get(siteUID));
+        }
+        xtreeMap = treeMap;
+        if(!root.getChildren().isEmpty()){
+            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+            rootUID = temp.getUid();
+        }
+        return root;
+    }
+
     public  Map<String, TreeNode> xtreeMap;
     public String rootUID;
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
@@ -482,29 +562,42 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(userUid);
         userOrgDao.delete(orgList);
     }
-    
+
+    @Transactional
+    public void clearUserOrgAfterOrgUpdate(String userUid){
+        userOrgDao.deleteByUserUid(userUid);
+    }
+
     @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
         List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
 
+        UserOrgInfo foundUserOrg = null;
+
         if (ownnedOrg.getOrgType() == 4 && workflowConfigs.size() == 0) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
-            UserOrgInfo userOrg = new UserOrgInfo();
-            userOrg.setUserUid(user.getUid());
-            userOrg.setOrgUid(ownnedOrg.getUid());
-            userOrg.setOrgType(ownnedOrg.getOrgType());
-            UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-            userOrgDao.save(userOrg);
+
+            foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), ownnedOrg.getUid());
+            if (foundUserOrg == null) {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(ownnedOrg.getUid());
+                userOrg.setOrgType(ownnedOrg.getOrgType());
+                userOrgDao.save(userOrg);
+            }
+
         } else {
             OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
             if (org != null) {
-                UserOrgInfo userOrg = new UserOrgInfo();
-                userOrg.setUserUid(user.getUid());
-                userOrg.setOrgUid(org.getUid());
-                userOrg.setOrgType(org.getOrgType());
-                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-                userOrgDao.save(userOrg);
+                foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), org.getUid());
+                if (foundUserOrg == null) {
+                    UserOrgInfo userOrg = new UserOrgInfo();
+                    userOrg.setUserUid(user.getUid());
+                    userOrg.setOrgUid(org.getUid());
+                    userOrg.setOrgType(org.getOrgType());
+                    userOrgDao.save(userOrg);
+                }
             }
         }
 
@@ -702,14 +795,27 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     
     //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("getOrgDeptList siteUID: " + siteUid + ", userUid: " + userUid);
+        }
+        List<OrgInfo> deptList;
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
         if (orgUidSet.contains(siteUid)) {
-            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
+            deptList = accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
         } else {
-            return getClinicalDeptListBySiteUID(siteUid);
+            deptList = getClinicalDeptListBySiteUID(siteUid);
         }
+        if(logger.isDebugEnabled()) {
+            logger.debug("deptList: " + deptList.stream().map(item -> item.getUid()).collect(Collectors.joining(",")));
+        }
+        List<String> regulatorUids = this.getRegulatorUidsBySiteUid(siteUid);
+        if(regulatorUids != null && regulatorUids.size() > 0) {
+            deptList = deptList.stream()
+                                .filter(item -> !regulatorUids.contains(item.getUid()))
+                                .collect(Collectors.toList());
+        }
+        return deptList;
     }
     
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
@@ -728,6 +834,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         TreeNode root = new DefaultTreeNode("root", null, null);
         for(OrgInfo item : orgList){
             TreeNode siteNode = getOrgTreeBySite(item.getUid());
+            root.getChildren().addAll(siteNode.getChildren());
+        }
+        return root;
+    }
+
+    public TreeNode getOrgFullTreeByTenantWithoutClinical(String tenantUid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
+        orgInfoFilters.add(new SearchFilter("parentUID", SearchFilter.Operator.IsNull, tenantUid));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        for(OrgInfo item : orgList){
+            TreeNode siteNode = getOrgTreeBySiteWithoutClinical(item.getUid());
             root.getChildren().addAll(siteNode.getChildren());
         }
         return root;
@@ -905,6 +1025,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         }
 
         return null;
+    }
+
+    // 根据院区UID(siteUID)获取工作流中配置的调剂中心UID列表
+    public List<String> getRegulatorUidsBySiteUid(String siteUID) {
+        List<WorkflowConfig> workflows = wfcfigDao.findBySiteUID(siteUID);
+        List<String> regulatorUids = workflows.stream()
+                                                .map(workflow -> workflow.getDeptForSharedAsset())
+                                                .distinct()
+                                                .collect(Collectors.toList());
+        if(logger.isDebugEnabled()) {
+            logger.debug("getRegulatorUidsBySiteUid siteUID: " + siteUID + ", regulatorUids: " + regulatorUids.stream().collect(Collectors.joining(",")));
+        }
+        return regulatorUids;
+
     }
 
 }

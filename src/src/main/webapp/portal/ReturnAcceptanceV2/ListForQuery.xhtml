@@ -24,12 +24,28 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">
-
                 <div class="ui-g-12 card cardTitle">
                     <p:outputLabel class="pageTitle" value="设备计费情况"/>
                 </div>
                 <div class="ui-g-12 card">
+                    <h:form id="searchForm">
+                        <h:panelGrid id="searchPanel" columns="2">
+                            <p:inputText id="searchText" value="#{sharedAssetReqDetailForQueryController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
+                                <p:ajax event="keyup" update=":IouListForm searchButtons" />
+                            </p:inputText>
+                            <h:panelGroup id='searchButtons'>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty sharedAssetReqDetailForQueryController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{sharedAssetReqDetailForQueryController.setOneSearchStr('')}" rendered="#{not empty sharedAssetReqDetailForQueryController.oneSearchStr}"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+                    </h:form>
             <h:form id="IouListForm">
+
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetReqDetailForQueryController.searchList(0)}" rendered="true" disabled="#{sharedAssetReqDetailForQueryController.queryIndex == 0}"/>
+                    <p:commandButton value="在借中"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetReqDetailForQueryController.searchList(1)}"  rendered="true" disabled="#{sharedAssetReqDetailForQueryController.queryIndex == 1}"/>
+                </h:panelGrid>
                 
                 <p:dataTable id="datalist" value="#{sharedAssetReqDetailForQueryController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{sharedAssetReqDetailForQueryController.selected}"
@@ -38,7 +54,7 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                     rows="20" emptyMessage="#{msg.noRecordFound}" 
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
                     
 <!--                    <p:ajax event="rowSelect" update="" 
                             listener="#{sharedAssetReqDetailForQueryController.onSelectE}" 
@@ -58,16 +74,16 @@
 <!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.borrowId)}"/>-->
                              <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                     <p:column headerText="归还科室" sortBy="#{item.returnId}" filterBy="#{item.clinicalDeptForReturnUid}" filterMatchMode="LIKE">
-                        <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevelForReturn()}" />
-                            </p:selectOneMenu>
-                        </f:facet>
-<!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.returnId)}"/>-->
-                            <h:outputText value="#{item.clinicalDeptForReturnName}"/>
-                    </p:column>
+                     <!--<p:column headerText="归还科室" sortBy="#{item.returnId}" filterBy="#{item.clinicalDeptForReturnUid}" filterMatchMode="LIKE">-->
+                        <!--<f:facet name="filter">-->
+                            <!--<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">-->
+                                <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
+                                <!--<f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevelForReturn()}" />-->
+                            <!--</p:selectOneMenu>-->
+                        <!--</f:facet>-->
+<!--&lt;!&ndash;                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.returnId)}"/>&ndash;&gt;-->
+                            <!--<h:outputText value="#{item.clinicalDeptForReturnName}"/>-->
+                    <!--</p:column>-->
                     <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
@@ -75,36 +91,85 @@
                             <h:outputText value="#{item.assetNumber}"/>
                         </p:column>
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" filterBy="#{item.chargingBeginTime}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.chargingBeginTime}"/>
+                            <f:facet name="filter">
+                                <p:calendar id="cal1" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterBeginTime}"
+                                            onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                            </f:facet>
+                            <h:outputText value="#{item.chargingBeginTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}" filterBy="#{item.chargingEndTime}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.chargingEndTime}"/>
+                            <f:facet name="filter">
+                                <p:calendar id="cal2" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterEndTime}"
+                                            onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                            </f:facet>
+                            <h:outputText value="#{item.chargingEndTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="单价" sortBy="#{item.unitPrice}" filterBy="#{item.unitPrice}" filterMatchMode="LIKE">
+                        <p:column headerText="单价" sortBy="#{item.unitPrice}">
+                            <f:facet name="filter">
+                                <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>
+                            </f:facet>
                             <h:outputText value="#{item.unitPrice}"/>
                         </p:column>
-                        <p:column headerText="计价方式" sortBy="#{item.unit}" filterBy="#{item.unit}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.unit}"/>
+                        <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItem itemLabel="维修借用" itemValue="维修借用" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
-                        <p:column headerText="费用" sortBy="#{item.cost}" filterBy="#{item.cost}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}"/>
-                            <h:outputText value="" rendered="#{item.chargingEndTime eq null}"/>
+                        <p:column headerText="使用时长">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
                         </p:column>
-                        <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.remark}"/>
+                        <p:column headerText="当前费用">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
+                                <f:convertNumber pattern="0.00"/>
+                            </h:outputText>
                         </p:column>
+                        <!--<p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">-->
+                            <!--<h:outputText value="#{item.remark}"/>-->
+                        <!--</p:column>-->
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
+                <!--<p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":IouListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">-->
+                    <!--<h:panelGrid columns="3">-->
+                        <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
+                        <!--</p:inputNumber>-->
+                        <!--&#45;&#45;-->
+                        <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
+                        <!--</p:inputNumber>-->
+                    <!--</h:panelGrid>-->
+                <!--</p:overlayPanel>-->
+
+                <!--<p:overlayPanel id="panelForFilterCost" widgetVar="panelFilterUnitCost" for=":IouListForm:datalist:filterCost" showCloseIcon="true" dismissable="false">-->
+                    <!--<h:panelGrid columns="3">-->
+                        <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterCostFrom}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
+                        <!--</p:inputNumber>-->
+                        <!--&#45;&#45;-->
+                        <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterCostTo}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
+                        <!--</p:inputNumber>-->
+                    <!--</h:panelGrid>-->
+                <!--</p:overlayPanel>-->
             </h:form>
             </div>
                 </div>
         </div>
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 $("#searchForm\\:searchText").keypress(function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();

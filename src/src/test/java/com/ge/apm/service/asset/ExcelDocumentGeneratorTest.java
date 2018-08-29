@@ -87,11 +87,11 @@ public class ExcelDocumentGeneratorTest {
             Map<String, Object> result = results.get(rowIndex);
 
             String format = ExcelDocumentGenerator.headerTitles[0] + ": %s, " + ExcelDocumentGenerator.headerTitles[1] + ": %s";
-            String[] args = {
-                    ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[0])),
-                    ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[1]))
-            };
-            String row = String.format(format, args);
+
+            String title1 = ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[0]));
+            String title2 = ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[1]));
+
+            String row = String.format(format, title1, title2);
             System.out.println(row);
 
         }

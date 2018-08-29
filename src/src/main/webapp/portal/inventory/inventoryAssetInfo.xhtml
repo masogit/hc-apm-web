@@ -15,14 +15,14 @@
 							<h:outputText value="名称" />
 							<h:outputText value="#{item.name}" />
 							<h:outputText value="设备分类" />
-							<h:outputText value="#{item.assetGroup}" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetGroup)}" />
 							<h:outputText value="当前状态" />
-							<h:outputText value="#{item.status}" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetStatus', item.status)}" />
 							<h:outputText value="盘点结果" />
-							<h:outputText value="#{item.inventoryStatus==0?'未盘点':item.inventoryStatus==1?'已盘点':item.inventoryStatus==2?'无台账':'有问题'}" />
+							<h:outputText value="#{item.inventoryStatus==1?'已盘点':item.inventoryStatus==2?'无台账':'未盘点'}" />
 							<!-- <h:outputText value="所属单位" />
 							<h:outputText value="#{item.orgPath}" /> -->
-							<h:outputText value="使用科室" />
+							<h:outputText value="#{msg.clinicalDeptName}" />
 							<h:outputText value="#{item.clinicalDeptName}" />
 							<h:outputText value="使用责任人" />
 							<h:outputText value="#{item.clinicalOwnerName}" />
@@ -59,27 +59,27 @@
 							<h:outputText value="2010国家编码" />
 							<h:outputText value="#{item.nationalStandardCode}" />
 							<h:outputText value="维修类型" />
-							<h:outputText value="#{item.assetCategory}" />
+							<h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}" />
 							<h:outputText value="用途分类" />
-							<h:outputText value="#{item.assetUsage}" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}" />
 							<h:outputText value="功能等级" />
 							<h:outputText value="#{item.functionGrade}" />
 							<h:outputText value="医疗器械分类" />
-							<h:outputText value="#{item.functionGroup}" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetFunctionType', item.functionGroup)}" />
 							<h:outputText value="资金来源" />
-							<h:outputText value="#{item.capitalSource}" />
+							<h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}" />
 							<h:outputText value="风险等级" />
-							<h:outputText value="#{item.riskGrade}" />
+							<h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}" />
 							<h:outputText value="计量等级" />
-							<h:outputText value="#{item.measureGrade}" />
+							<h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}" />
 							<h:outputText value="是否急救设备" />
-							<h:outputText value="#{item.emergencyEquipment}" />
+							<h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}" />
 							<h:outputText value="是否进口设备" />
-							<h:outputText value="#{item.importEquipment}" />
+							<h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}" />
 							<h:outputText value="核算类别" />
-							<h:outputText value="#{item.accountingCategory}" />
+							<h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}" />
 							<h:outputText value="计量项目类别" />
-							<h:outputText value="#{item.measuringItemCategory}" />
+							<h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}" />
 							<h:outputText value="资产编号" />
 							<h:outputText value="#{item.financingNum}" />
 							<h:outputText value="条码" />
@@ -108,20 +108,20 @@
 							<h:outputText value="#{item.factoryWarrantyDate}" />
 							<h:outputText value="报废日期" />
 							<h:outputText value="#{item.terminateDate}" />
-							<h:outputText value="上次维护日期" />
+							<h:outputText value="上次保养日期" />
 							<h:outputText value="#{item.lastPmDate}" />
 							<h:outputText value="上次巡检日期" />
 							<h:outputText value="#{item.lastQaDate}" />
 							<h:outputText value="上次计量日期" />
 							<h:outputText value="#{item.lastMeteringDate}" />
 							<h:outputText value="最终残值(元)" />
-							<h:outputText value="#{item.salvageValue}" />
+							<p:inputNumber minValue="0" decimalPlaces="2" value="#{item.salvageValue}"/>
 							<h:outputText value="采购价格(元)" />
-							<h:outputText value="#{item.purchasePrice}" />
+							<p:inputNumber minValue="0" decimalPlaces="2" value="#{item.purchasePrice}"/>
 							<h:outputText value="使用年限" />
 							<h:outputText value="#{item.lifecycle}" />
 							<h:outputText value="折旧算法" />
-							<h:outputText value="#{item.depreciationMethod}" />
+							<h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList', item.depreciationMethod)}" />
 						</p:panelGrid>
 					</p:carousel>
 				</h:form>

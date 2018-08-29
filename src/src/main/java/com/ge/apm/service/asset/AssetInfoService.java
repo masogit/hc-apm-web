@@ -8,8 +8,10 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetContractRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.domain.AssetContract;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -39,6 +41,7 @@ public class AssetInfoService {
 
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
     AssetContractRepository contractDao = WebUtil.getBean(AssetContractRepository.class);
+    ContractInfoItemRepository contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -71,8 +74,10 @@ public class AssetInfoService {
         return assetList;
     }
 
-    public List<AssetContract> getContractList(Integer assetId) {
-        return contractDao.findByAssetId(assetId);
+    public List<ContractInfoItem> getContractList(String assetUid) {
+//        return contractDao.findByAssetId(assetId);
+            //return contractItemDao.findByAssetUid(assetUid);
+        return contractItemDao.getByAssetUidAndContractType(assetUid);
     }
 
     public List<OrgInfo> getHospitalList() {
@@ -82,12 +87,32 @@ public class AssetInfoService {
 
     public List<OrgInfo> getOrgDeptList(String siteUid) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        return uaaService.getOrgDeptList(siteUid, user.getUid());
+        List<OrgInfo> orgInfos = uaaService.getOrgDeptList(siteUid, user.getUid());
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+        return orgInfos;
     }
 
     public List<OrgInfo> getClinicalDeptList(String siteUid) {
         List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        return orgInfos;
+    }
+
+    public List<OrgInfo> getHierachyClinicalDeptList(String siteUid) {
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeIn(siteUid, new Integer[] {4, 5});
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        return orgInfos;
+    }
+
+    public List<OrgInfo> getClinicalDeptListWithEmptyValue(String siteUid) {
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        OrgInfo emptyValue = new OrgInfo();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        orgInfos.add(0, emptyValue);
 
         return orgInfos;
     }

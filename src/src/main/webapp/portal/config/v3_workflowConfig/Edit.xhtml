@@ -8,37 +8,34 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.SystemConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset id="basic" legend="公共配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
-                            <h:panelGroup >
-                                <label class="label">集团</label>
-                                <p:selectOneMenu id="group" value="#{v2_WorkflowConfigController.selected.institutionUID}" >
-                                    <p:ajax update="display" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                            <h:panelGroup>
+                                <label class="label">#{msg.orgId}*</label>
+                                <p:inputText id="selectedUserOrgName" value="#{v2_WorkflowConfigController.getOrgFullName(v2_WorkflowConfigController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                                <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                                <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{v2_WorkflowConfigController.orgTree}" selection="#{v2_WorkflowConfigController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":V2_WorkflowConfigEditForm" listener="#{v2_WorkflowConfigController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
-
-                            <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.institutionUID != null}">
-                                <label class="label">医院</label>
-                                <p:selectOneMenu id="hospital" value="#{v2_WorkflowConfigController.selected.hospitalUID}" >
-                                    <p:ajax update="display" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-
-                            <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.hospitalUID != null}">
-                                <label class="label">院区</label>
-                                <p:selectOneMenu id="site" value="#{v2_WorkflowConfigController.selected.siteUID}" >
-                                    <p:ajax update="display" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                            <h:panelGroup rendered="true">
+                                <label class = "label">备件审核是否需要签名?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.partsNeedSign}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
 
                         </p:panelGrid>
                     </p:fieldset>
@@ -49,6 +46,7 @@
                                 <label class="label">维修#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
@@ -57,54 +55,141 @@
                                 <label class="label">维修#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="dispatchUserId2" value="#{v2_WorkflowConfigController.selected.dispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutDispatch}</label>
-                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
+                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.timeoutAccept}</label>
-                                <p:inputNumber id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutClose}</label>
-                                <p:inputNumber id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.maxMessageCount}</label>
-                                <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
                                 <label class = "label">系统自动验收(天)</label>
-                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否自动派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否允许抢单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否人工派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">工单完工不需要验收?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">工单完工自动关单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup >
+                                <label class = "label">是否必须评价?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ratingRequired}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup >
+                                <label class = "label">是否工时必填?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.hourRequired}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
 
                             <h:panelGroup rendered="true">
                                 <label class = "label">不允许临时账号?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">是否电话报修?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTelReport}">
+                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:wo" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup id="telStart" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修开始时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepStart}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+                            <h:panelGroup id="telEnd" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修结束时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepEnd}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+
+                            <h:panelGroup>
+                                <label class="label">工单人工费用(元/小时)</label>
+                                <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <!-- 紧急工单配置-->
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutDispatch}</label>
+                                <p:inputNumber id="emergencyTimeoutDispatch" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">紧急工单#{msg.timeoutAccept}</label>
+                                <p:inputNumber id="emergencyTimeoutAccept" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutClose}</label>
+                                <p:inputNumber id="emergencyTimeoutClose" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.maxMessageCount}</label>
+                                <p:inputNumber id="emergencyMaxMessageCount" value="#{v2_WorkflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class = "label">验收是否需要签名?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.ackNeedSign}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
@@ -151,6 +236,10 @@
                                 <label class="label">保养提醒次数</label>
                                 <p:inputNumber id="pmReminderTimes" value="#{v2_WorkflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">保养工单人工费用(元/小时)</label>
+                                <p:inputNumber id="pmManHourPrice" value="#{v2_WorkflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -158,30 +247,86 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
                                 <label class="label">资产创建审核人</label>
-                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetApprover}">
+                                <p:selectOneMenu id="approveUserList" value="#{v2_WorkflowConfigController.selected.assetApprover}">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getAssetCreateApproverlList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    <f:selectItems value="#{v2_WorkflowConfigController.approveUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
                                 <label class = "label">维保提醒提前天数</label>
-                                <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">维保提醒次数</label>
-                                <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />  
+                                </p:inputNumber>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒提前天数</label>
+                                <p:inputNumber id="measuringRemindDays" value="#{v2_WorkflowConfigController.selected.measuringRemindDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒次数</label>
+                                <p:inputNumber id="measuringReminderTimes" value="#{v2_WorkflowConfigController.selected.measuringReminderTimes}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">到货安装是否需要核对入库</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
                             </h:panelGroup >
-                            <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.siteUID != null}">
+                            <h:panelGroup rendered="true">
                                 <label class="label">调剂中心</label>
-                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                <p:selectOneMenu id="deptForSharedAsset" value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    <f:selectItems value="#{v2_WorkflowConfigController.dispatherClinical}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">三码配置</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
+                                    <p:ajax process="@this" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+
+                            <!--<h:panelGroup>
+                                <label class ="label">初始流水号</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.newFormat}" disabled="false">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class ="label">#{msg.generateMethod}</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:other" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class ="label">初始流水号</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
+                                    <p:ajax process="@this" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup style="display: #{(v2_WorkflowConfigController.selected.generateMethod == 1) or (v2_WorkflowConfigController.selected.generateMethod == 3) ? 'auto' : 'none'}">
+                                <label class ="label" >资产编号前缀(最多三位)</label>
+                                <p:inputText id="prefix" value="#{v2_WorkflowConfigController.selected.prefix}" maxlength="4" ><p:ajax process="@this"></p:ajax></p:inputText>
+                            </h:panelGroup>
+
                         </p:panelGrid>
                     </p:fieldset>
                         <!-- <p:spacer/> -->

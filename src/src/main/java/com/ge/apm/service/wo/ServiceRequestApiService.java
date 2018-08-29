@@ -8,6 +8,7 @@ package com.ge.apm.service.wo;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import webapp.framework.util.StringUtil;
 
 /**
  *
@@ -31,20 +34,17 @@ import org.springframework.stereotype.Component;
 public class ServiceRequestApiService extends MicroServiceInvoker {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    @Value("#{urlProperties.url_serviceRequestCreate}")
-    private String url_serviceRequestCreate;
-    @Value("#{urlProperties.url_workOrderAction}")
-    private String url_workOrderAction;
-    @Value("#{urlProperties.url_createWorkOrder}")
-    private String url_createWorkOrder;
-    @Value("#{urlProperties.url_getReponserByAsset}")
-    private String url_getReponserByAsset;
 
-    public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
+
+    public Map<String, Object> getReponserByAsset(String token, Integer assetId,String orgUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
 
-        String url = url_getReponserByAsset.replace("{assetId}", assetid.toString());
+        String gatewayURL = getGatewayURL(GatewayURL.GET_RESPONSER_BY_ASSET);
+        String url = gatewayURL.replace("{assetId}", assetId.toString());
+        if(StringUtils.isNotEmpty(orgUid)){
+            url = url + "?orgUid=" +orgUid;
+        }
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -52,6 +52,21 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         } else {
             return null;
         }
+    }
+
+    public ResponseEntity<LinkedHashMap> invokeWorkFlowConfig(String token, Integer assetId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        String gatewayURL = getGatewayURL(GatewayURL.GET_WORKFLOW_CONFIG);
+        String url = gatewayURL.replace("{assetId}", assetId.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if(isOkay(response)){
+            return response;
+        }
+        else{
+            return null;
+        }
+
     }
 
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
@@ -66,7 +81,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setAttachments(picList);
         formData.setAssetLocation(newServiceRequest.getAssetLocation());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_serviceRequestCreate, requestEntity, LinkedHashMap.class);
+        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (LinkedHashMap<String, Object>) responseMap.get("data");
@@ -75,22 +91,28 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
+
+
+
+
     public String invokeWorkOrderAction(String token, WorkOrderActionForm formData, String actionName, String woId) {
         HttpEntity<WorkOrderActionForm> requestEntity = new HttpEntity<WorkOrderActionForm>(formData, createHttpHeaders(token));
-        String url = url_workOrderAction.replace("{workOrderId}", woId).concat("?type=").concat(actionName);
+        String gatewayURL = getGatewayURL(GatewayURL.WORK_ORDER_ACTION);
+        String url = gatewayURL.replace("{workOrderId}", woId).concat("?type=").concat(actionName);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             logger.info("Invoke WorkOrderAction " + actionName + " has finished " + responseMap.get("data"));
             return (String) responseMap.get("data");
         } else {
-            return null;
+            return this.getResponseFailMessage(response);
         }
     }
 
     String createWorkOrder(String token, WorkOrderForm formData) {
         HttpEntity<WorkOrderForm> requestEntity = new HttpEntity<WorkOrderForm>(formData, createHttpHeaders(token));
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_createWorkOrder, requestEntity, LinkedHashMap.class);
+        String gatewayURL = getGatewayURL(GatewayURL.CREATE_WORK_ORDER);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (String) responseMap.get("message");
@@ -216,7 +238,7 @@ class ServiceRequestForm {
 class WorkOrderActionForm {
 
     String serviceRequestId;
-    String strDate;
+    String  strDate;
     String desc;
     String estimatedCloseTime;
     String assigneeId;
@@ -237,9 +259,17 @@ class WorkOrderActionForm {
     String equipmentTaker;
     String takeTime;
     Integer repairType;
+    String repairResult;
     Double externalExpense;
     List<V2_BlobObject> attachments;
 
+    public String getRepairResult() {
+        return repairResult;
+    }
+
+    public void setRepairResult(String repairResult) {
+        this.repairResult = repairResult;
+    }
 
     public String getServiceRequestId() {
         return serviceRequestId;

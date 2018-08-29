@@ -21,7 +21,8 @@
 
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"/>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"/>-->
                             <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
@@ -30,7 +31,7 @@
                             <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class='label'>虚拟电话网</label>
+                            <label class='label'>虚拟网电话</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}"/>
                             <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
@@ -54,7 +55,7 @@
                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                        rowsPerPageTemplate="20,40,60,90" editable="true">   
+                        rowsPerPageTemplate="20,50,100,500" editable="true">   
                              
                         <p:ajax event="rowEdit" listener="#{sharedAssetReqTypeController.onCellEditRegist}" />
                         <p:ajax event="rowSelect" />
@@ -64,7 +65,7 @@
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
                         <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                            <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId)}"/>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty2(item.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                         </p:column>
                         <p:column headerText="申请归还数" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.applyQty}"/>
@@ -90,7 +91,7 @@
                     
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
                         <p:column headerText="设备名称" sortBy="#{item.assetName}" >
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
@@ -120,7 +121,7 @@
                     
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90" >   
+                    rowsPerPageTemplate="20,50,100,500" >   
                 
                         <p:column headerText="设备名称" sortBy="#{item.assetName}">
                             <h:outputText value="#{item.assetName}"/>
@@ -162,7 +163,7 @@
                 </p:fieldset>
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
+                    <!--<p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>-->
                 </h:panelGroup>
             </h:form>
          </div>  

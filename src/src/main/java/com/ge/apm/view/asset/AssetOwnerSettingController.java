@@ -69,7 +69,7 @@ public class AssetOwnerSettingController {
 
     public void getQueryAssetsList() {
         Page page = aoService.getAssetListEx(queryAsset);
-        sourceAssets = page.getContent();
+        sourceAssets = new ArrayList<AssetInfo>(page.getContent());
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
                 sourceAssets.remove(item);
@@ -101,7 +101,7 @@ public class AssetOwnerSettingController {
 
     public List<UserAccount> getOwnerList() {
 //        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
-        List<UserAccount> res = userCommonService.getWorkerList(null);
+        List<UserAccount> res = userCommonService.getWorkerList(null,"");
         return res;
     }
 

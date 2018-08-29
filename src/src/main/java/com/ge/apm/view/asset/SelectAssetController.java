@@ -42,6 +42,18 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         this.filterByHospital = false;
     }
 
+
+    public Boolean getConfirm(){
+        if(selected==null)
+            return true;
+        else if(selected.getIsPm()==null){
+            return false;
+        }else if(selected.getIsPm()==true) {
+            return false;
+        }else{
+            return true;
+        }
+    }
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -63,10 +75,13 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
         return super.loadData(pageRequest);
     }
+
+
 
     private TreeNode orgAssetTree;
 
@@ -74,6 +89,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         return orgAssetTree;
     }
 
+    public boolean x1;
     public void onSelectRow() {
         selectedAsset = this.selected;
     }
@@ -102,6 +118,34 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             selectedAsset = (AssetInfo) nodeData;
         } else {
             selectedAsset = null;
+        }
+    }
+    
+    public void onSelectTreeNodePMAssets(NodeSelectEvent event){
+        TreeNode node = event.getTreeNode();
+        if (node.getType().equals("org")) {
+            addAssetToOrgNode(node);
+            node.setExpanded(true);
+            node.getChildren().forEach(item ->{
+                if(item.getData() instanceof AssetInfo){
+                    if(((AssetInfo)item.getData()).getIsPm()!=null && !((AssetInfo)item.getData()).getIsPm()){
+                        item.setSelectable(false);
+                    }
+                };
+            
+            });
+            
+            return;
+        }
+        node.setExpanded(true);
+
+        Object nodeData = node.getData();
+        if (nodeData instanceof AssetInfo) {
+            selectedAsset = (AssetInfo) nodeData;
+            selected =(AssetInfo) nodeData;
+        } else {
+            selectedAsset = null;
+            selected = null;
         }
     }
 

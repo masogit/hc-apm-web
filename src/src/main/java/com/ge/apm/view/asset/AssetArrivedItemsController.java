@@ -9,13 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
@@ -28,6 +32,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import com.ge.apm.service.asset.QrCodeTemplateService;
 
 @ManagedBean
 @ViewScoped
@@ -45,9 +50,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     private String arrivalFormatTime = null;
 
     private OrgInfo fileterDeptOrg;
+    
+    private String exportQrCodeTemplateId;
+    
+    private QrCodeService qrCodeService;
 
     @Override
     protected void init() {
+        qrCodeService = WebUtil.getBean(QrCodeService.class);
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -164,6 +174,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public List<V2_BlobObject> getAckPicList(String type) {
         return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
     }
+    
+    public String getInstallUrl(String itemId,String srcPage){
+        return UrlEncryptController.encodeUrlParam("ItemEdit?faces-redirect=true&src=".concat(srcPage).concat("&itemId=").concat(itemId));
+    }
 
     public ArrivalListItem getSelectedItem() {
         return selectedItem;
@@ -182,6 +196,27 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             }
         }
         fileterDeptOrg = null;
+    }
+    
+    public String getQrCodeImageForAsset() {
+        AssetInfo asset = new AssetInfo();
+        asset.setQrCode(selected.getQrCode());
+        asset.setName(selected.getArrivalList().getAssetName());
+        asset.setAssetGroup(selected.getArrivalList().getAssetGroup());
+        asset.setSiteUID(selected.getArrivalList().getSiteUID());
+        asset.setFunctionType(selected.getArrivalList().getFunctionType());
+        asset.setClinicalDeptUID(selected.getClinicalDeptUID());
+        asset.setSerialNum(selected.getSerialNum());
+        asset.setDepartNum(selected.getDepartNum());
+        asset.setFinancingNum(selected.getFinancingNum());
+        asset.setModalityId(selected.getModalityId());
+        asset.setSystemId(selected.getSystemId());
+        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId,selected.getArrivalList().getSiteUID() );
+    }
+    
+    public List<QrCodeTemplate> getQrCodeTemplates() {
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
     }
 
     public String getArrivalFormatTime() {
@@ -211,6 +246,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void setFileterDeptOrg(OrgInfo fileterDeptOrg) {
         this.fileterDeptOrg = fileterDeptOrg;
+    }
+
+    public String getExportQrCodeTemplateId() {
+        return exportQrCodeTemplateId;
+    }
+
+    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
+        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
 }

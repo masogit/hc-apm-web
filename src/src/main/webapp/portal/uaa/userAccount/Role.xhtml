@@ -21,8 +21,9 @@
 
                         <p:outputLabel value="#{msg.AssignRole}" for="roleNames" />
                         <p:selectManyCheckbox id="roleNames" value="#{userAccountController.assignedRoles}" layout="pageDirection" valueChangeListener="#{userAccountController.roleChangeListener}">
-                            <p:ajax update="@this"/>
-                            <f:selectItems value="#{userAccountController.allRoles}" />
+                            <p:ajax update=":userAccountTab:UserRoleEditForm:tabview:roleNames"/>
+                            <f:selectItems value="#{userAccountController.roleListVO}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.roleDesc}" itemDisabled="#{roleItem.disable}" />
+                            <!--<f:selectItems value="#{userAccountController.allRoles}" />-->
                         </p:selectManyCheckbox>
 
                     </p:panelGrid>
@@ -30,7 +31,7 @@
                         <p:tab title="访问权限" class="ui-g-12" >
                             <p:scrollPanel style="height: 300px; border: 0;" mode="native">
 
-                                <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="true"  cache="false" selectionMode="checkbox" highlight="true">
+                                <p:tree id="orgTree2" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="true"  cache="false" selectionMode="checkbox" highlight="true">
                                     <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
                                     <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
                     
@@ -44,7 +45,7 @@
                     
                     
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display,:RoleEditDlg, :UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display,:userAccountTab:RoleEditDlg, :userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('RoleEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>

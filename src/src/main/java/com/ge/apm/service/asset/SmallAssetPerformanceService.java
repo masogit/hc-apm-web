@@ -11,15 +11,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
@@ -36,7 +38,7 @@ import com.ge.apm.service.utils.ExcelParser;
 /**
  * Created by 212605082 on 2017/11/7.
  */
-@Component
+@Service
 public class SmallAssetPerformanceService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmallAssetPerformanceService.class);
 
@@ -133,8 +135,14 @@ public class SmallAssetPerformanceService {
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		List<SmallAssetPerformance> importFailedDataList = new ArrayList<>();
-		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-		HSSFSheet sheet = workbook.getSheetAt(0);
+		Workbook workbook = null;
+		if(file.getFileName().toLowerCase().endsWith(".xls")){
+			workbook=new HSSFWorkbook(file.getInputstream());
+		}
+		else if(file.getFileName().toLowerCase().endsWith(".xlsx")){
+			workbook=new XSSFWorkbook(file.getInputstream());
+		}
+		Sheet sheet = workbook.getSheetAt(0);
 		if (sheet == null) {
 			return null;
 		}
@@ -173,7 +181,7 @@ public class SmallAssetPerformanceService {
 		int happendateIndex=header.get(HEADER_HAPPENDATE);
 
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
-			HSSFRow row = sheet.getRow(j);
+			Row row = sheet.getRow(j);
 			if (row == null) {
 				continue;
 			}

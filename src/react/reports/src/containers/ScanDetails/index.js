@@ -13,11 +13,11 @@ import styles from './index.scss'
 const isHead = IsHead()
 
 export default
-@connect(({filters, depts, assets, steps, hospitals }) => ({filters, depts, assets, steps, hospitals}))
+@connect(({ScanDetails_filters, depts, assets, steps, hospitals }) => ({filters: ScanDetails_filters, depts, assets, steps, hospitals}))
 class ScanDetails extends React.PureComponent {
   onFilterChange = (e) => this.props.dispatch({
     type: 'ScanDetails_filters/field/set',
-    payload: e
+    payload: e,
   })
 
   render() {
@@ -29,17 +29,21 @@ class ScanDetails extends React.PureComponent {
       filterOptions.push(
         {
           type: 'select',
-            key: 'dept',
-            value: filters.dept,
-            options: depts,
-            placeholder: '全部科室'
+          key: 'hospital',
+          value: depts.selectedHospital,
+          options: depts.hospitals,
+          dropdownMatchSelectWidth: false,
+          allowClear: false,
         },
         {
           type: 'select',
-            key: 'hospital',
-            value: filters.hospital,
-            options: hospitals,
-            placeholder: '默认院区'
+          key: 'dept',
+          value: filters.dept,
+          options: depts.depts,
+          placeholder: '全部科室',
+          allowClear: false,
+          dropdownMatchSelectWidth: false,
+
         },
       )
     }

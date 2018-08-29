@@ -4,37 +4,37 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:form id="inventoryOrderDetailAssetInfo2ListForm">
-	<p:dataTable id="datalist2" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList2" selectionMode="single"
-		selection="#{inventoryOrderDetailAssetInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+	<p:dataTable id="datalist2" value="#{inventoryOrderDetailAssetInfoController2.lazyModel}" var="item" widgetVar="varDataList2" selectionMode="single"
+		selection="#{inventoryOrderDetailAssetInfoController2.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
-		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
-		<p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController2.onFilter}" />
+		<p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.assetInfo.namePyCode}">
 			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
 		</p:column>
 		<p:column headerText="设备名" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItems value="#{inventoryOrderDetailAssetInfoController.listClinicalDeptName}" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoController2.listClinicalDeptName}" />
 				</p:selectOneMenu>
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>
-		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.departNum}">
 			<h:outputText value="#{item.assetInfo.departNum}" />
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.functionType}">
 			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
-		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
+		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.financingNum}">
 			<h:outputText value="#{item.assetInfo.financingNum}" />
 		</p:column>
 		<p:column headerText="资产状态" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
@@ -50,15 +50,15 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
+			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
 			<h:outputText value="#{item.lastModifiedBy}" />
 		</p:column>
-		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
 			<f:facet name="filter">
-				<p:inputText id="filterLastModifiedDate" widgetVar="varFilterLastModifiedDate" />
+				<p:inputText id="filterLastModifiedDate2" widgetVar="varFilterLastModifiedDate2" />
 			</f:facet>
 			<h:outputText value="#{item.lastModifiedDate}">
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -71,18 +71,18 @@
 		</f:facet>
 	</p:dataTable>
 </h:form>
-<p:overlayPanel widgetVar="panelFilterLastModifiedDate" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2:filterLastModifiedDate" dismissable="false">
+<p:overlayPanel widgetVar="panelFilterLastModifiedDate2" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2:filterLastModifiedDate2" dismissable="false">
 	<h:panelGrid columns="2">
 		<p:outputLabel value="#{msg.From}" />
-		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
 			mask="true" size="12" locale="zh" />
 		<p:outputLabel value="#{msg.To}" />
-		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
 			mask="true" size="12" locale="zh" />
 	</h:panelGrid>
 	<p:commandButton
-		onclick="setDateFilter('varDataList2','varFilterLastModifiedDate','varStartTimeFrom_LastModifiedDate','varStartTimeTo_LastModifiedDate'); PF('panelFilterLastModifiedDate').hide();"
+		onclick="setDateFilter('varDataList2','varFilterLastModifiedDate2','varStartTimeFrom_LastModifiedDate2','varStartTimeTo_LastModifiedDate2'); PF('panelFilterLastModifiedDate2').hide();"
 		title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
-	<p:commandButton onclick="PF('panelFilterLastModifiedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+	<p:commandButton onclick="PF('panelFilterLastModifiedDate2').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
 </p:overlayPanel>
 </html>

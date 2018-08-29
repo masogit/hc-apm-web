@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="报表模版管理"/>
+                </div>
+                <h:form id="pmOrderReportTemplateListForm">
+                    <p:dataTable id="dataList" value="#{pmOrderReportTemplateController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{pmOrderReportTemplateController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" listener="#{pmOrderReportTemplateController.onSelect()}"
+                                update="createButton editButton deleteButton"/>
+
+                        <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
+                                  filterMatchMode="EQ">
+                            <h:outputText value="#{pmOrderReportTemplateController.getTenantName(item.tenantUID)}"/>
+                        </p:column>
+                        <p:column headerText="集团" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
+                                  filterMatchMode="EQ">
+                            <h:outputText
+                                    value="#{pmOrderReportTemplateController.getInsNameByUID(item.institutionUID)}"/>
+                        </p:column>
+                        <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}"
+                                  filterMatchMode="EQ">
+                            <h:outputText
+                                    value="#{pmOrderReportTemplateController.getHospitalNameByUID(item.hospitalUID)}"/>
+                        </p:column>
+                        <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
+                                  filterMatchMode="EQ">
+                            <h:outputText value="#{pmOrderReportTemplateController.getSiteNameByUID(item.siteUID)}"/>
+                        </p:column>
+                        <p:column headerText="模版文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
+                                  filterMatchMode="EQ">
+                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
+                                <h:outputText value="#{item.fileName}"/>
+                            </p:link>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                             actionListener="#{pmOrderReportTemplateController.prepareCreate()}"
+                                             update=":pmOrderReportTemplateEditDlg"
+                                             oncomplete="PF('pmOrderReportTemplateEditDialog').show()"
+                                             disabled="#{pmOrderReportTemplateController.existsSiteTemplate()}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             actionListener="#{pmOrderReportTemplateController.prepareEdit()}"
+                                             update=":pmOrderReportTemplateEditDlg"
+                                             oncomplete="PF('pmOrderReportTemplateEditDialog').show()"
+                                             disabled="#{empty pmOrderReportTemplateController.selected}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                             actionListener="#{pmOrderReportTemplateController.delete}"
+                                             update=":pmOrderReportTemplateEditDlg,dataList"
+                                             disabled="#{empty pmOrderReportTemplateController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                           icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

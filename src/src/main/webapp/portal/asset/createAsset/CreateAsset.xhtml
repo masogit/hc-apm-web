@@ -133,8 +133,19 @@
 
                                     <h:panelGroup>
                                         <label class="label">#{msg.manufacture}</label>
-                                        <p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>
+                                        <!--<p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>-->
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['manufacture']}" scrollHeight="300" 
+                                                        forceSelection="true" 
+                                                        completeMethod="#{assetCreateController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
+                                            <p:ajax listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
+
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">#{msg.manufacture}</label>
+                                                                            <p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>
+                                                                        </h:panelGroup>-->
 
                                     <h:panelGroup rendered="false">
                                         <label class="label">#{msg.brand}</label>
@@ -160,10 +171,12 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.clinicalDeptName}</label>
-                                        <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.assetInfo.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel assetOwnerName parentAssetList" />
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{assetCreateController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                        <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.clinicalDept}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" var="t"  filter="true" filterMatchMode="startsWith" converter="orgInfoConverter">
+                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
+                                            <f:selectItems value="#{assetCreateController.getClinicalDeptListWithEmptyValue()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                            <p:column>
+                                                <h:outputText value="#{t.name}"/>
+                                            </p:column>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -211,20 +224,26 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitanance}</label>
-                                        <p:inputText id="maitanance" value="#{assetCreateController.assetInfo.maitanance}"/>
+                                        <!--<p:inputText id="maitanance" value="#{assetCreateController.assetInfo.maitanance}"/>-->
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['maintainer']}" scrollHeight="300" 
+                                                        forceSelection="true" 
+                                                        completeMethod="#{assetCreateController.autoCompleteMaintainer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
+                                            <p:ajax listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitananceTel}</label>
-                                        <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
+                                        <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}" readonly="true"/>
                                     </h:panelGroup>
-<!--                                    <h:panelGroup>
-                                        <label class="label">同时生成保养工单*</label>
-                                        <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItem itemLabel="是" itemValue="true"/>
-                                            <f:selectItem itemLabel="否" itemValue="false"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>-->
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">同时生成保养工单*</label>
+                                                                            <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
+                                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                                                <f:selectItem itemLabel="是" itemValue="true"/>
+                                                                                <f:selectItem itemLabel="否" itemValue="false"/>
+                                                                            </p:selectOneMenu>
+                                                                        </h:panelGroup>-->
 
                                 </p:panelGrid>
                             </p:fieldset>
@@ -234,7 +253,7 @@
 
                                     <h:panelGroup>
                                         <label class="label">设备国标码</label>
-                                        <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname">
+                                        <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname financingNum">
                                             <!--<p:ajax process="@this"/>-->
                                         </p:autoComplete>
                                         <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
@@ -260,11 +279,17 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.parentAsset}</label>
-                                        <p:selectOneMenu id="parentAssetList" value="#{assetCreateController.assetInfo.parentAssetId}" >
+<!--                                        <p:selectOneMenu id="parentAssetList" value="#{assetCreateController.assetInfo.parentAssetId}" >
                                             <p:ajax process="@this" />
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetCreateController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
-                                        </p:selectOneMenu>
+                                        </p:selectOneMenu>-->
+
+                                        <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetCreateController.selectedObjectMap['parentAsset']}" completeMethod="#{assetCreateController.completeParentAssetId}"
+                                                        forceSelection="true" var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onParentAssetChange()}"/>
+                                            <p:ajax listener="#{assetCreateController.onParentAssetChange()}" />
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <p:spacer/>
                                     <h:panelGroup >
@@ -285,9 +310,9 @@
                                     <h:panelGroup >
                                         <label class="label">#{msg.financingNum}</label>
                                         <p:inputText  value="#{assetCreateController.assetInfo.financingNum}" class="financingNum">
-                                            <p:ajax process="@this" update="#{empty assetCreateController.assetInfo.financingNum? '':'@(.financingNum)'}"/>
+                                            <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                         </p:inputText>
-                                        <p:commandButton validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 3}" 
+                                        <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 4}" 
                                                          update="@(.financingNum) :growl" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                                     </h:panelGroup>
                                     <h:panelGroup>

@@ -17,7 +17,7 @@
 				<h:panelGroup>
 					<p>说明</p>
 					<p>
-						1. <a href="APM_SmallAssetPerformance_Template.xls" title="download">#{msg.downloadTemplateFile}</a>
+						1. <a href="APM_SmallAssetPerformance_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
 					<p>2. 文件中填入要导入的数据，其中[项目名称]和[日期]必填</p>
 					<p>3. 上传文件进行导入</p>
@@ -33,7 +33,7 @@
 					value="#{smallAssetPerformanceController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
 					paginatorAlwaysVisible="true"
 					paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 					<p:column headerText="EXCEL行数">
 						<h:outputText value="#{item.excelIdex}" />
 					</p:column>

@@ -65,9 +65,22 @@ public class V2_WorkOrder_Detail implements Serializable {
     private Date warrantyDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "apply_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date applyTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "estimated_arrive_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedArriveTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "arrived_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date arrivedTime;
+
+    @Column(name="closed_price")
+    private Double closedPrice;
 
     @Column(name = "arrived")
     private Boolean arrived;
@@ -209,7 +222,32 @@ public class V2_WorkOrder_Detail implements Serializable {
     public void setApproved(Boolean approved) {
         this.approved = approved;
     }
-    
+
+
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+
+    public Date getArrivedTime() {
+        return arrivedTime;
+    }
+
+    public void setArrivedTime(Date arrivedTime) {
+        this.arrivedTime = arrivedTime;
+    }
+
+    public Double getClosedPrice() {
+        return closedPrice;
+    }
+
+    public void setClosedPrice(Double closedPrice) {
+        this.closedPrice = closedPrice;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

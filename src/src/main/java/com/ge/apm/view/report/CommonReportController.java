@@ -1,18 +1,22 @@
 package com.ge.apm.view.report;
 
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UnstructuredDataCollection;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredDataCollection;
+import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.report.TableDefinitionService;
+
 import webapp.framework.web.WebUtil;
 
 /*
@@ -28,7 +32,7 @@ import webapp.framework.web.WebUtil;
 @ViewScoped
 public class CommonReportController {
 
-    private String reportUid;
+    private String reportBaseUid;
 
     private TableDefinitionRepository tableDao;
 
@@ -37,6 +41,8 @@ public class CommonReportController {
     private UnstructuredDataCollectionRepository reportDao;
 
     private TableDefinitionService tableService;
+    
+    private V2_PmOrderService v2PmOrderService;
 
     @PostConstruct
     protected void init() {
@@ -44,6 +50,7 @@ public class CommonReportController {
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        v2PmOrderService = WebUtil.getBean(V2_PmOrderService.class);
     }
 
     public List<UnstructuredDataCollection> getReportList(String boUid) {
@@ -63,10 +70,11 @@ public class CommonReportController {
     }
 
     public void addReporter(String boUid) {
+        TableDefinition table = tableDao.findByBaseId(reportBaseUid);
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
-        newReport.setSchemaId(reportUid);
-        reportDao.save(newReport);
+        newReport.setSchemaId(table.getId());
+        v2PmOrderService.saveReport(newReport);
     }
 
     public String getTemplateName(String templateId) {
@@ -79,27 +87,33 @@ public class CommonReportController {
 
     public String getEditLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+                return "";
         if (null != table.getExcelStorageId()) {
-            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }else{
-            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }
     }
 
     public String getViewLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+            return "";
          if (null != table.getExcelStorageId()) {
-            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
         }else{
-            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
         }
     }
 
-    public String getReportUid() {
-        return reportUid;
+    public String getReportBaseUid() {
+        return reportBaseUid;
     }
 
-    public void setReportUid(String reportUid) {
-        this.reportUid = reportUid;
+    public void setReportBaseUid(String reportBaseUid) {
+        this.reportBaseUid = reportBaseUid;
     }
+
+
 }

@@ -7,27 +7,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ge.apm.service.asset.SmallAssetPerformanceService;
 
 public class ExcelParser {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExcelParser.class);
 	private static final String HEADER_ROW="HEADER_ROW";
-	public static Map<String, Integer> findHeader(HSSFSheet sheet, List<String> headers) {
+	public static Map<String, Integer> findHeader(Sheet sheet, List<String> headers) {
         Map<String, Integer> result = new HashMap<>();
         String header = "";
         for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-            HSSFRow row = sheet.getRow(i);
+            Row row = sheet.getRow(i);
             if (row == null) {
                 continue;
             }
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-                HSSFCell cell = row.getCell(j);
+                Cell cell = row.getCell(j);
                 if (cell == null) {
                     continue;
                 }
@@ -55,8 +53,8 @@ public class ExcelParser {
         return result;
     }
 
-	public static Date getCellDateValue(HSSFRow row, int columIndex, SimpleDateFormat sdf) throws Exception {
-        HSSFCell cell = row.getCell(columIndex);
+	public static Date getCellDateValue(Row row, int columIndex, SimpleDateFormat sdf) throws Exception {
+        Cell cell = row.getCell(columIndex);
         String value = "";
         if (cell != null) {
             try {
@@ -80,8 +78,8 @@ public class ExcelParser {
         return null;
     }
 
-    public static String getCellStringValue(HSSFRow row, int columIndex) throws Exception {
-        HSSFCell cell = row.getCell(columIndex);
+    public static String getCellStringValue(Row row, int columIndex) throws Exception {
+        Cell cell = row.getCell(columIndex);
         if (cell != null) {
             try {
                 return cell.getStringCellValue();
@@ -98,8 +96,8 @@ public class ExcelParser {
         return "";
     }
 
-    public static Double getCellNumberValue(HSSFRow row, int columIndex) throws Exception {
-        HSSFCell cell = row.getCell(columIndex);
+    public static Double getCellNumberValue(Row row, int columIndex) throws Exception {
+        Cell cell = row.getCell(columIndex);
         if (cell != null) {
             try {
                 return cell.getNumericCellValue();

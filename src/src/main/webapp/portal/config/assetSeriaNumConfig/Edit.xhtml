@@ -17,7 +17,8 @@
                                <p:selectOneMenu id="group" value="#{assetSeriaNumConfigController.selected.institutionUID}" >
                              		<p:ajax update="display" /> 
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                   <f:selectItems value="#{assetSeriaNumConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(
+                                   assetSeriaNumConfigController.selected.institutionUID,assetSeriaNumConfigController.selected.tenantUID,1)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{assetSeriaNumConfigController.selected.institutionUID != null}">
@@ -25,7 +26,8 @@
                                <p:selectOneMenu id="hospital" value="#{assetSeriaNumConfigController.selected.hospitalUID}" >
                              		<p:ajax update="display" />
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(assetSeriaNumConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(
+                                   assetSeriaNumConfigController.selected.hospitalUID,assetSeriaNumConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
                         
@@ -34,7 +36,8 @@
                                <p:selectOneMenu id="site" value="#{assetSeriaNumConfigController.selected.siteUID}" >
                                		<p:ajax update="display" /> 
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(assetSeriaNumConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(
+                                   assetSeriaNumConfigController.selected.siteUID,assetSeriaNumConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>  
                         

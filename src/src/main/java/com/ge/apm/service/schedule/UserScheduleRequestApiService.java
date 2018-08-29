@@ -1,5 +1,6 @@
 package com.ge.apm.service.schedule;
 
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +21,11 @@ public class UserScheduleRequestApiService extends MicroServiceInvoker {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value("#{urlProperties.url_UserVacationCreate}")
-    private String url_UserVacationCreate;
 
     public List<LinkedHashMap<String, Date>> createUserVacationRequest(String token, UserScheduleForm formData ){
         HttpEntity<UserScheduleForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_UserVacationCreate, requestEntity, LinkedHashMap.class);
+        String gatewayURL = getGatewayURL(GatewayURL.USER_VACATION_CREATE);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (List<LinkedHashMap<String, Date>>) responseMap.get("data");

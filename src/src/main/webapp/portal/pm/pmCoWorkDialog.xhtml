@@ -7,8 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
 
-    <p:dialog class="pmcoworkerDlgClass" id="pmcoworkerDlg"  widgetVar="pmcoworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="协作者">
-        <h:form id="pmcoworkerDlgForm" >
+    <p:dialog class="pmcoworkerDlgClass" id="pmcoworkerDlg"  widgetVar="pmcoworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="协作者" >
+        <h:form id="pmcoworkerDlgForm">
             <h:panelGroup >
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
@@ -20,13 +20,13 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">内部工时(小时)</label>
+                        <label class="label">内部工时(小时)*</label>
                         <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{v2PmOrderController.coWorkerDetail.manHours}" required="true" requiredMessage="内部工时(小时) #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addCoWokerItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:pmcoworkerList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmcoworkerDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addCoWokerItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:pmcoworkerList :growl  @(.pmcoworkerDlgClass)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmcoworkerDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmcoworkerDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>

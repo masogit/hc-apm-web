@@ -104,6 +104,19 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+
+
+                    <p:dataGrid var="woAttachItem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}">
+                        <f:facet name="header">维修附件</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                #{woAttachItem.objectName}
+                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}" process="@this"> 下载文件</p:link>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+
+
                     <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
                         <f:facet name="header">报修语音</f:facet>
                         <p:panel  style="text-align:center">
@@ -208,10 +221,7 @@
                                 <p:column headerText="#{msg.description}">
                                     <h:outputText value="#{stepItem.comments}"  style="word-wrap: break-word;"/>
                                 </p:column>
-
                             </p:dataTable>
-
-
                             <br/>
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
@@ -235,20 +245,38 @@
                                         <h:outputText value="#{detailItem.serialNum}" />
                                     </p:column>
                                     <p:column headerText="发票号">
-                                        <h:outputText value="#{item.invoiceNum}" />
+                                        <h:outputText value="#{detailItem.invoiceNum}" />
                                     </p:column>
                                     <p:column headerText="质保期">
                                         <h:outputText value="#{detailItem.warrantyDate}">
                                             <f:convertDateTime pattern="yyyy-MM-dd"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="申请时间">
+                                        <h:outputText value="#{detailItem.applyTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
                                     <p:column headerText="预计到达时间">
                                         <h:outputText value="#{detailItem.estimatedArriveTime}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="到货确认时间">
+                                        <h:outputText value="#{detailItem.arrivedTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="到货">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
+                                    </p:column>
+                                    <p:column headerText="实际价格(元)">
+                                        <h:outputText value="#{detailItem.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="操作">
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
                                     </p:column>
 
                                 </p:dataTable>

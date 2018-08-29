@@ -47,10 +47,15 @@ public class TableDefinition implements Serializable {
     @Column(name = "name")
     private String name;
 
-    //jason 值
+    //json 值
     @Column(name = "schema")
     @Type(type = "text")
     private String schema;
+    
+    //jason 值
+    @Column(name = "instrument_key_values")
+    @Type(type = "text")
+    private String instrumentKeyValues;
 
     //分类
     @Column(name = "asset_group")
@@ -226,9 +231,16 @@ public class TableDefinition implements Serializable {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
-    
 
-    @Override
+    public String getInstrumentKeyValues() {
+		return instrumentKeyValues;
+	}
+
+	public void setInstrumentKeyValues(String instrumentKeyValues) {
+		this.instrumentKeyValues = instrumentKeyValues;
+	}
+
+	@Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);

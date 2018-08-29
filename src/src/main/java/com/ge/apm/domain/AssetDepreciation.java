@@ -29,12 +29,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "asset_depreciation")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "AssetDepreciation.findAll", query = "SELECT a FROM AssetDepreciation a"),
-    @NamedQuery(name = "AssetDepreciation.findById", query = "SELECT a FROM AssetDepreciation a WHERE a.id = :id"),
-    @NamedQuery(name = "AssetDepreciation.findBySiteId", query = "SELECT a FROM AssetDepreciation a WHERE a.siteId = :siteId"),
-    @NamedQuery(name = "AssetDepreciation.findByAssetId", query = "SELECT a FROM AssetDepreciation a WHERE a.assetId = :assetId"),
-    @NamedQuery(name = "AssetDepreciation.findByDeprecateDate", query = "SELECT a FROM AssetDepreciation a WHERE a.deprecateDate = :deprecateDate"),
-    @NamedQuery(name = "AssetDepreciation.findByDeprecateAmount", query = "SELECT a FROM AssetDepreciation a WHERE a.deprecateAmount = :deprecateAmount"),
+    @NamedQuery(name = "AssetDepreciation.findAll", query = "SELECT a FROM AssetDepreciation a")
+    ,
+    @NamedQuery(name = "AssetDepreciation.findById", query = "SELECT a FROM AssetDepreciation a WHERE a.id = :id")
+    ,
+    @NamedQuery(name = "AssetDepreciation.findBySiteId", query = "SELECT a FROM AssetDepreciation a WHERE a.siteId = :siteId")
+    ,
+    @NamedQuery(name = "AssetDepreciation.findByAssetId", query = "SELECT a FROM AssetDepreciation a WHERE a.assetId = :assetId")
+    ,
+    @NamedQuery(name = "AssetDepreciation.findByDeprecateDate", query = "SELECT a FROM AssetDepreciation a WHERE a.deprecateDate = :deprecateDate")
+    ,
+    @NamedQuery(name = "AssetDepreciation.findByDeprecateAmount", query = "SELECT a FROM AssetDepreciation a WHERE a.deprecateAmount = :deprecateAmount")
+    ,
     @NamedQuery(name = "AssetDepreciation.findByContractId", query = "SELECT a FROM AssetDepreciation a WHERE a.contractId = :contractId")})
 public class AssetDepreciation implements Serializable {
 
@@ -48,6 +54,10 @@ public class AssetDepreciation implements Serializable {
     @NotNull
     @Column(name = "site_id")
     private int siteId;
+
+    @Basic(optional = true)
+    @Column(name = "hospital_id")
+    private Integer hospitalId;
     @Basic(optional = false)
     @NotNull
     @Column(name = "asset_id")
@@ -151,5 +161,5 @@ public class AssetDepreciation implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.AssetDepreciation[ id=" + id + " ]";
     }
-    
+
 }

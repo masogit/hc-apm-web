@@ -8,11 +8,13 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.GbCode;
 import com.ge.apm.domain.OrgInfo;
@@ -20,6 +22,8 @@ import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ge.apm.domain.V2_BlobObject;
@@ -49,6 +53,9 @@ public class AssetInstallationService {
     BlobObjectRepository blobDao;
 
     @Autowired
+    protected BlobFileService blobService;
+
+    @Autowired
     SupplierRepository supplierDao;
 
     @Autowired
@@ -71,6 +78,8 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
+    @Autowired
+    private ContractInfoItemRepository contractItemDao;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -80,6 +89,31 @@ public class AssetInstallationService {
 
     public List<ArrivalListItem> getListItem(String arrivalListId) {
         return itemDao.findByArrivalListId(arrivalListId);
+    }
+
+    public void deleteListItem(String arrivalListId, String siteUid) {
+        List<ArrivalListItem> listItem = getListItem(arrivalListId);
+        if (listItem != null) {
+            for (ArrivalListItem item : listItem) {
+                if (StringUtils.isNotEmpty(item.getQrCode())) {
+                    deleteQrCode(item.getQrCode(), siteUid);
+                }
+            }
+            itemDao.delete(listItem);
+        }
+    }
+
+    public void deleteBlobObject(String arrivalListId) {
+        List<V2_BlobObject> listObj = blobDao.findByBoUuid(arrivalListId);
+        if (listObj != null) {
+            for (V2_BlobObject obj : listObj) {
+                blobService.deleteBlobFile(obj);
+            }
+        }
+    }
+
+    private void deleteQrCode(String qrCode, String siteUid) {
+        qrCodeService.deleteQrcode(qrCode, siteUid);
     }
 
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
@@ -92,7 +126,7 @@ public class AssetInstallationService {
                 ArrivalListItem temp = itemDao.findById(itemId);
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 3);
                 }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
@@ -115,8 +149,14 @@ public class AssetInstallationService {
                         case "asset3":
                             item.setBoSubType("3");
                             break;
+                        case "asset4":
+                            item.setBoSubType("4");
+                            break;
                         default:
                     }
+
+                    // See: YHAAO-2346: ignore verification & other document.
+                    if ("4".equals(item.getBoSubType()) && V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType())) return;
 
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
@@ -124,6 +164,12 @@ public class AssetInstallationService {
                 if (!userContextService.needInstorageCheck()) {
                     temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
                     itemDao.save(temp);
+                }
+
+                ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(temp.getId());
+                if (null != contractItem) {
+                    contractItem.setAssetUid(temp.getAssetUID());
+                    contractItemDao.save(contractItem);
                 }
             }
             return true;
@@ -134,10 +180,9 @@ public class AssetInstallationService {
 
     public void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
         arrivalListItem.setLastModifiedDate(new Date());
-        arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 2);
         }
 
     }
@@ -165,7 +210,7 @@ public class AssetInstallationService {
     }
 
     public List<UserAccount> getWorkerList() {
-        return ucService.getWorkerList(0);
+        return ucService.getWorkerList(0,"");
     }
 
     public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
@@ -193,7 +238,7 @@ public class AssetInstallationService {
         }
 
         if (Strings.isNullOrEmpty(item.getDepartNum())) {
-            return new Tuple2(false, "设备编号为空");
+            return new Tuple2(false, "设备编号不可为空");
         }
         List<SearchFilter> departNumFilters = new ArrayList<>();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
@@ -217,6 +262,15 @@ public class AssetInstallationService {
             return new Tuple2(true, "");
         }
         return new Tuple2(false, "设备编号已被分配");
+    }
+
+    public List<Supplier> getSupplierListBySiteUid(String siteUID) {
+        return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        if(Strings.isNullOrEmpty(siteUID)){
+//            return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        }else{
+//            return supplierDao.getBySiteUID(siteUID);
+//        }
     }
 
 }

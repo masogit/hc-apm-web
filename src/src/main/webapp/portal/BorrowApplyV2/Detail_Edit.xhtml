@@ -14,7 +14,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         
                         <h:panelGroup>                                    
-                            <label class="label">调剂设备名称</label>
+                            <label class="label">调剂设备名称*</label>
                             <p:selectOneMenu id="sharedAssetTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}" required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}">                     
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{sharedAssetTypeController.getSwapNameList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>                 
@@ -22,7 +22,7 @@
                         </h:panelGroup>
                         
                         <h:panelGroup>
-                            <label class="label">借用申请数</label>
+                            <label class="label">借用申请数*</label>
                             <!--<p:inputText id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
                             <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
                                            decimalPlaces="0" minValue="0"/>
@@ -41,14 +41,23 @@
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
-                                     update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                                     update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow2(xhr, status, args)" />
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                    <script>
+
+                        function openSwapTypeViewWindow2(xhr, status, args) {
+                            var message = args.message;
+                            if (message == "wrong") {
+
+                            } else {
+                                PF('SharedAssetReqTypeEditDialog').hide();
+                            }
+                        }
+
+                    </script>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
     </ui:composition>
-    
-     
 </html>

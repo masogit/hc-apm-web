@@ -21,7 +21,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
@@ -29,6 +29,10 @@
                             <h:outputText value="#{item.arrivalList.name}"/>
                         </p:column>
                         
+                        <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.arrivalList.contractNum}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.clinicalDeptName}" exportable="false">
                             <f:facet name="header"  >
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
@@ -53,19 +57,22 @@
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
-                        <p:column width="90"  headerText="操作" filterBy="#{item.installStatus}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.status}" filterBy="#{item.installStatus}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{assetArrivedItemsController.getInstallStatusList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                        </p:column>
+                        <p:column width="90"  headerText="操作">
+                            
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
-                          <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                                <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                             </p:commandLink>
-                            <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}
-                                <f:param name="itemId" value="#{item.id}" />
-                            </p:link >
+                            <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
+                            </p:commandLink >
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -112,7 +119,7 @@
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArrivalDate', 'varArrivalDateFrom', 'varArrivalDateTo'); PF('panelFilterArrivalDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterArrivalDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
-        
+
         <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetArrivalItemListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
                 <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(userContextService.loginUser.siteUID)}"  var="node" selectionMode="single" dynamic="false">

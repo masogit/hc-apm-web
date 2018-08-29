@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "pm_order_rule_check_list")
@@ -25,12 +26,14 @@ public class PmOrderRuleCheckList {
 	private Integer period;//周期，以‘月’为单位
     
     @Column(name = "name")
+	@Size(min = 1, max = 128)
 	private String name;//检查项名称
     
     @Column(name = "rule_uid")
     private String ruleUID;//pm_order_rule.uid
     
     @Column(name = "remark")
+	@Size(max = 1024)
 	private String remark;//项目内容
     
     @Column(name = "item_id")

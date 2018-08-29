@@ -21,9 +21,9 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                    rowsPerPageTemplate="20,40,60,90"> 
+                    rowsPerPageTemplate="20,50,100,500"> 
 
-                    <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton"/>
                     <p:ajax event="filter" listener="#{tenantInfoController.onFilter}" oncomplete="rc();"/>
                     
                     <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -91,6 +91,7 @@
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
+                        <p:commandButton id="editVersionButton" icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditVersionDlg" oncomplete="PF('SiteInfoEditVersionDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Edit}" actionListener="#{tenantInfoController.delete}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -99,10 +100,11 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:viewButton" immediate="true"/>
+                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton" immediate="true"/>
             </h:form>
 
             <ui:include src="Edit.xhtml"/>
+            <ui:include src="EditVersion.xhtml"/>
             <ui:include src="View.xhtml"/>
 
             </div>

@@ -21,9 +21,9 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,40,60,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="rowSelect" listener="#{supplierController.onSelectSupplier()}" update="createButton editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
 
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -44,10 +44,19 @@
                         <p:column headerText="#{msg.tel}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.tel}"/>
                         </p:column>
+                        <p:column headerText="类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{supplierController.supplierType}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Edit}" actionListener="#{supplierController.delete}" update="datalist" disabled="#{empty supplierController.selected}">
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{supplierController.delete}" update="datalist" disabled="#{empty supplierController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">

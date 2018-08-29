@@ -12,7 +12,10 @@ import { briefsByType, briefsBySupplier, briefsByDept } from './ProcessAnalysis/
 import { details } from './ProcessAnalysis/details'
 import { grossByDept, grossBySupplier, grossByType } from './ProcessAnalysis/gross'
 import { phaseArrival, phaseRespond, phaseETTR } from './ProcessAnalysis/phase'
+import { Assets as AssetInfo } from './Nurse/assetInfo'
 import { URLs } from '../index.js'
+import { sampleSize } from 'lodash'
+import { assetsInMaintain, avgResponseTime } from './Nurse/assetsInMaintain'
 
 const TAG = '[Mock]: '
 
@@ -25,9 +28,16 @@ export default function (mock) {
     return [200, AssetTypes]
   })
 
-  mock.onGet(URLs.AllDepartments).reply(function (config) {
+  mock.onGet(RegExp(URLs.AllDepartments)).reply(function (config) {
     info(config.url)
-    return [200, Orgs]
+    let orgs = JSON.parse(JSON.stringify(Orgs))
+    orgs.orgInfos = sampleSize(orgs.orgInfos, 1 + Math.random() * orgs.orgInfos.length | 0)
+    return [200, orgs]
+  })
+
+  mock.onGet(URLs.AllHospitals).reply(function (config) {
+    info(config.url)
+    return [200, Hospitals]
   })
 
   mock.onGet(URLs.AllHospitals).reply(function (config) {
@@ -189,6 +199,21 @@ export default function (mock) {
       }
     })
 
+  mock.onGet(URLs.Nurse_Assets)
+    .reply(function(config) {
+      info(config.url)
+      return [ 200, AssetInfo ]
+    })
+  mock.onGet(URLs.Nurse_AssetsInMaintain)
+    .reply(config => {
+      info(config.url)
+      return [200, assetsInMaintain]
+    })
+  mock.onGet(URLs.Nurse_responseTime)
+    .reply(config => {
+      info(config.url)
+      return [200, avgResponseTime]
+    })
   mock.onAny().passThrough()
 
 }

@@ -25,7 +25,7 @@ export default {
   effects: {
     *['data/get']({ payload }, { put, select }) {
       const query = yield select(state => {
-        const { ScanDetails_filters, briefs } = state
+        const { ScanDetails_filters, briefs, depts } = state
 
         const { range, dept } = ScanDetails_filters
         const { from, to } = range
@@ -33,6 +33,7 @@ export default {
           from,
           to,
           dept,
+          hospital: depts.selectedHospital,
           start: briefs.index * PAGE_SIZE,
           limit: PAGE_SIZE
         }

@@ -28,6 +28,7 @@ public interface GenericRepositoryUUID<E> extends PagingAndSortingRepository<E, 
 	Page<E> findBySearchFilter(final List<SearchFilter> filterFilter, Pageable pageable);
 
 	List<E> findBySearchFilter(final List<SearchFilter> filterFilter);
+	List<E> findBySearchFilter(final List<SearchFilter> filterFilter,Sort sort);
 
 	/**
 	 * Lookup entities having at least one String attribute matching the passed

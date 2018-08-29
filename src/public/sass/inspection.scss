@@ -1,3 +1,18 @@
 .ui-tree .ui-tree-container{
     overflow:visible !important;
 }
+.schedule-item-nocheck{
+
+}
+.schedule-item-pass{
+	color: white !important;
+	background-color: green !important;	
+}
+.schedule-item-nopass{
+	color: white !important;
+	background-color: red !important;
+}
+.schedule-item-partialpass{
+	color: white !important;
+	background-color: blue !important;
+}

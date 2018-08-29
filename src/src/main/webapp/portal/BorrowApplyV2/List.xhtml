@@ -12,6 +12,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
+                
      <ui:define name="preRenderView">
          <h:outputScript name="js/main.js"/>
          <f:metadata>
@@ -38,7 +39,7 @@
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                     rows="20" emptyMessage="#{msg.noRecordFound}" 
-                    rowsPerPageTemplate="20,40,60,90">
+                    rowsPerPageTemplate="20,50,100,500">
 
 <!--                    <p:ajax event="rowSelect" listener="#{iouApplyDetailController.onChanged}"  update="createButton "/>
                     <p:ajax event="rowSelect" listener="#{iouAssetDetailController.onChanged}"  update="createButton "/>
@@ -47,12 +48,18 @@
                             listener="#{sharedAssetRequestV2Controller.onSelectB}" 
                             oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                     <p:ajax event="filter" listener="#{sharedAssetRequestV2Controller.onFilter}" update="createButton "/>
-                    
-                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"  filterMatchMode="LIKE">
+
+                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="申请人" sortBy="#{item.applicant}" filterBy="#{item.applicant}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.applicant}"/>
+                    <p:column headerText="申请人" sortBy="#{item.applicantName}" filterBy="#{item.applicantName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applicantName}"/>
                     </p:column>
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
@@ -94,7 +101,7 @@
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                         </p:commandButton>
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{sharedAssetRequestV2Controller.workOrderRouter()}" oncomplete="router(xhr, status, args)"/>
                         
                         <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.getViewPageA('Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetRequestV2Controller.operation)}"  disabled="#{empty sharedAssetRequestV2Controller.selected}"/>-->
                     </f:facet>
@@ -104,22 +111,25 @@
                     <h:panelGrid columns="2">
                         <p:outputLabel for="cal1" />
                         <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold"
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间" readonly="true"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
                         <p:outputLabel for="cal2"/>
                         <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间" readonly="true"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
                     </h:panelGrid>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
                 </p:overlayPanel>
                 
             </h:form>
+            <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="提示信息" >
+                <p:outputPanel>如需借用设备请拨打虚拟网 #{sharedAssetRequestV2Controller.getOnCallNumber()}</p:outputPanel>
+            </p:dialog>
             </div>
             </div>
         </div>
         
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 $("#searchForm\\:searchText").keypress(function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();
@@ -127,14 +137,19 @@
                 });
             }
 
-
             function openSwapTypeViewWindow(xhr, status, args) {
                 this.location.href = args.url;
             }
-
+            
+            function router(xhr, status, args) {
+            	var d = PF('UserAccountEditDialog');
+            	if(args['showNotification']) {
+            		d.show();
+            	}
+            }
+            
         </script>
     </ui:define>
-    
 
 </ui:composition>
     <!--</html>-->

@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template_withoutGrowl.xhtml" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+	<ui:define name="content">
+		<h:outputScript name="js/captureDataMessage.js"></h:outputScript>
+		<ui:include src="captureDataMessageEdit.xhtml" />
+		<ui:include src="geIBDataEdit.xhtml" />
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="小屏消息配置" />
+			</div>
+			<div class="ui-g-12 card ">
+				<p:commandButton id="idGEIBDataEditButton" value="GE IB 配置" actionListener="#{captureDataMessagesController.prepareGEIBData}" update=":geIBDataEditDlg" oncomplete="PF('geIBDataEditDialog').show()" />
+				<h:form id="captureDataMessagesListForm">
+					<p:growl id="growl" showDetail="true" />
+					<p:growl id="captureDataMessageGrowl" showDetail="true" autoUpdate="true" for="other"/>
+					<p:dataTable id="datalist" value="#{captureDataMessagesController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+						selection="#{captureDataMessagesController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+						<p:ajax event="rowSelect" update="editButton deleteButton" />
+						<p:ajax event="filter" listener="#{captureDataMessagesController.onFilter}" />
+						
+						<p:column headerText="SystemID" filterBy="#{item.systemId}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.systemId}" />
+						</p:column>
+						<p:column headerText="设备类型" sortBy="#{item.geDeviceType}" filterMatchMode="LIKE">
+							<h:outputText value="#{fieldMsg.fieldValue('geDeviceType', item.geDeviceType)}" />
+						</p:column>
+						<p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.comment}" />
+						</p:column>
+						<p:column headerText="生效时间" sortBy="#{item.startDate}">
+							<h:outputText value="#{item.startDate}">
+								<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="截止时间" sortBy="#{item.endDate}">
+							<h:outputText value="#{item.endDate}">
+								<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="预览消息">
+							<p:commandButton update=":displayCaptureDataMessagesContent" oncomplete="PF('captureDataMessagesDlg').show()" icon="fa fa-search"
+								actionListener="#{captureDataMessagesController.setContent(item.id)}" />
+						</p:column>
+
+						<f:facet name="{Toolbar}">
+							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+								actionListener="#{captureDataMessagesController.prepareCreate}" update=":captureDataMessagesEditDlg"
+								oncomplete="PF('captureDataMessagesEditDialog').show()" onclick="CaptureDataMessageJS.initCaptureDataMessageParam()" />
+							<p:commandButton id="editButton" actionListener="#{captureDataMessagesController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+								update=":captureDataMessagesEditDlg" oncomplete="PF('captureDataMessagesEditDialog').show()"
+								disabled="#{empty captureDataMessagesController.selected.id}" onclick="CaptureDataMessageJS.initCaptureDataMessageParam()" />
+							<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{captureDataMessagesController.delete}"
+								update=":captureDataMessagesListForm:datalist" disabled="#{empty captureDataMessagesController.selected.id}">
+								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+							</p:commandButton>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+				<p:dialog header="消息内容" widgetVar="captureDataMessagesDlg" modal="true" resizable="false" draggable="true" appendTo="@(body)" height="450" width="700">
+					<p:outputPanel id="displayCaptureDataMessagesContent">
+						<h:outputText value="#{captureDataMessagesController.getContent()}" escape="false" />
+					</p:outputPanel>
+				</p:dialog>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

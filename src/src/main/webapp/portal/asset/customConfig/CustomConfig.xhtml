@@ -1,0 +1,250 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="自定义配置"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="customConfigForm">
+                    <h:panelGroup >
+                        <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                        <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <h:outputText id="configInfo" value="当前院区无配置,保存后创建" rendered="#{empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="创建人:" rendered="#{not empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['CreatedBy']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="创建时间:" rendered="#{not empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['CreatedDate']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="修改人:" rendered="#{not empty customConfigController.customConfig and not empty customConfigController.configInfo['LastModifiedBy']}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['LastModifiedBy']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="修改时间:" rendered="#{not empty customConfigController.customConfig and not empty customConfigController.configInfo['LastModifiedDate']}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['LastModifiedDate']}" rendered="#{not empty customConfigController.customConfig}"/>
+                    </h:panelGroup>
+                    <p:tabView  id="tabView">
+                        <p:tab title="资产字段设置">
+                            <p:dataTable id="assetFieldsTable" var='item' value="#{customConfigController.assetFieldsList}">
+                                <p:column headerText="显示的字段">
+                                    <h:outputText value="#{customConfigController.allFields[item.key]}#{customConfigController.isSystemFields(item.key)?'*':''}"  style="color:#{customConfigController.isSystemFields(item.key)? 'red':'black'}" />
+                                </p:column>
+                                <p:column headerText="可读取角色">
+                                    <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.readRoles)}" />
+                                </p:column>
+                                <p:column headerText="可导出角色">
+                                    <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.exportRoles)}" />
+                                </p:column>
+                                <p:column headerText="可修改角色">
+                                    <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.editRoles)}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header" >
+                                        <h:outputText />
+                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('UsingFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    </f:facet>
+                                    <p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.removeAssetField(item.key)}" disabled="#{customConfigController.isSystemFields(item.key)}" update=":customConfigForm"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                        <p:tab title="资产列表页面">
+                            <p:dataTable id="assetListPageTable" var='item' value="#{customConfigController.customConfigObject.assetsListPageFields}" draggableRows="true">
+                                <p:ajax event="rowReorder" update="assetListPageTable"/>
+                                <p:column headerText="显示的字段">
+                                    <h:outputText value="#{customConfigController.allFields[item]}" />
+                                </p:column>
+                                <!--                            <p:column headerText="列宽%">
+                                                                <h:outputText value="#{customConfigController.customConfigObject.assetFields[item].widthInListPage}" />
+                                                            </p:column>-->
+                                <p:column headerText="操作">
+                                    <f:facet name="header" >
+                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('ListPageFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    </f:facet>
+                                    <!--<p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item)}" update=":ListPageFieldsEditForm" oncomplete="PF('ListPageFieldsEditDialog').show()"/>-->
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.removeListPageField(item)}" update="assetListPageTable "/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                        <p:tab title="资产详细页面">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fieldset legend="基本信息字段组">
+                                    <p:orderList id="BasicFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="详细信息字段组">
+                                    <p:orderList id="DetailFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('DetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                            </p:panelGrid>
+                        </p:tab>
+                        <p:tab title="资产编辑页面">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fieldset legend="基本信息字段组">
+                                    <p:orderList id="EditpageBasicFields" value="#{customConfigController.customConfigObject.assetsEditpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="编码信息字段组">
+                                    <p:orderList id="EditpageCodesFields" value="#{customConfigController.customConfigObject.assetsEditpageCodesFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCodesFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageCodesFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="状态信息字段组">
+                                    <p:orderList id="EditpageStatusFields" value="#{customConfigController.customConfigObject.assetsEditpageStatusFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageStatusFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageStatusFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="分类信息字段组">
+                                    <p:orderList id="EditpageCatalogFields" value="#{customConfigController.customConfigObject.assetsEditpageCatalogFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCatalogFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageCatalogFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="日期信息字段组">
+                                    <p:orderList id="EditpageDateFields" value="#{customConfigController.customConfigObject.assetsEditpageDateFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageDateFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageDateFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="财务信息字段组">
+                                    <p:orderList id="EditpageFinicialFields" value="#{customConfigController.customConfigObject.assetsEditpageFinicialFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageFinicialFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageFinicialFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                            </p:panelGrid>
+                        </p:tab>
+                        <p:tab title="微信端资产页面">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fieldset legend="头部信息字段组">
+                                    <p:orderList id="MobileHeaderFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageHeaderFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileHeaderFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileHeaderFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="基本信息字段组">
+                                    <p:orderList id="MobileBasicFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="详细信息字段组">
+                                    <p:orderList id="MobileDetailFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                            </p:panelGrid>
+                        </p:tab>
+                    </p:tabView>
+
+                    <h:panelGroup >
+                        <p:commandButton value="一键#{msg.Save}" icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
+                        <p:commandButton value="一键#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
+                    </h:panelGroup>
+
+                </h:form>
+
+                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="650"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                    <h:form id="AssetFieldsEditForm" >
+                        <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.name}</label>
+                                    <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">是否必填</label>
+                                    <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.required}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">可读取角色</label>
+                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}">
+                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}" />
+                                    </p:selectManyCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">可导出角色</label>
+                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.exportRoles}" >
+                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
+                                    </p:selectManyCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">可修改角色</label>
+                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" >
+                                        <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
+                                    </p:selectManyCheckbox>
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}" update=" :customConfigForm:tabView:assetFieldsTable :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetFieldsEditDialog');"/>
+                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetFieldsEditDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+
+                <p:dialog id="ListPageFieldsEditDialog" widgetVar="ListPageFieldsEditDialog" modal="true" width="600"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                    <h:form id="ListPageFieldsEditForm" >
+                        <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.name}</label>
+                                    <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">列宽%</label>
+                                    <p:inputNumber value="#{customConfigController.currentEditField.widthInListPage}" symbol="%" />
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}" update=" :customConfigForm:tabView:assetListPageTable :growl" 
+                                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'ListPageFieldsEditDialog');"/>
+                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('ListPageFieldsEditDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+
+                <p:dialog id="FieldsAddDialog" widgetVar="FieldsAddDialog" modal="true" width="1000" height="400"  resizable="true" draggable="true" appendTo="@this" header="选择字段">
+                    <h:form id="FieldsAddForm" >
+                        <h:panelGroup id="display" rendered="#{not empty customConfigController.addFieldsType}">
+                            <h:outputText value="无可添加字段" rendered="#{empty customConfigController.addFieldsList}" />
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <c:forEach items="#{customConfigController.addFieldsList}" var="item" >
+                                    <h:panelGroup >
+                                        <p:selectBooleanCheckbox itemLabel="#{customConfigController.allFields[item]}" value="#{customConfigController.selectedAddFields[item]}"   />
+                                    </h:panelGroup>
+                                </c:forEach>
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" actionListener="#{customConfigController.addAssetFields()}" value="#{msg.Confirm}" 
+                                                 update="#{customConfigController.getAddFieldsUpdateString()} :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'FieldsAddDialog');"/>
+                                <p:commandButton immediate="true" actionListener="#{customConfigController.cancelAddFields}" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FieldsAddDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

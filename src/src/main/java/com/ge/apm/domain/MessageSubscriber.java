@@ -2,14 +2,15 @@
  */
 package com.ge.apm.domain;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.Date;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -31,13 +32,28 @@ public class MessageSubscriber implements Serializable {
     @Basic(optional = false)
     @Column(name = "hospital_id")
     private int hospitalId;
+
+
     @Basic(optional = false)
     @Column(name = "asset_id")
     private int assetId;
+
+
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
+
+
     @Basic(optional = false)
     @Column(name = "subscribe_user_id")
     private int subscribeUserId;
-    
+
+    @JoinColumn(name = "subscribe_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAccount subscriberUser;
+
+
     // receiveMsgMode: 0: no subscribe ; 1:all subscribe 2:partial subscribe
     @Basic(optional = false)
     @Column(name = "receive_msg_mode")
@@ -48,6 +64,68 @@ public class MessageSubscriber implements Serializable {
     @Basic(optional = false)
     @Column(name = "is_receive_chat_msg")
     private boolean isReceiveChatMsg;
+
+    @Basic(optional = true)
+    @Column(name = "level_0")
+    private Boolean level0;
+
+    @Basic(optional = true)
+    @Column(name = "level_1")
+    private Boolean level1;
+
+    @Basic(optional = true)
+    @Column(name = "level_2")
+    private Boolean level2;
+
+    //1 维修事件 2 保养事件 3 合同到期事件
+    @Basic(optional = true)
+    @Column(name = "select_type")
+    private Integer selectType;
+
+
+    @Basic(optional = true)
+    @Column(name = "repair_hit")
+    private Boolean repairHit;
+
+    @Basic(optional = true)
+    @Column(name = "contract_due_hit")
+    private Boolean contractDueHit;
+
+    @Basic(optional = true)
+    @Column(name = "main_rep_hit")
+    private Boolean mainRepHit;
+
+    @Basic(optional = true)
+    @Column(name = "meter_hit")
+    private Boolean meterHit;
+
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
 
     public MessageSubscriber() {
     }
@@ -153,7 +231,196 @@ public class MessageSubscriber implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.MessageSubscriber[ id=" + id + " ]";
+        return "MessageSubscriber[ id=" + id + " ]";
     }
-    
+
+    public Boolean getLevel0() {
+        return level0;
+    }
+
+    public void setLevel0(Boolean level0) {
+        this.level0 = level0;
+    }
+
+    public Boolean getLevel1() {
+        return level1;
+    }
+
+    public void setLevel1(Boolean level1) {
+        this.level1 = level1;
+    }
+
+    public Boolean getLevel2() {
+        return level2;
+    }
+
+    public void setLevel2(Boolean level2) {
+        this.level2 = level2;
+    }
+
+    public Integer getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(Integer selectType) {
+        this.selectType = selectType;
+    }
+
+    /*public Boolean getRepairEvent() {
+        return repairEvent;
+    }
+
+    public void setRepairEvent(Boolean repairEvent) {
+        this.repairEvent = repairEvent;
+    }
+
+    public Boolean getMaintainEvent() {
+        return maintainEvent;
+    }
+
+    public void setMaintainEvent(Boolean maintainEvent) {
+        this.maintainEvent = maintainEvent;
+    }
+
+    public Boolean getContractDueEvent() {
+        return contractDueEvent;
+    }
+
+    public void setContractDueEvent(Boolean contractDueEvent) {
+        this.contractDueEvent = contractDueEvent;
+    }*/
+
+
+
+    public Boolean getMainRepHit() {
+        return mainRepHit;
+    }
+
+    public void setMainRepHit(Boolean mainRepHit) {
+        this.mainRepHit = mainRepHit;
+    }
+
+    public UserAccount getSubscriberUser() {
+        return subscriberUser;
+    }
+
+    public void setSubscriberUser(UserAccount subscriberUser) {
+        this.subscriberUser = subscriberUser;
+    }
+
+    public boolean isReceiveTimeoutMsg() {
+        return isReceiveTimeoutMsg;
+    }
+
+    public void setReceiveTimeoutMsg(boolean receiveTimeoutMsg) {
+        isReceiveTimeoutMsg = receiveTimeoutMsg;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Boolean getMeterHit() {
+        return meterHit;
+    }
+
+    public void setMeterHit(Boolean meterHit) {
+        this.meterHit = meterHit;
+    }
+
+    public boolean isReceiveChatMsg() {
+        return isReceiveChatMsg;
+    }
+
+    public void setReceiveChatMsg(boolean receiveChatMsg) {
+        isReceiveChatMsg = receiveChatMsg;
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Boolean getRepairHit() {
+        return repairHit;
+    }
+
+    public void setRepairHit(Boolean repairHit) {
+        this.repairHit = repairHit;
+    }
+
+    public Boolean getContractDueHit() {
+        return contractDueHit;
+    }
+
+    public void setContractDueHit(Boolean contractDueHit) {
+        this.contractDueHit = contractDueHit;
+    }
 }
