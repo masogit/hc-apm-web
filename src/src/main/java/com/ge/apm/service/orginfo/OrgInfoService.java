@@ -444,4 +444,20 @@ public class OrgInfoService {
 
     }
 
+    @Transactional
+    public void saveOrg(OrgInfo selected) {
+
+    }
+
+    public String fullPathClinicalName(OrgInfo currentOrg) {
+        LinkedList<String> names = new LinkedList<>();
+        while (currentOrg != null && (currentOrg.getOrgType() == 4 || currentOrg.getOrgType() == 5)) {
+            names.addFirst(currentOrg.getName());
+            currentOrg = orgDao.findByUid(currentOrg.getUid());
+        }
+
+        return names.stream().collect(Collectors.joining("-"));
+
+    }
+
 }

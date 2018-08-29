@@ -84,6 +84,12 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "name_py_code")
     private String namePyCode;
 
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 64)
+    @Column(name = "short_name")
+    private String shortName;
+
     @JoinColumn(name = "parent_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
@@ -375,5 +381,14 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setOther(String other) {
         this.other = other;
+    }
+
+    @NotNull
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(@NotNull String shortName) {
+        this.shortName = shortName;
     }
 }
