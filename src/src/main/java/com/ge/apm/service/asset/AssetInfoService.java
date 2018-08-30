@@ -99,6 +99,13 @@ public class AssetInfoService {
         return orgInfos;
     }
 
+    public List<OrgInfo> getHierachyClinicalDeptList(String siteUid) {
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeIn(siteUid, new Integer[] {4, 5});
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        return orgInfos;
+    }
+
     public List<OrgInfo> getClinicalDeptListWithEmptyValue(String siteUid) {
         List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);

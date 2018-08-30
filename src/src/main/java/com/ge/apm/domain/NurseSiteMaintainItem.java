@@ -350,9 +350,6 @@ public class NurseSiteMaintainItem implements Serializable {
 		if(StringUtils.isNotEmpty(label)){
 			for(int i=0;i<listCopyData.size();++i){
 				NurseSiteMaintainData tempData=listCopyData.get(i);
-				System.out.println(label);
-				System.out.println(tempData.getCheckItem());
-				System.out.println(tempData.getCheckItem().equals(label));
 				if(tempData.getCheckItem().equals(label)){
 					listCopyData.remove(i);
 					return tempData;

@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +45,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private TenantInfo selectedTenant;
     UserAccount userAccount;
     private AssetInfoRepository assetInfoRepository;
+    private OrgInfoService orgInfoService;
     private boolean acShow = false;
 
     private String orgName;
@@ -64,6 +66,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userAccount = new UserAccount();
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        orgInfoService = WebUtil.getBean(OrgInfoService.class);
+
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -290,7 +294,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public boolean checkName() {
 
-        OrgInfo orgInfo = dao.findFirstByParentUIDAndName(selected.getParentUID(), orgName);
+        OrgInfo orgInfo = dao.findFirstByParentUIDAndShortName(selected.getParentUID(), orgName);
         if (orgInfo != null) {
             if (selected.getId() == null) {
                 //new
@@ -320,12 +324,15 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
 
-        assetInfoRepository.updateClinicalName(orgName, selected.getUid());
-        selected.setName(orgName);
+        selected.setShortName(orgName);
+        String name = orgInfoService.buildFullPathOrgName(selected);
+        selected.setName(name);
         selected.setNameEn(orgNameEn);
-
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
+
+        assetInfoRepository.updateClinicalName(name, selected.getUid());
+
         initWorkflowConfig();
         buildOrdTree();
         orgName = null;
@@ -358,6 +365,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void deleteSelectedOrg() {
         if (canDelete()) {
+
             super.delete();
             buildOrdTree();
         }
@@ -412,8 +420,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selected = (OrgInfo) node.getData();
-        preName = selected.getName();
-        orgName = selected.getName();
+        preName = selected.getShortName();
+        orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
         if (selected != null) {
             if (selected.getOrgType() == 4) {
@@ -464,7 +472,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateDepartmentDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() == 4) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null;
     }
 
     public UserAccount getUserAccount() {

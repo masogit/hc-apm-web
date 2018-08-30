@@ -41,7 +41,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1 order by name")
     public List<OrgInfo> getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(String siteId);
 
-    @Query("select o from OrgInfo o where orgType<>4 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")
+    @Query("select o from OrgInfo o where orgType<>4 and orgType<>5 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")
     public List<OrgInfo> getOrgInfosByParentId(String siteId);
     
     @Query("select o from OrgInfo o,UserOrgInfo u where o.uid=u.orgUid and u.userUid=?1")
@@ -82,6 +82,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc(String siteUID, Integer orgType);
 
+    public List<OrgInfo> findBySiteUIDAndOrgTypeIn(String siteUID, Integer[] orgTypes);
+
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
 
     OrgInfo findByUid(String uid);
@@ -93,10 +95,18 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
     public OrgInfo findFirstByParentUIDAndName(String parentUID, String name);
+
+    public OrgInfo findFirstByParentUIDAndShortName(String parentUID, String name);
     
     @Query(value = "select o.uid from org_info o where (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1) and o.org_type=4",nativeQuery = true)
     public Set<String> findClinicalDeptOrgUidListByOrgUid(String orgUid);
 
     public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
+
+    public int countByParentUIDAndUidIsNot(String parentUid, String uid);
+
+    public int countByParentUIDAndOrgType(String parentUid, int orgType);
+
+
 
 }
