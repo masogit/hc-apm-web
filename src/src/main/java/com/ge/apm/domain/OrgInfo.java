@@ -84,6 +84,14 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "name_py_code")
     private String namePyCode;
 
+//    @Basic(optional = false)
+//    @NotNull
+//    @Size(min = 1, max = 64)
+    @Column(name = "short_name")
+    private String shortName;
+    @Column(name = "short_name_py_code")
+    private String shortNamePyCode;
+
     @JoinColumn(name = "parent_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
@@ -375,5 +383,15 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setOther(String other) {
         this.other = other;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+        this.shortNamePyCode = shortName == null ? null : PinyinUtil.getShortPinyin(shortName).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+
     }
 }

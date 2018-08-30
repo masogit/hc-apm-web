@@ -444,4 +444,22 @@ public class OrgInfoService {
 
     }
 
+    @Transactional
+    public void saveOrg(OrgInfo selected) {
+
+    }
+
+    public String buildFullPathOrgName(OrgInfo currentOrg) {
+        if (currentOrg.getOrgType() < 4) return currentOrg.getShortName();
+
+        LinkedList<String> names = new LinkedList<>();
+        while (currentOrg != null && (currentOrg.getOrgType() == 4)) {
+            names.addFirst(currentOrg.getShortName());
+            currentOrg = orgDao.findByUid(currentOrg.getParentUID());
+        }
+
+        return names.stream().collect(Collectors.joining("-"));
+
+    }
+
 }
