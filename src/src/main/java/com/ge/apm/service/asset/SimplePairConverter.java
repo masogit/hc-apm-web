@@ -23,8 +23,6 @@ public class SimplePairConverter implements Converter{
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {
             try {
-            	System.out.println("convert");
-            	System.out.println(value);
                 return sp;
             } catch(NumberFormatException e) {
 //                throw new ConverterException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Conversion Error", "Not a valid theme."));

@@ -139,7 +139,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Override
     protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+        List<SearchFilter> searchFilters = new ArrayList();
+        
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         if(CollectionUtils.isNotEmpty(this.searchFilters)){
             searchFilters.addAll(this.searchFilters);
         }
