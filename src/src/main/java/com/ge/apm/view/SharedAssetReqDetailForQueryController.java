@@ -261,7 +261,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     }
 
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
-        SharedAssetRequest request = (StringUtils.isNotEmpty(reqDetail.getBorrowId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
+        SharedAssetRequest request = (StringUtils.isEmpty(reqDetail.getReturnId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
 
         BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail)._1;
         if ("1".equals(request.getType())) {//no charging for asset maintain
