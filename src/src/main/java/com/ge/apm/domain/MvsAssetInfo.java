@@ -27,7 +27,7 @@ public class MvsAssetInfo {
     @Column(name = "asset_uid")
     private String assetUid;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false, unique = true)
     @JsonBackReference
     private AssetInfo assetInfo;
