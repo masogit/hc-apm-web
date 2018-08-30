@@ -2042,6 +2042,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	}
 
 	public void generateVoucher(AssetInfo asset) {
+        List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+        log.info("调剂中心全名：" + allocDept.getParentOrg().getName() + allocDept.getName());
+        log.info("当前用户名:" + userContextService.getUserName());
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
         SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
