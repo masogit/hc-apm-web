@@ -151,6 +151,8 @@ public class WorkOrderExportService {
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
             if (sendStep != null) {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
+            }else{
+                workOrderMap.put("派工人", "无");
             }
             if(sendStep_2 != null){
                 workOrderMap.put("派工时间", formatDate(sendStep_2.getStartTime()));
