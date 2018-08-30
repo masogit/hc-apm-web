@@ -219,7 +219,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isBorrow(String uid){
         AssetInfo a = dao.findByUid(uid);
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
-        String clinicalDeptUID = a.getClinicalDeptUID();
+        String clinicalDeptUID = a.getAssetDeptUID();
 
         return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
 
