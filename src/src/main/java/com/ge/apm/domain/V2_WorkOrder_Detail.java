@@ -94,6 +94,25 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name="invoice_num")
     private String invoiceNum;
 
+    @Column(name="closed")
+    private Boolean closed;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @Column(name = "closed_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date closedTime;
+    @Column(name="supplier")
+    private String supplier;
+
+    @Column(name="comment", length = 500)
+    private String comment;
+
+    @Column(name="contract_num")
+    private String contractNum;
+
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @Column(name = "invoice_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date invoiceTime;
 
     public String getInvoiceNum() {
         return invoiceNum;
@@ -246,6 +265,54 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     public void setClosedPrice(Double closedPrice) {
         this.closedPrice = closedPrice;
+    }
+
+    public Boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(Boolean closed) {
+        this.closed = closed;
+    }
+
+    public Date getClosedTime() {
+        return closedTime;
+    }
+
+    public void setClosedTime(Date closedTime) {
+        this.closedTime = closedTime;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getContractNum() {
+        return contractNum;
+    }
+
+    public void setContractNum(String contractNum) {
+        this.contractNum = contractNum;
+    }
+
+    public Date getInvoiceTime() {
+        return invoiceTime;
+    }
+
+    public void setInvoiceTime(Date invoiceTime) {
+        this.invoiceTime = invoiceTime;
     }
 
     @Override
