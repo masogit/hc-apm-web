@@ -23,7 +23,31 @@
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
+ <!--update-->
+
+                    <h:panelGroup>
+                        <label class="label">发票号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">合同号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:column headerText="结单">
+                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                                <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
+                        </p:column>
+                    </h:panelGroup>
                 </p:panelGrid>
+
+
                 <br/>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.updateAccessPrice()}" value="#{msg.Save}" update="woTab:woMgrDetailForm woTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogPriceDlg');"/>
