@@ -89,6 +89,9 @@ public class MaintainExportController {
 			}
 			listMaintainData=nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
 		}
+		if(listMaintainData!=null){
+			nurseSiteMaintainService.supplementMaintainWithoutItem(listMaintainData);
+		}
 	}
 	
 	private List<NurseSiteMaintain> findDefaultMaintain(Date startDate,Date endDate){
@@ -127,11 +130,21 @@ public class MaintainExportController {
 		initValue();
 	}
 	
+	public void exportAll(){
+		if(listMaintainData==null || listMaintainData.size()==0){
+			addMessage("无数据");
+			return;
+		}
+		nurseSiteMaintainService.supplementMaintainWithoutItem(listMaintainData);
+		downloadFile(nurseSiteMaintainService.parseMaintainToMap(listMaintainData));
+	}
+	
 	public void exportSelected(){
 		if(selectedListMaintain==null || selectedListMaintain.size()==0){
 			addMessage("未选中的需要导出的记录");
 			return;
 		}
+		nurseSiteMaintainService.supplementMaintainWithoutItem(selectedListMaintain);
 		downloadFile(nurseSiteMaintainService.parseMaintainToMap(selectedListMaintain));
 	}
 	
