@@ -26,7 +26,7 @@
                                     <p:ajax process="@this" event="select" listener="#{orgInfoController.onSelectTreeNode}" update="@form:editPanel"/>
 
                                     <p:treeNode type="org">
-                                        <h:outputText value="#{node.name}"/>
+                                        <h:outputText value="#{node.shortName}"/>
                                     </p:treeNode>
                                 </p:tree>
                             </p:scrollPanel>

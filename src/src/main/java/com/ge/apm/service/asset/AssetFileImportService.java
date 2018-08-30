@@ -121,8 +121,8 @@ public class AssetFileImportService {
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 break;
             }
-
-            org.setName(orgName);
+            org.setShortName(orgName);
+//            org.setName(orgName);
             org.setLineNum(dataRow);
 
             Map<String, Object> map = new LinkedHashMap();
@@ -286,10 +286,10 @@ public class AssetFileImportService {
 
         importOrgMap.forEach(item -> {
             OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getShortName());
 
             if (orgInfo == null) {
-                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
+                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getShortName());
             }
 
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
