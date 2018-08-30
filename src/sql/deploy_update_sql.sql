@@ -239,3 +239,6 @@ update workflow_config set hour_required = true where hour_required is null;
 
 update sys_role set home_page = '/homeNurse.xhtml' where name like 'NursingStaff';
 ALTER TABLE public.i18n_message DROP CONSTRAINT i18n_message_msg_key;
+
+--JIRA 2761
+update shared_asset_req_detail set unit_price = (select a.unit_price from shared_asset_type a left join asset_info b on a.id=b.shared_asset_type where shared_asset_req_detail.asset_info_id = b.uid) where unit_price is null;
