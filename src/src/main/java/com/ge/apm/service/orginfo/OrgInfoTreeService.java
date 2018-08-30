@@ -74,4 +74,29 @@ public class OrgInfoTreeService {
 
     }
 
+    public Set<OrgInfo> collectChildClinicalDeptInExstingList(List<OrgInfo> orgInfosMatchingByName, List<OrgInfo> clinicalDeptList) {
+
+        Set<OrgInfo> clinicalDeptSet = new HashSet<>();
+
+        for (OrgInfo orgInfo: orgInfosMatchingByName) {
+            collectChildClinicalDeptInExstingList(orgInfo, clinicalDeptList, clinicalDeptSet);
+        }
+
+        return clinicalDeptSet;
+    }
+
+    public void collectChildClinicalDeptInExstingList(OrgInfo parentOrg, List<OrgInfo> clinicalDeptList, Set<OrgInfo> clinicalDeptSetOutput) {
+
+        clinicalDeptSetOutput.add(parentOrg);
+
+        for (OrgInfo orgInfo: clinicalDeptList) {
+            if (!orgInfo.getParentUID().equals(parentOrg.getUid())) continue;
+            collectChildClinicalDeptInExstingList(orgInfo, clinicalDeptList, clinicalDeptSetOutput);
+
+        }
+
+
+    }
+
+
 }
