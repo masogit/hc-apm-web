@@ -129,7 +129,7 @@
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" converter="orgInfoColumnFilterConverter"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <!--<p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />-->
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{assetInfoListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
@@ -144,7 +144,7 @@
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}"
                                                         >
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <!--<p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />-->
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptName}"/>
