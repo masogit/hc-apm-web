@@ -95,7 +95,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         org.setInstitutionUID(tenant.getUid());
         org.setHospitalUID(tenant.getUid());
         org.setSiteUID(tenant.getUid());
-        
+
+        org.setShortName(tenant.getName());
         org.setName(tenant.getName());
         
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);

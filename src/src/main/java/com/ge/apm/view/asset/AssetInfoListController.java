@@ -91,6 +91,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<AssetInfo> currentPageAssets;
 
     private Sort lastPageSort; //export use
+    private PageRequest lastPageRequest;
 
     private List<AssetInfo> selectedAssets;
     //custom config
@@ -142,6 +143,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        lastPageRequest = pageRequest;
         lastPageSort = pageRequest.getSort(); //export excel use
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -459,6 +461,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String)((SelectEvent) event).getObject();
+            return;
+        } else {
+            if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+                filterClinicalDeptOrg = null;
+            }
+        }
+
         if (filterClinicalDeptOrg != null) {
             List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
 
@@ -470,6 +481,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String)((SelectEvent) event).getObject();
+            return;
+        } else {
+            if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+                filterAssetDeptOrg = null;
+            }
+        }
+
         if (filterAssetDeptOrg != null) {
             List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
 
@@ -494,6 +515,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.removeFilterOnField("assetGroupSecondary");
 
 
+        if (lastPageRequest != null) {
+            loadData(lastPageRequest);
+        }
 
     }
     
