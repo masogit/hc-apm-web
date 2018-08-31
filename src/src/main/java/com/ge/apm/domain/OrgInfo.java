@@ -84,7 +84,6 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "name_py_code")
     private String namePyCode;
 
-    @Basic(optional = false)
     @Column(name = "short_name")
     private String shortName;
     
