@@ -101,6 +101,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
 
     private Integer assetGroup;
+    private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
 
@@ -488,6 +489,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
         }
 
+        assetGroupSecondary = null;
+
+        this.removeFilterOnField("assetGroupSecondary");
+
+
 
     }
     
@@ -637,5 +643,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondayList(List<I18nMessage> assetGroupSecondayList) {
         this.assetGroupSecondayList = assetGroupSecondayList;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
     }
 }
