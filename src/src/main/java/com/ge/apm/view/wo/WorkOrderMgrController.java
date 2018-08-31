@@ -9,6 +9,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.ServiceRequestApiService;
@@ -44,10 +46,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
 
     V2_WorkOrderRepository dao;
-
+    private String supplierName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;    private UaaService uaaService;
@@ -106,8 +108,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private ServiceRequestApiService serviceRequestApiService;
     private WorkflowConfigRepository woConDao;
     private String token;
+    private AutoCompleteService autoCompleteService;
 
+    private AssetInfoMgrService aimService;
+    private List<Supplier> supplierList = new ArrayList<Supplier>();
+    private Map<String, Object> selectedObjectMap = new HashMap();
     protected void init() {
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -140,7 +147,24 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         this.filterBySite = false;
         this.filterByHospital = false;
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+     /*   if(selected==null){
+            selected= new V2_WorkOrder();
+        }
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());*/
     }
+
+
+//    private void beforeEdit(){
+//        selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
+//    }
+public void onSupplierChange() {
+    Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+    if(supplier==null)
+        itemDetail.setSupplier(supplierName);
+    else
+        itemDetail.setSupplier(supplier.getName());
+}
     public String getManHourShow(){
         if(hourRequired){
             return "工时(小时)*";
@@ -149,6 +173,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
     }
     private Boolean isRating;
+    public List<String> autoCompleteSupplier(String query) {
+       List<Supplier> suList= autoCompleteService.autoCompleteVendor(query, supplierList);
+       List<String> sList= new ArrayList<String>();
+        suList.forEach(item->sList.add(item.getName()));
+        return sList;
+    }
+
+
+
     public Boolean needRating(){
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
@@ -407,6 +440,16 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             itemDetail.setArrivedTime(null);
         }
     }
+
+    public void orderSet(){
+        if(itemDetail==null)return;
+        if(itemDetail.getClosed()==true)
+            itemDetail.setClosedTime(new Date());
+        else{
+            itemDetail.setClosedTime(null);
+        }
+    }
+
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -808,10 +851,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
+            supplierName=null;
 
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+           supplierName=itemDetail.getSupplier();
         }
+        supplierList=aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
     }
 
     public void prepareEditAccDetailonPrice(String itemId){
@@ -1251,5 +1297,37 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void setAttachList(List<V2_BlobObject> attachList) {
         this.attachList = attachList;
+    }
+
+    public AutoCompleteService getAutoCompleteService() {
+        return autoCompleteService;
+    }
+
+    public void setAutoCompleteService(AutoCompleteService autoCompleteService) {
+        this.autoCompleteService = autoCompleteService;
+    }
+
+    public AssetInfoMgrService getAimService() {
+        return aimService;
+    }
+
+    public void setAimService(AssetInfoMgrService aimService) {
+        this.aimService = aimService;
+    }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

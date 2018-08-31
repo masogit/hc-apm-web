@@ -84,11 +84,9 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "name_py_code")
     private String namePyCode;
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 64)
     @Column(name = "short_name")
     private String shortName;
+    
     @Column(name = "short_name_py_code")
     private String shortNamePyCode;
 
@@ -394,4 +392,13 @@ public class OrgInfo implements Serializable, ChineseName {
         this.shortNamePyCode = shortName == null ? null : PinyinUtil.getShortPinyin(shortName).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
 
     }
+
+    public String getShortNamePyCode() {
+        return shortNamePyCode;
+    }
+
+    public void setShortNamePyCode(String shortNamePyCode) {
+        this.shortNamePyCode = shortNamePyCode;
+    }
+    
 }
