@@ -30,6 +30,9 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -425,8 +428,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return Collections.emptyList();
         }
 
-        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .filter(distinctByOrgName(OrgInfo::getName))  //display unique clinical name only
+                .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
     }
@@ -445,14 +451,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (filterClinicalDeptOrg != null && filterClinicalDeptOrg.getId() != null) {
-            if (filterClinicalDeptOrg.getOrgType() == 4) {
+            String deptName = filterClinicalDeptOrg.getName();
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+//            if (filterClinicalDeptOrg.getOrgType() == 4) {
 //                clinicalDeptOrgUidSet = new HashSet<>();
 //                clinicalDeptOrgUidSet.add(filterClinicalDeptOrg.getUid());
 //            } else {
 //                //大科室
-                clinicalDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterClinicalDeptOrg.getUid());
+//                clinicalDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterClinicalDeptOrg.getUid());
 
-            }
+//            }
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
@@ -599,5 +610,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
         this.filterAssetDeptOrg = filterAssetDeptOrg;
+    }
+
+    public static <T> Predicate<T> distinctByOrgName(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }
