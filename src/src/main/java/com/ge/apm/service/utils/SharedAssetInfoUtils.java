@@ -231,20 +231,32 @@ public class SharedAssetInfoUtils {
         List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
         String accessories = "";
 
-        if(accList.size() == 1)
+        if(accList == null)
         {
-            accessories = accList.get(0).getName();
+            accessories = "";
         }
         else
         {
-            for(int i = 0; i < accList.size() - 1; i++)
+            if(accList.size() < 1)
             {
-                accessories += accList.get(i).getName() + '+';
+                accessories = "";
             }
 
-            accessories += accList.get(accList.size()-1 ).getName();
-        }
+            if(accList.size() == 1)
+            {
+                accessories = accList.get(0).getName();
+            }
 
+            if(accList.size() > 1)
+            {
+                for(int i = 0; i < accList.size() - 1; i++)
+                {
+                    accessories += accList.get(i).getName() + '+';
+                }
+
+                accessories += accList.get(accList.size()-1 ).getName();
+            }
+        }
         return accessories;
     }
 }
