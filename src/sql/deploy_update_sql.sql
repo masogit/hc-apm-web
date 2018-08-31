@@ -246,4 +246,4 @@ ALTER TABLE public.org_info ADD short_name varchar(64) NULL;
 ALTER TABLE public.org_info ADD short_name_py_code varchar(64) NULL;
 update org_info set short_name = name, short_name_py_code = name_py_code;
 update shared_asset_req_detail set unit_price = (select a.unit_price from shared_asset_type a left join asset_info b on a.id=b.shared_asset_type where shared_asset_req_detail.asset_info_id = b.uid) where unit_price is null;
-
+update asset_info set clinical_dept_uid=asset_dept_uid, asset_dept_uid=clinical_dept_uid where shared_asset_type is not null and clinical_dept_uid!=asset_dept_uid;
