@@ -456,14 +456,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
-//            if (filterClinicalDeptOrg.getOrgType() == 4) {
-//                clinicalDeptOrgUidSet = new HashSet<>();
-//                clinicalDeptOrgUidSet.add(filterClinicalDeptOrg.getUid());
-//            } else {
-//                //大科室
-//                clinicalDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterClinicalDeptOrg.getUid());
-
-//            }
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
@@ -471,14 +463,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (filterAssetDeptOrg != null && filterAssetDeptOrg.getId() != null) {
-            if (filterAssetDeptOrg.getOrgType() == 4) {
-                assetDeptOrgUidSet = new HashSet<>();
-                assetDeptOrgUidSet.add(filterAssetDeptOrg.getUid());
-            } else {
-                //大科室
-                assetDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterAssetDeptOrg.getUid());
+            String deptName = filterAssetDeptOrg.getName();
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
 
-            }
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             assetDeptOrgUidSet = Collections.emptySet();
         }
