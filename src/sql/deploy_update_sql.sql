@@ -242,8 +242,6 @@ ALTER TABLE public.i18n_message DROP CONSTRAINT i18n_message_msg_key;
 
 
 --v8.2 plus
-ALTER TABLE public.org_info ADD short_name varchar(64) NULL;
-ALTER TABLE public.org_info ADD short_name_py_code varchar(64) NULL;
 update org_info set short_name = name, short_name_py_code = name_py_code;
 update shared_asset_req_detail set unit_price = (select a.unit_price from shared_asset_type a left join asset_info b on a.id=b.shared_asset_type where shared_asset_req_detail.asset_info_id = b.uid) where unit_price is null;
 
