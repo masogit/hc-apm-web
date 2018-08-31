@@ -1,6 +1,5 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.druid.sql.visitor.functions.Now;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
@@ -13,10 +12,20 @@ import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.wo.Map2XmlConverter;
+import com.ge.apm.view.wo.WorkOrderReportExportController;
 import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.mapper.DefaultMapper;
 import javaslang.Tuple2;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -31,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -42,16 +52,18 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -187,6 +199,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> deptListCanLeaseAsset;
 
     private String filterOrgName;
+
+    private StreamedContent exportPdf;
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -1777,7 +1791,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToBeTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1798,7 +1812,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1832,7 +1846,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (entry.getValue()) {
                 return true;
             }
@@ -2041,22 +2055,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		this.selected = asset;
 	}
 
-	public void generateVoucher(AssetInfo asset) {
-        List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
-        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
-        log.info("调剂中心全名：" + allocDept.getParentOrg().getName() + allocDept.getName());
-        log.info("当前用户名:" + userContextService.getUserName());
-        SharedAssetType sharedAssetType = findSharedAssetType(asset);
-        asset.setSharedAssetType(sharedAssetType);
-        SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
-        reqDetail = (reqDetail == null) ? this.findLatestReqDetail(asset) : reqDetail;
-        if(reqDetail != null) {
-            asset.setSharedAssetReqDetail(reqDetail);
-            this.selected = asset;
-            SharedAssetInfoUtils.fillData2Voucher(asset);
-        }
-    }
-	
 	public void forceReturnAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -2069,7 +2067,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			    if(reqDetail.getClinicalDeptUid() != null) {
 			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-                    sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
+                    log.info("****** force return response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -2089,7 +2090,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			    if(assetDept != null) {
                     selected.setAssetDeptUID(assetDept.getUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-                    sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
+                    log.info("****** force allocate response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -2200,6 +2204,104 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
         }
 
+    }
+
+    //301医院则显示打印按钮
+    public boolean validate301()
+    {
+        boolean isTargetHospital = false;
+        List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+        String hosName = allocDept.getOrgFullName();
+        if(hosName.contains("中国人民解放军总医院"))
+        {
+            isTargetHospital = true;
+        }
+
+        return isTargetHospital;
+    }
+
+    //若当前状态为可用，则打印上次归还信息
+    //若当前状态为借出，则打印当前借用信息
+    public void generateVoucher(AssetInfo asset) {
+        //当前状态已借出
+        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
+        {
+            List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+            Map<String, Object> info = new HashedMap();
+
+            info.put("抬头", allocDept.getParentOrg().getName() + allocDept.getName());
+            info.put("经办人", userContextService.getUserName());
+
+            getPdfContent(asset, info);
+            doExportToPdf(info, "sharedAssetBorrowed.xsl", "SharedAssetBorrowInfo.pdf" );
+        }
+        else
+        {
+            Map<String, Object> returned = new HashedMap();
+            getPdfContent(asset, returned);
+            doExportToPdf(returned, "sharedAssetReturned.xsl", "SharedAssetReturnInfo.pdf" );
+        }
+    }
+
+    private void getPdfContent(AssetInfo asset, Map<String, Object> info)
+    {
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
+        SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
+        reqDetail = (reqDetail == null) ? this.findLatestReqDetail(asset) : reqDetail;
+        if(reqDetail != null) {
+            asset.setSharedAssetReqDetail(reqDetail);
+            this.selected = asset;
+            SharedAssetInfoUtils.fillData2Voucher(asset, info);
+        }
+    }
+
+    private void doExportToPdf(Map<String, Object> info, String xslName, String pdfName) {
+        try {
+            String woXml = getWoXml(info);
+
+            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/" + xslName).getPath());
+
+            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/fop.xml").getPath());
+
+            FopFactory fopFactory = FopFactory.newInstance(conf);
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            try {
+                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
+                Source src = new StreamSource(new StringReader(woXml));
+                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
+                Result res = new SAXResult(fop.getDefaultHandler());
+                transformer.transform(src, res);
+            } finally {
+                exportPdf = (new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, pdfName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getWoXml(Map<String, Object> data) {
+        XStream xStream = new XStream(new DomDriver());
+        xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
+        xStream.alias("List", List.class);
+        xStream.alias("map", HashedMap.class);
+
+        return xStream.toXML(data);
+    }
+
+    public StreamedContent getExportPdf() {
+        return exportPdf;
+    }
+
+    public void setExportPdf(StreamedContent exportPdf) {
+        this.exportPdf = exportPdf;
     }
     
 }
