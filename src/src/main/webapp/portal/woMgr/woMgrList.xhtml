@@ -61,6 +61,23 @@
                     <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                     </p:column>
+
+
+                  <!--  <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                            &lt;!&ndash;<p:inputText id="clinicalDept"  value="#{workOrderMgrController.fileterOrg.name}"  readonly="true"/>&ndash;&gt;
+                            <p:autoComplete dropdown="true" value="#{workOrderMgrController.filterClinicalDeptOrg}" converter="orgInfoColumnFilterConverter"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}"
+                            >
+                                <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                &lt;!&ndash;<p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />&ndash;&gt;
+                            </p:autoComplete>
+                        </f:facet>
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>-->
+                    <!--xxxxxxx update-->
+
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>
                     </p:column>
