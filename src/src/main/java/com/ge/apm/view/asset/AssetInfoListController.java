@@ -230,6 +230,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 selectSite = null;
             }
             loadClinicalDeptList();
+
+            filterClinicalDeptOrg = null;
+            filterAssetDeptOrg = null;
+            assetDeptOrgUidSet = null;
+            clinicalDeptOrgUidSet = null;
         }
     }
 
