@@ -53,6 +53,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UaaService uaaService;
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
+    private I18nMessageRepository i18nDao;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -99,6 +100,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private List<OrgInfo> clinicalDeptList;
 
+    private Integer assetGroup;
+
+    private List<I18nMessage> assetGroupSecondayList;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -115,6 +120,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         acService = WebUtil.getBean(AssetCreateService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
@@ -456,14 +462,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
-//            if (filterClinicalDeptOrg.getOrgType() == 4) {
-//                clinicalDeptOrgUidSet = new HashSet<>();
-//                clinicalDeptOrgUidSet.add(filterClinicalDeptOrg.getUid());
-//            } else {
-//                //大科室
-//                clinicalDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterClinicalDeptOrg.getUid());
-
-//            }
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
@@ -471,17 +469,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (filterAssetDeptOrg != null && filterAssetDeptOrg.getId() != null) {
-            if (filterAssetDeptOrg.getOrgType() == 4) {
-                assetDeptOrgUidSet = new HashSet<>();
-                assetDeptOrgUidSet.add(filterAssetDeptOrg.getUid());
-            } else {
-                //大科室
-                assetDeptOrgUidSet = orgInfoTreeService.collectChildClinicalDept(filterAssetDeptOrg.getUid());
+            String deptName = filterAssetDeptOrg.getName();
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
 
-            }
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             assetDeptOrgUidSet = Collections.emptySet();
         }
+
+    }
+
+    public void assetGroupChangeListener() {
+
+        if (assetGroup == null) {
+            assetGroupSecondayList = Collections.emptyList();
+        } else {
+            assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
+        }
+
 
     }
     
@@ -615,5 +621,21 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public static <T> Predicate<T> distinctByOrgName(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondayList() {
+        return assetGroupSecondayList;
+    }
+
+    public void setAssetGroupSecondayList(List<I18nMessage> assetGroupSecondayList) {
+        this.assetGroupSecondayList = assetGroupSecondayList;
     }
 }
