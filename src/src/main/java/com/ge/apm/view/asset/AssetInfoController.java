@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -52,6 +53,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1777,7 +1779,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToBeTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1798,7 +1800,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1832,7 +1834,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (entry.getValue()) {
                 return true;
             }
@@ -2069,7 +2071,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			    if(reqDetail.getClinicalDeptUid() != null) {
 			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-                    sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
+                    log.info("****** force return response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -2089,7 +2094,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			    if(assetDept != null) {
                     selected.setAssetDeptUID(assetDept.getUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-                    sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
+                    log.info("****** force allocate response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
