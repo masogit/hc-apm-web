@@ -19,8 +19,8 @@
                         <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备件单价(元)*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" />
+                        <label class="label">实际价格(元)*</label>
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="实际价格(元) #{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">类型</label>
@@ -36,6 +36,15 @@
                     <h:panelGroup>
                         <label class="label">预计到达时间</label>
                         <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">质保期</label>
+                        <p:calendar timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.warrantyDate}" showOn="button"
+                                    readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">序列号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
                     </h:panelGroup>
                     <!--xxxxxxxzssssssssssssssssssssss-->
                     <h:panelGroup>
