@@ -1311,7 +1311,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            for (int i = 0; i < infoList.size(); i++) {
                AssetInfo info = infoList.get(i);
                AssetInfo realInfo = asiDao.findByUid(info.getUid());
-               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getClinicalDeptUID());
+               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getAssetDeptUID());
                if (wfcList != null && wfcList.size() > 0) {
                    msg = msg + "设备 ‘" + info.getDepartNum() +"’ 刚刚已被归还，请重新录入！ ";
                    for (int j = 0; j < sardList.size(); j++) {
