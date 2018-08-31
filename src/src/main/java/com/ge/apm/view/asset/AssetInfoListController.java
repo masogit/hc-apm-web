@@ -463,11 +463,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (event instanceof SelectEvent) {
             filterClinicalDeptOrg = (String)((SelectEvent) event).getObject();
-            return;
-        } else {
-            if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
-                filterClinicalDeptOrg = null;
-            }
+//        } else {
+//            if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+//                filterClinicalDeptOrg = null;
+//            }
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
         }
 
         if (filterClinicalDeptOrg != null) {
@@ -484,11 +487,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (event instanceof SelectEvent) {
             filterAssetDeptOrg = (String)((SelectEvent) event).getObject();
-            return;
-        } else {
-            if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
-                filterAssetDeptOrg = null;
-            }
+//        } else {
+//            if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+//                filterAssetDeptOrg = null;
+//            }
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
         }
 
         if (filterAssetDeptOrg != null) {
