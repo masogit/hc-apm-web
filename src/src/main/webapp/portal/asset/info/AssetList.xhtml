@@ -110,16 +110,24 @@
                                 <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                                     <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200" value="#{assetInfoListController.assetGroup}">
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="@(.assetGroupChange)" />
                                         </p:selectOneMenu>
                                     </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetGroupSecondary'}">
-                                <p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondary}">
+                                <p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondary}" filterBy="#{item.assetGroupSecondary}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(item.assetGroup), item.assetGroupSecondary)}"/>
+
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200" class="assetGroupChange">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{assetInfoListController.assetGroupSecondayList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetDeptName'}">
