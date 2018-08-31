@@ -61,8 +61,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //选定科室过滤
 //    private String fileterOrgName;
 //    private String fileterAssetDeptOrgName;
-    private OrgInfo filterClinicalDeptOrg;
-    private OrgInfo filterAssetDeptOrg;
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
 
     private Set<String> clinicalDeptOrgUidSet;
     private Set<String> assetDeptOrgUidSet;
@@ -101,6 +101,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
 
     private Integer assetGroup;
+    private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
 
@@ -448,17 +449,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return Collections.emptyList();
         }
 
-        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
-        if (filterClinicalDeptOrg != null && filterClinicalDeptOrg.getId() != null) {
-            String deptName = filterClinicalDeptOrg.getName();
-            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
@@ -468,9 +470,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
-        if (filterAssetDeptOrg != null && filterAssetDeptOrg.getId() != null) {
-            String deptName = filterAssetDeptOrg.getName();
-            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
             assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
@@ -487,6 +488,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
         }
+
+        assetGroupSecondary = null;
+
+        this.removeFilterOnField("assetGroupSecondary");
+
 
 
     }
@@ -602,19 +608,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
 //    }
 
-    public OrgInfo getFilterClinicalDeptOrg() {
+    public String getFilterClinicalDeptOrg() {
         return filterClinicalDeptOrg;
     }
 
-    public void setFilterClinicalDeptOrg(OrgInfo filterClinicalDeptOrg) {
+    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
         this.filterClinicalDeptOrg = filterClinicalDeptOrg;
     }
 
-    public OrgInfo getFilterAssetDeptOrg() {
+    public String getFilterAssetDeptOrg() {
         return filterAssetDeptOrg;
     }
 
-    public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
+    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
         this.filterAssetDeptOrg = filterAssetDeptOrg;
     }
 
@@ -637,5 +643,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondayList(List<I18nMessage> assetGroupSecondayList) {
         this.assetGroupSecondayList = assetGroupSecondayList;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
     }
 }
