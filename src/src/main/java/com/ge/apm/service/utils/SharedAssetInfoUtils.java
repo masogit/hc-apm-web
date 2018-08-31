@@ -35,6 +35,9 @@ public class SharedAssetInfoUtils {
         if(reqDetail.getChargingBeginTime() != null) {
             beginLDT = reqDetail.getChargingBeginTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+            if(rentalTimeInMinutes < 0) {
+                rentalTimeInMinutes = 0;
+            }
             days = rentalTimeInMinutes / (24 * 60);
             hours = (rentalTimeInMinutes / 60) % 24;
             minutes = rentalTimeInMinutes % 60;
