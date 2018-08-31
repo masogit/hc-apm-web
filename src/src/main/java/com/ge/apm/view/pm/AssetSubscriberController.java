@@ -27,10 +27,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -406,7 +403,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setContractDueHit(selected.getContractDueHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setMeterHit(selected.getMeterHit());
-				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
+				msgsub.setTenantUID(currentUser.getTenantUID());
+				msgsub.setHospitalUID(currentUser.getHospitalUID());
+				msgsub.setInstitutionUID(currentUser.getInstitutionUID());
+				msgsub.setSiteUID(currentUser.getSiteUID());
+				msgsub.setCreatedBy(currentUser.getName());
+				msgsub.setCreatedDate(new Date());
+				msgsub.setLastModifiedBy(currentUser.getName());
+				msgsub.setLastModifiedDate(new Date());
 				msgsubList.add(msgsub);
 			}
 
