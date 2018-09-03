@@ -157,8 +157,8 @@ public class NurseSiteMaintainService {
 		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
 	}
 	
-	public List<AssetInfo> getListAssetInfoBySearchFilter(List<SearchFilter> listFilter){
-		return assetInfoRepository.findBySearchFilter(listFilter);
+	public List<AssetInfo> getListAssetInfoBySearchFilter(List<SearchFilter> listFilter,Sort sort){
+		return assetInfoRepository.findBySearchFilter(listFilter,sort);
 	}
 
 	public List<OrgInfo> getListClinicalByUid(List<String> listUid) {
