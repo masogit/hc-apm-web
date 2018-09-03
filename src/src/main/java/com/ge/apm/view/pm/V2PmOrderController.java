@@ -536,7 +536,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
-                if (item.getId() == k && v == true)
+                if (item.getId().equalsIgnoreCase(k) && v == true)
                     pmList.add(item);
             });
         });
@@ -553,7 +553,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
-                if (item.getId() == k && v == true){
+                if (item.getId().equalsIgnoreCase(k) && v == true){
                     x3.add(item);
                 }
             });
