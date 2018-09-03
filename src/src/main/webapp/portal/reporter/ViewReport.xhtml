@@ -36,11 +36,7 @@
                                     <c:if test="#{fieldItem.component eq 'Select'}" >
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
-                                            <h:outputText value="#{editReportController.tableValue[fieldItem.key]}" />
-<!--                                            <p:selectOneMenu value="#{editReportController.tableValue[fieldItem.key]}" >
-                                               <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{fieldItem.options}" var="option" itemLabel="#{option.key}" itemValue="#{option.value}"/>
-                                            </p:selectOneMenu>-->
+                                            <h:outputText value="#{editReportController.getOptionValue(fieldItem)}" />
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Switch'}" >

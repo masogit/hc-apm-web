@@ -231,8 +231,11 @@ public class CustomConfigController {
                         && !customConfigObject.getAssetsMobilepageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "ListPageFields":
-                customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                List<String> addFields = new ArrayList();
+                addFields.addAll(customConfigObject.getAssetsListPageFields());
+                addFields.addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                customConfigObject.setAssetsListPageFields(addFields);
                 break;
             case "UsingFields":
                 customConfigObject.getAssetFields().putAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
