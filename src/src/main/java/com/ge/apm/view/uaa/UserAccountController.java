@@ -125,6 +125,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedTenant = tenantDao.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
+            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
@@ -351,10 +352,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
-    public void onAfterDeleteObject(UserAccount object, boolean isOk) {
-        if (isOk) {
-            uaaService.clearUserScope(object.getUid());
-        }
+    public void onBeforeDeleteObject(UserAccount object) {
+        uaaService.clearUserScope(object.getUid());
     }
 
     @Override

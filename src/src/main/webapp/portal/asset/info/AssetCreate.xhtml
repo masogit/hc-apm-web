@@ -110,6 +110,7 @@
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                         <p:commandButton id="setIsValid" value="#{assetInfoEditController.terminate? msg.ActiveAsset :msg.InactiveAsset}" action="#{assetInfoEditController.setValidButton}" immediate="true"  update=":growl" style="float:right;"/>
                     </h:panelGroup>
+
                 </h:form>
             </div>
         </div>

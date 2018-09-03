@@ -58,6 +58,12 @@
                                     <c:if test="#{fieldItem.component eq 'Date'}" >
                                         <p:calendar value="#{editReportController.tableValue[fieldItem.key]}"  />
                                     </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Label'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
+                                        </h:panelGroup>
+                                    </c:if>
                                 </c:forEach>
 
                             </p:panelGrid>

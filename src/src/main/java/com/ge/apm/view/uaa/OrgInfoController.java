@@ -1,12 +1,13 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.*;
 
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.lang.StringUtils;
@@ -14,13 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.NodeSelectEvent;
@@ -28,9 +22,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
 import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.QrCodeLib;
 import org.primefaces.util.TreeUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.UserContext;
@@ -44,6 +35,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private TenantInfo selectedTenant;
     UserAccount userAccount;
     private AssetInfoRepository assetInfoRepository;
+    private OrgInfoService orgInfoService;
+    private UserOrgInfoRepository userOrgDao;
+
     private boolean acShow = false;
 
     private String orgName;
@@ -64,6 +58,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userAccount = new UserAccount();
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        orgInfoService = WebUtil.getBean(OrgInfoService.class);
+        userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -290,7 +287,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public boolean checkName() {
 
-        OrgInfo orgInfo = dao.findFirstByParentUIDAndName(selected.getParentUID(), orgName);
+        OrgInfo orgInfo = dao.findFirstByParentUIDAndShortName(selected.getParentUID(), orgName);
         if (orgInfo != null) {
             if (selected.getId() == null) {
                 //new
@@ -320,19 +317,35 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
 
-        assetInfoRepository.updateClinicalName(orgName, selected.getUid());
-        selected.setName(orgName);
-        selected.setNameEn(orgNameEn);
+        boolean isNew = selected.getId() == null ? true : false;
 
-        if (selected.getOrgType() == 4) {
-            OrgInfo parentOrg = selected.getParentOrg();
-            if (parentOrg != null && parentOrg.getOrgType() == 4) {
-                parentOrg.setOrgType(5); //大科室
-                dao.save(parentOrg);
-            }
-        }
+        selected.setShortName(orgName);
+        String name = orgInfoService.buildFullPathOrgName(selected);
+        selected.setName(name);
+        selected.setNameEn(orgNameEn);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
+
+        if (isNew) {
+            //如果是增加小科室，并且它的父科室已经属于用户，则把小科室的权限可见性也加进去。
+            if (selected.getOrgType() == 4 && selected.getParentOrg().getOrgType() == 4) {
+
+                List<String> userUids = userOrgDao.findUserUidListByOrgUid(selected.getParentOrg().getUid());
+                for (String userUid: userUids) {
+                    UserOrgInfo found = userOrgDao.findFirstByUserUidAndOrgUid(userUid, selected.getUid());
+                    if (found == null) {
+                        found = new UserOrgInfo();
+                        found.setUserUid(userUid);
+                        found.setOrgUid(selected.getUid());
+                        found.setOrgType(4);
+                        userOrgDao.save(found);
+                    }
+                }
+            }
+        } else {
+            assetInfoRepository.updateClinicalName(name, selected.getUid());
+        }
+
         initWorkflowConfig();
         buildOrdTree();
         orgName = null;
@@ -366,19 +379,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void deleteSelectedOrg() {
         if (canDelete()) {
 
-            //如果是科室，重新设置大科室，小科室
-            if (selected.getOrgType() == 4) {
-                OrgInfo parentOrg = selected.getParentOrg();
-                if (parentOrg != null && parentOrg.getOrgType() == 5) {
-
-                    int otherChildsCount = dao.countByParentUIDAndUidIsNot(parentOrg.getUid(), selected.getUid());
-                    if (otherChildsCount == 0) { //only one child
-                        parentOrg.setOrgType(4); //大科室
-                        dao.save(parentOrg);
-                    }
-
-                }
-            }
 
             super.delete();
             buildOrdTree();
@@ -434,8 +434,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selected = (OrgInfo) node.getData();
-        preName = selected.getName();
-        orgName = selected.getName();
+        preName = selected.getShortName();
+        orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
         if (selected != null) {
             if (selected.getOrgType() == 4) {

@@ -571,6 +571,25 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
+        if (ownnedOrg.getOrgType() == 4) {
+            //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
+            UserOrgInfo userOrg = new UserOrgInfo();
+            userOrg.setUserUid(user.getUid());
+            userOrg.setOrgUid(ownnedOrg.getUid());
+            userOrg.setOrgType(ownnedOrg.getOrgType());
+            userOrgDao.save(userOrg);
+        } else {
+            OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
+            if (org != null) {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(org.getUid());
+                userOrg.setOrgType(org.getOrgType());
+                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+                userOrgDao.save(userOrg);
+            }
+        }
+        
         List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
 
         UserOrgInfo foundUserOrg = null;
@@ -765,7 +784,8 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
          orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //子科室
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 5)); //大科室
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
