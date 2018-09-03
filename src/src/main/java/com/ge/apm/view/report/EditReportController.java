@@ -12,8 +12,11 @@ import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.google.common.base.Strings;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +82,15 @@ public class EditReportController {
         tableService.saveTableDate(report,tableValue);
         tableService.submitReport(report);
          WebUtil.addSuccessMessage("已提交");
+    }
+    
+    public String getOptionValue(TableItem fieldItem){
+        String optionKey = (String)tableValue.get(fieldItem.getKey());
+        if(!Strings.isNullOrEmpty(optionKey)){
+            TableOption option = fieldItem.getOptions().stream().filter(item-> optionKey.equals(item.getKey())).findAny().orElse(null);
+            return option==null?null:option.getValue();
+        }
+        return null;
     }
     
     public void importElectricSafetyData(){
