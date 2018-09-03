@@ -125,6 +125,18 @@
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="保养事件:"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <h:panelGrid columns="2">
+                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                    </h:panelGrid>
 
                    <!-- <h:panelGrid columns="2">
                         <h:panelGroup>
@@ -140,18 +152,7 @@
                         </h:panelGroup>
                     </h:panelGrid>
 
-                    <h:panelGrid columns="2">
-                        <h:panelGroup>
-                            <h:panelGrid columns="2">
-                                <p:outputLabel value="保养事件:"/>
-                            </h:panelGrid>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.mainRepHit}"/>
-                            </h:panelGrid>
-                        </h:panelGroup>
-                    </h:panelGrid>
+
 
                     <h:panelGrid columns="2">
                         <h:panelGroup>
