@@ -484,7 +484,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
-                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
+                String assetDeptUID = infoVo.getAssetDeptUID();
                 String ClinicalDeptName = infoVo.getClinicalDeptName();
                 //获得计费开始时间、附件字段
 
@@ -496,7 +496,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     return; 
                 }
                 //在asset_info中判断是否属于 调剂中心科室
-                else if(depts.contains(ClinicalDeptUID)){
+                else if(depts.contains(assetDeptUID)){
                     WebUtil.addWarnMessage("该设备已归还！");
                     return; 
                 }
@@ -515,7 +515,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
                                     List<SharedAssetReqDetail> detail_list = asdDao.getBorrowInfo(infoVo.getUid());
                                     if(detail_list.size()==1){
-                                        if(!ClinicalDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
+                                        if(!assetDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
                                             WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName);
                                             return;
                                         }
@@ -584,7 +584,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                                     if(userOrg.getOrgType()==4){
                                         infoVo.setClinicalDeptName(userOrg.getName());
-                                        infoVo.setClinicalDeptUID(userOrg.getUid());
+                                        infoVo.setAssetDeptUID(userOrg.getUid());
                                     }
 
                                     //asiDao.save(infoVo);
@@ -815,9 +815,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     //更改使用科室
                                     
                                     OrgInfo findByUid = orgInfoDao.findByUid(this.selected.getClinicalDeptUid());
-                                    infoVo.setClinicalDeptId(findByUid.getId());
-                                    infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
-                                    infoVo.setClinicalDeptUID(this.selected.getClinicalDeptUid());
+                                    infoVo.setAssetDeptId(findByUid.getId());
+//                                    infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
+                                    infoVo.setAssetDeptUID(this.selected.getClinicalDeptUid());
 
                                     //asiDao.save(infoVo);
                                     
@@ -1311,7 +1311,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            for (int i = 0; i < infoList.size(); i++) {
                AssetInfo info = infoList.get(i);
                AssetInfo realInfo = asiDao.findByUid(info.getUid());
-               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getClinicalDeptUID());
+               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getAssetDeptUID());
                if (wfcList != null && wfcList.size() > 0) {
                    msg = msg + "设备 ‘" + info.getDepartNum() +"’ 刚刚已被归还，请重新录入！ ";
                    for (int j = 0; j < sardList.size(); j++) {

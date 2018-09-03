@@ -40,7 +40,7 @@ public enum GatewayURL {
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
     // Allocation Center URLs
     SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
-    ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList"),
+    ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList?requestId={requestId}"),
     ALLOCATION_ON_DUTY("/hcapmworkflowservice/api/apm/allocation/onDuty"),
     REMOTE_ASSIGN_REQUEST("/hcapmworkflowservice/api/apm/allocation/assign?requestId={requestId}&assigneeUID={assigneeUID}"),
     RENT_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}"),

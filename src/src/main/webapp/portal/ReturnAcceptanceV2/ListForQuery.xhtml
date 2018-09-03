@@ -28,7 +28,7 @@
                     <p:outputLabel class="pageTitle" value="设备计费情况"/>
                 </div>
                 <div class="ui-g-12 card">
-                    <h:form id="searchForm">
+                    <!--<h:form id="searchForm">
                         <h:panelGrid id="searchPanel" columns="2">
                             <p:inputText id="searchText" value="#{sharedAssetReqDetailForQueryController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
                                 <p:ajax event="keyup" update=":IouListForm searchButtons" />
@@ -39,7 +39,7 @@
                             </h:panelGroup>
 
                         </h:panelGrid>
-                    </h:form>
+                    </h:form>-->
             <h:form id="IouListForm">
 
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -125,10 +125,10 @@
                             <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="使用时长">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getRentalTime(item)}"/>
                         </p:column>
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
                                 <f:convertNumber pattern="0.00"/>
                             </h:outputText>
                         </p:column>

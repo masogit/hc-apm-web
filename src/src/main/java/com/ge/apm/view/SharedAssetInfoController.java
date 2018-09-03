@@ -88,8 +88,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         if (queryIndex == 1){
             //2、使用科室：任意科室  所属科室：调剂中心
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.IsNotNull,null));
-            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IN,deptids));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IsNotNull,null));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IN,deptids));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IsNotNull,null));
         }
 
         if (filterSatId != null && !filterSatId.equals("")){
@@ -219,7 +219,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isBorrow(String uid){
         AssetInfo a = dao.findByUid(uid);
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
-        String clinicalDeptUID = a.getClinicalDeptUID();
+        String clinicalDeptUID = a.getAssetDeptUID();
 
         return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
 
