@@ -3,7 +3,6 @@ package com.ge.apm.view.nurseSite;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -36,7 +37,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -316,7 +316,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			search=true;
 		}
 		if(search){
-			checkListAssets=nurseSiteMaintainService.getListAssetInfoBySearchFilter(listSearchFilter);
+			Sort sort=new Sort(Direction.ASC,"namePyCode");
+			checkListAssets=nurseSiteMaintainService.getListAssetInfoBySearchFilter(listSearchFilter,sort);
 		}
 		else{
 			checkListAssets=new ArrayList<AssetInfo>();
