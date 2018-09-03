@@ -521,14 +521,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
         }
 
-        assetGroupSecondary = null;
+//        if (lastPageRequest != null) {
+//            loadData(lastPageRequest);
+//        }
 
-        this.removeFilterOnField("assetGroupSecondary");
+    }
 
+    public void assetGroupSecondaryChangeListener() {
 
-        if (lastPageRequest != null) {
-            loadData(lastPageRequest);
-        }
 
     }
     
@@ -670,6 +670,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
+
+//        assetGroupSecondary = null;
+//        this.removeFilterOnField("assetGroupSecondary");
     }
 
     public List<I18nMessage> getAssetGroupSecondayList() {
