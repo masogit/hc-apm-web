@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -73,6 +74,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private SupplierRepository supplierDao;
     private Integer manufactureId;
     private AssetInfoRepository assetInfoRepository;
+    private RelRuleAssetRepository relRuleAssetRepository;
 
     @Override
     protected void init() {
@@ -91,6 +93,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
@@ -381,7 +384,31 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Override
     @Transactional
     public void delete() {
-        pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
+        String uid = selected.getUid();
+        //int level = selected.getLevel();
+        pmOrderRuleCheckListRepository.deleteExistsRecord(uid);
+        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findRelRuleAssets(uid);
+        List<RelRuleAsset> updateList = new ArrayList<>(relRuleAssets.size());
+        List<RelRuleAsset> deleteList = new ArrayList<>(relRuleAssets.size());
+        if(CollectionUtils.isNotEmpty(relRuleAssets)){
+            for (RelRuleAsset rra :relRuleAssets) {
+                if(rra.getRuleUID().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID2())){
+                        deleteList.add(rra);
+                    }else{
+                        updateList.add(rra);
+                    }
+                }else if(rra.getRuleUID2().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID())){
+                        deleteList.add(rra);
+                    }else{
+                        updateList.add(rra);
+                    }
+                }
+            }
+        }
+        relRuleAssetRepository.save(updateList);
+        relRuleAssetRepository.delete(deleteList);
         super.delete();
     }
 
