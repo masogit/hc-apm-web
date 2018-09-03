@@ -146,14 +146,14 @@ public class AssetInfo implements ChineseName,Serializable {
     private String locationName;//安装位置
 
     @Column(name = "clinical_dept_id")
-    private Integer clinicalDeptId;//使用科室
+    private Integer clinicalDeptId;//所属科室
 
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
-    private String clinicalDeptUID;//设备使用科室
+    private String clinicalDeptUID;//设备所属科室
 
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
-    private String clinicalDeptName;//使用科室
+    private String clinicalDeptName;//所属科室
 
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
@@ -162,9 +162,9 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer assetGroupSecondary;//设备分类2级
 
     @Column(name = "asset_dept_id")
-    private Integer assetDeptId;//所属设备科
+    private Integer assetDeptId;//使用设备科
 
-    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
+    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
     private String assetDeptUID;
     
     @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
