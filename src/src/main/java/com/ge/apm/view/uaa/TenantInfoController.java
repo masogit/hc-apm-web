@@ -7,8 +7,10 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.primefaces.context.RequestContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +40,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     TenantInfoConfig tenantConfig;
     List<String> listVersions;
     String selectedVersion;
+    private AssetInfoRepository assetInfoRepository;
 
     @Override
     protected void init() {
@@ -45,6 +48,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         loginUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     @Override
@@ -87,6 +91,24 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     	// TODO Auto-generated method stub
     	this.selected.setTenantConfig(generateTenantConfig());
     	super.save();
+    }
+
+    @Override
+    public void delete(){
+        String uid = selected.getUid();
+        boolean hasAssets = assetInfoRepository.findRecordByTenantUid(uid);
+        if(hasAssets){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("hasAssets"));
+            return;
+        }
+        boolean hasUsers = userAccountRepository.findRecordByTenantUid(uid);
+        if(hasUsers){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("hasUsers"));
+            return;
+        }
+        super.delete();
     }
     
     @Override
