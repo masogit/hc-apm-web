@@ -736,13 +736,13 @@ public void onSupplierChange() {
 
     public void closeWorkOrder() {
         Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
-           if(isRating && feedback<1){
-               WebUtil.addErrorMessage("请务必给予评价");
-               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
-               return;
-           }else {
-               woService.closeWorkOrder(selectedWorkOrder, comments, picList);
-           }
+//           if(isRating && feedback<1){
+//               WebUtil.addErrorMessage("请务必给予评价");
+//               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
+//               return;
+//           }else {
+//           }
+        woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
     }
 

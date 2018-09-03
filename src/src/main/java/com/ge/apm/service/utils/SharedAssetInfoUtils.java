@@ -3,15 +3,21 @@ package com.ge.apm.service.utils;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
+import com.ge.apm.domain.SharedAssetTypeAccesssory;
 import javaslang.Tuple2;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class SharedAssetInfoUtils {
@@ -81,29 +87,176 @@ public class SharedAssetInfoUtils {
         return totalAmount;
     }
 
-    public static void fillData2Voucher(AssetInfo asset) {
+    public static void fillData2Voucher(AssetInfo asset, Map<String, Object> info) {
         SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
         if(reqDetail.getReturnRequest() == null) {
-            log.info("借时，设备处于在借状态");
-            log.info("2.1 设备编号： " + asset.getDepartNum());
-            log.info("2.2 设备名称： " + asset.getName());
-            log.info("2.3 设备型号： " );
-            log.info("2.4 日租金(单价)： " + asset.getSharedAssetType().getUnitPrice());
-            log.info("2.5 借用状态： ");
-            log.info("2.6 状态: ");
-            log.info("2.7 附属物品: " + asset.getSharedAssetType().getAccessories());//json字符串，需额外处理
-            log.info("2.8 借用时间: " + reqDetail.getChargingBeginTime());
-            log.info("2.9 科室名称: " + reqDetail.getClinicalDept().getName());
-            log.info("2.10 借用人: " + reqDetail.getCreateBy());
-            log.info("2.11 经办人: " );
-        } else {
-            log.info("还时，设备处于归还状态");
-            log.info("3.1 还时状态： ");
-            log.info("3.2 总租用期: " + reqDetail.getRentalTime());
-            log.info("3.3 归还时间: " + reqDetail.getChargingEndTime());
-            log.info("3.4 总金额: " + reqDetail.getTotalAmount());
-            log.info("3.5 归还人签字");
-            log.info("3.6 经办人签字");
+            Date date = reqDetail.getChargingBeginTime();
+
+            String year = getSplittedTime(date, "yyyy");
+            String month = getSplittedTime(date, "MM");
+            String day = getSplittedTime(date, "dd");
+            String hour = getSplittedTime(date, "HH");
+            String minute = getSplittedTime(date, "mm");
+            String second = getSplittedTime(date, "ss");
+
+            String rcpID = year.substring(2,4) + month + day + hour + minute + second;
+
+            info.put("借据ID", rcpID);
+            info.put("设备编号", asset.getDepartNum());
+            info.put("设备名称", asset.getName());
+            info.put("设备型号", asset.getFunctionType());
+            info.put("设备分类", asset.getSharedAssetType().getSwapName());
+            info.put("租金", getPdfUnitPrice(asset));
+            info.put("状态", getPdfStatus(asset));
+            info.put("借用时间", year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second);
+            info.put("附属物品", getPdfAccessories(asset));
+            info.put("科室名称", reqDetail.getClinicalDept().getName());
         }
+        else
+        {
+            LocalDateTime beginLDT;
+            LocalDateTime endLDT;
+            beginLDT = reqDetail.getChargingBeginTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+            if(reqDetail.getChargingEndTime() != null) {
+                endLDT = reqDetail.getChargingEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            }
+            else {
+                endLDT = LocalDateTime.now();
+            }
+
+            long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+
+            DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
+            String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
+
+            info.put("归还时间", reqDetail.getChargingEndTime() == null ? null :
+                    getSplittedTime(reqDetail.getChargingEndTime(), "yyyy-MM-dd HH:mm:ss"));
+            info.put("总租用期", rentalTimeInMinutes < 360 ? 0.25 : borrowDays);
+            info.put("总金额", getPdfTotalAmount(asset, reqDetail, rentalTimeInMinutes) + "元");
+        }
+    }
+
+    public static double getPdfTotalAmount(AssetInfo asset, SharedAssetReqDetail reqDetail, long minutes)
+    {
+        double totalAmount = 0;
+        //chgType: 1.按次， 2.按小时/自然时间（60分钟）,3. 按天 , 4. 自然时间
+        //request.type: 1.维修, 2.补登记  3.正常借用
+        if(reqDetail.getReturnRequest().getType().equals("1"))
+        {
+            totalAmount = 0.0;
+        }
+        else
+        {
+            //按自然时间计费时，若小于6小时，按6小时计算保底价
+            if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
+            {
+                totalAmount = 6 * asset.getSharedAssetType().getUnitPrice();
+            }
+            else
+            {
+                totalAmount = reqDetail.getTotalAmount();
+            }
+        }
+
+        return totalAmount;
+    }
+
+    public static Date addHourOfDate(Date date,int i)
+    {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.HOUR_OF_DAY, i);
+        Date newDate = c.getTime();
+        return newDate;
+    }
+
+    private static String getSplittedTime(Date date, String timeUnit)
+    {
+        SimpleDateFormat format = new SimpleDateFormat(timeUnit);
+        return format.format(date);
+    }
+
+    private static String getPdfUnitPrice(AssetInfo asset)
+    {
+        Double price = asset.getSharedAssetType().getUnitPrice();
+        String chgType = asset.getSharedAssetType().getChargingType();
+
+        String uniPrice = null;
+        //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
+        if(chgType.equals("1"))
+        {
+            uniPrice = price.toString() + "元/次";
+        }
+        if(chgType.equals("2") || chgType.equals("4"))
+        {
+            Double pr = price.doubleValue() * 24;
+            uniPrice = pr.toString() + "元/天";
+        }
+        if(chgType.equals("3"))
+        {
+            uniPrice = price.toString() + "元/天";
+        }
+
+        return uniPrice;
+    }
+
+    private static String getPdfStatus(AssetInfo asset)
+    {
+        //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
+        Integer status = asset.getStatus();
+        String assetStatus = null;
+        if(status == 1 || status == 3)
+        {
+            assetStatus = "已借出";
+        }
+        if(status == 2)
+        {
+            assetStatus = "停机";
+        }
+        if(status == 4)
+        {
+            assetStatus = "待报废";
+        }
+        if(status == 5)
+        {
+            assetStatus = "停用";
+        }
+
+        return assetStatus;
+    }
+
+    private static String getPdfAccessories(AssetInfo asset)
+    {
+        List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
+        String accessories = "";
+
+        if(accList == null)
+        {
+            accessories = "";
+        }
+        else
+        {
+            if(accList.size() < 1)
+            {
+                accessories = "";
+            }
+
+            if(accList.size() == 1)
+            {
+                accessories = accList.get(0).getName();
+            }
+
+            if(accList.size() > 1)
+            {
+                for(int i = 0; i < accList.size() - 1; i++)
+                {
+                    accessories += accList.get(i).getName() + '+';
+                }
+
+                accessories += accList.get(accList.size()-1 ).getName();
+            }
+        }
+        return accessories;
     }
 }
