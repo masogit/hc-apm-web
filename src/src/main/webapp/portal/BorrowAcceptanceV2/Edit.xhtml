@@ -76,7 +76,10 @@
                             <!--<f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>-->
                             <!--&lt;!&ndash;<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>&ndash;&gt;-->
                         <!--</p:cellEditor>-->
-                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true" requiredMessage="预计借用数不能为空！" minValue="0" maxValue="#{item.applyQty}"/>
+                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true"
+                                       requiredMessage="预计借用数不能为空！" minValue="0" maxValue="#{item.applyQty}">
+                            <p:ajax update=":IouEditForm:confirmBtn"/>
+                        </p:inputNumber>
                     </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}">
                         <h:outputText value="#{item.remark}"/>
@@ -121,7 +124,7 @@
 
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
+                    <p:commandButton id="confirmBtn" validateClient="true" disabled="#{sharedAssetRequestV2Controller.validateAllExpectedQty()}" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.Shelve}" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
