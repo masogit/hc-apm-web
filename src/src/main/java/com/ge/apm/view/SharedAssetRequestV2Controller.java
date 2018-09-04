@@ -1093,16 +1093,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 2;//2借用待交付状态
 
        List<SharedAssetReqType> sartList = selected.getSartList();
-        for (SharedAssetReqType sart : sartList) {
-            if (sart.getExceptQty() == 0){
-                String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("url", url);
-
-                WebUtil.addWarnMessage("设备 '"+sart.getSwapName()+"' 的预计借用数必须大于0！");
-                return;
-            }
-        }
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 1) {
         	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
@@ -1754,6 +1744,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     		ex.printStackTrace();
     	}
     	requestContext.addCallbackParam("url", url);
+    }
+
+    public boolean validateAllExpectedQty() {
+        List<SharedAssetReqType> sartList = selected.getSartList();
+        boolean expectedQtyGTZero = false;
+        for (SharedAssetReqType sart : sartList) {
+            if (sart.getExceptQty() > 0){
+                expectedQtyGTZero = true;
+                break;
+            }
+        }
+        logger.debug("validateTotalExpectedQty result: " + expectedQtyGTZero);
+        return !expectedQtyGTZero;
     }
 
 }

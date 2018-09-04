@@ -43,7 +43,7 @@
 							paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 							currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
 							pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
-							rowsPerPageTemplate="20,50,100,500" selection="#{measureElectricSafetyController.selectedItems}" rowKey="#{item.lineIndex}">
+							rowsPerPageTemplate="20,50,100,500" selection="#{measureElectricSafetyController.selectedItems}" rowKey="#{item.lineIndex}" editable="true" editMode="cell" widgetVar="cellElectircImport">
 							<p:column selectionMode="multiple" style="width:32px;text-align:center" />
 							<p:column headerText="设备名称">
 								<h:outputText value="#{item.assetInfo.name}" />
@@ -54,14 +54,31 @@
 							<p:column headerText="#{msg.clinicalDeptName}">
 								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 							</p:column>
-							<p:column headerText="工单编号">
+							<!-- <p:column headerText="工单编号">
 								<h:outputText value="#{item.v2PmOrder.pmNum}" />
+							</p:column> -->
+							<p:column headerText="工单信息" colspan="3">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{item.v2PmOrder.pmNum}/" />
+										<h:outputText value="#{item.v2PmOrder.planTime}">
+											<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd" />
+										</h:outputText>
+										<h:outputText value="/#{item.v2PmOrder.getCurrentPersonName()}/#{item.v2PmOrder.finished?'已完工':'未完工'}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{item.v2PmOrder}" style="width:100%" converter="v2PmOrderConverter">
+											<f:selectItems value="#{item.listV2PmOrder}" var="t" itemLabel="#{t.pmNum}/#{t.strPlanTime}/#{t.getCurrentPersonName()}/#{t.finished?'已完工':'未完工'}" itemValue="#{t}" >
+											</f:selectItems>
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
 							</p:column>
-							<p:column headerText="计划完成时间">
+							<!-- <p:column headerText="计划完成时间">
 								<h:outputText value="#{item.v2PmOrder.planTime}" >
 									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 								</h:outputText>
-							</p:column>
+							</p:column> -->
 							<p:column headerText="资产编号">
 								<h:outputText value="#{item.financingNum}" />
 							</p:column>
@@ -110,6 +127,10 @@
                                 <p:commandButton actionListener="#{measureElectricSafetyController.importSelectedItem}" value="#{msg.Import}" update="datalistId :growl,:measureElectricSafetyTab:measureElectricSafetyListForm" icon="ui-icon-check" />
                             </f:facet>
 						</p:dataTable>
+						<p:contextMenu for="datalistId" widgetVar="cMenu">   
+					       <p:menuitem value="Edit Cell" icon="ui-icon-search" onclick="PF('cellElectircImport').showCellEditor();return false;"/>  
+					       <p:menuitem value="Hide Menu" icon="ui-icon-close" onclick="PF('cMenu').hide()"/>  
+					   </p:contextMenu>
 					</p:fieldset>
 				</h:form>
 			</div>
