@@ -462,4 +462,17 @@ public class OrgInfoService {
 
     }
 
+    public int getClinicalLevel(OrgInfo currentOrg) {
+        if (currentOrg.getOrgType() != 4) return 0;
+
+        int level = 0;
+        while (currentOrg != null && (currentOrg.getOrgType() == 4)) {
+            ++level;
+            currentOrg = orgDao.findByUid(currentOrg.getParentUID());
+        }
+
+        return level;
+
+    }
+
 }

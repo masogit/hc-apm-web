@@ -21,7 +21,7 @@
                           <h:panelGroup >
 		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
-                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
+                                    <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                              </p:inputText>
 		                 </h:panelGroup>
 		                 <h:panelGroup >
@@ -34,7 +34,7 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" >
+                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" style="max-width: 200px">
                                  <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                  <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -110,7 +110,6 @@
 	                             <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">#{msg.PmOrderRule}*</label>
                             <p:autoComplete id="SelectedPmOrderRule" value="#{relRuleAssetController.ruleUid}" dropdown="true" scrollHeight="300" rendered="#{relRuleAssetController.level > 0}"
