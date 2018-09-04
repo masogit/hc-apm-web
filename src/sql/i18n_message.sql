@@ -327,6 +327,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'functionGroup', '医疗器械分类', 'Function Group', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetCode68', '医疗器械子分类', 'Function Sub Group', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetGroup', '设备分类', 'Asset Group', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetGroupSecondary', '设备分类2级', 'Asset Group Secondary', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'hospitalId', '所属院区', 'Hospital Id', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'injectCount', '注射量', 'Inject Count', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'installDate', '启用日期', 'Install Date', NULL, '-1');
@@ -1449,7 +1450,6 @@ INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetRe
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 10, '归还已取消', -1);
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 11, '归还已搁置', -1);
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 12, '归还已完成', -1);
-INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 13, '归还已失效', -1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '1', '待派工', 'Assign', NULL, '-1');

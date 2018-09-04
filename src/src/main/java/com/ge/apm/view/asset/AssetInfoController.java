@@ -1,6 +1,5 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.druid.sql.visitor.functions.Now;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
@@ -13,10 +12,20 @@ import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.wo.Map2XmlConverter;
+import com.ge.apm.view.wo.WorkOrderReportExportController;
 import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.mapper.DefaultMapper;
 import javaslang.Tuple2;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -31,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -40,17 +50,20 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -183,9 +196,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     List<Supplier> supplierList = Collections.emptyList();
     
-    private Date nowDate = new Date();
-    
     private List<OrgInfo> deptListCanLeaseAsset;
+
+    private String filterOrgName;
+
+    private StreamedContent exportPdf;
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -445,22 +460,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
         
         //1st. if asset belongs to any distribution center
-        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
         //2nd, check if configuration regarding to shared asset has been created
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNotNull, null));
 
         if (queryIndex == 1) {
             //正常可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
         } else if(queryIndex == 2){
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
@@ -1776,7 +1791,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToBeTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1797,7 +1812,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void batchProcessToTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1831,7 +1846,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+        for (Entry<String, Boolean> entry : map.entrySet()) {
             if (entry.getValue()) {
                 return true;
             }
@@ -2012,16 +2027,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		return orgUids;
 	}
 
-	public Date getNowDate() {
-		return nowDate;
-	}
-
-	public void setNowDate(Date nowDate) {
-		this.nowDate = nowDate;
-	}
-	
-	public void prepareForceAllocateAsset(String assetUid) {
-		AssetInfo asset = dao.findByUid(assetUid);
+	public void prepareForceAllocateAsset(AssetInfo asset) {
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2035,8 +2041,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		this.selected = asset;
 	}
 	
-	public void prepareForceReturnAsset(String assetUid) {
-		AssetInfo asset = dao.findByUid(assetUid);
+	public void prepareForceReturnAsset(AssetInfo asset) {
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2049,17 +2054,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		asset.setSharedAssetReqDetail(reqDetail);
 		this.selected = asset;
 	}
-	
+
 	public void forceReturnAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-			Date chargingBeginTime = selected.getSharedAssetReqDetail().getChargingBeginTime();
-			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
+			SharedAssetReqDetail reqDetail = selected.getSharedAssetReqDetail();
+			Date chargingBeginTime = reqDetail.getChargingBeginTime();
+			Date chargingEndTime = reqDetail.getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-				sharedAssetService.returnByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+			    if(reqDetail.getClinicalDeptUid() != null) {
+			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
+                    log.info("****** force return response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2073,9 +2085,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = selected.getSharedAssetReqDetail().getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+            OrgInfo assetDept = clinicalDeptList.stream().filter(item -> item.getName().equals(this.filterOrgName)).findFirst().orElse(null);
 			try {
-				log.info("clinicalDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getClinicalDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-				sharedAssetService.borrowByShortcut(selected.getClinicalDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+			    if(assetDept != null) {
+                    selected.setAssetDeptUID(assetDept.getUid());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
+                    log.info("****** force allocate response ******");
+                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
+                }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -2091,30 +2110,59 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                                                             .orElse(null);
 
     	if(sharedAssetReqDetail != null) {
-    		Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
-    		Date endTime = sharedAssetReqDetail.getChargingEndTime();
-
-            String chargingType = item.getSharedAssetType().getChargingType();
-            Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(beginTime, endTime, chargingType);
-            BigDecimal unit = unitAndTotalTime._1;
-            String totalTime = unitAndTotalTime._2;
-
-    		if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
-    			if(this.getOrgUids().contains(item.getClinicalDeptUID())) {
-    			} else {
-    				SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
-    				if(request != null && "1".equals(request.getType())) {
-    					unit = new BigDecimal(0);
-    				}
-    			}
-    		}
-    		sharedAssetReqDetail.setRentalTime(totalTime);
-
-    		BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetType().getUnitPrice(), chargingType);
-    		sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
+            calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
     	}
     	return sharedAssetReqDetail;
 	}
+
+	private SharedAssetReqDetail findLatestReqDetail(AssetInfo item) {
+        List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
+        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                                                            .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
+                                                                if(o1.getChargingEndTime() == null) {
+                                                                        return -1;
+                                                                    } else if(o2.getChargingEndTime() == null) {
+                                                                        return 1;
+                                                                    } else {
+                                                                        if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
+                                                                            return 1;
+                                                                        } else {
+                                                                            return -1;
+                                                                        }
+                                                                    }
+                                                            })
+                                                            .findFirst()
+                                                            .orElse(null);
+        if(sharedAssetReqDetail != null) {
+            calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
+        }
+        return sharedAssetReqDetail;
+    }
+
+	private SharedAssetReqDetail calcChargingByAssetReqDetail(AssetInfo item, SharedAssetReqDetail sharedAssetReqDetail) {
+        Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
+        Date endTime = sharedAssetReqDetail.getChargingEndTime();
+
+        String chargingType = item.getSharedAssetType().getChargingType();
+        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetReqDetail);
+        BigDecimal unit = unitAndTotalTime._1;
+        String totalTime = unitAndTotalTime._2;
+
+        if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
+            if(this.getOrgUids().contains(item.getAssetDeptUID())) {
+            } else {
+                SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();
+                if(request != null && "1".equals(request.getType())) {
+                    unit = new BigDecimal(0);
+                }
+            }
+        }
+        sharedAssetReqDetail.setRentalTime(totalTime);
+
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetReqDetail);
+        sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
+        return sharedAssetReqDetail;
+    }
 
 	private SharedAssetType findSharedAssetType(AssetInfo assetInfo) {
         SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
@@ -2125,6 +2173,135 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public Date getCurrentDate() {
         return new Date();
+    }
+
+    public String getFilterOrgName() {
+        return filterOrgName;
+    }
+
+    public void setFilterOrgName(String filterOrgName) {
+        this.filterOrgName = filterOrgName;
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if(clinicalDeptList == null) {
+            clinicalDeptList = assetInfoService.getOrgDeptList(this.selected.getSiteUID());
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+            || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterOrgName = (String) ((SelectEvent) event).getObject();
+            return;
+        } else {
+            if (!Strings.isNullOrEmpty(filterOrgName) && !clinicalDeptList.stream().anyMatch(item -> filterOrgName.equals(item.getName()))) {
+                filterOrgName = "";
+            }
+        }
+
+    }
+
+    //301医院则显示打印按钮
+    public boolean validate301()
+    {
+        boolean isTargetHospital = false;
+        List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+        String hosName = allocDept.getOrgFullName();
+        if(hosName.contains("中国人民解放军总医院"))
+        {
+            isTargetHospital = true;
+        }
+
+        return isTargetHospital;
+    }
+
+    //若当前状态为可用，则打印上次归还信息
+    //若当前状态为借出，则打印当前借用信息
+    public void generateVoucher(AssetInfo asset) {
+        //当前状态已借出
+        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
+        {
+            List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+            Map<String, Object> info = new HashedMap();
+
+            info.put("抬头", allocDept.getParentOrg().getName() + allocDept.getName());
+            info.put("经办人", userContextService.getUserName());
+
+            getPdfContent(asset, info);
+            doExportToPdf(info, "sharedAssetBorrowed.xsl", "SharedAssetBorrowInfo.pdf" );
+        }
+        else
+        {
+            Map<String, Object> returned = new HashedMap();
+            getPdfContent(asset, returned);
+            doExportToPdf(returned, "sharedAssetReturned.xsl", "SharedAssetReturnInfo.pdf" );
+        }
+    }
+
+    private void getPdfContent(AssetInfo asset, Map<String, Object> info)
+    {
+        SharedAssetType sharedAssetType = findSharedAssetType(asset);
+        asset.setSharedAssetType(sharedAssetType);
+        SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
+        reqDetail = (reqDetail == null) ? this.findLatestReqDetail(asset) : reqDetail;
+        if(reqDetail != null) {
+            asset.setSharedAssetReqDetail(reqDetail);
+            this.selected = asset;
+            SharedAssetInfoUtils.fillData2Voucher(asset, info);
+        }
+    }
+
+    private void doExportToPdf(Map<String, Object> info, String xslName, String pdfName) {
+        try {
+            String woXml = getWoXml(info);
+
+            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/" + xslName).getPath());
+
+            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/fop.xml").getPath());
+
+            FopFactory fopFactory = FopFactory.newInstance(conf);
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            try {
+                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
+                Source src = new StreamSource(new StringReader(woXml));
+                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
+                Result res = new SAXResult(fop.getDefaultHandler());
+                transformer.transform(src, res);
+            } finally {
+                exportPdf = (new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, pdfName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getWoXml(Map<String, Object> data) {
+        XStream xStream = new XStream(new DomDriver());
+        xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
+        xStream.alias("List", List.class);
+        xStream.alias("map", HashedMap.class);
+
+        return xStream.toXML(data);
+    }
+
+    public StreamedContent getExportPdf() {
+        return exportPdf;
+    }
+
+    public void setExportPdf(StreamedContent exportPdf) {
+        this.exportPdf = exportPdf;
     }
     
 }

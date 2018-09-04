@@ -21,7 +21,7 @@ class MalfunctionTable extends React.Component {
         title: t`设备名称`,
         dataIndex: 'assetName',
         sorter: getComparator('assetName', strLocaleComparator),
-        width: '20%',
+        width: '25%',
       },
       {
         title: t`资产编号`,
@@ -39,7 +39,7 @@ class MalfunctionTable extends React.Component {
         title: t`报修人`,
         dataIndex: 'reporter',
         sorter: getComparator('reporter', strLocaleComparator),
-        width: '15%',
+        width: '10%',
       },
       {
         title: t`使用科室`,

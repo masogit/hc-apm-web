@@ -12,6 +12,7 @@ import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple2;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -254,15 +255,19 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.dao = dao;
     }
 
-    public String getRentalTime(Date chargingBeginTime,Date chargingEndTime,String chargingType) {
-        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(chargingBeginTime, chargingEndTime, chargingType);
+    public String getRentalTime(SharedAssetReqDetail reqDetail) {
+        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
         return chargingUnitAndTotalTime._2;
     }
 
-    public Double getTotalAmount(Date chargingBeginTime,Date chargingEndTime,String chargingType,Double unitPrice) {
-        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(chargingBeginTime, chargingEndTime, chargingType);
-        BigDecimal unit = chargingUnitAndTotalTime._1;
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, unitPrice, chargingType);
+    public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
+        SharedAssetRequest request = (StringUtils.isEmpty(reqDetail.getReturnId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
+
+        BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail)._1;
+        if ("1".equals(request.getType())) {//no charging for asset maintain
+            unit = new BigDecimal(0);
+        }
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, reqDetail);
         return totalAmount.doubleValue();
     }
 

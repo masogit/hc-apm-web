@@ -45,7 +45,7 @@ public class AssetFileImportSupportingService {
     @Transactional
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
 
-        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
+        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndShortName(selectedOrgToImport.getUid(), name);
 
         if (orgInfo == null) {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());

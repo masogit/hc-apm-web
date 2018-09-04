@@ -11,14 +11,25 @@
     <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName}设备关注">
         <h:form id="AssetSubscribEditForm">
             <h:panelGroup id="display" rendered="#{assetSubscriberController.selected != null}">
-                <h:panelGroup >
-                    <label class="label">关注人</label>
-                    <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
-                        <p:ajax  event="change" update="@(.tree) @(.pickListCls) scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
-                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{assetSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                    </p:selectOneMenu>
-                </h:panelGroup>
+
+                   <h:panelGroup >
+                       <label class="label">关注人</label>
+                       <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
+                           <p:ajax  event="change" update="@(.tree) @(.pickListCls) scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
+                           <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                           <f:selectItems value="#{assetSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                       </p:selectOneMenu>
+                   </h:panelGroup>
+
+                <p:fieldset legend="已选设备" rendered="#{assetSubscriberController.CRUDActionName.equals('修改')}" >
+                    <h:panelGroup>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel class="label">设备名:</h:outputLabel>
+                            <h:outputLabel
+                                           value="#{assetSubscriberController.getSelectedAssetName()}"></h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </p:fieldset>
 
                 <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" legend="设备选择">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">

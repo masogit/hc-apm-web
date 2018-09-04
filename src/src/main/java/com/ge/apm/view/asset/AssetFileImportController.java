@@ -108,7 +108,7 @@ public class AssetFileImportController {
             WebUtil.addErrorMessage("File can not be read!", null);
             logger.error(e.getMessage(),e);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage(), null);
             logger.error(e.getMessage(),e);
         }
@@ -122,7 +122,7 @@ public class AssetFileImportController {
             filterErrorRecords();
 
 //            downloadImportFailureData();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(null, message);
 

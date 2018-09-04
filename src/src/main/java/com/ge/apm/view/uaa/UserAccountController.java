@@ -1,9 +1,30 @@
 package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
 
-import java.util.Date;
-import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
@@ -12,37 +33,11 @@ import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.view.sysutil.UserContextService;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import webapp.framework.web.WebUtil;
-import org.primefaces.event.NodeUnselectEvent;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.TimeUtil;
-import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -83,6 +78,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private List<SysRoleVO> roleListVO;
 
+    private UserAccountService userAccountService;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -92,6 +89,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        userAccountService = WebUtil.getBean(UserAccountService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
 
@@ -127,6 +125,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedTenant = tenantDao.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
+            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
@@ -353,10 +352,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
-    public void onAfterDeleteObject(UserAccount object, boolean isOk) {
-        if (isOk) {
-            uaaService.clearUserScope(object.getUid());
-        }
+    public void onBeforeDeleteObject(UserAccount object) {
+        uaaService.clearUserScope(object.getUid());
     }
 
     @Override
@@ -568,12 +565,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
-    private void readSelectedOrgTree(TreeNode node, List<TreeNode> selectedTreeNodeList) {
+    private void readSelectedOrgTree(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
         if (node.isSelected()) {
             if (node.getParent() != null && node.getParent().isSelected()) {
                 return;
             } else {
-                selectedTreeNodeList.add(node);
+                selectedTreeNodeList.add((OrgInfo)node.getData());
             }
         } else {
             for (TreeNode item : node.getChildren()) {
@@ -582,27 +579,55 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
-    @Transactional
     public void updateUserScope() {
-        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        //below not working!!!!!!!
-//        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
-//        userOrgDao.delete(orgList);
-        userOrgDao.deleteByUserUid(selected.getUid());
 
-        List<TreeNode> selectedOrgList = new ArrayList();
+        Set<OrgInfo> selectedOrgList = new HashSet<>();
+
+        //only add parent if all children is selected
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
-        List<UserOrgInfo> userOrgList = new ArrayList();
-        for (TreeNode node : selectedOrgList) {
-            OrgInfo org = (OrgInfo) node.getData();
-            UserOrgInfo userOrg = new UserOrgInfo();
-            userOrg.setOrgType(org.getOrgType());
-            userOrg.setOrgUid(org.getUid());
-            userOrg.setUserUid(selected.getUid());
-            userOrgList.add(userOrg);
+
+        //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
+        addMissingChildClinical(accessOrgTree, selectedOrgList);
+
+        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList);
+
+    }
+
+
+
+    /**
+     * 大科室下面可以有小科室，如果选择了把小科室加进来，这样不影响已有的应用
+     * @param node
+     * @param selectedTreeNodeList
+     */
+    private void addMissingChildClinical(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
+
+        OrgInfo data = (OrgInfo)node.getData();
+        if (data == null) {
+            //root
+            for (TreeNode item : node.getChildren()) {
+                addMissingChildClinical(item, selectedTreeNodeList);
+            }
+
+        } else if (data.getOrgType() < 4) {
+            if (!node.isSelected()) {
+                for (TreeNode item : node.getChildren()) {
+                    addMissingChildClinical(item, selectedTreeNodeList);
+                }
+            }
+        } else if (data.getOrgType() == 5 || data.getOrgType() == 4) {
+            //if site is selected, will not traverse here
+            if (node.isSelected()) {
+                selectedTreeNodeList.add(data);
+            }
+
+            //大科室下面可能还有大科室
+            for (TreeNode item : node.getChildren()) {
+                addMissingChildClinical(item, selectedTreeNodeList);
+            }
+
         }
 
-        userOrgDao.save(userOrgList);
     }
 
     public void onSelectAccessTreeNode(NodeSelectEvent event) {

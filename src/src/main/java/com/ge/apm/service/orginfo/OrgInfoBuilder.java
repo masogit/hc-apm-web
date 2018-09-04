@@ -15,6 +15,7 @@ public class OrgInfoBuilder {
 
         orgInfo.setOrgLevel(1);
         orgInfo.setOrgType(1);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
@@ -37,6 +38,7 @@ public class OrgInfoBuilder {
 
         orgInfo.setOrgLevel(2);
         orgInfo.setOrgType(2);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
@@ -59,6 +61,7 @@ public class OrgInfoBuilder {
 
         orgInfo.setOrgLevel(3);
         orgInfo.setOrgType(3);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
@@ -81,6 +84,7 @@ public class OrgInfoBuilder {
 
         orgInfo.setOrgLevel(orgLevel);
         orgInfo.setOrgType(4);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
