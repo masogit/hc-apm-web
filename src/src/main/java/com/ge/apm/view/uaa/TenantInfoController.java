@@ -209,6 +209,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     
     private void setDefaultValueForConfig(){
     	this.selectedVersion=TenantInfoConfig.VERSION_FUNCTION;
+    	this.listVersions=TenantInfoConfig.getVersions();
     	tenantConfig=new TenantInfoConfig();
     	tenantConfig.setValueWithVersion(TenantInfoConfig.VERSION_FUNCTION);
     }
