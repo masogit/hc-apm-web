@@ -139,7 +139,7 @@ public class UserContextService implements Serializable {
         return true;
     }
     
-    public boolean versionContains(String menuName){
+    public boolean versionContains(String menuNameList){
     	UserAccount user = getLoginUser();
     	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
     	TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
@@ -148,9 +148,13 @@ public class UserContextService implements Serializable {
     		try {
 				JSONObject jsonObj=JSONObject.parseObject(configStr);
 				JSONArray jsonArray=jsonObj.getJSONArray("menuList");
-				for(int i=0;i<jsonArray.size();++i){
-					if(jsonArray.getString(i).equals(menuName)){
-						return true;
+				String[] menus=menuNameList.split(",");
+				for(String menuName:menus){
+					menuName=menuName.trim();
+					for(int i=0;i<jsonArray.size();++i){
+						if(jsonArray.getString(i).equals(menuName)){
+							return true;
+						}
 					}
 				}
 				return false;
