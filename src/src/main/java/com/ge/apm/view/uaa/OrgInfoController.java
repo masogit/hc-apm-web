@@ -486,7 +486,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateDepartmentDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null || orgInfoService.getClinicalLevel(selected) >=3;
     }
 
     public UserAccount getUserAccount() {
