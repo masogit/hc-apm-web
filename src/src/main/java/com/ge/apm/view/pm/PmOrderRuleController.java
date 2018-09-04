@@ -5,9 +5,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -67,6 +72,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TenantInfoRepository tenantInfoRepository;
     private OrgInfo selectedOrg;
     private SupplierRepository supplierDao;
+    private Integer manufactureId;
+    private AssetInfoRepository assetInfoRepository;
+    private RelRuleAssetRepository relRuleAssetRepository;
 
     @Override
     protected void init() {
@@ -81,9 +89,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
@@ -374,7 +384,33 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Override
     @Transactional
     public void delete() {
-        pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
+        String uid = selected.getUid();
+        //int level = selected.getLevel();
+        pmOrderRuleCheckListRepository.deleteExistsRecord(uid);
+        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findRelRuleAssets(uid);
+        List<RelRuleAsset> updateList = new ArrayList<>(relRuleAssets.size());
+        List<RelRuleAsset> deleteList = new ArrayList<>(relRuleAssets.size());
+        if(CollectionUtils.isNotEmpty(relRuleAssets)){
+            for (RelRuleAsset rra :relRuleAssets) {
+                if(StringUtils.isNotEmpty(rra.getRuleUID()) && rra.getRuleUID().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID2())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUID(null);
+                        updateList.add(rra);
+                    }
+                }else if(StringUtils.isNotEmpty(rra.getRuleUID2()) && rra.getRuleUID2().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUID2(null);
+                        updateList.add(rra);
+                    }
+                }
+            }
+        }
+        relRuleAssetRepository.save(updateList);
+        relRuleAssetRepository.delete(deleteList);
         super.delete();
     }
 
@@ -595,8 +631,52 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         }
     }
 
-    public List<Supplier> getSupplier(){
-        return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
+    public List<String> getSupplier(String name){
+/*        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        List<String> names = assetInfoRepository.findDistinctManufacturesByPrefix(tenantUID, prefix);
+        names.sort(new PinYinComparator());
+        return names;*/
+
+
+        List<SearchFilter> filter = new ArrayList<>();
+        if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
+        }
+        filter.add(new SearchFilter("manufacturerT", SearchFilter.Operator.EQ, true));
+        filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        //return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
+        List<Supplier> suppliers = supplierDao.findBySearchFilter(filter);
+        List<String> names = new ArrayList<>(suppliers.size());
+        suppliers.stream().forEach( s -> names.add(s.getName()));
+        names.sort(new PinYinComparator());
+/*        if(CollectionUtils.isNotEmpty(suppliers)){
+            suppliers.sort(new Comparator<Supplier>() {
+                @Override
+                public int compare(Supplier o1, Supplier o2) {
+                    try {
+                        String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+                        String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+                        return name1.compareTo(name2);
+                    } catch (PinyinException e) {
+                        e.printStackTrace();
+                        return 0;
+                    }
+                }
+            });
+        }*/
+        return names;
+    }
+
+    public void setNothing(){
+
+    }
+
+    public Integer getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(Integer manufactureId) {
+        this.manufactureId = manufactureId;
     }
 
     /**

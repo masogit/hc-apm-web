@@ -474,11 +474,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
         } else if(queryIndex == 2){
             //正常已借出
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
+            //JIRA#2898
+            //searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
+            //JIRA#2898
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUids));
         }
 
 

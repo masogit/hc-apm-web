@@ -216,7 +216,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             filterAssetDeptOrg = null;
             assetDeptOrgUidSet = null;
             clinicalDeptOrgUidSet = null;
+
+            assetGroup = null;
+            assetGroupSecondary = null;
+            filterAssetStatus = null;
+
+            clearSearchFiltersInTable();
+
         }
+    }
+
+    private void clearSearchFiltersInTable() {
+        this.removeFilterOnField("name");
+        this.removeFilterOnField("functionType");
+        this.removeFilterOnField("serialNum");
+        this.removeFilterOnField("departNum");
+        this.removeFilterOnField("assetGroup");
+        this.removeFilterOnField("assetGroupSecondary");
+        this.removeFilterOnField("manufacture");
+        this.removeFilterOnField("vendor");
+        this.removeFilterOnField("status");
+        this.removeFilterOnField("warrantyDate");
+        this.removeFilterOnField("financingNum");
+        this.removeFilterOnField("qrCode");
+
     }
 
     private void loadClinicalDeptList() {
@@ -378,6 +401,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+            assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
