@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import { connect } from 'dva'
 import { uniqBy } from 'lodash-es'
 import nursePicBg from '#/assets/bgd.png'
-import nursePic from '#/assets/nurse.png'
+// import nursePic from '#/assets/nurse.png'
 import { strLocaleComparator, numComparator } from '#/utils'
 import './index.scss'
 
@@ -16,7 +16,7 @@ export function getComparator(key, comparator) {
 const Header = () => (
   <div className="asset-overview-header">
     <img src={nursePicBg}/>
-    <img src={nursePic}/>
+    {/* <img src={nursePic}/> */}
   </div>
 )
 

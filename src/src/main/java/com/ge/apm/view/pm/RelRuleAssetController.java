@@ -224,8 +224,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
 		}
-		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+/*		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}*/
+		if(null != queryAsset.getManufactureId()){
+			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
 		}
 		if (queryAsset.getAssetGroup() != null) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
@@ -260,7 +263,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		}
 		if(StringUtils.isNotEmpty(name)){
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
-        }
+        }else if(StringUtils.isNotEmpty(queryAsset.getName())){
+			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+		}
 		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
         rules.sort(new Comparator<PmOrderRule>() {
 			@Override

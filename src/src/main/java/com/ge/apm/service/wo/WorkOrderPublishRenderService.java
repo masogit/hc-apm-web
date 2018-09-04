@@ -7,6 +7,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -72,7 +73,10 @@ public class WorkOrderPublishRenderService {
     }
 
     private String getFileName(Map<String, Object> map, int index) {
-        return "WO" + index + "-" + map.get("设备名称") + "-" + map.get("报修单号") + ".docx";
+        String deviceName = (String) map.get("设备名称");
+        deviceName = StringUtils.replace(deviceName, "\\", "-");
+        deviceName = StringUtils.replace(deviceName, "/", "-");
+        return "WO" + index + "-" + deviceName + "-" + map.get("报修单号") + ".docx";
     }
 
     private String encoding(String fileName) {

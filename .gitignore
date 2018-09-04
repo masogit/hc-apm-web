@@ -34,3 +34,6 @@ edgeServer/.project
 edgeServer/.settings/
 edgeServer/.classpath
 edgeServer/target
+/src/build-deploy-from-git.bat
+/src/buildFromGit.bat
+/src/buildpushToServer.bat

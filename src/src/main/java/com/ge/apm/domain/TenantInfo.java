@@ -104,6 +104,9 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "active_type")
     private Integer activeType;//0 means super admin ,1 means by tenant user
+    
+    @Column(name="tenant_config")
+    private String tenantConfig;
 
     public Integer getType() {
 		return type;
@@ -308,7 +311,15 @@ public class TenantInfo implements Serializable {
         isInsulate = insulate;
     }
 
-    @Override
+    public String getTenantConfig() {
+		return tenantConfig;
+	}
+
+	public void setTenantConfig(String tenantConfig) {
+		this.tenantConfig = tenantConfig;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
