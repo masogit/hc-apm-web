@@ -183,6 +183,12 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "approver_name")
     private String approverName;
 
+    @Column(name = "signature")
+    private String signature;
+
+    @Column(name = "ack_signature")
+    private String ackSignature;
+
     public Integer getDispatchMode() {
         return dispatchMode;
     }
@@ -526,8 +532,22 @@ public class V2_WorkOrder implements Serializable {
     public void setApproverName(String approverName) {
         this.approverName = approverName;
     }
-    
-    
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getAckSignature() {
+        return ackSignature;
+    }
+
+    public void setAckSignature(String ackSignature) {
+        this.ackSignature = ackSignature;
+    }
 
     @Override
     public int hashCode() {
