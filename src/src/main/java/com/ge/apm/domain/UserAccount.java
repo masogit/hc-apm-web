@@ -156,7 +156,7 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "wechat_nickname")
 	private String wechatNickname;
 
-	@Column(name = "location")
+	@Column(name = "region")
 	private Integer region = 1;//地区
 
 	@CreatedBy
