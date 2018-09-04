@@ -52,28 +52,28 @@ class AssetTable extends React.Component {
         dataIndex: 'name',
         key: 'name',
         sorter: getComparator('name', strLocaleComparator),
-        width: '25%',
+        width: '30%',
       },
       {
         title: t`资产编号`,
         dataIndex: 'financingNum',
         key: 'financingNum',
         sorter: getComparator('financingNum', strLocaleComparator),
-        width: '25%',
+        width: '30%',
       },
       {
         title: t`设备分类`,
         dataIndex: 'assetGroupName',
         key: 'assetGroupName',
         sorter: getComparator('assetGroupName', strLocaleComparator),
-        width: '25%',
+        width: '20%',
       },
       {
         title: t`使用科室`,
         dataIndex: 'clinicalDeptName',
         key: 'clinicalDeptName',
         sorter: getComparator('clinicalDeptName', strLocaleComparator),
-        width: '25%',
+        width: '20%',
       },
     ]
   }
@@ -101,7 +101,7 @@ class AssetTable extends React.Component {
 export class AssetOverview extends React.Component {
 
   render() {
-    let { t, assets, count } = this.props
+    let { t, assets } = this.props
 
     let typeCount = assets.length
     return (
@@ -111,7 +111,7 @@ export class AssetOverview extends React.Component {
 
         <div className="asset-overview-content">
           <Header />
-          <Count t={t} all={count} type={_.uniqBy(assets, a => a.assetGroup).length}/>
+          <Count t={t} all={assets.length} type={_.uniqBy(assets, a => a.assetGroup).length}/>
           <AssetTable t={t} data={assets} />
         </div>
 
@@ -124,7 +124,6 @@ export class AssetOverview extends React.Component {
 function mapState2Props(state) {
   return {
     assets: state.Nurse.assets,
-    count: state.Nurse.assetTotalCount,
   }
 }
 

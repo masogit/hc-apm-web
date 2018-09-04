@@ -307,7 +307,12 @@ public class AssetInfoFormatter {
     }
 
     public String getClinicalDeptName() {
-        return assetInfo.getClinicalDeptName();
+        if (assetInfo.getClinicalDeptUID() == null) return null;
+
+        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getShortName();
     }
 
     public Integer getAssetGroup() {
@@ -335,7 +340,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getName();
+        return orgInfo.getShortName();
     }
 
     public Integer getAssetOwnerId() {

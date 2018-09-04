@@ -179,7 +179,7 @@ public class OrgInfoService {
                             if (sameNameOrg != null) {
                                 throw new Exception(name + "已经存在!");
                             }
-
+                            found.setShortName(name);
                             found.setName(name);
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
@@ -426,7 +426,7 @@ public class OrgInfoService {
                 map.put("院区", siteLevelOrg.getName());
             }
 
-            map.put("科室", orgInfo.getName());
+            map.put("科室", orgInfo.getShortName());
 
         }
 
@@ -441,6 +441,24 @@ public class OrgInfoService {
         List<OrgInfo> children = orgInfoList.stream().filter(orgInfo -> parentUid.equals(orgInfo.getParentUID())).collect(Collectors.toList());
 
         return children;
+
+    }
+
+    @Transactional
+    public void saveOrg(OrgInfo selected) {
+
+    }
+
+    public String buildFullPathOrgName(OrgInfo currentOrg) {
+        if (currentOrg.getOrgType() < 4) return currentOrg.getShortName();
+
+        LinkedList<String> names = new LinkedList<>();
+        while (currentOrg != null && (currentOrg.getOrgType() == 4)) {
+            names.addFirst(currentOrg.getShortName());
+            currentOrg = orgDao.findByUid(currentOrg.getParentUID());
+        }
+
+        return names.stream().collect(Collectors.joining("-"));
 
     }
 

@@ -526,6 +526,41 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
+	
+	public void supplementMaintainWithoutItem(List<NurseSiteMaintain> listTempMaintain){
+		Set<String> setModifyByUids=new HashSet<String>();
+		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
+		List<UserAccount> listModify=null;
+		Set<String> nurseSiteMaintainIds=new HashSet<String>();
+		if(listTempMaintain!=null && listTempMaintain.size()>0){
+			for(int i=0;i<listTempMaintain.size();++i){
+				NurseSiteMaintain tempMaintain=listTempMaintain.get(i);
+				nurseSiteMaintainIds.add(tempMaintain.getId());
+				setModifyByUids.add(tempMaintain.getCreateByUid());
+				setModifyByUids.add(tempMaintain.getModifyByUid());
+			}
+		}
+		if (setModifyByUids.size() > 0) {
+			listModify=userAccountRepository.getSimpleByUids(setModifyByUids);
+		}
+		if(listModify!=null){
+			for(int i=0;i<listModify.size();++i){
+				UserAccount tempUser=listModify.get(i);
+				mapModifyBy.put(tempUser.getUid(), tempUser);
+			}
+		}
+		if(listTempMaintain!=null && listTempMaintain.size()>0){
+			for(int i=0;i<listTempMaintain.size();++i){
+				NurseSiteMaintain tempMaintain=listTempMaintain.get(i);
+				if(StringUtils.isNotEmpty(tempMaintain.getModifyByUid())){
+					tempMaintain.setModifyBy(mapModifyBy.get(tempMaintain.getModifyByUid()));
+				}
+				if(StringUtils.isNotEmpty(tempMaintain.getCreateByUid())){
+					tempMaintain.setCreateBy(mapModifyBy.get(tempMaintain.getCreateByUid()));
+				}
+			}
+		}
+	}
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
 		Set<NurseSiteMaintainItem> listItem = null;
