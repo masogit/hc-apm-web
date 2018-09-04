@@ -156,6 +156,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "wechat_nickname")
 	private String wechatNickname;
 
+	@Column(name = "location")
+	private Integer region = 1;//地区
+
 	@CreatedBy
 	@Column(name = "created_by", nullable = true, length = 50, updatable = false)
 	@JsonIgnore
@@ -267,6 +270,14 @@ public class UserAccount implements ChineseName, Serializable {
 		isLocalAdmin = false;
 		isActive = false;
 		isOnline = false;
+	}
+
+	public Integer getRegion() {
+		return region;
+	}
+
+	public void setRegion(Integer region) {
+		this.region = region;
 	}
 
 	public String getOrgInfoUID() {

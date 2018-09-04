@@ -1,12 +1,12 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.*;
 
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.common.UserCommonService;
@@ -15,13 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.NodeSelectEvent;
@@ -29,9 +22,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
 import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.QrCodeLib;
 import org.primefaces.util.TreeUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.service.UserContext;
@@ -46,6 +36,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     UserAccount userAccount;
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoService orgInfoService;
+    private UserOrgInfoRepository userOrgDao;
+
     private boolean acShow = false;
 
     private String orgName;
@@ -67,6 +59,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
+        userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
 
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
@@ -324,6 +317,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
 
+        boolean isNew = selected.getId() == null ? true : false;
+
         selected.setShortName(orgName);
         String name = orgInfoService.buildFullPathOrgName(selected);
         selected.setName(name);
@@ -331,7 +326,25 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
 
-        assetInfoRepository.updateClinicalName(name, selected.getUid());
+        if (isNew) {
+            //如果是增加小科室，并且它的父科室已经属于用户，则把小科室的权限可见性也加进去。
+            if (selected.getOrgType() == 4 && selected.getParentOrg().getOrgType() == 4) {
+
+                List<String> userUids = userOrgDao.findUserUidListByOrgUid(selected.getParentOrg().getUid());
+                for (String userUid: userUids) {
+                    UserOrgInfo found = userOrgDao.findFirstByUserUidAndOrgUid(userUid, selected.getUid());
+                    if (found == null) {
+                        found = new UserOrgInfo();
+                        found.setUserUid(userUid);
+                        found.setOrgUid(selected.getUid());
+                        found.setOrgType(4);
+                        userOrgDao.save(found);
+                    }
+                }
+            }
+        } else {
+            assetInfoRepository.updateClinicalName(name, selected.getUid());
+        }
 
         initWorkflowConfig();
         buildOrdTree();
@@ -365,6 +378,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void deleteSelectedOrg() {
         if (canDelete()) {
+
 
             super.delete();
             buildOrdTree();

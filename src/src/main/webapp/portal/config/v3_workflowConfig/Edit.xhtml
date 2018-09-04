@@ -307,6 +307,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>-->
                             <h:panelGroup>
+                                <label class ="label">#{msg.generateMethod}</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:other" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class ="label">初始流水号</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
                                     <p:ajax process="@this" />
@@ -314,13 +321,7 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <label class ="label">#{msg.generateMethod}</label>
-                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
-                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:other" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+
                             <h:panelGroup style="display: #{(v2_WorkflowConfigController.selected.generateMethod == 1) or (v2_WorkflowConfigController.selected.generateMethod == 3) ? 'auto' : 'none'}">
                                 <label class ="label" >资产编号前缀(最多三位)</label>
                                 <p:inputText id="prefix" value="#{v2_WorkflowConfigController.selected.prefix}" maxlength="4" ><p:ajax process="@this"></p:ajax></p:inputText>

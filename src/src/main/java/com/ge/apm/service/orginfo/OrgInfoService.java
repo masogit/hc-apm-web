@@ -179,7 +179,7 @@ public class OrgInfoService {
                             if (sameNameOrg != null) {
                                 throw new Exception(name + "已经存在!");
                             }
-
+                            found.setShortName(name);
                             found.setName(name);
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
@@ -426,7 +426,7 @@ public class OrgInfoService {
                 map.put("院区", siteLevelOrg.getName());
             }
 
-            map.put("科室", orgInfo.getName());
+            map.put("科室", orgInfo.getShortName());
 
         }
 

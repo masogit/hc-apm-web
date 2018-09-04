@@ -7,6 +7,17 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('AssetInfoListForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+
+                PF('varDataList').filter();
+            }
+        </script>
+
         <style>
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
@@ -110,9 +121,23 @@
                                 <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                                     <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                        <p:selectOneMenu onchange="handleAssetGroupChange()"  autoWidth="false" style="max-width: 150px;" height="200" value="#{assetInfoListController.assetGroup}">
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="@(.assetGroupChange)" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetGroupSecondary'}">
+                                <p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondary}" filterBy="#{item.assetGroupSecondary}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(item.assetGroup), item.assetGroupSecondary)}"/>
+
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu id="assetGroupSeconday" onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200" class="assetGroupChange" value="#{assetInfoListController.assetGroupSecondary}">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{assetInfoListController.assetGroupSecondayList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <p:ajax listener="#{assetInfoListController.assetGroupSecondaryChangeListener}"/>
                                         </p:selectOneMenu>
                                     </f:facet>
                                 </p:column>
@@ -126,10 +151,10 @@
                                 <p:column headerText="#{msg.assetDeptName}"  width="100">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetDeptName}"/><br/>
-                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" converter="orgInfoColumnFilterConverter"
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}">
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                            <!--<p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />-->
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{assetInfoListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
@@ -139,12 +164,10 @@
                                 <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                        <!--<p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>-->
-                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" converter="orgInfoColumnFilterConverter"
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5" var="t" itemLabel="#{t.name}" itemValue="#{t}"
-                                                        >
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                            <!--<p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />-->
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptName}"/>

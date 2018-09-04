@@ -28,7 +28,7 @@
                                         <p:ajax process="@this" event="collapse"/>
 
                                         <p:treeNode type="org">
-                                            <h:outputText value="#{node}"/>
+                                            <h:outputText value="#{node.shortName}"/>
                                         </p:treeNode>
                                     </p:tree>
                                 </p:scrollPanel>
@@ -49,6 +49,13 @@
                         <h:panelGroup>
                             <label class="label">#{msg.telephone}</label>
                             <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">地区</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.region}" >
+                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="false">
                             <p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>
