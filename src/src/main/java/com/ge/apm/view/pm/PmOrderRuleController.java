@@ -392,16 +392,18 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         List<RelRuleAsset> deleteList = new ArrayList<>(relRuleAssets.size());
         if(CollectionUtils.isNotEmpty(relRuleAssets)){
             for (RelRuleAsset rra :relRuleAssets) {
-                if(rra.getRuleUID().equals(uid)){
+                if(StringUtils.isNotEmpty(rra.getRuleUID()) && rra.getRuleUID().equals(uid)){
                     if(StringUtils.isEmpty(rra.getRuleUID2())){
                         deleteList.add(rra);
                     }else{
+                        rra.setRuleUID(null);
                         updateList.add(rra);
                     }
-                }else if(rra.getRuleUID2().equals(uid)){
+                }else if(StringUtils.isNotEmpty(rra.getRuleUID2()) && rra.getRuleUID2().equals(uid)){
                     if(StringUtils.isEmpty(rra.getRuleUID())){
                         deleteList.add(rra);
                     }else{
+                        rra.setRuleUID2(null);
                         updateList.add(rra);
                     }
                 }
