@@ -266,6 +266,12 @@
             <p:inputText id="assetUsage" value="#{fieldMsg.fieldValue('assetUsage', assetInfoDetailController.selected.assetUsage)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetValueCategory')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetValueCategory}</label>
+            <p:inputText value="#{fieldMsg.fieldValue('assetValueCategory', assetInfoDetailController.selected.assetValueCategory)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'capitalSource')}">
         <h:panelGroup >
             <label class="label">#{msg.capitalSource}</label>
