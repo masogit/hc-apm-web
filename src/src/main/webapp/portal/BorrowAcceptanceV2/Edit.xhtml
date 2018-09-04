@@ -76,7 +76,7 @@
                             <!--<f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>-->
                             <!--&lt;!&ndash;<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>&ndash;&gt;-->
                         <!--</p:cellEditor>-->
-                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true"
+                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" required="true" emptyValue="0"
                                        requiredMessage="预计借用数不能为空！" minValue="0" maxValue="#{item.applyQty}">
                             <p:ajax update=":IouEditForm:confirmBtn"/>
                         </p:inputNumber>
