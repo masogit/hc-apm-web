@@ -2,10 +2,12 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,9 +62,11 @@ public class WorkOrderExportService {
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
     @Autowired
     UserAccountRepository userAccountDao;
+    @Autowired
+    private BlobFileService blobService;
 
     //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
-    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner) {
+    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList, OrgInfo clinicalDept, UserAccount currentOwner) {
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
@@ -83,11 +88,11 @@ public class WorkOrderExportService {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
         }
-        
-        if(clinicalDept !=null){
+
+        if (clinicalDept != null) {
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
         }
-        if(currentOwner !=null){
+        if (currentOwner != null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
         }
 
@@ -151,10 +156,10 @@ public class WorkOrderExportService {
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
             if (sendStep != null) {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
-            }else{
+            } else {
                 workOrderMap.put("派工人", "无");
             }
-            if(sendStep_2 != null){
+            if (sendStep_2 != null) {
                 workOrderMap.put("派工时间", formatDate(sendStep_2.getStartTime()));
             }
             workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()) : "");
@@ -168,6 +173,24 @@ public class WorkOrderExportService {
             }
             workOrderMap.put("签到时间", formatDate(workOrder.getCheckinTime()));
             workOrderMap.put("维修工时", workOrder.getTotalManHour());
+
+            String signatureId = workOrder.getSignature();
+            try {
+                if (signatureId != null) {
+                    workOrderMap.put("signature", IOUtils.toByteArray(blobService.getBlobObjectByStorageId(signatureId).getStream()));
+                }
+            } catch (IOException ignore) {
+                //ignore
+            }
+            String ackSignatureId = workOrder.getAckSignature();
+            try {
+                if (ackSignatureId != null) {
+                    workOrderMap.put("ack_signature", IOUtils.toByteArray(blobService.getBlobObjectByStorageId(ackSignatureId).getStream()));
+                }
+            } catch (IOException ignore) {
+                //ignore
+            }
+
             String info = "";
             double infoTotalPrice = 0;
             List<Map<String, Object>> parts = new ArrayList<>();
@@ -246,11 +269,11 @@ public class WorkOrderExportService {
 
             //计算距上次报修天数
             String nearestWorkDay = "";
-            if(!closeWorkOrderList.isEmpty() && workOrder.getCreatedDate() != null){
+            if (!closeWorkOrderList.isEmpty() && workOrder.getCreatedDate() != null) {
                 closeWorkOrderList = closeWorkOrderList.stream().filter(item -> item.getCloseTime() != null && item.getCloseTime().before(workOrder.getCreatedDate())).collect(Collectors.toList());
-                if(!closeWorkOrderList.isEmpty()){
+                if (!closeWorkOrderList.isEmpty()) {
                     Date closeTime = closeWorkOrderList.get(0).getCloseTime();
-                    int days = (int) ((workOrder.getCreatedDate().getTime() - closeTime.getTime()) / (1000*3600*24));
+                    int days = (int) ((workOrder.getCreatedDate().getTime() - closeTime.getTime()) / (1000 * 3600 * 24));
                     nearestWorkDay = String.valueOf(days);
                 }
             }
