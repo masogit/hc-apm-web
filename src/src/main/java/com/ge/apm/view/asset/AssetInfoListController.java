@@ -216,7 +216,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             filterAssetDeptOrg = null;
             assetDeptOrgUidSet = null;
             clinicalDeptOrgUidSet = null;
+
+            assetGroup = null;
+            assetGroupSecondary = null;
+            filterAssetStatus = null;
+
+            clearSearchFiltersInTable();
+
         }
+    }
+
+    private void clearSearchFiltersInTable() {
+        this.removeFilterOnField("name");
+        this.removeFilterOnField("functionType");
+        this.removeFilterOnField("serialNum");
+        this.removeFilterOnField("departNum");
+        this.removeFilterOnField("assetGroup");
+        this.removeFilterOnField("assetGroupSecondary");
+        this.removeFilterOnField("manufacture");
+        this.removeFilterOnField("vendor");
+        this.removeFilterOnField("status");
+        this.removeFilterOnField("warrantyDate");
+        this.removeFilterOnField("financingNum");
+        this.removeFilterOnField("qrCode");
+
     }
 
     private void loadClinicalDeptList() {
