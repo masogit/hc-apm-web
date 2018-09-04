@@ -1,12 +1,12 @@
 package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.data.PictureRenderData;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.faces.context.FacesContext;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,6 +84,28 @@ public class WorkOrderDocxRenderService {
         datas.put("proceed_table", map.get("维修流程"));
         datas.put("audit_table", map.get("serviceRequestMessages"));
 
+        byte[] data = null;
+        try {
+            data = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/dot.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (map.containsKey("signature")) {
+            System.out.println("found");
+            datas.put("signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("signature")));
+            datas.put("signature_space", "");
+        } else {
+            datas.put("signature", new PictureRenderData(1, 1, "mock.png", data));
+            datas.put("signature_space", "_______________");
+        }
+        if (map.containsKey("ack_signature")) {
+            System.out.println("found");
+            datas.put("ack_signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("ack_signature")));
+            datas.put("ack_signature_space", "");
+        } else {
+            datas.put("ack_signature", new PictureRenderData(1, 1, "mock.png", data));
+            datas.put("ack_signature_space", "_______________");
+        }
         return datas;
     }
 }
