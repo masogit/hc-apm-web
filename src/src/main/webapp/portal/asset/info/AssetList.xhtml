@@ -269,6 +269,11 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetValueCategory'}">
+                                <p:column headerText="#{msg.assetValueCategory}" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetValueCategory', item.assetValueCategory)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'capitalSource'}">
                                 <p:column headerText="#{msg.capitalSource}" >
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
