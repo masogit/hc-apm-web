@@ -475,6 +475,16 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetValueCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetValueCategory}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetValueCategory'].required? '*':''}</span></label>
+            <p:selectOneMenu value="#{assetInfoEditController.selected.assetValueCategory}" required="#{assetInfoEditController.customConfig.assetFields['assetValueCategory'].required}" 
+                         requiredMessage="#{msg.assetValueCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetValueCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetValueCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'capitalSource')}" >
         <h:panelGroup>
             <label class="label">#{msg.capitalSource}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['capitalSource'].required? '*':''}</span></label>
