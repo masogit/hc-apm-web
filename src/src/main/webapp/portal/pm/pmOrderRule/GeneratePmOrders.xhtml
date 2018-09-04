@@ -41,10 +41,10 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-							 <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.manufactureId}" >
+							 <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.manufactureId}" style="max-width: 200px">
 								 <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
 								 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-								 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+								 <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
 							 </p:selectOneMenu>
 		                      <!--<p:inputText  value="#{generatePmOrdersController.queryAsset.manufacture}"  disabled="#{generatePmOrdersController.level == null}">
 	                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
