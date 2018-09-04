@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -205,6 +206,9 @@ public class ElectricSafetyData implements Serializable {
 	@JoinColumn(name = "v2_pm_order_id", referencedColumnName = "id",updatable=false,insertable=false)
     @ManyToOne(fetch = FetchType.EAGER,optional=true)
     private V2_PmOrder v2PmOrder;
+	
+	@Transient
+	private List<V2_PmOrder> listV2PmOrder;
 
 	// 文件名
 	@Transient
@@ -344,6 +348,14 @@ public class ElectricSafetyData implements Serializable {
 
 	public void setV2PmOrder(V2_PmOrder v2PmOrder) {
 		this.v2PmOrder = v2PmOrder;
+	}
+
+	public List<V2_PmOrder> getListV2PmOrder() {
+		return listV2PmOrder;
+	}
+
+	public void setListV2PmOrder(List<V2_PmOrder> listV2PmOrder) {
+		this.listV2PmOrder = listV2PmOrder;
 	}
 
 	public String getV2_PmOrderId() {
