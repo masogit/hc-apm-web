@@ -535,5 +535,9 @@ public class V2_PmOrderService {
     public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
         return msgDao.findBySrIdOrderBySendTime(id);
     }
+    
+    public V2_PmOrder findById(String id){
+    	return woDao.findById(id);
+    }
 }
 
