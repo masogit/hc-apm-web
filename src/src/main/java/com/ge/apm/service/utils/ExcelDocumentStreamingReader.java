@@ -19,7 +19,7 @@ import java.util.*;
  *
  * @author Quan Tang
  */
-public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, Cell>> {
+public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, ExcelDocument.ValueWrapper>> {
     private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingReader.class);
 
     Workbook workBook;
@@ -92,7 +92,7 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
     }
 
     @Override
-    public Iterator<Map<String, Cell>> iterator() {
+    public Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator() {
 
 //        int currentRow = 0;
 
@@ -109,7 +109,7 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         return new DataIterator(iterator);
     }
 
-    public class DataIterator implements Iterator<Map<String, Cell>> {
+    public class DataIterator implements Iterator<Map<String, ExcelDocument.ValueWrapper>> {
 
         Iterator<Row> iterator;
 
@@ -123,9 +123,9 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         }
 
         @Override
-        public Map<String, Cell> next() {
+        public Map<String, ExcelDocument.ValueWrapper> next() {
 
-            Map<String, Cell> map = new HashMap<>();
+            Map<String, ExcelDocument.ValueWrapper> map = new HashMap<>();
 
             Row row = iterator.next();
 
@@ -135,8 +135,10 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
                     break;
                 }
 
+                ExcelDocument.ValueWrapper wrapper = ExcelDocument.getCellValueWrapper(cell);
+
                 String columnTitle = columnTitles[cellIndex];
-                map.put(columnTitle, cell);
+                map.put(columnTitle, wrapper);
 
                 ++cellIndex;
             }
