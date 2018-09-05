@@ -46,9 +46,10 @@ public class ExcelDocumentStreamingReaderTest {
 
         ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
 
-        Iterator<Map<String, Cell>> iter = doc.iterator();
-        Map<String, Cell> firstRowData = iter.next();
-        System.out.println(doc.getStringValue(firstRowData.get("设备编号")));
+        Iterator<Map<String, ExcelDocument.ValueWrapper>> iter = doc.iterator();
+        Map<String, ExcelDocument.ValueWrapper> firstRowData = iter.next();
+        ExcelDocument.ValueWrapper wrapper = firstRowData.get("设备编号");
+        System.out.println(wrapper.value);
 
     }
 
@@ -59,9 +60,10 @@ public class ExcelDocumentStreamingReaderTest {
 
         ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, 2, 3);
 
-        Iterator<Map<String, Cell>> iter = doc.iterator();
-        Map<String, Cell> firstRowData = iter.next();
-        System.out.println(doc.getStringValue(firstRowData.get(ExcelDocumentGenerator.orgHeaderTitle)));
+        Iterator<Map<String, ExcelDocument.ValueWrapper>> iter = doc.iterator();
+        Map<String, ExcelDocument.ValueWrapper> firstRowData = iter.next();
+        ExcelDocument.ValueWrapper wrapper = firstRowData.get(ExcelDocumentGenerator.orgHeaderTitle);
+        System.out.println(wrapper.value);
 
     }
 }
