@@ -31,8 +31,14 @@
 <!--                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                 <!--<f:selectItems value="#{assetInfoService.getClinicalDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>-->
                                 <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <p:ajax update=":SharedAssetRequestBorrowEditForm:orgLocation"/>
                             </p:selectOneMenu>
                             
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>科室位置</label>
+                            <h:outputText id="orgLocation" value="#{sharedAssetRequestV2Controller.getOrgLocation()}" />
                         </h:panelGroup>
                         
                         <h:panelGroup>
