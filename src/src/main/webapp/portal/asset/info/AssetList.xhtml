@@ -274,6 +274,11 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'capitalSource2'}">
+                                <p:column headerText="#{msg.capitalSource2}" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'measureGrade'}">
                                 <p:column headerText="#{msg.measureGrade}" >
                                     <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
@@ -326,7 +331,7 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'assetCode68'}">
                                 <p:column headerText="#{msg.assetCode68}"  >
-                                    <h:outputText value="#{item.assetCode68}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValue(item.functionGroup,item.assetCode68)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'functionGrade'}">
@@ -377,42 +382,42 @@
                             <c:if test="#{columnItem eq 'manufactDate'}">
                                 <p:column headerText="#{msg.manufactDate}" >
                                     <h:outputText value="#{item.manufactDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'purchaseDate'}">
                                 <p:column headerText="#{msg.purchaseDate}" >
                                     <h:outputText value="#{item.purchaseDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'arriveDate'}">
                                 <p:column headerText="#{msg.arriveDate}" >
                                     <h:outputText value="#{item.arriveDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'installDate'}">
                                 <p:column headerText="#{msg.installDate}" >
                                     <h:outputText value="#{item.installDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'terminateDate'}">
                                 <p:column headerText="#{msg.terminateDate}" >
                                     <h:outputText value="#{item.terminateDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'factoryWarrantyDate'}">
                                 <p:column headerText="质保日期" >
                                     <h:outputText value="#{item.factoryWarrantyDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
