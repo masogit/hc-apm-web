@@ -29,7 +29,7 @@ public class TenantInfoConfig  {
 	private Boolean blnArrivalInstallation=false;
 	//设备档案,设备档案
 	private Boolean blnAssetMDM=false;
-	
+	//设备调剂
 	private Boolean blnAssetBorrow=false;
 	//维修流程,维修管理(不含排班管理)
 	private Boolean blnWorkOrderMgmtWithoutWorkSchedule=false;
@@ -58,7 +58,7 @@ public class TenantInfoConfig  {
 	}
 	public void setBlnAssetMDM(Boolean blnAssetMDM) {
 		this.blnAssetMDM = blnAssetMDM;
-	}
+	} 
 	public Boolean getBlnWorkOrderMgmtWithoutWorkSchedule() {
 		return blnWorkOrderMgmtWithoutWorkSchedule;
 	}
@@ -231,11 +231,11 @@ public class TenantInfoConfig  {
 	public void setValueWithVersion(String str){
 		this.blnWorkOrderMgmt=true;
 		this.blnNurseSite=true;
-		this.blnMeasuringMgmt=true;
+		this.blnAssetBorrow=true;
 		
 		this.blnArrivalInstallation=true;
 		this.blnAssetMDM=true;
-		this.blnAssetBorrow=true;
+		this.blnMeasuringMgmt=true;
 		this.blnWorkOrderMgmtWithoutWorkSchedule=true;
 		this.blnPreventiveMaintainceMgmt=true;
 		this.blnDeviceOperationKPIAnalysis=true;
@@ -247,12 +247,12 @@ public class TenantInfoConfig  {
 		else if(str.equals(VERSION_ULTRASOUND)){
 			this.blnWorkOrderMgmt=false;
 			this.blnNurseSite=false;
-			this.blnMeasuringMgmt=false;
+			this.blnAssetBorrow=false;
 		}
 		else if(str.equals(VERSION_FUNCTION)){
 			this.blnWorkOrderMgmt=false;
 			this.blnNurseSite=false;
-			this.blnMeasuringMgmt=false;
+			this.blnAssetBorrow=false;
 		}
 		else{
 			
