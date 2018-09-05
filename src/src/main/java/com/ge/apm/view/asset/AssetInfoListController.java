@@ -401,6 +401,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+            assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
