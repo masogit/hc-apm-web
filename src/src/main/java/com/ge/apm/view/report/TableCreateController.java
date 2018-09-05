@@ -346,6 +346,7 @@ public class TableCreateController extends TieWebSheetBean {
             return;
         }
         this.isStringEditable = false;
+        this.saveTemplate();
     }
 
     public void prepareAddOption() {
