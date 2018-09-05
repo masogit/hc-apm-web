@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -174,22 +175,8 @@ public class WorkOrderExportService {
             workOrderMap.put("签到时间", formatDate(workOrder.getCheckinTime()));
             workOrderMap.put("维修工时", workOrder.getTotalManHour());
 
-            String signatureId = workOrder.getSignature();
-            try {
-                if (signatureId != null) {
-                    workOrderMap.put("signature", IOUtils.toByteArray(blobService.getBlobObjectByStorageId(signatureId).getStream()));
-                }
-            } catch (IOException ignore) {
-                //ignore
-            }
-            String ackSignatureId = workOrder.getAckSignature();
-            try {
-                if (ackSignatureId != null) {
-                    workOrderMap.put("ack_signature", IOUtils.toByteArray(blobService.getBlobObjectByStorageId(ackSignatureId).getStream()));
-                }
-            } catch (IOException ignore) {
-                //ignore
-            }
+            putBlob(workOrderMap, workOrder.getSignature(), "signature");
+            putBlob(workOrderMap, workOrder.getAckSignature(), "ack_signature");
 
             String info = "";
             double infoTotalPrice = 0;
@@ -321,6 +308,16 @@ public class WorkOrderExportService {
         }
 
         return resultList;
+    }
+
+    private void putBlob(Map<String, Object> workOrderMap, String storageId, String key) {
+        if (storageId != null) {
+            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
+                workOrderMap.put(key, IOUtils.toByteArray(stream));
+            } catch (IOException ignore) {
+                //ignore
+            }
+        }
     }
 
     private void putServiceRequestMessage(V2_WorkOrder workOrder, Map<String, Object> workOrderMap) {
