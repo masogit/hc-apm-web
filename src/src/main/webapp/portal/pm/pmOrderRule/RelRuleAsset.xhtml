@@ -27,7 +27,7 @@
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
 		                     <p:selectOneMenu value="#{relRuleAssetController.queryAsset.assetGroup}" disabled="false" >
-		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
+		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
@@ -35,7 +35,7 @@
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
                              <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" style="max-width: 200px">
-                                 <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+                                 <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this" />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                  <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                              </p:selectOneMenu>
@@ -46,13 +46,13 @@
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>
 		                      <p:inputText  value="#{relRuleAssetController.queryAsset.functionType}"  required="false">
-	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
+	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
 	                          </p:inputText>
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.clinicalDeptName}</label>
 		                      <p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
-		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
+		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
 		                      </p:selectOneMenu>
@@ -60,14 +60,14 @@
                        <h:panelGroup >
                            <label class ="label">#{msg.brand}</label>
                            <p:inputText  value="#{relRuleAssetController.queryAsset.brand}"  disabled="false">
-                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this" />
                            </p:inputText>
                        </h:panelGroup>
 
 		                  <h:panelGroup >
                                 <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
                                 <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
-                                		<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" />
+                                		<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
