@@ -5,8 +5,10 @@ import com.deepoove.poi.data.PictureRenderData;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
-import javax.faces.context.FacesContext;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +16,18 @@ import java.util.Map;
 public class WorkOrderDocxRenderService {
 
     static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
+    private static byte[] data = null;
+
+    private byte[] getEmptyImage() {
+        if (data == null) {
+            try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("/image/dot.png")) {
+                data = IOUtils.toByteArray(inputStream);
+            } catch (IOException ignore) {
+                // ignore
+            }
+        }
+        return data;
+    }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
@@ -84,18 +98,13 @@ public class WorkOrderDocxRenderService {
         datas.put("proceed_table", map.get("维修流程"));
         datas.put("audit_table", map.get("serviceRequestMessages"));
 
-        byte[] data = null;
-        try {
-            data = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/dot.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         if (map.containsKey("signature")) {
             System.out.println("found");
             datas.put("signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("signature")));
             datas.put("signature_space", "");
         } else {
-            datas.put("signature", new PictureRenderData(1, 1, "mock.png", data));
+            datas.put("signature", new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
             datas.put("signature_space", "_______________");
         }
         if (map.containsKey("ack_signature")) {
@@ -103,7 +112,7 @@ public class WorkOrderDocxRenderService {
             datas.put("ack_signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("ack_signature")));
             datas.put("ack_signature_space", "");
         } else {
-            datas.put("ack_signature", new PictureRenderData(1, 1, "mock.png", data));
+            datas.put("ack_signature", new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
             datas.put("ack_signature_space", "_______________");
         }
         return datas;
