@@ -19,8 +19,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class WorkOrderDocxRenderServiceTest {
 
-
-    @Spy
     WorkOrderDocxRenderService workOrderDocxRenderService;
 
     @Test

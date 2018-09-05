@@ -16,8 +16,7 @@ public class WorkOrderDocxRenderService {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
 
-    private static PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
-
+    private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
