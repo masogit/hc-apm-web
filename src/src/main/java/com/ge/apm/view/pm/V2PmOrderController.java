@@ -7,6 +7,7 @@ package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
@@ -67,6 +68,7 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final String EMPTY_SIGNATURE_HOLDER = "_____________";
 
     V2_PmOrderRepository dao;
     private Double totalManHours;
@@ -336,6 +338,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         content.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), accessoryInfoTable);
+
+        // Accessory Signature
+        String signatureStorageId = pmOrder.getSignature();
+        if (!Strings.isNullOrEmpty(signatureStorageId)) {
+            byte[] signatureBytes = pmOrderReportTemplateService.getSignatureBytes(signatureStorageId);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+            }
+        }
+
+        if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())){
+            byte[] signatureBytes = pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
+        }
 
         // Maintenance Workflow Information
         List<Map<String, Object>> maintenanceInfoTable = new ArrayList<>();
