@@ -9,6 +9,8 @@ import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -18,6 +20,7 @@ import java.util.*;
  * @author Quan Tang
  */
 public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, Cell>> {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingReader.class);
 
     Workbook workBook;
     Sheet sheet;
@@ -48,7 +51,9 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
 //        Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             Row row = iterator.next();
-            if (currentRow == keyRowNum - 1) {
+//            logger.info("row： {}", row.getRowNum());
+
+            if (row.getRowNum() == keyRowNum - 1) {
                 for (Cell cell : row) {
                     resultList.add(cell.getStringCellValue());
                 }
