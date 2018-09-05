@@ -2,7 +2,6 @@ package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -15,19 +14,10 @@ import java.util.Map;
 @Component
 public class WorkOrderDocxRenderService {
 
-    static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
-    private static byte[] data = null;
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
 
-    private byte[] getEmptyImage() {
-        if (data == null) {
-            try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("/image/dot.png")) {
-                data = IOUtils.toByteArray(inputStream);
-            } catch (IOException ignore) {
-                // ignore
-            }
-        }
-        return data;
-    }
+    private static PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
+
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
@@ -110,7 +100,7 @@ public class WorkOrderDocxRenderService {
             target.put(key, new PictureRenderData(100, 75, "mock.png", (byte[]) source.get(key)));
             target.put(absentKey, "");
         } else {
-            target.put(key, new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
+            target.put(key, EMPTY_PICTURE);
             target.put(absentKey, "_______________");
         }
     }
