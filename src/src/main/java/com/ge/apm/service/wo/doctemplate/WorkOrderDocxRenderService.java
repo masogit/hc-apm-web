@@ -99,22 +99,19 @@ public class WorkOrderDocxRenderService {
         datas.put("audit_table", map.get("serviceRequestMessages"));
 
 
-        if (map.containsKey("signature")) {
-            System.out.println("found");
-            datas.put("signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("signature")));
-            datas.put("signature_space", "");
-        } else {
-            datas.put("signature", new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
-            datas.put("signature_space", "_______________");
-        }
-        if (map.containsKey("ack_signature")) {
-            System.out.println("found");
-            datas.put("ack_signature", new PictureRenderData(100, 75, "mock.png", (byte[]) map.get("ack_signature")));
-            datas.put("ack_signature_space", "");
-        } else {
-            datas.put("ack_signature", new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
-            datas.put("ack_signature_space", "_______________");
-        }
+        mapBlob(map, datas, "signature", "signature_space");
+        mapBlob(map, datas, "ack_signature", "ack_signature_space");
+
         return datas;
+    }
+
+    private void mapBlob(Map<String, Object> source, Map<String, Object> target, String key, String absentKey) {
+        if (source.containsKey(key)) {
+            target.put(key, new PictureRenderData(100, 75, "mock.png", (byte[]) source.get(key)));
+            target.put(absentKey, "");
+        } else {
+            target.put(key, new PictureRenderData(1, 1, "mock.png", getEmptyImage()));
+            target.put(absentKey, "_______________");
+        }
     }
 }
