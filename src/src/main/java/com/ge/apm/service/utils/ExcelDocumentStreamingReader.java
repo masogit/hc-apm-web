@@ -37,6 +37,10 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         this(new FileInputStream(path), sheetIndex, keyRowNum, versionRowNum, versionColNum);
     }
 
+    public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum) {
+        this(input, sheetIndex, keyRowNum, null, null);
+    }
+
     public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) {
         this.workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
         this.sheet = workBook.getSheetAt(sheetIndex);
@@ -48,8 +52,6 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         this.iterator = sheet.rowIterator();
 
         getMetaData();
-
-
     }
 
     private void getMetaData() {
@@ -86,7 +88,7 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
     }
 
     private String getVersion(Row row) {
-        Cell cell = row.getCell(versionColNum);
+        Cell cell = row.getCell(versionColNum - 1);
         if (cell == null) return null;
         return cell.getStringCellValue();
     }
@@ -277,5 +279,9 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
 
     public Workbook getWorkBook() {
         return workBook;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }

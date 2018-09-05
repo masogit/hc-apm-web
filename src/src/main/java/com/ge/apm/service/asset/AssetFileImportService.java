@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Scope("prototype")
-public class AssetFileImportService {
+public class AssetFileImportService extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
     public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.4";
@@ -631,66 +631,6 @@ public class AssetFileImportService {
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
         return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(inputVersion);
-    }
-
-    /**
-     * export asset based on the asset import excel template
-     * @param assetList
-     * @return
-     * @throws IOException
-     */
-    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
-
-        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
-        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-        //fix template version
-        doc.writeCellData(AssetFileImportService.SHEET_ASSET, 2, 3, AssetFileImportService.EXCEL_ASSET_TEMPLATE_VERSION);
-        //remove fake data row
-        doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW);
-        
-        String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
-        List<String> fields = Arrays.asList(columnKeys).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) || 
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-        for(int i=0;i<columnKeys.length;i++){
-            if(!fields.contains(columnKeys[i])){
-                doc.writeCellData(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, i+1, "");
-                columnKeys[i]="";
-            }
-        }
-        int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
-        for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
-
-            doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
-
-            ++startRow;
-        }
-
-        String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
-
-        String sumFormula = String.format("SUM('Asset List'!$AA$7:$AA$%d)", assetList.size() + 6);
-
-        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
-        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
-        doc.getWorkBook().setForceFormulaRecalculation(true);
-        doc.calculateFormula();
-
-        //export org info list
-        for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
-            doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);
-        }
-
-        startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW;
-        for (OrgInfo orgInfo: clinicalDeptList) {
-            doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, orgInfo.getName());
-
-            ++startRow;
-        }
-        doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, "#");
-
-        return doc;
-
     }
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {

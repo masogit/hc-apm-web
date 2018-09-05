@@ -48,7 +48,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    private AssetFileImportService importService;
+//    private AssetFileImportService importService;
+    private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
@@ -123,7 +124,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
-        importService = WebUtil.getBean(AssetFileImportService.class);
+//        importService = WebUtil.getBean(AssetFileImportService.class);
+        exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -321,7 +323,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
+        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, exportFields);
 
         excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
