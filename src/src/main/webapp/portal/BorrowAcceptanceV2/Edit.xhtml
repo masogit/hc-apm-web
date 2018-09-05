@@ -29,7 +29,11 @@
                             <label class='label'>申请科室</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />
                             <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
-                        </h:panelGroup>   
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>科室位置</label>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getOrgLocation()}" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>虚拟网电话</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />

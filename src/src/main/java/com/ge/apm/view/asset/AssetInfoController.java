@@ -2031,6 +2031,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	}
 
 	public void prepareForceAllocateAsset(AssetInfo asset) {
+        if(StringUtils.isBlank(asset.getDepartNum())) {
+            WebUtil.addErrorMessage("请补充设备编号!");
+            return;
+        }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2045,6 +2049,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	}
 	
 	public void prepareForceReturnAsset(AssetInfo asset) {
+        if(StringUtils.isBlank(asset.getDepartNum())) {
+            WebUtil.addErrorMessage("请补充设备编号!");
+            return;
+        }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
