@@ -25,48 +25,70 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
     Workbook workBook;
     Sheet sheet;
     int keyRowNum;
+    Integer versionRowNum;
+    Integer versionColNum;
+
     String[] columnTitles;
+    String version;
+
     Iterator<Row> iterator;
 
-    public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum) throws IOException {
-        this(new FileInputStream(path), sheetIndex, keyRowNum);
+    public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) throws IOException {
+        this(new FileInputStream(path), sheetIndex, keyRowNum, versionRowNum, versionColNum);
     }
 
-    public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum) {
+    public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) {
         this.workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
         this.sheet = workBook.getSheetAt(sheetIndex);
+
         this.keyRowNum = keyRowNum;
+        this.versionRowNum = versionRowNum;
+        this.versionColNum = versionColNum;
+
         this.iterator = sheet.rowIterator();
 
-        this.columnTitles = getColumnTitles();
+        getMetaData();
 
 
     }
 
-    private String[] getColumnTitles() {
+    private void getMetaData() {
 
-        int currentRow = 0;
-
-        List<String> resultList = new ArrayList<>();
-//        Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             Row row = iterator.next();
 //            logger.info("row： {}", row.getRowNum());
 
-            if (row.getRowNum() == keyRowNum - 1) {
-                for (Cell cell : row) {
-                    resultList.add(cell.getStringCellValue());
+            if (versionRowNum != null) {
+                if (row.getRowNum() == versionRowNum.intValue() - 1) {
+                    version = getVersion(row);
                 }
+            }
+
+            if (row.getRowNum() == keyRowNum - 1) {
+                this.columnTitles = getColumnTitles(row);
 
                 break;
             }
 
-            ++currentRow;
+        }
+
+    }
+
+    private String[] getColumnTitles(Row row ) {
+        List<String> resultList = new ArrayList<>();
+        for (Cell cell : row) {
+            resultList.add(cell.getStringCellValue());
         }
 
         String[] columnTitles = resultList.toArray(new String[]{});
 
         return columnTitles;
+    }
+
+    private String getVersion(Row row) {
+        Cell cell = row.getCell(versionColNum);
+        if (cell == null) return null;
+        return cell.getStringCellValue();
     }
 
     @Override
