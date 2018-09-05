@@ -65,6 +65,28 @@ public class PmOrderReportTemplateService {
         return templateBytes;
     }
 
+    public byte[] getSignatureBytes(String storageId) {
+        byte[] signatureBytes = null;
+
+        try {
+            signatureBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(storageId).getStream());
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error happens while get signature bytes", e);
+        }
+
+        return signatureBytes;
+    }
+
+    public byte[] getDefaultSignatureBytes() {
+        byte[] data = null;
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("/image/dot.png")) {
+            data = IOUtils.toByteArray(inputStream);
+        } catch (IOException ignore) {
+            // ignore
+        }
+        return data;
+    }
+
     private PmOrderReportTemplate getPrioritizedTemplate(List<PmOrderReportTemplate> templates, List<String> uids) {
         for (String uid : uids) {
             Optional<PmOrderReportTemplate> op = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
