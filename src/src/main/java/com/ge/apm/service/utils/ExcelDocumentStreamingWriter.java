@@ -20,49 +20,82 @@ import java.util.*;
  *
  * @author Quan Tang
  */
-public class ExcelDocumentStreamingWriter implements Closeable, Iterable<Map<String, ExcelDocument.ValueWrapper>> {
+public class ExcelDocumentStreamingWriter implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingWriter.class);
 
     Workbook workBook;
-    Sheet sheet;
-    int keyRowNum;
 
-    String[] columnTitles;
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
 
-    Iterator<Row> iterator;
+    List<SheetMetaData> metaData;
+    Map<Integer, SheetMetaData> sheetMetaDataMap = new HashMap<>();
 
-    public ExcelDocumentStreamingWriter(String path, int sheetIndex, int keyRowNum) throws IOException {
-        this(new FileInputStream(path), sheetIndex, keyRowNum);
+    public ExcelDocumentStreamingWriter(String path, List<SheetMetaData> metaData) throws IOException {
+        this(new FileInputStream(path), metaData);
     }
 
-    public ExcelDocumentStreamingWriter(InputStream input, int sheetIndex, int keyRowNum) throws IOException {
+    public ExcelDocumentStreamingWriter(InputStream input, List<SheetMetaData> metaData) throws IOException {
         this.workBook = new SXSSFWorkbook(new XSSFWorkbook(input));
-        this.sheet = workBook.getSheetAt(sheetIndex);
+//        this.workBook = new XSSFWorkbook(input);
 
-        this.keyRowNum = keyRowNum;
+        CreationHelper createHelper = workBook.getCreationHelper();
 
-        this.iterator = sheet.rowIterator();
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/dd/yyyy"));
 
-        getMetaData();
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
+
+        this.metaData = metaData;
+
+        this.metaData.stream().forEach(sheetMetaData -> {
+            sheetMetaDataMap.put(sheetMetaData.sheetIndex, sheetMetaData);
+
+            Sheet sheet = workBook.getSheetAt(sheetMetaData.sheetIndex);
+//            sheetMetaData.iterator = sheet.rowIterator();
+
+            sheet.getLastRowNum();
+
+            Iterator<Row> iterator = sheet.rowIterator();
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
+//            logger.info("row： {}", row.getRowNum());
+
+                if (row.getRowNum() == sheetMetaData.keyRowNum - 1) {
+                    sheetMetaData.columnTitles = getColumnTitles(row);
+
+                    break;
+                }
+
+            }
+        });
+
+//        getMetaData();
     }
 
     private void getMetaData() {
 
-        while (iterator.hasNext()) {
-            Row row = iterator.next();
+        this.metaData.stream().forEach(sheetMetaData -> {
+
+            Iterator<Row> iterator = sheetMetaData.iterator;
+
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
 //            logger.info("row： {}", row.getRowNum());
 
-            if (row.getRowNum() == keyRowNum - 1) {
-                this.columnTitles = getColumnTitles(row);
+                if (row.getRowNum() == sheetMetaData.keyRowNum - 1) {
+                    sheetMetaData.columnTitles = getColumnTitles(row);
 
-                break;
+                    break;
+                }
+
             }
-
-        }
+        });
 
     }
 
-    private String[] getColumnTitles(Row row ) {
+    private String[] getColumnTitles(Row row) {
         List<String> resultList = new ArrayList<>();
         for (Cell cell : row) {
             resultList.add(cell.getStringCellValue());
@@ -73,176 +106,102 @@ public class ExcelDocumentStreamingWriter implements Closeable, Iterable<Map<Str
         return columnTitles;
     }
 
-    @Override
-    public Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator() {
+    public String[] getColumnTitles(int sheetIndex) {
 
-//        int currentRow = 0;
+        SheetMetaData sheetMetaData = sheetMetaDataMap.get(sheetIndex);
+        if (sheetMetaData ==  null) return null;
 
-//        Iterator<Row> iterator = sheet.rowIterator();
-//        while (iterator.hasNext()) {
-//            iterator.next();
-//            if (currentRow == keyRowNum - 1) {
-//
-//                break;
-//            }
-//
-//            ++currentRow;
-//        }
-        return new DataIterator(iterator);
+        return sheetMetaData.columnTitles;
     }
 
-    public class DataIterator implements Iterator<Map<String, ExcelDocument.ValueWrapper>> {
 
-        Iterator<Row> iterator;
+    public void writeRowData(int sheetIndex, String[] rowKey, int dataRowNum, Map<String, Object> data) {
 
-        public DataIterator(Iterator<Row> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Map<String, ExcelDocument.ValueWrapper> next() {
-
-            Map<String, ExcelDocument.ValueWrapper> map = new HashMap<>();
-
-            Row row = iterator.next();
-
-            int cellIndex = 0;
-            for (Cell cell : row) {
-                if (cellIndex >= columnTitles.length) {
-                    break;
-                }
-
-                ExcelDocument.ValueWrapper wrapper = ExcelDocument.getCellValueWrapper(cell);
-
-                String columnTitle = columnTitles[cellIndex];
-                map.put(columnTitle, wrapper);
-
-                ++cellIndex;
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
             }
-            return map;
+            Object value = data.get(key);
+
+            writeCellData(sheet, dataRowNum, index + 1, value);
         }
     }
 
-    public String getStringValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case NUMERIC:
-//                return String.valueOf(cell.getNumericCellValue());
-                return ((XSSFCell) cell).getRawValue();
-            case STRING:
-                return cell.getStringCellValue();
+    public void removeRow(int sheetIndex, int dataRowNum) {
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        Row row = sheet.getRow(dataRowNum - 1);
+        sheet.removeRow(row);
 
-            default:
-                return null;
+    }
+    public void writeRowData(int sheetIndex, int dataRowNum, List<Object> data) {
+
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        for (int index = 0; index < data.size(); index++) {
+            Object value = data.get(index);
+
+            writeCellData(sheet, dataRowNum, index + 1, value);
         }
     }
 
-    public Integer getIntegerValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case NUMERIC:
-                double numericCellValue = cell.getNumericCellValue();
-                return Double.valueOf(numericCellValue).intValue();
-
-            case STRING:
-                return Integer.valueOf(cell.getStringCellValue());
-
-            default:
-                return null;
+    public void writeCellData(Sheet sheet, int rowNum, int colNum, Object value) {
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
         }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
     }
 
-    public Double getDoubleValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case NUMERIC:
-                double numericCellValue = cell.getNumericCellValue();
-                return Double.valueOf(numericCellValue);
+    public void writeCellData(Cell cell, Object data) {
 
-            case STRING:
-                return Double.valueOf(cell.getStringCellValue());
-
-            default:
-                return null;
+        if (data == null) {
+            return;
         }
-    }
-
-    public Date getDateValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case NUMERIC:
-                return cell.getDateCellValue();
-            case STRING:
-                return formatDate(cell.getStringCellValue());
-
-            default:
-                return null;
+        if (data instanceof String) {
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue((String) data);
         }
-    }
+        if (data instanceof Date) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
 
-    private Object getObjectValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
-        switch (type) {
-            case NUMERIC:
-                return HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
-            case STRING:
-                return cell.getStringCellValue();
-            default:
-                return null;
+            cell.setCellValue((Date) data);
         }
-    }
+        if (data instanceof Integer) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellValue((Integer) data);
+        }
+        if (data instanceof Double) {
+            cell.setCellType(CellType.NUMERIC);
+//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
-    private Date formatDate(String strDate) {
-        if (strDate == null) return null;
-
-        Date convertedDate = null;
-        if (strDate.length() == 10) {
-            String dateFormat = TimeUtils.getDateFormat(strDate);
-            if (dateFormat != null) {
-                convertedDate = TimeUtils.getDateFromStr(strDate, dateFormat);
-                if (convertedDate != null) {
-                    return convertedDate;
-                }
-            }
-            convertedDate = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
-            convertedDate = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
-            convertedDate = TimeUtils.getDateFromStr(strDate, "yyyy/MM/dd");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
-            convertedDate = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
-        } else if (strDate.length() == 8) {
-            convertedDate = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
-            convertedDate = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
-            if (convertedDate != null) {
-                return convertedDate;
-            }
+            cell.setCellValue((Double) data);
         }
 
-        return null;
     }
 
     public InputStream getStream() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public void writeToFile(File file) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        this.workBook.write(out);
+
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(out.toByteArray());
+        fos.close();
+
     }
 
     @Override
@@ -259,6 +218,25 @@ public class ExcelDocumentStreamingWriter implements Closeable, Iterable<Map<Str
 
     public Workbook getWorkBook() {
         return workBook;
+    }
+
+    public static class SheetMetaData {
+        private int sheetIndex;
+        private int keyRowNum;
+
+        SheetMetaData(int sheetIndex, int keyRowNum) {
+            this.sheetIndex = sheetIndex;
+            this.keyRowNum = keyRowNum;
+        }
+
+        private Sheet sheet;
+
+        private String[] columnTitles;
+
+        private Iterator<Row> iterator;
+
+
+
     }
 
 }
