@@ -2,6 +2,7 @@ package com.ge.apm.service.wo.doctemplate;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -50,6 +51,12 @@ public class WorkOrderDocxRenderServiceTest {
         byte[] outputBytes = workOrderDocxRenderService.renderDocx(map, template);
         assertTrue(outputBytes.length > 0);
         write(outputBytes, "test_wo_render_full");
+    }
+
+    @After
+    public void tearDown() {
+        FileUtils.deleteQuietly(new File("test_wo_render_empty.docx"));
+        FileUtils.deleteQuietly(new File("test_wo_render_full.docx"));
     }
 
     private Map<String, Object> mockFullMap() {
