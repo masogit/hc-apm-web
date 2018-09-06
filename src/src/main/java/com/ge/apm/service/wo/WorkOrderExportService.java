@@ -180,7 +180,8 @@ public class WorkOrderExportService {
                 workOrderMap.put("维修完成时间", formatDate(workStep.getEndTime()));
             }
             workOrderMap.put("签到时间", formatDate(workOrder.getCheckinTime()));
-            workOrderMap.put("维修工时", workOrder.getTotalManHour());
+            workOrderMap.put("维修工程师工时", workOrder.getManHours());
+            workOrderMap.put("维修总工时", workOrder.getTotalManHour());
 
             putBlob(workOrderMap, workOrder.getSignature(), "signature");
             putBlob(workOrderMap, workOrder.getAckSignature(), "ack_signature");
