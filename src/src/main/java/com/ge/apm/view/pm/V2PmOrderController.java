@@ -68,7 +68,8 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
-    private static final String EMPTY_SIGNATURE_HOLDER = "_____________";
+    private static final String SIGNATURE_HOLDER = "审核人签名：";
+    private static final String EMPTY_SIGNATURE_HOLDER = "";
 
     V2_PmOrderRepository dao;
     private Double totalManHours;
@@ -344,14 +345,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (!Strings.isNullOrEmpty(signatureStorageId)) {
             byte[] signatureBytes = pmOrderReportTemplateService.getSignatureBytes(signatureStorageId);
             if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), SIGNATURE_HOLDER);
                 content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
             }
         }
 
         if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())){
             byte[] signatureBytes = pmOrderReportTemplateService.getDefaultSignatureBytes();
-            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
         }
 
         // Maintenance Workflow Information
