@@ -96,8 +96,14 @@
                         </p:column>
                         
                         <p:column headerText="#{msg.Actions}" width="12%">
-	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item)}" rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceAllocateAssetDialog" oncomplete="PF('forceAllocateAssetDialog').show()"/>
-	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item)}" rendered="#{!item.assetDeptUID.equals(item.clinicalDeptUID)}" update="forceReturnAssetDialog" oncomplete="PF('forceReturnAssetDialog').show()"/>
+	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item)}"
+                                             rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}"
+                                             update="forceAllocateAssetDialog"
+                                             oncomplete="openForceAllocateDialog(xhr, status, args)"/>
+	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item)}"
+                                             rendered="#{!item.assetDeptUID.equals(item.clinicalDeptUID)}"
+                                             update="forceReturnAssetDialog"
+                                             oncomplete="openForceReturnDialog(xhr, status, args)"/>
 							<br/>
                             <p:commandButton value="打印" ajax="false" actionListener="#{assetInfoController.generateVoucher(item)}"  rendered="#{assetInfoController.validate301()}" >
                                 <p:fileDownload value="#{assetInfoController.exportPdf}" />
@@ -140,6 +146,24 @@
 
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+
+            function openForceAllocateDialog(xhr, status, args) {
+                console.log("openForceAllocateDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceAllocateAssetDialog').show()
+                }
+            }
+
+            function openForceReturnDialog(xhr, status, args) {
+                console.log("openForceReturnDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceReturnAssetDialog').show()
+                }
             }
 
         </script>
