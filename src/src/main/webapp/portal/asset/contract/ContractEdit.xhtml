@@ -191,7 +191,7 @@
                         <p:dataTable id="purchaseList"  value="#{contractInfoEditController.purchaseItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500"  rows="10" emptyMessage="#{msg.noRecordFound}">
+                                     rowsPerPageTemplate="20,50,100,500"  rows="20" emptyMessage="#{msg.noRecordFound}">
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.contractAssetName}">
                                 <h:outputText value="#{item.contractAssetName}"/>
@@ -224,7 +224,7 @@
                         <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500" rows="10" emptyMessage="#{msg.noRecordFound}" >
+                                     rowsPerPageTemplate="20,50,100,500" rows="20" emptyMessage="#{msg.noRecordFound}" >
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.AssetName}">
                                 <h:outputText value="#{item.itemType eq 'ExistAsset'? item.assetInfo.name : item.arrivalListItem.arrivalList.assetName}"/>

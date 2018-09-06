@@ -9,9 +9,8 @@ import java.util.Map;
 public class PartTableRenderPolicy extends AbstractWoTableRenderPolicy {
     public void render(XWPFTable table, Object o) {
 
-        List<Map<String, Object>> parts = (List) o;
-
-        if (parts != null) {
+        if (o instanceof List) {
+            List<Map<String, Object>> parts = (List) o;
             for (Map<String, Object> part : parts) {
                 XWPFTableRow row = addRow(table);
                 addCell(row, extractValue(part, "备件名"));
