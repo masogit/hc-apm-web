@@ -18,6 +18,13 @@ public class WorkOrderDocxRenderService {
 
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
+    private static final Map<String, String> myMap;
+    static {
+        myMap = new HashMap<String, String>();
+        myMap.put("a", "b");
+        myMap.put("c", "d");
+    }
+
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
         byte[] bytes;
@@ -88,19 +95,19 @@ public class WorkOrderDocxRenderService {
         datas.put("audit_table", map.get("serviceRequestMessages"));
 
 
-        mapBlob(map, datas, "signature", "signature_space");
-        mapBlob(map, datas, "ack_signature", "ack_signature_space");
+        mapBlob(map, datas, "signature", "signature_title", "审核人签名： ");
+        mapBlob(map, datas, "ack_signature", "ack_signature_title", "验收人签名： ");
 
         return datas;
     }
 
-    private void mapBlob(Map<String, Object> source, Map<String, Object> target, String key, String absentKey) {
+    private void mapBlob(Map<String, Object> source, Map<String, Object> target, String key, String esignTitleKey, String esignTitleValue) {
         if (source.containsKey(key)) {
             target.put(key, new PictureRenderData(100, 75, "mock.png", (byte[]) source.get(key)));
-            target.put(absentKey, "");
+            target.put(esignTitleKey, esignTitleValue);
         } else {
             target.put(key, EMPTY_PICTURE);
-            target.put(absentKey, "_______________");
+            target.put(esignTitleKey, "");
         }
     }
 }
