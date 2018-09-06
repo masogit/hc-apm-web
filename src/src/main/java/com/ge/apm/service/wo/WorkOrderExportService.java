@@ -100,7 +100,7 @@ public class WorkOrderExportService {
             }
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
-        if(currentOwner !=null){
+        if(currentOwner !=null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
         }
 
