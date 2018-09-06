@@ -19,7 +19,7 @@
                         <h:outputText value="#{compareImportController.file.fileName}" />
                         <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{compareImportController.cancelUpload}" update=":importForm :uploadDialogForm :ItemViewForm" rendered="#{not empty compareImportController.file}"/>
                     </h:panelGroup>
-                    <p:dataTable id="assetTable" value="#{compareImportController.importAssetMap.values()}" var="item" rows="10" paginator="true" 
+                    <p:dataTable id="assetTable" value="#{compareImportController.importAssetMap.values()}" var="item" rows="20" paginator="true" 
                                  selection="#{compareImportController.selectedItem}" rowKey="#{item['RowIndex']}"  selectionMode="single" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  rowsPerPageTemplate="20,50,100,500" >

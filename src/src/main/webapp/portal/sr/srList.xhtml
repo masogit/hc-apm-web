@@ -46,7 +46,7 @@
                                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                         rows="10" emptyMessage="#{msg.noRecordFound}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}"
                                          rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax  event="rowSelect" listener="#{serviceRequestController.onSelectServiceRequest}" update="tabview:WorkOrderEditForm" process="datalist"/>
@@ -101,7 +101,7 @@
                                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                         rows="10" emptyMessage="#{msg.noRecordFound}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}"
                                          rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax event="rowSelect"  update="tabview:ackDetailForm"/>
@@ -155,7 +155,7 @@
                                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                         rows="10" emptyMessage="#{msg.noRecordFound}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}"
                                          rowsPerPageTemplate="20,50,100,500">
 
                                 <p:ajax event="rowSelect"  update="tabview:rateDetailForm"/>
