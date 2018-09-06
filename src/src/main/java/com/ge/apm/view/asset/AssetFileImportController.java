@@ -102,8 +102,8 @@ public class AssetFileImportController {
 
             importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc);
 
-            if(importAssetMap.size() > 5000){
-                WebUtil.addErrorMessage("导入Excel中资产行数最多5000条，请分批导入！");
+            if(importAssetMap.size() > 20000){
+                WebUtil.addErrorMessage("导入Excel中资产行数最多20000条，请分批导入！");
                 return;
             }
 
