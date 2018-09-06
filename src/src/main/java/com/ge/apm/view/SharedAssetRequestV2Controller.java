@@ -1768,7 +1768,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 orgLoc.append("层");
             }
             if(StringUtils.isNotBlank(orgInfo.getOther())) {
-                orgLoc.append("其他 ");
                 orgLoc.append(orgInfo.getOther());
             }
         }
