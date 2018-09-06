@@ -22,11 +22,13 @@ public class SupplierService {
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();
+
+        filter.add(new SearchFilter("manufacturerT", SearchFilter.Operator.EQ, true,"1*"));
+        filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(),"1*"));
         if(StringUtils.isNotEmpty(name)){
-            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
+            filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
         }
-        filter.add(new SearchFilter("manufacturerT", SearchFilter.Operator.EQ, true));
-        filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         //return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
         List<Supplier> suppliers = supplierDao.findBySearchFilter(filter);
         List<String> names = new ArrayList<>(suppliers.size());
