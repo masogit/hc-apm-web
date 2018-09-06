@@ -329,7 +329,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.NAME.toString(), item.getParts());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.QUANTITY.toString(), item.getApartsQuantity());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getPartsPrice());
+                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getClosedPrice());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.TYPE.toString(), FieldValueMessageController.fieldValue("partsType", item.getPartsType()));
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.SERIAL_NUM.toString(), item.getSerialNum());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.WARRANTY_DATE.toString(), item.getWarrantyDate());

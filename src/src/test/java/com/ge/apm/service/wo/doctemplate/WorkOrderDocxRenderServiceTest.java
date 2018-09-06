@@ -2,6 +2,7 @@ package com.ge.apm.service.wo.doctemplate;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -41,7 +42,7 @@ public class WorkOrderDocxRenderServiceTest {
         Map<String, Object> map = new HashMap<>();
         byte[] outputBytes = workOrderDocxRenderService.renderDocx(map, template);
         assertTrue(outputBytes.length > 0);
-//        write(outputBytes, "test_wo_render_empty");
+        write(outputBytes, "test_wo_render_empty");
     }
 
     @Test
@@ -49,48 +50,20 @@ public class WorkOrderDocxRenderServiceTest {
         Map<String, Object> map = mockFullMap();
         byte[] outputBytes = workOrderDocxRenderService.renderDocx(map, template);
         assertTrue(outputBytes.length > 0);
-//        write(outputBytes, "test_wo_render_fulldata");
+        write(outputBytes, "test_wo_render_full");
+    }
+
+    @After
+    public void tearDown() {
+        FileUtils.deleteQuietly(new File("test_wo_render_empty.docx"));
+        FileUtils.deleteQuietly(new File("test_wo_render_full.docx"));
     }
 
     private Map<String, Object> mockFullMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("设备名称", "设备名称");
-        map.put("设备型号", "设备型号");
-        map.put("设备序列号", "设备序列号");
-        map.put("二维码", "二维码");
-        map.put("科室", "科室");
-        map.put("制造商", "制造商");
-        map.put("设备编号", "设备编号");
-        map.put("当前位置", "当前位置");
-
-        map.put("报修单号", "报修单号");
-        map.put("报修人", "报修人");
-        map.put("联系电话", "联系电话");
-        map.put("报修时间", "报修时间");
-        map.put("报修状态", "报修状态");
-        map.put("停机时间", "停机时间");
-        map.put("故障描述", "故障描述");
-
-        map.put("工单状态", "工单状态");
-        map.put("维修工时", "维修工时");
-        map.put("维修总费用", "维修总费用");
-        map.put("其他费用", "其他费用");
-        map.put("外修费用", "外修费用");
-        map.put("签到时间", "签到时间");
-        map.put("工单类型", "工单类型");
-        map.put("故障类型", "故障类型");
-
-        map.put("当前责任人", "当前责任人");
-        map.put("原因描述", "原因描述");
-        map.put("解决方案", "解决方案");
-        map.put("交付前检测", "交付前检测");
-
-        map.put("协作者1", "协作者1");
-        map.put("协作者2", "协作者2");
-        map.put("工时1", "工时1");
-        map.put("工时2", "工时2");
-
-        map.put("工时", "工时");
+        for (Map.Entry<String, String> entry : WorkOrderDocxRenderService.COPY_KEY_MAPPING.entrySet()) {
+            map.put(entry.getValue(), entry.getValue() + "X");
+        }
 
         map.put("备件信息", mockListMaps(KEYS_PARTS));
         map.put("维修流程", mockListMaps(KEYS_PROC));
