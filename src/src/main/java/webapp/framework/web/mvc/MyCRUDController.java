@@ -2,6 +2,7 @@ package webapp.framework.web.mvc;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -146,7 +147,7 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
         }
     }
 
-    protected void wrapSearchFilter(EntityWrapper ew){
+    protected void wrapSearchFilter(Wrapper ew){
         if(searchFilters==null) return;
         if(searchFilters.size()<1) return;
         

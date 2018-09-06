@@ -34,11 +34,24 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-                             <p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" style="max-width: 200px">
+                             <p:autoComplete id="manufacture" value="#{relRuleAssetController.queryAsset.manufacture}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                             forceSelection="true" required="false" requiredMessage="" completeMethod="#{relRuleAssetController.getSupplier}"
+                                             var="t" itemLabel="#{t}" itemValue="#{t}">
+                                 <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                             </p:autoComplete>
+
+                            <!-- <p:autoComplete id="manufacture" value="#{relRuleAssetController.queryAsset.manufacture}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                             forceSelection="true" completeMethod="#{relRuleAssetController.getSupplier}"
+                                                 var="t" itemLabel="#{t}" itemValue="#{t.name}">
+                                 <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}"/>
+                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}"/>
+                             </p:autoComplete>-->
+                             <!--<p:selectOneMenu value="#{relRuleAssetController.queryAsset.manufactureId}" style="max-width: 200px">
                                  <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this" />
                                  <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                  <f:selectItems value="#{generatePmOrdersController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                             </p:selectOneMenu>
+                             </p:selectOneMenu>-->
 		                      <!--<p:inputText  value="#{relRuleAssetController.queryAsset.manufacture}"  required="false">
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
 	                          </p:inputText>-->

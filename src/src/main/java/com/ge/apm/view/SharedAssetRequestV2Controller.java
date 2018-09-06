@@ -713,7 +713,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
-                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
+                String ClinicalDeptUID = infoVo.getAssetDeptUID();
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
@@ -1768,7 +1768,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 orgLoc.append("层");
             }
             if(StringUtils.isNotBlank(orgInfo.getOther())) {
-                orgLoc.append("其他 ");
                 orgLoc.append(orgInfo.getOther());
             }
         }
