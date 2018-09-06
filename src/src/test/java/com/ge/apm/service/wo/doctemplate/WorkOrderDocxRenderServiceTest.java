@@ -96,6 +96,12 @@ public class WorkOrderDocxRenderServiceTest {
         map.put("维修流程", mockListMaps(KEYS_PROC));
         map.put("serviceRequestMessages", mockListMaps(KEYS_AUDIT));
 
+        try {
+            map.put("signature", FileUtils.readFileToByteArray(new File("src\\test\\resources\\sign\\verify.png")));
+            map.put("ack_signature", FileUtils.readFileToByteArray(new File("src\\test\\resources\\sign\\acceptance.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return map;
     }
 
