@@ -192,14 +192,14 @@ public class WorkOrderExportService {
             for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
                 if (workOrderDetail.getApproved() == null || workOrderDetail.getApproved()) {
                     Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
-                    Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
+                    Double tempPrice = workOrderDetail.getClosedPrice() != null ? workOrderDetail.getClosedPrice() : 0;
                     info += workOrderDetail.getParts() + ",数量：" + tempQuantity + ",单价:" + tempPrice + ";";
                     infoTotalPrice += tempQuantity * tempPrice;
                 }
 
                 Map<String, Object> part = new HashedMap();
                 part.put("备件名", workOrderDetail.getParts());
-                part.put("单价", workOrderDetail.getPartsPrice());
+                part.put("单价", workOrderDetail.getClosedPrice());
                 part.put("数量", workOrderDetail.getApartsQuantity());
                 part.put("类型", getPartType(workOrderDetail.getPartsType()));
                 part.put("序列号", workOrderDetail.getSerialNum());
