@@ -3,6 +3,7 @@ package com.ge.apm.service.wo;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -23,10 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,10 +62,11 @@ public class WorkOrderExportService {
     @Autowired
     UserAccountRepository userAccountDao;
     @Autowired
+    private OrgInfoTreeService orgInfoTreeService;
+    @Autowired
     private BlobFileService blobService;
 
-    //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
-    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList, OrgInfo clinicalDept, UserAccount currentOwner) {
+    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList) {
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
@@ -89,11 +88,19 @@ public class WorkOrderExportService {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
         }
+        
+        if(clinicalDept !=null){
+            List<OrgInfo> orgSearchList = new ArrayList<>();
+            orgSearchList.add(clinicalDept);
 
-        if (clinicalDept != null) {
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
+            List<String> clinicalDeptUIDList = new ArrayList<>();
+            for (OrgInfo oi : tempOrgSearchSet) {
+                clinicalDeptUIDList.add(oi.getUid());
+            }
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
-        if (currentOwner != null) {
+        if(currentOwner !=null){
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
         }
 
