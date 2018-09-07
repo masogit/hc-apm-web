@@ -118,7 +118,7 @@
                         <h:panelGroup >
                               <label class="label">#{msg.ruleLevel}*</label>
                               <p:selectOneMenu id="ruleLevel" value="#{relRuleAssetController.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
-	                            	<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="PmOrderRule" />
+	                            	<p:ajax listener="#{relRuleAssetController.clearPmOrderRule()}" update="PmOrderRule"/>
 	                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                             <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 		                      </p:selectOneMenu>
@@ -127,7 +127,7 @@
                             <label class="label">#{msg.PmOrderRule}*</label>
                             <p:autoComplete id="SelectedPmOrderRule" value="#{relRuleAssetController.ruleUid}" dropdown="true" scrollHeight="300" rendered="#{relRuleAssetController.level > 0}"
                                             forceSelection="true" required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}" completeMethod="#{relRuleAssetController.getRuleList}"
-                                            var="t" itemLabel="#{t.name}" itemValue="#{t.uid}">
+                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
                                     <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.setRuleId()}"/>
                                     <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
                             </p:autoComplete>
@@ -146,7 +146,7 @@
                     </p:panelGrid>
                     <br/> <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />
+                        <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl PmOrderRule" />
                         <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
                     </h:panelGroup>
                     <!--<p:panelGrid id ="buttonGrid" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
