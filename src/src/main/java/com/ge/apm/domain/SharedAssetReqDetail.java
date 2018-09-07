@@ -658,7 +658,7 @@ public class SharedAssetReqDetail implements Serializable{
 		this.returnRequest = returnRequest;
 	}
 
-    public Boolean isIntact() {
+    public Boolean getIsIntact() {
         return isIntact;
     }
 
