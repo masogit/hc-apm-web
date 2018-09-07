@@ -53,7 +53,7 @@
                         <p:ajax event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="editButton viewButton"/>
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
                        
-                        <p:column headerText="借用科室" sortBy="#{item.clinicalDeptUID}">
+                        <p:column headerText="借用科室" sortBy="#{item.assetDeptUID}">
                             <h:outputText value="#{item.sharedAssetReqDetail.clinicalDept.name}"/>
                         </p:column>
 

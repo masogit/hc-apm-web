@@ -2066,6 +2066,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		//set default value for isIntact
+        reqDetail.setIntact(true);
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
 		if(assetRequest == null) {
 			assetRequest = new SharedAssetRequest();
