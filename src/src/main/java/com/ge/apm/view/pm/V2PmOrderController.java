@@ -1282,6 +1282,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             });
             pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
+            approvedDetails = null;
         }
     }
 
