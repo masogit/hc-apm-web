@@ -123,7 +123,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3")
     List<UserAccount> findBySiteUIDAndStaffRole(String siteUID);
     
-    @Query(value = "select u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
+    @Query(value = "select distinct u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
     List<UserAccount> getAssetHeadList(String tenantUID);
     
     @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
@@ -170,7 +170,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     //当前租户下的肥临时报修人
     //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
-    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 ",nativeQuery=true)
+    @Query(value= "select DISTINCT u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 ",nativeQuery=true)
     public List<UserAccount> getAssetHeadAndStaffByTenantUID(String tenantUID);
     
     @Query(value = "select o.uid from user_account o where o.org_uid in ?1",nativeQuery = true)
@@ -178,4 +178,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
     List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
+
+    @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
+    boolean findRecordByTenantUid(String uid);
+
 }

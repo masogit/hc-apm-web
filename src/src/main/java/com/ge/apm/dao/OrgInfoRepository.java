@@ -14,7 +14,10 @@ import webapp.framework.dao.GenericRepository;
 public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public List<OrgInfo> getByHospitalId(int hospitalId);
-    
+
+    @Query(value = "select t.uid from org_info t where site_uid in (?1) and name=?2",nativeQuery = true)
+    public List<String> getOrgBySite(List<String> orgList,String filterName);
+
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     @Query("select t from OrgInfo t where t.siteId=?1 and t.parentOrg is null")
     public List<OrgInfo> getHospitalBySiteId(int siteId);
@@ -95,6 +98,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
     public OrgInfo findFirstByParentUIDAndName(String parentUID, String name);
+
+    public OrgInfo findFirstByParentUIDAndShortName(String parentUID, String name);
     
     @Query(value = "select o.uid from org_info o where (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1) and o.org_type=4",nativeQuery = true)
     public Set<String> findClinicalDeptOrgUidListByOrgUid(String orgUid);

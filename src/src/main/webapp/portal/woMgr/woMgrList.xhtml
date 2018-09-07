@@ -37,7 +37,7 @@
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                             rows="10" emptyMessage="#{msg.noRecordFound}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500" >
 
                     <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
@@ -58,9 +58,25 @@
                     <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">
+                    <!--<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">-->
+                        <!--<h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
+                    <!--</p:column>-->
+
+
+<!--update......-->
+                    <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
+                                <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
+                                <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" />
+                            </p:autoComplete>
+                        </f:facet>
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                        <!--<h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
                     </p:column>
+
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>
                     </p:column>
@@ -105,8 +121,8 @@
                         <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
-                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
-                        <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/><br/>
+                        <p:commandButton id="sssss" value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
                         <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
 
                         <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
@@ -123,6 +139,12 @@
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                         <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                     </p:column>
+                    <p:column headerText="#{msg.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
+                        <h:outputText value="#{item.maintenanceValue}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
+                        <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
+                    </p:column>
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
@@ -138,6 +160,7 @@
             <ui:include src="repairCompleteDlg.xhtml"/>
             <ui:include src="newOrderDialog.xhtml"/>
             <ui:include src="toCloseDlg.xhtml"/>
+            <ui:include src="editCloseDlg.xhtml"/>
             <ui:include src="approveDlg.xhtml"/>
             <ui:include src="moreAccDialogPrice.xhtml"/>
 

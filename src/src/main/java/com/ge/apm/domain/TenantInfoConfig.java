@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TenantInfoConfig  {
 	private static final String ArrivalInstallation="安装验收";
+	private static final String AssetBorrow="设备调剂";
 	private static final String AssetMDM="设备档案";
 	private static final String WorkOrderMgmtWithoutWorkSchedule="维修管理(不含排班管理)";
 	private static final String WorkOrderMgmt="维修排班管理";
@@ -28,6 +29,8 @@ public class TenantInfoConfig  {
 	private Boolean blnArrivalInstallation=false;
 	//设备档案,设备档案
 	private Boolean blnAssetMDM=false;
+	//设备调剂
+	private Boolean blnAssetBorrow=false;
 	//维修流程,维修管理(不含排班管理)
 	private Boolean blnWorkOrderMgmtWithoutWorkSchedule=false;
 	//维修流程,维修排班管理
@@ -55,7 +58,7 @@ public class TenantInfoConfig  {
 	}
 	public void setBlnAssetMDM(Boolean blnAssetMDM) {
 		this.blnAssetMDM = blnAssetMDM;
-	}
+	} 
 	public Boolean getBlnWorkOrderMgmtWithoutWorkSchedule() {
 		return blnWorkOrderMgmtWithoutWorkSchedule;
 	}
@@ -104,7 +107,12 @@ public class TenantInfoConfig  {
 	public void setBlnMeasuringMgmt(Boolean blnMeasuringMgmt) {
 		this.blnMeasuringMgmt = blnMeasuringMgmt;
 	}
-	
+	public Boolean getBlnAssetBorrow() {
+		return blnAssetBorrow;
+	}
+	public void setBlnAssetBorrow(Boolean blnAssetBorrow) {
+		this.blnAssetBorrow = blnAssetBorrow;
+	}
 	public static List<String> getVersions(){
 		if(listVersions==null){
     		listVersions=new ArrayList<String>();
@@ -139,6 +147,8 @@ public class TenantInfoConfig  {
 			this.blnNurseSite=true;
 		} else if (str.equals(MeasuringMgmt)) {
 			this.blnMeasuringMgmt=true;
+		} else if (str.equals(AssetBorrow)) {
+			this.blnAssetBorrow=true;
 		}
 	}
 	
@@ -149,6 +159,9 @@ public class TenantInfoConfig  {
 		}
 		if(this.blnAssetMDM){
 			result.add(AssetMDM);
+		}
+		if(this.blnAssetBorrow){
+			result.add(AssetBorrow);
 		}
 		if(this.blnWorkOrderMgmtWithoutWorkSchedule){
 			result.add(WorkOrderMgmtWithoutWorkSchedule);
@@ -185,6 +198,9 @@ public class TenantInfoConfig  {
 		if(this.blnAssetMDM){
 			sb.append(AssetMDM+",");
 		}
+		if(this.blnAssetBorrow){
+			sb.append(AssetBorrow+",");
+		}
 		if(this.blnWorkOrderMgmtWithoutWorkSchedule){
 			sb.append(WorkOrderMgmtWithoutWorkSchedule+",");
 		}
@@ -215,10 +231,11 @@ public class TenantInfoConfig  {
 	public void setValueWithVersion(String str){
 		this.blnWorkOrderMgmt=true;
 		this.blnNurseSite=true;
-		this.blnMeasuringMgmt=true;
+		this.blnAssetBorrow=true;
 		
 		this.blnArrivalInstallation=true;
 		this.blnAssetMDM=true;
+		this.blnMeasuringMgmt=true;
 		this.blnWorkOrderMgmtWithoutWorkSchedule=true;
 		this.blnPreventiveMaintainceMgmt=true;
 		this.blnDeviceOperationKPIAnalysis=true;
@@ -230,12 +247,12 @@ public class TenantInfoConfig  {
 		else if(str.equals(VERSION_ULTRASOUND)){
 			this.blnWorkOrderMgmt=false;
 			this.blnNurseSite=false;
-			this.blnMeasuringMgmt=false;
+			this.blnAssetBorrow=false;
 		}
 		else if(str.equals(VERSION_FUNCTION)){
 			this.blnWorkOrderMgmt=false;
 			this.blnNurseSite=false;
-			this.blnMeasuringMgmt=false;
+			this.blnAssetBorrow=false;
 		}
 		else{
 			

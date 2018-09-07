@@ -6,6 +6,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -19,12 +20,12 @@ public class AssetInfoFormatter {
 
     private AssetInfo assetInfo;
     private List<OrgInfo> sites;
-    private AssetFileImportService importService;
+    private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
-                              AssetFileImportService importService,
+                              AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
@@ -307,7 +308,12 @@ public class AssetInfoFormatter {
     }
 
     public String getClinicalDeptName() {
-        return assetInfo.getClinicalDeptName();
+        if (assetInfo.getClinicalDeptUID() == null) return null;
+
+        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getShortName();
     }
 
     public Integer getAssetGroup() {
@@ -335,7 +341,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getName();
+        return orgInfo.getShortName();
     }
 
     public Integer getAssetOwnerId() {

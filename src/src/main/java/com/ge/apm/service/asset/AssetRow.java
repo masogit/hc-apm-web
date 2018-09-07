@@ -15,10 +15,10 @@ public class AssetRow {
     public static final String DELETE_MARK = "#";
 
     private AssetInfo assetInfo;
-    private Map<String, Object> rowMap;
+    private Map rowMap;
 
 
-    public AssetRow(AssetInfo assetInfo, Map<String, Object> rowMap) {
+    public AssetRow(AssetInfo assetInfo, Map rowMap) {
         this.assetInfo = assetInfo;
         this.rowMap = rowMap;
     }

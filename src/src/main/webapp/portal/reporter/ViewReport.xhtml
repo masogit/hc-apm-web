@@ -30,17 +30,13 @@
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
                                             <p:inputNumber value="#{editReportController.tableValue[fieldItem.key]}" decimalPlaces="3" readonly="true" />
-                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" />
+                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}"  style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Select'}" >
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
-                                            <h:outputText value="#{editReportController.tableValue[fieldItem.key]}" />
-<!--                                            <p:selectOneMenu value="#{editReportController.tableValue[fieldItem.key]}" >
-                                               <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{fieldItem.options}" var="option" itemLabel="#{option.key}" itemValue="#{option.value}"/>
-                                            </p:selectOneMenu>-->
+                                            <h:outputText value="#{editReportController.getOptionValue(fieldItem)}" />
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Switch'}" >
@@ -57,6 +53,12 @@
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Date'}" >
                                         <p:calendar value="#{editReportController.tableValue[fieldItem.key]}"  />
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Label'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
+                                        </h:panelGroup>
                                     </c:if>
                                 </c:forEach>
 

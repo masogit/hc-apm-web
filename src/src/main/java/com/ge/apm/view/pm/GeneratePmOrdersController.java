@@ -11,6 +11,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -60,7 +61,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
-	private SupplierRepository supplierDao;
+	//private SupplierRepository supplierDao;
+	private SupplierService supplierService;
 
 	@Override
 	protected void init() {
@@ -73,7 +75,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		pmOrderRequestApiService = WebUtil.getBean(PmOrderRequestApiService.class);
 		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
-		supplierDao = WebUtil.getBean(SupplierRepository.class);
+		supplierService = WebUtil.getBean(SupplierService.class);
 		targetAssets = new ArrayList<AssetInfo>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
@@ -111,12 +113,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
 		}
-/*		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
-		}*/
-		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId()));
 		}
+/*		if(null != queryAsset.getManufactureId()){
+			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
+		}*/
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
@@ -283,7 +285,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return queryAsset;
 	}
 
-	public List<Supplier> getSupplier(){
+	public List<String> getSupplier(String name) {
+		return supplierService.getSupplier(name);
+	}
+/*	public List<Supplier> getSupplier(){
 		List<Supplier> suppliers = supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
 		suppliers.sort(new Comparator<Supplier>() {
 			@Override
@@ -297,7 +302,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			}
 		});
 		return suppliers;
-	}
+	}*/
 
 	public void setQueryAsset(QueryAsset queryAsset) {
 		this.queryAsset = queryAsset;

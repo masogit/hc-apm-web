@@ -236,7 +236,7 @@ public class WorkOrderReportExportController implements Serializable {
                 return;
             }
 
-            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner);
+            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
         }
 
     }

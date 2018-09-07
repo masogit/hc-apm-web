@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -29,6 +30,9 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -44,18 +48,23 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    private AssetFileImportService importService;
+//    private AssetFileImportService importService;
+    private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
+    private OrgInfoTreeService orgInfoTreeService;
+    private I18nMessageRepository i18nDao;
 
     //选定的院区
     private OrgInfo selectSite;
 
     //选定科室过滤
-    private String fileterOrgName;
-    private String fileterAssetDeptOrgName;
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
 
+    private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> assetDeptOrgUidSet;
     //复选的设备
     private Map<String, Boolean> selectedMap;
 
@@ -90,6 +99,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private List<OrgInfo> clinicalDeptList;
 
+    private Integer assetGroup;
+    private Integer assetGroupSecondary;
+
+    private List<I18nMessage> assetGroupSecondayList;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -105,9 +119,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
-        importService = WebUtil.getBean(AssetFileImportService.class);
+//        importService = WebUtil.getBean(AssetFileImportService.class);
+        exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -164,17 +182,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 
-        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
-            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
+        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
-        if (!Strings.isNullOrEmpty(fileterOrgName)) {
-            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.EQ, fileterOrgName, "1*"));
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
         if (null != selectSite) {
@@ -189,19 +206,31 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        if (null != event) {
-            if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-                selectSite = (OrgInfo) event.getTreeNode().getData();
-            } else {
-                selectSite = null;
-            }
-            loadClinicalDeptList();
+
+        this.searchFilters.clear();
+
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
         }
+        loadClinicalDeptList();
+
+        //table header dropdown needs to clear manually, table filters cleared by clear method above.
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        assetDeptOrgUidSet = null;
+        clinicalDeptOrgUidSet = null;
+
+        assetGroup = null;
+        assetGroupSecondary = null;
+        filterAssetStatus = null;
+
     }
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> item.getOrgType() == 4 || item.getOrgType() == 5).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -278,7 +307,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
+        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, exportFields);
 
         excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
@@ -358,6 +387,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+            assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
@@ -403,8 +433,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return Collections.emptyList();
         }
 
-        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .filter(distinctByOrgName(OrgInfo::getName))  //display unique clinical name only
+                .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
     }
@@ -414,32 +447,67 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return Collections.emptyList();
         }
 
-        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+
         if (event instanceof SelectEvent) {
-            fileterOrgName = (String) ((SelectEvent) event).getObject();
-            return;
+            filterClinicalDeptOrg = (String)((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
-            if (!Strings.isNullOrEmpty(fileterOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterOrgName.equals(item.getName()))) {
-                fileterOrgName = "";
-            }
+            clinicalDeptOrgUidSet = Collections.emptySet();
         }
 
     }
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
         if (event instanceof SelectEvent) {
-            fileterAssetDeptOrgName = (String) ((SelectEvent) event).getObject();
-            return;
-        } else {
-            if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterAssetDeptOrgName.equals(item.getName()))) {
-                fileterAssetDeptOrgName = "";
-            }
+            filterAssetDeptOrg = (String)((SelectEvent) event).getObject();
         }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+
+    public void assetGroupChangeListener() {
+
+        if (assetGroup == null) {
+            assetGroupSecondayList = Collections.emptyList();
+        } else {
+            assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
+        }
+
+    }
+
+    public void assetGroupSecondaryChangeListener() {
+
 
     }
     
@@ -538,20 +606,48 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return customedColumns;
     }
 
-    public String getFileterOrgName() {
-        return fileterOrgName;
+    public String getFilterClinicalDeptOrg() {
+        return filterClinicalDeptOrg;
     }
 
-    public void setFileterOrgName(String fileterOrgName) {
-        this.fileterOrgName = fileterOrgName;
+    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
+        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
     }
 
-    public String getFileterAssetDeptOrgName() {
-        return fileterAssetDeptOrgName;
+    public String getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
     }
 
-    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
-        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
+    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
     }
 
+    public static <T> Predicate<T> distinctByOrgName(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondayList() {
+        return assetGroupSecondayList;
+    }
+
+    public void setAssetGroupSecondayList(List<I18nMessage> assetGroupSecondayList) {
+        this.assetGroupSecondayList = assetGroupSecondayList;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
+    }
 }
