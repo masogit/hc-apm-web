@@ -935,21 +935,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         tableService = WebUtil.getBean(TableDefinitionService.class);
         this.selectedMap = new HashMap();
-        /*backup  if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) )*/
-
-        /* if( (userContextService.hasAnyRole("DeptHead")||userContextService.hasAnyRole("HospitalHead")||userContextService.hasAnyRole("ClinicalStaff")) &&(!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")|| userContextService.hasAnyRole("ITAdmin")) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")))*/
-
 //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
-        if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
-            String query = WebUtil.getRequestParameter("query");
+        String query = WebUtil.getRequestParameter("query");
+        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
             if (Strings.isNullOrEmpty(query)) {
                 queryIndex = 8;
             } else {
                 queryIndex = Integer.valueOf(query);
                 searchList(queryIndex);
             }
-        } else {
-            String query = WebUtil.getRequestParameter("query");
+        }else {
             if (Strings.isNullOrEmpty(query)) {
                 queryIndex = -1;
             } else {
@@ -957,6 +952,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchList(queryIndex);
             }
         }
+
+        /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
+            String query = WebUtil.getRequestParameter("query");
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = 8;
+            } else { userContextService.()
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+        } else {
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = -1; //代办
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+        }*/
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
