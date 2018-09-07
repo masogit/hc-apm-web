@@ -407,6 +407,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            if(this.clinicalDeptList == null) {
+                clinicalDeptList = assetInfoService.getClinicalDeptList(userContextService.getCurrentUserAccount().getSiteUID());
+            }
+            List<OrgInfo> orgInfos = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(oneSearchStr) || item.getName().contains(oneSearchStr)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(oneSearchStr.toLowerCase()))).collect(Collectors.toList());
+            List<String> deptUids = orgInfos.stream().map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
+            if(deptUids.size() > 0) {
+                this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, deptUids, "1*3+"));
+            }
         }
 
         if (null != fileterOrg) {
@@ -1404,6 +1413,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
             this.removeFilterOnField("clinicalDeptName");
+            this.removeFilterOnField("assetDeptUID");
         }
     }
 
@@ -2066,6 +2076,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		//set default value for isIntact
+        reqDetail.setIntact(true);
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
 		if(assetRequest == null) {
 			assetRequest = new SharedAssetRequest();
