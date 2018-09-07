@@ -276,6 +276,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
         selectedOrg = null;
         clinicalDeptList = null;
+        filterDeptOrg = null;
 
         targetBiomedGroup = assetTagService.getTargetBiomedGroup(this.getSelected());
         this.getQueryBiomedGroupList();
@@ -295,6 +296,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         queryAsset.setAssetGroup(null);
 
         selectedOrg = null;
+        filterDeptOrg = null;
 
         super.prepareEdit();
 
