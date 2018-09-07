@@ -188,6 +188,10 @@ public class V2_WorkOrder implements Serializable {
 
     @Column(name = "ack_signature")
     private String ackSignature;
+    
+    //维修价值
+    @Column(name = "maintenance_value")
+    private Double maintenanceValue;
 
     public Integer getDispatchMode() {
         return dispatchMode;
@@ -549,6 +553,14 @@ public class V2_WorkOrder implements Serializable {
         this.ackSignature = ackSignature;
     }
 
+    public Double getMaintenanceValue() {
+        return maintenanceValue;
+    }
+
+    public void setMaintenanceValue(Double maintenanceValue) {
+        this.maintenanceValue = maintenanceValue;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;

@@ -11,7 +11,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
@@ -23,12 +26,6 @@ import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.QueryAsset;
-import com.ge.apm.domain.RelRuleAsset;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.AssetRuleModel;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -43,324 +40,352 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ViewScoped
 public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset> {
 
-	private static final long serialVersionUID = -1L;
-	private DualListModel<AssetInfo> availableAssets;
-	private List<AssetInfo> sourceAssets;
-	private List<AssetInfo> targetAssets;
-	private UserAccount user;
-	private AssetInfoRepository assetInfoRepository;
-	private QueryAsset queryAsset;
-	private RelRuleAssetRepository relRuleAssetRepository;
-	private String pmOrderRuleUID;
-	private Integer level;
-	private PmOrderRuleRepository pmOrderRuleRepository;
-	private OrgInfoRepository orgInfoRepository;
-	private String siteUid;
-	private BrandRepository brandRepository;
-	private Boolean isInsulate;
-	private Integer loginUserOrgType;
-	private UserCommonService userCommonService;
-	private PmOrderRule pmOrderRule;
-	private String ruleUid;
+    private static final long serialVersionUID = -1L;
+    private DualListModel<AssetInfo> availableAssets;
+    private List<AssetInfo> sourceAssets;
+    private List<AssetInfo> targetAssets;
+    private UserAccount user;
+    private AssetInfoRepository assetInfoRepository;
+    private QueryAsset queryAsset;
+    private RelRuleAssetRepository relRuleAssetRepository;
+    private String pmOrderRuleUID;
+    private Integer level;
+    private PmOrderRuleRepository pmOrderRuleRepository;
+    private OrgInfoRepository orgInfoRepository;
+    private String siteUid;
+    private BrandRepository brandRepository;
+    private Boolean isInsulate;
+    private Integer loginUserOrgType;
+    private UserCommonService userCommonService;
+    private PmOrderRule pmOrderRule;
+    private String ruleUid;
+    //private SupplierRepository supplierDao;
+    private SupplierService supplierService;
 
-	@Override
-	protected void init() {
-		this.filterByHospital = false;
-		this.filterBySite = false;
-		user = UserContextService.getCurrentUserAccount();
-		relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
-		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
-		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-		brandRepository = WebUtil.getBean(BrandRepository.class);
-		targetAssets = new ArrayList<>();
-		queryAsset = new QueryAsset();
-		queryAsset.setTenantUID(user.getTenantUID());
-		siteUid = user.getSiteUID();
-		initAssets();
-		userCommonService = WebUtil.getBean(UserCommonService.class);
-		isInsulate = UserContextService.isInsulate();
-		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-	}
+    @Override
+    protected void init() {
+        this.filterByHospital = false;
+        this.filterBySite = false;
+        user = UserContextService.getCurrentUserAccount();
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        brandRepository = WebUtil.getBean(BrandRepository.class);
+        targetAssets = new ArrayList<>();
+        queryAsset = new QueryAsset();
+        queryAsset.setTenantUID(user.getTenantUID());
+        siteUid = user.getSiteUID();
+        initAssets();
+        userCommonService = WebUtil.getBean(UserCommonService.class);
+        //supplierDao = WebUtil.getBean(SupplierRepository.class);
+        supplierService = WebUtil.getBean(SupplierService.class);
+        isInsulate = UserContextService.isInsulate();
+        loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+    }
 
-	public void initAssets() {
-		sourceAssets = new ArrayList<>();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
-	}
+    public void initAssets() {
+        sourceAssets = new ArrayList<>();
+        targetAssets.forEach((item) -> {
+            if (sourceAssets.contains(item)) {
+                sourceAssets.remove(item);
+            }
+        });
+        availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+    }
 
-	public String getOrgName(String uid) {
-		OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
-		if (orgInfo == null) {
-			return null;
-		}
-		return orgInfo.getName();
-	}
+    public String getOrgName(String uid) {
+        OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
+        if (orgInfo == null) {
+            return null;
+        }
+        return orgInfo.getName();
+    }
 
-	public List<AssetInfo> getAssetList() {
-		List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
-		List<String> uids = null;
-		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
-		}
-		if (StringUtils.isNotEmpty(queryAsset.getName())) {
-			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
-		}
-/*		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+    public List<AssetInfo> getAssetList() {
+        List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
+        List<String> uids = null;
+        if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+            assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getName())) {
+            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+        }
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
-		}*/
-		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
 		}
-		if (null != queryAsset.getAssetGroup()) {
-			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
-		}
-		if (null != queryAsset.getClinicalDeptId()) {
-			assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
-		}
-		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
-			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
-		}
-		if (!assetFilters.isEmpty()) {
-			if (queryAsset.getRuleStatus() != null) {
-				uids = new ArrayList<>();
-				if (queryAsset.getRuleStatus() == 1) {// 已配置
-					uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
-					if (CollectionUtils.isNotEmpty(uids)) {
-						assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-					}
-				} else if (queryAsset.getRuleStatus() == 2) {// 未配置
-					uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
-					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
-				}
-			}
-			List<SearchFilter> userFilter = getAssetFilter();
-			assetFilters.addAll(userFilter);
-			return assetInfoRepository.findBySearchFilter(assetFilters);
-		}
-		return new ArrayList<>();
-	}
+/*        if (null != queryAsset.getManufactureId()) {
+            assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
+        }*/
+        if (null != queryAsset.getAssetGroup()) {
+            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+        }
+        if (null != queryAsset.getClinicalDeptId()) {
+            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
+            assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+        }
+        if (!assetFilters.isEmpty()) {
+            if (queryAsset.getRuleStatus() != null) {
+                uids = new ArrayList<>();
+                if (queryAsset.getRuleStatus() == 1) {// 已配置
+                    uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    if (CollectionUtils.isNotEmpty(uids)) {
+                        assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+                    }
+                } else if (queryAsset.getRuleStatus() == 2) {// 未配置
+                    uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
+                }
+            }
+            List<SearchFilter> userFilter = getAssetFilter();
+            assetFilters.addAll(userFilter);
+            return assetInfoRepository.findBySearchFilter(assetFilters);
+        }
+        return new ArrayList<>();
+    }
 
-	public List<SearchFilter> getAssetFilter() {
-		List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
-		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
-		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
-		return filter;
-	}
+    public List<SearchFilter> getAssetFilter() {
+        List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType, user);
+        filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+        filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
+        return filter;
+    }
 
-	public void addFilter() {
-		sourceAssets = getAssetList();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
-	}
+    public void addFilter() {
+        sourceAssets = getAssetList();
+        targetAssets.forEach((item) -> {
+            if (sourceAssets.contains(item)) {
+                sourceAssets.remove(item);
+            }
+        });
+        availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+    }
 
-	@Override
-	protected RelRuleAssetRepository getDAO() {
-		return relRuleAssetRepository;
-	}
+    @Override
+    protected RelRuleAssetRepository getDAO() {
+        return relRuleAssetRepository;
+    }
 
-	public void onAssetsTransfer(TransferEvent event) {
-		for (Object item : event.getItems()) {
-			if (event.isAdd()) {
-				targetAssets.add((AssetInfo) item);
-			} else {
-				targetAssets.remove((AssetInfo) item);
-			}
-		}
-	}
+    public void onAssetsTransfer(TransferEvent event) {
+        for (Object item : event.getItems()) {
+            if (event.isAdd()) {
+                targetAssets.add((AssetInfo) item);
+            } else {
+                targetAssets.remove((AssetInfo) item);
+            }
+        }
+    }
 
-	@Transactional
-	public void saveRel() {
-		if (targetAssets.isEmpty()) {
-			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
-		} else {
-			List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
-			targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
-			for (AssetInfo ai : targetAssets) {
-				RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
-				if (rel == null) {
-					rel = new RelRuleAsset();
-					rel.setAssetUID(ai.getUid());
-					rel.setCreatedDate(new Date());
-					rel.setTenantUID(ai.getTenantUID());
-					rel.setInstitutionUID(ai.getInstitutionUID());
-					rel.setHospitalUID(ai.getHospitalUID());
-					rel.setSiteUID(ai.getSiteUID());
-				}
-				if (level != null) {
-					if (level == 1) {
-						rel.setRuleUID1(ruleUid);
-					} else if (level == 2) {
-						rel.setRuleUID2(ruleUid);
-					} else if (level == 3) {
-						rel.setRuleUID(ruleUid);
-					}
-					rels.add(rel);
-				}
-				relRuleAssetRepository.save(rels);
-			}
-			WebUtil.addSuccessMessage("配置成功!");
-		}
+    @Transactional
+    public void saveRel() {
+        if (targetAssets.isEmpty()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+        } else {
+            List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
+            targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
+            for (AssetInfo ai : targetAssets) {
+                RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
+                if (rel == null) {
+                    rel = new RelRuleAsset();
+                    rel.setAssetUID(ai.getUid());
+                    rel.setCreatedDate(new Date());
+                    rel.setTenantUID(ai.getTenantUID());
+                    rel.setInstitutionUID(ai.getInstitutionUID());
+                    rel.setHospitalUID(ai.getHospitalUID());
+                    rel.setSiteUID(ai.getSiteUID());
+                }
+                if (level != null) {
+                    if (level == 1) {
+                        rel.setRuleUID1(ruleUid);
+                    } else if (level == 2) {
+                        rel.setRuleUID2(ruleUid);
+                    } else if (level == 3) {
+                        rel.setRuleUID(ruleUid);
+                    }
+                    rels.add(rel);
+                }
+                relRuleAssetRepository.save(rels);
+            }
+            this.level = null;
+            this.ruleUid = null;
+            WebUtil.addSuccessMessage("配置成功!");
+        }
 
-	}
+    }
 
-	public List<PmOrderRule> getPmOrderRuleList() {
-		List<SearchFilter> assetFilters = new ArrayList<>();
-		assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
-		assetFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
-		}
-		if (StringUtils.isNotEmpty(queryAsset.getName())) {
-			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
-		}
-/*		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+    public List<PmOrderRule> getPmOrderRuleList() {
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+        assetFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+            assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getName())) {
+            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+        }
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
-		}*/
-		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
 		}
-		if (queryAsset.getAssetGroup() != null) {
-			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
-		}
-		if (level != null) {
-			assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
-		}
-		return pmOrderRuleRepository.findBySearchFilter(assetFilters);
-	}
+/*        if (null != queryAsset.getManufactureId()) {
+            assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
+        }*/
+        if (queryAsset.getAssetGroup() != null) {
+            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+        }
+        if (level != null) {
+            assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
+        }
+        return pmOrderRuleRepository.findBySearchFilter(assetFilters);
+    }
 
-	public List<PmOrderRule> getRuleList(String name){
+    public List<PmOrderRule> getRuleList(String name) {
 		/*		filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, this.level));
 		filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));*/
-		//List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
-		List<SearchFilter> filter = new ArrayList<>();
-                filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
-		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
-		}
+        //List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+        List<SearchFilter> filter = new ArrayList<>();
+        filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
+        if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+            filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+        }
 /*		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
 		}*/
-		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
-			filter.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
-		}
-		if (queryAsset.getAssetGroup() != null) {
-			filter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
-		}
-		if (level != null) {
-			filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
-		}
-		if(StringUtils.isNotEmpty(name)){
+        if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+            filter.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+        }
+        if (queryAsset.getAssetGroup() != null) {
+            filter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+        }
+        if (level != null) {
+            filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
+        }
+        if (StringUtils.isNotEmpty(name)) {
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
-        }else if(StringUtils.isNotEmpty(queryAsset.getName())){
-			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
-		}
-		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
+        } else if (StringUtils.isNotEmpty(queryAsset.getName())) {
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+        }
+        List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
         rules.sort(new Comparator<PmOrderRule>() {
-			@Override
-			public int compare(PmOrderRule o1, PmOrderRule o2) {
-				try {
-					String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
-					String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
-					return name1.compareTo(name2);
-				} catch (PinyinException e) {
-					e.printStackTrace();
-					return 0;
-				}
-			}
-		});
-		return rules;
-	}
+            @Override
+            public int compare(PmOrderRule o1, PmOrderRule o2) {
+                try {
+                    String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+                    String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+                    return name1.compareTo(name2);
+                } catch (PinyinException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+        return rules;
+    }
 
-	public void setRuleId(){
+    public void clearPmOrderRule(){
+        this.ruleUid = null;
+    }
 
-	}
+    public List<String> getSupplier(String name) {
+        return supplierService.getSupplier(name);
+    }
 
-	public String getRuleUid() {
-		return ruleUid;
-	}
+    public List<OrgInfo> getClinicalDeptList(String name){
+        //UserAccount user = UserContextService.getCurrentUserAccount();
+        List<SearchFilter> filter = new ArrayList<>();
+        filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
+        filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+        if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
+            filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
+        }
+        List<OrgInfo> orgInfos = orgInfoRepository.findBySearchFilter(filter);
+        orgInfos.sort(new OrgInfoComparator());
+        return orgInfos;
+    }
 
-	public void setRuleUid(String ruleUid) {
-		this.ruleUid = ruleUid;
-	}
+    public void setRuleId() {
 
-	public PmOrderRule getPmOrderRule() {
-		return pmOrderRule;
-	}
+    }
 
-	public void setPmOrderRule(PmOrderRule pmOrderRule) {
-		this.pmOrderRule = pmOrderRule;
-	}
+    public String getRuleUid() {
+        return ruleUid;
+    }
 
-	public String getStrDate(Date lastPmDate) {
-		return TimeUtils.getStrDate(lastPmDate, "yyyy-MM-dd");
-	}
+    public void setRuleUid(String ruleUid) {
+        this.ruleUid = ruleUid;
+    }
 
-	public String getPmOrderRuleUID() {
-		return pmOrderRuleUID;
-	}
+    public PmOrderRule getPmOrderRule() {
+        return pmOrderRule;
+    }
 
-	public void setPmOrderRuleUID(String pmOrderRuleUID) {
-		this.pmOrderRuleUID = pmOrderRuleUID;
-	}
+    public void setPmOrderRule(PmOrderRule pmOrderRule) {
+        this.pmOrderRule = pmOrderRule;
+    }
 
-	public QueryAsset getQueryAsset() {
-		return queryAsset;
-	}
+    public String getStrDate(Date lastPmDate) {
+        return TimeUtils.getStrDate(lastPmDate, "yyyy-MM-dd");
+    }
 
-	public void setQueryAsset(QueryAsset queryAsset) {
-		this.queryAsset = queryAsset;
-	}
+    public String getPmOrderRuleUID() {
+        return pmOrderRuleUID;
+    }
 
-	public DualListModel<AssetInfo> getAvailableAssets() {
-		return availableAssets;
-	}
+    public void setPmOrderRuleUID(String pmOrderRuleUID) {
+        this.pmOrderRuleUID = pmOrderRuleUID;
+    }
 
-	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
-		this.availableAssets = availableAssets;
-	}
+    public QueryAsset getQueryAsset() {
+        return queryAsset;
+    }
 
-	public List<AssetInfo> getSourceAssets() {
-		return sourceAssets;
-	}
+    public void setQueryAsset(QueryAsset queryAsset) {
+        this.queryAsset = queryAsset;
+    }
 
-	public void setSourceAssets(List<AssetInfo> sourceAssets) {
-		this.sourceAssets = sourceAssets;
-	}
+    public DualListModel<AssetInfo> getAvailableAssets() {
+        return availableAssets;
+    }
 
-	public List<AssetInfo> getTargetAssets() {
-		return targetAssets;
-	}
+    public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
+        this.availableAssets = availableAssets;
+    }
 
-	public void setTargetAssets(List<AssetInfo> targetAssets) {
-		this.targetAssets = targetAssets;
-	}
+    public List<AssetInfo> getSourceAssets() {
+        return sourceAssets;
+    }
 
-	public Integer getLevel() {
-		return level;
-	}
+    public void setSourceAssets(List<AssetInfo> sourceAssets) {
+        this.sourceAssets = sourceAssets;
+    }
 
-	public void setLevel(Integer level) {
-		this.level = level;
-	}
+    public List<AssetInfo> getTargetAssets() {
+        return targetAssets;
+    }
 
-	public String getSiteUid() {
-		return siteUid;
-	}
+    public void setTargetAssets(List<AssetInfo> targetAssets) {
+        this.targetAssets = targetAssets;
+    }
 
-	public void setSiteUid(String siteUid) {
-		this.siteUid = siteUid;
-	}
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public String getSiteUid() {
+        return siteUid;
+    }
+
+    public void setSiteUid(String siteUid) {
+        this.siteUid = siteUid;
+    }
 
 }

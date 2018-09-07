@@ -12,7 +12,9 @@ import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -23,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -30,6 +33,8 @@ import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
@@ -50,9 +55,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     V2_WorkOrderRepository dao;
     private String supplierName;
+    private String fileterOrgName;
+    private String fileterAssetDeptOrgName;
+    private List<OrgInfo> clinicalDeptList;
+    private boolean terminate = false;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
-    private V2_WorkOrderService woService;    private UaaService uaaService;
+    private V2_WorkOrderService woService;
+    private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
@@ -63,6 +73,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String locationName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
+    private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> assetDeptOrgUidSet;
 
     private V2_ServiceRequest newServiceRequest;
 
@@ -108,11 +120,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ServiceRequestApiService serviceRequestApiService;
     private WorkflowConfigRepository woConDao;
     private String token;
+    private OrgInfoTreeService orgInfoTreeService;
     private AutoCompleteService autoCompleteService;
 
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
+
     protected void init() {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         token = UserContextService.getAccessToken();
@@ -130,12 +144,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
         woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            if(null !=  UrlEncryptController.getValueFromMap(enCodeParameters, "query")){
+            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
                 query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
             }
         }
@@ -147,6 +162,50 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         this.filterBySite = false;
         this.filterByHospital = false;
+        terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        loadClinicalDeptList();
+
+    }
+
+    ///////////////////////////////////////////start
+//选定科室过滤
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
+    //搜索字串
+    private String oneSearchStr;
+    //选定的院区
+    private OrgInfo selectSite;
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
      /*   if(selected==null){
             selected= new V2_WorkOrder();
@@ -154,48 +213,129 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());*/
     }
 
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
 
-//    private void beforeEdit(){
+    private void setUserSearchFilters() {
+        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        if (terminate) {
+            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
+        } else {
+            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        }
+
+        if (!this.hasFilterOnField("siteUID")) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
+        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
+            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
+        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.EQ, fileterOrgName, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
+        if (null != selectSite) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+        }
+
+    }
+
+    public String getFileterOrgName() {
+        return fileterOrgName;
+    }
+
+    public void setFileterOrgName(String fileterOrgName) {
+        this.fileterOrgName = fileterOrgName;
+    }
+
+    public String getFileterAssetDeptOrgName() {
+        return fileterAssetDeptOrgName;
+    }
+
+    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
+        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
+    }
+    //////////////////////////end
+
+
+    //    private void beforeEdit(){
 //        selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
 //    }
-public void onSupplierChange() {
-    Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
-    if(supplier==null)
-        itemDetail.setSupplier(supplierName);
-    else
-        itemDetail.setSupplier(supplier.getName());
-}
-    public String getManHourShow(){
-        if(hourRequired){
+    public void onSupplierChange() {
+        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+        if (supplier == null)
+            itemDetail.setSupplier(supplierName);
+        else
+            itemDetail.setSupplier(supplier.getName());
+    }
+
+    public String getManHourShow() {
+        if (hourRequired) {
             return "工时(小时)*";
-        }else{
+        } else {
             return "工时(小时)";
         }
     }
+
     private Boolean isRating;
+
     public List<String> autoCompleteSupplier(String query) {
-       List<Supplier> suList= autoCompleteService.autoCompleteVendor(query, supplierList);
-       List<String> sList= new ArrayList<String>();
-        suList.forEach(item->sList.add(item.getName()));
+        List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
+        List<String> sList = new ArrayList<String>();
+        suList.forEach(item -> sList.add(item.getName()));
         return sList;
     }
 
 
-
-    public Boolean needRating(){
+    public Boolean needRating() {
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
-        isRating =  Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+        isRating = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("ratingRequired")).get();
         //查看是否被评价过
-        Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
         //如果配置流里设置过必须评价，并且没有被评价过 返回true即显示需要评价
-        if(isRating &&feedback<1 )
-        {
+        if (isRating && feedback < 1) {
             return true;
-        }else
+        } else
             return false;
     }
+
     @Override
     protected GenericRepositoryUUID<V2_WorkOrder> getDAO() {
         return dao;
@@ -401,24 +541,35 @@ public void onSupplierChange() {
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-        } else if(queryIndex ==11){ //全部维修单
+        } else if (queryIndex == 11) { //全部维修单
 
-        } else if(queryIndex ==12){ //指定设备queryAssetUid 工单 设备详细页面跳转
-            if(!Strings.isNullOrEmpty(queryAssetUid)){
+        } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
+            if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
             }
-        }else {//待办
+        } else {//待办
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
 
         this.selected = null;
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<V2_WorkOrder> bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+        return   bySearchFilter;
+
     }
 
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
+        }
+        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+            //先获取 filterOrgName-手术科的 uid
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
+            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.EQ, filterOrg.get(0).toString(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -432,20 +583,21 @@ public void onSupplierChange() {
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
-    public void arrivalTimeSet(){
-        if(itemDetail==null)return;
-        if(itemDetail.getArrived()==true)
+
+    public void arrivalTimeSet() {
+        if (itemDetail == null) return;
+        if (itemDetail.getArrived() == true)
             itemDetail.setArrivedTime(new Date());
-        else{
+        else {
             itemDetail.setArrivedTime(null);
         }
     }
 
-    public void orderSet(){
-        if(itemDetail==null)return;
-        if(itemDetail.getClosed()==true)
+    public void orderSet() {
+        if (itemDetail == null) return;
+        if (itemDetail.getClosed() == true)
             itemDetail.setClosedTime(new Date());
-        else{
+        else {
             itemDetail.setClosedTime(null);
         }
     }
@@ -476,7 +628,7 @@ public void onSupplierChange() {
     }
 
     public void cancel() {
-        confirmedUpDate=null;
+        confirmedUpDate = null;
         selected = null;
         newServiceRequest = null;
         esTime = null;
@@ -489,7 +641,7 @@ public void onSupplierChange() {
         equipmentTaker = null;
         takeTime = null;
         picList = null;
-        attachList=null;
+        attachList = null;
         selectedAsset = null;
 //      requestAssetUid = null;
         locationName = null;
@@ -501,26 +653,26 @@ public void onSupplierChange() {
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
-        audioList = getServiceRequestPicList(selected.getSrId(), 2,null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);
+        audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
+        picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
 
 
-        attachList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_DOCS);
+        attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
     }
 
-    public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type,String boSubType) { //type 1:picture 2:audio
+    public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
 
-		List<V2_BlobObject> pList = woService.getPicListBySrUid(srId,type, boSubType).stream().filter(item -> type == 1 ^
-				(item.getObjectType() != null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+        List<V2_BlobObject> pList = woService.getPicListBySrUid(srId, type, boSubType).stream().filter(item -> type == 1 ^
+                (item.getObjectType() != null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
 
-		return pList;
+        return pList;
     }
 
 
-/*
-*   if type =1 -->picList
-*
-* */
+    /*
+     *   if type =1 -->picList
+     *
+     * */
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
@@ -572,7 +724,7 @@ public void onSupplierChange() {
         prepareAct(woId);
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
-        isRating=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+        isRating = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("ratingRequired")).orElse(false);
 
         picList = new ArrayList<V2_BlobObject>();
@@ -580,30 +732,43 @@ public void onSupplierChange() {
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
+    public void prepareEditCloseOrder(String woId) {
+        prepareAct(woId);
+        picList = new ArrayList<V2_BlobObject>();
+        attachList = new ArrayList<V2_BlobObject>();
+        equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
+        takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
+    }
+    
+    public void saveEditedWorkOrder(){
+        
+        dao.save(selectedWorkOrder);
+    }
+
     private Boolean hourRequired;
+
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
         //获取当前工单的所属流程配置
 
-       ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
-        if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
+        if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
-        picList =woService.getAttachByBoSubType(selectedWorkOrder.getSrId(),V2_BlobObject.BO_SUB_TYPE_IMG);
-        attachList =woService.getAttachByBoSubType(selectedWorkOrder.getSrId(),V2_BlobObject.BO_SUB_TYPE_DOCS);
+        picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
+        attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
     }
 
     public void saveRepairWorkOrder() {
-        if(hourRequired)
-        {
-            if (selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours() < 0.01) {
+        if (hourRequired) {
+            if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
@@ -616,7 +781,7 @@ public void onSupplierChange() {
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        if(!attachList.isEmpty())
+        if (!attachList.isEmpty())
             picList.addAll(attachList);
         woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
@@ -686,13 +851,13 @@ public void onSupplierChange() {
 
        /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         hourRequired=  woc.getHourRequired();*/
-        if(hourRequired) { //如果工作流配置了工时必填，那么就要jian
+        if (hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("工时不能小于0.01");
                 RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
                 valid = false;
             }
-        }else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.0){
+        } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
 
@@ -735,7 +900,7 @@ public void onSupplierChange() {
     }
 
     public void closeWorkOrder() {
-        Integer feedback=woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
 //           if(isRating && feedback<1){
 //               WebUtil.addErrorMessage("请务必给予评价");
 //               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
@@ -766,7 +931,7 @@ public void onSupplierChange() {
     }
 
     public void saveServiceRequest() {
-        if(null == selectedAsset){
+        if (null == selectedAsset) {
             WebUtil.addErrorMessage("没有选择设备,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -788,7 +953,7 @@ public void onSupplierChange() {
         }
     }
 
-    private void onSelectedAsset(AssetInfo asset){
+    private void onSelectedAsset(AssetInfo asset) {
         if (Strings.isNullOrEmpty(asset.getLocationName())) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
@@ -798,7 +963,7 @@ public void onSupplierChange() {
             locationName = asset.getLocationName();
         }
     }
-    
+
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;
@@ -851,19 +1016,19 @@ public void onSupplierChange() {
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
-            supplierName=null;
+            supplierName = null;
 
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-           supplierName=itemDetail.getSupplier();
+            supplierName = itemDetail.getSupplier();
         }
-        supplierList=aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
     }
 
-    public void prepareEditAccDetailonPrice(String itemId){
-        accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+    public void prepareEditAccDetailonPrice(String itemId) {
+        accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
 
-        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
 
@@ -1330,4 +1495,13 @@ public void onSupplierChange() {
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
     }
+
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
 }
+

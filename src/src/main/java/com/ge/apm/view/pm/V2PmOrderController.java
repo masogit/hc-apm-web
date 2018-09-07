@@ -7,6 +7,7 @@ package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
@@ -67,6 +68,8 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final String SIGNATURE_HOLDER = "审核人签名：";
+    private static final String EMPTY_SIGNATURE_HOLDER = "";
 
     V2_PmOrderRepository dao;
     private Double totalManHours;
@@ -326,7 +329,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.NAME.toString(), item.getParts());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.QUANTITY.toString(), item.getApartsQuantity());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getPartsPrice());
+                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getClosedPrice());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.TYPE.toString(), FieldValueMessageController.fieldValue("partsType", item.getPartsType()));
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.SERIAL_NUM.toString(), item.getSerialNum());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.WARRANTY_DATE.toString(), item.getWarrantyDate());
@@ -336,6 +339,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         content.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), accessoryInfoTable);
+
+        // Accessory Signature
+        String signatureStorageId = pmOrder.getSignature();
+        if (!Strings.isNullOrEmpty(signatureStorageId)) {
+            byte[] signatureBytes = pmOrderReportTemplateService.getSignatureBytes(signatureStorageId);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), SIGNATURE_HOLDER);
+                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+            }
+        }
+
+        if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())){
+            byte[] signatureBytes = pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
 
         // Maintenance Workflow Information
         List<Map<String, Object>> maintenanceInfoTable = new ArrayList<>();
@@ -916,21 +935,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         tableService = WebUtil.getBean(TableDefinitionService.class);
         this.selectedMap = new HashMap();
-        /*backup  if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) )*/
-
-        /* if( (userContextService.hasAnyRole("DeptHead")||userContextService.hasAnyRole("HospitalHead")||userContextService.hasAnyRole("ClinicalStaff")) &&(!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")|| userContextService.hasAnyRole("ITAdmin")) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")))*/
-
 //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
-        if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
-            String query = WebUtil.getRequestParameter("query");
+        String query = WebUtil.getRequestParameter("query");
+        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
             if (Strings.isNullOrEmpty(query)) {
                 queryIndex = 8;
             } else {
                 queryIndex = Integer.valueOf(query);
                 searchList(queryIndex);
             }
-        } else {
-            String query = WebUtil.getRequestParameter("query");
+        }else {
             if (Strings.isNullOrEmpty(query)) {
                 queryIndex = -1;
             } else {
@@ -938,6 +952,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchList(queryIndex);
             }
         }
+
+        /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
+            String query = WebUtil.getRequestParameter("query");
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = 8;
+            } else { userContextService.()
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+        } else {
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = -1; //代办
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+        }*/
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
