@@ -206,41 +206,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        if (null != event) {
-            if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-                selectSite = (OrgInfo) event.getTreeNode().getData();
-            } else {
-                selectSite = null;
-            }
-            loadClinicalDeptList();
 
-            filterClinicalDeptOrg = null;
-            filterAssetDeptOrg = null;
-            assetDeptOrgUidSet = null;
-            clinicalDeptOrgUidSet = null;
+        this.searchFilters.clear();
 
-            assetGroup = null;
-            assetGroupSecondary = null;
-            filterAssetStatus = null;
-
-            clearSearchFiltersInTable();
-
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
         }
-    }
+        loadClinicalDeptList();
 
-    private void clearSearchFiltersInTable() {
-        this.removeFilterOnField("name");
-        this.removeFilterOnField("functionType");
-        this.removeFilterOnField("serialNum");
-        this.removeFilterOnField("departNum");
-        this.removeFilterOnField("assetGroup");
-        this.removeFilterOnField("assetGroupSecondary");
-        this.removeFilterOnField("manufacture");
-        this.removeFilterOnField("vendor");
-        this.removeFilterOnField("status");
-        this.removeFilterOnField("warrantyDate");
-        this.removeFilterOnField("financingNum");
-        this.removeFilterOnField("qrCode");
+        //table header dropdown needs to clear manually, table filters cleared by clear method above.
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        assetDeptOrgUidSet = null;
+        clinicalDeptOrgUidSet = null;
+
+        assetGroup = null;
+        assetGroupSecondary = null;
+        filterAssetStatus = null;
 
     }
 
