@@ -20,6 +20,8 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -70,8 +72,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
-
-    V2_PmOrderRepository dao;
+    private String supplierName;
+    private AutoCompleteService autoCompleteService;
+    private AssetInfoMgrService aimService;
+    private List<Supplier> supplierList = new ArrayList<Supplier>();
+    private V2_PmOrderRepository dao;
     private Double totalManHours;
     private String dptName;
     private OrgInfoRepository orgDao;
@@ -87,7 +92,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date planTimeForBatch;
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
-    Boolean terminate;
+    private Boolean terminate;
     private PmOrderReportTemplateService pmOrderReportTemplateService;
     private UaaService uaaService;
     private UserContextService userContextService;
@@ -144,6 +149,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private TenantInfoRepository tenantInfoRepository;
     Boolean isInsulate;
     private String reportUid; //selected table base uid
+    private Map<String, Object> selectedObjectMap = new HashMap();
 
 
     public String getHead() {
@@ -911,9 +917,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         takeTime = null;
         picList = null;
     }
-
+    public void onSupplierChange() {
+        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+        if (supplier == null)
+            itemDetail.setSupplier(supplierName);
+        else
+            itemDetail.setSupplier(supplier.getName());
+    }
     ///
     protected void init() {
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
         //  pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
@@ -934,6 +947,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         tableService = WebUtil.getBean(TableDefinitionService.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         this.selectedMap = new HashMap();
 //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
@@ -1268,6 +1282,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             });
             pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
+            approvedDetails = null;
         }
     }
 
@@ -1447,9 +1462,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedPmOrder.getId());
+            supplierName = null;
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            supplierName = itemDetail.getSupplier();
         }
+
+        supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
+
     }
 
     public void removeWoDetail(String itemId, Integer index) {
@@ -1566,7 +1586,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return true;
         }
     }
-
+    public List<String> autoCompleteSupplier(String query) {
+        List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
+        List<String> sList = new ArrayList<String>();
+        suList.forEach(item -> sList.add(item.getName()));
+        return sList;
+    }
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
             return null;
@@ -2020,5 +2045,37 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setCurrentPagePmOrders(List<V2_PmOrder> currentPagePmOrders) {
         this.currentPagePmOrders = currentPagePmOrders;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+
+    public AutoCompleteService getAutoCompleteService() {
+        return autoCompleteService;
+    }
+
+    public void setAutoCompleteService(AutoCompleteService autoCompleteService) {
+        this.autoCompleteService = autoCompleteService;
+    }
+
+    public AssetInfoMgrService getAimService() {
+        return aimService;
+    }
+
+    public void setAimService(AssetInfoMgrService aimService) {
+        this.aimService = aimService;
     }
 }
