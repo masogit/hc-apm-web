@@ -552,13 +552,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         this.selected = null;
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<V2_WorkOrder> bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+        return   bySearchFilter;
+
     }
 
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
+        }
+        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+            //先获取 filterOrgName-手术科的 uid
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
+            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.EQ, filterOrg.get(0).toString(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
