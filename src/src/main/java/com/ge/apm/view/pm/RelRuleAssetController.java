@@ -14,6 +14,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
@@ -291,6 +292,20 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public List<String> getSupplier(String name) {
         return supplierService.getSupplier(name);
+    }
+
+    public List<OrgInfo> getClinicalDeptList(String name){
+        //UserAccount user = UserContextService.getCurrentUserAccount();
+        List<SearchFilter> filter = new ArrayList<>();
+        filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
+        filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+        if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
+            filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
+        }
+        List<OrgInfo> orgInfos = orgInfoRepository.findBySearchFilter(filter);
+        orgInfos.sort(new OrgInfoComparator());
+        return orgInfos;
     }
 
     public void setRuleId() {

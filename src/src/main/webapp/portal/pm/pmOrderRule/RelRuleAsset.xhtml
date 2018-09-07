@@ -62,13 +62,20 @@
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
 	                          </p:inputText>
 		                 </h:panelGroup>
+
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.clinicalDeptName}</label>
-		                      <p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
+                             <p:autoComplete id="clinicalDeptName" value="#{relRuleAssetController.queryAsset.clinicalDeptId}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                             forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
+                                             var="t" itemLabel="#{t.name}" itemValue="#{t.id}" >
+                                 <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                             </p:autoComplete>
+		                      <!--<p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
 		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-		                      </p:selectOneMenu>
+		                      </p:selectOneMenu>-->
 		                 </h:panelGroup>
                        <h:panelGroup >
                            <label class ="label">#{msg.brand}</label>
