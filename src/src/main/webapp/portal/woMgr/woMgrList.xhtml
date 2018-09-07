@@ -138,7 +138,7 @@
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                         <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                     </p:column>
-                    <p:column headerText="#{msg.maintenanceValue}" sortBy="#{item.serviceRequest.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
+                    <p:column headerText="#{msg.maintenanceValue}" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
                         <h:outputText value="#{item.maintenanceValue}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->

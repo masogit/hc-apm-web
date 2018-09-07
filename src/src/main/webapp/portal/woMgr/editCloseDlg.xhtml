@@ -34,8 +34,11 @@
                             <label class="label">#{msg.equipmentTaker}</label>
                             <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="true"/>
                             <label class="label">#{msg.equiptaketime}</label>
-                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button"
-                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+<!--                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button" 
+                                        readonlyInput="true" showButtonPanel="false" navigator="true" mask="true" disabled="true"/>-->
+                            <h:outputText value="#{workOrderMgrController.takeTime}"  >
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
                             <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update="woTab:EditCloseDialogForm:equipmentTaker :growl" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
