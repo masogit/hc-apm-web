@@ -78,7 +78,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
-    AssetFileImportService importService;
+    AssetFileExportService exportService;
 
     AssetInfoService assetInfoService;
     
@@ -293,7 +293,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        importService = WebUtil.getBean(AssetFileImportService.class);
+        exportService= WebUtil.getBean(AssetFileExportService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
@@ -1954,7 +1954,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         //不可用
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
+        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
         streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

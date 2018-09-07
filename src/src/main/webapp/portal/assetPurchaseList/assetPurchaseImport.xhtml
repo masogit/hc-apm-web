@@ -37,7 +37,7 @@
                     <p:fieldset  legend="数据概览">
                         <p:dataTable id="datalist" rendered="#{not empty purchaseFromExcelController.purchaseList}" value="#{purchaseFromExcelController.purchaseList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
                                      rowsPerPageTemplate="20,50,100,500">
                             <p:column headerText="设备类别">
                                 <h:outputText value="#{item.assetType}" />

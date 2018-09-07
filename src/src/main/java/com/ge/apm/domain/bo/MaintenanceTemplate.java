@@ -61,6 +61,8 @@ public class MaintenanceTemplate {
             }
 
             this.content.put(Component.ACCESSORY_INFORMATION.toString(), Component.ACCESSORY_INFORMATION.value());
+            this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
+            this.content.put(Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.value());
             this.content.put(Component.MAINTENANCE_WORKFLOW.toString(), Component.MAINTENANCE_WORKFLOW.value());
             this.content.put(Component.AUDIT_RECORDS.toString(), Component.AUDIT_RECORDS.value());
             this.content.put(Component.CHECK_LIST.toString(), Component.CHECK_LIST.value());
@@ -182,6 +184,8 @@ public class MaintenanceTemplate {
      */
     public enum Component {
         ACCESSORY_INFORMATION("accessory_information", Widget.TABLE),
+        ACCESSORY_SIGNATURE("accessory_signature", Widget.PICTURE),
+        ACCESSORY_SIGNATURE_PLACE_HOLDER("accessory_signature_place_holder", Widget.TEXT),
         MAINTENANCE_WORKFLOW("maintenance_workflow", Widget.TABLE),
         AUDIT_RECORDS("audit_records", Widget.TABLE),
         CHECK_LIST("check_list", Widget.TABLE),
@@ -284,6 +288,11 @@ public class MaintenanceTemplate {
         TABLE {
             public String apply(String value) {
                 return "{{#" + value + "}}";
+            }
+        },
+        PICTURE {
+            public String apply(String value) {
+                return "{{@" + value + "}}";
             }
         },
         DYNAMIC {

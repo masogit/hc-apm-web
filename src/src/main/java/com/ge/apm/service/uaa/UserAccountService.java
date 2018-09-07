@@ -440,7 +440,7 @@ public class UserAccountService {
 				}
 				if (!StringUtils.isEmpty(email) && !emailValidator.isValid(email)) {
                     newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
-                    pass=false;
+                    newUser.setEmail(null);
                 }
 
 				if(handleNewUser(newUser, institution, hospital, site, department)==false){
