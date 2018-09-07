@@ -209,6 +209,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 }
                 relRuleAssetRepository.save(rels);
             }
+            this.level = null;
+            this.ruleUid = null;
             WebUtil.addSuccessMessage("配置成功!");
         }
 
@@ -283,6 +285,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return rules;
     }
 
+    public void clearPmOrderRule(){
+        this.ruleUid = null;
+    }
 
     public List<String> getSupplier(String name) {
         return supplierService.getSupplier(name);
