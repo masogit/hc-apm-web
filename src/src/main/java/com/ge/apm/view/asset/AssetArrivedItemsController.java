@@ -5,6 +5,9 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import org.primefaces.component.tree.Tree;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -55,12 +58,18 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     
     private QrCodeService qrCodeService;
 
+    private OrgInfoTreeService orgInfoTreeService;
+
+    private TreeNode selectedNode;
+
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+
         addDateTimeFields("arrivalList.arrivalDate");
     }
 
@@ -88,7 +97,15 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
 
         if (null != fileterDeptOrg) {
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterDeptOrg.getUid(), "1*"));
+            if (selectedNode.isLeaf()) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterDeptOrg.getUid(), "1*"));
+            } else {
+                List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
+                List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+            }
+
+
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
@@ -188,14 +205,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
-        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
-                fileterDeptOrg = deptOrg;
-                return;
-            }
+        selectedNode = event.getTreeNode();
+        OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
+        if (deptOrg.getOrgType() == 4) {
+            fileterDeptOrg = deptOrg;
+        } else {
+            fileterDeptOrg = null;
         }
-        fileterDeptOrg = null;
+
     }
     
     public String getQrCodeImageForAsset() {
