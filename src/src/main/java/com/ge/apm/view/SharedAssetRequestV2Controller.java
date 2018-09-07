@@ -486,11 +486,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
-                    WebUtil.addWarnMessage("该设备故障，不可借用！");
-                    return; 
-                }
-                //在asset_info中判断是否属于 调剂中心科室
+                }//在asset_info中判断是否属于 调剂中心科室
                 else if(depts.contains(assetDeptUID)){
                     WebUtil.addWarnMessage("该设备已归还！");
                     return; 

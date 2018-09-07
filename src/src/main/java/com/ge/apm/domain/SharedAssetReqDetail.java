@@ -159,6 +159,15 @@ public class SharedAssetReqDetail implements Serializable{
     @JoinColumn(name = "return_id", referencedColumnName = "id", unique = true, insertable = false, updatable = false)
     private SharedAssetRequest returnRequest;
 
+    @Column(name = "is_intact")
+    private Boolean isIntact;
+
+    @Column(name = "compensation_amount", columnDefinition = "decimal(11,2)")
+    private Double compensationAmount;
+
+    @Column(name = "req_comment", columnDefinition = "VARCHAR(256)")
+    private String reqComment;
+
     public String getId() {
         return id;
     }
@@ -649,4 +658,27 @@ public class SharedAssetReqDetail implements Serializable{
 		this.returnRequest = returnRequest;
 	}
 
+    public Boolean getIsIntact() {
+        return isIntact;
+    }
+
+    public void setIntact(boolean intact) {
+        isIntact = intact;
+    }
+
+    public Double getCompensationAmount() {
+        return compensationAmount;
+    }
+
+    public void setCompensationAmount(Double compensationAmount) {
+        this.compensationAmount = compensationAmount;
+    }
+
+    public String getReqComment() {
+        return reqComment;
+    }
+
+    public void setReqComment(String reqComment) {
+        this.reqComment = reqComment;
+    }
 }
