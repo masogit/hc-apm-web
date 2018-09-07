@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -30,6 +31,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by lsg on 20/7/2018.
@@ -92,15 +95,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
-		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
-		//queryAsset = new QueryAsset();
-		//queryAsset.setTenantUID(currentUser.getTenantUID());
-
+		tenantUserList = tenantUserList.stream().distinct().collect(toList());
+		 tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
+		tenantUserList.sort(new PinYinComparatorByName());
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoDao.findByUid(currentUser.getSiteUID()).getOrgType();
 		clinicalDeptList = new ArrayList<OrgInfo>();
-
-
 		queryAsset1 = new AssetInfo();
 		queryAsset1.setTenantUID(currentUser.getTenantUID());
 		if(currentUser.getOrgLevel() != 0) {
@@ -212,7 +212,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		if(selectedMap.isEmpty()){
 			return true;
 		}
-		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
+		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(toList());
 		if(collect.isEmpty()){
 			return true;
 		}
@@ -221,7 +221,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		if(selected!=null)
 			assetName =selected.getAssetInfo().getName();
 		//如果多于1个被选中
-   	if(selectedMap.entrySet().stream().filter(item->item.getValue()).collect(Collectors.toList()).size()==1){
+   	if(selectedMap.entrySet().stream().filter(item->item.getValue()).collect(toList()).size()==1){
    		return false;
    		} else
    		return true;
@@ -260,7 +260,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void delete(){
 		delMsgList.forEach(item-> System.out.println(item.getId()));
 		delMsgList=delMsgList.stream().filter(item->selectedMap.containsKey(item.getId())).filter(item->
-				selectedMap.get(item.getId())).collect(Collectors.toList());
+				selectedMap.get(item.getId())).collect(toList());
 
 		if(delMsgList.isEmpty()){
 			super.delete();
@@ -415,7 +415,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			}
 
 
-			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(Collectors.toList());
+			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(toList());
 			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
 			if(msglist.size()>0){
 				WebUtil.addErrorMessage("不能重复创建相同设备的消息订阅");
@@ -450,7 +450,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 	}
 	public void selectedSetting(){
-		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(Collectors.toList());
+		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(toList());
 		if(!collect.isEmpty()){
 			Integer msgId =collect.get(0);
 			selected=dao.findById(Integer.valueOf(msgId));
