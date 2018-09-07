@@ -2,20 +2,38 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author 212547631
@@ -95,6 +113,9 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
+    @Column(name="signature")
+    private String signature;
+
     @Column(name="int_ext_type")
     private Integer intExtType;
 
@@ -173,6 +194,9 @@ public class V2_PmOrder  implements Serializable {
     private String qualityChecking; //默认是合格
     @Column(name="approval_status")
     private String approvalStatus;
+    @Transient
+    @JsonIgnore
+    private String strPlanTime;
 
     public V2_PmOrder() {
     }
@@ -373,7 +397,19 @@ public class V2_PmOrder  implements Serializable {
 //        this.feedbackComment = feedbackComment;
 //    }
 
-    public String getCurrentStepId() {
+    public String getStrPlanTime() {
+    	if(this.planTime!=null){
+    		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+    		strPlanTime=sdf.format(this.planTime);
+    	}
+		return strPlanTime;
+	}
+
+	public void setStrPlanTime(String strPlanTime) {
+		this.strPlanTime = strPlanTime;
+	}
+
+	public String getCurrentStepId() {
         return currentStepId;
     }
 
@@ -535,6 +571,14 @@ public class V2_PmOrder  implements Serializable {
 
     public void setSimplify(Boolean simplify) {
         this.simplify = simplify;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     public Integer getPmType() {

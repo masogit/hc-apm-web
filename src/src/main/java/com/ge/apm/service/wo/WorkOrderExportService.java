@@ -2,10 +2,13 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -14,15 +17,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -59,9 +61,12 @@ public class WorkOrderExportService {
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
     @Autowired
     UserAccountRepository userAccountDao;
+    @Autowired
+    private OrgInfoTreeService orgInfoTreeService;
+    @Autowired
+    private BlobFileService blobService;
 
-    //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
-    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner) {
+    public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList) {
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
@@ -85,9 +90,17 @@ public class WorkOrderExportService {
         }
         
         if(clinicalDept !=null){
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDept.getUid()));
+            List<OrgInfo> orgSearchList = new ArrayList<>();
+            orgSearchList.add(clinicalDept);
+
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
+            List<String> clinicalDeptUIDList = new ArrayList<>();
+            for (OrgInfo oi : tempOrgSearchSet) {
+                clinicalDeptUIDList.add(oi.getUid());
+            }
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
-        if(currentOwner !=null){
+        if(currentOwner !=null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
         }
 
@@ -122,6 +135,7 @@ public class WorkOrderExportService {
             V2_ServiceRequest serviceRequest = serviceRequestDao.findOne(workOrder.getSrId());
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
             V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 2);
+            V2_WorkOrder_Step sendStep_2 = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 3);
             V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeAsc(workOrder.getId(), 4);
             V2_WorkOrder_Step workStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
@@ -150,7 +164,11 @@ public class WorkOrderExportService {
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
             if (sendStep != null) {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
-                workOrderMap.put("派工时间", formatDate(sendStep.getEndTime()));
+            } else {
+                workOrderMap.put("派工人", "无");
+            }
+            if (sendStep_2 != null) {
+                workOrderMap.put("派工时间", formatDate(sendStep_2.getStartTime()));
             }
             workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()) : "");
             workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()) : "");
@@ -162,21 +180,26 @@ public class WorkOrderExportService {
                 workOrderMap.put("维修完成时间", formatDate(workStep.getEndTime()));
             }
             workOrderMap.put("签到时间", formatDate(workOrder.getCheckinTime()));
-            workOrderMap.put("维修工时", workOrder.getTotalManHour());
+            workOrderMap.put("维修工程师工时", workOrder.getManHours());
+            workOrderMap.put("维修总工时", workOrder.getTotalManHour());
+
+            putBlob(workOrderMap, workOrder.getSignature(), "signature");
+            putBlob(workOrderMap, workOrder.getAckSignature(), "ack_signature");
+
             String info = "";
             double infoTotalPrice = 0;
             List<Map<String, Object>> parts = new ArrayList<>();
             for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
                 if (workOrderDetail.getApproved() == null || workOrderDetail.getApproved()) {
                     Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
-                    Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
+                    Double tempPrice = workOrderDetail.getClosedPrice() != null ? workOrderDetail.getClosedPrice() : 0;
                     info += workOrderDetail.getParts() + ",数量：" + tempQuantity + ",单价:" + tempPrice + ";";
                     infoTotalPrice += tempQuantity * tempPrice;
                 }
 
                 Map<String, Object> part = new HashedMap();
                 part.put("备件名", workOrderDetail.getParts());
-                part.put("单价", workOrderDetail.getPartsPrice());
+                part.put("单价", workOrderDetail.getClosedPrice());
                 part.put("数量", workOrderDetail.getApartsQuantity());
                 part.put("类型", getPartType(workOrderDetail.getPartsType()));
                 part.put("序列号", workOrderDetail.getSerialNum());
@@ -241,11 +264,11 @@ public class WorkOrderExportService {
 
             //计算距上次报修天数
             String nearestWorkDay = "";
-            if(!closeWorkOrderList.isEmpty() && workOrder.getCreatedDate() != null){
+            if (!closeWorkOrderList.isEmpty() && workOrder.getCreatedDate() != null) {
                 closeWorkOrderList = closeWorkOrderList.stream().filter(item -> item.getCloseTime() != null && item.getCloseTime().before(workOrder.getCreatedDate())).collect(Collectors.toList());
-                if(!closeWorkOrderList.isEmpty()){
+                if (!closeWorkOrderList.isEmpty()) {
                     Date closeTime = closeWorkOrderList.get(0).getCloseTime();
-                    int days = (int) ((workOrder.getCreatedDate().getTime() - closeTime.getTime()) / (1000*3600*24));
+                    int days = (int) ((workOrder.getCreatedDate().getTime() - closeTime.getTime()) / (1000 * 3600 * 24));
                     nearestWorkDay = String.valueOf(days);
                 }
             }
@@ -293,6 +316,16 @@ public class WorkOrderExportService {
         }
 
         return resultList;
+    }
+
+    private void putBlob(Map<String, Object> workOrderMap, String storageId, String key) {
+        if (storageId != null) {
+            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
+                workOrderMap.put(key, IOUtils.toByteArray(stream));
+            } catch (IOException ignore) {
+                //ignore
+            }
+        }
     }
 
     private void putServiceRequestMessage(V2_WorkOrder workOrder, Map<String, Object> workOrderMap) {

@@ -191,7 +191,7 @@
                         <p:dataTable id="purchaseList"  value="#{contractInfoEditController.purchaseItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500"  rows="10" emptyMessage="#{msg.noRecordFound}">
+                                     rowsPerPageTemplate="20,50,100,500"  rows="20" emptyMessage="#{msg.noRecordFound}">
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.contractAssetName}">
                                 <h:outputText value="#{item.contractAssetName}"/>
@@ -209,7 +209,7 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}" disabled="#{!contractInfoEditController.canRemovePucheseItem(item)}"  update="purchaseList" />
                             </p:column>
 
@@ -224,7 +224,7 @@
                         <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500" rows="10" emptyMessage="#{msg.noRecordFound}" >
+                                     rowsPerPageTemplate="20,50,100,500" rows="20" emptyMessage="#{msg.noRecordFound}" >
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.AssetName}">
                                 <h:outputText value="#{item.itemType eq 'ExistAsset'? item.assetInfo.name : item.arrivalListItem.arrivalList.assetName}"/>

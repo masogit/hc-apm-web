@@ -3,6 +3,7 @@ package com.ge.apm.view.uaa;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.MicroServiceUtil;
@@ -80,6 +81,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private UserAccountService userAccountService;
 
+    private OrgInfoTreeService orgInfoTreeService;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -90,6 +93,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
 
@@ -125,6 +129,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedTenant = tenantDao.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
+            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
@@ -178,7 +183,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+
+                if (selectedOrg.getOrgType()  == 4) {
+                    if (selectedNode.isLeaf()) {
+                        searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                    } else {
+                        List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
+                        List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                        searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalUids, "1*2+"));
+                    }
+
+                }
+
             }
         }
         boolean nameFilter=false;
@@ -351,10 +367,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
-    public void onAfterDeleteObject(UserAccount object, boolean isOk) {
-        if (isOk) {
-            uaaService.clearUserScope(object.getUid());
-        }
+    public void onBeforeDeleteObject(UserAccount object) {
+        uaaService.clearUserScope(object.getUid());
     }
 
     @Override

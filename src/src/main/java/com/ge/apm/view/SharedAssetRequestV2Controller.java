@@ -26,16 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 /**
  *
  * @author caoyong
@@ -484,7 +479,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
-                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
+                String assetDeptUID = infoVo.getAssetDeptUID();
                 String ClinicalDeptName = infoVo.getClinicalDeptName();
                 //获得计费开始时间、附件字段
 
@@ -496,7 +491,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     return; 
                 }
                 //在asset_info中判断是否属于 调剂中心科室
-                else if(depts.contains(ClinicalDeptUID)){
+                else if(depts.contains(assetDeptUID)){
                     WebUtil.addWarnMessage("该设备已归还！");
                     return; 
                 }
@@ -515,7 +510,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
                                     List<SharedAssetReqDetail> detail_list = asdDao.getBorrowInfo(infoVo.getUid());
                                     if(detail_list.size()==1){
-                                        if(!ClinicalDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
+                                        if(!assetDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
                                             WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName);
                                             return;
                                         }
@@ -584,7 +579,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                                     if(userOrg.getOrgType()==4){
                                         infoVo.setClinicalDeptName(userOrg.getName());
-                                        infoVo.setClinicalDeptUID(userOrg.getUid());
+                                        infoVo.setAssetDeptUID(userOrg.getUid());
                                     }
 
                                     //asiDao.save(infoVo);
@@ -718,7 +713,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
-                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
+                String ClinicalDeptUID = infoVo.getAssetDeptUID();
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
@@ -815,9 +810,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     //更改使用科室
                                     
                                     OrgInfo findByUid = orgInfoDao.findByUid(this.selected.getClinicalDeptUid());
-                                    infoVo.setClinicalDeptId(findByUid.getId());
-                                    infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
-                                    infoVo.setClinicalDeptUID(this.selected.getClinicalDeptUid());
+                                    infoVo.setAssetDeptId(findByUid.getId());
+//                                    infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
+                                    infoVo.setAssetDeptUID(this.selected.getClinicalDeptUid());
 
                                     //asiDao.save(infoVo);
                                     
@@ -1093,16 +1088,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 2;//2借用待交付状态
 
        List<SharedAssetReqType> sartList = selected.getSartList();
-        for (SharedAssetReqType sart : sartList) {
-            if (sart.getExceptQty() == 0){
-                String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("url", url);
-
-                WebUtil.addWarnMessage("设备 '"+sart.getSwapName()+"' 的预计借用数必须大于0！");
-                return;
-            }
-        }
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 1) {
         	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
@@ -1311,7 +1296,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            for (int i = 0; i < infoList.size(); i++) {
                AssetInfo info = infoList.get(i);
                AssetInfo realInfo = asiDao.findByUid(info.getUid());
-               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getClinicalDeptUID());
+               List<WorkflowConfig> wfcList = wfCfigDao.findByDeptForSharedAsset(realInfo.getAssetDeptUID());
                if (wfcList != null && wfcList.size() > 0) {
                    msg = msg + "设备 ‘" + info.getDepartNum() +"’ 刚刚已被归还，请重新录入！ ";
                    for (int j = 0; j < sardList.size(); j++) {
@@ -1754,6 +1739,39 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     		ex.printStackTrace();
     	}
     	requestContext.addCallbackParam("url", url);
+    }
+
+    public boolean validateAllExpectedQty() {
+        List<SharedAssetReqType> sartList = selected.getSartList();
+        boolean expectedQtyGTZero = false;
+        for (SharedAssetReqType sart : sartList) {
+            if (sart.getExceptQty() > 0){
+                expectedQtyGTZero = true;
+                break;
+            }
+        }
+        logger.debug("validateTotalExpectedQty result: " + expectedQtyGTZero);
+        return !expectedQtyGTZero;
+    }
+
+    public String getOrgLocation() {
+        StringBuilder orgLoc = new StringBuilder();
+        if(this.selected != null) {
+            String orgUid = this.selected.getClinicalDeptUid();
+            OrgInfo orgInfo = orgInfoDao.findByUid(orgUid);
+            if(StringUtils.isNotBlank(orgInfo.getBuildingNum())) {
+                orgLoc.append(orgInfo.getBuildingNum());
+                orgLoc.append("楼");
+            }
+            if(StringUtils.isNotBlank(orgInfo.getFloorNum())) {
+                orgLoc.append(orgInfo.getFloorNum());
+                orgLoc.append("层");
+            }
+            if(StringUtils.isNotBlank(orgInfo.getOther())) {
+                orgLoc.append(orgInfo.getOther());
+            }
+        }
+        return orgLoc.toString();
     }
 
 }

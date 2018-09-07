@@ -74,7 +74,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode gbTree;
     private TreeNode orgTree;
     private TreeNode clinicalOrgTree;
-    private boolean hierachyClinicalSupport = false;
 
     private boolean assetGroupSecondarySupport = false;
     private List<I18nMessage> assetGroupSecondaryList;
@@ -214,6 +213,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             List<OrgInfo> clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(siteOrg.getSiteUID());
             clinicalOrgTree = orgInfoTreeService.buildHierachyClinicalDept(siteOrg.getSiteUID(), clinicalDeptList);
 
+            OrgInfo clinicalDept = orgDao.findByUid(selected.getClinicalDeptUID());
+            selectedObjectMap.put("clinicalDept", clinicalDept);
+
+            OrgInfo assetDept = orgDao.findByUid(selected.getAssetDeptUID());
+            selectedObjectMap.put("assetDept", assetDept);
         }
 
     }
@@ -221,8 +225,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-        changeAssetOrg(orgInfo);
+
         selectedObjectMap.put("selectedOrg", orgInfo);
+
+        changeAssetOrg(orgInfo);
     }
 
     public void onSelectClinicalDeptTreeNode(NodeSelectEvent event) {
@@ -230,6 +236,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
         selectedObjectMap.put("clinicalDept", orgInfo);
+
+        onAssetDeptChange("clinicalDept");
     }
 
     public void onSelectAssetDeptTreeNode(NodeSelectEvent event) {
@@ -237,6 +245,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
         selectedObjectMap.put("assetDept", orgInfo);
+
+        onAssetDeptChange("assetDept");
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -272,17 +282,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private void updateClinicalDeptOnSiteChange() {
 
-        //later support hierachy clinical dept
-//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
-        int parentClinicalCount = 0;
-        if (parentClinicalCount > 0) {
-            //如果存在大科室，则显示树结构
-            hierachyClinicalSupport = true;
-            initClinicalOrgTree();
-        } else {
-            hierachyClinicalSupport = false;
-            clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        }
+        clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
     }
 
     public void onParentAssetChange() {
@@ -782,6 +782,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
 
+    public boolean needShow(String fieldKey) {
+
+        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageStatusFields().contains(fieldKey)) return true;
+
+        return false;
+    }
+
     public boolean needEdit(String fieldKey) {
         return editableFieldsList.contains(fieldKey);
     }
@@ -861,14 +873,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
         this.selectedObjectMap = selectedObjectMap;
-    }
-
-    public boolean isHierachyClinicalSupport() {
-        return hierachyClinicalSupport;
-    }
-
-    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
-        this.hierachyClinicalSupport = hierachyClinicalSupport;
     }
 
     public TreeNode getClinicalOrgTree() {

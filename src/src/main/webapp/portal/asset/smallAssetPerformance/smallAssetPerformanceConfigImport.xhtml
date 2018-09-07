@@ -33,7 +33,7 @@
 					value="#{smallAssetPerformanceConfigController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
 					paginatorAlwaysVisible="true"
 					paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 					<p:column headerText="EXCEL行数">
 						<h:outputText value="#{item.excelIdex}" />
 					</p:column>

@@ -116,10 +116,10 @@
     <h:form id="dataListForm">
         <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item"
                      selection="#{workOrderReportExportController.selectedItems}"
-                     rowKey="#{item.报修单号}" lazy="false" paginator="true" paginatorPosition="both"
+                     rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="both"
                      paginatorAlwaysVisible="true"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10"
+                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
                      emptyMessage="#{msg.noRecordFound}"
                      rowsPerPageTemplate="20,50,100,500">
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>

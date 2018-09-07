@@ -125,7 +125,7 @@
 
                     </p:fieldset>
 
-                    <p:fieldset  legend="评价">
+<!--                    <p:fieldset  legend="评价">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
                                 <label id="rateId" class="label">#{msg.feedbackRating}</label>
@@ -136,7 +136,7 @@
                                 <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
                             </h:panelGroup>
                         </p:panelGrid>
-                    </p:fieldset>
+                    </p:fieldset>-->
 
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.closeWorkOrder}" value="#{msg.closeWo}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleClose(xhr, status, args);"/>
@@ -151,10 +151,10 @@
         <script type="text/javascript">
             function handleClose(xhr,status,args){
                 var valid =true;
-                 if(args.isRate){
-                 $('#woTab\\:toCloseDialogForm\\:rateId').addClass("ui-state-error")
-                         valid=false
-                     }
+//                 if(args.isRate){
+//                 $('#woTab\\:toCloseDialogForm\\:rateId').addClass("ui-state-error")
+//                         valid=false
+//                     }
 
                 if(valid){
                     handleSubmit(args,'toCloseDialog')

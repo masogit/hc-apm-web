@@ -12,6 +12,7 @@ import javax.faces.context.FacesContext;
 import com.ge.apm.dao.UserOrgInfoRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -82,6 +83,8 @@ public class UserAccountService {
 
 	@Autowired
 	UserOrgInfoRepository userOrgDao;
+
+	EmailValidator emailValidator = EmailValidator.getInstance();
 
 	public List<UserAccount> getUserAccount() {
 		return userAccountMapper.getAllUser();
@@ -435,6 +438,11 @@ public class UserAccountService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
 					pass=false;
 				}
+				if (!StringUtils.isEmpty(email) && !emailValidator.isValid(email)) {
+                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
+                    newUser.setEmail(null);
+                }
+
 				if(handleNewUser(newUser, institution, hospital, site, department)==false){
 					importFailedDataList.add(newUser);
 					failedCount++;

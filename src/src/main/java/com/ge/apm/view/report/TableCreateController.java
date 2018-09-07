@@ -6,7 +6,6 @@ import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.domain.ElectricSafetyData;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
@@ -182,6 +181,8 @@ public class TableCreateController extends TieWebSheetBean {
             WebUtil.addErrorMessage("名称最大长度64");
             return;
         }
+        Date operationTime = new Date();
+        String operator = UserContextService.getCurrentUserAccount().getUid();
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
             //save instrument data
@@ -190,8 +191,10 @@ public class TableCreateController extends TieWebSheetBean {
             table.setSchemaId(selectedTableDefinition.getId());
             tableString = JSONObject.toJSONString(table);
             selectedTableDefinition.setSchema(tableString);
-            templateDao.save(selectedTableDefinition);
+            //templateDao.save(selectedTableDefinition);
             selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
+            selectedTableDefinition.setCreatedBy(operator);
+            selectedTableDefinition.setCreatedDate(operationTime);
             templateDao.save(selectedTableDefinition);
 
             WebUtil.addSuccessMessage("JSON已保存");
@@ -202,6 +205,8 @@ public class TableCreateController extends TieWebSheetBean {
                 selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition.setSchema(tableString);
                 selectedTableDefinition.setName(table.getTitle());
+                selectedTableDefinition.setLastModifiedBy(operator);
+                selectedTableDefinition.setLastModifiedDate(operationTime);
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("JSON已保存");
             } else {
@@ -341,6 +346,7 @@ public class TableCreateController extends TieWebSheetBean {
             return;
         }
         this.isStringEditable = false;
+        this.saveTemplate();
     }
 
     public void prepareAddOption() {
