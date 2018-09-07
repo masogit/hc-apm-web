@@ -8,6 +8,7 @@ package com.ge.apm.service.wo;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 import java.util.LinkedHashMap;
@@ -113,6 +114,18 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         HttpEntity<WorkOrderForm> requestEntity = new HttpEntity<WorkOrderForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.CREATE_WORK_ORDER);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
+    String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (String) responseMap.get("message");
