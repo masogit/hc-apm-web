@@ -580,6 +580,21 @@ public void onSupplierChange() {
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
+    
+    public void prepareEditCloseOrder(String woId) {
+        prepareAct(woId);
+        picList = new ArrayList<V2_BlobObject>();
+        attachList = new ArrayList<V2_BlobObject>();
+        equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
+        takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
+    }
+    
+    public void saveEditedWorkOrder(){
+        
+        dao.save(selectedWorkOrder);
+    }
+    
+    
     private Boolean hourRequired;
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
