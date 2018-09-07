@@ -112,33 +112,39 @@
                         <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
-                        <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
+                        <p:commandLink value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
-                        <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
+                        <p:commandLink value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
-                        <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
-                        <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
+                        <p:commandLink value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/><br/>
+                        <p:commandLink value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
-                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
-                        <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandLink value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/><br/>
+                        <p:commandLink id="sssss" value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/><br/>
+                        <p:commandLink value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/><br/>
 
-                        <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandLink  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
-                        <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandLink value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
-                        <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
+                        <p:commandLink value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
-                        <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
+                        <p:commandLink value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
-                        <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
+                        <p:commandLink value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
+                        <h:outputText value="#{item.maintenanceValue}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
+                        <p:commandLink value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
                     </p:column>
 
                     <f:facet name="{Toolbar}">
@@ -155,6 +161,7 @@
             <ui:include src="repairCompleteDlg.xhtml"/>
             <ui:include src="newOrderDialog.xhtml"/>
             <ui:include src="toCloseDlg.xhtml"/>
+            <ui:include src="EditCloseDlg.xhtml"/>
             <ui:include src="approveDlg.xhtml"/>
             <ui:include src="moreAccDialogPrice.xhtml"/>
 
