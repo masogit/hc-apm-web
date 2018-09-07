@@ -946,7 +946,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }else {
             if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 1;
+                queryIndex = -1;
             } else {
                 queryIndex = Integer.valueOf(query);
                 searchList(queryIndex);
