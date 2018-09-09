@@ -166,7 +166,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
-
+    public void orderSet() {
+        if (itemDetail == null) return;
+        if (itemDetail.getClosed() == true)
+            itemDetail.setClosedTime(new Date());
+        else {
+            itemDetail.setClosedTime(null);
+        }
+    }
     public void arrivalTimeSet() {
         if (itemDetail == null) return;
         if (itemDetail.getArrived() == true)
