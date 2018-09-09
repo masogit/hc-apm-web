@@ -85,6 +85,9 @@
                             <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
                                 <p:ajax listener="#{v2PmOrderController.arrivalTimeSet}" event="change"></p:ajax>
                             </p:selectBooleanButton>
+                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                                <p:ajax listener="#{v2PmOrderController.orderSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
                         </p:column>
 
                     </p:panelGrid>
