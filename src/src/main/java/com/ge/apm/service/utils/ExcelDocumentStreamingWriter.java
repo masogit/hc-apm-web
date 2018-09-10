@@ -9,6 +9,7 @@ import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
@@ -28,7 +29,6 @@ import java.util.*;
 public class ExcelDocumentStreamingWriter implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingWriter.class);
 
-//    XSSFWorkbook xssfWorkbook;
     XSSFWorkbook workBook;
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
@@ -42,11 +42,10 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     }
 
     public ExcelDocumentStreamingWriter(InputStream input, List<SheetMetaData> metaData) throws IOException {
-//        this.xssfWorkbook = new XSSFWorkbook(input);
-
-//        this.workBook = new SXSSFWorkbook(xssfWorkbook);
+//        this.workBook = new SXSSFWorkbook(new XSSFWorkbook(input));
         this.workBook = new XSSFWorkbook(input);
-//        formatAsTable();
+
+
 
         CreationHelper createHelper = workBook.getCreationHelper();
 
@@ -81,6 +80,19 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         });
 
 //        getMetaData();
+    }
+
+    public void printNames() {
+        for (int i=0; i<workBook.getNumberOfNames(); i++) {
+            Name name = workBook.getNameAt(i);
+            logger.info("{}, {}", name.getNameName(), name.getRefersToFormula());
+            AreaReference area = new AreaReference(name.getRefersToFormula(), SpreadsheetVersion.EXCEL2007);
+            CellReference crList[] = area.getAllReferencedCells();
+            for (CellReference cr : crList) {
+                logger.info(cr.formatAsString());
+
+            }
+        }
     }
 
     private void getMetaData() {
