@@ -114,7 +114,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
     private void initTree(String tenantUid) {
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        if(UserContextService.isInsulate()){
+		selectedTenant = tempTenantInfo;
+		orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+/*        if(UserContextService.isInsulate()){
             //隔离租户
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
@@ -127,7 +129,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
-        }
+        }*/
 
         TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedUserOrg) {

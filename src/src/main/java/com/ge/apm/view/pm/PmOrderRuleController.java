@@ -103,9 +103,36 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         initTree(user.getTenantUID());
     }
 
+/*    public void setTenantUid(String tenantUid) {
+        //searchFilters.clear();
+        //this.tenantUid = tenantUid;
+        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isInsulate()){
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+        }else{
+            selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+        }
+
+        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedUserOrg) {
+            selectedUserOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        }
+    }*/
+
     private void initTree(String tenantUid) {
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        if(UserContextService.isInsulate()){
+        selectedTenant = tempTenantInfo;
+        orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+/*        if(UserContextService.isInsulate()){
             //隔离租户
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
@@ -118,7 +145,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
-        }
+        }*/
 
         TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedUserOrg) {
@@ -143,6 +170,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
+        selected.setSiteUID(selectedUserOrg.getSiteUID());
     }
 
     @Override
