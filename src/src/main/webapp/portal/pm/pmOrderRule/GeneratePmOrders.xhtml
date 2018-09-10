@@ -43,9 +43,9 @@
 					   </h:panelGroup>
 					   <h:panelGroup >
 						   <label class ="label">#{msg.clinicalDeptName}</label>
-						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.queryAsset.clinicalDeptUid}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
 										   forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
-										   var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" disabled="#{generatePmOrdersController.level == null}">
+										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" disabled="#{generatePmOrdersController.level == null}">
 							   <p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
 							   <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
 						   </p:autoComplete>

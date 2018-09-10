@@ -77,6 +77,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private TenantInfoRepository tenantInfoRepository;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
+    private OrgInfo clinicalOrgInfo;
 
     @Override
 	protected void init() {
@@ -179,8 +180,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
-        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
-            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
+        if (clinicalOrgInfo != null){//StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())
+            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
             List<String> results = new ArrayList<>(clinicalUids);
             if(CollectionUtils.isNotEmpty(results)){
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
@@ -376,7 +377,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-        WebUtil.addSuccessMessage("工单生成成功，");
+        WebUtil.addSuccessMessage("工单生成成功！");
 		//WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 	}
 
@@ -407,7 +408,15 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return suppliers;
 	}*/
 
-    public TenantInfo getSelectedTenant() {
+	public OrgInfo getClinicalOrgInfo() {
+		return clinicalOrgInfo;
+	}
+
+	public void setClinicalOrgInfo(OrgInfo clinicalOrgInfo) {
+		this.clinicalOrgInfo = clinicalOrgInfo;
+	}
+
+	public TenantInfo getSelectedTenant() {
         return selectedTenant;
     }
 
