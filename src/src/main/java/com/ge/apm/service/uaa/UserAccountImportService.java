@@ -696,7 +696,8 @@ public class UserAccountImportService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
 					pass=false;
 				}
-				if (StringUtils.isEmpty(email) || !emailValidator.isValid(email)) {
+				if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
+					newUser.setEmail(null);
 //                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
                 }
 				if(StringUtils.isEmpty(roleName)){
