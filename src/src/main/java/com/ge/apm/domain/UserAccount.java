@@ -189,6 +189,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private OrgInfo orgInfo;
+	
+	@Transient
+	private List<OrgInfo> listOrgInfo;
 
 	@Transient
 	private String tenantName;
@@ -204,6 +207,12 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private String departName;
+	
+	@Transient
+	private String departName2;
+	
+	@Transient
+	private String departName3;
 
 	@Transient
 	private String orgFullName;
@@ -257,6 +266,21 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private String status;
+	
+	@Transient
+	private String accessScope;
+	
+	@Transient
+	private String importRoleNames;
+	
+	@Transient
+	private List<UserOrgInfo> listUserOrgInfo;
+	
+	@Transient
+	private List<UserRole> listImportUserRole;
+	
+	@Transient
+	private List<UserOrgInfo> listImportUserOrgInfo;
 
 	@PrePersist
 	public void initializeUid() {
@@ -578,6 +602,14 @@ public class UserAccount implements ChineseName, Serializable {
 		this.orgInfo = orgInfo;
 	}
 
+	public List<OrgInfo> getListOrgInfo() {
+		return listOrgInfo;
+	}
+
+	public void setListOrgInfo(List<OrgInfo> listOrgInfo) {
+		this.listOrgInfo = listOrgInfo;
+	}
+
 	public void entryptPassword() throws NoSuchAlgorithmException {
 		byte[] salt = Digests.generateSalt(SALT_SIZE);
 		setPwdSalt(Digests.encodeHex(salt));
@@ -592,6 +624,30 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setLockTime(Date lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	public String getAccessScope() {
+		return accessScope;
+	}
+
+	public void setAccessScope(String accessScope) {
+		this.accessScope = accessScope;
+	}
+	
+	public String getImportRoleNames() {
+		return importRoleNames;
+	}
+
+	public void setImportRoleNames(String importRoleNames) {
+		this.importRoleNames = importRoleNames;
+	}
+
+	public List<UserOrgInfo> getListUserOrgInfo() {
+		return listUserOrgInfo;
+	}
+
+	public void setListUserOrgInfo(List<UserOrgInfo> listUserOrgInfo) {
+		this.listUserOrgInfo = listUserOrgInfo;
 	}
 
 	@Override
@@ -710,7 +766,7 @@ public class UserAccount implements ChineseName, Serializable {
 			return;
 		}
 		OrgInfo org = this.orgInfo;
-		if (this.orgInfo == null) {
+		if (org == null) {
 			return;
 		}
 		OrgInfo parentOrg = org;
@@ -781,6 +837,22 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setDepartName(String departName) {
 		this.departName = departName;
+	}
+
+	public String getDepartName2() {
+		return departName2;
+	}
+
+	public void setDepartName2(String departName2) {
+		this.departName2 = departName2;
+	}
+
+	public String getDepartName3() {
+		return departName3;
+	}
+
+	public void setDepartName3(String departName3) {
+		this.departName3 = departName3;
 	}
 
 	public String loadOrgTableColumn() {
@@ -881,5 +953,21 @@ public class UserAccount implements ChineseName, Serializable {
 	public UserAccount(String name,String uid){
 		this.name=name;
 		this.uid=uid;
+	}
+
+	public List<UserRole> getListImportUserRole() {
+		return listImportUserRole;
+	}
+
+	public void setListImportUserRole(List<UserRole> listImportUserRole) {
+		this.listImportUserRole = listImportUserRole;
+	}
+
+	public List<UserOrgInfo> getListImportUserOrgInfo() {
+		return listImportUserOrgInfo;
+	}
+
+	public void setListImportUserOrgInfo(List<UserOrgInfo> listImportUserOrgInfo) {
+		this.listImportUserOrgInfo = listImportUserOrgInfo;
 	}
 }

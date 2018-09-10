@@ -252,3 +252,5 @@ ALTER TABLE weixin_article ALTER COLUMN content TYPE varchar(204800) USING conte
 
 update qr_code_lib set status=5 where status=2 and submit_wechat_id is null;
 
+ALTER TABLE public.user_org DROP CONSTRAINT fk_gj8bl5ul9orysa05e0j4vve8n;
+update tenant_info set tenant_config='{"menuList":["安装验收","设备档案","设备调剂","维修管理(不含排班管理)","维修排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}' where tenant_config is null;
