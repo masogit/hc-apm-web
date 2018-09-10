@@ -210,11 +210,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
         if(selectedUserOrg != null){
-            if(selectedUserOrg.getOrgType() == 0){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
+            /*if(selectedUserOrg.getOrgType() == 0){
                 filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
-            }
+            }*/
         }else{
-            filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+            //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
         }
         filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));

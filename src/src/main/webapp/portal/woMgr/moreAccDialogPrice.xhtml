@@ -56,6 +56,48 @@
             </h:panelGroup>
         </h:form>
     </p:dialog>
+    
+    <p:dialog id="moreAccDialogViewDlg" class="moreAccDialogViewDlg" widgetVar="moreAccDialogViewDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="备件查看">
+        <h:form id="moreAccDialogViewForm" >
+            <h:panelGroup>
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">备件名称*</label>
+                        <p:inputText id="parts" disabled="true" value="#{workOrderMgrController.itemDetail.parts}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">备件(数量)*</label>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">实际价格(元)*</label>
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}" readonly="true" />
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">发票号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">合同号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}" readonly="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:column headerText="结单">
+                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单" disabled="true">
+                            </p:selectBooleanButton>
+                        </p:column>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
 
 </ui:composition>
 </html>

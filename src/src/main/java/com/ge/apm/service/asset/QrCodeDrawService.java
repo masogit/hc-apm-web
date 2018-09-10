@@ -137,10 +137,10 @@ public class QrCodeDrawService {
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
 
+        QrCodeTemplateElement qrCodeItem = elements.stream().filter(item-> QrCodeTemplateElement.QrCodeElementType.QrCode.equals(item.getType())).findAny().get();
+        drawQrcodeElement(g, suscribeLink, qrCodeItem);
         for (QrCodeTemplateElement item : elements) {
-            if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)) {
-                drawQrcodeElement(g, suscribeLink, item);
-            } else if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.Text)) {
+            if (!QrCodeTemplateElement.QrCodeElementType.QrCode.equals(item.getType())) {
                 drawTextElement(g, item);
             }
         }
