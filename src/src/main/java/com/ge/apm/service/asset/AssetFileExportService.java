@@ -119,4 +119,11 @@ public class AssetFileExportService extends AssetFileImportBaseService {
         return hasFailData;
     }
 
+    public ExcelDocument exportAssetTemplate() throws IOException {
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+
+        return doc;
+    }
+
 }
