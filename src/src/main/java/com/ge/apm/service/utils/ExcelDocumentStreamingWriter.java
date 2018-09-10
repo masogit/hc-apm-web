@@ -5,11 +5,16 @@
  */
 package com.ge.apm.service.utils;
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +28,8 @@ import java.util.*;
 public class ExcelDocumentStreamingWriter implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingWriter.class);
 
-    Workbook workBook;
+//    XSSFWorkbook xssfWorkbook;
+    XSSFWorkbook workBook;
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
     final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
@@ -36,8 +42,11 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     }
 
     public ExcelDocumentStreamingWriter(InputStream input, List<SheetMetaData> metaData) throws IOException {
-        this.workBook = new SXSSFWorkbook(new XSSFWorkbook(input));
-//        this.workBook = new XSSFWorkbook(input);
+//        this.xssfWorkbook = new XSSFWorkbook(input);
+
+//        this.workBook = new SXSSFWorkbook(xssfWorkbook);
+        this.workBook = new XSSFWorkbook(input);
+//        formatAsTable();
 
         CreationHelper createHelper = workBook.getCreationHelper();
 
@@ -185,6 +194,36 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
             cell.setCellValue((Double) data);
         }
+
+    }
+
+    public void formatAsTable() {
+        XSSFTable my_table = workBook.getSheetAt(0).createTable();
+        CTTable cttable = my_table.getCTTable();
+//        AutoFilter autoFilter = new XSSFAutoFilter();
+//        cttable.setAutoFilter(autoFilter);
+        CTTableStyleInfo tableStyleInfo = cttable.addNewTableStyleInfo();
+        tableStyleInfo.setName("TableStyleMedium9");
+        tableStyleInfo.setShowColumnStripes(false);
+        tableStyleInfo.setShowRowStripes(true);
+
+        AreaReference areaReference = new AreaReference(
+                new CellReference(6, 0),
+                new CellReference(10, 0),
+                SpreadsheetVersion.EXCEL97);
+
+        cttable.setRef(areaReference.formatAsString());
+        cttable.setDisplayName("Asset List");
+        cttable.setName("Asset List");
+        cttable.setId(1L);
+
+        CTTableColumns columns = cttable.addNewTableColumns();
+        columns.setCount(1);
+
+        CTTableColumn column = columns.addNewTableColumn();
+        column.setName("Column 1");
+        column.setId(1);
+
 
     }
 
