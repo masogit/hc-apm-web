@@ -8,10 +8,19 @@ public class QueryAsset {
 	private String manufacture;//品牌
 	private Integer ruleStatus;//规则状态 0：全部 1、已配置 2、未配置
 	private Integer level;
-	private Integer clinicalDeptId;//使用科室
+	//private Integer clinicalDeptId;//使用科室
 	private String brand;//品牌
+    private String clinicalDeptUid;//使用科室uid
 
-	public String getBrand() {
+    public String getClinicalDeptUid() {
+        return clinicalDeptUid;
+    }
+
+    public void setClinicalDeptUid(String clinicalDeptUid) {
+        this.clinicalDeptUid = clinicalDeptUid;
+    }
+
+    public String getBrand() {
 		return brand;
 	}
 
@@ -19,12 +28,6 @@ public class QueryAsset {
 		this.brand = brand;
 	}
 
-	public Integer getClinicalDeptId() {
-		return clinicalDeptId;
-	}
-	public void setClinicalDeptId(Integer clinicalDeptId) {
-		this.clinicalDeptId = clinicalDeptId;
-	}
 	public Integer getLevel() {
 		return level;
 	}

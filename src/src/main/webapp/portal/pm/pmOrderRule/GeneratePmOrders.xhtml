@@ -16,15 +16,46 @@
     
         <h:form id="GeneratePmOrderForm">
                    <p:panelGrid id="param" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                   	
-	                   	<h:panelGroup>
-	                       		<label class="label">#{msg.ruleLevel} *</label>
-	                               <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}"  required="true"   requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
-	                                   <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList param"  />
-	                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-	                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}" /> 
-	                               </p:selectOneMenu>
-	                       </h:panelGroup> 
+					   <h:panelGroup>
+						   <label class="label">#{msg.ruleLevel}*</label>
+						   <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}"  required="true"   requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
+							   <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList param"  />
+							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+							   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+						   </p:selectOneMenu>
+					   </h:panelGroup>
+					   <h:panelGroup>
+						   <label class="label">#{msg.orgId}</label>
+						   <p:inputText id="selectedUserOrgName" value="#{generatePmOrdersController.getOrgFullName(generatePmOrdersController.selectedUserOrg)}" readonly="true" required="false" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+						   <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+						   <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+							   <p:scrollPanel style="height:300px;border: 0" mode="native">
+								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="single">
+									   <p:ajax process="@this" event="select" update=":GeneratePmOrderForm" listener="#{generatePmOrdersController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+									   <p:ajax process="@this" event="expand"/>
+									   <p:ajax process="@this" event="collapse"/>
+									   <p:treeNode type="org">
+										   <h:outputText value="#{node}"/>
+									   </p:treeNode>
+								   </p:tree>
+							   </p:scrollPanel>
+						   </p:overlayPanel>
+					   </h:panelGroup>
+					   <h:panelGroup >
+						   <label class ="label">#{msg.clinicalDeptName}</label>
+						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.queryAsset.clinicalDeptUid}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+										   forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
+										   var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" disabled="#{generatePmOrdersController.level == null}">
+							   <p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
+							   <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
+						   </p:autoComplete>
+						   <!-- <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.clinicalDeptId}" disabled="#{generatePmOrdersController.level == null}" >
+                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{assetInfoService.getClinicalDeptList(generatePmOrdersController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>-->
+					   </h:panelGroup>
+
                           <h:panelGroup >
 		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{generatePmOrdersController.queryAsset.name}"  disabled="#{generatePmOrdersController.level == null}">
@@ -62,14 +93,7 @@
 	                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
 	                          </p:inputText>
 		                 </h:panelGroup>
-		                  <h:panelGroup >
-		                      <label class ="label">#{msg.clinicalDeptName}</label>
-		                      <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.clinicalDeptId}" disabled="#{generatePmOrdersController.level == null}" >
-		                              <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
-		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(generatePmOrdersController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-		                      </p:selectOneMenu>
-		                 </h:panelGroup>
+
 						   <h:panelGroup >
 							   <label class ="label">#{msg.brand}</label>
 							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}"  disabled="#{generatePmOrdersController.level == null}">

@@ -1,10 +1,7 @@
 package com.ge.apm.view.pm;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -14,16 +11,22 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.TreeNode;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.pure.AssetRuleModel;
@@ -62,6 +65,15 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     //private SupplierRepository supplierDao;
     private SupplierService supplierService;
 
+    private TenantInfo selectedTenant;
+    private OrgInfo selectedUserOrg;
+    private OrgInfo selectedOrg;
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private TenantInfoRepository tenantInfoRepository;
+    private UaaService uaaService;
+    private OrgInfoTreeService orgInfoTreeService;
+
     @Override
     protected void init() {
         this.filterByHospital = false;
@@ -78,10 +90,43 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         siteUid = user.getSiteUID();
         initAssets();
         userCommonService = WebUtil.getBean(UserCommonService.class);
-        //supplierDao = WebUtil.getBean(SupplierRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
+        initTree(user.getTenantUID());
+    }
+
+    private void initTree(String tenantUid) {
+        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+        if(UserContextService.isInsulate()){
+            //隔离租户
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+        }else{
+            //非隔离租户
+            selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+        }
+
+        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedUserOrg) {
+            selectedUserOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        }
+    }
+
+    public void onSelectOrgForUser(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedUserOrg = (OrgInfo) node.getData();
     }
 
     public void initAssets() {
@@ -102,6 +147,18 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return orgInfo.getName();
     }
 
+    public String getOrgFullName(OrgInfo org) {
+        if(null == org || org.getId() == -1) {
+            return null;
+        }
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
+        }
+        return name;
+    }
+
     public List<AssetInfo> getAssetList() {
         List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
         List<String> uids = null;
@@ -120,8 +177,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (null != queryAsset.getAssetGroup()) {
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
-        if (null != queryAsset.getClinicalDeptId()) {
-            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
+            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
+            List<String> results = new ArrayList<>(clinicalUids);
+            if(CollectionUtils.isNotEmpty(results)){
+                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
+            }
         }
         if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
             assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
@@ -147,7 +208,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     }
 
     public List<SearchFilter> getAssetFilter() {
-        List<SearchFilter> filter = userCommonService.getUserLogicFilters(loginUserOrgType, user);
+        List<SearchFilter> filter = new ArrayList<>();
+        if(selectedUserOrg != null){
+            if(selectedUserOrg.getOrgType() == 0){
+                filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
+            }
+        }else{
+            filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
+        }
         filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -200,11 +268,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 }
                 if (level != null) {
                     if (level == 1) {
-                        rel.setRuleUID1(ruleUid);
+                        rel.setRuleUID1(pmOrderRule.getUid());
                     } else if (level == 2) {
-                        rel.setRuleUID2(ruleUid);
+                        rel.setRuleUID2(pmOrderRule.getUid());
                     } else if (level == 3) {
-                        rel.setRuleUID(ruleUid);
+                        rel.setRuleUID(pmOrderRule.getUid());
                     }
                     rels.add(rel);
                 }
@@ -308,8 +376,48 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return orgInfos;
     }
 
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public OrgInfo getSelectedUserOrg() {
+        return selectedUserOrg;
+    }
+
+    public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+        this.selectedUserOrg = selectedUserOrg;
+    }
+
     public void setRuleId() {
 
+    }
+
+    public TenantInfo getSelectedTenant() {
+        return selectedTenant;
+    }
+
+    public void setSelectedTenant(TenantInfo selectedTenant) {
+        this.selectedTenant = selectedTenant;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
     }
 
     public String getRuleUid() {

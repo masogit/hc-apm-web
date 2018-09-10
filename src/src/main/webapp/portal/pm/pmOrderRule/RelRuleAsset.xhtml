@@ -18,13 +18,46 @@
 <!--              <p:tabView>
                 <p:tab > -->
                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                          <h:panelGroup >
+                       <h:panelGroup>
+                           <label class="label">#{msg.orgId}</label>
+                           <p:inputText id="selectedUserOrgName" value="#{relRuleAssetController.getOrgFullName(relRuleAssetController.selectedUserOrg)}" readonly="true" required="false" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                           <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                           <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                               <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{relRuleAssetController.orgTree}" selection="#{relRuleAssetController.selectedNode}" var="node" selectionMode="single">
+                                       <p:ajax process="@this" event="select" update=":BatchCreateForm" listener="#{relRuleAssetController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                       <p:ajax process="@this" event="expand"/>
+                                       <p:ajax process="@this" event="collapse"/>
+                                       <p:treeNode type="org">
+                                           <h:outputText value="#{node}"/>
+                                       </p:treeNode>
+                                   </p:tree>
+                               </p:scrollPanel>
+                           </p:overlayPanel>
+                       </h:panelGroup>
+
+                       <h:panelGroup >
+                           <label class ="label">#{msg.clinicalDeptName}</label>
+                           <p:autoComplete id="clinicalDeptName" value="#{relRuleAssetController.queryAsset.clinicalDeptUid}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                           forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
+                                           var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" >
+                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                           </p:autoComplete>
+                           <!--<p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
+                                   <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
+                                   <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                   <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                           </p:selectOneMenu>-->
+                       </h:panelGroup>
+
+                       <h:panelGroup >
 		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
                                     <p:ajax listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                              </p:inputText>
-		                 </h:panelGroup>
-		                 <h:panelGroup >
+                       </h:panelGroup>
+                       <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
 		                     <p:selectOneMenu value="#{relRuleAssetController.queryAsset.assetGroup}" disabled="false" >
 		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
@@ -63,20 +96,6 @@
 	                          </p:inputText>
 		                 </h:panelGroup>
 
-		                 <h:panelGroup >
-		                      <label class ="label">#{msg.clinicalDeptName}</label>
-                             <p:autoComplete id="clinicalDeptName" value="#{relRuleAssetController.queryAsset.clinicalDeptId}" dropdown="true" scrollHeight="300" style="max-width: 200px"
-                                             forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
-                                             var="t" itemLabel="#{t.name}" itemValue="#{t.id}" >
-                                 <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
-                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
-                             </p:autoComplete>
-		                      <!--<p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
-		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
-		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-		                      </p:selectOneMenu>-->
-		                 </h:panelGroup>
                        <h:panelGroup >
                            <label class ="label">#{msg.brand}</label>
                            <p:inputText  value="#{relRuleAssetController.queryAsset.brand}"  disabled="false">
@@ -132,7 +151,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PmOrderRule}*</label>
-                            <p:autoComplete id="SelectedPmOrderRule" value="#{relRuleAssetController.ruleUid}" dropdown="true" scrollHeight="300" rendered="#{relRuleAssetController.level > 0}"
+                            <p:autoComplete id="SelectedPmOrderRule" value="#{relRuleAssetController.pmOrderRule}" dropdown="true" scrollHeight="300" rendered="#{relRuleAssetController.level > 0}"
                                             forceSelection="true" required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}" completeMethod="#{relRuleAssetController.getRuleList}"
                                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
                                     <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.setRuleId()}"/>
