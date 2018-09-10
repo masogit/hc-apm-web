@@ -184,7 +184,7 @@
                             <h:panelGroup id="parentAssetList">
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" 
-                                completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
+                                completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                                 <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
                                 </p:autoComplete>
                             </h:panelGroup>
