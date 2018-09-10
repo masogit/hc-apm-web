@@ -1,9 +1,6 @@
 package com.ge.apm.view.pm;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -13,12 +10,20 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.OrgInfoComparator;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +69,16 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	//private SupplierRepository supplierDao;
 	private SupplierService supplierService;
 
-	@Override
+    private TenantInfo selectedTenant;
+    private OrgInfo selectedUserOrg;
+    private OrgInfo selectedOrg;
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private TenantInfoRepository tenantInfoRepository;
+    private UaaService uaaService;
+    private OrgInfoTreeService orgInfoTreeService;
+
+    @Override
 	protected void init() {
 		this.filterByHospital = false;
 		this.filterBySite = false;
@@ -82,10 +96,56 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
 		siteUid = user.getSiteUID();
 		initAssets();
-		userCommonService = WebUtil.getBean(UserCommonService.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
+        initTree(user.getTenantUID());
 	}
+
+    public void onSelectOrgForUser(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedUserOrg = (OrgInfo) node.getData();
+    }
+
+    private void initTree(String tenantUid) {
+        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+        if(UserContextService.isInsulate()){
+            //隔离租户
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+        }else{
+            //非隔离租户
+            selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+        }
+
+        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedUserOrg) {
+            selectedUserOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        }
+    }
+
+    public String getOrgFullName(OrgInfo org) {
+        if(null == org || org.getId() == -1) {
+            return null;
+        }
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
+        }
+        return name;
+    }
 
 	public void initAssets() {
 		sourceAssets = new ArrayList<>();
@@ -116,15 +176,25 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}
-/*		if(null != queryAsset.getManufactureId()){
-			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
-		}*/
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
-        if (null != queryAsset.getClinicalDeptId()) {
-            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
+            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
+            List<String> results = new ArrayList<>(clinicalUids);
+            if(CollectionUtils.isNotEmpty(results)){
+                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
+            }
         }
+/*        if (null != queryAsset.getClinicalDeptId()) {
+            OrgInfo selectedOrg = orgInfoRepository.findById(queryAsset.getClinicalDeptId());
+            if(selectedOrg != null){
+                Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(selectedOrg.getUid());
+                if(CollectionUtils.isNotEmpty(clinicalUids)){
+                    assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,clinicalUids ));
+                }
+            }
+        }*/
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
 		}
@@ -153,10 +223,18 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public List<SearchFilter> getAssetFilter() {
-		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+        List<SearchFilter> filter = new ArrayList<>();
+        if(selectedUserOrg != null){
+            if(selectedUserOrg.getOrgType() == 0){
+                filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
+            }
+        }else{
+            filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
+        }
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+        filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
 		return filter;
 	}
 
@@ -169,6 +247,20 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		});
 		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
+
+    public List<OrgInfo> getClinicalDeptList(String name){
+        //UserAccount user = UserContextService.getCurrentUserAccount();
+        List<SearchFilter> filter = new ArrayList<>();
+        filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
+        filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+        if(StringUtils.isNotEmpty(name)){
+            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
+            filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
+        }
+        List<OrgInfo> orgInfos = orgInfoRepository.findBySearchFilter(filter);
+        orgInfos.sort(new OrgInfoComparator());
+        return orgInfos;
+    }
 
 	@Override
 	protected RelRuleAssetRepository getDAO() {
@@ -274,7 +366,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-		WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
+        WebUtil.addSuccessMessage("工单生成成功，");
+		//WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 	}
 
 	public String getStrDate(Date lastPmDate) {
@@ -304,7 +397,47 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return suppliers;
 	}*/
 
-	public void setQueryAsset(QueryAsset queryAsset) {
+    public TenantInfo getSelectedTenant() {
+        return selectedTenant;
+    }
+
+    public void setSelectedTenant(TenantInfo selectedTenant) {
+        this.selectedTenant = selectedTenant;
+    }
+
+    public OrgInfo getSelectedUserOrg() {
+        return selectedUserOrg;
+    }
+
+    public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+        this.selectedUserOrg = selectedUserOrg;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public void setQueryAsset(QueryAsset queryAsset) {
 		this.queryAsset = queryAsset;
 	}
 
