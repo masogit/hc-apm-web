@@ -485,7 +485,7 @@ public class QrCodeService {
         if (qrCodeLib == null) {
             return "InvalidQRCode";
         }
-        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2 && qrCodeLib.getStatus() != 5) {
                 return "AlreadyUsingQrCode";
         }
         return "Normal";
