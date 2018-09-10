@@ -225,12 +225,17 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
         if(selectedUserOrg != null){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID(),"1*"));
+        }else{
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+        }
+/*        if(selectedUserOrg != null){
             if(selectedUserOrg.getOrgType() == 0){
                 filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
             }
         }else{
             filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
-        }
+        }*/
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -252,7 +257,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         //UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();
         filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
-        filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+		if(selectedUserOrg != null){
+			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID(),"1*"));
+		}else{
+			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
+		}
+        //filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         if(StringUtils.isNotEmpty(name)){
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name,"1*2+"));
             filter.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, name.toLowerCase(),"1*2+"));
