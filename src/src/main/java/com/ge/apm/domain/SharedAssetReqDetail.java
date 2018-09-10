@@ -160,7 +160,7 @@ public class SharedAssetReqDetail implements Serializable{
     private SharedAssetRequest returnRequest;
 
     @Column(name = "is_intact")
-    private Boolean isIntact;
+    private Boolean intact = Boolean.TRUE;
 
     @Column(name = "compensation_amount", columnDefinition = "decimal(11,2)")
     private Double compensationAmount;
@@ -658,12 +658,12 @@ public class SharedAssetReqDetail implements Serializable{
 		this.returnRequest = returnRequest;
 	}
 
-    public Boolean getIsIntact() {
-        return isIntact;
+    public Boolean getIntact() {
+        return this.intact;
     }
 
-    public void setIntact(boolean intact) {
-        isIntact = intact;
+    public void setIntact(Boolean intact) {
+        this.intact = intact;
     }
 
     public Double getCompensationAmount() {
