@@ -77,8 +77,8 @@ public class UserAccountImportService {
 	private static final String SHEET_USER="datalist";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
-	private Map<String,List<UserOrgInfo>> mapUserOrgInfo=new HashMap<String,List<UserOrgInfo>>();
-	private Map<String,List<UserRole>> mapUserRole=new HashMap<String,List<UserRole>>();
+	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
+	private Map<String,TenantInfo> mapUidTenantInfo=new HashMap<String,TenantInfo>();
 	private OrgInfo orgInfoTemp;
 	private int successCount;
 	private int failedCount;
@@ -186,9 +186,101 @@ public class UserAccountImportService {
 		}
 		return newUser;
 	}
+	private OrgInfo getOrgInfoByMappingUid(String uid){
+		OrgInfo tempOrgInfo=null;
+		if(mapUidOrgInfo.containsKey(uid)){
+			tempOrgInfo=mapUidOrgInfo.get(uid);
+		}
+		if(tempOrgInfo==null){
+			tempOrgInfo=orgInfoRepository.getByUid(uid);
+			if(tempOrgInfo!=null){
+				mapUidOrgInfo.put(uid, tempOrgInfo);
+			}
+		}
+		return tempOrgInfo;
+	}
+	private TenantInfo getTenantInfoByMappingUid(String uid){
+		TenantInfo temp=null;
+		if(mapUidTenantInfo.containsKey(uid)){
+			temp=mapUidTenantInfo.get(uid);
+		}
+		if(temp==null){
+			temp=tenantInfoRepository.findByuid(uid);
+			if(temp!=null){
+				mapUidTenantInfo.put(uid, temp);
+			}
+		}
+		return temp;
+	}
+	private OrgInfo getOrgInfoByInstitutionKey(String name,String uid){
+		OrgInfo temp=null;
+		String key=name+uid;
+		if(mapOrgInfo.containsKey(key)){
+			temp=mapOrgInfo.get(key);
+		}
+		if(temp==null){
+			temp=orgInfoRepository.getInstitutionByName(name, uid);
+			if(temp!=null){
+				mapOrgInfo.put(key, temp);
+			}
+		}
+		return temp;
+	}
+	private OrgInfo getOrgInfoByHospitalKey(String name,String uid){
+		OrgInfo temp=null;
+		String key=name+uid;
+		if(mapOrgInfo.containsKey(key)){
+			temp=mapOrgInfo.get(key);
+		}
+		if(temp==null){
+			temp=orgInfoRepository.getHospitalByName(name, uid);
+			if(temp!=null){
+				mapOrgInfo.put(key, temp);
+			}
+		}
+		return temp;
+	}
+	private OrgInfo getOrgInfoBySiteKey(String name,String uid){
+		OrgInfo temp=null;
+		String key=name+uid;
+		if(mapOrgInfo.containsKey(key)){
+			temp=mapOrgInfo.get(key);
+		}
+		if(temp==null){
+			temp=orgInfoRepository.getSiteByName(name, uid);
+			if(temp!=null){
+				mapOrgInfo.put(key, temp);
+			}
+		}
+		return temp;
+	}
+	private OrgInfo getOrgInfoByDepartmentKey(String name,String uid){
+		OrgInfo temp=null;
+		String key=name+uid;
+		if(mapOrgInfo.containsKey(key)){
+			temp=mapOrgInfo.get(key);
+		}
+		if(temp==null){
+			temp=orgInfoRepository.getDepartmentByName(name, uid);
+			if(temp!=null){
+				mapOrgInfo.put(key, temp);
+			}
+		}
+		return temp;
+	}
+	private void getOrgInfoByDepartmentKey(Set<String> names,String uid){
+		List<OrgInfo> listOrgInfo=orgInfoRepository.getDepartmentByName(names,uid);
+		if(listOrgInfo!=null){
+			for(int i=0;i<listOrgInfo.size();++i){
+				OrgInfo tempOrgInfo=listOrgInfo.get(i);
+				String key=tempOrgInfo.getName()+uid;
+				mapOrgInfo.put(key, tempOrgInfo);
+			}
+		}
+	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3){
-		orgInfoTemp=orgInfoRepository.getByUid(currentUser.getTenantUID());
-		TenantInfo tenantInfo=tenantInfoRepository.findByuid(currentUser.getTenantUID());
+		orgInfoTemp=getOrgInfoByMappingUid(currentUser.getTenantUID());
+		TenantInfo tenantInfo=getTenantInfoByMappingUid(currentUser.getTenantUID());
 		if(orgInfoTemp==null || tenantInfo==null){
 			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
 			return;
@@ -197,7 +289,7 @@ public class UserAccountImportService {
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
-			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getHospitalUID());
+			orgInfoTemp=getOrgInfoByMappingUid(currentUser.getHospitalUID());
 //			newUser.setSiteUID(currentUser.getSiteUID());
 //			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
 			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
@@ -231,7 +323,7 @@ public class UserAccountImportService {
 	}
 	
 	private boolean getInstitutionID(UserAccount newUser,String institution){
-		OrgInfo temp=orgInfoRepository.getInstitutionByName(institution,orgInfoTemp.getUid());
+		OrgInfo temp=getOrgInfoByInstitutionKey(institution, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(institution)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团错误;");
@@ -247,7 +339,7 @@ public class UserAccountImportService {
 		return true;
 	}
 	private boolean getHospitalID(UserAccount newUser,String hospital){
-		OrgInfo temp=orgInfoRepository.getHospitalByName(hospital,orgInfoTemp.getUid());
+		OrgInfo temp=getOrgInfoByHospitalKey(hospital, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(hospital)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"医院错误;");
@@ -263,7 +355,7 @@ public class UserAccountImportService {
 		return true;
 	}
 	private boolean getSiteID(UserAccount newUser,String site){
-		OrgInfo temp=orgInfoRepository.getSiteByName(site,orgInfoTemp.getUid());
+		OrgInfo temp=getOrgInfoBySiteKey(site, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(site)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"院区错误;");
@@ -280,8 +372,7 @@ public class UserAccountImportService {
 		return true;
 	}
 	private boolean getDepartmentID(UserAccount newUser,String department,boolean isInsulate){
-		
-		OrgInfo temp=orgInfoRepository.getDepartmentByName(department,orgInfoTemp.getUid());
+		OrgInfo temp=getOrgInfoByDepartmentKey(department, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(department)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室错误;");
@@ -336,13 +427,7 @@ public class UserAccountImportService {
 	private void supplementOriginUserOrgInfo(UserAccount user){
 		List<UserOrgInfo> listUserOrgInfo=user.getListUserOrgInfo();
 		if(listUserOrgInfo==null||listUserOrgInfo.size()==0){
-			if(mapUserOrgInfo.containsKey(user.getUid())){
-				listUserOrgInfo=mapUserOrgInfo.get(user.getUid());
-			}
-			if(listUserOrgInfo==null||listUserOrgInfo.size()==0){
-				listUserOrgInfo=userOrgInfoRepository.findByUserUid(user.getUid());
-				mapUserOrgInfo.put(user.getUid(), listUserOrgInfo);
-			}
+			listUserOrgInfo=userOrgInfoRepository.findByUserUid(user.getUid());
 			user.setListUserOrgInfo(listUserOrgInfo);
 		}
 	}
@@ -350,13 +435,7 @@ public class UserAccountImportService {
 	private void supplementOriginUserRole(UserAccount user){
 		List<UserRole> listUserRole=user.getUserRoleList();
 		if(listUserRole==null||listUserRole.size()==0){
-			if(mapUserRole.containsKey(user.getUid())){
-				listUserRole=mapUserRole.get(user.getUid());
-			}
-			if(listUserRole==null||listUserRole.size()==0){
-				listUserRole=userRoleRepository.findByUserId(user.getId());
-				mapUserRole.put(user.getUid(), listUserRole);
-			}
+			listUserRole=userRoleRepository.findByUserId(user.getId());
 			user.setUserRoleList(listUserRole);
 		}
 	}
@@ -375,35 +454,6 @@ public class UserAccountImportService {
 			}
 		}
 		return sysRoleMap;
-	}
-	
-	private void supplementMapOrgInfo(Set<String> setAccessScope,String siteUid){
-		List<OrgInfo> listOrgInfo=orgInfoRepository.getDepartmentByName(setAccessScope,siteUid);
-		if(listOrgInfo!=null){
-			for(int i=0;i<listOrgInfo.size();++i){
-				OrgInfo tempOrgInfo=listOrgInfo.get(i);
-				String key=tempOrgInfo.getName()+siteUid;
-				mapOrgInfo.put(key, tempOrgInfo);
-			}
-		}
-	}
-	
-	private OrgInfo supplementMapOrgInfoSiteUid(String name,String hospitalUID){
-		OrgInfo tempOrgInfo=orgInfoRepository.getSiteByName(name,hospitalUID);
-		if(tempOrgInfo!=null){
-			String key=tempOrgInfo.getName()+hospitalUID;
-			mapOrgInfo.put(key, tempOrgInfo);
-		}
-		return tempOrgInfo;
-	}
-	
-	private OrgInfo supplementMapOrgInfoHospitalUid(String name,String institutionUID){
-		OrgInfo tempOrgInfo=orgInfoRepository.getHospitalByName(name, institutionUID);
-		if(tempOrgInfo!=null){
-			String key=tempOrgInfo.getName()+institutionUID;
-			mapOrgInfo.put(key, tempOrgInfo);
-		}
-		return tempOrgInfo;
 	}
 	
 	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo){
@@ -436,7 +486,7 @@ public class UserAccountImportService {
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
-					tempOrgInfo=supplementMapOrgInfoSiteUid(user.getSiteName(), user.getHospitalUID());
+					tempOrgInfo=getOrgInfoBySiteKey(user.getSiteName(), user.getHospitalUID());
 				}
 				if(addUserAccessScope(user, tempOrgInfo)==false){
 					return false;
@@ -448,7 +498,7 @@ public class UserAccountImportService {
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
-					tempOrgInfo=supplementMapOrgInfoHospitalUid(user.getHospitalName(), user.getInstitutionUID());
+					tempOrgInfo=getOrgInfoByHospitalKey(user.getHospitalName(), user.getInstitutionUID());
 				}
 				if(addUserAccessScope(user, tempOrgInfo)==false){
 					return false;
@@ -457,47 +507,33 @@ public class UserAccountImportService {
 		}
 		else{
 			String accessScope=user.getAccessScope();
-			if(StringUtils.isNotEmpty(accessScope)){
-				String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
-				Set<String> setAccessScope=new HashSet<String>();
-				for(int i=0;i<arrUserOrgInfo.length;++i){
-					setAccessScope.add(arrUserOrgInfo[i]);
-				}
-				for(int i=0;i<arrUserOrgInfo.length;++i){
-					String key=arrUserOrgInfo[i]+user.getSiteUID();
-					OrgInfo tempOrgInfo=null;
-					if(mapOrgInfo.containsKey(key)){
-						tempOrgInfo=mapOrgInfo.get(key);
-					}
-					else{
-						supplementMapOrgInfo(setAccessScope, user.getSiteUID());
-						tempOrgInfo=mapOrgInfo.get(key);
-					}
-					if(addUserAccessScope(user,tempOrgInfo)==false){
-						return false;
+			if(StringUtils.isEmpty(accessScope)){
+				accessScope="";
+			}
+			String defaultName="";
+			if(StringUtils.isNotEmpty(user.getDepartName())){
+				defaultName+="-"+user.getDepartName();
+				if(StringUtils.isNotEmpty(user.getDepartName2())){
+					defaultName+="-"+user.getDepartName2();
+					if(StringUtils.isNotEmpty(user.getDepartName3())){
+						defaultName+="-"+user.getDepartName3();
 					}
 				}
 			}
-			else{
-				String key="";
-				if(StringUtils.isNotEmpty(user.getDepartName())){
-					key+="-"+user.getDepartName();
-					if(StringUtils.isNotEmpty(user.getDepartName2())){
-						key+="-"+user.getDepartName2();
-						if(StringUtils.isNotEmpty(user.getDepartName3())){
-							key+="-"+user.getDepartName3();
-						}
-					}
-				}
-				key+=user.getSiteUID();
+			accessScope+=","+defaultName;
+			String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
+			Set<String> setAccessScope=new HashSet<String>();
+			for(int i=0;i<arrUserOrgInfo.length;++i){
+				setAccessScope.add(arrUserOrgInfo[i]);
+			}
+			for(int i=0;i<arrUserOrgInfo.length;++i){
+				String key=arrUserOrgInfo[i]+user.getSiteUID();
 				OrgInfo tempOrgInfo=null;
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
-					Set<String> setAccessScope=new HashSet<String>();
-					setAccessScope.add(key);
-					supplementMapOrgInfo(setAccessScope, user.getSiteUID());
+					getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				if(addUserAccessScope(user,tempOrgInfo)==false){
@@ -510,8 +546,8 @@ public class UserAccountImportService {
 	
 	private void initParam(){
 		mapOrgInfo.clear();
-		mapUserOrgInfo.clear();
-		mapUserRole.clear();
+		mapUidOrgInfo.clear();
+		mapUidTenantInfo.clear();
 	}
 	
 	public List<UserAccount> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
