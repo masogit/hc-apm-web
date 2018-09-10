@@ -362,7 +362,6 @@ public class UserContextService implements Serializable {
     }
 
     public static String getAccessToken(HttpServletRequest request) {
-
         String token = null;
         if (request == null) {
             try {

@@ -41,6 +41,19 @@
                                         showOn="button" showButtonPanel="true" navigator="true" readonlyInput="true"
                                         locale= "zh" required="true" requiredMessage="计费结束时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
+                       <h:panelGroup>
+                           <label class="label">设备状态完好</label>
+                           <p:selectBooleanCheckbox value="#{assetInfoController.selected.sharedAssetReqDetail.intact}" />
+                       </h:panelGroup>
+                       <h:panelGroup>
+                           <label class="label">赔偿费用</label>
+                           <p:inputNumber value="#{assetInfoController.selected.sharedAssetReqDetail.compensationAmount}" decimalPlaces="2" emptyValue="0" minValue="0">
+                           </p:inputNumber>
+                       </h:panelGroup>
+                       <h:panelGroup>
+                           <label class="label">备注</label>
+                           <p:inputTextarea rows="3" cols="30" value="#{assetInfoController.selected.sharedAssetReqDetail.reqComment}" />
+                       </h:panelGroup>
                    </p:panelGrid>
                    <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{assetInfoController.forceReturnAsset()}" value="确认" update="AssetInfoListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'forceReturnAssetDialog');"/>

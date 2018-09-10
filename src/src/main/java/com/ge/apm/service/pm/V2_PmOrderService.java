@@ -5,15 +5,17 @@
  */
 package com.ge.apm.service.pm;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -59,7 +61,7 @@ import webapp.framework.web.WebUtil;
  * @author 212579464
  */
 @Component
-public class V2_PmOrderService {
+public class V2_PmOrderService extends MicroServiceInvoker {
 	private static final Logger log = LoggerFactory.getLogger(V2_PmOrderService.class);
     @Autowired
     private ServiceRequestMsgRepository msgDao;
@@ -108,9 +110,26 @@ public class V2_PmOrderService {
     @Autowired
     private ElectricSafetyDataRepository electricSafetyDataRepository;
 
+    public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
+
 
     public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
-        detailDao.save(workOrderDetail);
+        String token = UserContextService.getAccessToken();
+        String res = srApi.updateWorkOrderDetailPrice(token,workOrderDetail);
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
+        }
     }
 
 

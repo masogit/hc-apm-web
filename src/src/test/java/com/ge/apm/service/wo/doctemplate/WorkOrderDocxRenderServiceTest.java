@@ -1,0 +1,96 @@
+package com.ge.apm.service.wo.doctemplate;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
+
+
+@RunWith(MockitoJUnitRunner.class)
+public class WorkOrderDocxRenderServiceTest {
+
+    private WorkOrderDocxRenderService workOrderDocxRenderService = new WorkOrderDocxRenderService();
+
+    private static final String[] KEYS_PARTS = {"备件名", "单价", "数量", "类型", "序列号", "质保期", "到货"};
+    private static final String[] KEYS_PROC = {"步骤名称", "责任人", "开始时间", "结束时间", "处理描述"};
+    private static final String[] KEYS_AUDIT = {"sendTime", "senderUserName", "message"};
+
+    private static byte[] template;
+
+    static {
+        try (FileInputStream input = new FileInputStream("src\\main\\webapp\\portal\\wo\\woExportTemplate\\template.docx")) {
+            template = IOUtils.toByteArray(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testRenderEmptyFile() throws IOException {
+        Map<String, Object> map = new HashMap<>();
+        byte[] outputBytes = workOrderDocxRenderService.renderDocx(map, template);
+        assertTrue(outputBytes.length > 0);
+        write(outputBytes, "test_wo_render_empty");
+    }
+
+    @Test
+    public void testRenderFullData() throws IOException {
+        Map<String, Object> map = mockFullMap();
+        byte[] outputBytes = workOrderDocxRenderService.renderDocx(map, template);
+        assertTrue(outputBytes.length > 0);
+        write(outputBytes, "test_wo_render_full");
+    }
+
+    @After
+    public void tearDown() {
+        FileUtils.deleteQuietly(new File("test_wo_render_empty.docx"));
+        FileUtils.deleteQuietly(new File("test_wo_render_full.docx"));
+    }
+
+    private Map<String, Object> mockFullMap() {
+        Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, String> entry : WorkOrderDocxRenderService.COPY_KEY_MAPPING.entrySet()) {
+            map.put(entry.getValue(), entry.getValue() + "X");
+        }
+
+        map.put("备件信息", mockListMaps(KEYS_PARTS));
+        map.put("维修流程", mockListMaps(KEYS_PROC));
+        map.put("serviceRequestMessages", mockListMaps(KEYS_AUDIT));
+
+        try {
+            map.put("signature", FileUtils.readFileToByteArray(new File("src\\test\\resources\\sign\\verify.png")));
+            map.put("ack_signature", FileUtils.readFileToByteArray(new File("src\\test\\resources\\sign\\acceptance.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    private List<Map<String, Object>> mockListMaps(String[] keys) {
+        List<Map<String, Object>> parts = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Map<String, Object> map = new HashMap<>();
+            for (String key : keys) {
+                map.put(key, key + i);
+            }
+            parts.add(map);
+        }
+        return parts;
+    }
+
+    private void write(byte[] outputBytes, String fileName) throws IOException {
+        FileUtils.writeByteArrayToFile(new File(fileName + ".docx"), outputBytes);
+    }
+}

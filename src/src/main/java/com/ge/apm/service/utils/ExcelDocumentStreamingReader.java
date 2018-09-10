@@ -9,6 +9,8 @@ import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -17,46 +19,67 @@ import java.util.*;
  *
  * @author Quan Tang
  */
-public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, Cell>> {
+public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<String, ExcelDocument.ValueWrapper>> {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelDocumentStreamingReader.class);
 
     Workbook workBook;
     Sheet sheet;
     int keyRowNum;
+    Integer versionRowNum;
+    Integer versionColNum;
+
     String[] columnTitles;
+    String version;
+
     Iterator<Row> iterator;
 
-    public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum) throws IOException {
-        this(new FileInputStream(path), sheetIndex, keyRowNum);
+    public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) throws IOException {
+        this(new FileInputStream(path), sheetIndex, keyRowNum, versionRowNum, versionColNum);
     }
 
     public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum) {
-        this.workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
-        this.sheet = workBook.getSheetAt(sheetIndex);
-        this.keyRowNum = keyRowNum;
-        this.iterator = sheet.rowIterator();
-
-        this.columnTitles = getColumnTitles();
-
-
+        this(input, sheetIndex, keyRowNum, null, null);
     }
 
-    private String[] getColumnTitles() {
+    public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) {
+        this.workBook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(input);
+        this.sheet = workBook.getSheetAt(sheetIndex);
 
-        int currentRow = 0;
+        this.keyRowNum = keyRowNum;
+        this.versionRowNum = versionRowNum;
+        this.versionColNum = versionColNum;
 
-        List<String> resultList = new ArrayList<>();
-//        Iterator<Row> iterator = sheet.rowIterator();
+        this.iterator = sheet.rowIterator();
+
+        getMetaData();
+    }
+
+    private void getMetaData() {
+
         while (iterator.hasNext()) {
             Row row = iterator.next();
-            if (currentRow == keyRowNum - 1) {
-                for (Cell cell : row) {
-                    resultList.add(cell.getStringCellValue());
+//            logger.info("row： {}", row.getRowNum());
+
+            if (versionRowNum != null) {
+                if (row.getRowNum() == versionRowNum.intValue() - 1) {
+                    version = getVersion(row);
                 }
+            }
+
+            if (row.getRowNum() == keyRowNum - 1) {
+                this.columnTitles = getColumnTitles(row);
 
                 break;
             }
 
-            ++currentRow;
+        }
+
+    }
+
+    private String[] getColumnTitles(Row row ) {
+        List<String> resultList = new ArrayList<>();
+        for (Cell cell : row) {
+            resultList.add(cell.getStringCellValue());
         }
 
         String[] columnTitles = resultList.toArray(new String[]{});
@@ -64,8 +87,14 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         return columnTitles;
     }
 
+    private String getVersion(Row row) {
+        Cell cell = row.getCell(versionColNum - 1);
+        if (cell == null) return null;
+        return cell.getStringCellValue();
+    }
+
     @Override
-    public Iterator<Map<String, Cell>> iterator() {
+    public Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator() {
 
 //        int currentRow = 0;
 
@@ -82,7 +111,7 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         return new DataIterator(iterator);
     }
 
-    public class DataIterator implements Iterator<Map<String, Cell>> {
+    public class DataIterator implements Iterator<Map<String, ExcelDocument.ValueWrapper>> {
 
         Iterator<Row> iterator;
 
@@ -96,9 +125,9 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
         }
 
         @Override
-        public Map<String, Cell> next() {
+        public Map<String, ExcelDocument.ValueWrapper> next() {
 
-            Map<String, Cell> map = new HashMap<>();
+            Map<String, ExcelDocument.ValueWrapper> map = new HashMap<>();
 
             Row row = iterator.next();
 
@@ -108,8 +137,10 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
                     break;
                 }
 
+                ExcelDocument.ValueWrapper wrapper = ExcelDocument.getCellValueWrapper(cell);
+
                 String columnTitle = columnTitles[cellIndex];
-                map.put(columnTitle, cell);
+                map.put(columnTitle, wrapper);
 
                 ++cellIndex;
             }
@@ -248,5 +279,9 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
 
     public Workbook getWorkBook() {
         return workBook;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }
