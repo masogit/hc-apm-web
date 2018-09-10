@@ -652,11 +652,30 @@ public class AssetInfoFormatter {
         return i18nMessage.getValueZh();
     }
 
+    public String getAssetValueCategoryName() {
+        if (assetInfo.getAssetValueCategory() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetValueCategory(), importService.assetValueCategoryList);
+
+        return value;
+    }
+
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
 
         String msgKey = String.valueOf(item);
         for (I18nMessage msg: msgList) {
             if (msg.getMsgKey().equals(msgKey)) {
+                return msg.getValueZh();
+            }
+        }
+
+        return null;
+    }
+
+    private String findMatchValue(String item, List<I18nMessage> msgList) {
+
+        for (I18nMessage msg: msgList) {
+            if (msg.getMsgKey().equals(item)) {
                 return msg.getValueZh();
             }
         }
@@ -743,6 +762,7 @@ public class AssetInfoFormatter {
         map.put("是否PM", assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
         map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
         map.put("设备分类2级", this.getAssetGroupSecondayName());
+        map.put("资产价值分类", this.getAssetValueCategoryName());
 
         map.put("UUID", this.getUid());
 
