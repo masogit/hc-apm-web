@@ -179,6 +179,9 @@ public class UserAccountImportService {
 			newUser.setId(user.getId());
 			newUser.setPasswordErrorCount(user.getPasswordErrorCount());
 			newUser.setUserRoleList(user.getUserRoleList());
+			if(StringUtils.isEmpty(newUser.getEmail())){
+				newUser.setEmail(user.getEmail());
+			}
 			return newUser;
 		}
 		return newUser;
