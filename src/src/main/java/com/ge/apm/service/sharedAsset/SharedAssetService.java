@@ -93,13 +93,17 @@ public class SharedAssetService extends MicroServiceInvoker {
         return response;
     }
 
-    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType) {
+    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType,
+                                                          String isIntact, String compensationAmount, String reqComment) {
         String url = getGatewayURL(GatewayURL.RETURN_SHORTCUT);
         url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
         url = url.replace("{assetInfoUID}", assetInfoUID);
         url = url.replace("{chargingBeginTime}", chargingBeginTime);
         url = url.replace("{chargingEndTime}", chargingEndTime);
         url = url.replace("{reqType}", reqType);
+        url = url.replace("{isIntact}", isIntact);
+        url = url.replace("{compensationAmount}", compensationAmount);
+        url = url.replace("{reqComment}", reqComment);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);

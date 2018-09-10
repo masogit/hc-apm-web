@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,9 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
     
     @Query(value = "select o.* from user_org o where o.user_uid = ?1",nativeQuery = true)
     public List<UserOrgInfo> findOrgUidListByUserUid(String userUid);
+    
+    @Query(value = "select o.* from user_org o where o.user_uid in ?1",nativeQuery = true)
+    public List<UserOrgInfo> findOrgUidListByUserUid(Set<String> userUid);
 
     UserOrgInfo findFirstByUserUidAndOrgUid(String userUid, String orgUid);
 

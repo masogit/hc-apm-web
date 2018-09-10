@@ -12,7 +12,7 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}</label>
-                            <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" disabled="true">
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -20,23 +20,26 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.patProblems}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.patActions}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.patTests}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup  id="equipmentTaker" >
                             <label class="label">#{msg.equipmentTaker}</label>
-                            <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+                            <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="true"/>
                             <label class="label">#{msg.equiptaketime}</label>
-                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button"
-                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
-                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update="woTab:EditCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+<!--                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button" 
+                                        readonlyInput="true" showButtonPanel="false" navigator="true" mask="true" disabled="true"/>-->
+                            <h:outputText value="#{workOrderMgrController.takeTime}"  >
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update="woTab:EditCloseDialogForm:equipmentTaker :growl" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -49,11 +52,11 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.otherExpense}</label>
-                                <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" />
+                                <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">外部费用</label><!--外部费用-->
-                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" />
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.maintenanceValue}</label>

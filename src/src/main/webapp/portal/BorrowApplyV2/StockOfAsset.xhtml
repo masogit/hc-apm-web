@@ -22,7 +22,7 @@
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="4">
-                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
@@ -53,7 +53,7 @@
                         <p:ajax event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="editButton viewButton"/>
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
                        
-                        <p:column headerText="借用科室" sortBy="#{item.clinicalDeptUID}">
+                        <p:column headerText="借用科室">
                             <h:outputText value="#{item.sharedAssetReqDetail.clinicalDept.name}"/>
                         </p:column>
 

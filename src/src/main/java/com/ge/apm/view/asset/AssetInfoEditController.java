@@ -696,12 +696,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetInfo> completeParentAssetId(String query) {
-        if (null == parentAssetList || parentAssetList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
-                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
-                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+        return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {

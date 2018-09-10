@@ -58,7 +58,6 @@ public class OrgInfoTreeService {
     public Set<String> collectChildClinicalDept(String parentUid) {
         Set<String> orgUidSet = new HashSet<>();
         collectChildClinicalDept(parentUid, orgUidSet);
-
         return orgUidSet;
     }
 

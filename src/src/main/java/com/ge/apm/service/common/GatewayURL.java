@@ -16,6 +16,7 @@ public enum GatewayURL {
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
     CREATE_WORK_ORDER("/hcapmassetservice/api/apm/asset/workOrders"),
+    UPDATE_WODETAIL_PRICE("/hcapmassetservice/api/apm/asset/workOrderDetails"),
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
 
@@ -44,7 +45,7 @@ public enum GatewayURL {
     ALLOCATION_ON_DUTY("/hcapmworkflowservice/api/apm/allocation/onDuty"),
     REMOTE_ASSIGN_REQUEST("/hcapmworkflowservice/api/apm/allocation/assign?requestId={requestId}&assigneeUID={assigneeUID}"),
     RENT_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}"),
-    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}"),
+    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}&isIntact={isIntact}&compensationAmount={compensationAmount}&reqComment={reqComment}"),
     REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}");
 
     private final String url;

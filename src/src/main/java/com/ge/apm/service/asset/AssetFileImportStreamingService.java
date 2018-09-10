@@ -142,6 +142,13 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 }
 
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
+                if (asset.getAssetGroup() != null) {
+                    String msgType = "assetGroupSecondary_" + asset.getAssetGroup();
+                    List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(msgType, siteId);
+                    assetRow.setFieldDropdownValue("设备分类2级", "setAssetGroupSecondary", msgList, map, null);
+                } else {
+                    asset.setAssetGroupSecondary(null);
+                }
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
                 assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
@@ -187,6 +194,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
                 assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
+                assetRow.setFieldDropdownValueAsString("资产价值分类", "setAssetValueCategory", assetValueCategoryList, map, null);
 
 
                 if (StringUtils.isEmpty(asset.getUid())) {
