@@ -151,7 +151,7 @@ public class UserAccountImportService {
 			//create
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在");
 				return newUser;
 			}
 			else{
@@ -163,13 +163,13 @@ public class UserAccountImportService {
 			//update
 			UserAccount user=userAccountRepository.getByUid(uuid);
 			if(user==null){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户不存在;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_NOT_EXISTS,"用户不存在;");
 				return newUser;
 			}
 			else{
 				if(!user.getLoginName().equals(loginName)){
 					if(isExistsByLoginName(loginName)){
-						newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在;");
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在;");
 						return newUser;
 					}
 				}
@@ -282,7 +282,7 @@ public class UserAccountImportService {
 		orgInfoTemp=getOrgInfoByMappingUid(currentUser.getTenantUID());
 		TenantInfo tenantInfo=getTenantInfoByMappingUid(currentUser.getTenantUID());
 		if(orgInfoTemp==null || tenantInfo==null){
-			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
+			newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"集团不存在;");
 			return;
 		}
 		newUser.setSiteId(tenantInfo.getId());
@@ -326,7 +326,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByInstitutionKey(institution, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(institution)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"集团错误;");
 				return false;
 			}
 		}
@@ -342,7 +342,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByHospitalKey(hospital, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(hospital)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"医院错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL,"医院错误;");
 				return false;
 			}
 		}
@@ -358,7 +358,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoBySiteKey(site, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(site)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"院区错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE,"院区错误;");
 				return false;
 			}
 		}
@@ -375,7 +375,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByDepartmentKey(department, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(department)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT,"科室错误;");
 				return false;
 			}
 		}
@@ -391,7 +391,7 @@ public class UserAccountImportService {
 		String roleName=user.getImportRoleNames();
 		List<UserRole> listRole=new ArrayList<UserRole>();
 		if(StringUtils.isEmpty(roleName)){
-			user.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"角色不能为空;");
+			user.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
 			return false;
 		}
 		else{
@@ -408,7 +408,7 @@ public class UserAccountImportService {
 					listRole.add(newRole);
 				}
 				else{
-					user.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"角色不存在;");
+					user.setStatusDisplay(UploadFileErrorTypeEnum.ROLE_NOT_EXISTS,"角色不存在;");
 					return false;
 				}
 			}
@@ -461,7 +461,7 @@ public class UserAccountImportService {
 	
 	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo){
 		if(tempOrgInfo==null){
-			user.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"可见范围不存在;");
+			user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
 			return false;
 		}
 		else{
@@ -721,24 +721,24 @@ public class UserAccountImportService {
 				newUser.setImportRoleNames(roleName);
 				
 				if(StringUtils.isEmpty(hospital)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"所属医院不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL,"所属医院不能为空;");
 					pass=false;
 				}
 				
 				if(StringUtils.isEmpty(loginName)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"登录名不能为空;");
 					pass=false;
 				}
 				if(StringUtils.isEmpty(name)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"姓名不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.NAME,"姓名不能为空;");
 					pass=false;
 				}
 				if(StringUtils.isEmpty(strActive)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"激活值不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_ACTIVED,"激活值不能为空;");
 					pass=false;
 				}
 				if(StringUtils.isEmpty(strLocked)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_LOCKED,"锁定值不能为空;");
 					pass=false;
 				}
 				if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
@@ -746,7 +746,7 @@ public class UserAccountImportService {
 //                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
                 }
 				if(StringUtils.isEmpty(roleName)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"角色不能为空;");
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
 					pass=false;
 				}
 				
