@@ -30,7 +30,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +65,8 @@ public class AssetFileImportController {
     private Boolean isGeneratePmOrder;
 
     private StreamedContent exportFile;
+
+    private StreamedContent assetTemplateFile;
 
     private TreeNode orgTree;
     private TreeNode selectedNode;
@@ -138,6 +142,13 @@ public class AssetFileImportController {
 
             isImported = true; //disable import button
         }
+    }
+
+    public void exportAssetExcelTemplate() throws IOException {
+
+        ExcelDocument doc = exportService.exportAssetTemplate();
+
+        assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
     public void downloadImportFailureData() {
@@ -373,5 +384,13 @@ public class AssetFileImportController {
         } else {
             return selectedOrg.getName();
         }
+    }
+
+    public StreamedContent getAssetTemplateFile() {
+        return assetTemplateFile;
+    }
+
+    public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
+        this.assetTemplateFile = assetTemplateFile;
     }
 }
