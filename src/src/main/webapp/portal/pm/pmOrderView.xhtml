@@ -139,7 +139,7 @@
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
-                            <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+                            <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
@@ -151,7 +151,7 @@
                                 <h:outputText value="#{item.cowokerUserName}"/>
                             </p:column>
                             <p:column headerText="#{msg.manHours}">
-                                <h:outputText value="#{item.manHours}" />
+                                <h:outputText value="#{item.manHours}"/>
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
