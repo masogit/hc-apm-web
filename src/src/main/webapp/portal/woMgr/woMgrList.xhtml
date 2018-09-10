@@ -74,7 +74,7 @@
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
-                        <!--<h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
+                       <!-- <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
                     </p:column>
 
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
@@ -121,11 +121,10 @@
                         <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
-                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/><br/>
-                        <p:commandButton id="sssss" value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-
-                        <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
+                        <p:commandButton id="sssss" value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1'? '':'woTab:transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'? '':'@(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
                         <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
@@ -139,7 +138,7 @@
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                         <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                     </p:column>
-                    <p:column headerText="#{msg.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
+                    <p:column headerText="#{msg.maintenanceValue}" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
                         <h:outputText value="#{item.maintenanceValue}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->

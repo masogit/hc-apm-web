@@ -269,16 +269,9 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</span></label>
-<!--            <p:selectOneMenu id="parentAssetList" value="#{assetInfoEditController.selected.parentAssetId}" required="#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required}" disabled="#{!assetInfoEditController.needEdit('parentAssetId')}" 
-                             requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" class="SiteUIDChange clinicalDeptNameChange">
-                <p:ajax process="@this" />
-                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{assetInfoEditController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
-            </p:selectOneMenu>-->
-            
             <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoEditController.completeParentAssetId}" required="#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required}" 
                          requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" forceSelection="true" readonly="#{!assetInfoEditController.needEdit('parentAssetId')}" class="SiteUIDChange clinicalDeptNameChange"
-                         var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
+                         var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onParentAssetChange()}"/>
                 <p:ajax listener="#{assetInfoEditController.onParentAssetChange()}" />
             </p:autoComplete>

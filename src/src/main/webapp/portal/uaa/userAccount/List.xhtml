@@ -101,8 +101,8 @@
 					actionListener="#{userAccountController.unlockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.unlockAccount}" message="#{msg.unlockAccountConfirm}" icon="ui-icon-alert" />
 				</p:commandButton>
-				<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-					<p:dataExporter type="xls" target="datalist" fileName="UserAccount_export" />
+				<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" actionListener="#{userAccountController.exportAll()}" validateClient="true" update=":growl">
+					<p:fileDownload value="#{userAccountController.exportFile}"/>
 				</p:commandButton>
 			</f:facet>
 		</p:dataTable>

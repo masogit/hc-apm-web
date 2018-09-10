@@ -75,7 +75,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Integer queryIndex;
     private Set<String> clinicalDeptOrgUidSet;
     private Set<String> assetDeptOrgUidSet;
-
+    private  UserOrgInfoRepository userOrgInfoRepository;
     private V2_ServiceRequest newServiceRequest;
 
     private V2_WorkOrder selectedWorkOrder;
@@ -129,6 +129,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     protected void init() {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -145,6 +146,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -206,11 +208,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
 
-        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
-     /*   if(selected==null){
-            selected= new V2_WorkOrder();
-        }
-        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());*/
+
+
     }
 
     private void loadClinicalDeptList() {
@@ -290,12 +289,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
         this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
     }
-    //////////////////////////end
-
-
-    //    private void beforeEdit(){
-//        selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
-//    }
     public void onSupplierChange() {
         Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
         if (supplier == null)
@@ -560,16 +553,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     @Override
     public void setSearchFilter() {
+
+
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
         if (!Strings.isNullOrEmpty(fileterOrgName)) {
             //先获取 filterOrgName-手术科的 uid
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
-            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.EQ, filterOrg.get(0).toString(), "1*"));
+           if(!filterOrg.isEmpty())
+            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, filterOrg, "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -1154,12 +1150,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void approveWorkOrder() {
-        approvedDetails.stream().filter(item -> selectedMap.get(item.getId())).forEach(item -> item.setApproved(true));
-        if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+        if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
             WebUtil.addErrorMessage("审核不通过原因必须填写");
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
+        approvedDetails.stream().filter(item -> selectedMap.get(item.getId())).forEach(item -> item.setApproved(true));
         approvedDetails.forEach(item -> {
             item.setCreatedDate(null);
             if (null == item.getApproved()) {
@@ -1185,6 +1181,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             getNeedApprovalDetails().stream().filter(item -> !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+//            approvedDetails.stream().filter(item->item.getId().equals(id)).findFirst().get().setApproved(selectedMap.get(id));
         }
     }
 

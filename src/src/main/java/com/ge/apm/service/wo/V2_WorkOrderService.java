@@ -97,7 +97,12 @@ public class V2_WorkOrderService {
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
     public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
-        detailDao.save(workOrderDetail);
+//        detailDao.save(workOrderDetail);
+        String token = UserContextService.getAccessToken();
+        String res = srApi.updateWorkOrderDetailPrice(token,workOrderDetail);
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
+        }
     }
 
 

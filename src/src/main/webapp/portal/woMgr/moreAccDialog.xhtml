@@ -52,12 +52,12 @@
                      <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                    <label class="label">维修合同号</label>
+                    <label class="label">合同号</label>
                      <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
                     </h:panelGroup>
                     <!--value="#{workOrderMgrController.selectedObjectMap['supplier']}"-->
                     <h:panelGroup>
-                        <label class="label">供应商字段</label>
+                        <label class="label">供应商</label>
                         <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300"
                                         forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
                                         completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">

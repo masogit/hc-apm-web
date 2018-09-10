@@ -183,7 +183,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
                 assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
-
+                assetRow.setFieldDropdownValueAsString("资产价值分类", "setAssetValueCategory", assetValueCategoryList, map, null);
 
                 if (StringUtils.isEmpty(asset.getUid())) {
 

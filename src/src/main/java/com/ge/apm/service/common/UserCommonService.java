@@ -215,6 +215,21 @@ public class UserCommonService {
         return searchFilters;
     }
 
+    public List<SearchFilter> getSelectedOrgFilters(OrgInfo orgInfo){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        int orgType = orgInfo.getOrgType();
+        if (orgType == 0) {
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
+        } else if (orgType == 1) {
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
+        } else if (orgType == 2) {
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
+        } else if (orgType == 3 || orgType == 4) {
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
+        }
+        return searchFilters;
+    }
+
     public List<OrgInfo> getIncludeOrgInfo(Boolean isInsulate, Integer loginUserOrgType, String uid, String parentUID, Integer orgType) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         if (isInsulate) {

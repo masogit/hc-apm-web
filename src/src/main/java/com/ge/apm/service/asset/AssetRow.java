@@ -168,6 +168,39 @@ public class AssetRow {
 
     }
 
+    public void setFieldDropdownValueAsString(String fieldName, String methodName, List<I18nMessage> msgList, Map map, String defaultValue) {
+        try {
+            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            Method method = AssetInfo.class.getMethod(methodName, String.class);
+
+            String selectedOption = null;
+            if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
+                selectedOption = getI18nMsgKeyAsString(msgList, fieldValueOfString, map, fieldName);
+            }
+
+            if (selectedOption == null) {
+                selectedOption = defaultValue;
+            }
+
+            if (StringUtils.isEmpty(assetInfo.getUid())) {
+                method.invoke(assetInfo, selectedOption);
+            } else {
+                if (!StringUtils.isEmpty(fieldValueOfString)) {
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        String nullString = null;
+                        method.invoke(assetInfo, nullString);
+                    } else {
+                        method.invoke(assetInfo, selectedOption);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+
+    }
+
     public void setFieldBooleanValue(String fieldName, String methodName, Boolean defaultValue) {
         String fieldValueOfString = null;
         try {
@@ -225,6 +258,28 @@ public class AssetRow {
             return null;
         } else {
             return Integer.parseInt(msg.getMsgKey());
+        }
+    }
+
+    private String getI18nMsgKeyAsString(List<I18nMessage> msgList, String value, Map map, String fieldName) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+
+        I18nMessage msg = null;
+        for(I18nMessage message: msgList) {
+            if (message.getValueZh().equals(value)) {
+                msg = message;
+                break;
+            }
+        }
+
+//        I18nMessage msg = msgList.stream().filter(t -> t.getValueZh().equals(value)).findAny().orElse(null);
+        if (msg == null) {
+            addErrMessage(map, "警告:无效值" + fieldName + "[" + value + "]");
+            return null;
+        } else {
+            return msg.getMsgKey();
         }
     }
 
