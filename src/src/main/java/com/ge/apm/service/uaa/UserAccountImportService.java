@@ -507,46 +507,32 @@ public class UserAccountImportService {
 		}
 		else{
 			String accessScope=user.getAccessScope();
-			if(StringUtils.isNotEmpty(accessScope)){
-				String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
-				Set<String> setAccessScope=new HashSet<String>();
-				for(int i=0;i<arrUserOrgInfo.length;++i){
-					setAccessScope.add(arrUserOrgInfo[i]);
-				}
-				for(int i=0;i<arrUserOrgInfo.length;++i){
-					String key=arrUserOrgInfo[i]+user.getSiteUID();
-					OrgInfo tempOrgInfo=null;
-					if(mapOrgInfo.containsKey(key)){
-						tempOrgInfo=mapOrgInfo.get(key);
-					}
-					else{
-						getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
-						tempOrgInfo=mapOrgInfo.get(key);
-					}
-					if(addUserAccessScope(user,tempOrgInfo)==false){
-						return false;
+			if(StringUtils.isEmpty(accessScope)){
+				accessScope="";
+			}
+			String defaultName="";
+			if(StringUtils.isNotEmpty(user.getDepartName())){
+				defaultName+="-"+user.getDepartName();
+				if(StringUtils.isNotEmpty(user.getDepartName2())){
+					defaultName+="-"+user.getDepartName2();
+					if(StringUtils.isNotEmpty(user.getDepartName3())){
+						defaultName+="-"+user.getDepartName3();
 					}
 				}
 			}
-			else{
-				String key="";
-				if(StringUtils.isNotEmpty(user.getDepartName())){
-					key+="-"+user.getDepartName();
-					if(StringUtils.isNotEmpty(user.getDepartName2())){
-						key+="-"+user.getDepartName2();
-						if(StringUtils.isNotEmpty(user.getDepartName3())){
-							key+="-"+user.getDepartName3();
-						}
-					}
-				}
-				key+=user.getSiteUID();
+			accessScope+=","+defaultName;
+			String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
+			Set<String> setAccessScope=new HashSet<String>();
+			for(int i=0;i<arrUserOrgInfo.length;++i){
+				setAccessScope.add(arrUserOrgInfo[i]);
+			}
+			for(int i=0;i<arrUserOrgInfo.length;++i){
+				String key=arrUserOrgInfo[i]+user.getSiteUID();
 				OrgInfo tempOrgInfo=null;
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
-					Set<String> setAccessScope=new HashSet<String>();
-					setAccessScope.add(key);
 					getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
