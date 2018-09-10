@@ -249,3 +249,6 @@ update asset_info set clinical_dept_uid=asset_dept_uid, asset_dept_uid=clinical_
 --v9.1
 update user_account set region = 1 where region is null;
 ALTER TABLE weixin_article ALTER COLUMN content TYPE varchar(204800) USING content::varchar ;
+
+update qr_code_lib set status=5 where status=2 and submit_wechat_id is null;
+
