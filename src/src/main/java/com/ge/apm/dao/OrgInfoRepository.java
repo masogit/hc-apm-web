@@ -30,6 +30,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     @Query("select t from OrgInfo t where t.name=?1 and t.orgType=4 and t.siteUID=?2")
     public OrgInfo getDepartmentByName(String name,String siteUID);
+    
+    @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=4 and t.siteUID=?2")
+    public List<OrgInfo> getDepartmentByName(Set<String> name,String siteUID);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     @Query("select t from OrgInfo t where t.siteId=?1 order by t.orgLevel, t.parentOrg")
@@ -100,6 +103,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     @Query(value = "select o.uid from org_info o where (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1) and o.org_type=4",nativeQuery = true)
     public Set<String> findClinicalDeptOrgUidListByOrgUid(String orgUid);
+    
+    @Query(value = "select o.uid from org_info o where (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1)) and o.org_type=4",nativeQuery = true)
+    public Set<String> findClinicalDeptOrgUidListByOrgUid(Set<String> orgUid);
 
     public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
 
