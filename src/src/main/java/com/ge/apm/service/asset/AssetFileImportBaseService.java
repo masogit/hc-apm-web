@@ -5,33 +5,23 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -96,6 +86,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected AssetDepreciationService assetDepreciationService;
+
+    @Autowired
+    protected I18nMessageRepository i18nDao;
 
     protected OrgInfo selectedOrgToImport;
 
