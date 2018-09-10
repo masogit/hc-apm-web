@@ -2077,7 +2077,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		//set default value for isIntact
-        reqDetail.setIntact(true);
+        reqDetail.setIntact(Boolean.TRUE);
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
 		if(assetRequest == null) {
 			assetRequest = new SharedAssetRequest();
@@ -2095,11 +2095,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = reqDetail.getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			Boolean isIntact = reqDetail.getIntact();
+			Double compensationAmount = reqDetail.getCompensationAmount();
+			String reqComment = reqDetail.getReqComment();
 			try {
 			    if(reqDetail.getClinicalDeptUid() != null) {
 			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
-                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType, isIntact, compensationAmount, reqComment： "
+                        + selected.getAssetDeptUID() + ","
+                        + selected.getUid() + ", "
+                        + beginTimeStr + ", "
+                        + endTimeStr + ", "
+                        + selected.getSharedAssetReqDetail().getReturnRequest().getType() + ","
+                        + isIntact + ","
+                        + compensationAmount + ","
+                        + reqComment);
+                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType(),
+                                                                                            isIntact.toString(), compensationAmount.toString(), reqComment);
                     LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
                     log.info("****** force return response ******");
                     rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
