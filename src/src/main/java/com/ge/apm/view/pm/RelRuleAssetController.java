@@ -73,6 +73,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private TenantInfoRepository tenantInfoRepository;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
+    private OrgInfo clinicalOrgInfo;
 
     @Override
     protected void init() {
@@ -102,7 +103,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     private void initTree(String tenantUid) {
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        if(UserContextService.isInsulate()){
+        selectedTenant = tempTenantInfo;
+        orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+ /*       if(UserContextService.isInsulate()){
             //隔离租户
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
@@ -115,7 +118,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
-        }
+        }*/
 
         TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedUserOrg) {
@@ -177,13 +180,20 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (null != queryAsset.getAssetGroup()) {
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
-        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
-            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
+        if (clinicalOrgInfo != null){
+            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
             List<String> results = new ArrayList<>(clinicalUids);
             if(CollectionUtils.isNotEmpty(results)){
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
             }
         }
+/*        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
+            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
+            List<String> results = new ArrayList<>(clinicalUids);
+            if(CollectionUtils.isNotEmpty(results)){
+                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
+            }
+        }*/
         if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
             assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
         }
@@ -192,9 +202,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 uids = new ArrayList<>();
                 if (queryAsset.getRuleStatus() == 1) {// 已配置
                     uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
-                    if (CollectionUtils.isNotEmpty(uids)) {
+                    assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+/*                    if (CollectionUtils.isNotEmpty(uids)) {
                         assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-                    }
+                    }*/
                 } else if (queryAsset.getRuleStatus() == 2) {// 未配置
                     uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
                     assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
@@ -358,6 +369,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     }
 
     public void clearPmOrderRule(){
+        this.pmOrderRule = null;
         this.ruleUid = null;
     }
 
@@ -381,6 +393,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         List<OrgInfo> orgInfos = orgInfoRepository.findBySearchFilter(filter);
         orgInfos.sort(new OrgInfoComparator());
         return orgInfos;
+    }
+
+    public OrgInfo getClinicalOrgInfo() {
+        return clinicalOrgInfo;
+    }
+
+    public void setClinicalOrgInfo(OrgInfo clinicalOrgInfo) {
+        this.clinicalOrgInfo = clinicalOrgInfo;
     }
 
     public TreeNode getSelectedNode() {
