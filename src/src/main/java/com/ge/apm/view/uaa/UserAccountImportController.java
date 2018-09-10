@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UserAccountImportService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -34,6 +35,7 @@ public class UserAccountImportController extends GenericCRUDController<UserAccou
     private UserAccountRepository dao;
     private UserAccount currentUser;
     private UserAccountService service;
+    private UserAccountImportService userAccountImportService;
     private UploadedFile file;
     private List<UserAccount> importFailedDataList;
     
@@ -42,6 +44,7 @@ public class UserAccountImportController extends GenericCRUDController<UserAccou
         dao = WebUtil.getBean(UserAccountRepository.class);
         service = WebUtil.getBean(UserAccountService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        userAccountImportService=WebUtil.getBean(UserAccountImportService.class);
     }
     
     @Override
@@ -81,7 +84,7 @@ public class UserAccountImportController extends GenericCRUDController<UserAccou
     
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
-        importFailedDataList=service.handleExcel(file, currentUser);
+        importFailedDataList=userAccountImportService.handleExcel(file, currentUser);
     }
     
     public UploadedFile getFile() {

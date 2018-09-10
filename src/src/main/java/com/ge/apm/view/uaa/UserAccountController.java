@@ -6,6 +6,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -13,7 +14,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +37,10 @@ import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
@@ -80,6 +87,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private List<SysRoleVO> roleListVO;
 
     private UserAccountService userAccountService;
+    
+    private StreamedContent exportFile;
 
     private OrgInfoTreeService orgInfoTreeService;
 
@@ -840,4 +849,49 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+    
+    public void exportAll(){
+    	List<SearchFilter> listSearchFilter=new ArrayList<SearchFilter>();
+    	if (selectedOrg == null) {
+    		listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
+        } else {
+            if (selectedOrg.getId() == -1) {
+            	listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
+            } else {
+            	listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+            	listSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+            	listSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+            	listSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+            	listSearchFilter.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+            }
+        }
+    	List<UserAccount> listUserAccount=dao.findBySearchFilter(listSearchFilter);
+		if(listUserAccount==null || listUserAccount.size()==0){
+			WebUtil.addErrorMessage("无数据");
+			return;
+		}
+		userAccountService.supplementUserAccount(listUserAccount);
+		downloadFile(userAccountService.parseUserAccountToMap(listUserAccount));
+	}
+    
+    private void downloadFile(List<Map<String,Object>> data){
+		try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = userAccountService.exportData(doc, data);
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "UserAccount.xlsx");
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+	}
+
+	public StreamedContent getExportFile() {
+		return exportFile;
+	}
+
+	public void setExportFile(StreamedContent exportFile) {
+		this.exportFile = exportFile;
+	}
 }
