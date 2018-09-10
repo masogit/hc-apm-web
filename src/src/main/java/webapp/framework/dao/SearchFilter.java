@@ -2,9 +2,12 @@ package webapp.framework.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.util.HttpRequestUtil;
 import webapp.framework.util.TimeUtil;
@@ -35,6 +38,35 @@ public class SearchFilter {
      *              A and (B or C)  => (A, 1*),(B,1*2+),(C,1*2+)    ==> (A, ABC*),(B,ABC*BC+),(C,ABC*BC+)
     */
     public String conditionPath;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.fieldName);
+        hash = 29 * hash + Objects.hashCode(this.operator);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SearchFilter other = (SearchFilter) obj;
+        if (!Objects.equals(this.fieldName, other.fieldName)) {
+            return false;
+        }
+        if (this.operator != other.operator) {
+            return false;
+        }
+        return true;
+    }
 
     public SearchFilter(String fieldName, Operator operator, Object value) {
         this(fieldName,operator,value,"1*");
@@ -123,11 +155,80 @@ public class SearchFilter {
         return filters;
     }
 
+    private static Set<SearchFilter> parseToParamSet(Map<String, Object> searchParams) {
+        Set<SearchFilter> filters = new HashSet<SearchFilter>();
+
+        for (Entry<String, Object> entry : searchParams.entrySet()) {
+            String key = entry.getKey();
+
+            Object value = entry.getValue();
+            if (StringUtils.isBlank((String) value))  continue;
+
+            int indexFieldName = key.indexOf("_");
+            if(indexFieldName<2) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("InvalidSearchFilterName")+": "+key);
+                continue;                
+            }
+
+            Operator operator = Operator.valueOf(key.substring(0, indexFieldName));
+            
+            String fieldName;
+            if(key.endsWith("BOOLEAN")){
+                fieldName = key.substring(indexFieldName+1, key.length()-8);
+                value = value.equals("true");
+            }
+            else if(key.contains("_DATETIME")){
+                int posDataType = key.indexOf("_DATETIME");
+                fieldName = key.substring(indexFieldName+1, posDataType);
+
+                try{
+                    value = TimeUtil.fromString(value.toString()).toDate();
+                }
+                catch(Exception ex){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("InvalidDateFormat")+": " + entry.getValue());
+                    continue;
+                }
+            }
+            else{
+                fieldName = key.substring(indexFieldName+1, key.length());
+            }
+            
+            if(fieldName.endsWith("_input"))
+                fieldName = fieldName.substring(0, fieldName.length()-6);
+            
+            SearchFilter filter;
+            if (operator.equals(Operator.IN) || operator.equals(Operator.NotIN)) {
+                String[] intList = StringUtils.split((String) value, ",");
+                List<Integer> valueList = new ArrayList<Integer>();
+                for (String intValue : intList) {
+                    try {
+                        valueList.add(Integer.valueOf(intValue));
+                    } catch (Exception ex) {
+                        valueList.add(-1);
+                    }
+                }
+
+                filter = new SearchFilter(fieldName, operator, valueList);
+            } else {
+                filter = new SearchFilter(fieldName, operator, value);
+            }
+
+            filters.add(filter);
+        }
+
+        return filters;
+    }
+
     public static List<SearchFilter> getSearchFiltersFromHttpRequest(String prefix) {
         Map<String, Object> params = HttpRequestUtil.getParametersStartingWith(prefix);
         return parse(params);
     }
-    
+    public static Set<SearchFilter> getSearchFilterSetFromHttpRequest(String prefix) {
+        Map<String, Object> params = HttpRequestUtil.getParametersStartingWith(prefix);
+        return parseToParamSet(params);
+    }
+
+        
     public String getSqlParamName(){
         String sqlOperator = this.operator.toString();
 
