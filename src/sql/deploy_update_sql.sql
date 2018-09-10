@@ -248,3 +248,4 @@ update asset_info set clinical_dept_uid=asset_dept_uid, asset_dept_uid=clinical_
 
 --v9.1
 update user_account set region = 1 where region is null;
+ALTER TABLE weixin_article ALTER COLUMN content TYPE varchar(204800) USING content::varchar ;

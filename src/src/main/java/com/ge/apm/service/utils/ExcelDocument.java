@@ -297,7 +297,7 @@ public class ExcelDocument implements AutoCloseable{
         return res;
     }
 
-    private Object getCellValue(Cell cell) {
+    private static Object getCellValue(Cell cell) {
         CellType type = cell.getCellTypeEnum();
         switch (type) {
             case BLANK:
@@ -315,7 +315,7 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
 
-    private String getRawValue(Cell cell) {
+    private static String getRawValue(Cell cell) {
         CellType type = cell.getCellTypeEnum();
         switch (type) {
             case BLANK:
@@ -342,6 +342,14 @@ public class ExcelDocument implements AutoCloseable{
             default:
                 return null;
         }
+    }
+
+    public static ValueWrapper getCellValueWrapper(Cell cell) {
+        Object v = getCellValue(cell);
+        String rawValue = getRawValue(cell);
+        ValueWrapper wrapper = new ValueWrapper(v, rawValue);
+
+        return wrapper;
     }
 
     static public String getCellStringValue(Object value) {

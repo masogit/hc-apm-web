@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,7 @@ import webapp.framework.dao.SearchFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by 212605082 on 2017/5/15.
@@ -31,6 +33,8 @@ public class AssetTagService {
     private OrgInfoRepository orgDao;
     @Autowired
     private AssetTagRepository assetTagDao;
+    @Autowired
+    private OrgInfoTreeService orgInfoTreeService;
 
     public List<BiomedGroup> getBiomedGroupList(BiomedGroup queryBiomedGroup){
         List<SearchFilter> biomedGroupFilters = new ArrayList<>();
@@ -85,6 +89,52 @@ public class AssetTagService {
             }
             if (null != queryAsset.getClinicalDeptId()) {
                 assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+            }
+            if (null != queryAsset.getAssetGroup()) {
+                assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+            }
+
+            //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
+            Pageable pageable = new PageRequest(0, 5000);
+            Page page = assetDao.findBySearchFilter(assetFilters, pageable);
+            return page.getContent();
+        }else{
+            return new ArrayList<AssetInfo>();
+        }
+
+    }
+
+    public List<AssetInfo> getAssetListByDept(AssetInfo queryAsset, OrgInfo clinicalDept, List<OrgInfo> clinicalDeptList) {
+
+        if(queryAsset.getTenantUID() != null) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
+
+            //assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
+            assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
+            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
+
+            if (queryAsset.getTenantUID() != null) {
+                assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+            }
+            if (queryAsset.getInstitutionUID() != null) {
+                assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, queryAsset.getInstitutionUID()));
+            }
+            if (queryAsset.getHospitalUID() != null) {
+                assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryAsset.getHospitalUID()));
+            }
+            if (queryAsset.getSiteUID() != null) {
+                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, queryAsset.getSiteUID()));
+            }
+            if (null != clinicalDept) {
+                List<OrgInfo> orgSearchList = new ArrayList<>();
+                orgSearchList.add(clinicalDept);
+
+                Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
+                List<String> clinicalDeptUIDList = new ArrayList<>();
+                for (OrgInfo oi : tempOrgSearchSet) {
+                    clinicalDeptUIDList.add(oi.getUid());
+                }
+                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
             }
             if (null != queryAsset.getAssetGroup()) {
                 assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));

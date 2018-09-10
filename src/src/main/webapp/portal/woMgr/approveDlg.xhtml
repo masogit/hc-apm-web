@@ -14,12 +14,12 @@
                             <!--<p:column selectionMode="multiple" style="text-align:center;color: #000!important"/>-->
                             <p:column >
                                 <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
-                                    <p:ajax listener="#{workOrderMgrController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
+                                    <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
                                 </p:selectBooleanCheckbox>
                                 <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
                                 <f:facet name="header"  >
                                     <p:selectBooleanCheckbox itemLabel="勾选审批" id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
-                                        <p:ajax  listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox)"/>
+                                        <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox)"/>
                                     </p:selectBooleanCheckbox>
                                     <!--<h:outputText value="勾选审批" />-->
                                 </f:facet>
