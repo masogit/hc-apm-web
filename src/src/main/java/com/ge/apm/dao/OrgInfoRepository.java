@@ -15,7 +15,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public List<OrgInfo> getByHospitalId(int hospitalId);
 
-    @Query(value = "select t.uid from org_info t where site_uid in (?1) and name=?2",nativeQuery = true)
+   // @Query(value = "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')",nativeQuery = true)
+    @Query(value = "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')",nativeQuery = true)
     public List<String> getOrgBySite(List<String> orgList,String filterName);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
