@@ -398,6 +398,9 @@ public class UserAccountImportService {
 			String roleNames[]=roleName.split("[,， ]");
 			for(int i=0;i<roleNames.length;++i){
 				String tempRoleName=roleNames[i];
+				if(StringUtils.isEmpty(tempRoleName)){
+					continue;
+				}
 				if(sysRoleMap.containsKey(tempRoleName)){
 					UserRole newRole=new UserRole();
 					newRole.setRoleId(sysRoleMap.get(tempRoleName));
@@ -524,6 +527,9 @@ public class UserAccountImportService {
 			String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
 			Set<String> setAccessScope=new HashSet<String>();
 			for(int i=0;i<arrUserOrgInfo.length;++i){
+				if(StringUtils.isEmpty(arrUserOrgInfo[i])){
+					continue;
+				}
 				setAccessScope.add(arrUserOrgInfo[i]);
 			}
 			for(int i=0;i<arrUserOrgInfo.length;++i){
