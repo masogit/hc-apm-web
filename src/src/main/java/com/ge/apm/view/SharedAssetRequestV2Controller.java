@@ -26,16 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 /**
  *
  * @author caoyong
@@ -491,11 +486,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
-                    WebUtil.addWarnMessage("该设备故障，不可借用！");
-                    return; 
-                }
-                //在asset_info中判断是否属于 调剂中心科室
+                }//在asset_info中判断是否属于 调剂中心科室
                 else if(depts.contains(assetDeptUID)){
                     WebUtil.addWarnMessage("该设备已归还！");
                     return; 
@@ -718,7 +709,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
-                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
+                String ClinicalDeptUID = infoVo.getAssetDeptUID();
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
@@ -1757,6 +1748,26 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         logger.debug("validateTotalExpectedQty result: " + expectedQtyGTZero);
         return !expectedQtyGTZero;
+    }
+
+    public String getOrgLocation() {
+        StringBuilder orgLoc = new StringBuilder();
+        if(this.selected != null) {
+            String orgUid = this.selected.getClinicalDeptUid();
+            OrgInfo orgInfo = orgInfoDao.findByUid(orgUid);
+            if(StringUtils.isNotBlank(orgInfo.getBuildingNum())) {
+                orgLoc.append(orgInfo.getBuildingNum());
+                orgLoc.append("楼");
+            }
+            if(StringUtils.isNotBlank(orgInfo.getFloorNum())) {
+                orgLoc.append(orgInfo.getFloorNum());
+                orgLoc.append("层");
+            }
+            if(StringUtils.isNotBlank(orgInfo.getOther())) {
+                orgLoc.append(orgInfo.getOther());
+            }
+        }
+        return orgLoc.toString();
     }
 
 }

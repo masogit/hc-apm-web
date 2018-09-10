@@ -48,13 +48,22 @@
                             </p:scrollPanel>
                         </p:overlayPanel>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}</label>
                         <p:selectOneMenu id="clinicalDeptName" value="#{assetTagController.queryAsset.clinicalDeptId}">
                             <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetTagController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">#{msg.clinicalDeptName}</label>
+                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetTagController.filterDeptOrg}"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetTagController.autoCompleteDept}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                            <p:ajax event="itemSelect" listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
+                            <p:ajax listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
+                        </p:autoComplete>
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:pickList id="AssetsPickList" value="#{assetTagController.availableAssets}" var="item"

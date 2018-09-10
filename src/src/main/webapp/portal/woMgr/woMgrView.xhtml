@@ -111,7 +111,7 @@
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 #{woAttachItem.objectName}
-                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}" process="@this"> 下载文件</p:link>
+                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}"> 下载文件</p:link>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
@@ -198,6 +198,11 @@
                                     </p:outputLabel>
                                 </h:panelGroup>
 
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maintenanceValue}</label>
+                                    <p:outputLabel value="#{woItem.maintenanceValue}"/>
+                                </h:panelGroup>
+
                             </p:panelGrid>
 
 
@@ -238,6 +243,9 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="审核状态">
+                                        <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
+                                    </p:column>
                                     <p:column headerText="类型">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                                     </p:column>
@@ -275,8 +283,9 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="操作">
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
+                                    <p:column headerText="操作" >
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{!userContextService.hasAnyRole('AssetHead,AssetStaff') or detailItem.approved==null?'false': not detailItem.approved}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
+                                        <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogViewDlg)" oncomplete="PF('moreAccDialogViewDlg').show()"/>
                                     </p:column>
 
                                 </p:dataTable>
