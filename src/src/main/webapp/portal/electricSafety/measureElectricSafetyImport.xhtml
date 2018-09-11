@@ -8,7 +8,7 @@
 			</div> -->
 			<div class="ui-g-12 card">
 				<h:form enctype="multipart/form-data">
-					<p:fieldset legend="批量导入电气安全数据" id="uploaderContainer">
+					<p:fieldset legend="批量添加电气安全数据" id="uploaderContainer">
 						<p:panelGrid columns="1" layout="grid"
 							styleClass="ui-panelgrid-blank form-group">
 							<p:fileUpload
@@ -58,7 +58,7 @@
 								<h:outputText value="#{item.v2PmOrder.pmNum}" />
 							</p:column> -->
 							<p:column headerText="工单信息" colspan="3">
-								<p:cellEditor>
+								<p:cellEditor rendered="#{item.v2PmOrder!=null}">
 									<f:facet name="output">
 										<h:outputText value="#{item.v2PmOrder.pmNum}/" />
 										<h:outputText value="#{item.v2PmOrder.planTime}">
@@ -68,7 +68,7 @@
 									</f:facet>
 									<f:facet name="input">
 										<h:selectOneMenu value="#{item.v2PmOrder}" style="width:100%" converter="v2PmOrderConverter">
-											<f:selectItems value="#{item.listV2PmOrder}" var="t" itemLabel="#{t.pmNum}/#{t.strPlanTime}/#{t.getCurrentPersonName()}/#{t.finished?'已完工':'未完工'}" itemValue="#{t}" >
+											<f:selectItems value="#{item.listV2PmOrder}" var="t" itemLabel="#{t.pmNum}/#{t.finished?t.strFinishTime:t.strPlanTime}/#{t.getCurrentPersonName()}/#{t.finished?'已完工':'未完工'}" itemValue="#{t}" >
 											</f:selectItems>
 										</h:selectOneMenu>
 									</f:facet>
