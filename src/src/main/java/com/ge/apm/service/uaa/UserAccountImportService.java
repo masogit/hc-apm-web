@@ -636,7 +636,7 @@ public class UserAccountImportService {
 					getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
-				if(key.equals(defaultName)){
+				if(key.equals(defaultName+user.getSiteUID())){
 					if(addUserAccessScope(user,tempOrgInfo,false)==false){
 						return false;
 					}
