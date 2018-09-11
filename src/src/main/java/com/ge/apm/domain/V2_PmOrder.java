@@ -113,6 +113,9 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
+    @Column(name="signature")
+    private String signature;
+
     @Column(name="int_ext_type")
     private Integer intExtType;
 
@@ -568,6 +571,14 @@ public class V2_PmOrder  implements Serializable {
 
     public void setSimplify(Boolean simplify) {
         this.simplify = simplify;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     public Integer getPmType() {
