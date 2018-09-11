@@ -182,7 +182,7 @@ public class AssetInstallationService {
         arrivalListItem.setLastModifiedDate(new Date());
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 5);
         }
 
     }

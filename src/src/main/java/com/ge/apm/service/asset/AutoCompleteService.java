@@ -70,11 +70,16 @@ public class AutoCompleteService {
         return res;
     }
     
+    //for parent asset
     public List<AssetInfo> completeAssetInfoList(String query,List<AssetInfo> assetInfoList){
     	if(assetInfoList==null){
     		return Collections.emptyList();
     	}
-    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
+    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) 
+                || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) 
+                || item.getQrCode() != null && item.getQrCode().contains(query)
+                || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
     	res.sort(new PinYinComparatorByName());
     	return res;
     }

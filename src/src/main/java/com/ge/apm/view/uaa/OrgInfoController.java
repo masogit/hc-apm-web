@@ -343,13 +343,32 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
                 }
             }
         } else {
-            assetInfoRepository.updateClinicalName(name, selected.getUid());
+            if (selected.getOrgType() == 4) {
+
+                TreeNode parentClinicalDeptNode = TreeNodeUtil.findNodeFromTree(orgTree, selected);
+                updateClinicalDeptOrgName(parentClinicalDeptNode);
+            }
+
         }
 
         initWorkflowConfig();
         buildOrdTree();
         orgName = null;
         orgNameEn = null;
+    }
+
+    private void updateClinicalDeptOrgName(TreeNode parentClinicalDeptNode) {
+
+        OrgInfo parentClinicalDeptOrg = (OrgInfo)parentClinicalDeptNode.getData();
+        dao.save(parentClinicalDeptOrg);
+        assetInfoRepository.updateClinicalName(parentClinicalDeptOrg.getName(), parentClinicalDeptOrg.getUid());
+
+        for (TreeNode child : parentClinicalDeptNode.getChildren()) {
+            OrgInfo childClinicalDeptOrg = (OrgInfo)child.getData();
+            childClinicalDeptOrg.setName(parentClinicalDeptOrg.getName() + "-" + childClinicalDeptOrg.getShortName());
+            updateClinicalDeptOrgName(child);
+        }
+
     }
 
     public void initWorkflowConfig() {

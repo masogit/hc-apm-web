@@ -209,7 +209,7 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}" disabled="#{!contractInfoEditController.canRemovePucheseItem(item)}"  update="purchaseList" />
                             </p:column>
 

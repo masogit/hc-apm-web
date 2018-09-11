@@ -137,7 +137,7 @@ public class UserAccountService {
 		}
 		return true;
 	}
-	
+
 
 	@Transactional
 	public UserAccount createUser(String name, String mobile, Integer assetId, String wechatId, String telephone,String nickName) {
