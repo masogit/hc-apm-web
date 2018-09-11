@@ -122,7 +122,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
-        userAccountService = WebUtil.getBean(UserAccountService.class);
+        userAccountService = WebUtil.getBean(UserAccountService.class); 
 
         loginUser = UserContextService.getCurrentUserAccount();
 
