@@ -799,7 +799,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getTenantName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(tenantName)){
+			setOrgFullName();
+		}
 		return tenantName;
 	}
 
@@ -808,7 +810,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getInstitutionName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(institutionName)){
+			setOrgFullName();
+		}
 		return institutionName;
 	}
 
@@ -817,7 +821,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getHospitalName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(hospitalName)){
+			setOrgFullName();
+		}
 		return hospitalName;
 	}
 
@@ -826,7 +832,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getSiteName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(siteName)){
+			setOrgFullName();
+		}
 		return siteName;
 	}
 
@@ -835,7 +843,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getDepartName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(departName)){
+			setOrgFullName();
+		}
 		return departName;
 	}
 
