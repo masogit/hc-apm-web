@@ -96,8 +96,8 @@ public class AssetFileImportController {
 
 
         try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
-             ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null)
-        ) {
+             ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
+        {
 
             if(!streamingService.checkDocVersion(assetDoc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
@@ -146,9 +146,24 @@ public class AssetFileImportController {
 
     public void exportAssetExcelTemplate() throws IOException {
 
+//        FacesContext fc = FacesContext.getCurrentInstance();
+//        ExternalContext ec = fc.getExternalContext();
+//
+////        ec.responseReset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
+//        ec.setResponseContentType("application/vnd.ms-excel"); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ExternalContext#getMimeType() for auto-detection based on filename.
+////        ec.setResponseContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
+//        ec.setResponseHeader("Content-Disposition", "attachment; filename=APM_Asset_Template.xlsx"); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
+//
+//        OutputStream output = ec.getResponseOutputStream();
+
         ExcelDocument doc = exportService.exportAssetTemplate();
 
-        assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+//        IOUtils.copy(doc.getStream(), output);
+
+
+        assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+
+        doc.close();
     }
 
     public void downloadImportFailureData() {
