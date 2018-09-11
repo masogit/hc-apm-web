@@ -100,7 +100,23 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
-        initTree(user.getTenantUID());
+        //initTree(user.getTenantUID());
+        initOrgTree();
+    }
+
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+
     }
 
 /*    public void setTenantUid(String tenantUid) {
@@ -159,10 +175,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             return null;
         }
         String name = org.getName();
-        while (org.getParentOrg() != null) {
+/*        while (org.getParentOrg() != null) {
             org = org.getParentOrg();
             name = org.getName() + "/" + name;
-        }
+        }*/
 
         return name;
     }
