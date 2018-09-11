@@ -8,9 +8,12 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetFileExportService;
 import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.service.asset.AssetFileImportStreamingService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -27,7 +30,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +49,9 @@ public class AssetFileImportController {
     private List<Map<String, Object>> importOrgMap;
     private List<Map<String, Object>> importAssetMap;
 
-    private AssetFileImportService aiService;
+    private AssetFileExportService exportService;
+
+    private AssetFileImportStreamingService streamingService;
 
     private UaaService uaaService;
 
@@ -59,6 +66,8 @@ public class AssetFileImportController {
 
     private StreamedContent exportFile;
 
+    private StreamedContent assetTemplateFile;
+
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
@@ -67,7 +76,8 @@ public class AssetFileImportController {
 
     @PostConstruct
     protected void init() {
-        aiService = WebUtil.getBean(AssetFileImportService.class);
+        exportService = WebUtil.getBean(AssetFileExportService.class);
+        streamingService = WebUtil.getBean(AssetFileImportStreamingService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
@@ -84,23 +94,27 @@ public class AssetFileImportController {
 
         this.file = event.getFile();
 
-        try (ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()))) {
 
-            if(!aiService.checkDocVersion(doc)){
+        try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
+             ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null)
+        ) {
+
+            if(!streamingService.checkDocVersion(assetDoc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
                 return;
             }
 
-            int maxRowNum = AssetFileImportService.EXCEL_ASSET_HEADER_ROW + 5000;
-            if(doc.exceedMaxRowNum(AssetFileImportService.SHEET_ASSET, maxRowNum)){
-                WebUtil.addErrorMessage("导入Excel中资产行数最多5000条，请分批导入！");
+            importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc);
+
+            if(importAssetMap.size() > 20000){
+                WebUtil.addErrorMessage("导入Excel中资产行数最多20000条，请分批导入！");
                 return;
             }
 
-            importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
-            importAssetMap = aiService.getAssetMapFromTemplate(doc);
+            importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
+
             
-            canbeImported = aiService.checkData(importOrgMap, importAssetMap);
+            canbeImported = streamingService.checkData(importOrgMap, importAssetMap);
 
             filterErrorRecords();
 
@@ -116,7 +130,7 @@ public class AssetFileImportController {
 
     public void importData() {
         try {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+            streamingService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
             filterErrorRecords();
@@ -130,11 +144,18 @@ public class AssetFileImportController {
         }
     }
 
+    public void exportAssetExcelTemplate() throws IOException {
+
+        ExcelDocument doc = exportService.exportAssetTemplate();
+
+        assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+    }
+
     public void downloadImportFailureData() {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
+            hasExportData = exportService.exportFailData(doc, importOrgMap, importAssetMap);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
@@ -199,7 +220,8 @@ public class AssetFileImportController {
         }
 
         if (selectedOrg != null) {
-            aiService.setSelectedOrgToImport(selectedOrg);
+//            aiService.setSelectedOrgToImport(selectedOrg);
+            streamingService.setSelectedOrgToImport(selectedOrg);
         }
 
     }
@@ -362,5 +384,13 @@ public class AssetFileImportController {
         } else {
             return selectedOrg.getName();
         }
+    }
+
+    public StreamedContent getAssetTemplateFile() {
+        return assetTemplateFile;
+    }
+
+    public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
+        this.assetTemplateFile = assetTemplateFile;
     }
 }

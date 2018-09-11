@@ -58,7 +58,6 @@ public class OrgInfoTreeService {
     public Set<String> collectChildClinicalDept(String parentUid) {
         Set<String> orgUidSet = new HashSet<>();
         collectChildClinicalDept(parentUid, orgUidSet);
-
         return orgUidSet;
     }
 
@@ -96,6 +95,26 @@ public class OrgInfoTreeService {
         }
 
 
+    }
+
+
+    public List<OrgInfo> collectChildClinicalDeptByParent(TreeNode parent) {
+
+        List<OrgInfo> clinicalDeptList = new ArrayList<>();
+
+        collectChildClinicalDeptByParent(parent, clinicalDeptList);
+
+        return clinicalDeptList;
+    }
+
+    public void collectChildClinicalDeptByParent(TreeNode parent, List<OrgInfo> clinicalDeptList) {
+
+        OrgInfo parentOrg = (OrgInfo)parent.getData();
+        clinicalDeptList.add(parentOrg);
+
+        for (TreeNode child: parent.getChildren()) {
+            collectChildClinicalDeptByParent(child, clinicalDeptList);
+        }
     }
 
 

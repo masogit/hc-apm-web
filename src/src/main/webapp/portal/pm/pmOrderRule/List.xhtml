@@ -50,9 +50,21 @@
                     </p:column>
                     <p:column headerText="#{msg.approveUserId}" sortBy="#{item.approveUserId}" filterBy="#{item.approveUserId}" filterMatchMode="EQ">
                         <h:outputText value="#{pmOrderRuleController.getUserName(item.approveUserId)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getApproveUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
                     <p:column headerText="#{msg.ownerId}" sortBy="#{item.ownerId}" filterBy="#{item.ownerId}" filterMatchMode="EQ">
                         <h:outputText value="#{pmOrderRuleController.getUserName(item.ownerId)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
                      <p:column headerText="#{msg.createdDate}" >
                        	<h:outputText value="#{item.createdDate}">

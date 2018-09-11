@@ -224,14 +224,6 @@
   <util:properties id="urlProperties" location="classpath:/url.properties"/>
   <util:properties id="ratingProperties" location="classpath:/rating.properties"/>
 
-
-  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="dataSource" ref="risDataSource"/>
-    <property name="configLocation" value="classpath:config/mybatis-config.xml"></property>
-    <!-- 自动扫描mapping.xml文件
-    <property name="mapperLocations" value="classpath:config/mapper/*.xml"></property>  -->
-  </bean>
-
   <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
     <property name="basePackage" value="com.ge.apm.dao.mapper"/>
     <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
@@ -247,4 +239,63 @@
   <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
     <constructor-arg ref="httpClientFactory" />
   </bean>
+  
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="risDataSource"/>
+        <property name="typeAliasesPackage" value="com.baomidou.mybatisplus.test.h2.entity"/>
+        <property name="configuration" ref="mybatisConfig"/>
+        <property name="globalConfig" ref="globalConfig"/>
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+        <property name="plugins">
+            <array>
+                <bean id="paginationInterceptor"
+                      class="com.baomidou.mybatisplus.plugins.PaginationInterceptor"/>
+                <bean id="optimisticLockerInterceptor"
+                      class="com.baomidou.mybatisplus.plugins.OptimisticLockerInterceptor">
+                </bean>
+                <bean id="performanceInterceptor"
+                      class="com.baomidou.mybatisplus.plugins.PerformanceInterceptor"/>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="mybatisConfig" class="com.baomidou.mybatisplus.MybatisConfiguration">
+        <property name="mapUnderscoreToCamelCase" value="true"/>
+        <property name="jdbcTypeForNull">
+            <util:constant static-field="org.apache.ibatis.type.JdbcType.NULL"/>
+        </property>
+    </bean>
+
+    <bean id="globalConfig" class="com.baomidou.mybatisplus.entity.GlobalConfiguration">
+        <property name="sqlInjector" ref="logicSqlInjector"/>
+        <property name="logicDeleteValue" value="-1"/>
+        <property name="logicNotDeleteValue" value="1"/>
+        <property name="idType" value="2"/>
+        <!-- 2.1-gamma+ 数据库自动识别，无需配置数据库类型
+        <property name="dbType" value="mysql" />
+        -->
+        <!-- 2.3+ 全局表前缀 mp_
+        <property name="tablePrefix" value="mp_" />
+        -->
+        <!--主键Sequence-->
+        <property name="keyGenerator" ref="keyGenerator"/>
+        <!-- 公共字段填充处理器 
+        <property name="metaObjectHandler" ref="myMetaObjectHandler"/>-->
+        <!--数据库关键字转义符，'desc', "desc" 2.1-gamma+不需要制定-->
+        <!--<property name="identifierQuote" value="'" />-->
+    </bean>
+
+    <!-- 配置oracle主键Sequence， 其他类型数据库，请配置相应的类型-->
+    <bean id="keyGenerator" class="com.baomidou.mybatisplus.incrementer.OracleKeyGenerator"/>
+
+    <!-- 自定义处理器 -->
+    <!--<bean id="myMetaObjectHandler" class="com.baomidou.test.MyMetaObjectHandler" />-->
+    <!-- 逻辑删除Sql注入器-->
+    <bean id="logicSqlInjector" class="com.baomidou.mybatisplus.mapper.LogicSqlInjector"/>
+
+    <!-- 配置mybatis 扫描mapper接口的路径, 相当于注解@MapperScan，@MapperScan("com.baomidou.mybatisplus.test.h2.entity.mapper")-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ge.apm.dao.mapper"/>
+    </bean>
+  
 </beans>
