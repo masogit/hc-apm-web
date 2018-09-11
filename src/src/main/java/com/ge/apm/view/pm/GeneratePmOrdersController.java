@@ -404,14 +404,15 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			pmOrderRequestApiService.createPmOrdersByBatch(token, request);
 			WebUtil.addSuccessMessage("工单生成成功！");
 		} catch(Exception e){
+			WebUtil.addErrorMessage("工单生成失败！");
 			e.printStackTrace();
 			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
-			WebUtil.addErrorMessage("工单生成失败！");
+
 		}
 		long end = System.currentTimeMillis();
 		LOGGER.info("批量生成保养工单结束，耗时 : {} 秒 !",(end - start)/1000);
 
-		//WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
+		WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 	}
 
 	public String getStrDate(Date lastPmDate) {

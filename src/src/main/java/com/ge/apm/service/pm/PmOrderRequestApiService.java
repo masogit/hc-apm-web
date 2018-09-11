@@ -120,7 +120,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }
     }
     
-   // @Async
+    @Async
     public void createPmOrdersByBatch(String token,String requestBody){
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.CREATE_PM_ORDER_BY_BATCH);
