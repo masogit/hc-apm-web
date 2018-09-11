@@ -332,9 +332,17 @@ public class UserAccountImportService {
 							newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE_ERROR,"院区错误;");
 							return;
 						}
-						if(getDepartmentID(newUser, department,isInsulate)){
-							if(getDepartmentIDParent(newUser, department+"-"+department2,isInsulate)){
-								if(getDepartmentIDParent(newUser, department+"-"+department2+"-"+department3,isInsulate)){
+						if(StringUtils.isNotEmpty(department)){
+							if(getDepartmentID(newUser, department,isInsulate)){
+								if(StringUtils.isNotEmpty(department2)){
+									String tempDepartment=department+"-"+department2;
+									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+										if(StringUtils.isNotEmpty(department3)){
+											tempDepartment=department+"-"+department2+"-"+department3;
+											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+											}
+										}
+									}
 								}
 							}
 						}
@@ -347,9 +355,17 @@ public class UserAccountImportService {
 			if(getInstitutionID(newUser, institution)){
 				if(getHospitalID(newUser, hospital)){
 					if(getSiteID(newUser, site)){
-						if(getDepartmentID(newUser, department,isInsulate)){
-							if(getDepartmentIDParent(newUser, department+"-"+department2,isInsulate)){
-								if(getDepartmentIDParent(newUser, department+"-"+department2+"-"+department3,isInsulate)){
+						if(StringUtils.isNotEmpty(department)){
+							if(getDepartmentID(newUser, department,isInsulate)){
+								if(StringUtils.isNotEmpty(department2)){
+									String tempDepartment=department+"-"+department2;
+									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+										if(StringUtils.isNotEmpty(department3)){
+											tempDepartment=department+"-"+department2+"-"+department3;
+											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+											}
+										}
+									}
 								}
 							}
 						}
