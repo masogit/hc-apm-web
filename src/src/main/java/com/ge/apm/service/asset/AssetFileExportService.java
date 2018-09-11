@@ -95,8 +95,32 @@ public class AssetFileExportService extends AssetFileImportBaseService {
         }
         doc.writeCellData(AssetFileExportService.SHEET_ORG, startRow, 1, "#");
 
+        outputMetaData(doc);
+
         return doc;
 
+    }
+
+    private void outputMetaData(ExcelDocument doc) {
+        int siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        List<I18nMessage> assetGroupList = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
+
+        int rowNum = 2;
+        while(true) {
+            String cellStringValue = doc.getCellStringValue("设备分类", rowNum, 2);
+
+            if (cellStringValue == null) {
+                break;
+            }
+            doc.clearCell("设备分类", rowNum, 2);
+
+            ++rowNum;
+        }
+        rowNum = 2;
+        for(I18nMessage msg: assetGroupList) {
+            doc.writeCellData("设备分类", rowNum, 2, msg.getValueZh());
+            ++rowNum;
+        }
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
@@ -126,25 +150,7 @@ public class AssetFileExportService extends AssetFileImportBaseService {
         InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
 
-        int siteId = UserContextService.getCurrentUserAccount().getSiteId();
-        List<I18nMessage> assetGroupList = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
-
-        int rowNum = 2;
-        while(true) {
-            String cellStringValue = doc.getCellStringValue("设备分类", rowNum, 1);
-
-            if (cellStringValue == null) {
-                break;
-            }
-            doc.clearCell("设备分类", rowNum, 1);
-
-            ++rowNum;
-        }
-        rowNum = 2;
-        for(I18nMessage msg: assetGroupList) {
-            doc.writeCellData("设备分类", rowNum, 1, msg.getValueZh());
-            ++rowNum;
-        }
+        outputMetaData(doc);
 
         return doc;
     }
