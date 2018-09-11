@@ -266,15 +266,7 @@ public class AssetRow {
             return null;
         }
 
-        I18nMessage msg = null;
-        for(I18nMessage message: msgList) {
-            if (message.getValueZh().equals(value)) {
-                msg = message;
-                break;
-            }
-        }
-
-//        I18nMessage msg = msgList.stream().filter(t -> t.getValueZh().equals(value)).findAny().orElse(null);
+        I18nMessage msg = msgList.stream().filter(t -> t.getValueZh().equals(value)).findAny().orElse(null);
         if (msg == null) {
             addErrMessage(map, "警告:无效值" + fieldName + "[" + value + "]");
             return null;
