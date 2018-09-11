@@ -46,7 +46,14 @@
 
                             <h:panelGroup>
                                 <p>说明</p>
-                                <p>1. <a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>
+
+                                <p>
+                                    1. <h:outputText value="#{msg.downloadTemplateFile}" />
+                                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetFileImportController.exportAssetExcelTemplate}" update=":growl"
+                                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                        <p:fileDownload value="#{assetFileImportController.assetTemplateFile}" />
+                                    </p:commandButton>
+                                </p>
                                 <p>2. 文件中填入要导入的资产数据</p>
                                 <p>3. 上传文件进行导入</p>
                                 <!--<p><a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a></p>-->
