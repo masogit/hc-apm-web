@@ -28,6 +28,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -160,6 +161,7 @@ public class AssetFileImportController {
 
 //        IOUtils.copy(doc.getStream(), output);
 
+//        doc.writeToFile(new File("./APM_Asset_Template_1.xlsx"));
 
         assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
 
