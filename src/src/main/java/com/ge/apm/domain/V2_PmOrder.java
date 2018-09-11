@@ -194,6 +194,10 @@ public class V2_PmOrder  implements Serializable {
     @Transient
     @JsonIgnore
     private String strPlanTime;
+    
+    @Transient
+    @JsonIgnore
+    private String strFinishTime;
 
     public V2_PmOrder() {
     }
@@ -404,6 +408,18 @@ public class V2_PmOrder  implements Serializable {
 
 	public void setStrPlanTime(String strPlanTime) {
 		this.strPlanTime = strPlanTime;
+	}
+
+	public String getStrFinishTime() {
+		if(this.endTime!=null){
+    		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+    		strFinishTime=sdf.format(this.endTime);
+    	}
+		return strFinishTime;
+	}
+
+	public void setStrFinishTime(String strFinishTime) {
+		this.strFinishTime = strFinishTime;
 	}
 
 	public String getCurrentStepId() {
