@@ -709,21 +709,21 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getStatusDisplay() {
-		if (this.status != null) {
-			String result = "";
-			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
-				result += "格式错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
-				result += "占比总和错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
-				result += "设备名称不存在；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
-				result += this.otherErrorMessage;
-			} else {
-				result += this.status;
-			}
-			return result;
-		}
+//		if (this.status != null) {
+//			String result = "";
+//			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
+//				result += "格式错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
+//				result += "占比总和错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
+//				result += "设备名称不存在；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+//				result += this.otherErrorMessage;
+//			} else {
+//				result += this.status;
+//			}
+//			return result;
+//		}
 		return statusDisplay;
 	}
 
@@ -741,13 +741,17 @@ public class UserAccount implements ChineseName, Serializable {
 		}
 	}
 
-	public void setStatusDisplay(UploadFileErrorTypeEnum type, String otherErrorMessage) {
+	public void setStatusDisplay(UploadFileErrorTypeEnum type, String statusDisplay) {
+		if(this.statusDisplay==null){
+			this.statusDisplay="";
+		}
 		if (this.status == null) {
 			this.status = type + ",";
+			this.statusDisplay+=statusDisplay;
 		} else if (this.status.indexOf(type + ",") < 0) {
 			this.status += type + ",";
+			this.statusDisplay+=statusDisplay;
 		}
-		this.otherErrorMessage = otherErrorMessage;
 	}
 
 	public String getOrgFullName() {
