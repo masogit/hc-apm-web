@@ -99,7 +99,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         supplierService = WebUtil.getBean(SupplierService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
+        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
         //initTree(user.getTenantUID());
         initOrgTree();
     }
@@ -116,7 +116,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             rootNode.getChildren().add(treeNode);
         }
         rootNode.setExpanded(true);
-
     }
 
 /*    public void setTenantUid(String tenantUid) {
