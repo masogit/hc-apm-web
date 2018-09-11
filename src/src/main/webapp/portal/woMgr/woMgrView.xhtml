@@ -284,7 +284,7 @@
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="操作" >
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{!userContextService.hasAnyRole('AssetHead,AssetStaff') or detailItem.approved==null?'false': not detailItem.approved}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{!userContextService.hasAnyRole('AssetStaff') or detailItem.approved==null?'false': not detailItem.approved}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
                                         <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogViewDlg)" oncomplete="PF('moreAccDialogViewDlg').show()"/>
                                     </p:column>
 
