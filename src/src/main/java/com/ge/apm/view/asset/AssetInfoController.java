@@ -78,7 +78,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
-    AssetFileImportService importService;
+    AssetFileExportService exportService;
 
     AssetInfoService assetInfoService;
     
@@ -293,7 +293,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        importService = WebUtil.getBean(AssetFileImportService.class);
+        exportService= WebUtil.getBean(AssetFileExportService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
@@ -407,6 +407,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            if(this.clinicalDeptList == null) {
+                clinicalDeptList = assetInfoService.getClinicalDeptList(userContextService.getCurrentUserAccount().getSiteUID());
+            }
+            List<OrgInfo> orgInfos = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(oneSearchStr) || item.getName().contains(oneSearchStr)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(oneSearchStr.toLowerCase()))).collect(Collectors.toList());
+            List<String> deptUids = orgInfos.stream().map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
+            if(deptUids.size() > 0) {
+                this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, deptUids, "1*3+"));
+            }
         }
 
         if (null != fileterOrg) {
@@ -1404,6 +1413,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
             this.removeFilterOnField("clinicalDeptName");
+            this.removeFilterOnField("assetDeptUID");
         }
     }
 
@@ -1944,7 +1954,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         //不可用
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
+        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
         streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -2030,7 +2040,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		return orgUids;
 	}
 
+	private boolean isDepartNumEmpty(AssetInfo asset) {
+        boolean isEmpty = false;
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(StringUtils.isBlank(asset.getDepartNum())) {
+            WebUtil.addErrorMessage("请补充设备编号!");
+            requestContext.addCallbackParam("validationFailed", true);
+            isEmpty = true;
+        }
+        return isEmpty;
+    }
+
 	public void prepareForceAllocateAsset(AssetInfo asset) {
+        if(isDepartNumEmpty(asset)) {
+            return;
+        }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
@@ -2045,10 +2069,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	}
 	
 	public void prepareForceReturnAsset(AssetInfo asset) {
+        if(isDepartNumEmpty(asset)) {
+            return;
+        }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
         asset.setSharedAssetType(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
+		//set default value for isIntact
+        reqDetail.setIntact(Boolean.TRUE);
 		SharedAssetRequest assetRequest = reqDetail.getReturnRequest();
 		if(assetRequest == null) {
 			assetRequest = new SharedAssetRequest();
@@ -2066,11 +2095,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			Date chargingEndTime = reqDetail.getChargingEndTime();
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
+			Boolean isIntact = reqDetail.getIntact();
+			Double compensationAmount = reqDetail.getCompensationAmount();
+			String reqComment = reqDetail.getReqComment();
 			try {
 			    if(reqDetail.getClinicalDeptUid() != null) {
 			        selected.setAssetDeptUID(reqDetail.getClinicalDeptUid());
-                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getReturnRequest().getType());
-                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType());
+                    log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType, isIntact, compensationAmount, reqComment： "
+                        + selected.getAssetDeptUID() + ","
+                        + selected.getUid() + ", "
+                        + beginTimeStr + ", "
+                        + endTimeStr + ", "
+                        + selected.getSharedAssetReqDetail().getReturnRequest().getType() + ","
+                        + isIntact + ","
+                        + compensationAmount + ","
+                        + reqComment);
+                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType(),
+                                                                                            isIntact.toString(), compensationAmount.toString(), reqComment);
                     LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
                     log.info("****** force return response ******");
                     rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));

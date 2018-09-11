@@ -1,12 +1,10 @@
 package com.ge.apm.domain.pure;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.Brand;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -19,19 +17,26 @@ public class AssetInfoFormatter {
 
     private AssetInfo assetInfo;
     private List<OrgInfo> sites;
-    private AssetFileImportService importService;
+    private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
+    private I18nMessageRepository i18nDao;
+
+//    private boolean assetGroupSecondarySupport;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
-                              AssetFileImportService importService,
+                              AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
-                              OrgInfoRepository orgDao) {
+                              OrgInfoRepository orgDao,
+                              I18nMessageRepository i18nDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
+        this.i18nDao = i18nDao;
+
+//        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
     }
 
     public Integer getAssetUsage() {
@@ -636,11 +641,41 @@ public class AssetInfoFormatter {
         return assetInfo.getGeDeviceType();
     }
 
+    public String getAssetGroupSecondayName() {
+        if (assetInfo.getAssetGroup() == null || assetInfo.getAssetGroupSecondary() == null) return null;
+
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        String msgType = "assetGroupSecondary_" + assetInfo.getAssetGroup();
+        I18nMessage i18nMessage = i18nDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, String.valueOf(assetInfo.getAssetGroupSecondary()), UserContextService.getCurrentUserAccount().getSiteId());
+        if (i18nMessage == null) return null;
+        return i18nMessage.getValueZh();
+    }
+
+    public String getAssetValueCategoryName() {
+        if (assetInfo.getAssetValueCategory() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetValueCategory(), importService.assetValueCategoryList);
+
+        return value;
+    }
+
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
 
         String msgKey = String.valueOf(item);
         for (I18nMessage msg: msgList) {
             if (msg.getMsgKey().equals(msgKey)) {
+                return msg.getValueZh();
+            }
+        }
+
+        return null;
+    }
+
+    private String findMatchValue(String item, List<I18nMessage> msgList) {
+
+        for (I18nMessage msg: msgList) {
+            if (msg.getMsgKey().equals(item)) {
                 return msg.getValueZh();
             }
         }
@@ -726,6 +761,8 @@ public class AssetInfoFormatter {
         map.put("核算类别", this.getAccountingCategoryAsString());
         map.put("是否PM", assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
         map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
+        map.put("设备分类2级", this.getAssetGroupSecondayName());
+        map.put("资产价值分类", this.getAssetValueCategoryName());
 
         map.put("UUID", this.getUid());
 
