@@ -487,6 +487,16 @@ public class ExcelDocument implements AutoCloseable{
         return workBook.getSheet(sheetName).getRow(dataRowNum - 1).getCell(cellnum - 1);
     }
 
+    public String getCellStringValue(String sheetName, int dataRowNum, int cellnum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row row = sheet.getRow(dataRowNum - 1);
+        if (row == null) return null;
+
+        Cell cell = row.getCell(cellnum - 1);
+        if (cell == null) return null;
+        return cell.getStringCellValue();
+    }
+
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
 
         for (int index = 0; index < rowKey.length; index++) {
@@ -666,6 +676,15 @@ public class ExcelDocument implements AutoCloseable{
                 }
             }
         }
+    }
+
+    public void clearCell(String sheetName, int rowNum, int colNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row row = sheet.getRow(rowNum -1);
+        if (row == null) return;
+
+        Cell cell = row.getCell(colNum -1);
+        cell.setCellType(CellType.BLANK);
     }
 
     public void calculateFormula() {
