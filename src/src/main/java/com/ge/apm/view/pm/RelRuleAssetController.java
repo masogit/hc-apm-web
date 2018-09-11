@@ -150,6 +150,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
+        addFilter();
     }
 
     public void initAssets() {
