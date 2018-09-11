@@ -746,9 +746,9 @@ public class UserAccount implements ChineseName, Serializable {
 			this.statusDisplay="";
 		}
 		if (this.status == null) {
-			this.status = type + ",";
+			this.status = ","+type + ",";
 			this.statusDisplay+=statusDisplay;
-		} else if (this.status.indexOf(type + ",") < 0) {
+		} else if (this.status.indexOf(","+type + ",") < 0) {
 			this.status += type + ",";
 			this.statusDisplay+=statusDisplay;
 		}
