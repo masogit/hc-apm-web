@@ -121,6 +121,9 @@ public class AssetFileExportService extends AssetFileImportBaseService {
             doc.writeCellData("设备分类", rowNum, 2, msg.getValueZh());
             ++rowNum;
         }
+
+        String formula = "设备分类!$B$2:$B$" + (rowNum - 1);
+        doc.updateName("设备分类", formula);
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
