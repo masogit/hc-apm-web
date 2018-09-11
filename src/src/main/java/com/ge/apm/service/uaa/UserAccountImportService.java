@@ -567,13 +567,25 @@ public class UserAccountImportService {
 					return false;
 				}
 			}
-			else if(StringUtils.isNotEmpty(user.getInstitutionName())){
-				key=user.getSiteName()+user.getInstitutionUID();
+			else if(StringUtils.isNotEmpty(user.getHospitalName())){
+				key=user.getHospitalName()+user.getInstitutionUID();
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
 					tempOrgInfo=getOrgInfoByHospitalKey(user.getHospitalName(), user.getInstitutionUID());
+				}
+				if(addUserAccessScope(user, tempOrgInfo)==false){
+					return false;
+				}
+			}
+			else if(StringUtils.isNotEmpty(user.getInstitutionName())){
+				key=user.getInstitutionName()+user.getTenantUID();
+				if(mapOrgInfo.containsKey(key)){
+					tempOrgInfo=mapOrgInfo.get(key);
+				}
+				else{
+					tempOrgInfo=getOrgInfoByHospitalKey(user.getInstitutionName(), user.getTenantUID());
 				}
 				if(addUserAccessScope(user, tempOrgInfo)==false){
 					return false;
@@ -587,7 +599,7 @@ public class UserAccountImportService {
 			}
 			String defaultName="";
 			if(StringUtils.isNotEmpty(user.getDepartName())){
-				defaultName+="-"+user.getDepartName();
+				defaultName+=user.getDepartName();
 				if(StringUtils.isNotEmpty(user.getDepartName2())){
 					defaultName+="-"+user.getDepartName2();
 					if(StringUtils.isNotEmpty(user.getDepartName3())){
@@ -596,7 +608,7 @@ public class UserAccountImportService {
 				}
 			}
 			accessScope+=","+defaultName;
-			String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
+			String[] arrUserOrgInfo=accessScope.split("[,， ]");
 			Set<String> setAccessScope=new HashSet<String>();
 			for(int i=0;i<arrUserOrgInfo.length;++i){
 				if(StringUtils.isEmpty(arrUserOrgInfo[i])){
@@ -604,8 +616,10 @@ public class UserAccountImportService {
 				}
 				setAccessScope.add(arrUserOrgInfo[i]);
 			}
-			for(int i=0;i<arrUserOrgInfo.length;++i){
-				String key=arrUserOrgInfo[i]+user.getSiteUID();
+			Iterator<String> tempIt=setAccessScope.iterator();
+			while(tempIt.hasNext()){
+				String tempStr=tempIt.next();
+				String key=tempStr+user.getSiteUID();
 				OrgInfo tempOrgInfo=null;
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
