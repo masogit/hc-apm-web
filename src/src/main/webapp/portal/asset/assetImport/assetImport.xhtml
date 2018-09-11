@@ -48,9 +48,9 @@
                                 <p>说明</p>
 
                                 <p>
-                                    1. <h:outputText value="#{msg.downloadTemplateFile}" />
-                                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetFileImportController.exportAssetExcelTemplate}" update=":growl"
-                                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                    1.
+                                    <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm" actionListener="#{assetFileImportController.exportAssetExcelTemplate}" update=":growl"
+                                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"  style="background-color: #5180ce;">
                                         <p:fileDownload value="#{assetFileImportController.assetTemplateFile}" />
                                     </p:commandButton>
                                 </p>
