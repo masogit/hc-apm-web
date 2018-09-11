@@ -707,6 +707,15 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
 
+    public void writeToFile(File file) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+
+        this.workBook.write(fos);
+
+        fos.close();
+
+    }
+
     public InputStream getStream() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);
