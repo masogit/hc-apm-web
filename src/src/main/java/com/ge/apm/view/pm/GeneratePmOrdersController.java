@@ -103,13 +103,34 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
-        initTree(user.getTenantUID());
+        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+        //initTree(user.getTenantUID());
+		initOrgTree();
+	}
+
+	public void initOrgTree() {
+		UserAccount loginUser = UserContextService.getCurrentUserAccount();
+		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+//        orgTree = new DefaultTreeNode("root",null,null);
+//        orgTree.getChildren().add(treeNode);
+//        orgTree.setExpanded(true);
+
+		OrgInfo rootOrg = new OrgInfo();
+		rootOrg.setId(-1);
+		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+		orgTree = new DefaultTreeNode("root", null, null);
+		TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+		if (null != treeNode) {
+			rootNode.getChildren().add(treeNode);
+		}
+		rootNode.setExpanded(true);
+
 	}
 
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
+        addFilter();
     }
 
     private void initTree(String tenantUid) {
@@ -143,10 +164,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
             return null;
         }
         String name = org.getName();
-        while (org.getParentOrg() != null) {
+/*        while (org.getParentOrg() != null) {
             org = org.getParentOrg();
             name = org.getName() + "/" + name;
-        }
+        }*/
         return name;
     }
 
@@ -367,7 +388,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				models.add(model);
 			}
 			if (CollectionUtils.isEmpty(models)) {
-				WebUtil.addErrorMessage("无可生成保养工单的资产！");
+				WebUtil.addErrorMessage("已经存在同级别同类型的保养工单！");
 				LOGGER.warn("no assets need to generate pm orders !");
 				return;
 			}
@@ -378,8 +399,18 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		String request = JSON.toJSONString(model);
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
-		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-        WebUtil.addSuccessMessage("工单生成成功！");
+		long start = System.currentTimeMillis();
+		try{
+			pmOrderRequestApiService.createPmOrdersByBatch(token, request);
+			WebUtil.addSuccessMessage("工单生成成功！");
+		} catch(Exception e){
+			e.printStackTrace();
+			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
+			WebUtil.addErrorMessage("工单生成失败！");
+		}
+		long end = System.currentTimeMillis();
+		LOGGER.info("批量生成保养工单结束，耗时 : {} 秒 !",(end - start)/1000);
+
 		//WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 	}
 

@@ -97,8 +97,28 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
-        initTree(user.getTenantUID());
+        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+        //initTree(user.getTenantUID());
+        initOrgTree();
+    }
+
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+//        orgTree = new DefaultTreeNode("root",null,null);
+//        orgTree.getChildren().add(treeNode);
+//        orgTree.setExpanded(true);
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+
     }
 
     private void initTree(String tenantUid) {
@@ -155,10 +175,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             return null;
         }
         String name = org.getName();
-        while (org.getParentOrg() != null) {
+/*        while (org.getParentOrg() != null) {
             org = org.getParentOrg();
             name = org.getName() + "/" + name;
-        }
+        }*/
         return name;
     }
 
