@@ -773,6 +773,15 @@ public class UserAccount implements ChineseName, Serializable {
 		if (org == null) {
 			return;
 		}
+		else{
+			institutionName="";
+			tenantName="";
+			hospitalName="";
+			siteName="";
+			departName="";
+			departName2="";
+			departName3="";
+		}
 		OrgInfo parentOrg = org;
 		String name="";
 		while (parentOrg != null) {
@@ -785,7 +794,19 @@ public class UserAccount implements ChineseName, Serializable {
 			} else if (parentOrg.getOrgType() == 3) {
 				setSiteName(parentOrg.getName());
 			} else if (parentOrg.getOrgType() == 4) {
-				setDepartName(parentOrg.getName());
+				if(StringUtils.isEmpty(departName)){
+					String tempDepartName=parentOrg.getName();
+					String[] arrTempDepartName=tempDepartName.split("-");
+					if(arrTempDepartName.length>0){
+						setDepartName(arrTempDepartName[0]);
+					}
+					if(arrTempDepartName.length>1){
+						setDepartName2(arrTempDepartName[1]);
+					}
+					if(arrTempDepartName.length>2){
+						setDepartName3(arrTempDepartName[2]);
+					}
+				}
 			}
 			if(StringUtils.isEmpty(name)){
 				name=parentOrg.getName();
