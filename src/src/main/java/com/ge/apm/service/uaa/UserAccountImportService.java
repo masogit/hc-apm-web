@@ -59,8 +59,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 @Service
 public class UserAccountImportService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String HEADER_INSTITUTION="所属集团";
-	private static final String HEADER_HOSPITAL="所属医院*";
+	private static final String HEADER_INSTITUTION="所属集团*";
+	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
 	private static final String HEADER_DEPARTMENT="科室1";
 	private static final String HEADER_DEPARTMENT2="科室2";
@@ -85,6 +85,7 @@ public class UserAccountImportService {
 	private int existsCount;
 	private int recordCount;
 	boolean isInsulate=false;
+	boolean isCreate=true;
 	UserAccount currentUser;
 	
 	@Autowired
@@ -149,6 +150,7 @@ public class UserAccountImportService {
 		String uuid=newUser.getUid();
 		if(StringUtils.isEmpty(uuid)){
 			//create
+			isCreate=true;
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在");
@@ -161,6 +163,7 @@ public class UserAccountImportService {
 		}
 		else{
 			//update
+			isCreate=false;
 			UserAccount user=userAccountRepository.getByUid(uuid);
 			if(user==null){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_NOT_EXISTS,"用户不存在;");
@@ -268,6 +271,21 @@ public class UserAccountImportService {
 		}
 		return temp;
 	}
+	
+	private OrgInfo getOrgInfoByDepartmentKeyParent(String name,String uid){
+		OrgInfo temp=null;
+		String key=name+uid;
+		if(mapOrgInfo.containsKey(key)){
+			temp=mapOrgInfo.get(key);
+		}
+		if(temp==null){
+			temp=orgInfoRepository.getDepartmentByNameParent(name, uid);
+			if(temp!=null){
+				mapOrgInfo.put(key, temp);
+			}
+		}
+		return temp;
+	}
 	private void getOrgInfoByDepartmentKey(Set<String> names,String uid){
 		List<OrgInfo> listOrgInfo=orgInfoRepository.getDepartmentByName(names,uid);
 		if(listOrgInfo!=null){
@@ -287,29 +305,70 @@ public class UserAccountImportService {
 		}
 		newUser.setSiteId(tenantInfo.getId());
 		if(isInsulate){
-			newUser.setInstitutionUID(currentUser.getInstitutionUID());
-			newUser.setHospitalUID(currentUser.getHospitalUID());
-			orgInfoTemp=getOrgInfoByMappingUid(currentUser.getHospitalUID());
-//			newUser.setSiteUID(currentUser.getSiteUID());
-//			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
-			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
-			newUser.setOrgType(orgInfoTemp.getOrgType());
-			if(getSiteID(newUser, site)){
-				if(getDepartmentID(newUser, department,isInsulate)){
-					if(getDepartmentID(newUser, department2,isInsulate)){
-						if(getDepartmentID(newUser, department3,isInsulate)){
+//			newUser.setInstitutionUID(currentUser.getInstitutionUID());
+//			newUser.setHospitalUID(currentUser.getHospitalUID());
+//			orgInfoTemp=getOrgInfoByMappingUid(currentUser.getHospitalUID());
+////			newUser.setSiteUID(currentUser.getSiteUID());
+////			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
+//			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+//			newUser.setOrgType(orgInfoTemp.getOrgType());
+//			if(getSiteID(newUser, site)){
+//				if(getDepartmentID(newUser, department,isInsulate)){
+//					if(getDepartmentIDParent(newUser, department+"-"+department2,isInsulate)){
+//						if(getDepartmentIDParent(newUser,department+"-"+department2+"-"+department3,isInsulate)){
+//						}
+//					}
+//				}
+//			}
+			if(getInstitutionID(newUser, institution)){
+				if(!orgInfoTemp.getUid().equals(currentUser.getInstitutionUID())){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION_ERROR,"集团错误;");
+					return;
+				}
+				if(getHospitalID(newUser, hospital)){
+					if(!orgInfoTemp.getUid().equals(currentUser.getHospitalUID())){
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL_ERROR,"医院错误;");
+						return;
+					}
+					if(getSiteID(newUser, site)){
+						if(!orgInfoTemp.getUid().equals(currentUser.getSiteUID())){
+							newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE_ERROR,"院区错误;");
+							return;
+						}
+						if(StringUtils.isNotEmpty(department)){
+							if(getDepartmentID(newUser, department,isInsulate)){
+								if(StringUtils.isNotEmpty(department2)){
+									String tempDepartment=department+"-"+department2;
+									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+										if(StringUtils.isNotEmpty(department3)){
+											tempDepartment=department+"-"+department2+"-"+department3;
+											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
 			}
 		}
 		else{
+			//always
 			if(getInstitutionID(newUser, institution)){
 				if(getHospitalID(newUser, hospital)){
 					if(getSiteID(newUser, site)){
-						if(getDepartmentID(newUser, department,isInsulate)){
-							if(getDepartmentID(newUser, department2,isInsulate)){
-								if(getDepartmentID(newUser, department3,isInsulate)){
+						if(StringUtils.isNotEmpty(department)){
+							if(getDepartmentID(newUser, department,isInsulate)){
+								if(StringUtils.isNotEmpty(department2)){
+									String tempDepartment=department+"-"+department2;
+									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+										if(StringUtils.isNotEmpty(department3)){
+											tempDepartment=department+"-"+department2+"-"+department3;
+											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
+											}
+										}
+									}
 								}
 							}
 						}
@@ -326,7 +385,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByInstitutionKey(institution, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(institution)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"集团错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION_ERROR,"集团错误;");
 				return false;
 			}
 		}
@@ -342,7 +401,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByHospitalKey(hospital, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(hospital)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL,"医院错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL_ERROR,"医院错误;");
 				return false;
 			}
 		}
@@ -358,7 +417,7 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoBySiteKey(site, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(site)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE,"院区错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE_ERROR,"院区错误;");
 				return false;
 			}
 		}
@@ -375,7 +434,23 @@ public class UserAccountImportService {
 		OrgInfo temp=getOrgInfoByDepartmentKey(department, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(department)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT,"科室错误;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
+				return false;
+			}
+		}
+		else{
+			orgInfoTemp=temp;
+		}
+		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+		newUser.setOrgType(orgInfoTemp.getOrgType());
+		return true;
+	}
+	
+	private boolean getDepartmentIDParent(UserAccount newUser,String department,boolean isInsulate){
+		OrgInfo temp=getOrgInfoByDepartmentKeyParent(department, orgInfoTemp.getUid());
+		if(temp==null){
+			if(StringUtils.isNotEmpty(department)){
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
 				return false;
 			}
 		}
@@ -459,9 +534,11 @@ public class UserAccountImportService {
 		return sysRoleMap;
 	}
 	
-	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo){
+	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo,boolean showError){
 		if(tempOrgInfo==null){
-			user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
+			if(showError){
+				user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
+			}
 			return false;
 		}
 		else{
@@ -491,19 +568,31 @@ public class UserAccountImportService {
 				else{
 					tempOrgInfo=getOrgInfoBySiteKey(user.getSiteName(), user.getHospitalUID());
 				}
-				if(addUserAccessScope(user, tempOrgInfo)==false){
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
 					return false;
 				}
 			}
-			else if(StringUtils.isNotEmpty(user.getInstitutionName())){
-				key=user.getSiteName()+user.getInstitutionUID();
+			else if(StringUtils.isNotEmpty(user.getHospitalName())){
+				key=user.getHospitalName()+user.getInstitutionUID();
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
 				else{
 					tempOrgInfo=getOrgInfoByHospitalKey(user.getHospitalName(), user.getInstitutionUID());
 				}
-				if(addUserAccessScope(user, tempOrgInfo)==false){
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
+					return false;
+				}
+			}
+			else if(StringUtils.isNotEmpty(user.getInstitutionName())){
+				key=user.getInstitutionName()+user.getTenantUID();
+				if(mapOrgInfo.containsKey(key)){
+					tempOrgInfo=mapOrgInfo.get(key);
+				}
+				else{
+					tempOrgInfo=getOrgInfoByHospitalKey(user.getInstitutionName(), user.getTenantUID());
+				}
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
 					return false;
 				}
 			}
@@ -511,11 +600,14 @@ public class UserAccountImportService {
 		else{
 			String accessScope=user.getAccessScope();
 			if(StringUtils.isEmpty(accessScope)){
+				if(!isCreate){
+					return true;
+				}
 				accessScope="";
 			}
 			String defaultName="";
 			if(StringUtils.isNotEmpty(user.getDepartName())){
-				defaultName+="-"+user.getDepartName();
+				defaultName+=user.getDepartName();
 				if(StringUtils.isNotEmpty(user.getDepartName2())){
 					defaultName+="-"+user.getDepartName2();
 					if(StringUtils.isNotEmpty(user.getDepartName3())){
@@ -524,7 +616,7 @@ public class UserAccountImportService {
 				}
 			}
 			accessScope+=","+defaultName;
-			String[] arrUserOrgInfo=user.getAccessScope().split("[,， ]");
+			String[] arrUserOrgInfo=accessScope.split("[,， ]");
 			Set<String> setAccessScope=new HashSet<String>();
 			for(int i=0;i<arrUserOrgInfo.length;++i){
 				if(StringUtils.isEmpty(arrUserOrgInfo[i])){
@@ -532,8 +624,10 @@ public class UserAccountImportService {
 				}
 				setAccessScope.add(arrUserOrgInfo[i]);
 			}
-			for(int i=0;i<arrUserOrgInfo.length;++i){
-				String key=arrUserOrgInfo[i]+user.getSiteUID();
+			Iterator<String> tempIt=setAccessScope.iterator();
+			while(tempIt.hasNext()){
+				String tempStr=tempIt.next();
+				String key=tempStr+user.getSiteUID();
 				OrgInfo tempOrgInfo=null;
 				if(mapOrgInfo.containsKey(key)){
 					tempOrgInfo=mapOrgInfo.get(key);
@@ -542,8 +636,15 @@ public class UserAccountImportService {
 					getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
-				if(addUserAccessScope(user,tempOrgInfo)==false){
-					return false;
+				if(key.equals(defaultName+user.getSiteUID())){
+					if(addUserAccessScope(user,tempOrgInfo,false)==false){
+						return false;
+					}
+				}
+				else{
+					if(addUserAccessScope(user,tempOrgInfo,true)==false){
+						return false;
+					}
 				}
 			}
 		}
@@ -720,8 +821,8 @@ public class UserAccountImportService {
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
 				
-				if(StringUtils.isEmpty(hospital)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL,"所属医院不能为空;");
+				if(StringUtils.isEmpty(institution)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
 					pass=false;
 				}
 				
@@ -759,7 +860,7 @@ public class UserAccountImportService {
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,false);
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,"格式错误;");
 				importFailedDataList.add(newUser);
 				failedCount++;
 			}

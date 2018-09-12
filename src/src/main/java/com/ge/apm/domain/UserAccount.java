@@ -709,21 +709,21 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getStatusDisplay() {
-		if (this.status != null) {
-			String result = "";
-			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
-				result += "格式错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
-				result += "占比总和错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
-				result += "设备名称不存在；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
-				result += this.otherErrorMessage;
-			} else {
-				result += this.status;
-			}
-			return result;
-		}
+//		if (this.status != null) {
+//			String result = "";
+//			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
+//				result += "格式错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
+//				result += "占比总和错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
+//				result += "设备名称不存在；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+//				result += this.otherErrorMessage;
+//			} else {
+//				result += this.status;
+//			}
+//			return result;
+//		}
 		return statusDisplay;
 	}
 
@@ -741,13 +741,17 @@ public class UserAccount implements ChineseName, Serializable {
 		}
 	}
 
-	public void setStatusDisplay(UploadFileErrorTypeEnum type, String otherErrorMessage) {
-		if (this.status == null) {
-			this.status = type + ",";
-		} else if (this.status.indexOf(type + ",") < 0) {
-			this.status += type + ",";
+	public void setStatusDisplay(UploadFileErrorTypeEnum type, String statusDisplay) {
+		if(this.statusDisplay==null){
+			this.statusDisplay="";
 		}
-		this.otherErrorMessage = otherErrorMessage;
+		if (this.status == null) {
+			this.status = ","+type + ",";
+			this.statusDisplay+=statusDisplay;
+		} else if (this.status.indexOf(","+type + ",") < 0) {
+			this.status += type + ",";
+			this.statusDisplay+=statusDisplay;
+		}
 	}
 
 	public String getOrgFullName() {
@@ -795,7 +799,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getTenantName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(tenantName)){
+			setOrgFullName();
+		}
 		return tenantName;
 	}
 
@@ -804,7 +810,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getInstitutionName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(institutionName)){
+			setOrgFullName();
+		}
 		return institutionName;
 	}
 
@@ -813,7 +821,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getHospitalName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(hospitalName)){
+			setOrgFullName();
+		}
 		return hospitalName;
 	}
 
@@ -822,7 +832,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getSiteName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(siteName)){
+			setOrgFullName();
+		}
 		return siteName;
 	}
 
@@ -831,7 +843,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getDepartName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(departName)){
+			setOrgFullName();
+		}
 		return departName;
 	}
 

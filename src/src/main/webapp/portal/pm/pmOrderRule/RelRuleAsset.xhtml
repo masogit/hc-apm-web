@@ -25,7 +25,7 @@
                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                <p:scrollPanel style="height:300px;border: 0" mode="native">
                                    <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{relRuleAssetController.orgTree}" selection="#{relRuleAssetController.selectedNode}" var="node" selectionMode="single">
-                                       <p:ajax process="@this" event="select" update=":BatchCreateForm" listener="#{relRuleAssetController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                       <p:ajax process="@this" event="select" update="BatchCreateForm" listener="#{relRuleAssetController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
                                        <p:ajax process="@this" event="expand"/>
                                        <p:ajax process="@this" event="collapse"/>
                                        <p:treeNode type="org">
