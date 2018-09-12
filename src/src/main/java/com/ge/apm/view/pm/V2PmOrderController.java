@@ -59,6 +59,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * v
@@ -1274,13 +1275,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void approvePMorder() {
-        if (selectedPmOrder != null) {
-            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
+        if (selectedPmOrder != null) { //selectedMapy有问题
+
             if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
                 WebUtil.addErrorMessage("审核不通过原因必须填写");
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
             }
+            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
             approvedDetails.forEach(item -> {
                 item.setCreatedDate(null);
                 if (null == item.getApproved()) {

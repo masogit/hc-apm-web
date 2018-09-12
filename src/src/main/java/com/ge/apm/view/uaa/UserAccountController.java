@@ -1,16 +1,27 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import com.ge.apm.view.sysutil.UserContextService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
+import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -24,28 +35,39 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BiomedGroupUserRepository;
+import com.ge.apm.dao.JsonTemplateRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.BiomedGroupUser;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SysRoleVO;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserRole;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.uaa.UserAccountExportService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.sysutil.UserContextService;
+
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.faces.event.ValueChangeEvent;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -88,6 +110,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private UserAccountService userAccountService;
     
+    private UserAccountExportService userAccountExportService;
+    
     private StreamedContent exportFile;
 
     private OrgInfoTreeService orgInfoTreeService;
@@ -111,6 +135,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
+        userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -870,15 +895,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 			WebUtil.addErrorMessage("无数据");
 			return;
 		}
-		userAccountService.supplementUserAccount(listUserAccount);
-		downloadFile(userAccountService.parseUserAccountToMap(listUserAccount));
+		userAccountExportService.supplementUserAccount(listUserAccount);
+		downloadFile(userAccountExportService.parseUserAccountToMap(listUserAccount));
 	}
     
     private void downloadFile(List<Map<String,Object>> data){
 		try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = userAccountService.exportData(doc, data);
+            Boolean exportFlag = userAccountExportService.exportData(doc, data);
             if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "UserAccount.xlsx");
             }

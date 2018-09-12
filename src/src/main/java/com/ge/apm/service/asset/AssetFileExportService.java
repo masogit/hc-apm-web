@@ -6,10 +6,13 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -92,8 +95,35 @@ public class AssetFileExportService extends AssetFileImportBaseService {
         }
         doc.writeCellData(AssetFileExportService.SHEET_ORG, startRow, 1, "#");
 
+        outputMetaData(doc);
+
         return doc;
 
+    }
+
+    private void outputMetaData(ExcelDocument doc) {
+        int siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        List<I18nMessage> assetGroupList = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
+
+        int rowNum = 2;
+        while(true) {
+            String cellStringValue = doc.getCellStringValue("设备分类", rowNum, 2);
+
+            if (cellStringValue == null) {
+                break;
+            }
+            doc.clearCell("设备分类", rowNum, 2);
+
+            ++rowNum;
+        }
+        rowNum = 2;
+        for(I18nMessage msg: assetGroupList) {
+            doc.writeCellData("设备分类", rowNum, 2, msg.getValueZh());
+            ++rowNum;
+        }
+
+        String formula = "设备分类!$B$2:$B$" + (rowNum - 1);
+        doc.updateName("设备分类", formula);
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
@@ -117,6 +147,15 @@ public class AssetFileExportService extends AssetFileImportBaseService {
         }
 
         return hasFailData;
+    }
+
+    public ExcelDocument exportAssetTemplate() throws IOException {
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+
+        outputMetaData(doc);
+
+        return doc;
     }
 
 }

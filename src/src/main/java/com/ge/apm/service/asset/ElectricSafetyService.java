@@ -405,9 +405,15 @@ public class ElectricSafetyService {
 						if (order != null) {
 							data.setV2PmOrder(order);
 						} else {
-							data.setWarnMessage("工单未找到");
+							if(listPmOrder!=null && listPmOrder.size()>0){
+								data.setV2PmOrder(listPmOrder.get(0));
+							}
+							else{
+								data.setWarnMessage("工单未找到");
+							}
 						}
 						if(listPmOrder!=null){
+							listPmOrder.add(order);
 							data.setListV2PmOrder(listPmOrder);
 						}
 						else{
