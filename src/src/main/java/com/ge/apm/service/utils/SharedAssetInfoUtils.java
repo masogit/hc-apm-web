@@ -1,12 +1,5 @@
 package com.ge.apm.service.utils;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.SharedAssetRequest;
-import com.ge.apm.domain.SharedAssetTypeAccesssory;
-import javaslang.Tuple2;
-import org.apache.commons.lang.StringUtils;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -19,6 +12,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetTypeAccesssory;
+
+import javaslang.Tuple2;
 
 public class SharedAssetInfoUtils {
 
@@ -106,7 +105,7 @@ public class SharedAssetInfoUtils {
             info.put("设备名称", asset.getName());
             info.put("设备型号", asset.getFunctionType());
             info.put("设备分类", asset.getSharedAssetType().getSwapName());
-            info.put("租金", getPdfUnitPrice(asset));
+            info.put("租金", getPdfUnitPrice(reqDetail));
             info.put("状态", getPdfStatus(asset));
             info.put("借用时间", year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second);
             info.put("附属物品", getPdfAccessories(asset));
@@ -130,19 +129,35 @@ public class SharedAssetInfoUtils {
             DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
             String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
 
+            Double compenAmount = reqDetail.getCompensationAmount();
+            Double rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
+            if(compenAmount == null || compenAmount == 0)
+            {
+            	info.put("赔偿费用", "/");
+            	info.put("总计费用", rentFee);
+            }
+            else
+            {
+            	info.put("赔偿费用", compenAmount);
+            	info.put("总计费用", rentFee + compenAmount);
+            }
+            
             info.put("归还时间", reqDetail.getChargingEndTime() == null ? null :
                     getSplittedTime(reqDetail.getChargingEndTime(), "yyyy-MM-dd HH:mm:ss"));
             info.put("总租用期", rentalTimeInMinutes < 360 ? 0.25 : borrowDays);
-            info.put("总金额", getPdfTotalAmount(asset, reqDetail, rentalTimeInMinutes) + "元");
+            info.put("租赁费用", rentFee);
+            info.put("备注", reqDetail.getReqComment());
+            //is_intact为true或者null时默认为完好
+            info.put("还时状态", (reqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好"));
         }
     }
 
-    public static double getPdfTotalAmount(AssetInfo asset, SharedAssetReqDetail reqDetail, long minutes)
+    public static Double getPdfTotalAmount(SharedAssetReqDetail reqDetail, long minutes)
     {
-        double totalAmount = 0;
+    	Double totalAmount = 0.0;
         //chgType: 1.按次， 2.按小时/自然时间（60分钟）,3. 按天 , 4. 自然时间
-        //request.type: 1.维修, 2.补登记  3.正常借用
-        if(reqDetail.getReturnRequest().getType().equals("1"))
+        //request.type: 1.维修, 2.补登记 , 3. NULL的时候正常计费
+        if("1".equals(reqDetail.getReturnRequest().getType()))
         {
             totalAmount = 0.0;
         }
@@ -151,7 +166,7 @@ public class SharedAssetInfoUtils {
             //按自然时间计费时，若小于6小时，按6小时计算保底价
             if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
             {
-                totalAmount = 6 * asset.getSharedAssetType().getUnitPrice();
+                totalAmount = 6 * reqDetail.getUnitPrice();
             }
             else
             {
@@ -177,10 +192,10 @@ public class SharedAssetInfoUtils {
         return format.format(date);
     }
 
-    private static String getPdfUnitPrice(AssetInfo asset)
+    private static String getPdfUnitPrice(SharedAssetReqDetail reqDetail)
     {
-        Double price = asset.getSharedAssetType().getUnitPrice();
-        String chgType = asset.getSharedAssetType().getChargingType();
+        Double price = reqDetail.getUnitPrice();
+        String chgType = reqDetail.getChargingType();
 
         String uniPrice = null;
         //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
