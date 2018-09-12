@@ -18,15 +18,13 @@
 			
 			<fo:block font-weight="bold" font-size="10px" text-align="center" margin-top="1cm">
 				<xsl:value-of select="抬头"/>
-			</fo:block>
+			</fo:block>	
 			
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.1cm">
+			
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center"  space-after="-0.2cm">
 				设备租赁凭据
 			</fo:block>
-			<fo:block font-family="SimSun" font-weight="bold" font-size="8px" text-align="center" space-after="-0.2cm">
-				（设备如有丢失、损坏，按院有关规定赔偿）
-			</fo:block>
-			
+						
 			<fo:block wrap-option="no-wrap" overflow="visible" margin-left="1cm" margin-right="1cm">
      			<fo:leader leader-length="220mm"
                			   leader-pattern="rule"
@@ -194,20 +192,14 @@
 					</fo:table-body>					
 				</fo:table>
 			</fo:block>
+			
 		
-			<fo:block font-weight="bolder" font-size="8px" text-align="center" margin-top="6cm">
-				第1联：中心留存 &#160;第2联：卫生经济科记账  &#160;第3联：租用科室凭据
-				<fo:leader leader-length="160mm"
-               			   leader-pattern="rule"
-                           rule-style="solid"
-                           rule-thickness="0.1mm"
-                           color="black">
-                </fo:leader>
-			</fo:block>
 		</fo:block>
+		
 		</fo:flow>
 		</fo:page-sequence>
     </fo:root>
   </xsl:template>
+
   
 </xsl:stylesheet>
