@@ -136,8 +136,7 @@
 												
 					</fo:table-body>					
 				</fo:table>
-				
-				
+								
 				<fo:table table-layout="fixed" border-style="solid" border-width="0.8px">
 					<fo:table-column column-width="98%"/>
 					
