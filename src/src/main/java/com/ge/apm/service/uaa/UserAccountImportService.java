@@ -305,7 +305,7 @@ public class UserAccountImportService {
 			return;
 		}
 		newUser.setSiteId(tenantInfo.getId());
-		if(isInsulate){
+//		if(isInsulate){
 //			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 //			newUser.setHospitalUID(currentUser.getHospitalUID());
 //			orgInfoTemp=getOrgInfoByMappingUid(currentUser.getHospitalUID());
@@ -321,41 +321,18 @@ public class UserAccountImportService {
 //					}
 //				}
 //			}
-			if(getInstitutionID(newUser, institution,isInsulate)){
-				if(getHospitalID(newUser, hospital,isInsulate)){
-					if(getSiteID(newUser, site,isInsulate)){
-						if(StringUtils.isNotEmpty(department)){
-							if(getDepartmentID(newUser, department,isInsulate)){
-								if(StringUtils.isNotEmpty(department2)){
-									String tempDepartment=department+"-"+department2;
-									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
-										if(StringUtils.isNotEmpty(department3)){
-											tempDepartment=department+"-"+department2+"-"+department3;
-											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else{
-			//always
-			if(getInstitutionID(newUser, institution,isInsulate)){
-				if(getHospitalID(newUser, hospital,isInsulate)){
-					if(getSiteID(newUser, site,isInsulate)){
-						if(StringUtils.isNotEmpty(department)){
-							if(getDepartmentID(newUser, department,isInsulate)){
-								if(StringUtils.isNotEmpty(department2)){
-									String tempDepartment=department+"-"+department2;
-									if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
-										if(StringUtils.isNotEmpty(department3)){
-											tempDepartment=department+"-"+department2+"-"+department3;
-											if(getDepartmentIDParent(newUser, tempDepartment,isInsulate)){
-											}
+//		}
+		if (getInstitutionID(newUser, institution, isInsulate)) {
+			if (getHospitalID(newUser, hospital, isInsulate)) {
+				if (getSiteID(newUser, site, isInsulate)) {
+					if (StringUtils.isNotEmpty(department)) {
+						if (getDepartmentID(newUser, department, isInsulate)) {
+							if (StringUtils.isNotEmpty(department2)) {
+								String tempDepartment = department + "-" + department2;
+								if (getDepartmentIDParent(newUser, tempDepartment, isInsulate)) {
+									if (StringUtils.isNotEmpty(department3)) {
+										tempDepartment = department + "-" + department2 + "-" + department3;
+										if (getDepartmentIDParent(newUser, tempDepartment, isInsulate)) {
 										}
 									}
 								}
