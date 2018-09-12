@@ -413,7 +413,11 @@ public class ElectricSafetyService {
 							}
 						}
 						if(listPmOrder!=null){
-							listPmOrder.add(order);
+							if(order!=null){
+								if(!listPmOrder.contains(order)){
+									listPmOrder.add(order);
+								}
+							}
 							data.setListV2PmOrder(listPmOrder);
 						}
 						else{
