@@ -42,6 +42,7 @@
 				借  时
 			</fo:block>
 			
+			
 			<fo:block wrap-option="wrap" font-size="11px" language="zh" text-align="left" margin-left="1cm" margin-right="1cm" space-after="0.6cm">
 			<fo:table table-layout="fixed" border-style="solid" border-width="0.8px">
 					<fo:table-column column-width="13%"/>
