@@ -75,6 +75,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
+	private static final String ROLE_GUEST="仅报修权限账号";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
@@ -475,6 +476,10 @@ public class UserAccountImportService {
 				String tempRoleName=roleNames[i];
 				if(StringUtils.isEmpty(tempRoleName)){
 					continue;
+				}
+				if(ROLE_GUEST.equals(tempRoleName)){
+					roleNames=new String[]{tempRoleName};
+					listRole.clear();
 				}
 				if(sysRoleMap.containsKey(tempRoleName)){
 					UserRole newRole=new UserRole();

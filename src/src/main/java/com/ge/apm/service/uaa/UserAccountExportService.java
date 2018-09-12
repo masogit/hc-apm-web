@@ -126,7 +126,6 @@ public class UserAccountExportService {
 				UserAccount tempUser = listUserAccount.get(i);
 				Map<String, Object> tempMap = new HashMap<String, Object>();
 				String orgFullName=tempUser.getOrgFullName();
-				String orgDepartName=tempUser.getDepartName();
 				if(StringUtils.isNotEmpty(tempUser.getInstitutionName())){
 					tempMap.put(HEADER_INSTITUTION, tempUser.getInstitutionName());
 				}
@@ -136,17 +135,14 @@ public class UserAccountExportService {
 				if(StringUtils.isNotEmpty(tempUser.getSiteName())){
 					tempMap.put(HEADER_SITE, tempUser.getSiteName());
 				}
-				if(StringUtils.isNotEmpty(orgDepartName)){
-					String[] departNameArr=orgDepartName.split("-");
-					if(departNameArr.length>0){
-						tempMap.put(HEADER_DEPARTMENT, departNameArr[0]);
-					}
-					if(departNameArr.length>1){
-						tempMap.put(HEADER_DEPARTMENT2, departNameArr[1]);
-					}
-					if(departNameArr.length>2){
-						tempMap.put(HEADER_DEPARTMENT3, departNameArr[2]);
-					}
+				if(StringUtils.isNotEmpty(tempUser.getDepartName())){
+					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartName());
+				}
+				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
+					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartName2());
+				}
+				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
+					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartName3());
 				}
 				tempMap.put(HEADER_LOGINNAME, tempUser.getLoginName());
 				tempMap.put(HEADER_NAME, tempUser.getName());
