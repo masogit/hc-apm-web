@@ -722,6 +722,14 @@ public class ExcelDocument implements AutoCloseable{
         return new ByteArrayInputStream(out.toByteArray());
     }
 
+    public void updateName(String name, String formula) {
+        Name rangeName = workBook.getName(name);
+        if (StringUtils.isNotEmpty(formula)) {
+            rangeName.setRefersToFormula(formula);
+        }
+
+    }
+
     public static class ValueWrapper {
 
         public Object value;

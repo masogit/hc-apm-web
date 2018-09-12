@@ -75,6 +75,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
+	private static final String ROLE_GUEST="仅报修权限账号";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
@@ -85,6 +86,7 @@ public class UserAccountImportService {
 	private int existsCount;
 	private int recordCount;
 	boolean isInsulate=false;
+	boolean isCreate=true;
 	UserAccount currentUser;
 	
 	@Autowired
@@ -149,6 +151,7 @@ public class UserAccountImportService {
 		String uuid=newUser.getUid();
 		if(StringUtils.isEmpty(uuid)){
 			//create
+			isCreate=true;
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在");
@@ -161,6 +164,7 @@ public class UserAccountImportService {
 		}
 		else{
 			//update
+			isCreate=false;
 			UserAccount user=userAccountRepository.getByUid(uuid);
 			if(user==null){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_NOT_EXISTS,"用户不存在;");
@@ -473,6 +477,10 @@ public class UserAccountImportService {
 				if(StringUtils.isEmpty(tempRoleName)){
 					continue;
 				}
+				if(ROLE_GUEST.equals(tempRoleName)){
+					roleNames=new String[]{tempRoleName};
+					listRole.clear();
+				}
 				if(sysRoleMap.containsKey(tempRoleName)){
 					UserRole newRole=new UserRole();
 					newRole.setRoleId(sysRoleMap.get(tempRoleName));
@@ -531,9 +539,11 @@ public class UserAccountImportService {
 		return sysRoleMap;
 	}
 	
-	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo){
+	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo,boolean showError){
 		if(tempOrgInfo==null){
-			user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
+			if(showError){
+				user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
+			}
 			return false;
 		}
 		else{
@@ -563,7 +573,7 @@ public class UserAccountImportService {
 				else{
 					tempOrgInfo=getOrgInfoBySiteKey(user.getSiteName(), user.getHospitalUID());
 				}
-				if(addUserAccessScope(user, tempOrgInfo)==false){
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
 					return false;
 				}
 			}
@@ -575,7 +585,7 @@ public class UserAccountImportService {
 				else{
 					tempOrgInfo=getOrgInfoByHospitalKey(user.getHospitalName(), user.getInstitutionUID());
 				}
-				if(addUserAccessScope(user, tempOrgInfo)==false){
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
 					return false;
 				}
 			}
@@ -587,7 +597,7 @@ public class UserAccountImportService {
 				else{
 					tempOrgInfo=getOrgInfoByHospitalKey(user.getInstitutionName(), user.getTenantUID());
 				}
-				if(addUserAccessScope(user, tempOrgInfo)==false){
+				if(addUserAccessScope(user, tempOrgInfo,true)==false){
 					return false;
 				}
 			}
@@ -595,6 +605,9 @@ public class UserAccountImportService {
 		else{
 			String accessScope=user.getAccessScope();
 			if(StringUtils.isEmpty(accessScope)){
+				if(!isCreate){
+					return true;
+				}
 				accessScope="";
 			}
 			String defaultName="";
@@ -628,8 +641,15 @@ public class UserAccountImportService {
 					getOrgInfoByDepartmentKey(setAccessScope, user.getSiteUID());
 					tempOrgInfo=mapOrgInfo.get(key);
 				}
-				if(addUserAccessScope(user,tempOrgInfo)==false){
-					return false;
+				if(key.equals(defaultName+user.getSiteUID())){
+					if(addUserAccessScope(user,tempOrgInfo,false)==false){
+						return false;
+					}
+				}
+				else{
+					if(addUserAccessScope(user,tempOrgInfo,true)==false){
+						return false;
+					}
 				}
 			}
 		}
