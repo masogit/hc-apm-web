@@ -131,18 +131,18 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
 
             Row row = iterator.next();
 
-            int cellIndex = 0;
+//            int cellIndex = 0;
             for (Cell cell : row) {
-                if (cellIndex >= columnTitles.length) {
+                if (cell.getColumnIndex() >= columnTitles.length) {
                     break;
                 }
 
                 ExcelDocument.ValueWrapper wrapper = ExcelDocument.getCellValueWrapper(cell);
 
-                String columnTitle = columnTitles[cellIndex];
+                String columnTitle = columnTitles[cell.getColumnIndex()];
                 map.put(columnTitle, wrapper);
 
-                ++cellIndex;
+//                ++cellIndex;
             }
             return map;
         }
