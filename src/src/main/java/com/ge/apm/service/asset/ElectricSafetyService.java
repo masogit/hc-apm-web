@@ -315,9 +315,9 @@ public class ElectricSafetyService {
 	
 	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder,Map<String,List<V2_PmOrder>> mapListPmOrder){
 		Calendar startCa=Calendar.getInstance();
-		startCa.add(Calendar.MONTH, -3);
+		startCa.add(Calendar.MONTH, -6);
 		Calendar endCa=Calendar.getInstance();
-		endCa.add(Calendar.MONTH, 3);
+		endCa.add(Calendar.MONTH, 6);
 		Date startDate=startCa.getTime();
 		Date endDate=endCa.getTime();
 		
