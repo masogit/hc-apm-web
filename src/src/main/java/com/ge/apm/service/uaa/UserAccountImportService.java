@@ -321,21 +321,9 @@ public class UserAccountImportService {
 //					}
 //				}
 //			}
-			if(getInstitutionID(newUser, institution)){
-				if(!orgInfoTemp.getUid().equals(currentUser.getInstitutionUID())){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION_ERROR,"集团错误;");
-					return;
-				}
-				if(getHospitalID(newUser, hospital)){
-					if(!orgInfoTemp.getUid().equals(currentUser.getHospitalUID())){
-						newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL_ERROR,"医院错误;");
-						return;
-					}
-					if(getSiteID(newUser, site)){
-						if(!orgInfoTemp.getUid().equals(currentUser.getSiteUID())){
-							newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE_ERROR,"院区错误;");
-							return;
-						}
+			if(getInstitutionID(newUser, institution,isInsulate)){
+				if(getHospitalID(newUser, hospital,isInsulate)){
+					if(getSiteID(newUser, site,isInsulate)){
 						if(StringUtils.isNotEmpty(department)){
 							if(getDepartmentID(newUser, department,isInsulate)){
 								if(StringUtils.isNotEmpty(department2)){
@@ -356,9 +344,9 @@ public class UserAccountImportService {
 		}
 		else{
 			//always
-			if(getInstitutionID(newUser, institution)){
-				if(getHospitalID(newUser, hospital)){
-					if(getSiteID(newUser, site)){
+			if(getInstitutionID(newUser, institution,isInsulate)){
+				if(getHospitalID(newUser, hospital,isInsulate)){
+					if(getSiteID(newUser, site,isInsulate)){
 						if(StringUtils.isNotEmpty(department)){
 							if(getDepartmentID(newUser, department,isInsulate)){
 								if(StringUtils.isNotEmpty(department2)){
@@ -382,7 +370,17 @@ public class UserAccountImportService {
 		
 	}
 	
-	private boolean getInstitutionID(UserAccount newUser,String institution){
+	private boolean hasControllerOrgInfo(OrgInfo tempOrgInfo,String userOrgInfoUid){
+		while(tempOrgInfo!=null){
+			if(tempOrgInfo.getUid().equals(userOrgInfoUid)){
+                return true;
+            }
+			tempOrgInfo=tempOrgInfo.getParentOrg();
+		}
+		return false;
+	}
+	
+	private boolean getInstitutionID(UserAccount newUser,String institution,boolean isInsulate){
 		OrgInfo temp=getOrgInfoByInstitutionKey(institution, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(institution)){
@@ -393,12 +391,18 @@ public class UserAccountImportService {
 		else{
 			orgInfoTemp=temp;
 		}
+		if(isInsulate){
+			if(!hasControllerOrgInfo(orgInfoTemp,currentUser.getInstitutionUID())){
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION_ERROR,"集团错误;");
+                return false;
+			}
+		}
 		newUser.setInstitutionUID(orgInfoTemp.getUid());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
-	private boolean getHospitalID(UserAccount newUser,String hospital){
+	private boolean getHospitalID(UserAccount newUser,String hospital,boolean isInsulate){
 		OrgInfo temp=getOrgInfoByHospitalKey(hospital, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(hospital)){
@@ -409,12 +413,18 @@ public class UserAccountImportService {
 		else{
 			orgInfoTemp=temp;
 		}
+		if(isInsulate){
+			if(!hasControllerOrgInfo(orgInfoTemp,currentUser.getHospitalUID())){
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.HOSPITAL_ERROR,"医院错误;");
+                return false;
+			}
+		}
 		newUser.setHospitalUID(orgInfoTemp.getUid());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
-	private boolean getSiteID(UserAccount newUser,String site){
+	private boolean getSiteID(UserAccount newUser,String site,boolean isInsulate){
 		OrgInfo temp=getOrgInfoBySiteKey(site, orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(site)){
@@ -424,6 +434,12 @@ public class UserAccountImportService {
 		}
 		else{
 			orgInfoTemp=temp;
+		}
+		if(isInsulate){
+			if(!hasControllerOrgInfo(orgInfoTemp,currentUser.getSiteUID())){
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.SITE_ERROR,"院区错误;");
+                return false;
+			}
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
 		newUser.setHospitalId(orgInfoTemp.getId());
@@ -909,7 +925,7 @@ public class UserAccountImportService {
 	
 	private void deleteUserRole(UserAccount user){
 		List<UserRole> listUserRole=user.getUserRoleList();
-		if(listUserRole!=null && listUserRole.size()>0){
+		if(listUserRole!=null && listUserRole.size()>0 && user.getListImportUserRole()!=null && user.getListImportUserRole().size()>0){
 			for(int i=0;i<listUserRole.size();++i){
 				userAccountMapper.deleteUserRole(listUserRole.get(i));
 			}
@@ -933,7 +949,7 @@ public class UserAccountImportService {
 	
 	private void deleteUserOrgInfo(UserAccount user){
 		List<UserOrgInfo> listUserOrgInfo=user.getListUserOrgInfo();
-		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0){
+		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0 && user.getListImportUserOrgInfo()!=null && user.getListImportUserOrgInfo().size()>0){
 			userOrgInfoRepository.delete(listUserOrgInfo);
 		}
 	}
