@@ -22,6 +22,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -71,7 +72,8 @@ public class AssetFileDynamicTemplateTest {
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        template.buildMetaData(workBook);
+        template.writeAsset(workBook, assetList, sites, clinicalDeptList, exportFields);
 
+        template.writeToFile(workBook, new File("./temp.xlsx"));
     }
 }
