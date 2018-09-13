@@ -104,12 +104,12 @@ public class SharedAssetInfoUtils {
             info.put("设备编号", asset.getDepartNum());
             info.put("设备名称", asset.getName());
             info.put("设备型号", asset.getFunctionType());
-            info.put("设备分类", asset.getSharedAssetType().getSwapName());
+            info.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
             info.put("租金", getPdfUnitPrice(reqDetail));
             info.put("状态", getPdfStatus(asset));
             info.put("借用时间", year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second);
             info.put("附属物品", getPdfAccessories(asset));
-            info.put("科室名称", reqDetail.getClinicalDept().getName());
+            info.put("科室名称", reqDetail.getClinicalDept() == null ? null : reqDetail.getClinicalDept().getName());
         }
         else
         {
