@@ -1,33 +1,46 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.OrgInfoRepository;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.dao.AssetInfoRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.primefaces.context.RequestContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.web.mvc.JpaCRUDController;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
-import java.util.UUID;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.ge.apm.domain.TenantInfoConfig;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserContextService;
+
 import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
+import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
-
+	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
     TenantInfoRepository dao = null;
     UserAccountRepository userAccountRepository;
     UserAccount loginUser;
+    TenantInfoConfig tenantConfig;
+    List<String> listVersions;
+    String selectedVersion;
+    private AssetInfoRepository assetInfoRepository;
 
     @Override
     protected void init() {
@@ -35,6 +48,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         loginUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     @Override
@@ -56,6 +70,45 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     @Override
     public List<TenantInfo> getItemList() {
         return dao.getAllOrderByName();
+    }
+    
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    	// TODO Auto-generated method stub
+    	super.prepareCreate();
+    	setDefaultValueForConfig();
+    }
+    
+    @Override
+    public void prepareEdit() {
+    	// TODO Auto-generated method stub
+    	super.prepareEdit();
+    	parseTenantConfig();
+    }
+    
+    @Override
+    public void save() {
+    	// TODO Auto-generated method stub
+    	this.selected.setTenantConfig(generateTenantConfig());
+    	super.save();
+    }
+
+    @Override
+    public void delete(){
+        String uid = selected.getUid();
+        boolean hasAssets = assetInfoRepository.findRecordByTenantUid(uid);
+        if(hasAssets){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("hasAssets"));
+            return;
+        }
+        boolean hasUsers = userAccountRepository.findRecordByTenantUid(uid);
+        if(hasUsers){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("hasUsers"));
+            return;
+        }
+        super.delete();
     }
     
     @Override
@@ -149,5 +202,68 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         }
 
     }
+    
+    public void onVersionChange(){
+    	tenantConfig.setValueWithVersion(this.selectedVersion);
+    }
+    
+    private void setDefaultValueForConfig(){
+    	this.selectedVersion=TenantInfoConfig.VERSION_COMMON;
+    	this.listVersions=TenantInfoConfig.getVersions();
+    	tenantConfig=new TenantInfoConfig();
+    	tenantConfig.setValueWithVersion(this.selectedVersion);
+    }
+    
+    private void parseTenantConfig(){
+    	String configJsonStr=this.selected.getTenantConfig();
+    	this.listVersions=TenantInfoConfig.getVersions();
+    	tenantConfig=new TenantInfoConfig();
+    	if(StringUtils.isNotEmpty(configJsonStr)){
+    		JSONObject jsonObj=JSONObject.parseObject(configJsonStr);
+    		try {
+				this.selectedVersion=jsonObj.getString("edition");
+				JSONArray jsonArr=jsonObj.getJSONArray("menuList");
+				for(int i=0;i<jsonArr.size();++i){
+					tenantConfig.putStr(jsonArr.getString(i));
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.error(e.getMessage());
+			}
+    	}
+    }
+    
+    private String generateTenantConfig(){
+    	JSONObject jsonObj=new JSONObject();
+    	JSONArray jsonArray=new JSONArray(tenantConfig.getListStr());
+    	jsonObj.put("edition", this.selectedVersion);
+    	jsonObj.put("menuList", jsonArray);
+    	return jsonObj.toString();
+    }
+
+	public TenantInfoConfig getTenantConfig() {
+		return tenantConfig;
+	}
+
+	public void setTenantConfig(TenantInfoConfig tenantConfig) {
+		this.tenantConfig = tenantConfig;
+	}
+
+	public List<String> getListVersions() {
+		return listVersions;
+	}
+
+	public void setListVersions(List<String> listVersions) {
+		this.listVersions = listVersions;
+	}
+
+	public String getSelectedVersion() {
+		return selectedVersion;
+	}
+
+	public void setSelectedVersion(String selectedVersion) {
+		this.selectedVersion = selectedVersion;
+	}
+    
     
 }

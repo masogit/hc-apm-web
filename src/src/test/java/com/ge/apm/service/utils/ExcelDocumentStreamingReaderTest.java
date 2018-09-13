@@ -1,5 +1,6 @@
 package com.ge.apm.service.utils;
 
+import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.asset.ExcelDocumentGenerator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.junit.After;
@@ -29,7 +30,7 @@ public class ExcelDocumentStreamingReaderTest {
 
         InputStream inputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
 
-        ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 0, 1);
+        ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
         String[] columnTitles = doc.columnTitles;
 
         assertEquals(2, doc.getWorkBook().getNumberOfSheets());
@@ -39,15 +40,30 @@ public class ExcelDocumentStreamingReaderTest {
     }
 
     @Test
-    public void getFirstDataRow() throws IOException {
+    public void getFirstDataRow_First_Sheet() throws IOException {
 
         InputStream inputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
 
-        ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 0, 1);
+        ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
 
-        Iterator<Map<String, Cell>> iter = doc.iterator();
-        Map<String, Cell> firstRowData = iter.next();
-        System.out.println(doc.getStringValue(firstRowData.get("设备编号")));
+        Iterator<Map<String, ExcelDocument.ValueWrapper>> iter = doc.iterator();
+        Map<String, ExcelDocument.ValueWrapper> firstRowData = iter.next();
+        ExcelDocument.ValueWrapper wrapper = firstRowData.get("设备编号");
+        System.out.println(wrapper.value);
+
+    }
+
+    @Test
+    public void getFirstDataRow_Second_sheet() throws IOException {
+
+        InputStream inputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
+
+        ExcelDocumentStreamingReader doc = new ExcelDocumentStreamingReader(inputStream, 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, 2, 3);
+
+        Iterator<Map<String, ExcelDocument.ValueWrapper>> iter = doc.iterator();
+        Map<String, ExcelDocument.ValueWrapper> firstRowData = iter.next();
+        ExcelDocument.ValueWrapper wrapper = firstRowData.get(ExcelDocumentGenerator.orgHeaderTitle);
+        System.out.println(wrapper.value);
 
     }
 }

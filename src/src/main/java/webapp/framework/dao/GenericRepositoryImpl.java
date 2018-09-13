@@ -62,6 +62,15 @@ public class GenericRepositoryImpl<E> extends SimpleJpaRepository<E, Long> imple
 			return findAll(spec);
 		}
 	}
+	
+	public List<E> findBySearchFilter(final List<SearchFilter> filterFilter,Sort sort) {
+		if (filterFilter == null)
+			return findAll(sort);
+		else {
+			Specification<E> spec = BySearchFilterSpecification.bySearchFilter(filterFilter, type);
+			return findAll(spec,sort);
+		}
+	}
 
 	@Override
 	public E findById(Integer id) {

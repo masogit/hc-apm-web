@@ -44,6 +44,7 @@ import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ibm.icu.util.Calendar;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -161,7 +162,8 @@ public class ElectricSafetyService {
         			detail.setAssetId(listInfo.get(0).getId());
 //            		detail.setAssetInfo(info);
             		detail.setAssetUid(uid);
-        			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
+//        			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
+            		V2_PmOrder order=detail.getV2PmOrder();
         			if(order!=null){
                 		detail.setV2_PmOrderId(order.getId());
                 		List<UnstructuredDataCollection> listUnstructuredDataCollection=unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(),"pm-safety-report");
@@ -311,7 +313,14 @@ public class ElectricSafetyService {
 //		return newMap;
 //	}
 	
-	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder){
+	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder,Map<String,List<V2_PmOrder>> mapListPmOrder){
+		Calendar startCa=Calendar.getInstance();
+		startCa.add(Calendar.MONTH, -6);
+		Calendar endCa=Calendar.getInstance();
+		endCa.add(Calendar.MONTH, 6);
+		Date startDate=startCa.getTime();
+		Date endDate=endCa.getTime();
+		
 		Set<String> setFinancingNum=new HashSet<String>();
 		Set<String> setAssetUids=new HashSet<String>();
 		List<AssetInfo> listAssetInfo=null;
@@ -349,13 +358,33 @@ public class ElectricSafetyService {
 					mapPmOrder.put(tempPmOrder.getAssetUid(), tempPmOrder);
 				}
 			}
+			
+			//set list pmOrder
+			List<V2_PmOrder> listV2_PmOrder=v2_PmOrderRepository.findMultiByAssetUids(setAssetUids,startDate,endDate);
+			if(listV2_PmOrder!=null && listV2_PmOrder.size()>0){
+				for(int i=0;i<listV2_PmOrder.size();++i){
+					V2_PmOrder tempOrder=listV2_PmOrder.get(i);
+					String assetUid=tempOrder.getAssetUid();
+					List<V2_PmOrder> listTempV2PmOrder=null;
+					if(mapListPmOrder.containsKey(assetUid)){
+						listTempV2PmOrder=mapListPmOrder.get(tempOrder.getAssetUid());
+						listTempV2PmOrder.add(tempOrder);
+					}
+					else{
+						listTempV2PmOrder=new ArrayList<V2_PmOrder>();
+						listTempV2PmOrder.add(tempOrder);
+						mapListPmOrder.put(tempOrder.getAssetUid(), listTempV2PmOrder);
+					}
+				}
+			}
 		}
 	}
 
 	private void analysisFinancingNum(List<ElectricSafetyData> listData) {
 		Map<String,List<AssetInfo>> mapAsset=new HashMap<String,List<AssetInfo>>();
 		Map<String,V2_PmOrder> mapPmOrder=new HashMap<String,V2_PmOrder>();
-		getListAssetInfo(listData,mapAsset,mapPmOrder);
+		Map<String,List<V2_PmOrder>> mapListPmOrder=new HashMap<String,List<V2_PmOrder>>();
+		getListAssetInfo(listData,mapAsset,mapPmOrder,mapListPmOrder);
 		if (listData != null && listData.size() > 0) {
 			for (int i = 0; i < listData.size(); ++i) {
 				ElectricSafetyData data = listData.get(i);
@@ -372,10 +401,26 @@ public class ElectricSafetyService {
 					if (listAssetInfo != null && listAssetInfo.size() == 1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())) {
 						data.setAssetInfo(listAssetInfo.get(0));
 						V2_PmOrder order = mapPmOrder.get(listAssetInfo.get(0).getUid());
+						List<V2_PmOrder> listPmOrder=mapListPmOrder.get(listAssetInfo.get(0).getUid());
 						if (order != null) {
 							data.setV2PmOrder(order);
 						} else {
-							data.setWarnMessage("工单未找到");
+							if(listPmOrder!=null && listPmOrder.size()>0){
+								data.setV2PmOrder(listPmOrder.get(0));
+							}
+							else{
+								data.setWarnMessage("工单未找到");
+							}
+						}
+						if(listPmOrder!=null){
+							if(order!=null){
+								if(!listPmOrder.contains(order)){
+									listPmOrder.add(order);
+								}
+							}
+							data.setListV2PmOrder(listPmOrder);
+						}
+						else{
 						}
 					} else if (listAssetInfo != null && listAssetInfo.size() > 1) {
 						data.setWarnMessage("找到多台设备");

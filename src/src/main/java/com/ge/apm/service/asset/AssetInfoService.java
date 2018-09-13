@@ -100,7 +100,7 @@ public class AssetInfoService {
     }
 
     public List<OrgInfo> getHierachyClinicalDeptList(String siteUid) {
-        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeIn(siteUid, new Integer[] {4, 5});
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeIn(siteUid, new Integer[] {4});
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);
 
         return orgInfos;

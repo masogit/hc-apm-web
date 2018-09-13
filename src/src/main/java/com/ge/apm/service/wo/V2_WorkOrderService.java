@@ -97,7 +97,12 @@ public class V2_WorkOrderService {
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
     public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
-        detailDao.save(workOrderDetail);
+//        detailDao.save(workOrderDetail);
+        String token = UserContextService.getAccessToken();
+        String res = srApi.updateWorkOrderDetailPrice(token,workOrderDetail);
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
+        }
     }
 
 
@@ -331,6 +336,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(4);
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
+        formData.setRepairResult(selectedWorkOrder.getRepairResult());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());

@@ -1,5 +1,6 @@
 package com.ge.apm.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +30,13 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(value = "select exists(select 1 from v2_pm_order where asset_id= ?1 and is_finished = false and rule_level = ?2) ",nativeQuery = true)
 	public Boolean findOpenPm(int assetId, Integer level);
 	
-	@Query(value = "select o.* from v2_pm_order o where o.asset_uid= ?1 and o.rule_level=3 and o.is_finished='false' order by o.created_date desc limit 1",nativeQuery = true)
+	@Query(value = "select o.* from v2_pm_order o where o.asset_uid= ?1 and o.rule_level=3 and o.is_finished='false' order by o.plan_time desc limit 1",nativeQuery = true)
 	public V2_PmOrder findByAssetUid(String asset_uid);
-	@Query(value = "select o.* from v2_pm_order o where o.asset_uid in ?1 and o.rule_level=3 and o.is_finished='false' order by o.created_date desc limit 1",nativeQuery = true)
+	@Query(value = "select o.* from v2_pm_order o where o.asset_uid in ?1 and o.rule_level=3 and o.is_finished='false' order by o.plan_time desc limit 1",nativeQuery = true)
 	public Set<V2_PmOrder> findByAssetUids(Set<String> setAssetUids);
+	
+	@Query(value = "select o.* from v2_pm_order o where o.asset_uid in ?1 and o.rule_level=3 and o.plan_time>= ?2 and o.plan_time< ?3 order by o.plan_time desc",nativeQuery = true)
+	public List<V2_PmOrder> findMultiByAssetUids(Set<String> setAssetUids,Date startDate,Date endDate);
 
 	@Query(value = "select exists(select 1 from v2_pm_order where asset_id= ?1 and is_finished = false and rule_level = ?2 and pm_type = ?3) ",nativeQuery = true)
 	public Boolean findOpenPm(int assetId, Integer level,Integer pmType);

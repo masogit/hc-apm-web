@@ -67,7 +67,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.BatchfileStatus}*</label>
                         <h:outputText value="#{fieldMsg.fieldValue('batchFileProcessStatus',batchFileController.selected.status)}"/>
-                        <p:commandLink value="重试"  actionListener="#{batchFileController.restartBatchJob()}"  rendered="#{batchFileController.selected.status eq 'FAILED' }" 
+                        <p:commandLink value="重试"  actionListener="#{batchFileController.restartBatchJob()}"  rendered="#{batchFileController.selected.status ne 'STARTING' }" 
                                        update=":BatchFileImportForm:datalist, :growl :BatchFileImportEditForm" immediate="true"/>
                     </h:panelGroup>
                     <h:panelGroup>

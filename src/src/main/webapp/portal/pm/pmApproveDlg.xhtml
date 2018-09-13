@@ -14,12 +14,12 @@
                                   rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                         <p:column >
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
-                                <p:ajax listener="#{v2PmOrderController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader) @(.beizhuClass)"/>
+                                <p:ajax listener="#{v2PmOrderController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
                             </p:selectBooleanCheckbox>
                             <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox itemLabel="勾选审批" id="selectCheckBoxHeader" value="#{v2PmOrderController.selectedMap['All']}" class="selectCheckBoxHeader">
-                                    <p:ajax  listener="#{v2PmOrderController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox) @(.beizhuClass)"/>
+                                    <p:ajax  listener="#{v2PmOrderController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox)"/>
                                 </p:selectBooleanCheckbox>
                                 <!--<h:outputText value="勾选审批" />-->
                             </f:facet>
@@ -60,7 +60,7 @@
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>
-                   <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.approvePMorder()}" value="审批" update="pmTab:pmOrderDetailForm pmTab:pmOrderListForm @(.beizhuClass)" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                   <p:commandButton validateClient="false" actionListener="#{v2PmOrderController.approvePMorder()}" value="审批" update="pmTab:pmOrderDetailForm pmTab:pmOrderListForm @(.beizhuClass)" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmapproveDialog').hide()"/>
                 </h:panelGroup>
             </h:panelGroup>

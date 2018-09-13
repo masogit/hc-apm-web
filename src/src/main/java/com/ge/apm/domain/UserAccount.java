@@ -156,6 +156,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "wechat_nickname")
 	private String wechatNickname;
 
+	@Column(name = "region")
+	private Integer region = 1;//地区
+
 	@CreatedBy
 	@Column(name = "created_by", nullable = true, length = 50, updatable = false)
 	@JsonIgnore
@@ -186,6 +189,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private OrgInfo orgInfo;
+	
+	@Transient
+	private List<OrgInfo> listOrgInfo;
 
 	@Transient
 	private String tenantName;
@@ -201,6 +207,12 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private String departName;
+	
+	@Transient
+	private String departName2;
+	
+	@Transient
+	private String departName3;
 
 	@Transient
 	private String orgFullName;
@@ -254,6 +266,21 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private String status;
+	
+	@Transient
+	private String accessScope;
+	
+	@Transient
+	private String importRoleNames;
+	
+	@Transient
+	private List<UserOrgInfo> listUserOrgInfo;
+	
+	@Transient
+	private List<UserRole> listImportUserRole;
+	
+	@Transient
+	private List<UserOrgInfo> listImportUserOrgInfo;
 
 	@PrePersist
 	public void initializeUid() {
@@ -267,6 +294,14 @@ public class UserAccount implements ChineseName, Serializable {
 		isLocalAdmin = false;
 		isActive = false;
 		isOnline = false;
+	}
+
+	public Integer getRegion() {
+		return region;
+	}
+
+	public void setRegion(Integer region) {
+		this.region = region;
 	}
 
 	public String getOrgInfoUID() {
@@ -567,6 +602,14 @@ public class UserAccount implements ChineseName, Serializable {
 		this.orgInfo = orgInfo;
 	}
 
+	public List<OrgInfo> getListOrgInfo() {
+		return listOrgInfo;
+	}
+
+	public void setListOrgInfo(List<OrgInfo> listOrgInfo) {
+		this.listOrgInfo = listOrgInfo;
+	}
+
 	public void entryptPassword() throws NoSuchAlgorithmException {
 		byte[] salt = Digests.generateSalt(SALT_SIZE);
 		setPwdSalt(Digests.encodeHex(salt));
@@ -581,6 +624,30 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setLockTime(Date lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	public String getAccessScope() {
+		return accessScope;
+	}
+
+	public void setAccessScope(String accessScope) {
+		this.accessScope = accessScope;
+	}
+	
+	public String getImportRoleNames() {
+		return importRoleNames;
+	}
+
+	public void setImportRoleNames(String importRoleNames) {
+		this.importRoleNames = importRoleNames;
+	}
+
+	public List<UserOrgInfo> getListUserOrgInfo() {
+		return listUserOrgInfo;
+	}
+
+	public void setListUserOrgInfo(List<UserOrgInfo> listUserOrgInfo) {
+		this.listUserOrgInfo = listUserOrgInfo;
 	}
 
 	@Override
@@ -642,21 +709,21 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getStatusDisplay() {
-		if (this.status != null) {
-			String result = "";
-			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
-				result += "格式错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
-				result += "占比总和错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
-				result += "设备名称不存在；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
-				result += this.otherErrorMessage;
-			} else {
-				result += this.status;
-			}
-			return result;
-		}
+//		if (this.status != null) {
+//			String result = "";
+//			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
+//				result += "格式错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
+//				result += "占比总和错误；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
+//				result += "设备名称不存在；";
+//			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+//				result += this.otherErrorMessage;
+//			} else {
+//				result += this.status;
+//			}
+//			return result;
+//		}
 		return statusDisplay;
 	}
 
@@ -674,13 +741,17 @@ public class UserAccount implements ChineseName, Serializable {
 		}
 	}
 
-	public void setStatusDisplay(UploadFileErrorTypeEnum type, String otherErrorMessage) {
-		if (this.status == null) {
-			this.status = type + ",";
-		} else if (this.status.indexOf(type + ",") < 0) {
-			this.status += type + ",";
+	public void setStatusDisplay(UploadFileErrorTypeEnum type, String statusDisplay) {
+		if(this.statusDisplay==null){
+			this.statusDisplay="";
 		}
-		this.otherErrorMessage = otherErrorMessage;
+		if (this.status == null) {
+			this.status = ","+type + ",";
+			this.statusDisplay+=statusDisplay;
+		} else if (this.status.indexOf(","+type + ",") < 0) {
+			this.status += type + ",";
+			this.statusDisplay+=statusDisplay;
+		}
 	}
 
 	public String getOrgFullName() {
@@ -699,8 +770,17 @@ public class UserAccount implements ChineseName, Serializable {
 			return;
 		}
 		OrgInfo org = this.orgInfo;
-		if (this.orgInfo == null) {
+		if (org == null) {
 			return;
+		}
+		else{
+			institutionName="";
+			tenantName="";
+			hospitalName="";
+			siteName="";
+			departName="";
+			departName2="";
+			departName3="";
 		}
 		OrgInfo parentOrg = org;
 		String name="";
@@ -714,7 +794,19 @@ public class UserAccount implements ChineseName, Serializable {
 			} else if (parentOrg.getOrgType() == 3) {
 				setSiteName(parentOrg.getName());
 			} else if (parentOrg.getOrgType() == 4) {
-				setDepartName(parentOrg.getName());
+				if(StringUtils.isEmpty(departName)){
+					String tempDepartName=parentOrg.getName();
+					String[] arrTempDepartName=tempDepartName.split("-");
+					if(arrTempDepartName.length>0){
+						setDepartName(arrTempDepartName[0]);
+					}
+					if(arrTempDepartName.length>1){
+						setDepartName2(arrTempDepartName[1]);
+					}
+					if(arrTempDepartName.length>2){
+						setDepartName3(arrTempDepartName[2]);
+					}
+				}
 			}
 			if(StringUtils.isEmpty(name)){
 				name=parentOrg.getName();
@@ -728,7 +820,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getTenantName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(tenantName)){
+			setOrgFullName();
+		}
 		return tenantName;
 	}
 
@@ -737,7 +831,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getInstitutionName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(institutionName)){
+			setOrgFullName();
+		}
 		return institutionName;
 	}
 
@@ -746,7 +842,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getHospitalName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(hospitalName)){
+			setOrgFullName();
+		}
 		return hospitalName;
 	}
 
@@ -755,7 +853,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getSiteName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(siteName)){
+			setOrgFullName();
+		}
 		return siteName;
 	}
 
@@ -764,12 +864,30 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public String getDepartName() {
-		setOrgFullName();
+		if(StringUtils.isEmpty(departName)){
+			setOrgFullName();
+		}
 		return departName;
 	}
 
 	public void setDepartName(String departName) {
 		this.departName = departName;
+	}
+
+	public String getDepartName2() {
+		return departName2;
+	}
+
+	public void setDepartName2(String departName2) {
+		this.departName2 = departName2;
+	}
+
+	public String getDepartName3() {
+		return departName3;
+	}
+
+	public void setDepartName3(String departName3) {
+		this.departName3 = departName3;
 	}
 
 	public String loadOrgTableColumn() {
@@ -870,5 +988,21 @@ public class UserAccount implements ChineseName, Serializable {
 	public UserAccount(String name,String uid){
 		this.name=name;
 		this.uid=uid;
+	}
+
+	public List<UserRole> getListImportUserRole() {
+		return listImportUserRole;
+	}
+
+	public void setListImportUserRole(List<UserRole> listImportUserRole) {
+		this.listImportUserRole = listImportUserRole;
+	}
+
+	public List<UserOrgInfo> getListImportUserOrgInfo() {
+		return listImportUserOrgInfo;
+	}
+
+	public void setListImportUserOrgInfo(List<UserOrgInfo> listImportUserOrgInfo) {
+		this.listImportUserOrgInfo = listImportUserOrgInfo;
 	}
 }

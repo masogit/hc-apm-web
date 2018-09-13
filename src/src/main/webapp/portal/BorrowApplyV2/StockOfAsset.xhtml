@@ -22,7 +22,7 @@
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="4">
-                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
@@ -53,7 +53,7 @@
                         <p:ajax event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="editButton viewButton"/>
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
                        
-                        <p:column headerText="借用科室" sortBy="#{item.clinicalDeptUID}">
+                        <p:column headerText="借用科室">
                             <h:outputText value="#{item.sharedAssetReqDetail.clinicalDept.name}"/>
                         </p:column>
 
@@ -95,10 +95,17 @@
                             <h:outputText value="#{item.sharedAssetReqDetail.totalAmount}"/>
                         </p:column>
                         
-                        <p:column headerText="#{msg.Actions}">
-	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item)}" rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceAllocateAssetDialog" oncomplete="PF('forceAllocateAssetDialog').show()"/>
-	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item)}" rendered="#{(item.status == 1 || item.status == 3) and (!item.assetDeptUID.equals(item.clinicalDeptUID))}" update="forceReturnAssetDialog" oncomplete="PF('forceReturnAssetDialog').show()"/>
-							<p:commandButton value="打  &#160;&#160;&#160;&#160;&#160;&#160;&#160;印" ajax="false" actionListener="#{assetInfoController.generateVoucher(item)}"  rendered="#{assetInfoController.validate301()}" >
+                        <p:column headerText="#{msg.Actions}" width="16%">
+	                        <p:commandButton value="强制调拨" actionListener="#{assetInfoController.prepareForceAllocateAsset(item)}"
+                                             rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}"
+                                             update="forceAllocateAssetDialog"
+                                             oncomplete="openForceAllocateDialog(xhr, status, args)"/>
+	                        <p:commandButton value="强制归还" actionListener="#{assetInfoController.prepareForceReturnAsset(item)}"
+                                             rendered="#{!item.assetDeptUID.equals(item.clinicalDeptUID)}"
+                                             update="forceReturnAssetDialog"
+                                             oncomplete="openForceReturnDialog(xhr, status, args)"/>
+							
+                            <p:commandButton value="打印" ajax="false" actionListener="#{assetInfoController.generateVoucher(item)}"  rendered="#{assetInfoController.validate301()}" >
                                 <p:fileDownload value="#{assetInfoController.exportPdf}" />
                             </p:commandButton>
 	                    </p:column>
@@ -138,7 +145,25 @@
             }
 
             function openAssetViewWindow(xhr, status, args) {
-                newWin.location.href = args.url;
+                newWin.location.href = '../asset/info/Asset' + args.url;
+            }
+
+            function openForceAllocateDialog(xhr, status, args) {
+                console.log("openForceAllocateDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceAllocateAssetDialog').show()
+                }
+            }
+
+            function openForceReturnDialog(xhr, status, args) {
+                console.log("openForceReturnDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceReturnAssetDialog').show()
+                }
             }
 
         </script>

@@ -245,3 +245,12 @@ ALTER TABLE public.i18n_message DROP CONSTRAINT i18n_message_msg_key;
 update org_info set short_name = name, short_name_py_code = name_py_code;
 update shared_asset_req_detail set unit_price = (select a.unit_price from shared_asset_type a left join asset_info b on a.id=b.shared_asset_type where shared_asset_req_detail.asset_info_id = b.uid) where unit_price is null;
 update asset_info set clinical_dept_uid=asset_dept_uid, asset_dept_uid=clinical_dept_uid where shared_asset_type is not null and clinical_dept_uid!=asset_dept_uid;
+
+--v9.1
+update user_account set region = 1 where region is null;
+ALTER TABLE weixin_article ALTER COLUMN content TYPE varchar(204800) USING content::varchar ;
+
+update qr_code_lib set status=5 where status=2 and submit_wechat_id is null;
+
+ALTER TABLE public.user_org DROP CONSTRAINT fk_gj8bl5ul9orysa05e0j4vve8n;
+update tenant_info set tenant_config='{"menuList":["安装验收","设备档案","设备调剂","维修管理(不含排班管理)","维修排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}' where tenant_config is null;

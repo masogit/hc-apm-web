@@ -8,6 +8,7 @@ package com.ge.apm.service.pm;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
@@ -51,7 +52,17 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
-
+    String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
     public Map<String, Object> getPmOrderSteps(String token, String pmOrderId) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);

@@ -89,7 +89,7 @@
                         </p:column>
                     </p:dataTable>
                         <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
-                        <label class="label">备件信息</label><!--增加备件-->
+                        <label class="label">使用的备件</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.accessory}">
                                 <h:outputText value="#{detailItem.parts}"/>
@@ -102,6 +102,9 @@
                                 <h:outputText value="#{detailItem.partsPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
+                            </p:column>
+                            <p:column headerText="审核状态">
+                                <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
                             </p:column>
                             <p:column headerText="类型">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
@@ -136,7 +139,10 @@
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
-                            <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+                            <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetStaff')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+
+                                <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmmoreAccDialogViewDlg)" oncomplete="PF('pmmoreAccDialogViewDlg').show()"/>
+
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>
@@ -148,7 +154,7 @@
                                 <h:outputText value="#{item.cowokerUserName}"/>
                             </p:column>
                             <p:column headerText="#{msg.manHours}">
-                                <h:outputText value="#{item.manHours}" />
+                                <h:outputText value="#{item.manHours}"/>
                             </p:column>
                         </p:dataTable>
                     </h:panelGroup>

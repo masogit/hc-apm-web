@@ -1,31 +1,35 @@
 package com.ge.apm.view.sysutil;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.uaa.UaaService;
-import javaslang.control.Option;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.service.UserContext;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import javaslang.control.Option;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean(name = "userContextService")
 @SessionScoped
@@ -133,6 +137,35 @@ public class UserContextService implements Serializable {
         }
 
         return true;
+    }
+    
+    public boolean versionContains(String menuNameList){
+    	UserAccount user = getLoginUser();
+    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+    	TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
+    	String configStr=tenantInfo.getTenantConfig();
+    	if(StringUtils.isNotEmpty(configStr)){
+    		try {
+				JSONObject jsonObj=JSONObject.parseObject(configStr);
+				JSONArray jsonArray=jsonObj.getJSONArray("menuList");
+				String[] menus=menuNameList.split(",");
+				for(String menuName:menus){
+					menuName=menuName.trim();
+					for(int i=0;i<jsonArray.size();++i){
+						if(jsonArray.getString(i).equals(menuName)){
+							return true;
+						}
+					}
+				}
+				return false;
+			} catch (Exception e) {
+				// TODO: handle exception
+				return false;
+			}
+    	}
+    	else{
+    		return true;
+    	}
     }
 
     public static boolean checkRole(String role) {
@@ -329,7 +362,6 @@ public class UserContextService implements Serializable {
     }
 
     public static String getAccessToken(HttpServletRequest request) {
-
         String token = null;
         if (request == null) {
             try {
