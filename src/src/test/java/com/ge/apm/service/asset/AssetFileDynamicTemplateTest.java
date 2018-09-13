@@ -10,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mock.ExistingAccountTestExecutionListener;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,6 +26,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,11 @@ public class AssetFileDynamicTemplateTest {
 
         List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
+//        List<String> fields = Arrays.asList(columnKeys).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<String> localizedFields = exportFields.stream().map((item) -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
+
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
@@ -72,7 +79,7 @@ public class AssetFileDynamicTemplateTest {
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        template.writeAsset(workBook, assetList, sites, clinicalDeptList, exportFields);
+        template.writeAsset(workBook, assetList, sites, clinicalDeptList, localizedFields);
 
         template.writeToFile(workBook, new File("./temp.xlsx"));
     }
