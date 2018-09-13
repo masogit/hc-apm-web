@@ -5,6 +5,11 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.pure.AssetInfoFormatter;
+import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -15,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,6 +53,28 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void buildMetaData(SXSSFWorkbook workBook) {
+
+
+    }
+
+    public void writeAsset(SXSSFWorkbook workBook, List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
+
+        Sheet sheet = workBook.getSheet(SHEET_ASSET);
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, SHEET_ASSET, exportFields);
+
+        String[] columnTitles = exportFields.toArray(new String[] {});
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+
+        int startRow = EXCEL_ASSET_DATA_ROW;
+        for (AssetInfo assetInfo: assetList) {
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
+
+            writer.writeRowData(startRow, rowMap);
+
+            ++startRow;
+        }
 
 
     }

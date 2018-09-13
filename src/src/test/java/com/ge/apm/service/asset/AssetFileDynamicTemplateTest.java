@@ -1,7 +1,11 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.CustomConfig;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mock.ExistingAccountTestExecutionListener;
@@ -38,6 +42,12 @@ public class AssetFileDynamicTemplateTest {
     @Autowired
     CustomConfigService customConfigService;
 
+    @Autowired
+    AssetInfoRepository assetInfoDao;
+
+    @Autowired
+    OrgInfoRepository orgInfoDao;
+
     @Before
     public void setup() {
 //        UserAccount userAccount = userAccountDao.getByLoginName("tq-clinicals");
@@ -52,6 +62,11 @@ public class AssetFileDynamicTemplateTest {
         List<String> customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
 
         List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
