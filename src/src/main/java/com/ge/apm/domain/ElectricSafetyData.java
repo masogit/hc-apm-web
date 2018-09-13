@@ -58,19 +58,9 @@ public class ElectricSafetyData implements Serializable {
 	// 检测仪日期
 	@Column(name = "check_date")
 	private Date checkDate;
-
-	// 检测类型
-	@Column(name = "check_type")
-	private String checkType;
-
-	// 应用组数
+//delete,oneGroupApp
 //	@Column(name = "group_type")
 //	private String groupType;
-
-	// 资产编号
-	@Column(name = "financing_num")
-	private String financingNum;
-	
 	//设备uid
 	@Column(name = "asset_uid")
 	private String assetUid;
@@ -95,109 +85,149 @@ public class ElectricSafetyData implements Serializable {
 	@Column(name = "last_modified_date")
 	private Date lastModifiedDate;
 	
-//	1——》1组应用
-	@Column(name="one_group_app")
-	private String oneGroupApp;
+//	2,——》 检测类型
+	@Column(name = "check_type")
+	private String checkType;
 	
-//	7，——》保护接地阻抗（单位：Ω）
+//	2,4,——》 类别
+	@Column(name = "type")
+	private String type;
+	
+//	2,——》 名称
+	@Column(name = "name")
+	private String name;
+	
+//	2,——》 标准名称
+	@Column(name = "standard_name")
+	private String standardName;
+	
+//	2,——》应用组数
+	@Column(name="app_group_count")
+	private String appGroupCount;
+	
+//	5，——》测试仪日期（格式：日-月-年）
+	@Column(name="origin_check_date")
+	private String originCheckDate;
+	
+//	6，——》测试仪时间（格式：H:M:S）
+	@Column(name="origin_check_time")
+	private String originCheckTime;
+	
+//	7,——》保护接地阻抗（单位：Ω）
 	@Column(name = "protect_ground_impedance")
 	private String protectGroundImpedance;
-//	8，——》保护接地阻抗参考值（<0.2Ω）
+//	8,——》保护接地阻抗参考值（<0.2Ω）
 	@Column(name = "protect_ground_impedance_ref_val")
 	private String protectGroundImpedanceRefVal;
 	
-//	21，——》等效设备漏电流（单位：μA）
+//	21,——》等效设备漏电流（单位：μA）
 	@Column(name="equipment_electric_leakage")
 	private String equipmentElectricLeakage;
 	
-//	22，——》等效设备漏电流参考值（<1.0mA）
+//	22,——》等效设备漏电流参考值（<1.0mA）
 	@Column(name="equipment_electric_leakage_ref_val")
 	private String equipmentElectricLeakageRefVal;
 	
-//	23，——》患者漏电流（应用部分加电）（单位：μA）
+//	23,——》患者漏电流（应用部分加电）（单位：μA）
 	@Column(name = "patient_electric_leakage_app")
 	private String patientElectricLeakage_app;
-//	24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
+//	24,——》患者漏电流（应用部分加电）参考值（<50.0μA）
 	@Column(name = "patient_electric_leakage_ref_val_app")
 	private String patientElectricLeakageRefVal_app;
-//	25，——》对地漏电流（正常状态）（单位：mA）
+//	25,——》对地漏电流（正常状态）（单位：mA）
 	@Column(name = "ground_electric_leakage_normal")
 	private String groundElectricLeakage_normal;
-//	26，——》对地漏电流（正常状态）参考值（<0.5mA）
+//	26,——》对地漏电流（正常状态）参考值（<0.5mA）
 	@Column(name = "ground_electric_leakage_ref_val_normal")
 	private String groundElectricLeakageRefVal_normal;
-//	27，——》对地漏电流（单一故障状态）（单位：mA）
+//	27,——》对地漏电流（单一故障状态）（单位：mA）
 	@Column(name = "ground_electric_leakage_single_error")
 	private String groundElectricLeakage_singleError;
-//	28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
+//	28,——》对地漏电流（单一故障状态）参考值（<1.0mA）
 	@Column(name = "ground_electric_leakage_ref_val_single_error")
 	private String groundElectricLeakageRefVal_singleError;
-//	29，——》外壳漏电流（正常状态）（单位：μA）
+//	29,——》外壳漏电流（正常状态）（单位：μA）
 	@Column(name = "shell_electric_leakage_normal")
 	private String shellElectricLeakage_normal;
-//	30，——》外壳漏电流（正常状态）参考值（<100μA）
+//	30,——》外壳漏电流（正常状态）参考值（<100μA）
 	@Column(name = "shell_electric_leakage_ref_val_normal")
 	private String shellElectricLeakageRefVal_normal;
-//	31，——》外壳漏电流（单一故障状态）（单位：μA）
+//	31,——》外壳漏电流（单一故障状态）（单位：μA）
 	@Column(name = "shell_electric_leakage_single_error")
 	private String shellElectricLeakage_singleError;
-//	32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
+//	32,——》外壳漏电流（单一故障状态）参考值（<0.5mA）
 	@Column(name = "shell_electric_leakage_ref_val_single_error")
 	private String shellElectricLeakageRefVal_singleError;
-//	33，——》患者漏电流AC（正常状态）（单位：μA）
+//	33,——》患者漏电流AC（正常状态）（单位：μA）
 	@Column(name = "patient_electric_leakage_ac_normal")
 	private String patientElectricLeakageAC_normal;
-//	34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
+//	34,——》患者漏电流AC（正常状态）参考值（<10.0μA）
 	@Column(name = "patient_electric_leakage_ref_val_ac_normal")
 	private String patientElectricLeakageRefValAC_normal;
-//	35，——》患者漏电流AC（单一故障状态）（单位：μA）
+//	35,——》患者漏电流AC（单一故障状态）（单位：μA）
 	@Column(name = "shell_electric_leakage_ac_single_error")
 	private String shellElectricLeakageAC_singleError;
-//	36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
+//	36,——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
 	@Column(name = "shell_electric_leakage_ref_val_ac_single_error")
 	private String shellElectricLeakageRefValAC_singleError;
-//	37，——》患者漏电流DC（正常状态）（单位：μA）
-//	@Column(name = "patient_electric_leakage_dc_normal")
-//	private String patientElectricLeakageDC_normal;
-//	38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
-//	@Column(name = "patient_electric_leakage_ref_val_dc_normal")
-//	private String patientElectricLeakageRefValDC_normal;
-//	39，——》患者漏电流DC（单一故障状态）（单位：μA）
-//	@Column(name = "shell_electric_leakage_dc_single_error")
-//	private String shellElectricLeakageDC_singleError;
-//	40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
-//	@Column(name = "shell_electric_leakage_ref_val_dc_single_error")
-//	private String shellElectricLeakageRefValDC_singleError;
-//	41，——》患者辅助电流AC（正常状态）（单位：μA）
+//	37,——》患者漏电流DC（正常状态）（单位：μA）
+	@Column(name = "patient_electric_leakage_dc_normal")
+	private String patientElectricLeakageDC_normal;
+//	38,——》患者漏电流DC（正常状态）参考值（<10.0μA）
+	@Column(name = "patient_electric_leakage_ref_val_dc_normal")
+	private String patientElectricLeakageRefValDC_normal;
+//	39,——》患者漏电流DC（单一故障状态）（单位：μA）
+	@Column(name = "shell_electric_leakage_dc_single_error")
+	private String shellElectricLeakageDC_singleError;
+//	40,——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
+	@Column(name = "shell_electric_leakage_ref_val_dc_single_error")
+	private String shellElectricLeakageRefValDC_singleError;
+//	41,——》患者辅助电流AC（正常状态）（单位：μA）
 	@Column(name = "patient_assis_electric_ac_normal")
 	private String patientAssisElectricAC_normal;
-//	42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
+//	42,——》患者辅助电流AC（正常状态）参考值（<10.0μA）
 	@Column(name = "patient_assis_electric_ref_val_ac_normal")
 	private String patientAssisElectricRefValAC_normal;
-//	43，——》患者辅助电流AC（单一故障状态）（单位：μA）
+//	43,——》患者辅助电流AC（单一故障状态）（单位：μA）
 	@Column(name = "patient_assis_electric_ac_single_error")
 	private String patientAssisElectricAC_singleError;
-//	44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
+//	44,——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
 	@Column(name = "patient_assis_electric_ref_val_ac_single_error")
 	private String patientAssisElectricRefValAC_singleError;
-//	45，——》患者辅助电流DC（正常状态）（单位：μA）
-//	@Column(name = "patient_assis_electric_dc_normal")
-//	private String patientAssisElectricDC_normal;
-//	46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
-//	@Column(name = "patient_assis_electric_ref_val_dc_normal")
-//	private String patientAssisElectricRefValDC_normal;
-//	47，——》患者辅助电流DC（单一故障状态）（单位：μA）
-//	@Column(name = "patient_assis_electric_dc_single_error")
-//	private String patientAssisElectricDC_singleError;
-//	48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
-//	@Column(name = "patient_assis_electric_ref_val_dc_single_error")
-//	private String patientAssisElectricRefValDC_singleError;
-//	51，——》市电电压实际值
-//	@Column(name = "city_voltage")
-//	private String cityVoltage;
-//	52，——》市电电压参考值（230V）
-//	@Column(name = "city_voltage_ref_val")
-//	private String cityVoltageRefVal;
+//	45,——》患者辅助电流DC（正常状态）（单位：μA）
+	@Column(name = "patient_assis_electric_dc_normal")
+	private String patientAssisElectricDC_normal;
+//	46,——》患者辅助电流DC（正常状态）参考值（<10.0μA）
+	@Column(name = "patient_assis_electric_ref_val_dc_normal")
+	private String patientAssisElectricRefValDC_normal;
+//	47,——》患者辅助电流DC（单一故障状态）（单位：μA）
+	@Column(name = "patient_assis_electric_dc_single_error")
+	private String patientAssisElectricDC_singleError;
+//	48,——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
+	@Column(name = "patient_assis_electric_ref_val_dc_single_error")
+	private String patientAssisElectricRefValDC_singleError;
+//	51,——》市电电压实际值
+	@Column(name = "city_voltage")
+	private String cityVoltage;
+//	52,——》市电电压参考值（230V）
+	@Column(name = "city_voltage_ref_val")
+	private String cityVoltageRefVal;
+	
+//	55，——》存储器日期（格式：日-月-年）
+	@Column(name = "origin_storage_date")
+	private String originStorageDate;
+	
+//	56，——》存储器时间（格式：H:M）
+	@Column(name = "origin_storage_time")
+	private String originStorageTime;
+	
+//	60，——》 资产编号
+	@Column(name = "financing_num")
+	private String financingNum;
+	
+//	75，——》序号
+	@Column(name = "sequence_num")
+	private String sequenceNum;
 	
 	@JoinColumn(name = "asset_id", referencedColumnName = "id",updatable=false,insertable=false)
     @ManyToOne(fetch = FetchType.EAGER,optional=true)
@@ -294,6 +324,35 @@ public class ElectricSafetyData implements Serializable {
 		}
 	}
 	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		if(this.type==null){
+			this.type = type;
+		}
+		else if (!this.type.equals(type)) {
+//			this.warnMessage = "duplicate Type:" + this.type + " AND " + type;
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getStandardName() {
+		return standardName;
+	}
+
+	public void setStandardName(String standardName) {
+		this.standardName = standardName;
+	}
+
 	public Integer getCreatedBy() {
 		return createdBy;
 	}
@@ -458,12 +517,12 @@ public class ElectricSafetyData implements Serializable {
 		this.equipmentElectricLeakage = equipmentElectricLeakage;
 	}
 
-	public String getOneGroupApp() {
-		return oneGroupApp;
+	public String getAppGroupCount() {
+		return appGroupCount;
 	}
 
-	public void setOneGroupApp(String oneGroupApp) {
-		this.oneGroupApp = oneGroupApp;
+	public void setAppGroupCount(String appGroupCount) {
+		this.appGroupCount = appGroupCount;
 	}
 
 	public String getProtectGroundImpedanceRefVal() {
@@ -602,15 +661,177 @@ public class ElectricSafetyData implements Serializable {
 		this.equipmentElectricLeakageRefVal = equipmentElectricLeakageRefVal;
 	}
 
+	public String getOriginCheckDate() {
+		return originCheckDate;
+	}
+
+	public void setOriginCheckDate(String originCheckDate) {
+		this.originCheckDate = originCheckDate;
+	}
+
+	public String getOriginCheckTime() {
+		return originCheckTime;
+	}
+
+	public void setOriginCheckTime(String originCheckTime) {
+		this.originCheckTime = originCheckTime;
+	}
+
+	public String getPatientElectricLeakageDC_normal() {
+		return patientElectricLeakageDC_normal;
+	}
+
+	public void setPatientElectricLeakageDC_normal(String patientElectricLeakageDC_normal) {
+		this.patientElectricLeakageDC_normal = patientElectricLeakageDC_normal;
+	}
+
+	public String getPatientElectricLeakageRefValDC_normal() {
+		return patientElectricLeakageRefValDC_normal;
+	}
+
+	public void setPatientElectricLeakageRefValDC_normal(String patientElectricLeakageRefValDC_normal) {
+		this.patientElectricLeakageRefValDC_normal = patientElectricLeakageRefValDC_normal;
+	}
+
+	public String getShellElectricLeakageDC_singleError() {
+		return shellElectricLeakageDC_singleError;
+	}
+
+	public void setShellElectricLeakageDC_singleError(String shellElectricLeakageDC_singleError) {
+		this.shellElectricLeakageDC_singleError = shellElectricLeakageDC_singleError;
+	}
+
+	public String getShellElectricLeakageRefValDC_singleError() {
+		return shellElectricLeakageRefValDC_singleError;
+	}
+
+	public void setShellElectricLeakageRefValDC_singleError(String shellElectricLeakageRefValDC_singleError) {
+		this.shellElectricLeakageRefValDC_singleError = shellElectricLeakageRefValDC_singleError;
+	}
+
+	public String getPatientAssisElectricDC_normal() {
+		return patientAssisElectricDC_normal;
+	}
+
+	public void setPatientAssisElectricDC_normal(String patientAssisElectricDC_normal) {
+		this.patientAssisElectricDC_normal = patientAssisElectricDC_normal;
+	}
+
+	public String getPatientAssisElectricRefValDC_normal() {
+		return patientAssisElectricRefValDC_normal;
+	}
+
+	public void setPatientAssisElectricRefValDC_normal(String patientAssisElectricRefValDC_normal) {
+		this.patientAssisElectricRefValDC_normal = patientAssisElectricRefValDC_normal;
+	}
+
+	public String getPatientAssisElectricDC_singleError() {
+		return patientAssisElectricDC_singleError;
+	}
+
+	public void setPatientAssisElectricDC_singleError(String patientAssisElectricDC_singleError) {
+		this.patientAssisElectricDC_singleError = patientAssisElectricDC_singleError;
+	}
+
+	public String getPatientAssisElectricRefValDC_singleError() {
+		return patientAssisElectricRefValDC_singleError;
+	}
+
+	public void setPatientAssisElectricRefValDC_singleError(String patientAssisElectricRefValDC_singleError) {
+		this.patientAssisElectricRefValDC_singleError = patientAssisElectricRefValDC_singleError;
+	}
+
+	public String getCityVoltage() {
+		return cityVoltage;
+	}
+
+	public void setCityVoltage(String cityVoltage) {
+		this.cityVoltage = cityVoltage;
+	}
+
+	public String getCityVoltageRefVal() {
+		return cityVoltageRefVal;
+	}
+
+	public void setCityVoltageRefVal(String cityVoltageRefVal) {
+		this.cityVoltageRefVal = cityVoltageRefVal;
+	}
+
+	public String getOriginStorageDate() {
+		return originStorageDate;
+	}
+
+	public void setOriginStorageDate(String originStorageDate) {
+		this.originStorageDate = originStorageDate;
+	}
+
+	public String getOriginStorageTime() {
+		return originStorageTime;
+	}
+
+	public void setOriginStorageTime(String originStorageTime) {
+		this.originStorageTime = originStorageTime;
+	}
+
+	public String getSequenceNum() {
+		return sequenceNum;
+	}
+
+	public void setSequenceNum(String sequenceNum) {
+		this.sequenceNum = sequenceNum;
+	}
+
 	public static Map<String,String> getLabelAttributeMapping(){
 		if(mapLabelAttributes==null){
 			mapLabelAttributes=new HashMap<String,String>();
 		}
+//		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
+//		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
+//		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
+//		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流");
+//		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
+//		mapLabelAttributes.put("originCheckDate", "测试仪日期");
+//		mapLabelAttributes.put("originCheckTime", "测试仪时间");
+		mapLabelAttributes.put("checkType", "检测类型");
+		mapLabelAttributes.put("type", "类别");
+		mapLabelAttributes.put("name", "名称");
+		mapLabelAttributes.put("standardName", "标准名称");
+		mapLabelAttributes.put("appGroupCount", "应用组数");
 		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
-		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
-		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
-		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流");
-		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
+		mapLabelAttributes.put("protectGroundImpedanceRefVal", "保护接地阻抗参考值");
+		mapLabelAttributes.put("equipmentElectricLeakage", "等效设备漏电流");
+		mapLabelAttributes.put("equipmentElectricLeakageRefVal", "等效设备漏电流参考值");
+		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流(应用部分加电)");
+		mapLabelAttributes.put("patientElectricLeakageRefVal_app", "患者漏电流(应用部分加电)参考值");
+		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流(正常状态)");
+		mapLabelAttributes.put("groundElectricLeakageRefVal_normal", "对地漏电流(正常状态)参考值");
+		mapLabelAttributes.put("groundElectricLeakage_singleError", "对地漏电流(单一故障状态)");
+		mapLabelAttributes.put("groundElectricLeakageRefVal_singleError", "对地漏电流(单一故障状态)参考值");
+		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流(正常状态)");
+		mapLabelAttributes.put("shellElectricLeakageRefVal_normal", "外壳漏电流(正常状态)参考值");
+		mapLabelAttributes.put("shellElectricLeakage_singleError", "外壳漏电流(单一故障状态)");
+		mapLabelAttributes.put("shellElectricLeakageRefVal_singleError", "外壳漏电流(单一故障状态)参考值");
+		mapLabelAttributes.put("patientElectricLeakageAC_normal", "患者漏电流AC(正常状态)");
+		mapLabelAttributes.put("patientElectricLeakageRefValAC_normal", "患者漏电流AC(正常状态)参考值");
+		mapLabelAttributes.put("shellElectricLeakageAC_singleError", "患者漏电流AC(单一故障状态)");
+		mapLabelAttributes.put("shellElectricLeakageRefValAC_singleError", "患者漏电流AC(单一故障状态)参考值");
+		mapLabelAttributes.put("patientElectricLeakageDC_normal", "患者漏电流DC(正常状态)");
+		mapLabelAttributes.put("patientElectricLeakageRefValDC_normal", "患者漏电流DC(正常状态)参考值");
+		mapLabelAttributes.put("shellElectricLeakageDC_singleError", "患者漏电流DC(单一故障状态)");
+		mapLabelAttributes.put("shellElectricLeakageRefValDC_singleError", "患者漏电流DC(单一故障状态)参考值");
+		mapLabelAttributes.put("patientAssisElectricAC_normal", "患者辅助电流AC(正常状态)");
+		mapLabelAttributes.put("patientAssisElectricRefValAC_normal", "患者辅助电流AC(正常状态)参考值");
+		mapLabelAttributes.put("patientAssisElectricAC_singleError", "患者辅助电流AC(单一故障状态)");
+		mapLabelAttributes.put("patientAssisElectricRefValAC_singleError", "患者辅助电流AC(单一故障状态)参考值");
+		mapLabelAttributes.put("patientAssisElectricDC_normal", "患者辅助电流DC(正常状态)");
+		mapLabelAttributes.put("patientAssisElectricRefValDC_normal", "患者辅助电流DC(正常状态)参考值");
+		mapLabelAttributes.put("patientAssisElectricDC_singleError", "患者辅助电流DC(单一故障状态)");
+		mapLabelAttributes.put("patientAssisElectricRefValDC_singleError", "患者辅助电流DC(单一故障状态)参考值");
+		mapLabelAttributes.put("cityVoltage", "市电电压实际值");
+		mapLabelAttributes.put("cityVoltageRefVal", "市电电压参考值");
+//		mapLabelAttributes.put("originStorageDate", "存储器日期");
+//		mapLabelAttributes.put("originStorageTime", "存储器时间");
+		mapLabelAttributes.put("sequenceNum", "序号");
 		return mapLabelAttributes;
 	}
 	
