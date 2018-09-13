@@ -504,7 +504,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         selectedPmOrder.setCurrentStepId("repair");
     }
-    public void acceptWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch) {
+    public void acceptWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch,int type) {
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         pmList.stream().forEach(item->{
@@ -526,9 +526,17 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         });
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"accept");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+            if(type==1)
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+            else
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"抢单");
+
         }else{
-            WebUtil.addSuccessMessage("批量接单成功");
+            if(type==1)
+                WebUtil.addSuccessMessage("批量接单成功");
+            else
+                WebUtil.addSuccessMessage("批量抢单成功");
+
             for(V2_PmOrder item:pmListTmp){
                 item.setCurrentStepId("repair");
             }
