@@ -1,17 +1,18 @@
 package task;
 
-import com.ge.apm.dao.AssetFaultTypeRepository;
-import com.ge.apm.dao.WorkOrderMsgRepository;
-import com.ge.apm.dao.WorkOrderRepository;
-import com.ge.apm.domain.AssetFaultType;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
+import com.ge.apm.dao.AssetFaultTypeRepository;
+import com.ge.apm.dao.WorkOrderMsgRepository;
+import com.ge.apm.dao.WorkOrderRepository;
+import com.ge.apm.domain.AssetFaultType;
 
 /**
  * Created by lsg on 7/3/2017.

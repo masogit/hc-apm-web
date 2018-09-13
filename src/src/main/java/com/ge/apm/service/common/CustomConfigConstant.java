@@ -97,6 +97,7 @@ public class CustomConfigConstant {
             exportFields.put("上次巡检日期", "lastQaDate");
             exportFields.put("上次计量日期", "lastMeteringDate");
             exportFields.put("是否对维保到期提醒", "warranty");
+            exportFields.put("资产价值分类", "assetValueCategory");
         }
         return exportFields;
     }
@@ -171,6 +172,7 @@ public class CustomConfigConstant {
             allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
             allFields.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
             allFields.put("warranty", WebUtil.getMessage("isWarrantyNotice"));
+            allFields.put("assetValueCategory", WebUtil.getMessage("assetValueCategory"));
         }
         return allFields;
     }

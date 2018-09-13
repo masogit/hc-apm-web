@@ -146,14 +146,14 @@ public class AssetInfo implements ChineseName,Serializable {
     private String locationName;//安装位置
 
     @Column(name = "clinical_dept_id")
-    private Integer clinicalDeptId;//使用科室
+    private Integer clinicalDeptId;//所属科室
 
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
-    private String clinicalDeptUID;//设备使用科室
+    private String clinicalDeptUID;//设备所属科室
 
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
-    private String clinicalDeptName;//使用科室
+    private String clinicalDeptName;//所属科室
 
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
@@ -162,9 +162,9 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer assetGroupSecondary;//设备分类2级
 
     @Column(name = "asset_dept_id")
-    private Integer assetDeptId;//所属设备科
+    private Integer assetDeptId;//使用设备科
 
-    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
+    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
     private String assetDeptUID;
     
     @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
@@ -369,6 +369,10 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    //资产价值分类
+    @Column(name = "asset_value_category")
+    private String assetValueCategory;
 
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
     @Column(name = "asset_category")
@@ -447,14 +451,6 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "is_checked")
     private Boolean isChecked = Boolean.TRUE;//是否盘点
-
-//    public Integer getAssetCategory() {
-//        return assetCategory;
-//    }
-//
-//    public void setAssetCategory(Integer assetCategory) {
-//        this.assetCategory = assetCategory;
-//    }
 
     @CreatedBy
     @Column(name = "created_by", nullable = true, length = 50)
@@ -1553,6 +1549,14 @@ public class AssetInfo implements ChineseName,Serializable {
         this.assetGroupSecondary = assetGroupSecondary;
     }
 
+    public String getAssetValueCategory() {
+        return assetValueCategory;
+    }
+
+    public void setAssetValueCategory(String assetValueCategory) {
+        this.assetValueCategory = assetValueCategory;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

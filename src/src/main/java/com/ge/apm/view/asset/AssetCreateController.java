@@ -14,6 +14,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TimeUtils;
@@ -49,6 +50,7 @@ public class AssetCreateController {
     private AssetCreateService acService;
     private BrandRepository brandDao;
     private OrgInfoRepository orgDao;
+    private AutoCompleteService autoCompleteService;
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
@@ -102,6 +104,7 @@ public class AssetCreateController {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
         createRequest = acService.getCreateRequest(qrCode, siteUid);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         assetInfo = createAssetInfo();
 
         pictureList = acService.getQrCodePictureList(createRequest.getUid());
@@ -159,26 +162,15 @@ public class AssetCreateController {
     }
     
     public List<AssetInfo> completeParentAssetId(String query) {
-        if (null == parentAssetList || parentAssetList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
-                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
-                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+        return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
     
     public List<Supplier> autoCompleteManufacture(String query) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() != null && item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return autoCompleteService.autoCompleteManufacture(query, supplierList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT() != null && item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
     }
 
     private AssetInfo createAssetInfo() {

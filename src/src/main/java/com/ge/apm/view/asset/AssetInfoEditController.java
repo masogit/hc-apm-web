@@ -74,7 +74,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode gbTree;
     private TreeNode orgTree;
     private TreeNode clinicalOrgTree;
-//    private boolean hierachyClinicalSupport = false;
 
     private boolean assetGroupSecondarySupport = false;
     private List<I18nMessage> assetGroupSecondaryList;
@@ -283,17 +282,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private void updateClinicalDeptOnSiteChange() {
 
-        //later support hierachy clinical dept
-//        int parentClinicalCount = orgDao.countByParentUIDAndOrgType(selected.getSiteUID(), 5);
-////        int parentClinicalCount = 0;
-//        if (parentClinicalCount > 0) {
-//            //如果存在大科室，则显示树结构
-//            hierachyClinicalSupport = true;
-//            initClinicalOrgTree();
-//        } else {
-//            hierachyClinicalSupport = false;
-            clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
-//        }
+        clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(selected.getSiteUID());
     }
 
     public void onParentAssetChange() {
@@ -707,12 +696,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetInfo> completeParentAssetId(String query) {
-        if (null == parentAssetList || parentAssetList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return parentAssetList.stream().filter(item -> item.getName().contains(query) || item.getAliasName() != null && item.getAliasName().contains(query)
-                || item.getDepartNum() != null && item.getDepartNum().contains(query) || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
-                || item.getQrCode() != null && item.getQrCode().contains(query) || item.getNamePyCode() != null && item.getNamePyCode().contains(query)).collect(Collectors.toList());
+        return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
@@ -885,14 +869,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
         this.selectedObjectMap = selectedObjectMap;
     }
-
-//    public boolean isHierachyClinicalSupport() {
-//        return hierachyClinicalSupport;
-//    }
-//
-//    public void setHierachyClinicalSupport(boolean hierachyClinicalSupport) {
-//        this.hierachyClinicalSupport = hierachyClinicalSupport;
-//    }
 
     public TreeNode getClinicalOrgTree() {
         return clinicalOrgTree;

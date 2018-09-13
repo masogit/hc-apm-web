@@ -297,7 +297,7 @@ public class ExcelDocument implements AutoCloseable{
         return res;
     }
 
-    private Object getCellValue(Cell cell) {
+    private static Object getCellValue(Cell cell) {
         CellType type = cell.getCellTypeEnum();
         switch (type) {
             case BLANK:
@@ -315,7 +315,7 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
 
-    private String getRawValue(Cell cell) {
+    private static String getRawValue(Cell cell) {
         CellType type = cell.getCellTypeEnum();
         switch (type) {
             case BLANK:
@@ -342,6 +342,14 @@ public class ExcelDocument implements AutoCloseable{
             default:
                 return null;
         }
+    }
+
+    public static ValueWrapper getCellValueWrapper(Cell cell) {
+        Object v = getCellValue(cell);
+        String rawValue = getRawValue(cell);
+        ValueWrapper wrapper = new ValueWrapper(v, rawValue);
+
+        return wrapper;
     }
 
     static public String getCellStringValue(Object value) {
@@ -477,6 +485,16 @@ public class ExcelDocument implements AutoCloseable{
 
     public Object getCellValue(String sheetName, Integer dataRowNum, Integer cellnum) {
         return workBook.getSheet(sheetName).getRow(dataRowNum - 1).getCell(cellnum - 1);
+    }
+
+    public String getCellStringValue(String sheetName, int dataRowNum, int cellnum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row row = sheet.getRow(dataRowNum - 1);
+        if (row == null) return null;
+
+        Cell cell = row.getCell(cellnum - 1);
+        if (cell == null) return null;
+        return cell.getStringCellValue();
     }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
@@ -660,6 +678,15 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
 
+    public void clearCell(String sheetName, int rowNum, int colNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row row = sheet.getRow(rowNum -1);
+        if (row == null) return;
+
+        Cell cell = row.getCell(colNum -1);
+        cell.setCellType(CellType.BLANK);
+    }
+
     public void calculateFormula() {
 
         if (documentType.equals(ExcelType.XLS)) {
@@ -680,10 +707,27 @@ public class ExcelDocument implements AutoCloseable{
         }
     }
 
+    public void writeToFile(File file) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+
+        this.workBook.write(fos);
+
+        fos.close();
+
+    }
+
     public InputStream getStream() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public void updateName(String name, String formula) {
+        Name rangeName = workBook.getName(name);
+        if (StringUtils.isNotEmpty(formula)) {
+            rangeName.setRefersToFormula(formula);
+        }
+
     }
 
     public static class ValueWrapper {

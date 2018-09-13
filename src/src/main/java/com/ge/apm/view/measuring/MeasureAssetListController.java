@@ -6,12 +6,14 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,6 +60,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private OrgInfo fileterOrg;
 
+    private TreeNode selectedNode;
+
+    private OrgInfoTreeService orgInfoTreeService;
+
     @Override
     protected void init() {
 
@@ -67,6 +73,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -136,11 +143,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
 
         if(null != fileterOrg){
-            /*if(!this.hasFilterOnField("clinicalDeptUID")){
-                searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
-            }else{*/
+            if (selectedNode.isLeaf()) {
                 this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
-            //}
+            } else {
+                List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
+                List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+            }
+
         }else{
             if(this.hasFilterOnField("clinicalDeptUID")){
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
@@ -204,14 +214,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
 
-        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
-                fileterOrg = deptOrg;
-                return;
-            }
+        selectedNode = event.getTreeNode();
+        OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
+        if (deptOrg.getOrgType() == 4) {
+            fileterOrg = deptOrg;
+        } else {
+            fileterOrg = null;
         }
-        fileterOrg = null;
     }
 
     public void onTabChange(TabChangeEvent event){

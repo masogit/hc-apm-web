@@ -48,7 +48,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    private AssetFileImportService importService;
+//    private AssetFileImportService importService;
+    private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
@@ -123,7 +124,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
-        importService = WebUtil.getBean(AssetFileImportService.class);
+//        importService = WebUtil.getBean(AssetFileImportService.class);
+        exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -204,19 +206,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        if (null != event) {
-            if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-                selectSite = (OrgInfo) event.getTreeNode().getData();
-            } else {
-                selectSite = null;
-            }
-            loadClinicalDeptList();
 
-            filterClinicalDeptOrg = null;
-            filterAssetDeptOrg = null;
-            assetDeptOrgUidSet = null;
-            clinicalDeptOrgUidSet = null;
+        this.searchFilters.clear();
+
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
         }
+        loadClinicalDeptList();
+
+        //table header dropdown needs to clear manually, table filters cleared by clear method above.
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        assetDeptOrgUidSet = null;
+        clinicalDeptOrgUidSet = null;
+
+        assetGroup = null;
+        assetGroupSecondary = null;
+        filterAssetStatus = null;
+
     }
 
     private void loadClinicalDeptList() {
@@ -298,7 +307,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
+        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, exportFields);
 
         excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
@@ -378,6 +387,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+            assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);

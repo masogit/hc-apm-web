@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="SiteInfoEditVersionDlg" widgetVar="SiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息" width="700px" height="600px;">
+            <p:ajax event="close" update=":SiteInfoListForm:datalist" />
+            <h:form id="SiteInfoEditVersionForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{tenantInfoController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">版本</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selectedVersion}" >
+                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
+                                <p:ajax listener="#{tenantInfoController.onVersionChange}" update=":SiteInfoEditVersionForm"></p:ajax>
+                                <f:selectItems value="#{tenantInfoController.listVersions}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{tenantInfoController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">安装验收</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnArrivalInstallation}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备调剂</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetBorrow}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备档案</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetMDM}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{tenantInfoController.selectedVersion!='通用版'}">
+                            <label class="label">维修管理</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{tenantInfoController.selectedVersion=='通用版'}">
+                            <label class="label">维修管理</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmt}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预防维护</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnPreventiveMaintainceMgmt}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">绩效分析</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnDeviceOperationKPIAnalysis}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">系统配置</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnSysAdmin}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">知识文档</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetKnowledgeBaseMgmt}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">护士站</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnNurseSite}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计量管理</label>
+                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnMeasuringMgmt}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{tenantInfoController.save}" value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SiteInfoEditVersionDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('SiteInfoEditVersionDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

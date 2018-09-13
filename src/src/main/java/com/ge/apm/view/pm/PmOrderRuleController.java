@@ -3,11 +3,16 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -67,6 +73,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TenantInfoRepository tenantInfoRepository;
     private OrgInfo selectedOrg;
     private SupplierRepository supplierDao;
+    private Integer manufactureId;
+    private AssetInfoRepository assetInfoRepository;
+    private RelRuleAssetRepository relRuleAssetRepository;
+    private SupplierService supplierService;
 
     @Override
     protected void init() {
@@ -81,23 +91,42 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        supplierService = WebUtil.getBean(SupplierService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
-        initTree(user.getTenantUID());
+        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+        //initTree(user.getTenantUID());
+        initOrgTree();
     }
 
-    private void initTree(String tenantUid) {
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+    }
+
+/*    public void setTenantUid(String tenantUid) {
+        //searchFilters.clear();
+        //this.tenantUid = tenantUid;
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isInsulate()){
-            //隔离租户
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
         }else{
-            //非隔离租户
             selectedTenant = tenantInfoRepository.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
@@ -112,6 +141,32 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             selectedUserOrg.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedUserOrg);
         }
+    }*/
+
+    private void initTree(String tenantUid) {
+        TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+        selectedTenant = tempTenantInfo;
+        orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+/*        if(UserContextService.isInsulate()){
+            //隔离租户
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+        }else{
+            //非隔离租户
+            selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+        }*/
+
+        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedUserOrg) {
+            selectedUserOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        }
     }
 
     public String getOrgFullName(OrgInfo org) {
@@ -119,10 +174,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             return null;
         }
         String name = org.getName();
-        while (org.getParentOrg() != null) {
+/*        while (org.getParentOrg() != null) {
             org = org.getParentOrg();
             name = org.getName() + "/" + name;
-        }
+        }*/
 
         return name;
     }
@@ -130,6 +185,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
+        selected.setSiteUID(selectedUserOrg.getSiteUID());
     }
 
     @Override
@@ -148,6 +204,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    public List<UserAccount> getOwnerList(){
+        return userAccountRepository.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
     }
 
 
@@ -223,8 +283,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderRuleCheckListRepository.deleteExistsRecord(por.getUid());
     }
 
-    public List<UserAccount> getApproveUserList(String tenantUID) {
-        return userAccountRepository.getAssetHeadList(tenantUID);
+    public List<UserAccount> getApproveUserList() {
+        return userAccountRepository.getAssetHeadList(user.getTenantUID());
     }
 
     public UserAccount getUser() {
@@ -374,7 +434,33 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Override
     @Transactional
     public void delete() {
-        pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
+        String uid = selected.getUid();
+        //int level = selected.getLevel();
+        pmOrderRuleCheckListRepository.deleteExistsRecord(uid);
+        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findRelRuleAssets(uid);
+        List<RelRuleAsset> updateList = new ArrayList<>(relRuleAssets.size());
+        List<RelRuleAsset> deleteList = new ArrayList<>(relRuleAssets.size());
+        if(CollectionUtils.isNotEmpty(relRuleAssets)){
+            for (RelRuleAsset rra :relRuleAssets) {
+                if(StringUtils.isNotEmpty(rra.getRuleUID()) && rra.getRuleUID().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID2())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUID(null);
+                        updateList.add(rra);
+                    }
+                }else if(StringUtils.isNotEmpty(rra.getRuleUID2()) && rra.getRuleUID2().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUID2(null);
+                        updateList.add(rra);
+                    }
+                }
+            }
+        }
+        relRuleAssetRepository.save(updateList);
+        relRuleAssetRepository.delete(deleteList);
         super.delete();
     }
 
@@ -595,8 +681,20 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         }
     }
 
-    public List<Supplier> getSupplier(){
-        return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
+    public List<String> getSupplier(String name){
+       return supplierService.getSupplier(name);
+    }
+
+    public void setNothing(){
+
+    }
+
+    public Integer getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(Integer manufactureId) {
+        this.manufactureId = manufactureId;
     }
 
     /**

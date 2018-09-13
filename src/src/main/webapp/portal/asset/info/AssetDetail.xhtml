@@ -18,13 +18,6 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <h:panelGroup rendered="#{!assetInfoDetailController.terminate and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead')}">
-                <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
-                    <f:param name="asset_name" value="#{assetInfoDetailController.selected.name}" />
-                    <f:param name="asset_id" value="#{assetInfoDetailController.selected.id}" />
-                </p:link>
-                <br/>
-            </h:panelGroup>
 
             <p:accordionPanel id="accordion" multiple="false" >
                 <p:tab title="#{msg.BasicInfo}">
@@ -150,8 +143,8 @@
                 </p:panelGrid>
             </h:form>
 
-            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
-                <!-- Chart 2: Device Exposure -->
+<!--            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
+                 Chart 2: Device Exposure 
                 <div class="ui-g-12">
                     <div class="block">
                         <h3 class="block-title">#{msg.deviceExpohd}</h3>
@@ -161,7 +154,7 @@
                 </div>
             </p:fieldset>
             <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
-                <!-- Chart 1: Device Scan --> 
+                 Chart 1: Device Scan  
                 <div class="ui-g-12">
                     <div class="block">
                         <h3 class="block-title">#{msg.deviceScanhd}</h3>
@@ -169,7 +162,7 @@
                                  model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
                     </div>
                 </div>
-            </p:fieldset>
+            </p:fieldset>-->
             <h:form>
                 <p:panel  header="相关设备" rendered="#{assetInfoDetailController.showParentsTree()}">
                     <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
