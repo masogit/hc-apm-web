@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +57,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void writeAsset(SXSSFWorkbook workBook, List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
 
-        Sheet sheet = workBook.getSheet(SHEET_ASSET);
+//        Sheet sheet = workBook.getSheet(SHEET_ASSET);
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, SHEET_ASSET, exportFields);
 
@@ -76,7 +74,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             ++startRow;
         }
 
+    }
 
+    public void writeToFile(SXSSFWorkbook workBook, File file) throws IOException {
+
+        FileOutputStream fos = new FileOutputStream(file);
+        workBook.write(fos);
+        fos.close();
     }
 
 }
