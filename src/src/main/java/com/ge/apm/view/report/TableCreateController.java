@@ -81,7 +81,7 @@ public class TableCreateController extends TieWebSheetBean {
 
     //for instrument data import
     private List<String> instrumentDataLabels;
-    private Collection<String> templateLabels;
+    private List<String> templateLabels;
     private Map<String, String> mapTemplateKeyValues;
     private DualListModel listInstrumentMppingLabels = new DualListModel<>();
     private String instrumentDataLabel;
@@ -661,7 +661,13 @@ public class TableCreateController extends TieWebSheetBean {
     }
 
     public List<String> getInstrumentDataLabels() {
-        instrumentDataLabels = new ArrayList<String>(ElectricSafetyData.getLabelAttributeMapping().values());
+    	Collection<String> tempCollection=ElectricSafetyData.getLabelAttributeMapping().values();
+    	if(tempCollection!=null){
+    		instrumentDataLabels = new ArrayList<String>(tempCollection);
+    	}
+    	else{
+    		instrumentDataLabels = new ArrayList<String>();
+    	}
         instrumentDataLabels.sort(new StringComparator());
         return instrumentDataLabels;
     }
@@ -703,7 +709,14 @@ public class TableCreateController extends TieWebSheetBean {
                         mapTemplateKeyValues.put(item.getKey(), item.getLabel() + "(" + item.getKey() + ")");
                     }
                 }
-                templateLabels = mapTemplateKeyValues.values();
+                Collection<String> tempCollection=mapTemplateKeyValues.values();
+                if(tempCollection!=null){
+                	templateLabels = new ArrayList<String>(tempCollection);
+                }
+                else{
+                	templateLabels = new ArrayList<String>();
+                }
+                templateLabels.sort(new StringComparator());
             } catch (Exception e) {
                 // TODO: handle exception
                 WebUtil.addErrorMessage(e, "解析模版失败");
@@ -713,7 +726,7 @@ public class TableCreateController extends TieWebSheetBean {
     }
     
 
-    public void setTemplateLabels(Collection<String> templateLabels) {
+    public void setTemplateLabels(List<String> templateLabels) {
         this.templateLabels = templateLabels;
     }
 
