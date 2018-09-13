@@ -16,6 +16,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ReportTemplateDocument;
+import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +80,7 @@ public class TableCreateController extends TieWebSheetBean {
     private V2_BlobObject uploadedFileObject;
 
     //for instrument data import
-    private Collection<String> instrumentDataLabels;
+    private List<String> instrumentDataLabels;
     private Collection<String> templateLabels;
     private Map<String, String> mapTemplateKeyValues;
     private DualListModel listInstrumentMppingLabels = new DualListModel<>();
@@ -660,12 +661,13 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
-    public Collection<String> getInstrumentDataLabels() {
-        instrumentDataLabels = ElectricSafetyData.getLabelAttributeMapping().values();
+    public List<String> getInstrumentDataLabels() {
+        instrumentDataLabels = new ArrayList<String>(ElectricSafetyData.getLabelAttributeMapping().values());
+        instrumentDataLabels.sort(new StringComparator());
         return instrumentDataLabels;
     }
 
-    public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
+    public void setInstrumentDataLabels(List<String> instrumentDataLabels) {
         this.instrumentDataLabels = instrumentDataLabels;
     }
 

@@ -476,9 +476,17 @@ public class ElectricSafetyService {
 					data.setFinancingNum(strValue);
 				}
 			}
-//			1——》1组应用
-			else if(StringUtils.equals(key, "1")){
-				data.setOneGroupApp(strValue.replaceAll("\\+", "").trim());
+//			4，——》类别General/Defi
+			else if(StringUtils.equals(key, "4")){
+				data.setType(strValue.replaceAll("\\+", "").trim());
+			}
+//			5，——》测试仪日期（格式：日-月-年）
+			else if(StringUtils.equals(key, "5")){
+				data.setOriginCheckDate(strValue.replaceAll("\\+", "").trim());
+			}
+//			6，——》测试仪时间（格式：H:M:S）
+			else if(StringUtils.equals(key, "6")){
+				data.setOriginCheckTime(strValue.replaceAll("\\+", "").trim());
 			}
 //			7，——》保护接地阻抗（单位：Ω）
 			else if(StringUtils.equals(key, "7")){
@@ -553,21 +561,21 @@ public class ElectricSafetyService {
 				data.setShellElectricLeakageRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
 			}
 //			37，——》患者漏电流DC（正常状态）（单位：μA）
-//			else if(StringUtils.equals(key, "37")){
-//				data.setPatientElectricLeakageDC_normal(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "37")){
+				data.setPatientElectricLeakageDC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
-//			else if(StringUtils.equals(key, "38")){
-//				data.setPatientElectricLeakageRefValDC_normal(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "38")){
+				data.setPatientElectricLeakageRefValDC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			39，——》患者漏电流DC（单一故障状态）（单位：μA）
-//			else if(StringUtils.equals(key, "39")){
-//				data.setShellElectricLeakageDC_singleError(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "39")){
+				data.setShellElectricLeakageDC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
-//			else if(StringUtils.equals(key, "40")){
-//				data.setShellElectricLeakageRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "40")){
+				data.setShellElectricLeakageRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			41，——》患者辅助电流AC（正常状态）（单位：μA）
 			else if(StringUtils.equals(key, "41")){
 				data.setPatientAssisElectricAC_normal(strValue.replaceAll("\\+", "").trim());
@@ -585,29 +593,41 @@ public class ElectricSafetyService {
 				data.setPatientAssisElectricRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
 			}
 //			45，——》患者辅助电流DC（正常状态）（单位：μA）
-//			else if(StringUtils.equals(key, "45")){
-//				data.setPatientAssisElectricDC_normal(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "45")){
+				data.setPatientAssisElectricDC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
-//			else if(StringUtils.equals(key, "46")){
-//				data.setPatientAssisElectricRefValDC_normal(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "46")){
+				data.setPatientAssisElectricRefValDC_normal(strValue.replaceAll("\\+", "").trim());
+			}
 //			47，——》患者辅助电流DC（单一故障状态）（单位：μA）
-//			else if(StringUtils.equals(key, "47")){
-//				data.setPatientAssisElectricDC_singleError(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "47")){
+				data.setPatientAssisElectricDC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
-//			else if(StringUtils.equals(key, "48")){
-//				data.setPatientAssisElectricRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "48")){
+				data.setPatientAssisElectricRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
+			}
 //			51，——》市电电压实际值
-//			else if(StringUtils.equals(key, "51")){
-//				data.setCityVoltage(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "51")){
+				data.setCityVoltage(strValue.replaceAll("\\+", "").trim());
+			}
 //			52，——》市电电压参考值（230V）
-//			else if(StringUtils.equals(key, "52")){
-//				data.setCityVoltageRefVal(strValue.replaceAll("\\+", "").trim());
-//			}
+			else if(StringUtils.equals(key, "52")){
+				data.setCityVoltageRefVal(strValue.replaceAll("\\+", "").trim());
+			}
+//			55，——》存储器日期（格式：日-月-年）
+			else if(StringUtils.equals(key, "55")){
+				data.setOriginStorageDate(strValue.replaceAll("\\+", "").trim());
+			}
+//			56，——》存储器时间（格式：H:M）
+			else if(StringUtils.equals(key, "56")){
+				data.setOriginStorageTime(strValue.replaceAll("\\+", "").trim());
+			}
+//			75，——》序号
+			else if(StringUtils.equals(key, "75")){
+				data.setSequenceNum(strValue.replaceAll("\\+", "").trim());
+			}
 			map.put(key, strValue);
 		}
 		return map;
@@ -808,7 +828,39 @@ public class ElectricSafetyService {
 			else if(StringUtils.equals(c, "42")){
 				data.setCheckType("II CF");
 			}
+			a=str.substring(5,6);
+			b=str.substring(12,13);
+			c=a+b;
+			if(StringUtils.equals(c, "07")){
+				data.setName("IEC 60601-1");
+				data.setStandardName("GB 9706.1");
+			}
+			else if(StringUtils.equals(c, "27")){
+				data.setName("IEC 60601-1");
+				data.setStandardName("GB 9706.1");
+			}
+			else if(StringUtils.equals(c, "16")){
+				data.setName("IEC 62353");
+				data.setStandardName("YY/T 0841");
+			}
+			else if(StringUtils.equals(c, "26")){
+				data.setName("IEC 62353");
+				data.setStandardName("YY/T 0841");
+			}
+			else if(StringUtils.equals(c, "09")){
+				data.setName("EN 61010-1");
+				data.setStandardName("GB 4793.1");
+			}
 			a=str.substring(18,19);
+			b=str.substring(19,20);
+			c=a+b;
+			if(StringUtils.equals(c, "3C")){
+				data.setType("General");
+			}
+			else if(StringUtils.equals(c, "42")){
+				data.setCheckType("Defi");
+			}
+			a=str.substring(29,30);
 			b=str.substring(31,32);
 			c=a+b;
 			if(StringUtils.equals(c, "51")){
@@ -830,19 +882,22 @@ public class ElectricSafetyService {
 				data.setCheckType("II CF");
 			}
 			
-//			c=str.substring(33,34);
-//			if(StringUtils.equals(c, "0")){
-//				data.setGroupType("0组应用");
-//			}
-//			else if(StringUtils.equals(c, "2")){
-//				data.setGroupType("2组应用");
-//			}
-//			else if(StringUtils.equals(c, "5")){
-//				data.setGroupType("5组应用");
-//			}
-//			else if(StringUtils.equals(c, "10")){
-//				data.setGroupType("10组应用");
-//			}
+			c=str.substring(33,34);
+			if(StringUtils.equals(c, "0")){
+				data.setAppGroupCount("0组应用");
+			}
+			else if(StringUtils.equals(c, "1")){
+				data.setAppGroupCount("1组应用");
+			}
+			else if(StringUtils.equals(c, "2")){
+				data.setAppGroupCount("2组应用");
+			}
+			else if(StringUtils.equals(c, "5")){
+				data.setAppGroupCount("5组应用");
+			}
+			else if(StringUtils.equals(c, "10")){
+				data.setAppGroupCount("10组应用");
+			}
 		}
 	}
 }
