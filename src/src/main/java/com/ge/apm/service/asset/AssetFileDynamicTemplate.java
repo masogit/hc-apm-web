@@ -9,15 +9,21 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +45,17 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "是否急救设备", "是否进口设备", "当前状态",
             "是否PM", "是否盘点", "资产价值分类", "UUID"
     };
+
+    public static int MAX_FORMULA_ROWS = 5000;
+
+    public static Map<String, String> columnFormulas;
+
+    static
+    {
+        columnFormulas = new HashMap<String, String>();
+        columnFormulas.put("所属科室", "=OrgList");
+        columnFormulas.put("使用科室", "=OrgList");
+    }
 
 //    Workbook workBook;
 
@@ -91,6 +108,37 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         FileOutputStream fos = new FileOutputStream(file);
         workBook.write(fos);
         fos.close();
+    }
+
+    public void applyFormula(SXSSFWorkbook workBook, List<String> exportFields) {
+
+        exportFields.stream().forEach(field -> {
+            String formula = columnFormulas.get(field);
+            if (formula != null) {
+                applyCellDropdown(workBook, exportFields, field, formula);
+            }
+
+        });
+
+    }
+
+    public void applyCellDropdown(SXSSFWorkbook workBook, List<String> exportFields, String currentField, String formula) {
+        int columnIndex = exportFields.indexOf(currentField);
+
+        XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(SHEET_ASSET));
+
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint(formula);
+
+        CellRangeAddressList addressList = new CellRangeAddressList(EXCEL_ASSET_DATA_ROW - 1, EXCEL_ASSET_DATA_ROW + MAX_FORMULA_ROWS, columnIndex, columnIndex);
+
+        XSSFDataValidation dataValidation = (XSSFDataValidation) helper.createValidation(dvConstraint, addressList);
+
+        dataValidation.setShowErrorBox(true);
+        dataValidation.setSuppressDropDownArrow(true);
+        dataValidation.setShowPromptBox(true);
+
+        workBook.getSheet(SHEET_ASSET).addValidationData(dataValidation);
+
     }
 
 }

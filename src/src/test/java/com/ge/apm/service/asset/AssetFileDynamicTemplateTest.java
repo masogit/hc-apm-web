@@ -4,12 +4,9 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mock.ExistingAccountTestExecutionListener;
-import com.ge.apm.mock.FacesContextTestExecutionListener;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -62,7 +59,7 @@ public class AssetFileDynamicTemplateTest {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 //        List<String> readFields = customConfigService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-//        List<String> customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
+//        List<String> customedColuhhmns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
 
         List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
@@ -78,6 +75,8 @@ public class AssetFileDynamicTemplateTest {
 
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+
+        template.applyFormula(workBook, exportColumnFields);
 
         template.writeAsset(workBook, assetList, sites, clinicalDeptList, exportColumnFields);
 
