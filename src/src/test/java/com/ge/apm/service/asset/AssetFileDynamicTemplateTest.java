@@ -61,15 +61,15 @@ public class AssetFileDynamicTemplateTest {
     public void buildMetaData() throws IOException {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-        List<String> readFields = customConfigService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        List<String> customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
+//        List<String> readFields = customConfigService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+//        List<String> customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
 
         List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-//        List<String> fields = Arrays.asList(columnKeys).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-        List<String> localizedFields = exportFields.stream().map((item) -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
+//        List<String> localizedFields = exportFields.stream().map((item) -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
 
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -79,7 +79,7 @@ public class AssetFileDynamicTemplateTest {
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        template.writeAsset(workBook, assetList, sites, clinicalDeptList, localizedFields);
+        template.writeAsset(workBook, assetList, sites, clinicalDeptList, exportColumnFields);
 
         template.writeToFile(workBook, new File("./temp.xlsx"));
     }
