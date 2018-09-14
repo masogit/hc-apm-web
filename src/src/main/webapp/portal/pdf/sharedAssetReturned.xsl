@@ -31,14 +31,14 @@
 						<fo:table-row>
 							<fo:table-cell border-style="dotted" border-width="0.8px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
-								是否损坏  
+								是否完好  
 								</fo:block>
 							</fo:table-cell>
 							
 							<fo:table-cell border-style="dotted" border-width="0.8px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
 									<xsl:choose>
-										<xsl:when test="还时状态/text()='损坏'">
+										<xsl:when test="还时状态/text()='完好'">
 											<fo:external-graphic content-width="10pt" content-height="10pt" 
 											overflow="hidden" src="./checkbox.png" left="2cm">		
 											</fo:external-graphic>

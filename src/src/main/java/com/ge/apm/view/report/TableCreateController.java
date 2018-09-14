@@ -16,6 +16,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ReportTemplateDocument;
+import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
@@ -79,8 +80,8 @@ public class TableCreateController extends TieWebSheetBean {
     private V2_BlobObject uploadedFileObject;
 
     //for instrument data import
-    private Collection<String> instrumentDataLabels;
-    private Collection<String> templateLabels;
+    private List<String> instrumentDataLabels;
+    private List<String> templateLabels;
     private Map<String, String> mapTemplateKeyValues;
     private DualListModel listInstrumentMppingLabels = new DualListModel<>();
     private String instrumentDataLabel;
@@ -660,12 +661,19 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
-    public Collection<String> getInstrumentDataLabels() {
-        instrumentDataLabels = ElectricSafetyData.getLabelAttributeMapping().values();
+    public List<String> getInstrumentDataLabels() {
+    	Collection<String> tempCollection=ElectricSafetyData.getLabelAttributeMapping().values();
+    	if(tempCollection!=null){
+    		instrumentDataLabels = new ArrayList<String>(tempCollection);
+    	}
+    	else{
+    		instrumentDataLabels = new ArrayList<String>();
+    	}
+        instrumentDataLabels.sort(new StringComparator());
         return instrumentDataLabels;
     }
 
-    public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
+    public void setInstrumentDataLabels(List<String> instrumentDataLabels) {
         this.instrumentDataLabels = instrumentDataLabels;
     }
 
@@ -702,7 +710,14 @@ public class TableCreateController extends TieWebSheetBean {
                         mapTemplateKeyValues.put(item.getKey(), item.getLabel() + "(" + item.getKey() + ")");
                     }
                 }
-                templateLabels = mapTemplateKeyValues.values();
+                Collection<String> tempCollection=mapTemplateKeyValues.values();
+                if(tempCollection!=null){
+                	templateLabels = new ArrayList<String>(tempCollection);
+                }
+                else{
+                	templateLabels = new ArrayList<String>();
+                }
+                templateLabels.sort(new StringComparator());
             } catch (Exception e) {
                 // TODO: handle exception
                 WebUtil.addErrorMessage(e, "解析模版失败");
@@ -712,7 +727,7 @@ public class TableCreateController extends TieWebSheetBean {
     }
     
 
-    public void setTemplateLabels(Collection<String> templateLabels) {
+    public void setTemplateLabels(List<String> templateLabels) {
         this.templateLabels = templateLabels;
     }
 
