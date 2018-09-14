@@ -55,6 +55,26 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         columnFormulas = new HashMap<String, String>();
         columnFormulas.put("所属科室", "=OrgList");
         columnFormulas.put("使用科室", "=OrgList");
+        columnFormulas.put("医疗器械分类", null);
+        columnFormulas.put("医疗器械子分类", null);
+        columnFormulas.put("设备分类", null);
+        columnFormulas.put("设备分类2级", null);
+
+        columnFormulas.put("功能等级", null);
+        columnFormulas.put("维修类型", null);
+        columnFormulas.put("折旧算法", null);
+
+        columnFormulas.put("用途分类", null);
+        columnFormulas.put("资金来源", null);
+        columnFormulas.put("风险等级", null);
+        columnFormulas.put("计量等级", null);
+        columnFormulas.put("计量项目类别", null);
+        columnFormulas.put("是否急救设备", null);
+        columnFormulas.put("是否进口设备", null);
+        columnFormulas.put("当前状态", null);
+        columnFormulas.put("是否PM", null);
+        columnFormulas.put("是否盘点", null);
+        columnFormulas.put("资产价值分类", null);
     }
 
 //    Workbook workBook;
