@@ -6,15 +6,17 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ import java.util.Map;
 @Service
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
+
+    private static final String SHEET_DYNAMIC_LIST_NAME = "动态列表";
 
     public static String[] columnTitles = {
             "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "院区", "所属科室", "使用科室", "制造商", "品牌/制造商简称",
@@ -99,6 +103,33 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void buildMetaData(SXSSFWorkbook workBook) {
 
+        SXSSFSheet dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
+
+        Row row = dynamicListSheet.createRow(0);
+        row.createCell(0).setCellValue("列表名称");
+        row.createCell(1).setCellValue("列表");
+
+        writeDropdown(dynamicListSheet, 1, "设备分类", assetGroup);
+
+
+
+    }
+
+    private void writeDropdown(SXSSFSheet dynamicListSheet, int rowNum, String name, List<I18nMessage> msgList) {
+
+        Row row = dynamicListSheet.createRow(rowNum);
+        row.createCell(0).setCellValue(name);
+
+        int columnIndex = 1;
+
+        for (I18nMessage msg: msgList) {
+            row.createCell(columnIndex++, CellType.STRING).setCellValue(msg.getValueZh());
+        }
+
+        Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
+        namedCell.setNameName(name + "列表");
+        String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
+        namedCell.setRefersToFormula(SHEET_DYNAMIC_LIST_NAME + "!" + cellRange);
 
     }
 
