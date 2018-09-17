@@ -109,13 +109,25 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        writeDropdown(dynamicListSheet, 1, "设备分类", assetGroup);
-
+        writeDropdown(dynamicListSheet, 1, "设备分类", assetGroup, false);
+        writeDropdown(dynamicListSheet, 2, "医疗器械分类", assetFunctionTypes, true);
+        writeDropdown(dynamicListSheet, 3, "折旧算法", depreciationMethod, true);
+        writeDropdown(dynamicListSheet, 4, "用途分类", assetUsageList, true);
+        writeDropdown(dynamicListSheet, 5, "资金来源", capitalSourceList, true);
+        writeDropdown(dynamicListSheet, 6, "计量等级", measureGradeList, true);
+        writeDropdown(dynamicListSheet, 7, "风险等级", riskGradeList, true);
+        writeDropdown(dynamicListSheet, 8, "是否急救设备", emergencyEquipmentList, true);
+        writeDropdown(dynamicListSheet, 9, "是否进口设备", importEquipmentList, true);
+        writeDropdown(dynamicListSheet, 10, "核算类别", accountingCategoryList, true);
+        writeDropdown(dynamicListSheet, 11, "计量项目类别", measuringItemCategoryList, true);
+        writeDropdown(dynamicListSheet, 12, "维修类型", repairFormList, true);
+        writeDropdown(dynamicListSheet, 13, "当前状态", assetStatusList, false);
+        writeDropdown(dynamicListSheet, 14, "资产价值分类", assetValueCategoryList, true);
 
 
     }
 
-    private void writeDropdown(SXSSFSheet dynamicListSheet, int rowNum, String name, List<I18nMessage> msgList) {
+    private void writeDropdown(SXSSFSheet dynamicListSheet, int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
         Row row = dynamicListSheet.createRow(rowNum);
         row.createCell(0).setCellValue(name);
@@ -124,6 +136,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         for (I18nMessage msg: msgList) {
             row.createCell(columnIndex++, CellType.STRING).setCellValue(msg.getValueZh());
+        }
+
+        if (optional) {
+            // # mark is used to delete the column in database record.
+            row.createCell(columnIndex++, CellType.STRING).setCellValue("#");
         }
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
