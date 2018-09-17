@@ -98,7 +98,8 @@ public class SharedAssetInfoUtils {
             String minute = getSplittedTime(date, "mm");
             String second = getSplittedTime(date, "ss");
 
-            String rcpID = year.substring(2,4) + month + day + hour + minute + second;
+            String rcpID = year.substring(2,4) + "-" + month + "-" + day + "/" + hour + ":"
+            		+ minute + ":" + second;
 
             info.put("借据ID", rcpID);
             info.put("设备编号", asset.getDepartNum());
@@ -149,6 +150,7 @@ public class SharedAssetInfoUtils {
             info.put("备注", reqDetail.getReqComment());
             //is_intact为true或者null时默认为完好
             info.put("还时状态", (reqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好"));
+            info.put("设备编号", asset.getDepartNum());
         }
     }
 
