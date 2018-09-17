@@ -109,6 +109,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
+        createFormulaForExistingDropdown(dynamicListSheet, "所属科室", "'Org List'!A5:A100");
+        createFormulaForExistingDropdown(dynamicListSheet, "使用科室", "'Org List'!A5:A100");
+
         writeDropdown(dynamicListSheet, 1, "设备分类", assetGroup, false);
         writeDropdown(dynamicListSheet, 2, "医疗器械分类", assetFunctionTypes, true);
         writeDropdown(dynamicListSheet, 3, "折旧算法", depreciationMethod, true);
@@ -150,6 +153,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+    private void createFormulaForExistingDropdown(SXSSFSheet dynamicListSheet, String columnName, String formula) {
+
+        Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
+        namedCell.setNameName(columnName + "列表");
+//        namedCell.setRefersToFormula("=OrgList");
+        namedCell.setRefersToFormula(formula);
+
+    }
+
     public void writeAsset(SXSSFWorkbook workBook, List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
 
 //        Sheet sheet = workBook.getSheet(SHEET_ASSET);
@@ -180,11 +192,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void applyFormula(SXSSFWorkbook workBook, List<String> exportFields) {
 
+        workBook.getSheet(SHEET_ASSET).getDataValidations().clear();
+
         exportFields.stream().forEach(field -> {
-            String formula = columnFormulas.get(field);
-            if (formula != null) {
-                applyCellDropdown(workBook, exportFields, field, formula);
-            }
+            applyCellDropdownIfPossible(workBook, exportFields, field);
+//            String formula = columnFormulas.get(field);
+//            if (formula != null) {
+//                applyCellDropdown(workBook, exportFields, field, formula);
+//            }
 
         });
 
@@ -207,6 +222,38 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         workBook.getSheet(SHEET_ASSET).addValidationData(dataValidation);
 
+    }
+
+    public void applyCellDropdownIfPossible(SXSSFWorkbook workBook, List<String> exportFields, String currentField) {
+
+        Name name = workBook.getXSSFWorkbook().getName(currentField + "列表");
+        if (name == null) return;
+
+        String formula = name.getRefersToFormula();
+
+        int columnIndex = exportFields.indexOf(currentField);
+
+        XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(SHEET_ASSET));
+
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint(formula);
+
+        CellRangeAddressList addressList = new CellRangeAddressList(EXCEL_ASSET_DATA_ROW - 1, EXCEL_ASSET_DATA_ROW + MAX_FORMULA_ROWS, columnIndex, columnIndex);
+
+        XSSFDataValidation dataValidation = (XSSFDataValidation) helper.createValidation(dvConstraint, addressList);
+
+        dataValidation.setShowErrorBox(true);
+        dataValidation.setSuppressDropDownArrow(true);
+        dataValidation.setShowPromptBox(true);
+
+        workBook.getSheet(SHEET_ASSET).addValidationData(dataValidation);
+
+    }
+
+    public boolean isDropdown(SXSSFWorkbook workBook, String currentField) {
+        Name name = workBook.getXSSFWorkbook().getName(currentField + "列表");
+        if (name != null) return true;
+
+        return false;
     }
 
 }

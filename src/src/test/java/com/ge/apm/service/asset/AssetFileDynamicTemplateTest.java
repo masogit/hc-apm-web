@@ -67,7 +67,7 @@ public class AssetFileDynamicTemplateTest {
         template.writeToFile(workBook, new File("./temp.xlsx"));
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void writeAsset() throws IOException {
 
@@ -89,6 +89,8 @@ public class AssetFileDynamicTemplateTest {
 
         InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+
+        template.buildMetaData(workBook);
 
         template.applyFormula(workBook, exportColumnFields);
 
