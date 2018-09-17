@@ -59,6 +59,12 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                     </p:column>
+                    <p:column headerText="起步价" sortBy="#{item.startingPrice}">
+                        <h:outputText value="#{item.startingPrice}"/>
+                    </p:column>
+                    <p:column headerText="起步时长" sortBy="#{item.startingDuration}">
+                        <h:outputText value="#{item.startingDuration}"/>
+                    </p:column>
                     <p:column headerText="创建人" sortBy="#{item.createBy}" filterBy="#{item.createBy}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.createBy}"/>
                     </p:column>

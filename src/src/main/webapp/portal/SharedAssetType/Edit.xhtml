@@ -37,13 +37,33 @@
                         <h:panelGroup>
                             <label class='label'>计价方式*</label>
                             <p:selectOneRadio id="chargingType" required="true"  value="#{sharedAssetTypeController.selected.chargingType}" requiredMessage="计价方式 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="小时(整点)" itemValue="5" />
                                 <f:selectItem itemLabel="小时(半点/整点)" itemValue="2" />
                                 <f:selectItem itemLabel="自然时间" itemValue="4" />
                                 <f:selectItem itemLabel="天" itemValue="3" />
                                 <f:selectItem itemLabel="次" itemValue="1" />
                             </p:selectOneRadio>
                         </h:panelGroup>
-                        
+
+                        <h:panelGroup>
+                            <label class='label'>起步价</label>
+                            <p:inputNumber id="startingPrice"
+                                           value="#{sharedAssetTypeController.selected.startingPrice}" minValue="0"
+                                           decimalPlaces="2" required="false" readonly="false"
+                                           requiredMessage="起步价 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>起步时长（小时）</label>
+                            <p:inputNumber id="startingPeriod"
+                                           value="#{sharedAssetTypeController.selected.startingDuration}" minValue="0"
+                                           decimalPlaces="2" required="false" readonly="false"
+                                           requiredMessage="起步时长 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class='label'>创建人</label>
                             <p:inputText id="createBy" value="#{sharedAssetTypeController.selected.createBy}"  required="true" readonly="true" requiredMessage="创建人 #{msg.ValidationRequire}" />
