@@ -2269,23 +2269,34 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     //若当前状态为借出，则打印当前借用信息
     public void generateVoucher(AssetInfo asset) {
         //当前状态已借出
-        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
-        {
-            List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
-            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
-            Map<String, Object> info = new HashedMap();
-
-            info.put("抬头", allocDept.getParentOrg().getName() + allocDept.getName());
-            info.put("经办人", userContextService.getUserName());
-
-            getPdfContent(asset, info);
-            doExportToPdf(info, "sharedAssetBorrowed.xsl", "SharedAssetBorrowInfo.pdf" );
-        }
-        else
-        {
-            Map<String, Object> returned = new HashedMap();
-            getPdfContent(asset, returned);
-            doExportToPdf(returned, "sharedAssetReturned.xsl", "SharedAssetReturnInfo.pdf" );
+    	try 
+		{
+    		String fileName = null;
+	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
+	        {
+	            List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
+	            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+	            Map<String, Object> info = new HashedMap();
+	
+	            info.put("抬头", allocDept.getParentOrg().getName() + allocDept.getName());
+	            info.put("经办人", userContextService.getUserName());
+	
+	            getPdfContent(asset, info);
+	            fileName = new String(("Shared_Asset_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+						+ ".pdf").getBytes(),"UTF-8");
+	            doExportToPdf(info, "sharedAssetBorrowed.xsl", fileName);
+	        }
+	        else
+	        {
+	            Map<String, Object> returned = new HashedMap();
+	            getPdfContent(asset, returned);
+				
+				fileName = new String(("Shared_Asset_Return_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+						+ ".pdf").getBytes(),"UTF-8");
+				doExportToPdf(returned, "sharedAssetReturned.xsl", fileName );
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
         }
     }
 
