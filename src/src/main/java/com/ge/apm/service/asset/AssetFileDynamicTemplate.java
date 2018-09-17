@@ -151,7 +151,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             String msgType = "assetGroupSecondary_" + msg.getMsgKey();
 
             List<I18nMessage> msgList = i18nDao.getByMsgTypeAndSiteId(msgType, siteId);
-            createDropdownOnly(sheet, rowNum, title, msgList, true);
+            createDropdownWithNamedRange(sheet, rowNum, title, msgList, true);
 
             ++rowNum;
         }
@@ -159,7 +159,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
 //        Name namedCell = sheet.getWorkbook().getXSSFWorkbook().createName();
 //        namedCell.setNameName("设备分类2级" + "列表");
-//        namedCell.setRefersToFormula("OFFSET(INDIRECT(CONCATENATE('B', MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0):MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0))), 0, 0, 1, 20)");
+//        namedCell.setRefersToFormula("INDIRECT(CONCATENATE(\"动态列表!$B$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0), \":$AZ$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)))");
 
 
     }
@@ -187,16 +187,21 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownOnly(dynamicListSheet, rowNum, name, msgList, optional);
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
-        namedCell.setNameName(name + "列表");
+        namedCell.setNameName(getRangeName(name));
         String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
-        namedCell.setRefersToFormula(SHEET_DYNAMIC_LIST_NAME + "!" + cellRange);
+        namedCell.setRefersToFormula(dynamicListSheet.getSheetName() + "!" + cellRange);
 
+    }
+
+    private String getRangeName(String fieldName) {
+        String normalizedName = "_" + fieldName.replaceAll("[\\（\\）]", "_") + "列表";
+        return normalizedName;
     }
 
     private void createFormulaForExistingDropdown(SXSSFSheet dynamicListSheet, String columnName, String formula) {
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
-        namedCell.setNameName(columnName + "列表");
+        namedCell.setNameName(getRangeName(columnName));
 //        namedCell.setRefersToFormula("=OrgList");
         namedCell.setRefersToFormula(formula);
 
@@ -243,7 +248,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public void applyCellDropdownIfPossible(SXSSFWorkbook workBook, List<String> exportFields, String currentField) {
         String formula = null;
 
-        Name name = workBook.getXSSFWorkbook().getName(currentField + "列表");
+        String normalizedName = getRangeName(currentField);
+        Name name = workBook.getXSSFWorkbook().getName(normalizedName);
         if (name != null) {
             formula = name.getRefersToFormula();
         }
