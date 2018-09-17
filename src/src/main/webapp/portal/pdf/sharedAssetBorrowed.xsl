@@ -34,11 +34,11 @@
                 </fo:leader>
    			</fo:block>
 			
-			<fo:block font-weight="bold" font-size="11px" margin-left="1.2cm"  text-align="left" space-after="0.1cm">
+			<fo:block font-weight="bold" font-size="12px" margin-left="1.2cm"  text-align="left" space-after="0.1cm">
 				借据ID： <xsl:value-of select="借据ID"/>				
 			</fo:block>
 			
-			<fo:block font-weight="bold" font-size="11px" margin-left="1.2cm"  text-align="left" space-after="0.1cm">
+			<fo:block font-weight="bold" font-size="12px" margin-left="1.2cm"  text-align="left" space-after="0.1cm">
 				借  时
 			</fo:block>
 			
