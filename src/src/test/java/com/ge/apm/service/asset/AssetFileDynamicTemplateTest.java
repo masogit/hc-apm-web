@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,20 @@ public class AssetFileDynamicTemplateTest {
     }
 
     @Test
-    public void buildMetaData() throws IOException {
+    public void writeMetaData() throws IOException {
+
+
+        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
+        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+
+        template.buildMetaData(workBook);
+
+        template.writeToFile(workBook, new File("./temp.xlsx"));
+    }
+
+    @Ignore
+    @Test
+    public void writeAsset() throws IOException {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 //        List<String> readFields = customConfigService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
