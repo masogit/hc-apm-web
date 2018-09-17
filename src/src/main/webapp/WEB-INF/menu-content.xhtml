@@ -66,7 +66,7 @@
                 <p:menuitem  value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.needInstorageCheck()}"/>
                 <!--<p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>-->
             </p:submenu>
-            <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff') and userContextService.versionContains('维修管理(不含排班管理),维修排班管理')}">
+            <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff') and userContextService.versionContains('维修管理,排班管理')}">
                 <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
                 <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" rendered="false"/>
                 <p:menuitem  id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="false"/> 
@@ -77,7 +77,7 @@
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um085" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml"/>
                 <p:menuitem id="um200" value="维修工单报表" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.versionContains('维修排班管理')}"/>
+                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.versionContains('排班管理')}"/>
                             <!--rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>-->
                 <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="false"/>
                 <p:menuitem id="um220" value="报表模版管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
