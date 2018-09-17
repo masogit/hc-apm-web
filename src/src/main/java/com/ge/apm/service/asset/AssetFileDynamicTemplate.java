@@ -57,13 +57,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     static
     {
-        columnFormulas = new HashMap<String, String>();
-        columnFormulas.put("所属科室", "=OrgList");
-        columnFormulas.put("使用科室", "=OrgList");
+        columnFormulas = new HashMap<>();
+//        columnFormulas.put("所属科室", "=OrgList");
+//        columnFormulas.put("使用科室", "=OrgList");
         columnFormulas.put("医疗器械分类", null);
         columnFormulas.put("医疗器械子分类", null);
         columnFormulas.put("设备分类", null);
-        columnFormulas.put("设备分类2级", null);
+//        columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(CONCATENATE('B', MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0):MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0))), 0, 0, 1, 20)");
 
         columnFormulas.put("功能等级", null);
         columnFormulas.put("维修类型", null);
@@ -112,8 +112,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        createFormulaForExistingDropdown(dynamicListSheet, "所属科室", "'Org List'!A5:A100");
-        createFormulaForExistingDropdown(dynamicListSheet, "使用科室", "'Org List'!A5:A100");
+        createFormulaForExistingDropdown(dynamicListSheet, "所属科室", "'Org List'!$A$5:$A$100");
+        createFormulaForExistingDropdown(dynamicListSheet, "使用科室", "'Org List'!$A$5:$A$100");
 
         createDropdownWithNamedRange(dynamicListSheet, 1, "设备分类", assetGroup, false);
         createDropdownWithNamedRange(dynamicListSheet, 2, "医疗器械分类", assetFunctionTypes, true);
@@ -155,6 +155,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
             ++rowNum;
         }
+
+
+//        Name namedCell = sheet.getWorkbook().getXSSFWorkbook().createName();
+//        namedCell.setNameName("设备分类2级" + "列表");
+//        namedCell.setRefersToFormula("OFFSET(INDIRECT(CONCATENATE('B', MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0):MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0))), 0, 0, 1, 20)");
 
 
     }
@@ -236,17 +241,23 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void applyCellDropdownIfPossible(SXSSFWorkbook workBook, List<String> exportFields, String currentField) {
+        String formula = null;
 
         Name name = workBook.getXSSFWorkbook().getName(currentField + "列表");
-        if (name == null) return;
+        if (name != null) {
+            formula = name.getRefersToFormula();
+        }
+//        if (formula == null) {
+//            formula = columnFormulas.get(currentField);
+//        }
+        if (formula == null) return;
 
-        String formula = name.getRefersToFormula();
 
         int columnIndex = exportFields.indexOf(currentField);
 
         XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(SHEET_ASSET));
 
-        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint(formula);
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint("=" + name.getNameName());
 
         CellRangeAddressList addressList = new CellRangeAddressList(EXCEL_ASSET_DATA_ROW - 1, EXCEL_ASSET_DATA_ROW + MAX_FORMULA_ROWS, columnIndex, columnIndex);
 
