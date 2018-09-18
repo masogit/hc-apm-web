@@ -59,12 +59,12 @@ public class AssetFileDynamicTemplateTest {
     public void writeMetaData() throws IOException {
 
 
-        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
+//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        template.buildMetaData(workBook);
+        template.buildMetaData();
 
-        template.writeToFile(workBook, new File("./temp.xlsx"));
+        template.writeToFile(new File("./temp.xlsx"));
     }
 
 //    @Ignore
@@ -85,15 +85,15 @@ public class AssetFileDynamicTemplateTest {
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
+//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        template.buildMetaData(workBook);
+        template.buildMetaData();
 
-        template.applyFormula(workBook, exportColumnFields);
+        template.applyFormula(exportColumnFields);
 
-        template.writeAsset(workBook, assetList, sites, clinicalDeptList, exportColumnFields);
+        template.writeAsset(assetList, sites, clinicalDeptList, exportColumnFields);
 
-        template.writeToFile(workBook, new File("./temp.xlsx"));
+        template.writeToFile(new File("./temp.xlsx"));
     }
 }

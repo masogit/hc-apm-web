@@ -40,9 +40,14 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     List<String> columnTitles;
 
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
+        SXSSFSheet sheet = workBook.getSheet(sheetName);
+        if (sheet == null) {
+            sheet = workBook.createSheet(sheetName);
+        }
+
         this.workBook = workBook;
         this.sheetName = sheetName;
-        this.sheet = workBook.getSheet(sheetName);
+        this.sheet = sheet;
         this.columnTitles = columnTitles;
     }
 
