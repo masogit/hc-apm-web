@@ -19,6 +19,8 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -35,6 +37,7 @@ import java.util.Map;
  */
 
 @Service
+//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "prototype")
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
 
@@ -82,58 +85,62 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         columnFormulas.put("资产价值分类", null);
     }
 
-//    Workbook workBook;
+    SXSSFWorkbook workBook;
 
-//    public AssetFileDynamicTemplate(Workbook workBook) {
-//        this.workBook = workBook;
-//    }
-//
-//    public AssetFileDynamicTemplate(String path) throws IOException {
-//        this(new FileInputStream(path));
-//    }
-//
-//    public AssetFileDynamicTemplate(InputStream input) throws IOException {
-//        this.workBook = new SXSSFWorkbook(new XSSFWorkbook(input));
-////        this.workBook = new XSSFWorkbook(input);
-//    }
+    SXSSFSheet assetSheet;
 
-    public void buildMetaData(InputStream input) throws IOException {
-        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(input));
-        buildMetaData(workBook);
+    SXSSFSheet dynamicListSheet;
+
+    public AssetFileDynamicTemplate() throws IOException {
+        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
+        workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+
+        assetSheet = workBook.getSheet(SHEET_ASSET + "_2");
+        if (assetSheet == null) {
+            assetSheet = workBook.createSheet(SHEET_ASSET + "_2");
+        }
+
+        dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
+        if (dynamicListSheet == null) {
+            dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
+        }
+
+        logger.info("Dynamic template instance created!");
+
     }
 
-    public void buildMetaData(SXSSFWorkbook workBook) {
+    public void buildMetaData() {
 
-        createAssetGroupSecondaryLevel(workBook);
+        createAssetGroupSecondaryLevel();
 
-        SXSSFSheet dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
+//        SXSSFSheet dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
 
         Row row = dynamicListSheet.createRow(0);
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        createFormulaForExistingDropdown(dynamicListSheet, "所属科室", "'Org List'!$A$5:$A$100");
-        createFormulaForExistingDropdown(dynamicListSheet, "使用科室", "'Org List'!$A$5:$A$100");
+        createFormulaForExistingDropdown("所属科室", "'Org List'!$A$5:$A$100");
+        createFormulaForExistingDropdown( "使用科室", "'Org List'!$A$5:$A$100");
 
-        createDropdownWithNamedRange(dynamicListSheet, 1, "设备分类", assetGroup, false);
-        createDropdownWithNamedRange(dynamicListSheet, 2, "医疗器械分类", assetFunctionTypes, true);
-        createDropdownWithNamedRange(dynamicListSheet, 3, "折旧算法", depreciationMethod, true);
-        createDropdownWithNamedRange(dynamicListSheet, 4, "用途分类", assetUsageList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 5, "资金来源", capitalSourceList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 6, "计量等级", measureGradeList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 7, "风险等级", riskGradeList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 8, "是否急救设备", emergencyEquipmentList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 9, "是否进口设备", importEquipmentList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 10, "核算类别", accountingCategoryList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 11, "计量项目类别", measuringItemCategoryList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 12, "维修类型", repairFormList, true);
-        createDropdownWithNamedRange(dynamicListSheet, 13, "当前状态", assetStatusList, false);
-        createDropdownWithNamedRange(dynamicListSheet, 14, "资产价值分类", assetValueCategoryList, true);
+        createDropdownWithNamedRange(1, "设备分类", assetGroup, false);
+        createDropdownWithNamedRange(2, "医疗器械分类", assetFunctionTypes, true);
+        createDropdownWithNamedRange(3, "折旧算法", depreciationMethod, true);
+        createDropdownWithNamedRange(4, "用途分类", assetUsageList, true);
+        createDropdownWithNamedRange(5, "资金来源", capitalSourceList, true);
+        createDropdownWithNamedRange(6, "计量等级", measureGradeList, true);
+        createDropdownWithNamedRange(7, "风险等级", riskGradeList, true);
+        createDropdownWithNamedRange(8, "是否急救设备", emergencyEquipmentList, true);
+        createDropdownWithNamedRange(9, "是否进口设备", importEquipmentList, true);
+        createDropdownWithNamedRange(10, "核算类别", accountingCategoryList, true);
+        createDropdownWithNamedRange(11, "计量项目类别", measuringItemCategoryList, true);
+        createDropdownWithNamedRange(12, "维修类型", repairFormList, true);
+        createDropdownWithNamedRange(13, "当前状态", assetStatusList, false);
+        createDropdownWithNamedRange(14, "资产价值分类", assetValueCategoryList, true);
 
 
     }
 
-    private void createAssetGroupSecondaryLevel(SXSSFWorkbook workBook) {
+    private void createAssetGroupSecondaryLevel() {
         SXSSFSheet sheet = workBook.getSheet(SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME);
         if (sheet == null) {
             sheet = workBook.createSheet(SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME);
@@ -151,7 +158,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             String msgType = "assetGroupSecondary_" + msg.getMsgKey();
 
             List<I18nMessage> msgList = i18nDao.getByMsgTypeAndSiteId(msgType, siteId);
-            createDropdownWithNamedRange(sheet, rowNum, title, msgList, true);
+            createDropdownWithNamedRange(rowNum, title, msgList, true);
 
             ++rowNum;
         }
@@ -164,7 +171,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    private void createDropdownOnly(SXSSFSheet dynamicListSheet, int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
+    private void createDropdownOnly(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
         Row row = dynamicListSheet.createRow(rowNum);
         row.createCell(0).setCellValue(name);
@@ -182,9 +189,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    private void createDropdownWithNamedRange(SXSSFSheet dynamicListSheet, int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
+    private void createDropdownWithNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
-        createDropdownOnly(dynamicListSheet, rowNum, name, msgList, optional);
+        createDropdownOnly(rowNum, name, msgList, optional);
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(name));
@@ -198,7 +205,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         return normalizedName;
     }
 
-    private void createFormulaForExistingDropdown(SXSSFSheet dynamicListSheet, String columnName, String formula) {
+    private void createFormulaForExistingDropdown(String columnName, String formula) {
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(columnName));
@@ -207,11 +214,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void writeAsset(SXSSFWorkbook workBook, List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
+    public void writeAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
 
 //        Sheet sheet = workBook.getSheet(SHEET_ASSET);
 
-        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, SHEET_ASSET, exportFields);
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
         String[] columnTitles = exportFields.toArray(new String[] {});
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
@@ -228,24 +235,25 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void writeToFile(SXSSFWorkbook workBook, File file) throws IOException {
+    public void writeToFile(File file) throws IOException {
 
         FileOutputStream fos = new FileOutputStream(file);
         workBook.write(fos);
+        workBook.close();
         fos.close();
     }
 
-    public void applyFormula(SXSSFWorkbook workBook, List<String> exportFields) {
+    public void applyFormula(List<String> exportFields) {
 
-        workBook.getSheet(SHEET_ASSET).getDataValidations().clear();
+        assetSheet.getDataValidations().clear();
 
         exportFields.stream().forEach(field -> {
-            applyCellDropdownIfPossible(workBook, exportFields, field);
+            applyCellDropdownIfPossible(exportFields, field);
         });
 
     }
 
-    public void applyCellDropdownIfPossible(SXSSFWorkbook workBook, List<String> exportFields, String currentField) {
+    public void applyCellDropdownIfPossible(List<String> exportFields, String currentField) {
         String formula = null;
 
         String normalizedName = getRangeName(currentField);
@@ -261,7 +269,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int columnIndex = exportFields.indexOf(currentField);
 
-        XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(SHEET_ASSET));
+        XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(assetSheet.getSheetName()));
 
         XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint("=" + name.getNameName());
 
@@ -274,7 +282,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         dataValidation.setShowPromptBox(true);
         dataValidation.setEmptyCellAllowed(false);
 
-        workBook.getSheet(SHEET_ASSET).addValidationData(dataValidation);
+        assetSheet.addValidationData(dataValidation);
 
     }
 
