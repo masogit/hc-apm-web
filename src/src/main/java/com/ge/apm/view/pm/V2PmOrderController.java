@@ -579,6 +579,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return mark;
     }
 
+    public boolean isBatchRob() {
+        boolean mark = false;
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k, v) -> {
+            result.getContent().stream().forEach(item -> {
+                if (item.getId().equalsIgnoreCase(k) && v == true)
+                    pmList.add(item);
+            });
+        });
+        if (pmList.size() > 0)
+            mark = pmList.stream().allMatch(item -> !item.getSimplify().equals(true));
+        return mark;
+    }
+
+
     public boolean isBatchTakePm() {
         // System.out.println(result);
         boolean mark = true;
@@ -1062,7 +1078,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return dao;
     }
 
-    public void acceptWorkOrder() {
+    public void acceptWorkOrder(int type) {
         if (isChecked() == false) //如果是false说明不是批量的操作
         {
             Date planTime = selectedPmOrder.getPlanTime();
@@ -1079,7 +1095,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
                 return;
             }
-            pmOrderService.acceptWorkOrderBatch(currentPagePmOrders, selectedMap, planTimeForBatch);
+            pmOrderService.acceptWorkOrderBatch(currentPagePmOrders, selectedMap, planTimeForBatch,type);
         }
         cancel();
     }

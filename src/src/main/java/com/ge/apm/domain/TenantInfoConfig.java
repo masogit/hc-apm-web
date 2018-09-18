@@ -12,8 +12,10 @@ public class TenantInfoConfig  {
 	private static final String ArrivalInstallation="安装验收";
 	private static final String AssetBorrow="设备调剂";
 	private static final String AssetMDM="设备档案";
-	private static final String WorkOrderMgmtWithoutWorkSchedule="维修管理(不含排班管理)";
-	private static final String WorkOrderMgmt="维修排班管理";
+	//维修管理(不含排班管理)
+	private static final String WorkOrderMgmtWithoutWorkSchedule="维修管理";
+	private static final String WorkSchedule="排班管理";
+//	private static final String WorkOrderMgmt="维修排班管理";
 	private static final String PreventiveMaintainceMgmt="预防维护";
 	private static final String DeviceOperationKPIAnalysis="绩效分析";
 	private static final String SysAdmin="系统配置";
@@ -34,7 +36,9 @@ public class TenantInfoConfig  {
 	//维修流程,维修管理(不含排班管理)
 	private Boolean blnWorkOrderMgmtWithoutWorkSchedule=false;
 	//维修流程,维修排班管理
-	private Boolean blnWorkOrderMgmt=false;
+//	private Boolean blnWorkOrderMgmt=false;
+	//排班管理
+	private Boolean blnWorkSchedule=false;
 	//预防维护,预防维护
 	private Boolean blnPreventiveMaintainceMgmt=false;
 	//绩效分析,绩效分析
@@ -65,14 +69,21 @@ public class TenantInfoConfig  {
 	public void setBlnWorkOrderMgmtWithoutWorkSchedule(Boolean blnWorkOrderMgmtWithoutWorkSchedule) {
 		this.blnWorkOrderMgmtWithoutWorkSchedule = blnWorkOrderMgmtWithoutWorkSchedule;
 	}
-	public Boolean getBlnWorkOrderMgmt() {
-		return blnWorkOrderMgmt;
-	}
-	public void setBlnWorkOrderMgmt(Boolean blnWorkOrderMgmt) {
-		this.blnWorkOrderMgmt = blnWorkOrderMgmt;
-	}
+//	public Boolean getBlnWorkOrderMgmt() {
+//		return blnWorkOrderMgmt;
+//	}
+//	public void setBlnWorkOrderMgmt(Boolean blnWorkOrderMgmt) {
+//		this.blnWorkOrderMgmt = blnWorkOrderMgmt;
+//	}
+	
 	public Boolean getBlnPreventiveMaintainceMgmt() {
 		return blnPreventiveMaintainceMgmt;
+	}
+	public Boolean getBlnWorkSchedule() {
+		return blnWorkSchedule;
+	}
+	public void setBlnWorkSchedule(Boolean blnWorkSchedule) {
+		this.blnWorkSchedule = blnWorkSchedule;
 	}
 	public void setBlnPreventiveMaintainceMgmt(Boolean blnPreventiveMaintainceMgmt) {
 		this.blnPreventiveMaintainceMgmt = blnPreventiveMaintainceMgmt;
@@ -133,9 +144,14 @@ public class TenantInfoConfig  {
 			this.blnAssetMDM=true;
 		} else if (str.equals(WorkOrderMgmtWithoutWorkSchedule)) {
 			this.blnWorkOrderMgmtWithoutWorkSchedule=true;
-		} else if (str.equals(WorkOrderMgmt)) {
-			this.blnWorkOrderMgmt=true;
-		} else if (str.equals(PreventiveMaintainceMgmt)) {
+		} 
+//		else if (str.equals(WorkOrderMgmt)) {
+//			this.blnWorkOrderMgmt=true;
+//		} 
+		else if (str.equals(WorkSchedule)) {
+			this.blnWorkSchedule=true;
+		} 
+		else if (str.equals(PreventiveMaintainceMgmt)) {
 			this.blnPreventiveMaintainceMgmt=true;
 		} else if (str.equals(DeviceOperationKPIAnalysis)) {
 			this.blnDeviceOperationKPIAnalysis=true;
@@ -166,8 +182,11 @@ public class TenantInfoConfig  {
 		if(this.blnWorkOrderMgmtWithoutWorkSchedule){
 			result.add(WorkOrderMgmtWithoutWorkSchedule);
 		}
-		if(this.blnWorkOrderMgmt){
-			result.add(WorkOrderMgmt);
+//		if(this.blnWorkOrderMgmt){
+//			result.add(WorkOrderMgmt);
+//		}
+		if(this.blnWorkSchedule){
+			result.add(WorkSchedule);
 		}
 		if(this.blnPreventiveMaintainceMgmt){
 			result.add(PreventiveMaintainceMgmt);
@@ -204,8 +223,11 @@ public class TenantInfoConfig  {
 		if(this.blnWorkOrderMgmtWithoutWorkSchedule){
 			sb.append(WorkOrderMgmtWithoutWorkSchedule+",");
 		}
-		if(this.blnWorkOrderMgmt){
-			sb.append(WorkOrderMgmt+",");
+//		if(this.blnWorkOrderMgmt){
+//			sb.append(WorkOrderMgmt+",");
+//		}
+		if(this.blnWorkSchedule){
+			sb.append(WorkSchedule+",");
 		}
 		if(this.blnPreventiveMaintainceMgmt){
 			sb.append(PreventiveMaintainceMgmt+",");
@@ -229,7 +251,8 @@ public class TenantInfoConfig  {
 	}
 	
 	public void setValueWithVersion(String str){
-		this.blnWorkOrderMgmt=true;
+//		this.blnWorkOrderMgmt=true;
+		this.blnWorkSchedule=true;
 		this.blnNurseSite=true;
 		this.blnAssetBorrow=true;
 		
@@ -245,12 +268,14 @@ public class TenantInfoConfig  {
 			
 		}
 		else if(str.equals(VERSION_ULTRASOUND)){
-			this.blnWorkOrderMgmt=false;
+//			this.blnWorkOrderMgmt=false;
+			this.blnWorkSchedule=false;
 			this.blnNurseSite=false;
 			this.blnAssetBorrow=false;
 		}
 		else if(str.equals(VERSION_FUNCTION)){
-			this.blnWorkOrderMgmt=false;
+//			this.blnWorkOrderMgmt=false;
+			this.blnWorkSchedule=false;
 			this.blnNurseSite=false;
 			this.blnAssetBorrow=false;
 		}

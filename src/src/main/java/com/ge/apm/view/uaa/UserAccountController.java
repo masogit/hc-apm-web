@@ -203,11 +203,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected UserAccountRepository getDAO() {
         return dao;
     }
-
-    @Override
-    protected Page<UserAccount> loadData(PageRequest pageRequest) {
-        //this.selected = null;
-        if (selectedOrg == null) {
+    
+    private void generateListSearchFilter(){
+    	if (selectedOrg == null) {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
         } else {
             if (selectedOrg.getId() == -1) {
@@ -217,7 +215,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-
                 if (selectedOrg.getOrgType()  == 4) {
                     if (selectedNode.isLeaf()) {
                         searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
@@ -228,7 +225,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     }
 
                 }
-
             }
         }
         boolean nameFilter=false;
@@ -244,7 +240,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         	nameValue=((String)nameValue).toLowerCase();
         	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
         }
+    }
 
+    @Override
+    protected Page<UserAccount> loadData(PageRequest pageRequest) {
+        //this.selected = null;
+    	generateListSearchFilter();
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
         	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
@@ -364,6 +365,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void setSelectedNode(TreeNode selectedNode) {
+    	if(selectedNode==null){
+    		return;
+    	}
         this.selectedNode = selectedNode;
     }
 
@@ -756,7 +760,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void confirmActivation(){
         if(loginUser.getIsActive()){
-            //System.out.println("already active !");
             WebUtil.addSuccessMessage("激活成功！");
             return;
         }
@@ -876,21 +879,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void exportAll(){
-    	List<SearchFilter> listSearchFilter=new ArrayList<SearchFilter>();
-    	if (selectedOrg == null) {
-    		listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
-        } else {
-            if (selectedOrg.getId() == -1) {
-            	listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
-            } else {
-            	listSearchFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-            	listSearchFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-            	listSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-            	listSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-            	listSearchFilter.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-            }
-        }
-    	List<UserAccount> listUserAccount=dao.findBySearchFilter(listSearchFilter);
+    	generateListSearchFilter();
+    	List<UserAccount> listUserAccount=dao.findBySearchFilter(searchFilters);
 		if(listUserAccount==null || listUserAccount.size()==0){
 			WebUtil.addErrorMessage("无数据");
 			return;

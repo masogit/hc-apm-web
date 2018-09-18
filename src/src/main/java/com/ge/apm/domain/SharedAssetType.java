@@ -13,49 +13,54 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 /**
- *
  * @author caoyong
  */
 @Entity
 @Table(name = "shared_asset_type")
-public class SharedAssetType implements Serializable{
-    
+public class SharedAssetType implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "id",columnDefinition = "CHAR(32)")
+    @Column(name = "id", columnDefinition = "CHAR(32)")
     private String id;//主键
-    
+
     @Column(name = "swap_name")
     private String swapName;//调剂设备名称
-    
+
     @Column(name = "charging_type")
-    private String chargingType;//计价方式  1.次  2.小时（整点半点） 3.天  4. 自然时间
-    
+    private String chargingType;//计价方式  1.次  2.小时（整点半点） 3.天  4. 自然时间 5.小时（整点）
+
     @Column(name = "unit_price")
     private Double unitPrice;//单价
-    
+
     @Column(name = "unit")
     private String unit;//计量单位
-    
+
     @Column(name = "remark")
     private String remark;//备注
-    
+
     @Column(name = "create_by")
     private String createBy;//创建人
-    
+
     @Column(name = "modify_by")
     private String modifyBy;//修改人
-    
+
     @Column(name = "create_date")
     @Temporal(TemporalType.DATE)
     private Date createDate;//创建日期
-    
+
     @Column(name = "modify_date")
     @Temporal(TemporalType.DATE)
     private Date modifyDate;//修改日期
-    
-    
+
+    @Column(name = "starting_price")
+    private Double startingPrice;//起步价
+
+    @Column(name = "starting_duration")
+    private Double startingDuration;//起步时长
+
     //新增字段（数据权限四个字段）
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -177,11 +182,26 @@ public class SharedAssetType implements Serializable{
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
-    
-    
+
+    public Double getStartingPrice() {
+        return startingPrice;
+    }
+
+    public void setStartingPrice(Double startingPrice) {
+        this.startingPrice = startingPrice;
+    }
+
+    public Double getStartingDuration() {
+        return startingDuration;
+    }
+
+    public void setStartingDuration(Double startingDuration) {
+        this.startingDuration = startingDuration;
+    }
+
     @Override
     public boolean equals(Object object) {
-        
+
         if (!(object instanceof SharedAssetType)) {
             return false;
         }
@@ -203,16 +223,16 @@ public class SharedAssetType implements Serializable{
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
+
     @PrePersist
     public void initializeUid() {
-        if(getId()==null)
+        if (getId() == null)
             setId(UUID.randomUUID().toString().replace("-", ""));
     }
-    
+
     @Column(name = "accessories")
     private String accessories;//附件信息
-    
+
 //    public List <SharedAssetTypeAccesssory>  getAccessoriesAsList(){ // checkbox 调用
 //        try{
 //            List <SharedAssetTypeAccesssory> accessoriesList = JSON.parseObject(accessories, List.class);
@@ -221,12 +241,12 @@ public class SharedAssetType implements Serializable{
 //            return new ArrayList <SharedAssetTypeAccesssory>();
 //        }
 //    }
-    
+
 //    public void setAccessoriesAsList (List <SwapTypeAttach> accessoriesList){
 //        accessories = JSON.toJSONString(accessoriesList);
 //
 //    }
-    
+
     @Column(name = "accessories_long")
     private String accessoriesLong;//附件信息
 
@@ -237,7 +257,7 @@ public class SharedAssetType implements Serializable{
     public void setAccessoriesLong(String accessoriesLong) {
         this.accessoriesLong = accessoriesLong;
     }
-    
+
     public String getAccessories() {
         return accessories;
     }
@@ -245,20 +265,21 @@ public class SharedAssetType implements Serializable{
     public void setAccessories(String accessories) {
         this.accessories = accessories;
     }
-    
+
     @Transient
     private List<SharedAssetTypeAccesssory> accessoryList;
-//
-    public void setAccessoryList(List<SharedAssetTypeAccesssory> accessoryList){
+
+    //
+    public void setAccessoryList(List<SharedAssetTypeAccesssory> accessoryList) {
         this.accessoryList = accessoryList;
         accessories = JSON.toJSONString(accessoryList);
 //        System.out.println(accessories);
     }
-    
-    public List<SharedAssetTypeAccesssory> getAccessoryList(){
-        if(accessoryList!=null) return accessoryList;
 
-        if (accessories==null)
+    public List<SharedAssetTypeAccesssory> getAccessoryList() {
+        if (accessoryList != null) return accessoryList;
+
+        if (accessories == null)
             accessoryList = new ArrayList<>();
         else
             accessoryList = JSON.parseArray(accessories, SharedAssetTypeAccesssory.class);
