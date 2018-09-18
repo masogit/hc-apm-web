@@ -30,6 +30,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -498,6 +500,15 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private SharedAssetType sharedAssetType;
+
+    @Transient
+    private OrgInfo assetDeptOrg;
+
+    @Transient
+    private Boolean canBorrow;
+
+    @Transient
+    private Boolean canReturn;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -523,7 +534,31 @@ public class AssetInfo implements ChineseName,Serializable {
 		this.sharedAssetType = sharedAssetType;
 	}
 
-	public Integer getAssetUsage() {
+    public OrgInfo getAssetDeptOrg() {
+        return assetDeptOrg;
+    }
+
+    public void setAssetDeptOrg(OrgInfo assetDeptOrg) {
+        this.assetDeptOrg = assetDeptOrg;
+    }
+
+    public Boolean getCanBorrow() {
+        Boolean rst = Boolean.FALSE;
+        if(this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
+            rst = Boolean.TRUE;
+        }
+        return rst;
+    }
+
+    public Boolean getCanReturn() {
+        Boolean rst = Boolean.FALSE;
+        if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+            rst = Boolean.TRUE;
+        }
+        return rst;
+    }
+
+    public Integer getAssetUsage() {
         return assetUsage;
     }
 
