@@ -81,7 +81,7 @@ public class SharedAssetInfoUtils {
         }
         BigDecimal totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
         if("2".equals(reqDetail.getChargingType())) {
-            totalAmount = unit.multiply(new BigDecimal(unitPrice.longValue() / 2));
+            totalAmount = unit.multiply(new BigDecimal(unitPrice)).divide(new BigDecimal(2));
         }
         return totalAmount;
     }
@@ -98,7 +98,8 @@ public class SharedAssetInfoUtils {
             String minute = getSplittedTime(date, "mm");
             String second = getSplittedTime(date, "ss");
 
-            String rcpID = year.substring(2,4) + month + day + hour + minute + second;
+            String rcpID = year.substring(2,4) + "-" + month + "-" + day + "/" + hour + ":"
+            		+ minute + ":" + second;
 
             info.put("借据ID", rcpID);
             info.put("设备编号", asset.getDepartNum());
