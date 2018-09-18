@@ -272,6 +272,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         dataValidation.setShowErrorBox(true);
         dataValidation.setSuppressDropDownArrow(true);
         dataValidation.setShowPromptBox(true);
+        dataValidation.setEmptyCellAllowed(false);
 
         workBook.getSheet(SHEET_ASSET).addValidationData(dataValidation);
 
