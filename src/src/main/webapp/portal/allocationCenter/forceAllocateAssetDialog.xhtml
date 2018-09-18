@@ -13,31 +13,38 @@
                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class='label'>请求类型*</label>
-                            <p:selectOneRadio id="chargingType" required="true"  value="#{assetInfoController.selected.sharedAssetReqDetail.leaseRequest.type}" requiredMessage="#{msg.ValidationRequire}">
+                            <p:selectOneRadio id="chargingType" required="true"  value="#{sharedAssetStockController.selected.sharedAssetReqDetail.leaseRequest.type}" requiredMessage="#{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="维修" itemValue="1" />
                                 <f:selectItem itemLabel="补登记" itemValue="2" />
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">借用科室*</label>
-                            <p:autoComplete dropdown="true" value="#{assetInfoController.filterOrgName}"
+                            <p:autoComplete dropdown="true" value="#{sharedAssetStockController.leaseDeptName}"
                                             required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoController.autoCompleteDeptName}" size="8">
-                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}" event="itemSelect"/>
-                                <p:ajax process="@this" listener="#{assetInfoController.onClinicalDeptNameFilterChange}"/>
+                                            scrollHeight="300"  forceSelection="true"  size="8"
+                                            completeMethod="#{sharedAssetStockController.autoCompleteDeptName}">
+                                <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}" event="itemSelect"/>
+                                <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}"/>
                             </p:autoComplete>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费开始时间*</label>
-                            <p:calendar timeZone="GMT+8" id="chargingBeginTime" pattern="yyyy/MM/dd HH:mm:ss"  value="#{assetInfoController.selected.sharedAssetReqDetail.chargingBeginTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计费开始时间 #{msg.ValidationRequire}"></p:calendar>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="false">
-                            <label class="label">计费结束时间</label>
-                            <p:calendar timeZone="GMT+8" id="chargingEndTime" pattern="yyyy/MM/dd HH:mm:ss" value="#{assetInfoController.selected.sharedAssetReqDetail.chargingEndTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false"></p:calendar>
+                            <p:calendar timeZone="GMT+8"
+                                        id="chargingBeginTime"
+                                        pattern="yyyy/MM/dd HH:mm:ss"
+                                        value="#{sharedAssetStockController.selected.sharedAssetReqDetail.chargingBeginTime}"
+                                        showOn="button"
+                                        showButtonPanel="true"
+                                        navigator="true"
+                                        eadonlyInput="false"
+                                        locale= "zh"
+                                        required="true"
+                                        requiredMessage="计费开始时间 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                    </p:panelGrid>
                    <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{assetInfoController.forceAllocateAsset()}" value="确认" update="AssetInfoListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'forceAllocateAssetDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{sharedAssetStockController.forceAllocateAsset()}" value="确认" update="sharedAssetListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'forceAllocateAssetDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('forceAllocateAssetDialog').hide()"/>
                    </h:panelGroup>
                 </h:panelGroup>
