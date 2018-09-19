@@ -65,29 +65,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     static
     {
+        //we need to use formula for 2nd level dependant dropdown list, name range define is ok for others
         columnFormulas = new HashMap<>();
-//        columnFormulas.put("所属科室", "=OrgList");
-//        columnFormulas.put("使用科室", "=OrgList");
-        columnFormulas.put("医疗器械分类", null);
         columnFormulas.put("医疗器械子分类", "=OFFSET(INDIRECT(\"医疗器械子分类!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)),0,0,1,INDIRECT(\"医疗器械子分类!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)))");
-        columnFormulas.put("设备分类", null);
         columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"设备分类2级!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)),0,0,1,INDIRECT(\"设备分类2级!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)))");
 
-        columnFormulas.put("功能等级", null);
-        columnFormulas.put("维修类型", null);
-        columnFormulas.put("折旧算法", null);
-
-        columnFormulas.put("用途分类", null);
-        columnFormulas.put("资金来源", null);
-        columnFormulas.put("风险等级", null);
-        columnFormulas.put("计量等级", null);
-        columnFormulas.put("计量项目类别", null);
-        columnFormulas.put("是否急救设备", null);
-        columnFormulas.put("是否进口设备", null);
-        columnFormulas.put("当前状态", null);
-        columnFormulas.put("是否PM", null);
-        columnFormulas.put("是否盘点", null);
-        columnFormulas.put("资产价值分类", null);
     }
 
     SXSSFWorkbook workBook;
@@ -275,8 +257,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         Name namedCell = workBook.getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(name));
-        String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
-        namedCell.setRefersToFormula(dynamicListSheet.getSheetName() + "!" + cellRange);
+        String cellRange = getRangeFormulaWithHorizontalList(dynamicListSheet.getSheetName(), rowNum);
+        namedCell.setRefersToFormula(cellRange);
 
     }
 
@@ -286,13 +268,19 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         Name namedCell = workBook.getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(name));
-        String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
-        namedCell.setRefersToFormula(staticListSheet.getSheetName() + "!" + cellRange);
+        String cellRange = getRangeFormulaWithHorizontalList(staticListSheet.getSheetName(), rowNum);
+        namedCell.setRefersToFormula(cellRange);
     }
 
     private String getRangeName(String fieldName) {
         String normalizedName = "_" + fieldName.replaceAll("[\\（\\）]", "_") + "列表";
         return normalizedName;
+    }
+
+    private String getRangeFormulaWithHorizontalList(String sheetName, int rowNum) {
+        //example "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)";
+        String cellRange = String.format("OFFSET('%s'!$B$%d, 0, 0, 1, COUNTA('%s'!$%d:$%d) - 1)", sheetName, rowNum + 1, sheetName, rowNum + 1, rowNum + 1);
+        return cellRange;
     }
 
     private void createFormulaForExistingDropdown(String columnName, String formula) {
