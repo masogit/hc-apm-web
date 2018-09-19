@@ -273,7 +273,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     private String getRangeName(String fieldName) {
-        String normalizedName = "_" + fieldName.replaceAll("[\\（\\）]", "_") + "列表";
+        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_") + "列表";
         return normalizedName;
     }
 
@@ -331,7 +331,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void applyCellDropdownIfPossible(List<String> exportFields, String currentField) {
-        String formula = null;
 
         String normalizedName = getRangeName(currentField);
         Name name = workBook.getXSSFWorkbook().getName(normalizedName);
