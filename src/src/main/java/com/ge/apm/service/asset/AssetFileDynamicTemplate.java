@@ -28,9 +28,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -42,6 +44,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
 
     private static final String SHEET_DYNAMIC_LIST_NAME = "动态列表";
+    private static final String SHEET_STATIC_LIST_NAME = "静态列表";
     private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = "设备分类2级";
 
     public static String[] columnTitles = {
@@ -90,6 +93,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet assetSheet;
 
     SXSSFSheet dynamicListSheet;
+    SXSSFSheet staticListSheet;
 
     public AssetFileDynamicTemplate() throws IOException {
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
@@ -105,20 +109,33 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
         }
 
+        staticListSheet = workBook.getSheet(SHEET_STATIC_LIST_NAME);
+        if (staticListSheet == null) {
+            staticListSheet = workBook.createSheet(SHEET_STATIC_LIST_NAME);
+        }
+
         logger.info("Dynamic template instance created!");
 
     }
 
     public void buildMetaData() {
 
+        createDynamicList();
+
+        createStaticList();
+
         createAssetGroupSecondaryLevel();
+
+        createFormulaForExistingDropdown("所属科室", "'Org List'!$A$5:$A$100");
+        createFormulaForExistingDropdown( "使用科室", "'Org List'!$A$5:$A$100");
+
+    }
+
+    private void createDynamicList() {
 
         Row row = dynamicListSheet.createRow(0);
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
-
-        createFormulaForExistingDropdown("所属科室", "'Org List'!$A$5:$A$100");
-        createFormulaForExistingDropdown( "使用科室", "'Org List'!$A$5:$A$100");
 
         createDropdownWithNamedRange(1, "设备分类", assetGroup, false);
         createDropdownWithNamedRange(2, "医疗器械分类", assetFunctionTypes, true);
@@ -136,6 +153,18 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(14, "资产价值分类", assetValueCategoryList, true);
 
         dynamicListSheet.setSelected(false);
+    }
+
+    private void createStaticList() {
+        Row row = staticListSheet.createRow(0);
+        row.createCell(0).setCellValue("列表名称");
+        row.createCell(1).setCellValue("列表");
+
+        createDropdownWithStaticList(1, "功能分级", true, "1", "2", "3");
+        createDropdownWithStaticList(2, "是否PM", true, "是", "否");
+        createDropdownWithStaticList(3, "是否盘点", true, "是", "否");
+
+        staticListSheet.setSelected(false);
     }
 
     private void createAssetGroupSecondaryLevel() {
@@ -156,28 +185,29 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             String msgType = "assetGroupSecondary_" + msg.getMsgKey();
 
             List<I18nMessage> msgList = i18nDao.getByMsgTypeAndSiteId(msgType, siteId);
-            createDropdownWithNamedRange(rowNum, title, msgList, true);
+
+            List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+            createDropdownOnly(sheet, rowNum, title, msgs, true);
 
             ++rowNum;
         }
-
 
 //        Name namedCell = sheet.getWorkbook().getXSSFWorkbook().createName();
 //        namedCell.setNameName("设备分类2级" + "列表");
 //        namedCell.setRefersToFormula("INDIRECT(CONCATENATE(\"动态列表!$B$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0), \":$AZ$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)))");
 
-
     }
 
-    private void createDropdownOnly(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
+    private void createDropdownOnly(SXSSFSheet sheet, int rowNum, String name, List<String> msgList, boolean optional) {
 
-        Row row = dynamicListSheet.createRow(rowNum);
+        Row row = sheet.createRow(rowNum);
         row.createCell(0).setCellValue(name);
 
         int columnIndex = 1;
 
-        for (I18nMessage msg: msgList) {
-            row.createCell(columnIndex++, CellType.STRING).setCellValue(msg.getValueZh());
+        for (String msg: msgList) {
+            row.createCell(columnIndex++, CellType.STRING).setCellValue(msg);
         }
 
         if (optional) {
@@ -189,13 +219,25 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     private void createDropdownWithNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
-        createDropdownOnly(rowNum, name, msgList, optional);
+        List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
 
-        Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
+        createDropdownOnly(dynamicListSheet, rowNum, name, msgs, optional);
+
+        Name namedCell = workBook.getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(name));
         String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
         namedCell.setRefersToFormula(dynamicListSheet.getSheetName() + "!" + cellRange);
 
+    }
+
+    private void createDropdownWithStaticList(int rowNum, String name, boolean optional, String... items) {
+
+        createDropdownOnly(staticListSheet, rowNum, name, Arrays.asList(items), optional);
+
+        Name namedCell = workBook.getXSSFWorkbook().createName();
+        namedCell.setNameName(getRangeName(name));
+        String cellRange = String.format("$B$%s:$AZ$%s", String.valueOf(rowNum + 1), String.valueOf(rowNum + 1));
+        namedCell.setRefersToFormula(staticListSheet.getSheetName() + "!" + cellRange);
     }
 
     private String getRangeName(String fieldName) {
@@ -205,7 +247,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     private void createFormulaForExistingDropdown(String columnName, String formula) {
 
-        Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
+        Name namedCell = workBook.getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(columnName));
         namedCell.setRefersToFormula(formula);
 
