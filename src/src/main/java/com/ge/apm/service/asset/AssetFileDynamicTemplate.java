@@ -69,7 +69,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         columnFormulas.put("医疗器械分类", null);
         columnFormulas.put("医疗器械子分类", null);
         columnFormulas.put("设备分类", null);
-//        columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(CONCATENATE('B', MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0):MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0))), 0, 0, 1, 20)");
+        columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"动态列表!$A$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)),0,0,1,INDIRECT(\"动态列表!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)))");
 
         columnFormulas.put("功能等级", null);
         columnFormulas.put("维修类型", null);
@@ -177,7 +177,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         Row row = sheet.createRow(0);
         row.createCell(0).setCellValue("列表名称");
-        row.createCell(1).setCellValue("列表");
+        row.createCell(1).setCellValue("列表项个数");
+        row.createCell(2).setCellValue("列表项");
 
         int rowNum = 1;
         for (I18nMessage msg: assetGroup) {
@@ -188,7 +189,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
             List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
 
-            createDropdownOnly(sheet, rowNum, title, msgs, true);
+            createDropdownOnlyWithListCount(sheet, rowNum, title, msgs, true);
 
             ++rowNum;
         }
@@ -205,6 +206,28 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue(name);
 
         int columnIndex = 1;
+
+        for (String msg: msgList) {
+            row.createCell(columnIndex++, CellType.STRING).setCellValue(msg);
+        }
+
+        if (optional) {
+            // # mark is used to delete the column in database record.
+            row.createCell(columnIndex++, CellType.STRING).setCellValue("#");
+        }
+
+    }
+
+    private void createDropdownOnlyWithListCount(SXSSFSheet sheet, int rowNum, String name, List<String> msgList, boolean optional) {
+
+        Row row = sheet.createRow(rowNum);
+        row.createCell(0).setCellValue(name);
+
+        int itemCount = optional ? msgList.size() + 1 : msgList.size();
+
+        row.createCell(1).setCellValue(itemCount);
+
+        int columnIndex = 2;
 
         for (String msg: msgList) {
             row.createCell(columnIndex++, CellType.STRING).setCellValue(msg);
@@ -297,20 +320,21 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         String normalizedName = getRangeName(currentField);
         Name name = workBook.getXSSFWorkbook().getName(normalizedName);
+        String formulaList;
         if (name != null) {
-            formula = name.getRefersToFormula();
+            formulaList = "=" + name.getNameName();
+        } else {
+            //if we cannot define this formula in name, then use formula
+            formulaList = columnFormulas.get(currentField);
         }
-//        if (formula == null) {
-//            formula = columnFormulas.get(currentField);
-//        }
-        if (formula == null) return;
 
+        if (formulaList == null) return;
 
         int columnIndex = exportFields.indexOf(currentField);
 
         XSSFDataValidationHelper helper = new XSSFDataValidationHelper(workBook.getXSSFWorkbook().getSheet(assetSheet.getSheetName()));
 
-        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint("=" + name.getNameName());
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) helper.createFormulaListConstraint(formulaList);
 
         CellRangeAddressList addressList = new CellRangeAddressList(EXCEL_ASSET_DATA_ROW - 1, EXCEL_ASSET_DATA_ROW + MAX_FORMULA_ROWS, columnIndex, columnIndex);
 
