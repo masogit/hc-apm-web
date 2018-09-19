@@ -806,6 +806,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*.properties</include>
+                    <include>mapper/*.xml</include>
                     <include>log4j.xml</include>
                 </includes>
                 <filtering>true</filtering>
