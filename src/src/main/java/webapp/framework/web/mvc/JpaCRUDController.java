@@ -133,7 +133,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     }
 
     protected void getFilterMatchModes(DataTable table) {
-        if (filterMatchModes == null) {
+         if (filterMatchModes == null) {
             filterMatchModes = new HashMap<String, String>();
             for (FilterMeta a : (List<FilterMeta>) table.getFilterMetadata()) {
                 String fieldName = a.getFilterByVE().getExpressionString();

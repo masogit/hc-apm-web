@@ -54,6 +54,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 
 import javaslang.Tuple2;
+import lombok.Getter;
+import lombok.Setter;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -65,6 +67,7 @@ import webapp.framework.web.WebUtil;
 @ViewScoped
 public class AssetInstallationController {
 
+    @Getter@Setter
     private ArrivalListItem arrivalListItem;
     private ArrivalListItemRepository itemDao;
     private AssetInstallationService aiService;
@@ -76,27 +79,43 @@ public class AssetInstallationController {
 
     private List<V2_BlobObject> attachList;
 
+    @Getter@Setter
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
+    
+    
+    @Getter@Setter
     private TreeNode selectedNode;
+    @Getter@Setter
     private TreeNode selectedGbNode;
+    
+    @Getter@Setter
     private String gbCodeName;
+    
+    @Getter@Setter
     private GbCode selectedGb;
+    @Getter@Setter
     private TreeNode gbTree;
     private String src = "";
+    @Getter@Setter
     private UserAccount owner1;
+    @Getter@Setter
     private UserAccount owner2;
+    @Getter@Setter
     private UserAccount owner3;
+    @Getter@Setter
     private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
 //    private String currentQrCode;
 
     private ConfigService configService;
 
+    @Getter@Setter
     private String exportQrCodeTemplateId;
 
+    @Getter@Setter
     private String deptName;
     private List<UserAccount> ownerList;
     private List<UserAccount> clinicalOwnerList;
@@ -105,6 +124,8 @@ public class AssetInstallationController {
     private WorkflowConfig config;
     private boolean needInstorageCheck;
     private List<AssetInfo> parentAssetList;
+    
+    @Getter@Setter
     private AssetInfo parentAssetInfo;
     
     private String oldQrCode;
@@ -515,6 +536,8 @@ public class AssetInstallationController {
         if(!Strings.isNullOrEmpty(oldQrCode)){
             //release old qrCode
             qrCodeService.releaseQrCode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
+            //delete old qrCode
+            qrCodeService.deleteQrcode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
         }
         if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
             String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
@@ -663,77 +686,77 @@ public class AssetInstallationController {
         return aiService.getUserAccountByUid(uid);
     }
 
-    public ArrivalListItem getArrivalListItem() {
-        return arrivalListItem;
-    }
+//    public ArrivalListItem getArrivalListItem() {
+//        return arrivalListItem;
+//    }
+//
+//    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
+//        this.arrivalListItem = arrivalListItem;
+//    }
 
-    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
-        this.arrivalListItem = arrivalListItem;
-    }
+//    public List<I18nMessage> getCode68List() {
+//        return code68List;
+//    }
+//
+//    public void setCode68List(List<I18nMessage> code68List) {
+//        this.code68List = code68List;
+//    }
 
-    public List<I18nMessage> getCode68List() {
-        return code68List;
-    }
+//    public String getGbCodeName() {
+//        return gbCodeName;
+//    }
+//
+//    public void setGbCodeName(String gbCodeName) {
+//        this.gbCodeName = gbCodeName;
+//    }
 
-    public void setCode68List(List<I18nMessage> code68List) {
-        this.code68List = code68List;
-    }
+//    public GbCode getSelectedGb() {
+//        return selectedGb;
+//    }
+//
+//    public void setSelectedGb(GbCode selectedGb) {
+//        this.selectedGb = selectedGb;
+//    }
 
-    public String getGbCodeName() {
-        return gbCodeName;
-    }
+//    public TreeNode getSelectedNode() {
+//        return selectedNode;
+//    }
+//
+//    public void setSelectedNode(TreeNode selectedNode) {
+//        this.selectedNode = selectedNode;
+//    }
 
-    public void setGbCodeName(String gbCodeName) {
-        this.gbCodeName = gbCodeName;
-    }
+//    public TreeNode getSelectedGbNode() {
+//        return selectedGbNode;
+//    }
+//
+//    public void setSelectedGbNode(TreeNode selectedGbNode) {
+//        this.selectedGbNode = selectedGbNode;
+//    }
 
-    public GbCode getSelectedGb() {
-        return selectedGb;
-    }
+//    public TreeNode getGbTree() {
+//        return gbTree;
+//    }
+//
+//    public void setGbTree(TreeNode gbTree) {
+//        this.gbTree = gbTree;
+//    }
 
-    public void setSelectedGb(GbCode selectedGb) {
-        this.selectedGb = selectedGb;
-    }
+//    public String getExportQrCodeTemplateId() {
+//        return exportQrCodeTemplateId;
+//    }
+//
+//    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
+//        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
+//    }
 
-    public TreeNode getSelectedNode() {
-        return selectedNode;
-    }
-
-    public void setSelectedNode(TreeNode selectedNode) {
-        this.selectedNode = selectedNode;
-    }
-
-    public TreeNode getSelectedGbNode() {
-        return selectedGbNode;
-    }
-
-    public void setSelectedGbNode(TreeNode selectedGbNode) {
-        this.selectedGbNode = selectedGbNode;
-    }
-
-    public TreeNode getGbTree() {
-        return gbTree;
-    }
-
-    public void setGbTree(TreeNode gbTree) {
-        this.gbTree = gbTree;
-    }
-
-    public String getExportQrCodeTemplateId() {
-        return exportQrCodeTemplateId;
-    }
-
-    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
-        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
-    }
-
-    public String getDeptName() {
-        return deptName;
-    }
-
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
-    }
+//    public String getDeptName() {
+//        return deptName;
+//    }
+//
+//    public void setDeptName(String deptName) {
+//        this.deptName = deptName;
+//    }
 
     public boolean isNeedInstorageCheck() {
         return needInstorageCheck;
@@ -743,43 +766,43 @@ public class AssetInstallationController {
         this.needInstorageCheck = needInstorageCheck;
     }
 
-    public UserAccount getOwner1() {
-        return owner1;
-    }
+//    public UserAccount getOwner1() {
+//        return owner1;
+//    }
+//
+//    public void setOwner1(UserAccount owner1) {
+//        this.owner1 = owner1;
+//    }
 
-    public void setOwner1(UserAccount owner1) {
-        this.owner1 = owner1;
-    }
+//    public UserAccount getOwner2() {
+//        return owner2;
+//    }
+//
+//    public void setOwner2(UserAccount owner2) {
+//        this.owner2 = owner2;
+//    }
 
-    public UserAccount getOwner2() {
-        return owner2;
-    }
+//    public UserAccount getOwner3() {
+//        return owner3;
+//    }
+//
+//    public void setOwner3(UserAccount owner3) {
+//        this.owner3 = owner3;
+//    }
 
-    public void setOwner2(UserAccount owner2) {
-        this.owner2 = owner2;
-    }
-
-    public UserAccount getOwner3() {
-        return owner3;
-    }
-
-    public void setOwner3(UserAccount owner3) {
-        this.owner3 = owner3;
-    }
-
-    public UserAccount getUseOwner() {
-        return useOwner;
-    }
-
-    public void setUseOwner(UserAccount useOwner) {
-        this.useOwner = useOwner;
-    }
-
-	public AssetInfo getParentAssetInfo() {
-		return parentAssetInfo;
-	}
-
-	public void setParentAssetInfo(AssetInfo parentAssetInfo) {
-		this.parentAssetInfo = parentAssetInfo;
-	}
+//    public UserAccount getUseOwner() {
+//        return useOwner;
+//    }
+//
+//    public void setUseOwner(UserAccount useOwner) {
+//        this.useOwner = useOwner;
+//    }
+//
+//	public AssetInfo getParentAssetInfo() {
+//		return parentAssetInfo;
+//	}
+//
+//	public void setParentAssetInfo(AssetInfo parentAssetInfo) {
+//		this.parentAssetInfo = parentAssetInfo;
+//	}
 }
