@@ -160,7 +160,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        createDropdownWithStaticList(1, "功能分级", true, "1", "2", "3");
+        createDropdownWithStaticList(1, "功能等级", true, "1", "2", "3");
         createDropdownWithStaticList(2, "是否PM", true, "是", "否");
         createDropdownWithStaticList(3, "是否盘点", true, "是", "否");
 
