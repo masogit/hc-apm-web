@@ -10,6 +10,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
@@ -46,6 +47,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final String SHEET_DYNAMIC_LIST_NAME = "动态列表";
     private static final String SHEET_STATIC_LIST_NAME = "静态列表";
     private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = "设备分类2级";
+    private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = "医疗器械子分类";
 
     public static String[] columnTitles = {
             "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "院区", "所属科室", "使用科室", "制造商", "品牌/制造商简称",
@@ -67,7 +69,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 //        columnFormulas.put("所属科室", "=OrgList");
 //        columnFormulas.put("使用科室", "=OrgList");
         columnFormulas.put("医疗器械分类", null);
-        columnFormulas.put("医疗器械子分类", null);
+        columnFormulas.put("医疗器械子分类", "=OFFSET(INDIRECT(\"医疗器械子分类!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)),0,0,1,INDIRECT(\"医疗器械子分类!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)))");
         columnFormulas.put("设备分类", null);
         columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"设备分类2级!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)),0,0,1,INDIRECT(\"设备分类2级!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)))");
 
@@ -114,8 +116,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             staticListSheet = workBook.createSheet(SHEET_STATIC_LIST_NAME);
         }
 
-        logger.info("Dynamic template instance created!");
-
     }
 
     public void buildMetaData() {
@@ -126,8 +126,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         createAssetGroupSecondaryLevel();
 
-        createFormulaForExistingDropdown("所属科室", "'Org List'!$A$5:$A$100");
-        createFormulaForExistingDropdown( "使用科室", "'Org List'!$A$5:$A$100");
+        createFunctionTypeSecondaryLevel();
+
+        createFormulaForExistingDropdown("所属科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        createFormulaForExistingDropdown( "使用科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
 
     }
 
@@ -185,7 +187,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             String title = msg.getValueZh();
             String msgType = "assetGroupSecondary_" + msg.getMsgKey();
 
-            List<I18nMessage> msgList = i18nDao.getByMsgTypeAndSiteId(msgType, siteId);
+            List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(msgType, siteId);
 
             List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
 
@@ -194,9 +196,34 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             ++rowNum;
         }
 
-//        Name namedCell = sheet.getWorkbook().getXSSFWorkbook().createName();
-//        namedCell.setNameName("设备分类2级" + "列表");
-//        namedCell.setRefersToFormula("INDIRECT(CONCATENATE(\"动态列表!$B$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0), \":$AZ$\", MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)))");
+    }
+
+    private void createFunctionTypeSecondaryLevel() {
+        SXSSFSheet sheet = workBook.getSheet(SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME);
+        if (sheet == null) {
+            sheet = workBook.createSheet(SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME);
+            int index = workBook.getSheetIndex(sheet);
+            workBook.setSheetHidden(index, true);
+        }
+
+        Row row = sheet.createRow(0);
+        row.createCell(0).setCellValue("列表名称");
+        row.createCell(1).setCellValue("列表项个数");
+        row.createCell(2).setCellValue("列表项");
+
+        int rowNum = 1;
+        for (I18nMessage msg: assetFunctionTypes) {
+            String title = msg.getValueZh();
+            String msgType = msg.getMsgKey();
+
+            List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(msgType, siteId);
+
+            List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+
+            createDropdownOnlyWithListCount(sheet, rowNum, title, msgs, true);
+
+            ++rowNum;
+        }
 
     }
 
