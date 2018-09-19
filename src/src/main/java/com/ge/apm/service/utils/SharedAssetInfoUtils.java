@@ -167,7 +167,7 @@ public class SharedAssetInfoUtils {
             //按自然时间计费时，若小于6小时，按6小时计算保底价
             if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
             {
-                totalAmount = 6 * reqDetail.getUnitPrice();
+                totalAmount = BigDecimal.valueOf(6).multiply(BigDecimal.valueOf(reqDetail.getUnitPrice())).doubleValue();
             }
             else
             {
@@ -206,7 +206,7 @@ public class SharedAssetInfoUtils {
         }
         if(chgType.equals("2") || chgType.equals("4"))
         {
-            Double pr = price.doubleValue() * 24;
+            Double pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24))).doubleValue();
             uniPrice = pr.toString() + "元/天";
         }
         if(chgType.equals("3"))
