@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SharedAssetMapper">
+
+    <resultMap type="com.ge.apm.domain.AssetInfo" id="sharedAsset" autoMapping="true">
+        <id column="asset_id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="asset_dept_uid" property="assetDeptUID"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+        <result column="asset_status" property="status"/>
+        <result column="asset_name" property="name"/>
+        <result column="asset_num" property="departNum"/>
+        <result column="asset_site_uid" property="siteUID"/>
+        <result column="financing_num" property="financingNum"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="serial_num" property="serialNum"/>
+        <result column="manufacture" property="manufacture"/>
+        <association property="assetDeptOrg" resultMap="orgInfoResult"/>
+        <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
+        <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
+    </resultMap>
+
+    <resultMap id="orgInfoResult" type="com.ge.apm.domain.OrgInfo">
+        <id property="id" column="id"/>
+        <result column="lease_org_name" property="name"/>
+        <result column="org_name_py_code" property="namePyCode"/>
+    </resultMap>
+
+    <resultMap id="sharedAssetTypeResult" type="com.ge.apm.domain.SharedAssetType">
+        <id column="sat_id" property="id"/>
+        <result column="swap_name" property="swapName"/>
+        <result column="asset_unit_price" property="unitPrice"/>
+        <result column="asset_charging_type" property="chargingType"/>
+    </resultMap>
+
+    <resultMap id="sharedAssetReqDetailResult" type="com.ge.apm.domain.SharedAssetReqDetail">
+        <id column="sard_id" property="id"/>
+        <result column="charging_begin_time" property="chargingBeginTime"/>
+        <result column="charging_end_time" property="chargingEndTime"/>
+        <result column="req_charging_type" property="chargingType"/>
+        <result column="req_unit_price" property="unitPrice"/>
+        <result column="borrow_id" property="borrowId"/>
+        <result column="return_id" property="returnId"/>
+    </resultMap>
+
+    <select id="getTotalRowCount" resultType="int">
+            select count(assets.uid) from (
+                select ai.id as asset_id,
+                ai.uid,
+                ai.asset_dept_uid,
+                ai.clinical_dept_uid,
+                ai.status as asset_status,
+                ai.name as asset_name,
+                ai.depart_num as asset_num,
+                ai.shared_asset_type,
+                ai.tenant_uid as asset_tenant_uid,
+                ai.institution_uid as asset_institution_uid,
+                ai.hospital_uid as asset_hospital_uid,
+                ai.site_uid as asset_site_uid,
+                ai.financing_num,
+                ai.qr_code,
+                ai.serial_num,
+                ai.manufacture,
+                oi.name as lease_org_name,
+                oi.name_py_code as org_name_py_code,
+                sat.swap_name as swap_name,
+                sard.charging_type as charging_type,
+                sard.charging_begin_time,
+                sard.charging_end_time
+                from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
+                left join org_info oi on ai.asset_dept_uid=oi.uid
+                left join (select * from shared_asset_req_detail where charging_end_time is null or charging_end_time > now()) sard on ai.uid=sard.asset_info_id
+            ) assets
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+    <select id="loadSharedAssets" resultMap="sharedAsset">
+        select * from (
+            select ai.id as asset_id,
+            ai.uid,
+            ai.asset_dept_uid,
+            ai.clinical_dept_uid,
+            ai.status as asset_status,
+            ai.name as asset_name,
+            ai.depart_num as asset_num,
+            ai.shared_asset_type,
+            ai.tenant_uid as asset_tenant_uid,
+            ai.institution_uid as asset_institution_uid,
+            ai.hospital_uid as asset_hospital_uid,
+            ai.site_uid as asset_site_uid,
+            ai.financing_num,
+            ai.qr_code,
+            ai.serial_num,
+            ai.manufacture,
+            oi.name as lease_org_name,
+            oi.name_py_code as org_name_py_code,
+            sat.id as sat_id,
+            sat.swap_name as swap_name,
+            sat.unit_price as asset_unit_price,
+            sat.charging_type as asset_charging_type,
+            sard.id as sard_id,
+            sard.charging_begin_time,
+            sard.charging_end_time,
+            sard.charging_type as req_charging_type,
+            sard.unit_price as req_unit_price,
+            sard.borrow_id,
+            sard.return_id
+            from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
+            left join org_info oi on ai.asset_dept_uid=oi.uid
+            left join (select * from shared_asset_req_detail where charging_end_time is null or charging_end_time > now()) sard on ai.uid=sard.asset_info_id
+        ) assets
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+</mapper>
