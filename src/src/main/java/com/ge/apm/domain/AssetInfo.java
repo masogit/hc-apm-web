@@ -489,6 +489,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "clinical_dept_name_py_code")
     private String clinicalDeptNamePyCode;
 
+    @Column(name = "pm_owner_id")
+    private Integer pmOwnerId;//保养负责人
+
     @Transient
     private int lineNum;
 
@@ -1591,7 +1594,15 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAssetValueCategory(String assetValueCategory) {
         this.assetValueCategory = assetValueCategory;
     }
-    
+
+    public Integer getPmOwnerId() {
+        return pmOwnerId;
+    }
+
+    public void setPmOwnerId(Integer pmOwnerId) {
+        this.pmOwnerId = pmOwnerId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
