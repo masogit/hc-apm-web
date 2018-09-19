@@ -69,7 +69,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         columnFormulas.put("医疗器械分类", null);
         columnFormulas.put("医疗器械子分类", null);
         columnFormulas.put("设备分类", null);
-        columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"动态列表!$A$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)),0,0,1,INDIRECT(\"动态列表!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),动态列表!A:A,0)))");
+        columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"设备分类2级!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)),0,0,1,INDIRECT(\"设备分类2级!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)))");
 
         columnFormulas.put("功能等级", null);
         columnFormulas.put("维修类型", null);
