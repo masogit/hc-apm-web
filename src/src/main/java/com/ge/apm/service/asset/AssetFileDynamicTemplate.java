@@ -16,11 +16,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -37,7 +38,6 @@ import java.util.Map;
  */
 
 @Service
-//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "prototype")
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
 
@@ -95,9 +95,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
-        assetSheet = workBook.getSheet(SHEET_ASSET + "_2");
+        assetSheet = workBook.getSheet(SHEET_ASSET);
         if (assetSheet == null) {
-            assetSheet = workBook.createSheet(SHEET_ASSET + "_2");
+            assetSheet = workBook.createSheet(SHEET_ASSET);
         }
 
         dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
@@ -112,8 +112,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public void buildMetaData() {
 
         createAssetGroupSecondaryLevel();
-
-//        SXSSFSheet dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
 
         Row row = dynamicListSheet.createRow(0);
         row.createCell(0).setCellValue("列表名称");
@@ -137,7 +135,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(13, "当前状态", assetStatusList, false);
         createDropdownWithNamedRange(14, "资产价值分类", assetValueCategoryList, true);
 
-
+        dynamicListSheet.setSelected(false);
     }
 
     private void createAssetGroupSecondaryLevel() {
@@ -209,14 +207,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         Name namedCell = dynamicListSheet.getWorkbook().getXSSFWorkbook().createName();
         namedCell.setNameName(getRangeName(columnName));
-//        namedCell.setRefersToFormula("=OrgList");
         namedCell.setRefersToFormula(formula);
 
     }
 
     public void writeAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
-
-//        Sheet sheet = workBook.getSheet(SHEET_ASSET);
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
@@ -232,6 +227,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
             ++startRow;
         }
+
+        assetSheet.setSelected(true);
 
     }
 
