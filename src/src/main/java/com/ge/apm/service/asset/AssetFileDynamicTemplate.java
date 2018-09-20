@@ -107,7 +107,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void buildMetaData() {
+    public void writeMetaData(List<String> exportFields) {
+
+        loadMetaDataAndApplyNamedRange();
+
+        applyAssetDateValidation(exportFields);
+
+    }
+
+    public void loadMetaDataAndApplyNamedRange() {
 
         createDynamicList();
 
@@ -119,7 +127,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         createFormulaForExistingDropdown("所属科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
         createFormulaForExistingDropdown( "使用科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-
     }
 
     private void createDynamicList() {
@@ -298,57 +305,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void writeAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) {
-
-        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
-
-
-        String[] columnTitles = exportFields.toArray(new String[] {});
-
-        //create asset table
-//        createAssetTable(columnTitles);
-
-        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
-
-        int startRow = EXCEL_ASSET_DATA_ROW;
-        for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
-
-            writer.writeRowData(startRow, rowMap);
-
-            ++startRow;
-        }
-
-        assetSheet.setSelected(true);
-
-    }
-
-    public void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
-
-        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
-
-        int startRow = EXCEL_ORG_DATA_ROW;
-        for (OrgInfo orgInfo: clinicalDeptList) {
-
-            writer.writeRowData(startRow, new String[]{orgInfo.getName()});
-
-            ++startRow;
-        }
-
-        orgSheet.setSelected(false);
-
-    }
-
-    public void writeToFile(File file) throws IOException {
-
-        FileOutputStream fos = new FileOutputStream(file);
-        workBook.write(fos);
-        workBook.close();
-        fos.close();
-    }
-
-    public void applyFormula(List<String> exportFields) {
+    private void applyAssetDateValidation(List<String> exportFields) {
 
         assetSheet.getDataValidations().clear();
 
@@ -390,6 +347,59 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         assetSheet.addValidationData(dataValidation);
 
     }
+
+    public void writeAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<String> exportFields) {
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
+
+
+        String[] columnTitles = exportFields.toArray(new String[] {});
+
+        //create asset table
+//        createAssetTable(columnTitles);
+
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+
+        int startRow = EXCEL_ASSET_DATA_ROW;
+        for (AssetInfo assetInfo: assetList) {
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
+
+            writer.writeRowData(startRow, rowMap);
+
+            ++startRow;
+        }
+
+        assetSheet.setSelected(true);
+
+    }
+
+    public void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
+
+        int startRow = EXCEL_ORG_DATA_ROW;
+        for (OrgInfo orgInfo: clinicalDeptList) {
+
+            writer.writeRowData(startRow, new String[]{orgInfo.getName()});
+
+            ++startRow;
+        }
+        writer.writeRowData(startRow, new String[]{"#"});
+
+        orgSheet.setSelected(false);
+
+    }
+
+    public void writeToFile(File file) throws IOException {
+
+        FileOutputStream fos = new FileOutputStream(file);
+        workBook.write(fos);
+        workBook.close();
+        fos.close();
+    }
+
+
 
     public void createAssetTable(String[] columnTitles) {
 
