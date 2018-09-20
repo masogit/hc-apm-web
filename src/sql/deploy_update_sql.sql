@@ -257,3 +257,4 @@ update tenant_info set tenant_config='{"menuList":["安装验收","设备档案"
 
 --v10.1
 update tenant_info set tenant_config ='{"menuList":["安装验收","设备档案","设备调剂","维修管理","排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}' where tenant_config='{"menuList":["安装验收","设备档案","设备调剂","维修管理(不含排班管理)","维修排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}';
+update asset_info set pm_owner_id = asset_owner_id where asset_owner_id is not null;
