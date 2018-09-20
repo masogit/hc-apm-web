@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @TestExecutionListeners(listeners = {ExistingAccountTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileDynamicTemplateTest {
 
-    @Autowired
+//    @Autowired
     AssetFileDynamicTemplate template;
 
     @Autowired
@@ -46,8 +46,8 @@ public class AssetFileDynamicTemplateTest {
     OrgInfoRepository orgInfoDao;
 
     @Before
-    public void setup() {
-
+    public void setup() throws IOException {
+        template = new AssetFileDynamicTemplate();
     }
 
     @Test
@@ -90,6 +90,26 @@ public class AssetFileDynamicTemplateTest {
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
 
         template.writeClinicalDeptList(clinicalDeptList);
+
+        template.writeToFile(new File("./temp.xlsx"));
+    }
+
+    @Test
+    public void exportAll() throws IOException {
+
+        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        template.exportAsset(assetList, sites, clinicalDeptList, exportColumnFields);
 
         template.writeToFile(new File("./temp.xlsx"));
     }

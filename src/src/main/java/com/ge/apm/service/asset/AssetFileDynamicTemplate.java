@@ -24,8 +24,10 @@ import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.jsf.FacesContextUtils;
 
+import javax.faces.context.FacesContext;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,8 +39,6 @@ import java.util.stream.Collectors;
  *
  * @author Quan Tang
  */
-
-@Service
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
 
@@ -79,6 +79,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet staticListSheet;
 
     public AssetFileDynamicTemplate() throws IOException {
+
+        WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
+
+        webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
+
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
@@ -386,6 +391,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         orgSheet.setSelected(false);
 
+    }
+
+    public void exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
+        writeMetaData(exportFields);
+        writeClinicalDeptList(clinicalDeptList);
+        writeAsset(assetList, sites, exportFields);
     }
 
     public InputStream getInputStream() throws IOException {
