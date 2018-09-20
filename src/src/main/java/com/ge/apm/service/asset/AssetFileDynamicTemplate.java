@@ -354,6 +354,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
+        //write sum formula
+        writeSummaryFormula(writer, exportFields);
 
         String[] columnTitles = exportFields.toArray(new String[] {});
 
@@ -371,6 +373,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
             ++startRow;
         }
+
+        workBook.setForceFormulaRecalculation(true);
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
 
         assetSheet.setSelected(true);
 
@@ -414,7 +419,22 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         fos.close();
     }
 
+    private void writeSummaryFormula(ExcelDocumentStreamingWriter writer, List<String> exportFields) {
 
+        int nameIndex = exportFields.indexOf("设备名称");
+        int purchasePriceIndex = exportFields.indexOf("采购价格");
+
+        String nameColLetter = CellReference.convertNumToColString(nameIndex);
+        String purchasePriceLetter = CellReference.convertNumToColString(purchasePriceIndex);
+
+        String countFormula = String.format("COUNTA('Asset List'!$%s$7:$%s$20000)", nameColLetter, nameColLetter);
+
+        String sumFormula = String.format("SUM('Asset List'!$%s$7:$%s$20000)", purchasePriceLetter, purchasePriceLetter);
+
+        writer.writeCellFormula(5, 1, countFormula);
+        writer.writeCellFormula(5, 2, sumFormula);
+
+    }
 
     public void createAssetTable(String[] columnTitles) {
 

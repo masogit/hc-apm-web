@@ -126,6 +126,21 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     }
 
+    public void writeCellFormula(int rowNum, int colNum, String formula) {
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        cell.setCellFormula(formula);
+
+    }
+
     public InputStream getStream() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);
