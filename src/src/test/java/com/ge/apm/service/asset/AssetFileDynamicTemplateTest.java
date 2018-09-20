@@ -53,7 +53,7 @@ public class AssetFileDynamicTemplateTest {
     @Test
     public void writeMetaData() throws IOException {
 
-        template.buildMetaData();
+        template.loadMetaDataAndApplyNamedRange();
 
         template.writeToFile(new File("./temp.xlsx"));
     }
@@ -74,11 +74,11 @@ public class AssetFileDynamicTemplateTest {
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        template.buildMetaData();
+        template.writeMetaData(exportColumnFields);
 
-        template.applyFormula(exportColumnFields);
+        template.writeClinicalDeptList(clinicalDeptList);
 
-        template.writeAsset(assetList, sites, clinicalDeptList, exportColumnFields);
+        template.writeAsset(assetList, sites, exportColumnFields);
 
         template.writeToFile(new File("./temp.xlsx"));
     }
