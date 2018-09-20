@@ -26,10 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -389,6 +386,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         orgSheet.setSelected(false);
 
+    }
+
+    public InputStream getInputStream() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        this.workBook.write(out);
+        this.workBook.close();
+        return new ByteArrayInputStream(out.toByteArray());
     }
 
     public void writeToFile(File file) throws IOException {
