@@ -76,6 +76,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFWorkbook workBook;
 
     SXSSFSheet assetSheet;
+    SXSSFSheet orgSheet;
 
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
@@ -87,6 +88,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         assetSheet = workBook.getSheet(SHEET_ASSET);
         if (assetSheet == null) {
             assetSheet = workBook.createSheet(SHEET_ASSET);
+        }
+
+        orgSheet = workBook.getSheet(SHEET_ORG);
+        if (orgSheet == null) {
+            orgSheet = workBook.createSheet(SHEET_ORG);
         }
 
         dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
@@ -300,7 +306,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         String[] columnTitles = exportFields.toArray(new String[] {});
 
         //create asset table
-        createAssetTable(columnTitles);
+//        createAssetTable(columnTitles);
 
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
 
@@ -315,6 +321,22 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         assetSheet.setSelected(true);
+
+    }
+
+    public void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
+
+        int startRow = EXCEL_ORG_DATA_ROW;
+        for (OrgInfo orgInfo: clinicalDeptList) {
+
+            writer.writeRowData(startRow, new String[]{orgInfo.getName()});
+
+            ++startRow;
+        }
+
+        orgSheet.setSelected(false);
 
     }
 

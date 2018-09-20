@@ -9,10 +9,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mock.ExistingAccountTestExecutionListener;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +79,17 @@ public class AssetFileDynamicTemplateTest {
         template.applyFormula(exportColumnFields);
 
         template.writeAsset(assetList, sites, clinicalDeptList, exportColumnFields);
+
+        template.writeToFile(new File("./temp.xlsx"));
+    }
+
+
+    @Test
+    public void writeClinicalDeptList() throws IOException {
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        template.writeClinicalDeptList(clinicalDeptList);
 
         template.writeToFile(new File("./temp.xlsx"));
     }
