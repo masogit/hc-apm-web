@@ -21,10 +21,7 @@ import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -376,6 +373,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         XSSFTable assetSheetTable = assetSheet.getWorkbook().getXSSFWorkbook().getSheet(assetSheet.getSheetName()).createTable();
         CTTable cttable = assetSheetTable.getCTTable();
+        CTAutoFilter autoFilter = cttable.addNewAutoFilter();
+        cttable.setAutoFilter(autoFilter);
 
         AreaReference areaReference = new AreaReference(
                 new CellReference(EXCEL_ASSET_HEADER_ROW - 1, 0),
@@ -387,9 +386,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         cttable.setId(1L);
         cttable.setRef(areaReference.formatAsString());
         cttable.setTotalsRowShown(false);
+        cttable.setTotalsRowCount(MAX_FORMULA_ROWS);
 
         CTTableStyleInfo tableStyleInfo = cttable.addNewTableStyleInfo();
-        tableStyleInfo.setName("TableStyleMedium2");
+        tableStyleInfo.setName("TableStyleMedium1");
         tableStyleInfo.setShowColumnStripes(false);
         tableStyleInfo.setShowRowStripes(true);
 
