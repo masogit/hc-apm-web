@@ -10,6 +10,8 @@ public class StringComparator implements Comparator<String> {
 
     @Override
     public int compare(String arg0, String arg1) {
-		return arg0.compareTo(arg1);
+    	String pinyin0=PinyinUtil.getShortPinyin(arg0).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+    	String pinyin1=PinyinUtil.getShortPinyin(arg1).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+		return pinyin0.compareTo(pinyin1);
     }
 }
