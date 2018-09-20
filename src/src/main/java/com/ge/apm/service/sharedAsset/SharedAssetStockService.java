@@ -132,7 +132,7 @@ public class SharedAssetStockService {
         return orgInfos;
     }
 
-    public ResponseEntity<LinkedHashMap> forceAllocateAsset(AssetInfo asset) {
+    public ResponseEntity<LinkedHashMap> forceLeaseAsset(AssetInfo asset) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date chargingBeginTime = asset.getSharedAssetReqDetail().getChargingBeginTime();
         Date chargingEndTime = asset.getSharedAssetReqDetail().getChargingEndTime();

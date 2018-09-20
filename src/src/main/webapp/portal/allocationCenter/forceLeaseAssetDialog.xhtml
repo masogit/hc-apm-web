@@ -7,8 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="forceAllocateAssetDialog" widgetVar="forceAllocateAssetDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="强制调拨">
-            <h:form id="forceAllocateAssetDialogForm" >
+        <p:dialog id="forceLeaseAssetDialog" widgetVar="forceLeaseAssetDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="强制调拨">
+            <h:form id="forceLeaseAssetDialogForm" >
                 <h:panelGroup id="display1">
                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -44,8 +44,8 @@
                         </h:panelGroup>
                    </p:panelGrid>
                    <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{sharedAssetStockController.forceAllocateAsset()}" value="确认" update="sharedAssetListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'forceAllocateAssetDialog');"/>
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('forceAllocateAssetDialog').hide()"/>
+                        <p:commandButton validateClient="true" actionListener="#{sharedAssetStockController.forceLeaseAsset()}" value="确认" update="sharedAssetListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'forceLeaseAssetDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('forceLeaseAssetDialog').hide()"/>
                    </h:panelGroup>
                 </h:panelGroup>
             </h:form>
