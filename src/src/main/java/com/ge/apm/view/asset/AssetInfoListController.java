@@ -1,12 +1,15 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -14,6 +17,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -27,6 +31,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,9 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import javax.faces.event.AjaxBehaviorEvent;
-import org.primefaces.event.SelectEvent;
 
 @ManagedBean
 @ViewScoped
@@ -307,9 +309,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, exportFields);
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-        excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
+        template.exportAsset(assetList, sites, orgList, exportColumnFields);
+
+        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
     public void batchProcessToBeTerminated() {
