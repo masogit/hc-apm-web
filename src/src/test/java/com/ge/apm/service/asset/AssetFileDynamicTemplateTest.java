@@ -51,16 +51,11 @@ public class AssetFileDynamicTemplateTest {
 
     @Before
     public void setup() {
-//        UserAccount userAccount = userAccountDao.getByLoginName("tq-clinicals");
-//        UserContextService.setLoginUser(userAccount);
+
     }
 
     @Test
     public void writeMetaData() throws IOException {
-
-
-//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         template.buildMetaData();
 
@@ -78,15 +73,10 @@ public class AssetFileDynamicTemplateTest {
         List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
                 exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-//        List<String> localizedFields = exportFields.stream().map((item) -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
-
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
-//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         template.buildMetaData();
 

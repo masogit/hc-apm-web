@@ -126,50 +126,6 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     }
 
-    public void printNames() {
-        for (int i=0; i<workBook.getNumberOfNames(); i++) {
-            Name name = workBook.getNameAt(i);
-            logger.info("{}, {}", name.getNameName(), name.getRefersToFormula());
-            AreaReference area = new AreaReference(name.getRefersToFormula(), SpreadsheetVersion.EXCEL2007);
-            CellReference crList[] = area.getAllReferencedCells();
-            for (CellReference cr : crList) {
-                logger.info(cr.formatAsString());
-
-            }
-        }
-    }
-
-    public void formatAsTable() {
-
-        XSSFTable my_table = workBook.getXSSFWorkbook().getSheet(sheetName).createTable();
-        CTTable cttable = my_table.getCTTable();
-//        AutoFilter autoFilter = new XSSFAutoFilter();
-//        cttable.setAutoFilter(autoFilter);
-        CTTableStyleInfo tableStyleInfo = cttable.addNewTableStyleInfo();
-        tableStyleInfo.setName("TableStyleMedium9");
-        tableStyleInfo.setShowColumnStripes(false);
-        tableStyleInfo.setShowRowStripes(true);
-
-        AreaReference areaReference = new AreaReference(
-                new CellReference(6, 0),
-                new CellReference(10, 0),
-                SpreadsheetVersion.EXCEL97);
-
-        cttable.setRef(areaReference.formatAsString());
-        cttable.setDisplayName("Asset List");
-        cttable.setName("Asset List");
-        cttable.setId(1L);
-
-        CTTableColumns columns = cttable.addNewTableColumns();
-        columns.setCount(1);
-
-        CTTableColumn column = columns.addNewTableColumn();
-        column.setName("Column 1");
-        column.setId(1);
-
-
-    }
-
     public InputStream getStream() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);

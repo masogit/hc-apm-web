@@ -11,16 +11,20 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -295,7 +299,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
+
         String[] columnTitles = exportFields.toArray(new String[] {});
+
+        //create asset table
+        createAssetTable(columnTitles);
+
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
@@ -360,6 +369,41 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         dataValidation.setEmptyCellAllowed(false);
 
         assetSheet.addValidationData(dataValidation);
+
+    }
+
+    public void createAssetTable(String[] columnTitles) {
+
+        XSSFTable assetSheetTable = assetSheet.getWorkbook().getXSSFWorkbook().getSheet(assetSheet.getSheetName()).createTable();
+        CTTable cttable = assetSheetTable.getCTTable();
+
+        AreaReference areaReference = new AreaReference(
+                new CellReference(EXCEL_ASSET_HEADER_ROW - 1, 0),
+                new CellReference(EXCEL_ASSET_HEADER_ROW - 1 + MAX_FORMULA_ROWS, columnTitles.length - 1),
+                SpreadsheetVersion.EXCEL2007);
+
+        cttable.setDisplayName("Asset List");
+        cttable.setName("AssetList");
+        cttable.setId(1L);
+        cttable.setRef(areaReference.formatAsString());
+        cttable.setTotalsRowShown(false);
+
+        CTTableStyleInfo tableStyleInfo = cttable.addNewTableStyleInfo();
+        tableStyleInfo.setName("TableStyleMedium2");
+        tableStyleInfo.setShowColumnStripes(false);
+        tableStyleInfo.setShowRowStripes(true);
+
+        CTTableColumns columns = cttable.addNewTableColumns();
+        columns.setCount(columnTitles.length);
+
+        for (int i = 1; i <= columnTitles.length; i++) {
+            CTTableColumn column = columns.addNewTableColumn();
+            column.setId(i);
+            column.setName(columnTitles[i - 1]);
+
+        }
+
+
 
     }
 
