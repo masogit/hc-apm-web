@@ -785,6 +785,7 @@ public class ElectricSafetyData implements Serializable {
 		if(mapLabelAttributes==null){
 			mapLabelAttributes=new HashMap<String,String>();
 		}
+		//
 //		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
 //		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
 //		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
@@ -792,46 +793,47 @@ public class ElectricSafetyData implements Serializable {
 //		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
 //		mapLabelAttributes.put("originCheckDate", "测试仪日期");
 //		mapLabelAttributes.put("originCheckTime", "测试仪时间");
-		mapLabelAttributes.put("checkType", "检测类型");
-		mapLabelAttributes.put("type", "类别");
-		mapLabelAttributes.put("name", "名称");
-		mapLabelAttributes.put("standardName", "标准名称");
-		mapLabelAttributes.put("appGroupCount", "应用组数");
+		//
+//		mapLabelAttributes.put("checkType", "检测类型");
+//		mapLabelAttributes.put("type", "类别");
+//		mapLabelAttributes.put("name", "名称");
+//		mapLabelAttributes.put("standardName", "标准名称");
+//		mapLabelAttributes.put("appGroupCount", "应用组数");
 		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
-		mapLabelAttributes.put("protectGroundImpedanceRefVal", "保护接地阻抗参考值");
+//		mapLabelAttributes.put("protectGroundImpedanceRefVal", "保护接地阻抗参考值");
 		mapLabelAttributes.put("equipmentElectricLeakage", "等效设备漏电流");
-		mapLabelAttributes.put("equipmentElectricLeakageRefVal", "等效设备漏电流参考值");
+//		mapLabelAttributes.put("equipmentElectricLeakageRefVal", "等效设备漏电流参考值");
 		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流(应用部分加电)");
-		mapLabelAttributes.put("patientElectricLeakageRefVal_app", "患者漏电流(应用部分加电)参考值");
+//		mapLabelAttributes.put("patientElectricLeakageRefVal_app", "患者漏电流(应用部分加电)参考值");
 		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流(正常状态)");
-		mapLabelAttributes.put("groundElectricLeakageRefVal_normal", "对地漏电流(正常状态)参考值");
+//		mapLabelAttributes.put("groundElectricLeakageRefVal_normal", "对地漏电流(正常状态)参考值");
 		mapLabelAttributes.put("groundElectricLeakage_singleError", "对地漏电流(单一故障状态)");
-		mapLabelAttributes.put("groundElectricLeakageRefVal_singleError", "对地漏电流(单一故障状态)参考值");
+//		mapLabelAttributes.put("groundElectricLeakageRefVal_singleError", "对地漏电流(单一故障状态)参考值");
 		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流(正常状态)");
-		mapLabelAttributes.put("shellElectricLeakageRefVal_normal", "外壳漏电流(正常状态)参考值");
+//		mapLabelAttributes.put("shellElectricLeakageRefVal_normal", "外壳漏电流(正常状态)参考值");
 		mapLabelAttributes.put("shellElectricLeakage_singleError", "外壳漏电流(单一故障状态)");
-		mapLabelAttributes.put("shellElectricLeakageRefVal_singleError", "外壳漏电流(单一故障状态)参考值");
+//		mapLabelAttributes.put("shellElectricLeakageRefVal_singleError", "外壳漏电流(单一故障状态)参考值");
 		mapLabelAttributes.put("patientElectricLeakageAC_normal", "患者漏电流AC(正常状态)");
-		mapLabelAttributes.put("patientElectricLeakageRefValAC_normal", "患者漏电流AC(正常状态)参考值");
+//		mapLabelAttributes.put("patientElectricLeakageRefValAC_normal", "患者漏电流AC(正常状态)参考值");
 		mapLabelAttributes.put("shellElectricLeakageAC_singleError", "患者漏电流AC(单一故障状态)");
-		mapLabelAttributes.put("shellElectricLeakageRefValAC_singleError", "患者漏电流AC(单一故障状态)参考值");
+//		mapLabelAttributes.put("shellElectricLeakageRefValAC_singleError", "患者漏电流AC(单一故障状态)参考值");
 		mapLabelAttributes.put("patientElectricLeakageDC_normal", "患者漏电流DC(正常状态)");
-		mapLabelAttributes.put("patientElectricLeakageRefValDC_normal", "患者漏电流DC(正常状态)参考值");
+//		mapLabelAttributes.put("patientElectricLeakageRefValDC_normal", "患者漏电流DC(正常状态)参考值");
 		mapLabelAttributes.put("shellElectricLeakageDC_singleError", "患者漏电流DC(单一故障状态)");
-		mapLabelAttributes.put("shellElectricLeakageRefValDC_singleError", "患者漏电流DC(单一故障状态)参考值");
+//		mapLabelAttributes.put("shellElectricLeakageRefValDC_singleError", "患者漏电流DC(单一故障状态)参考值");
 		mapLabelAttributes.put("patientAssisElectricAC_normal", "患者辅助电流AC(正常状态)");
-		mapLabelAttributes.put("patientAssisElectricRefValAC_normal", "患者辅助电流AC(正常状态)参考值");
+//		mapLabelAttributes.put("patientAssisElectricRefValAC_normal", "患者辅助电流AC(正常状态)参考值");
 		mapLabelAttributes.put("patientAssisElectricAC_singleError", "患者辅助电流AC(单一故障状态)");
-		mapLabelAttributes.put("patientAssisElectricRefValAC_singleError", "患者辅助电流AC(单一故障状态)参考值");
+//		mapLabelAttributes.put("patientAssisElectricRefValAC_singleError", "患者辅助电流AC(单一故障状态)参考值");
 		mapLabelAttributes.put("patientAssisElectricDC_normal", "患者辅助电流DC(正常状态)");
-		mapLabelAttributes.put("patientAssisElectricRefValDC_normal", "患者辅助电流DC(正常状态)参考值");
+//		mapLabelAttributes.put("patientAssisElectricRefValDC_normal", "患者辅助电流DC(正常状态)参考值");
 		mapLabelAttributes.put("patientAssisElectricDC_singleError", "患者辅助电流DC(单一故障状态)");
-		mapLabelAttributes.put("patientAssisElectricRefValDC_singleError", "患者辅助电流DC(单一故障状态)参考值");
+//		mapLabelAttributes.put("patientAssisElectricRefValDC_singleError", "患者辅助电流DC(单一故障状态)参考值");
 		mapLabelAttributes.put("cityVoltage", "市电电压实际值");
-		mapLabelAttributes.put("cityVoltageRefVal", "市电电压参考值");
+//		mapLabelAttributes.put("cityVoltageRefVal", "市电电压参考值");
 //		mapLabelAttributes.put("originStorageDate", "存储器日期");
 //		mapLabelAttributes.put("originStorageTime", "存储器时间");
-		mapLabelAttributes.put("sequenceNum", "序号");
+//		mapLabelAttributes.put("sequenceNum", "序号");
 		return mapLabelAttributes;
 	}
 	
