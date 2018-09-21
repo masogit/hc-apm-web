@@ -101,12 +101,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (dynamicListSheet == null) {
             dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
         }
+        int index = workBook.getSheetIndex(dynamicListSheet);
+        workBook.setSheetHidden(index, true);
 
         staticListSheet = workBook.getSheet(SHEET_STATIC_LIST_NAME);
         if (staticListSheet == null) {
             staticListSheet = workBook.createSheet(SHEET_STATIC_LIST_NAME);
         }
-
+        index = workBook.getSheetIndex(staticListSheet);
+        workBook.setSheetHidden(index, true);
     }
 
     public void writeMetaData(List<String> exportFields) {
