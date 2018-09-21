@@ -39,6 +39,9 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     List<String> columnTitles;
 
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
+
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
         SXSSFSheet sheet = workBook.getSheet(sheetName);
         if (sheet == null) {
@@ -49,6 +52,14 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         this.sheetName = sheetName;
         this.sheet = sheet;
         this.columnTitles = columnTitles;
+
+        CreationHelper createHelper = workBook.getCreationHelper();
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/dd/yyyy"));
+
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
     }
 
     public void writeRowData(int row, Map<String, Object> data) {
@@ -103,24 +114,27 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         if (data == null) {
             return;
         }
+
         if (data instanceof String) {
             cell.setCellType(CellType.STRING);
             cell.setCellValue((String) data);
-        }
-        if (data instanceof Date) {
-            cell.setCellType(CellType.NUMERIC);
-//            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
 
+        } else if (data instanceof Date) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
             cell.setCellValue((Date) data);
-        }
-        if (data instanceof Integer) {
+
+        } else if (data instanceof Integer) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Integer) data);
-        }
-        if (data instanceof Double) {
-            cell.setCellType(CellType.NUMERIC);
-//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
+        } else if (data instanceof Long) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellValue((Long) data);
+
+        } else if (data instanceof Double) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
             cell.setCellValue((Double) data);
         }
 
