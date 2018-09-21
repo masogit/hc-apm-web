@@ -98,15 +98,17 @@
                         </p:column>
 
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}"/>
+                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
                         </p:column>
 
                         <p:column headerText="#{msg.Actions}" width="16%">
                             <p:commandButton value="强制调拨"
                                              rendered="#{asset.canBorrow}"
-                                             update="forceAllocateAssetDialog"
-                                             actionListener="#{sharedAssetStockController.prepareForceAllocateAsset(asset)}"
-                                             oncomplete="openForceAllocateDialog(xhr, status, args)"/>
+                                             update="forceLeaseAssetDialog"
+                                             actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
+                                             oncomplete="openForceLeaseDialog(xhr, status, args)"/>
                             <p:commandButton value="强制归还"
                                              rendered="#{asset.canReturn}"
                                              update="forceReturnAssetDialog"
@@ -125,7 +127,7 @@
             </div>
         </div>
 
-        <ui:include src="forceAllocateAssetDialog.xhtml"/>
+        <ui:include src="forceLeaseAssetDialog.xhtml"/>
         <ui:include src="forceReturnAssetDialog.xhtml"/>
 
         <script>
@@ -147,12 +149,12 @@
                 newWin.location.href = '../asset/info/' + args.url;
             }
 
-            function openForceAllocateDialog(xhr, status, args) {
-                console.log("openForceAllocateDialog: " + args.validationFailed);
+            function openForceLeaseDialog(xhr, status, args) {
+                console.log("openForceLeaseDialog: " + args.validationFailed);
                 if (args.validationFailed) {
                     console.log(args.validationFailed);
                 } else {
-                    PF('forceAllocateAssetDialog').show()
+                    PF('forceLeaseAssetDialog').show()
                 }
             }
 
