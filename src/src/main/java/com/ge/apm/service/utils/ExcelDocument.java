@@ -8,7 +8,6 @@ package com.ge.apm.service.utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -305,7 +304,7 @@ public class ExcelDocument implements AutoCloseable{
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:
-                return HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
+                return DateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
             case STRING:
                 return cell.getStringCellValue();
             case FORMULA:
@@ -323,7 +322,7 @@ public class ExcelDocument implements AutoCloseable{
             case BOOLEAN:
                 return null;
             case NUMERIC:
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     return null;
                 }
 
