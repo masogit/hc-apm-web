@@ -53,7 +53,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             "SystemID/厂商报修ID", "2010国家编码", "资产编号", "条码", "IT系统编号", "采购价格", "最终残值", "折旧算法", "使用年限",
             "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期",
             "维修商", "维修商电话", "二维码", "安装位置编码", "安装位置", "使用责任人", "备注",
-            "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "是否急救设备", "是否进口设备", "当前状态",
+            "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "核算类别", "是否急救设备", "是否进口设备", "当前状态",
             "是否PM", "是否盘点", "资产价值分类", "UUID"
     };
 
@@ -381,6 +381,30 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+    public void writeSampleAsset(List<String> exportFields) {
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
+
+        //write sum formula
+        writeSummaryFormula(writer, exportFields);
+
+        String[] columnTitles = exportFields.toArray(new String[] {});
+
+        //create asset table
+//        createAssetTable(columnTitles);
+
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+
+        int startRow = EXCEL_ASSET_DATA_ROW;
+        writer.writeRowData(startRow, buildSampleAsset());
+
+        workBook.setForceFormulaRecalculation(true);
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
+
+        assetSheet.setSelected(true);
+
+    }
+
     public void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
@@ -402,6 +426,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         writeMetaData(exportFields);
         writeClinicalDeptList(clinicalDeptList);
         writeAsset(assetList, sites, exportFields);
+    }
+
+    public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
+        writeMetaData(exportFields);
+        writeClinicalDeptList(clinicalDeptList);
+        writeSampleAsset(exportFields);
     }
 
     public InputStream getInputStream() throws IOException {
@@ -471,6 +501,45 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
 
+
+    }
+
+    public Map<String, Object> buildSampleAsset() {
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("设备名称", "XXXXXX");
+        map.put("设备编号", "SBBH0001");
+        map.put("设备别名", "XXXX");
+        map.put("维修负责人", "张三");
+        map.put("维修负责人2", "李四");
+        map.put("所属科室", "放射科");
+        map.put("制造商", "XXX医疗器械有限公司");
+        map.put("供应商", "XX医疗设备有限公司");
+
+        map.put("医疗器械分类", "6801基础外科手术器械");
+        map.put("医疗器械子分类", "医用缝合针(不带线)");
+
+        map.put("设备分类", "其他类");
+
+        map.put("设备型号", "XXX");
+        map.put("制造商序列号", "123456");
+
+        map.put("采购价格", 0);
+        map.put("最终残值", 0);
+        map.put("使用年限", null);
+        map.put("折旧算法", "平均年限");
+
+        map.put("用途分类", "治疗类");
+        map.put("资金来源", "医疗");
+        map.put("风险等级", "二级");
+        map.put("计量等级", "B类计量设备");
+        map.put("计量项目类别", "磁共振类");
+        map.put("是否急救设备", "急救设备");
+        map.put("是否进口设备", "进口");
+        map.put("当前状态", "正常");
+
+        return map;
 
     }
 
