@@ -58,44 +58,8 @@ public class AssetFileDynamicTemplateTest {
         template.writeToFile(new File("./temp.xlsx"));
     }
 
-//    @Ignore
     @Test
-    public void writeAsset() throws IOException {
-
-        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-
-        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-
-        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
-        List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
-        template.writeMetaData(exportColumnFields);
-
-        template.writeClinicalDeptList(clinicalDeptList);
-
-        template.writeAsset(assetList, sites, exportColumnFields);
-
-        template.writeToFile(new File("./temp.xlsx"));
-    }
-
-
-    @Test
-    public void writeClinicalDeptList() throws IOException {
-
-        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-
-        template.writeClinicalDeptList(clinicalDeptList);
-
-        template.writeToFile(new File("./temp.xlsx"));
-    }
-
-    @Test
-    public void exportAll() throws IOException {
+    public void exportAsset() throws IOException {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
@@ -111,6 +75,23 @@ public class AssetFileDynamicTemplateTest {
 
         template.exportAsset(assetList, sites, clinicalDeptList, exportColumnFields);
 
-        template.writeToFile(new File("./temp.xlsx"));
+        template.writeToFile(new File("./asset_list.xlsx"));
+    }
+
+    @Test
+    public void exportSampleAsset() throws IOException {
+
+        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        template.exportSampleAsset(clinicalDeptList, exportColumnFields);
+
+        template.writeToFile(new File("./asset_sample.xlsx"));
     }
 }

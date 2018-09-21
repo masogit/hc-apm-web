@@ -84,7 +84,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
 
-        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
+        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/APM_Asset_Dynamic_Template.xlsx");
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         assetSheet = workBook.getSheet(SHEET_ASSET);
@@ -525,8 +525,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put("设备型号", "XXX");
         map.put("制造商序列号", "123456");
 
-        map.put("采购价格", 0);
-        map.put("最终残值", 0);
+        map.put("采购价格", 100.0);
+        map.put("最终残值", 0.0);
         map.put("使用年限", null);
         map.put("折旧算法", "平均年限");
 
