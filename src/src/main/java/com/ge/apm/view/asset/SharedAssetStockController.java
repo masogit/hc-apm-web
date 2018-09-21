@@ -100,6 +100,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
         if(reqDetail == null) {
             reqDetail = new SharedAssetReqDetail();
+            reqDetail.setChargingBeginTime(new Date());//默认计费开始时间为系统当前时间
             SharedAssetRequest leaseRequest = new SharedAssetRequest();
             leaseRequest.setType("2");//默认请求类型:补登记
             reqDetail.setLeaseRequest(leaseRequest);
@@ -113,7 +114,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         SharedAssetRequest leaseRequest = sharedAssetStockService.findRequestById(asset.getSharedAssetReqDetail().getBorrowId());
         if(reqDetail.getReturnRequest() == null) {
             SharedAssetRequest returnRequest = new SharedAssetRequest();
-            if(leaseRequest.getType() == null) {
+            if(leaseRequest.getType() == null) {//默认请求类型和强制调拨类型相同
                 returnRequest.setType("2");//默认请求类型:补登记
             } else {
                 returnRequest.setType(leaseRequest.getType());
