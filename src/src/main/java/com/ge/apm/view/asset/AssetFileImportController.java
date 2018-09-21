@@ -8,9 +8,9 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.asset.AssetFileExportService;
-import com.ge.apm.service.asset.AssetFileImportService;
-import com.ge.apm.service.asset.AssetFileImportStreamingService;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
@@ -28,10 +28,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +53,7 @@ public class AssetFileImportController {
     private AssetFileExportService exportService;
 
     private AssetFileImportStreamingService streamingService;
+    private CustomConfigService ccService;
 
     private UaaService uaaService;
 
@@ -81,6 +82,7 @@ public class AssetFileImportController {
         streamingService = WebUtil.getBean(AssetFileImportStreamingService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
 
         initOrgTree();
 
@@ -146,26 +148,20 @@ public class AssetFileImportController {
     }
 
     public void exportAssetExcelTemplate() throws IOException {
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //field name using english
+        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        //field name using chinese
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-//        FacesContext fc = FacesContext.getCurrentInstance();
-//        ExternalContext ec = fc.getExternalContext();
-//
-////        ec.responseReset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
-//        ec.setResponseContentType("application/vnd.ms-excel"); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ExternalContext#getMimeType() for auto-detection based on filename.
-////        ec.setResponseContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
-//        ec.setResponseHeader("Content-Disposition", "attachment; filename=APM_Asset_Template.xlsx"); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
-//
-//        OutputStream output = ec.getResponseOutputStream();
+        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
-        ExcelDocument doc = exportService.exportAssetTemplate();
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
+        template.exportSampleAsset(orgList, exportColumnFields);
 
-//        IOUtils.copy(doc.getStream(), output);
-
-//        doc.writeToFile(new File("./APM_Asset_Template_1.xlsx"));
-
-        assetTemplateFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
-
-        doc.close();
+        assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
     public void downloadImportFailureData() {
