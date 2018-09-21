@@ -130,9 +130,9 @@ public class SharedAssetInfoUtils {
             DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
             String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
 
-            Double compenAmount = reqDetail.getCompensationAmount();
-            Double rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
-            if(compenAmount == null || compenAmount == 0)
+            BigDecimal compenAmount = reqDetail.getCompensationAmount();
+            BigDecimal rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
+            if(compenAmount == null || compenAmount.doubleValue() == 0d)
             {
             	info.put("赔偿费用", "/");
             	info.put("总计费用", rentFee);
@@ -140,7 +140,7 @@ public class SharedAssetInfoUtils {
             else
             {
             	info.put("赔偿费用", compenAmount);
-            	info.put("总计费用", rentFee + compenAmount);
+            	info.put("总计费用", rentFee.add(compenAmount));
             }
             
             info.put("归还时间", reqDetail.getChargingEndTime() == null ? null :
@@ -153,21 +153,21 @@ public class SharedAssetInfoUtils {
         }
     }
 
-    public static Double getPdfTotalAmount(SharedAssetReqDetail reqDetail, long minutes)
+    public static BigDecimal getPdfTotalAmount(SharedAssetReqDetail reqDetail, long minutes)
     {
-    	Double totalAmount = 0.0;
+    	BigDecimal totalAmount = new BigDecimal(0);
         //chgType: 1.按次， 2.按小时/自然时间（60分钟）,3. 按天 , 4. 自然时间
         //request.type: 1.维修, 2.补登记 , 3. NULL的时候正常计费
         if("1".equals(reqDetail.getReturnRequest().getType()))
         {
-            totalAmount = 0.0;
+            totalAmount = new BigDecimal(0);
         }
         else
         {
             //按自然时间计费时，若小于6小时，按6小时计算保底价
             if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
             {
-                totalAmount = 6 * reqDetail.getUnitPrice();
+                totalAmount = new BigDecimal(reqDetail.getUnitPrice()).multiply(new BigDecimal(6));
             }
             else
             {

@@ -98,7 +98,9 @@
                         </p:column>
 
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}"/>
+                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
                         </p:column>
 
                         <p:column headerText="#{msg.Actions}" width="16%">

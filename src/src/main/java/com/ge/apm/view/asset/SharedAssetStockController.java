@@ -59,11 +59,12 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     }
 
     protected void init() {
-        logger.info("Start to initialize component " + (sharedAssetStockService == null));
+        logger.info("Start to initialize component");
         sharedAssetStockService = WebUtil.getBean(SharedAssetStockService.class);
     }
 
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        logger.info("thread: {}, searchCriteria: {}", Thread.currentThread().getId(), this.searchCriteria);
         Wrapper ew = new EntityWrapper();
 
         sharedAssetStockService.buildDefaultFilters(ew);
