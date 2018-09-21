@@ -156,7 +156,7 @@ public class SharedAssetStockService {
         String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
         String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
         Boolean isIntact = reqDetail.getIntact();
-        Double compensationAmount = reqDetail.getCompensationAmount();
+        BigDecimal compensationAmount = reqDetail.getCompensationAmount();
         String reqComment = reqDetail.getReqComment();
         logger.info("assetDeptUID: {}, assetInfoUID: {}, chargingBeginTime: {}, chargingEndTime: {}, reqType: {}, intact: {}, compensationAmount: {}, reqComment: {}",
                         asset.getAssetDeptUID(), asset.getUid(), beginTimeStr, endTimeStr, asset.getSharedAssetReqDetail().getReturnRequest().getType(), isIntact.toString(), compensationAmount.toString(), reqComment);
@@ -182,7 +182,7 @@ public class SharedAssetStockService {
                 Tuple2<BigDecimal, String> chargingUnitAndRentTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
                 BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, reqDetail);
                 reqDetail.setRentalTime(chargingUnitAndRentTime._2);
-                reqDetail.setTotalAmount(fee.doubleValue());
+                reqDetail.setTotalAmount(fee);
             }
         }
     }
