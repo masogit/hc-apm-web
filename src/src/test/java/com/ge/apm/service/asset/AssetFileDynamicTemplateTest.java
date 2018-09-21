@@ -20,6 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,5 +94,33 @@ public class AssetFileDynamicTemplateTest {
         template.exportSampleAsset(clinicalDeptList, exportColumnFields);
 
         template.writeToFile(new File("./asset_sample.xlsx"));
+    }
+
+
+    @Test
+    public void exportLargeAmountOfAsset() throws IOException {
+
+        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<AssetInfo> bigList = new ArrayList<>(20000);
+        for (int i = 0; i < 20000; i++) {
+            double random = Math.random() * assetList.size();
+            int which = Double.valueOf(random).intValue();
+            bigList.add(assetList.get(which));
+        }
+
+        template.exportAsset(bigList, sites, clinicalDeptList, exportColumnFields);
+
+        template.writeToFile(new File("./asset__big_list.xlsx"));
     }
 }
