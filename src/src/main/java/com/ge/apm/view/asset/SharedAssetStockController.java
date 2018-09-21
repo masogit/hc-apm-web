@@ -59,11 +59,12 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     }
 
     protected void init() {
-        logger.info("Start to initialize component " + (sharedAssetStockService == null));
+        logger.info("Start to initialize component");
         sharedAssetStockService = WebUtil.getBean(SharedAssetStockService.class);
     }
 
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        logger.info("thread: {}, searchCriteria: {}", Thread.currentThread().getId(), this.searchCriteria);
         Wrapper ew = new EntityWrapper();
 
         sharedAssetStockService.buildDefaultFilters(ew);
@@ -73,8 +74,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         }
         ew.andNew().isNotNull("shared_asset_type");
         wrapSearchFilter(ew);
-        String sql = ew.originalSql();
-        logger.info("SQL: " + sql);
+        logger.info("SQL: " + ew.originalSql());
         lazyModel.setRowCount(sharedAssetStockService.getTotalRowCount(ew));
         ew.orderBy(sortField, isAscending);
         List<AssetInfo> assetList = sharedAssetStockService.loadAllSharedAssets(pageRequest, ew);
@@ -96,7 +96,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         return sharedAssetStockService.getAllAccessibleOrgDeptListNestedByOrgLevel();
     }
 
-    public void prepareForceAllocateAsset(AssetInfo asset) {
+    public void prepareForceLeaseAsset(AssetInfo asset) {
         SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
         if(reqDetail == null) {
             reqDetail = new SharedAssetReqDetail();
@@ -125,7 +125,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         super.setSelected(asset);
     }
 
-    public void forceAllocateAsset() {
+    public void forceLeaseAsset() {
         if(this.selected != null) {
             List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
             OrgInfo assetDept = deptList.stream().filter(item -> item.getName().equals(leaseDeptName))
@@ -134,9 +134,9 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             try {
                 if(assetDept != null) {
                     selected.setAssetDeptUID(assetDept.getUid());
-                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetStockService.forceAllocateAsset(selected);
+                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetStockService.forceLeaseAsset(selected);
                     LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
-                    logger.info("****** force allocate response ******");
+                    logger.info("****** force lease response ******");
                     rspBody.forEach((k, v) -> logger.info("key: " + k + ", value: " + v));
                 }
             } catch (Exception ex) {
@@ -163,7 +163,6 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     public void onLeaseDeptNameChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             leaseDeptName = (String) ((SelectEvent) event).getObject();
-            return;
         } else {
             List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
             if (!Strings.isNullOrEmpty(leaseDeptName) && !deptList.stream().anyMatch(item -> leaseDeptName.equals(item.getName()))) {
