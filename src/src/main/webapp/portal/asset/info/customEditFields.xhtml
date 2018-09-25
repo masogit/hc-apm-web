@@ -118,6 +118,31 @@
                          requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerId')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerId'].required? '*':''}</span></label>
+            <p:autoComplete id="pmOwnerId" value="#{assetInfoEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerId')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerId'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerIdChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerIdChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required? '*':''}</span></label>
+            <p:inputText id="pmOwnerTel" value="#{assetInfoEditController.selected.pmOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required}"
+                         requiredMessage="#{msg.pmOwnerTel} #{msg.ValidationRequire}" readonly="true" class="pmOwnerIdChange"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'siteUID')}" >
         <h:panelGroup>
             <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
