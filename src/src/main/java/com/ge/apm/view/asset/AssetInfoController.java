@@ -2096,7 +2096,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
 			String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
 			Boolean isIntact = reqDetail.getIntact();
-			Double compensationAmount = reqDetail.getCompensationAmount();
+			BigDecimal compensationAmount = reqDetail.getCompensationAmount();
 			String reqComment = reqDetail.getReqComment();
 			try {
 			    if(reqDetail.getClinicalDeptUid() != null) {
@@ -2204,7 +2204,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         sharedAssetReqDetail.setRentalTime(totalTime);
 
         BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetReqDetail);
-        sharedAssetReqDetail.setTotalAmount(totalAmount.doubleValue());
+        sharedAssetReqDetail.setTotalAmount(totalAmount);
         return sharedAssetReqDetail;
     }
 
