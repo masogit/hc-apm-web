@@ -32,6 +32,8 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import webapp.framework.web.WebUtil;
 
+import lombok.Getter;
+import lombok.Setter;
 /**
  *
  * @author 212579464
@@ -44,16 +46,25 @@ public class CustomConfigController {
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
 
+    @Getter
     private OrgInfo selectSite;
+    @Getter @Setter
     private CustomConfigObject customConfigObject;
+    @Getter @Setter
     private Map<String, Boolean> selectedAddFields;
+    @Getter @Setter
     private CustomConfigAssetField currentEditField;
+    @Getter
     private CustomConfig customConfig;
+    @Getter
     private LinkedHashMap<String, String> allFields;
+    @Getter
     private Map<String, String> configRoles;
+    @Getter 
     private List<String> addFieldsList;
+    @Getter
     private String addFieldsType;
-
+    @Getter
     private Map<String, String> configInfo = new HashMap();
 
     @PostConstruct
@@ -99,9 +110,6 @@ public class CustomConfigController {
                         .filter(item -> !customConfigObject.getAssetsMobilepageHeaderFields().contains(item)).collect(Collectors.toList());
                 break;
             case "MobileBasicFields":
-//                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-//                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
-//                break;
             case "MobileDetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)
@@ -395,7 +403,6 @@ public class CustomConfigController {
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
-//            customConfigObject.getAssetsListPageFields().remove(key);
         }
     }
 
@@ -407,57 +414,18 @@ public class CustomConfigController {
         return new ArrayList(configRoles.keySet());
     }
 
-    //getter and setter
-    public OrgInfo getSelectSite() {
-        return selectSite;
+    //for 10.1 update
+    public void updateCustomFieldForArrivalRequired(){
+       com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
+       List<CustomConfig> allConfigList = customConfigDao.find();
+       
+       allConfigList.stream().forEach(item->{
+           CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
+           configObject.getAssetFields().entrySet().stream().filter(fielditem-> fielditem.getValue().isRequired()).forEach(fielditem-> {fielditem.getValue().setArrivalRequired(true);});
+           item.setConfig(JSONObject.toJSONString(configObject));
+       });
+       customConfigDao.save(allConfigList);
+       WebUtil.addSuccessMessage("updated all config:"+ allConfigList.size());
     }
-
-    public CustomConfigAssetField getCurrentEditField() {
-        return currentEditField;
-    }
-
-    public void setCurrentEditField(CustomConfigAssetField currentEditField) {
-        this.currentEditField = currentEditField;
-    }
-
-    public Map<String, Boolean> getSelectedAddFields() {
-        return selectedAddFields;
-    }
-
-    public void setSelectedAddFields(Map<String, Boolean> selectedAddFields) {
-        this.selectedAddFields = selectedAddFields;
-    }
-
-    public CustomConfigObject getCustomConfigObject() {
-        return customConfigObject;
-    }
-
-    public void setCustomConfigObject(CustomConfigObject customConfigObject) {
-        this.customConfigObject = customConfigObject;
-    }
-
-    public LinkedHashMap<String, String> getAllFields() {
-        return allFields;
-    }
-
-    public Map<String, String> getConfigRoles() {
-        return configRoles;
-    }
-
-    public List<String> getAddFieldsList() {
-        return addFieldsList;
-    }
-
-    public String getAddFieldsType() {
-        return addFieldsType;
-    }
-
-    public Map<String, String> getConfigInfo() {
-        return configInfo;
-    }
-
-    public CustomConfig getCustomConfig() {
-        return customConfig;
-    }
-
+    
 }

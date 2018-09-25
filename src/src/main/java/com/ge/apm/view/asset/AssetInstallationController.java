@@ -38,11 +38,13 @@ import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
@@ -76,6 +78,7 @@ public class AssetInstallationController {
     private QrCodeService qrCodeService;
     private AssetInfoMgrService assetMgrService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    private CustomConfigService ccService;
 
     private List<V2_BlobObject> attachList;
 
@@ -129,6 +132,9 @@ public class AssetInstallationController {
     private AssetInfo parentAssetInfo;
     
     private String oldQrCode;
+    
+    @Getter
+    private CustomConfigObject customConfig;
 
     @PostConstruct
     protected void init() {
@@ -143,6 +149,8 @@ public class AssetInstallationController {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
+        
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
@@ -157,6 +165,7 @@ public class AssetInstallationController {
             arrivalListItem.setInstallDate(new Date());
         }
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
+        customConfig = ccService.getCurrentCustomConfig(arrivalListItem.getArrivalList().getSiteUID());
         initOwner();
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());

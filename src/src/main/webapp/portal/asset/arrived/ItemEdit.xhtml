@@ -181,151 +181,204 @@
                                     <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
                                 </p:autoComplete>
                             </h:panelGroup>
-                            <h:panelGroup id="parentAssetList">
-                                <label class="label">#{msg.parentAsset}</label>
-                                <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" 
-                                completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
-                                <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <p:spacer />
-
-
-                            <h:panelGroup>
-                                <label class="label">#{msg.aliasName}</label>
-                                <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}"/>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <label class="label">#{msg.serialNum}*</label>
-                                <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="false" requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.departNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" >
-                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)" />
-                                </p:inputText>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.financingNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
-                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
-                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
-                                </p:inputText>
-                                <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
-                                                 update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
-                            </h:panelGroup>
-                            <h:panelGroup id="qrCode" class="financingNum">
-                                <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}">
-                                    <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />
-                                </p:inputText>
-                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
-                                <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.systemId}</label>
-                                <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.barcode}</label>
-                                <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.modalityId}</label>
-                                <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.manufactDate}</label>
-                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.manufactDate}" 
-                                            maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.warrantyDate}</label>
-                                <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.InstallDate}</label>
-                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName}</label>
-                                <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                    <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
-                                    <p:column>
-                                        <h:outputText value="#{t.name}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <h:outputText value="#{t.telephone}"/>
-                                    </p:column>
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName2}</label>
-                                <p:autoComplete id="assetOwnerName2" value="#{assetInstallationController.owner2}" converter="userAccountConverter" dropdown="true" forceSelection="true"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                    <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName2Change}" process="@this"/>
-                                    <p:column>
-                                        <h:outputText value="#{t.name}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <h:outputText value="#{t.telephone}"/>
-                                    </p:column>
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName3}</label>
-                                <p:autoComplete id="assetOwnerName3" value="#{assetInstallationController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                   	<p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName3Change}" process="@this"/>
-                                    <p:column>
-                                        <h:outputText value="#{t.name}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <h:outputText value="#{t.telephone}"/>
-                                    </p:column>
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.clinicalOwnerName}</label>
-                                <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
-                                    <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
-                                    <p:column>
-                                        <h:outputText value="#{t.name}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <h:outputText value="#{t.telephone}"/>
-                                    </p:column>
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.locationCode}</label>
-                                <p:inputText id="locationCode" value="#{assetInstallationController.arrivalListItem.locationCode}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.locationName}</label>
-                                <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}"/>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.isAssetPMed}</label>
-                                <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isPm}">
-                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                                </p:selectOneRadio>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.isAssetChecked}</label>
-                                <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isChecked}">
-                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                                </p:selectOneRadio>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.comments}</label>
-                                <p:inputTextarea value="#{assetInstallationController.arrivalListItem.comments}"  maxlength="256"/>
-                            </h:panelGroup>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['parentAssetId']}">
+                                <h:panelGroup id="parentAssetList">
+                                    <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired? '*':''}</span></label>
+                                    <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}" 
+                                                    requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['aliasName']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.aliasName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['aliasName'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}" required="#{assetInstallationController.customConfig.assetFields['aliasName'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['serialNum']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.serialNum}<span style="color:red">#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['departNum']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.departNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired)? '*':''}</span></label>
+                                    <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.departNum} #{msg.ValidationRequire}">
+                                        <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['financingNum']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.financingNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired)? '*':''}</span></label>
+                                    <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired}" 
+                                                  requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}">
+                                        <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                                        <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
+                                    </p:inputText>
+                                    <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
+                                                     update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
+                                <h:panelGroup id="qrCode" class="financingNum">
+                                    <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
+                                    <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired}" 
+                                                  requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}">
+                                        <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />
+                                    </p:inputText>
+                                    <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                    <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['systemId']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.systemId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}" required="#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.systemId} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['barcode']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.barcode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}" required="#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.barcode} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['modalityId']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.modalityId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}" required="#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['manufactDate']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manufactDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['manufactDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.manufactDate}" required="#{assetInstallationController.customConfig.assetFields['manufactDate'].arrivalRequired}" 
+                                                requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['warrantyDate']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}" 
+                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['installDate']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.InstallDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired? '*':''}</span></label>
+                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" required="#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired}" 
+                                                requiredMessage="#{msg.installDate} #{msg.ValidationRequire}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.assetOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName'].arrivalRequired? '*':''}</span></label>
+                                    <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName'].arrivalRequired}" 
+                                                    requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
+                                        <p:column>
+                                            <h:outputText value="#{t.name}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{t.telephone}"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName2']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.assetOwnerName2}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName2'].arrivalRequired? '*':''}</span></label>
+                                    <p:autoComplete id="assetOwnerName2" value="#{assetInstallationController.owner2}" converter="userAccountConverter" dropdown="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName2'].arrivalRequired}" 
+                                                    requiredMessage="#{msg.assetOwnerName2} #{msg.ValidationRequire}" forceSelection="true" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName2Change}" process="@this"/>
+                                        <p:column>
+                                            <h:outputText value="#{t.name}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{t.telephone}"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName3']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.assetOwnerName3}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName3'].arrivalRequired? '*':''}</span></label>
+                                    <p:autoComplete id="assetOwnerName3" value="#{assetInstallationController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName3'].arrivalRequired}" 
+                                                    requiredMessage="#{msg.assetOwnerName3} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName3Change}" process="@this"/>
+                                        <p:column>
+                                            <h:outputText value="#{t.name}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{t.telephone}"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['clinicalOwnerName']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired? '*':''}</span></label>
+                                    <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
+                                                    requiredMessage="#{msg.clinicalOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
+                                        <p:column>
+                                            <h:outputText value="#{t.name}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{t.telephone}"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['locationCode']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationCode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationCode'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="locationCode" value="#{assetInstallationController.arrivalListItem.locationCode}" required="#{assetInstallationController.customConfig.assetFields['locationCode'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['locationName']}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}" required="#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired}" 
+                                                 requiredMessage="#{msg.locationName} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['isPm']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.isAssetPMed}<span style="color:red">#{assetInstallationController.customConfig.assetFields['isPm'].arrivalRequired? '*':''}</span></label>
+                                    <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isPm}" required="#{assetInstallationController.customConfig.assetFields['isPm'].arrivalRequired}" 
+                                                      requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['isChecked']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.isAssetChecked}<span style="color:red">#{assetInstallationController.customConfig.assetFields['isChecked'].arrivalRequired? '*':''}</span></label>
+                                    <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isChecked}" required="#{assetInstallationController.customConfig.assetFields['isChecked'].arrivalRequired}" 
+                                                      requiredMessage="#{msg.isAssetChecked} #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['comments']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.comments}<span style="color:red">#{assetInstallationController.customConfig.assetFields['comments'].arrivalRequired? '*':''}</span></label>
+                                    <p:inputTextarea value="#{assetInstallationController.arrivalListItem.comments}"  maxlength="256" required="#{assetInstallationController.customConfig.assetFields['comments'].arrivalRequired}" 
+                                                     requiredMessage="#{msg.comments} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -473,16 +526,16 @@
 
 
                     </p:fieldset>
-<!--                                                            <p:fieldset legend="相关报告" >
-                                                                <h:panelGroup id="addReport">
-                                                                    <p:selectOneMenu value="#{commonReportController.reportBaseUid}">
-                                                                        <p:ajax update="addReport" />
-                                                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                        <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
-                                                                    </p:selectOneMenu>
-                                                                    <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
-                                                                </h:panelGroup>-->
-<!--                                                                <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                    <!--                                                            <p:fieldset legend="相关报告" >
+                                                                                    <h:panelGroup id="addReport">
+                                                                                        <p:selectOneMenu value="#{commonReportController.reportBaseUid}">
+                                                                                            <p:ajax update="addReport" />
+                                                                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                                                            <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
+                                                                                        </p:selectOneMenu>
+                                                                                        <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
+                                                                                    </h:panelGroup>-->
+                    <!--                                                                <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                     #{commonReportController.getTemplateName(reportItem.schemaId)}
 
                     <h:outputText id="installDate" value="#{reportItem.createdDate}" >
@@ -492,7 +545,7 @@
                     <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                     <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                 </p:dataList>-->
-            <!--</p:fieldset>-->
+                    <!--</p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <!--                            <h:panelGroup>
