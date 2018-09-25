@@ -126,6 +126,7 @@ public class SharedAssetInfoUtils {
             }
 
             long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+            
 
             DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
             String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
