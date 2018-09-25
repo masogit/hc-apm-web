@@ -171,7 +171,7 @@ public class SharedAssetInfoUtils {
             }
             else
             {
-                totalAmount =  reqDetail.getTotalAmount();
+                totalAmount = reqDetail.getTotalAmount();
             }
         }
 
