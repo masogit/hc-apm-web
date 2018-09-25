@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
 
-    @Select("selectCountForSharedAssets")
+    @Select("getTotalRowCount")
     Integer getTotalRowCount(@Param("ew") Wrapper<AssetInfo> wrapper);
 
     @Select("loadSharedAssets")
