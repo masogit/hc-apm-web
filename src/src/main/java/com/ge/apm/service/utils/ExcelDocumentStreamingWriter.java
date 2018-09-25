@@ -39,6 +39,9 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     List<String> columnTitles;
 
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
+
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
         SXSSFSheet sheet = workBook.getSheet(sheetName);
         if (sheet == null) {
@@ -49,6 +52,14 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         this.sheetName = sheetName;
         this.sheet = sheet;
         this.columnTitles = columnTitles;
+
+        CreationHelper createHelper = workBook.getCreationHelper();
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/dd/yyyy"));
+
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
     }
 
     public void writeRowData(int row, Map<String, Object> data) {
@@ -103,70 +114,44 @@ public class ExcelDocumentStreamingWriter implements Closeable {
         if (data == null) {
             return;
         }
+
         if (data instanceof String) {
             cell.setCellType(CellType.STRING);
             cell.setCellValue((String) data);
-        }
-        if (data instanceof Date) {
-            cell.setCellType(CellType.NUMERIC);
-//            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
 
+        } else if (data instanceof Date) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
             cell.setCellValue((Date) data);
-        }
-        if (data instanceof Integer) {
+
+        } else if (data instanceof Integer) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Integer) data);
-        }
-        if (data instanceof Double) {
-            cell.setCellType(CellType.NUMERIC);
-//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
+        } else if (data instanceof Long) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellValue((Long) data);
+
+        } else if (data instanceof Double) {
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
             cell.setCellValue((Double) data);
         }
 
     }
 
-    public void printNames() {
-        for (int i=0; i<workBook.getNumberOfNames(); i++) {
-            Name name = workBook.getNameAt(i);
-            logger.info("{}, {}", name.getNameName(), name.getRefersToFormula());
-            AreaReference area = new AreaReference(name.getRefersToFormula(), SpreadsheetVersion.EXCEL2007);
-            CellReference crList[] = area.getAllReferencedCells();
-            for (CellReference cr : crList) {
-                logger.info(cr.formatAsString());
-
-            }
+    public void writeCellFormula(int rowNum, int colNum, String formula) {
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
         }
-    }
 
-    public void formatAsTable() {
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
 
-        XSSFTable my_table = workBook.getXSSFWorkbook().getSheet(sheetName).createTable();
-        CTTable cttable = my_table.getCTTable();
-//        AutoFilter autoFilter = new XSSFAutoFilter();
-//        cttable.setAutoFilter(autoFilter);
-        CTTableStyleInfo tableStyleInfo = cttable.addNewTableStyleInfo();
-        tableStyleInfo.setName("TableStyleMedium9");
-        tableStyleInfo.setShowColumnStripes(false);
-        tableStyleInfo.setShowRowStripes(true);
-
-        AreaReference areaReference = new AreaReference(
-                new CellReference(6, 0),
-                new CellReference(10, 0),
-                SpreadsheetVersion.EXCEL97);
-
-        cttable.setRef(areaReference.formatAsString());
-        cttable.setDisplayName("Asset List");
-        cttable.setName("Asset List");
-        cttable.setId(1L);
-
-        CTTableColumns columns = cttable.addNewTableColumns();
-        columns.setCount(1);
-
-        CTTableColumn column = columns.addNewTableColumn();
-        column.setName("Column 1");
-        column.setId(1);
-
+        cell.setCellFormula(formula);
 
     }
 

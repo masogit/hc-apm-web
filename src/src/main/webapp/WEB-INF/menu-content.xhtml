@@ -112,10 +112,10 @@
                 <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml"/>
                 <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml"/>
             </p:submenu>
-            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff') and userContextService.versionContains('护士站')}">
-                       <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}"/>
-                       <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}"/>
-                       <p:menuitem id="um703" value="日常维护报表" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}"/>
+            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('护士站')}">
+                       <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff')}"/>
+                       <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff')}"/>
+                       <p:menuitem id="um703" value="日常维护报表" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff')}"/>
             </p:submenu>
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book"
                        rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('知识文档')}">
