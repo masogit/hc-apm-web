@@ -21,7 +21,7 @@ public class CustomConfigConstant {
     private static HashMap<String, String> exportFields;
 
     static public List<String> getSysTemFields() {
-        return Arrays.asList("name", "assetGroup");
+        return Arrays.asList("name", "assetGroup","status");
     }
 
     static public List<String> getConfigRolesName() {
