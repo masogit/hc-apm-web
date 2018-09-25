@@ -251,7 +251,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitanance')}" >
         <h:panelGroup>
-            <label class="label">维修商<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</span></label>
+            <label class="label">#{msg.maitanance}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</span></label>
             <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
@@ -269,7 +269,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nationalStandardCode')}" >
         <h:panelGroup>
-            <label class="label">设备国标码<span style="color:red">#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required? '*':''}</span></label>
+            <label class="label">#{msg.nationalStandardCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required? '*':''}</span></label>
             <p:autoComplete id="gbname" value="#{assetInfoEditController.gbCodeName}" completeMethod="#{assetInfoEditController.completeGbName}" required="#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required}" 
                          requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('nationalStandardCode')}" class="financingNumChange">
                 <p:ajax process="@this" update="" listener="#{assetInfoEditController.updateFinancingNumByNationalStandardCode()}"/>
