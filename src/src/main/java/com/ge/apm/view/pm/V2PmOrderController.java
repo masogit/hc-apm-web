@@ -709,11 +709,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
-            approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+            getNeedApprovalDetails().stream().filter(item -> !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+//            approvedDetails.stream().filter(item->item.getId().equals(id)).findFirst().get().setApproved(selectedMap.get(id));
         }
     }
+
 
     public void removeAttachmentByIdForRP(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -1293,7 +1295,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void approvePMorder() {
         if (selectedPmOrder != null) { //selectedMapy有问题
 
-            if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+            if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
+                    (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
                 WebUtil.addErrorMessage("审核不通过原因必须填写");
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;

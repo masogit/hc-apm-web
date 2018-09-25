@@ -79,8 +79,8 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="单价" sortBy="#{asset_unit_price}">
-                            <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
+                        <p:column headerText="单价" sortBy="#{req_unit_price}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                         </p:column>
 
                         <p:column headerText="计价方式" sortBy="#{charging_type}" filterBy="#{asset.charging_type}" filterMatchMode="EQ">
@@ -98,20 +98,25 @@
                         </p:column>
 
                         <p:column headerText="当前费用">
-                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}"/>
+                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
                         </p:column>
 
                         <p:column headerText="#{msg.Actions}" width="16%">
                             <p:commandButton value="强制调拨"
                                              rendered="#{asset.canBorrow}"
-                                             update="forceAllocateAssetDialog"
-                                             actionListener="#{sharedAssetStockController.prepareForceAllocateAsset(asset)}"
-                                             oncomplete="openForceAllocateDialog(xhr, status, args)"/>
+                                             update="forceLeaseAssetDialog"
+                                             actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
+                                             oncomplete="openForceLeaseDialog(xhr, status, args)"/>
                             <p:commandButton value="强制归还"
                                              rendered="#{asset.canReturn}"
                                              update="forceReturnAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
                                              oncomplete="openForceReturnDialog(xhr, status, args)"/>
+                            <p:commandButton value="打印" ajax="false" actionListener="#{assetInfoController.generateVoucher(item)}"  rendered="#{assetInfoController.validate301()}" >
+                                <p:fileDownload value="#{assetInfoController.exportPdf}" />
+                            </p:commandButton>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -125,7 +130,7 @@
             </div>
         </div>
 
-        <ui:include src="forceAllocateAssetDialog.xhtml"/>
+        <ui:include src="forceLeaseAssetDialog.xhtml"/>
         <ui:include src="forceReturnAssetDialog.xhtml"/>
 
         <script>
@@ -147,12 +152,12 @@
                 newWin.location.href = '../asset/info/' + args.url;
             }
 
-            function openForceAllocateDialog(xhr, status, args) {
-                console.log("openForceAllocateDialog: " + args.validationFailed);
+            function openForceLeaseDialog(xhr, status, args) {
+                console.log("openForceLeaseDialog: " + args.validationFailed);
                 if (args.validationFailed) {
                     console.log(args.validationFailed);
                 } else {
-                    PF('forceAllocateAssetDialog').show()
+                    PF('forceLeaseAssetDialog').show()
                 }
             }
 

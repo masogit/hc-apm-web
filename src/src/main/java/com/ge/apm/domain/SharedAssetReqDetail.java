@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -145,7 +146,7 @@ public class SharedAssetReqDetail implements Serializable{
     private String rentalTime;
     
     @Transient
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "uid", unique = true, insertable = false, updatable = false)
@@ -163,7 +164,7 @@ public class SharedAssetReqDetail implements Serializable{
     private Boolean intact = Boolean.TRUE;
 
     @Column(name = "compensation_amount", columnDefinition = "decimal(11,2)")
-    private Double compensationAmount;
+    private BigDecimal compensationAmount;
 
     @Column(name = "req_comment", columnDefinition = "VARCHAR(256)")
     private String reqComment;
@@ -626,11 +627,11 @@ public class SharedAssetReqDetail implements Serializable{
 		this.rentalTime = rentalTime;
 	}
 
-	public Double getTotalAmount() {
+	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
 
-	public void setTotalAmount(Double totalAmount) {
+	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 
@@ -666,11 +667,11 @@ public class SharedAssetReqDetail implements Serializable{
         this.intact = intact;
     }
 
-    public Double getCompensationAmount() {
+    public BigDecimal getCompensationAmount() {
         return compensationAmount;
     }
 
-    public void setCompensationAmount(Double compensationAmount) {
+    public void setCompensationAmount(BigDecimal compensationAmount) {
         this.compensationAmount = compensationAmount;
     }
 
