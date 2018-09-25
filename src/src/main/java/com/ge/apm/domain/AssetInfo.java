@@ -492,6 +492,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "pm_owner_id")
     private Integer pmOwnerId;//保养负责人
 
+    @Column(name = "pm_owner_name")
+    private String pmOwnerName;
+
+    @Column(name = "pm_owner_tel")
+    private String pmOwnerTel;
     @Transient
     private int lineNum;
 
@@ -1601,6 +1606,22 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setPmOwnerId(Integer pmOwnerId) {
         this.pmOwnerId = pmOwnerId;
+    }
+
+    public String getPmOwnerName() {
+        return pmOwnerName;
+    }
+
+    public void setPmOwnerName(String pmOwnerName) {
+        this.pmOwnerName = pmOwnerName;
+    }
+
+    public String getPmOwnerTel() {
+        return pmOwnerTel;
+    }
+
+    public void setPmOwnerTel(String pmOwnerTel) {
+        this.pmOwnerTel = pmOwnerTel;
     }
 
     @Override

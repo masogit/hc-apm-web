@@ -395,6 +395,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setLevel0(selected.getLevel0());
 				msgsub.setLevel1(selected.getLevel1());
 				msgsub.setLevel2(selected.getLevel2());
+				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
 				//如果紧急程度任选了一个 说明维修事件被选择了
 				if(selected.getLevel0() || selected.getLevel1() ||selected.getLevel2())
 					msgsub.setRepairHit(true);
@@ -403,10 +404,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setContractDueHit(selected.getContractDueHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setMeterHit(selected.getMeterHit());
-				msgsub.setTenantUID(currentUser.getTenantUID());
-				msgsub.setHospitalUID(currentUser.getHospitalUID());
-				msgsub.setInstitutionUID(currentUser.getInstitutionUID());
-				msgsub.setSiteUID(currentUser.getSiteUID());
+				msgsub.setTenantUID(assetInfo.getTenantUID());
+				msgsub.setHospitalUID(assetInfo.getHospitalUID());
+				msgsub.setInstitutionUID(assetInfo.getInstitutionUID());
+				msgsub.setSiteUID(assetInfo.getSiteUID());
 				msgsub.setCreatedBy(currentUser.getName());
 				msgsub.setCreatedDate(new Date());
 				msgsub.setLastModifiedBy(currentUser.getName());

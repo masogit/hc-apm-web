@@ -9,10 +9,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mock.ExistingAccountTestExecutionListener;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 @TestExecutionListeners(listeners = {ExistingAccountTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileDynamicTemplateTest {
 
-    @Autowired
+//    @Autowired
     AssetFileDynamicTemplate template;
 
     @Autowired
@@ -50,26 +47,20 @@ public class AssetFileDynamicTemplateTest {
     OrgInfoRepository orgInfoDao;
 
     @Before
-    public void setup() {
-//        UserAccount userAccount = userAccountDao.getByLoginName("tq-clinicals");
-//        UserContextService.setLoginUser(userAccount);
+    public void setup() throws IOException {
+        template = new AssetFileDynamicTemplate();
     }
 
     @Test
     public void writeMetaData() throws IOException {
 
-
-//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
-
-        template.buildMetaData();
+        template.loadMetaDataAndApplyNamedRange();
 
         template.writeToFile(new File("./temp.xlsx"));
     }
 
-//    @Ignore
     @Test
-    public void writeAsset() throws IOException {
+    public void exportAsset() throws IOException {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
@@ -78,22 +69,58 @@ public class AssetFileDynamicTemplateTest {
         List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
                 exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-//        List<String> localizedFields = exportFields.stream().map((item) -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        template.exportAsset(assetList, sites, clinicalDeptList, exportColumnFields);
+
+        template.writeToFile(new File("./asset_list.xlsx"));
+    }
+
+    @Test
+    public void exportSampleAsset() throws IOException {
+
+        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+
+        List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        template.exportSampleAsset(clinicalDeptList, exportColumnFields);
+
+        template.writeToFile(new File("./asset_sample.xlsx"));
+    }
+
+
+    @Test
+    public void exportLargeAmountOfAsset() throws IOException {
+
+        CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-//        InputStream inputStream = AssetFileDynamicTemplateTest.class.getClassLoader().getResourceAsStream("asset/template/APM_Asset_Dynamic_Template.xlsx");
-//        SXSSFWorkbook workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+        List<AssetInfo> bigList = new ArrayList<>(20000);
+        for (int i = 0; i < 20000; i++) {
+            double random = Math.random() * assetList.size();
+            int which = Double.valueOf(random).intValue();
+            bigList.add(assetList.get(which));
+        }
 
-        template.buildMetaData();
+        template.exportAsset(bigList, sites, clinicalDeptList, exportColumnFields);
 
-        template.applyFormula(exportColumnFields);
-
-        template.writeAsset(assetList, sites, clinicalDeptList, exportColumnFields);
-
-        template.writeToFile(new File("./temp.xlsx"));
+        template.writeToFile(new File("./asset__big_list.xlsx"));
     }
 }
