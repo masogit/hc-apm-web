@@ -114,9 +114,7 @@
                                              update="forceReturnAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
                                              oncomplete="openForceReturnDialog(xhr, status, args)"/>
-                            <p:commandButton value="打印" ajax="false" actionListener="#{assetInfoController.generateVoucher(item)}"  rendered="#{assetInfoController.validate301()}" >
-                                <p:fileDownload value="#{assetInfoController.exportPdf}" />
-                            </p:commandButton>
+                            
                         </p:column>
 
                         <f:facet name="{Toolbar}">
