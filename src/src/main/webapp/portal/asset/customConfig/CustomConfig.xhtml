@@ -168,11 +168,11 @@
                                     <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">是否建档必填</label>
+                                    <label class="label">设备基本信息是否必填</label>
                                     <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.required}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">是否到货安装必填</label>
+                                    <label class="label">到货安装是否必填</label>
                                     <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.arrivalRequired}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >

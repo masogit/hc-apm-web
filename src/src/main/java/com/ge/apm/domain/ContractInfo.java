@@ -7,14 +7,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
@@ -72,10 +65,14 @@ public class ContractInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    //合同金额
+    //结束月数
+    @Column(name = "end_months")
+    private Integer endMonths;
+
+    //合同总额
     @Basic(optional = true)
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
 
     //供应商
     @Column(name = "supplier_uid", columnDefinition = "CHAR(32)")
@@ -191,8 +188,10 @@ public class ContractInfo implements Serializable {
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;
-    
-    
+
+    //excel行数
+    @Transient
+    private int lineNum;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -266,11 +265,11 @@ public class ContractInfo implements Serializable {
         this.endDate = endDate;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -521,8 +520,22 @@ public class ContractInfo implements Serializable {
     public void setSignContractDate(Date signContractDate) {
         this.signContractDate = signContractDate;
     }
-    
-    
+
+    public Integer getEndMonths() {
+        return endMonths;
+    }
+
+    public void setEndMonths(Integer endMonths) {
+        this.endMonths = endMonths;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
+    }
 
     @Override
     public int hashCode() {
