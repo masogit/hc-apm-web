@@ -161,7 +161,7 @@ public class AssetFileImportController {
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
         template.exportSampleAsset(orgList, exportColumnFields);
 
-        assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+        assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
     }
 
     public void downloadImportFailureData() {

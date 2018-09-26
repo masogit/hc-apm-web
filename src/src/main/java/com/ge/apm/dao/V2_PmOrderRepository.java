@@ -44,4 +44,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 @Query(value="select pm.* from v2_pm_order pm where id in ?1 and pm.simplify =true",nativeQuery = true)
 	public  List<V2_PmOrder> checkSimplify(List<String> idList);
 
+	@Query(value="select pm.* from v2_pm_order pm where id in ?1",nativeQuery = true)
+	public  List<V2_PmOrder> getBatchPmOrderList(List<String> idList);
+
 }

@@ -126,27 +126,28 @@ public class SharedAssetInfoUtils {
             }
 
             long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+            
 
             DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
             String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
 
             BigDecimal compenAmount = reqDetail.getCompensationAmount();
             BigDecimal rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
-            if(compenAmount == null || compenAmount.doubleValue() == 0d)
+            if(compenAmount == null || compenAmount.doubleValue() == 0)
             {
             	info.put("赔偿费用", "/");
-            	info.put("总计费用", rentFee);
+            	info.put("总计费用", df.format(rentFee));
             }
             else
             {
-            	info.put("赔偿费用", compenAmount);
-            	info.put("总计费用", rentFee.add(compenAmount));
+            	info.put("赔偿费用", df.format(compenAmount));
+            	info.put("总计费用", df.format(rentFee.add(compenAmount)));
             }
             
             info.put("归还时间", reqDetail.getChargingEndTime() == null ? null :
                     getSplittedTime(reqDetail.getChargingEndTime(), "yyyy-MM-dd HH:mm:ss"));
             info.put("总租用期", rentalTimeInMinutes < 360 ? 0.25 : borrowDays);
-            info.put("租赁费用", rentFee);
+            info.put("租赁费用", df.format(rentFee));
             info.put("备注", reqDetail.getReqComment());
             //is_intact为true或者null时默认为完好
             info.put("还时状态", (reqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好"));
@@ -160,7 +161,7 @@ public class SharedAssetInfoUtils {
         //request.type: 1.维修, 2.补登记 , 3. NULL的时候正常计费
         if("1".equals(reqDetail.getReturnRequest().getType()))
         {
-            totalAmount = new BigDecimal(0);
+            totalAmount = BigDecimal.valueOf(0);
         }
         else
         {
@@ -168,7 +169,6 @@ public class SharedAssetInfoUtils {
             if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
             {
                 totalAmount = BigDecimal.valueOf(6).multiply(BigDecimal.valueOf(reqDetail.getUnitPrice()));
-
             }
             else
             {
@@ -207,7 +207,7 @@ public class SharedAssetInfoUtils {
         }
         if(chgType.equals("2") || chgType.equals("4"))
         {
-            Double pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24))).doubleValue();
+        	BigDecimal pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24)));
             uniPrice = pr.toString() + "元/天";
         }
         if(chgType.equals("3"))
