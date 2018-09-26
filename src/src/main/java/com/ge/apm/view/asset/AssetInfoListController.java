@@ -349,7 +349,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public List<AssetInfo> getExportList() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        return assetUids.isEmpty() ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUids);
+        List<AssetInfo> resultList;
+        if (assetUids.isEmpty()) {
+            resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
+        }else {
+            resultList = dao.findByUidIn(assetUids);
+        }
+
+        return resultList;
     }
 
     public String getParentAssetNameByAssetId(int assetId) {
