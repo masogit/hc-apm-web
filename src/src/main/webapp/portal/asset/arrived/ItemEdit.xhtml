@@ -227,7 +227,7 @@
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
                                 <h:panelGroup id="qrCode" class="financingNum">
-                                    <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
+                                    <label class="label">#{msg.qrCode}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired}" 
                                                   requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}">
                                         <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />
