@@ -23,6 +23,10 @@ public class CustomConfigConstant {
     static public List<String> getSysTemFields() {
         return Arrays.asList("name", "assetGroup","status");
     }
+    
+    static public List<String> getInstallRequiredFields() {
+        return Arrays.asList("serialNum");
+    }
 
     static public List<String> getConfigRolesName() {
         return Arrays.asList("HospitalHead", "AssetHead", "DeptHead", "AssetStaff", "ClinicalStaff");

@@ -43,6 +43,9 @@ public class CustomConfigObject {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
             });
+            CustomConfigConstant.getInstallRequiredFields().forEach(item -> {
+                assetFields.get(item).setArrivalRequired(true);
+            });
         }
         return assetFields;
     }
