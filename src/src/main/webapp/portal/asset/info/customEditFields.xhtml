@@ -145,7 +145,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'siteUID')}" >
         <h:panelGroup>
-            <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+            <label class="label">#{msg.hospitalId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['siteUID'].required? '*':''}</span></label>
             <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
             <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id or !assetInfoEditController.needEdit('siteUID')}"/>
             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
