@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -124,6 +126,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public void updateStandardCode(String name, String uid);
 
     public List<AssetInfo> findByUidIn(List<String> assetUids);
+
+    public List<AssetInfo> findByUidIn(List<String> assetUids, Sort sort);
 
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and (ai.assetOwnerId = ?2 or ai.assetOwnerId2 = ?2 or ai.assetOwnerId3 = ?2)")
     public List<AssetInfo> getByTenantUIDAndAssetOwner(String tenantUID, Integer assetOwnerId);
