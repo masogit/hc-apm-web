@@ -444,15 +444,17 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_PmOrder> pmList,Map<String, Boolean> hmPmOrder) {
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
-        pmList.stream().forEach(item->{
+        List<String> uidList = new ArrayList<String>();
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        batchPmOrderList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 hmPmOrder.put(item.getId(),false);
-                pmListTmp.add(item);
             }
         });
-        Double averageHours = totalManHours/pmListTmp.size();
+        Double averageHours = totalManHours/batchPmOrderList.size();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
-        pmListTmp.stream().forEach(item->{
+        batchPmOrderList.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setPmOrderId(item.getId());
             if(item.getSimplify()!=null && item.getSimplify()==true){
@@ -469,6 +471,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
+
         String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
