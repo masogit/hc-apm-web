@@ -374,6 +374,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
             writer.writeRowData(startRow, rowMap);
 
+            if (startRow % 1000 == 0) {
+                logger.info("export asset rows {}", startRow);
+            }
+
+
             ++startRow;
         }
 
@@ -426,8 +431,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
+        logger.info("export asset meta data");
         writeMetaData(exportFields);
+        logger.info("export clinical dept list");
         writeClinicalDeptList(clinicalDeptList);
+        logger.info("export asset list");
         writeAsset(assetList, sites, exportFields);
     }
 
