@@ -99,9 +99,6 @@
 
                         <p:ajax event="rowSelect" update="createAccessoryButton editAccessoryButton deleteAccessoryButton"/>
                         <!--<p:ajax event="cellEdit" listener="#{sharedAssetTypeController.save}"/>-->
-                        <p:column headerText="#{msg.id}">
-                            <h:outputText value="#{item.name.hashCode()}"/>
-                        </p:column>
                         <p:column headerText="#{msg.name}">
                             <h:outputText value="#{item.name}" />
                         </p:column>

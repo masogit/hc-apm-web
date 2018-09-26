@@ -7,17 +7,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -160,6 +150,10 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;
+
+    //excel行数
+    @Transient
+    private int lineNum;
 
     public String getId() {
         return id;
@@ -359,6 +353,14 @@ public class ContractInfoItem implements Serializable {
 
     public void setApplyDept(String applyDept) {
         this.applyDept = applyDept;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
     }
 
     @Override

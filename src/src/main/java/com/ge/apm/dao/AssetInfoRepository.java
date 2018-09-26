@@ -188,4 +188,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
+
+    public AssetInfo findByUidAndTenantUID(String uid, String tenantUID);
 }
