@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.utils;
 
+import com.monitorjbl.xlsx.impl.StreamingCell;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -17,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -332,6 +334,19 @@ public class ExcelDocument implements AutoCloseable{
                 if (cell instanceof HSSFCell) {
                     cell.setCellType(CellType.STRING);
                     return cell.getStringCellValue();
+                }
+                if (cell instanceof StreamingCell) {
+                    StreamingCell streamingCell = (StreamingCell) cell;
+                    String result = null;
+                    try {
+                        Field field = StreamingCell.class.getDeclaredField("rawContents");
+                        field.setAccessible(true);
+                        result = (String)field.get(streamingCell);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return result;
                 }
                 return null;
             case STRING:
