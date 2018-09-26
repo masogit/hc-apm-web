@@ -60,7 +60,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 break;
             }
             org.setShortName(orgName);
-//            org.setName(orgName);
+            org.setName(orgName);
             org.setLineNum(dataRow);
 
             Map<String, Object> map = new LinkedHashMap();
