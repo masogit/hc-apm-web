@@ -2,6 +2,8 @@ package com.ge.apm.service.sharedAsset;
 
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.dao.mapper.SharedAssetRequestMapper;
@@ -12,7 +14,9 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xpath.operations.Bool;
 import org.primefaces.model.TreeNode;
+import org.primefaces.ultima.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +25,9 @@ import org.springframework.stereotype.Service;
 
 import javax.faces.model.SelectItem;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +48,13 @@ public class SharedAssetStockService {
     private SharedAssetService sharedAssetService;
 
     @Autowired
+    private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
     private WorkflowConfigRepository wfCfigDao;
+
+    @Autowired
+    private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
 
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -171,6 +179,77 @@ public class SharedAssetStockService {
         return returnResponse;
     }
 
+    public void generateVoucher(AssetInfo asset) {
+        Map<String, String> voucherInfo = new HashMap<>();
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
+        voucherInfo.put("抬头", getVoucherTitle4Print(currentUser));
+        voucherInfo.put("经办人", currentUser.getName());
+        DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
+        if(asset.getClinicalDeptUID().equals(asset.getAssetDeptUID())) {
+            SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
+            if(sharedAssetReqDetail != null) {
+                sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, sharedAssetReqDetail);
+                if(StringUtils.isNotBlank(sharedAssetReqDetail.getReturnId())) {//借出状态
+                    voucherInfo.put("借据ID", "");
+                    voucherInfo.put("设备编号", asset.getDepartNum());
+                    voucherInfo.put("设备名称", asset.getName());
+                    voucherInfo.put("设备型号", asset.getFunctionType());
+                    voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
+                    voucherInfo.put("租金", df.format(SharedAssetInfoUtils.getPdfUnitPrice(sharedAssetReqDetail)));
+                    voucherInfo.put("状态", SharedAssetInfoUtils.getPdfStatus(asset));
+                    voucherInfo.put("借用时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
+                    voucherInfo.put("附属物品", SharedAssetInfoUtils.getPdfAccessories(asset));
+                    voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
+                } else {
+                    BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
+                    BigDecimal totalFee = sharedAssetReqDetail.getTotalAmount();
+                    if(compensationAmount == null || compensationAmount.doubleValue() == 0d) {
+                        voucherInfo.put("赔偿费用", "/");
+                        voucherInfo.put("总计费用", df.format(totalFee));
+                    } else {
+                        voucherInfo.put("赔偿费用", df.format(compensationAmount));
+                        voucherInfo.put("总计费用", df.format(totalFee.add(compensationAmount)));
+                    }
+                    voucherInfo.put("归还时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
+                    Long rentalTimeInMinutes = SharedAssetInfoUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
+                    String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
+                    voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
+                    voucherInfo.put("租赁费用", df.format(totalFee));
+                    voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
+                    voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
+                }
+            }
+        }
+    }
+
+    private String getVoucherTitle4Print(UserAccount currentUser) {
+        List<String> orgUids = wfCfigDao.findDeptForSharedAsset(currentUser.getSiteUID());
+        List<OrgInfo> allocDeptList = orgInfoRepository.findByUids(new HashSet<>(orgUids));
+        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+        return allocDept.getParentOrg().getName() + allocDept.getName();
+    }
+
+    private SharedAssetReqDetail findLatestReqDetailByAsset(AssetInfo asset) {
+        List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(asset.getUid());
+        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                                                            .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
+                                                                if(o1.getChargingEndTime() == null) {
+                                                                    return -1;
+                                                                } else if(o2.getChargingEndTime() == null) {
+                                                                    return 1;
+                                                                } else {
+                                                                    if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
+                                                                        return 1;
+                                                                    } else {
+                                                                        return -1;
+                                                                    }
+                                                                }
+                                                            })
+                                                            .findFirst()
+                                                            .orElse(null);
+        return sharedAssetReqDetail;
+    }
+
     private void calcRentTimeAndFee(List<AssetInfo> assets) {
         for(AssetInfo asset : assets) {
             SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
@@ -180,11 +259,19 @@ public class SharedAssetStockService {
                     reqDetail.setChargingType(asset.getSharedAssetType().getChargingType());
                 }
                 Tuple2<BigDecimal, String> chargingUnitAndRentTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
-                BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, reqDetail);
+                BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, asset.getSharedAssetType(), reqDetail);
                 reqDetail.setRentalTime(chargingUnitAndRentTime._2);
                 reqDetail.setTotalAmount(fee);
             }
         }
+    }
+
+    private SharedAssetReqDetail calcRentTimeAndFeeByReqDetail(AssetInfo asset, SharedAssetReqDetail reqDetail) {
+        Tuple2<BigDecimal, String> chargingUnitAndRentTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
+        BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, asset.getSharedAssetType(), reqDetail);
+        reqDetail.setRentalTime(chargingUnitAndRentTime._2);
+        reqDetail.setTotalAmount(fee);
+        return reqDetail;
     }
 
     private void traverse(TreeNode node, List<SelectItem> itemList) {
