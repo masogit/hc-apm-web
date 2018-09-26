@@ -452,6 +452,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 hmPmOrder.put(item.getId(),false);
             }
         });
+
         Double averageHours = totalManHours/batchPmOrderList.size();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
         batchPmOrderList.stream().forEach(item->{

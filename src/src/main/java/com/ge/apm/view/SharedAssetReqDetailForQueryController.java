@@ -46,6 +46,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
     WorkflowConfigRepository wfCfigDao = null;
+    SharedAssetTypeRepository sharedAssetTypeRepository = null;
     private UaaService uuaService;
 
     private Date filterBeginTime;
@@ -97,6 +98,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         sharedDao = WebUtil.getBean(SharedAssetRequestRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -267,7 +269,9 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if ("1".equals(request.getType())) {//no charging for asset maintain
             unit = new BigDecimal(0);
         }
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, reqDetail);
+        AssetInfo asset = asiDao.findByUid(reqDetail.getAssetInfoId());
+        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(asset.getSharedAssetTypeUid());
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetType, reqDetail);
         return totalAmount.doubleValue();
     }
 
