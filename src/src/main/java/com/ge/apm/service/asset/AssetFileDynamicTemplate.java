@@ -101,12 +101,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (dynamicListSheet == null) {
             dynamicListSheet = workBook.createSheet(SHEET_DYNAMIC_LIST_NAME);
         }
+        int index = workBook.getSheetIndex(dynamicListSheet);
+        workBook.setSheetHidden(index, true);
 
         staticListSheet = workBook.getSheet(SHEET_STATIC_LIST_NAME);
         if (staticListSheet == null) {
             staticListSheet = workBook.createSheet(SHEET_STATIC_LIST_NAME);
         }
-
+        index = workBook.getSheetIndex(staticListSheet);
+        workBook.setSheetHidden(index, true);
     }
 
     public void writeMetaData(List<String> exportFields) {
@@ -520,7 +523,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put("医疗器械分类", "6801基础外科手术器械");
         map.put("医疗器械子分类", "医用缝合针(不带线)");
 
-        map.put("设备分类", "其他类");
+        String data = assetGroup.isEmpty() ? "其他类" : assetGroup.get(0).getValueZh();
+        map.put("设备分类", data);
 
         map.put("设备型号", "XXX");
         map.put("制造商序列号", "123456");

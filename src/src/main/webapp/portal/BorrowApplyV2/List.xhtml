@@ -49,7 +49,7 @@
                             oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                     <p:ajax event="filter" listener="#{sharedAssetRequestV2Controller.onFilter}" update="createButton "/>
 
-                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptUid}" filterBy="#{item.clinicalDeptUid}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
