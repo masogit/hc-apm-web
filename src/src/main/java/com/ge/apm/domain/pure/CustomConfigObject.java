@@ -41,6 +41,7 @@ public class CustomConfigObject {
             assetFields = CustomConfigConstant.getAllFields().entrySet().stream().collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
             CustomConfigConstant.getSysTemFields().forEach(item -> {
                 assetFields.get(item).setRequired(true);
+                assetFields.get(item).setArrivalRequired(true);
             });
         }
         return assetFields;

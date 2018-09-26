@@ -1613,3 +1613,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'hasUsers', '租户下有关联用户，不能删除！', 'tenant cannot be deleted if having users !', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerId', '保养负责人', 'PM Owner Id', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerTel', '保养负责人电话', 'PM Owner Tel', NULL, '-1');
