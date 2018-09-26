@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -118,146 +119,192 @@
                             </p:fieldset>
                             <p:fieldset legend="设备信息" rendered="#{assetArrivedListEditController.selected.status eq 2}">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <h:panelGroup>
-                                        <label class="label">设备国标码</label>
-                                        <p:autoComplete id="gbname" value="#{assetArrivedListEditController.nationalStandardCode}"  completeMethod="#{assetArrivedListEditController.completeGbName}" />
-                                        <p:commandButton id="btnOrg1"  style="width: 22px;height: 22px; padding-right: 0px;float: next;" process="@this" icon="fa fa-angle-down"/>
-                                        <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"  style="width:300px" modal="false">
-                                            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                                <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetArrivedListEditController.gbTree}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" listener="#{assetArrivedListEditController.onSelectGbTreeNode}" update=":AssetArrivalEditForm:gbname"  oncomplete="PF('varPanelOrg1').hide();"/>
-                                                    <p:ajax process="@this" event="expand"/>
-                                                    <p:ajax process="@this" event="collapse"/>
-                                                    <p:treeNode type="gb">
-                                                        <h:outputText value="#{node}"/>
-                                                    </p:treeNode>
-                                                </p:tree>
-                                            </p:scrollPanel>
-                                        </p:overlayPanel>
-                                    </h:panelGroup>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['nationalStandardCode']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.nationalStandardCode}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['nationalStandardCode'].arrivalRequired? '*':''}</span></label>
+                                            <p:autoComplete id="gbname" value="#{assetArrivedListEditController.nationalStandardCode}" required="#{assetArrivedListEditController.customConfig.assetFields['nationalStandardCode'].arrivalRequired}" 
+                                                            requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" completeMethod="#{assetArrivedListEditController.completeGbName}" />
+                                            <p:commandButton id="btnOrg1"  style="width: 22px;height: 22px; padding-right: 0px;float: next;" process="@this" icon="fa fa-angle-down"/>
+                                            <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"  style="width:300px" modal="false">
+                                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                                    <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetArrivedListEditController.gbTree}" var="node" selectionMode="single">
+                                                        <p:ajax process="@this" event="select" listener="#{assetArrivedListEditController.onSelectGbTreeNode}" update=":AssetArrivalEditForm:gbname"  oncomplete="PF('varPanelOrg1').hide();"/>
+                                                        <p:ajax process="@this" event="expand"/>
+                                                        <p:ajax process="@this" event="collapse"/>
+                                                        <p:treeNode type="gb">
+                                                            <h:outputText value="#{node}"/>
+                                                        </p:treeNode>
+                                                    </p:tree>
+                                                </p:scrollPanel>
+                                            </p:overlayPanel>
+                                        </h:panelGroup>
+                                    </c:if>
 
 
-                                    <h:panelGroup >
-                                        <label class="label">#{msg.medicalInstrumentClassification}</label>
-                                        <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" autoWidth="false" style="width: 100%">
-                                            <p:ajax  listener="#{assetArrivedListEditController.onFunctionGroupChange()}" update="assetCode68" />
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-                                    <h:panelGroup >
-                                        <label class="label">#{msg.medicalInstrumentSubclassification}</label>
-                                        <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" autoWidth="false" style="width: 100%">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{assetArrivedListEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.registrationNo}</label>
-                                        <p:inputText id="registrationNo" value="#{assetArrivedListEditController.easyInstallItem.registrationNo}" />
-                                    </h:panelGroup>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['functionGroup']}">
+                                        <h:panelGroup >
+                                            <label class="label">#{msg.functionGroup}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired? '*':''}</span></label>
+                                            <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" required="#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired}" 
+                                                             requiredMessage="#{msg.functionGroup} #{msg.ValidationRequire}"  autoWidth="false" style="width: 100%">
+                                                <p:ajax  listener="#{assetArrivedListEditController.onFunctionGroupChange()}" update="@(.assetCode68)" />
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['assetCode68']}">
+                                        <h:panelGroup >
+                                            <label class="label">#{msg.assetCode68}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired? '*':''}</span></label>
+                                            <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" required="#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired}" 
+                                                             requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" autoWidth="false" style="width: 100%" class="assetCode68">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{assetArrivedListEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['registrationNo']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.registrationNo}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired? '*':''}</span></label>
+                                            <p:inputText id="registrationNo" value="#{assetArrivedListEditController.easyInstallItem.registrationNo}" required="#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired}" 
+                                                         requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" />
+                                        </h:panelGroup>
+                                    </c:if>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.maitanance}</label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" completeMethod="#{assetArrivedListEditController.autoCompleteMaintainer}"
-                                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
-                                            <p:ajax listener="#{assetArrivedListEditController.onMaintainerChange}"/>
-                                        </p:autoComplete>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.purchaseDate}</label>
-                                        <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.purchaseDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                                    </h:panelGroup>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['maitanance']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.maitanance}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['maitanance'].arrivalRequired? '*':''}</span></label>
+                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['maitanance'].arrivalRequired}" 
+                                                            requiredMessage="#{msg.maitanance} #{msg.ValidationRequire}" completeMethod="#{assetArrivedListEditController.autoCompleteMaintainer}"
+                                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
+                                                <p:ajax listener="#{assetArrivedListEditController.onMaintainerChange}"/>
+                                            </p:autoComplete>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['purchaseDate']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.purchaseDate}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['purchaseDate'].arrivalRequired? '*':''}</span></label>
+                                            <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.purchaseDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" required="#{assetArrivedListEditController.customConfig.assetFields['purchaseDate'].arrivalRequired}" 
+                                                        requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        </h:panelGroup>
+                                    </c:if>
                                     <h:panelGroup>
                                         <label class="label">保修时长(年)</label>
                                         <p:inputNumber value="#{assetArrivedListEditController.easyInstallItem.warrantyYear}"  minValue="0" decimalPlaces="2" />
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.purchasePrice}</label>
-                                        <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
-                                    </h:panelGroup>
-
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['purchasePrice']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.purchasePrice}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['purchasePrice'].arrivalRequired? '*':''}</span></label>
+                                            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" required="#{assetArrivedListEditController.customConfig.assetFields['purchasePrice'].arrivalRequired}" 
+                                                           requiredMessage="#{msg.purchasePrice} #{msg.ValidationRequire}" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
+                                        </h:panelGroup>
+                                    </c:if>
                                 </p:panelGrid>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.assetUsage}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="assetUsage" value="#{assetArrivedListEditController.easyInstallItem.assetUsage}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.assetUsage}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['assetUsage']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.assetUsage}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['assetUsage'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="assetUsage" value="#{assetArrivedListEditController.easyInstallItem.assetUsage}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['assetUsage'].arrivalRequired}" requiredMessage="#{msg.assetUsage}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.capitalSource}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="capitalSource" value="#{assetArrivedListEditController.easyInstallItem.capitalSource}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.capitalSource}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource').subList(0, 5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['capitalSource']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.capitalSource}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="capitalSource" value="#{assetArrivedListEditController.easyInstallItem.capitalSource}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired}" requiredMessage="#{msg.capitalSource}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource').subList(0, 5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.measureGrade}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.measureGrade}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['measureGrade']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.measureGrade}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['measureGrade'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['measureGrade'].arrivalRequired}" requiredMessage="#{msg.measureGrade}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.riskGrade}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="riskGrade" value="#{assetArrivedListEditController.easyInstallItem.riskGrade}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.riskGrade}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['riskGrade']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.riskGrade}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['riskGrade'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="riskGrade" value="#{assetArrivedListEditController.easyInstallItem.riskGrade}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['riskGrade'].arrivalRequired}" requiredMessage="#{msg.riskGrade}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.emergencyEquipment}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="emergencyEquipment" value="#{assetArrivedListEditController.easyInstallItem.emergencyEquipment}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.emergencyEquipment}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['emergencyEquipment']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.emergencyEquipment}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['emergencyEquipment'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="emergencyEquipment" value="#{assetArrivedListEditController.easyInstallItem.emergencyEquipment}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['emergencyEquipment'].arrivalRequired}" requiredMessage="#{msg.emergencyEquipment}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.importEquipment}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:selectOneMenu id="importEquipment" value="#{assetArrivedListEditController.easyInstallItem.importEquipment}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.importEquipment}#{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.measuringItemCategory}</label>
-                                        <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.accountingCategory}</label>
-                                        <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.salvageValue}</label>
-                                        <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetArrivedListEditController.easyInstallItem.salvageValue}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.lifecycle}</label>
-                                        <p:inputNumber minValue="0" decimalPlaces="1" value="#{assetArrivedListEditController.easyInstallItem.lifecycleInYear}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.depreciationMethod}</label>
-                                        <p:selectOneMenu id="depreciationMethod" value="#{assetArrivedListEditController.easyInstallItem.depreciationMethod}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['importEquipment']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.importEquipment}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['importEquipment'].arrivalRequired)? '*':''}</span></label>
+                                            <p:selectOneMenu id="importEquipment" value="#{assetArrivedListEditController.easyInstallItem.importEquipment}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['importEquipment'].arrivalRequired}" requiredMessage="#{msg.importEquipment}#{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['measuringItemCategory']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.measuringItemCategory}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['measuringItemCategory'].arrivalRequired? '*':''}</span></label>
+                                            <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['measuringItemCategory'].arrivalRequired}" 
+                                                             requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['accountingCategory']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.accountingCategory}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['accountingCategory'].arrivalRequired? '*':''}</span></label>
+                                            <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['accountingCategory'].arrivalRequired}" 
+                                                             requiredMessage="#{msg.accountingCategory} #{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['salvageValue']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.salvageValue}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['salvageValue'].arrivalRequired? '*':''}</span></label>
+                                            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetArrivedListEditController.easyInstallItem.salvageValue}" required="#{assetArrivedListEditController.customConfig.assetFields['salvageValue'].arrivalRequired}" 
+                                                           requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}"/>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['lifecycle']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.lifecycle}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['lifecycle'].arrivalRequired? '*':''}</span></label>
+                                            <p:inputNumber minValue="0" decimalPlaces="1" value="#{assetArrivedListEditController.easyInstallItem.lifecycleInYear}" required="#{assetArrivedListEditController.customConfig.assetFields['lifecycle'].arrivalRequired}" 
+                                                           requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}"/>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['depreciationMethod']}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.depreciationMethod}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['depreciationMethod'].arrivalRequired? '*':''}</span></label>
+                                            <p:selectOneMenu id="depreciationMethod" value="#{assetArrivedListEditController.easyInstallItem.depreciationMethod}" required="#{assetArrivedListEditController.customConfig.assetFields['depreciationMethod'].arrivalRequired}" 
+                                                             requiredMessage="#{msg.depreciationMethod} #{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
                                 </p:panelGrid>
                                 <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
                                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
