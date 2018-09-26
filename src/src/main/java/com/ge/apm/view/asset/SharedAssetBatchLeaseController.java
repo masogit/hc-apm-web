@@ -8,6 +8,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.service.sharedAsset.SharedAssetBatchService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
@@ -48,10 +49,14 @@ public class SharedAssetBatchLeaseController extends MyCRUDController<AssetInfo>
     }
 
     public void findAndSelectAsset() {
-        boolean hasAdded = selectedAssets.stream()
-                            .anyMatch(assetInfo -> assetInfo.getDepartNum().equals(this.searchCriteria)
-                                                || assetInfo.getFinancingNum().equals(this.searchCriteria)
-                                                || assetInfo.getQrCode().equals(this.searchCriteria));
+        boolean hasAdded = false;
+        if(StringUtils.isNotEmpty(this.searchCriteria)) {
+            hasAdded = selectedAssets.stream()
+                                        .anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
+                                                        || this.searchCriteria.equals(asset.getFinancingNum())
+                                                        || this.searchCriteria.equals(asset.getQrCode()));
+        }
+
         if(hasAdded) {
 
         } else {
@@ -63,4 +68,11 @@ public class SharedAssetBatchLeaseController extends MyCRUDController<AssetInfo>
         logger.info("findAndSelectAsset");
     }
 
+    public String getSearchCriteria() {
+        return searchCriteria;
+    }
+
+    public void setSearchCriteria(String searchCriteria) {
+        this.searchCriteria = searchCriteria;
+    }
 }
