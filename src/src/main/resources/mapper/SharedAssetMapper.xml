@@ -10,6 +10,7 @@
         <result column="asset_status" property="status"/>
         <result column="asset_name" property="name"/>
         <result column="asset_num" property="departNum"/>
+        <result column="asset_function_type" property="functionType"/>
         <result column="asset_site_uid" property="siteUID"/>
         <result column="financing_num" property="financingNum"/>
         <result column="qr_code" property="qrCode"/>
@@ -54,6 +55,7 @@
                 ai.status as asset_status,
                 ai.name as asset_name,
                 ai.depart_num as asset_num,
+                ai.function_type as asset_function_type,
                 ai.shared_asset_type,
                 ai.tenant_uid as asset_tenant_uid,
                 ai.institution_uid as asset_institution_uid,
@@ -86,6 +88,7 @@
             ai.status as asset_status,
             ai.name as asset_name,
             ai.depart_num as asset_num,
+            ai.function_type as asset_function_type,
             ai.shared_asset_type,
             ai.tenant_uid as asset_tenant_uid,
             ai.institution_uid as asset_institution_uid,
