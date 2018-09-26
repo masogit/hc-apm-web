@@ -63,6 +63,10 @@
                             <h:outputText value="#{asset.departNum}"/>
                         </p:column>
 
+                        <p:column headerText="设备型号" sortBy="#{asset_function_type}" filterBy="#{asset.asset_function_type}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.functionType}"/>
+                        </p:column>
+
                         <p:column headerText="调剂设备名称" sortBy="#{swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                         </p:column>
