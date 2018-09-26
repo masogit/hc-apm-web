@@ -185,7 +185,7 @@
                                 <h:panelGroup id="parentAssetList">
                                     <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}" 
-                                                    requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
+                                                    requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
                                     </p:autoComplete>
                                 </h:panelGroup>
