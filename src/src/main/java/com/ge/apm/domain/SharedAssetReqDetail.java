@@ -169,6 +169,9 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "req_comment", columnDefinition = "VARCHAR(256)")
     private String reqComment;
 
+    @Column(name = "voucher_num", columnDefinition = "VARCHAR(16)")
+    private String voucherNum;
+
     public String getId() {
         return id;
     }
@@ -681,5 +684,13 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setReqComment(String reqComment) {
         this.reqComment = reqComment;
+    }
+
+    public String getVoucherNum() {
+        return voucherNum;
+    }
+
+    public void setVoucherNum(String voucherNum) {
+        this.voucherNum = voucherNum;
     }
 }
