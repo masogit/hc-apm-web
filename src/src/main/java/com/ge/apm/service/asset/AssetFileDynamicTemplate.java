@@ -46,6 +46,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final String SHEET_STATIC_LIST_NAME = "静态列表";
     private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = "设备分类2级";
     private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = "医疗器械子分类";
+    public static final int ASSET_FORMULA_DEFAULT_MAX_ROWS = 20000;
 
     public static String[] columnTitles = {
             "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "院区", "所属科室", "使用科室", "制造商", "品牌/制造商简称",
@@ -357,8 +358,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
+        int maxRows = assetList.size() > ASSET_FORMULA_DEFAULT_MAX_ROWS ? assetList.size() : ASSET_FORMULA_DEFAULT_MAX_ROWS;
         //write sum formula
-        writeSummaryFormula(writer, exportFields);
+        writeSummaryFormula(writer, exportFields, maxRows);
 
         String[] columnTitles = exportFields.toArray(new String[] {});
 
@@ -393,8 +395,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
+        int maxRows = ASSET_FORMULA_DEFAULT_MAX_ROWS;
         //write sum formula
-        writeSummaryFormula(writer, exportFields);
+        writeSummaryFormula(writer, exportFields, maxRows);
 
         String[] columnTitles = exportFields.toArray(new String[] {});
 
@@ -460,7 +463,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         fos.close();
     }
 
-    private void writeSummaryFormula(ExcelDocumentStreamingWriter writer, List<String> exportFields) {
+    private void writeSummaryFormula(ExcelDocumentStreamingWriter writer, List<String> exportFields, int maxRows) {
 
         int nameIndex = exportFields.indexOf("设备名称");
         int purchasePriceIndex = exportFields.indexOf("采购价格");
@@ -468,9 +471,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         String nameColLetter = CellReference.convertNumToColString(nameIndex);
         String purchasePriceLetter = CellReference.convertNumToColString(purchasePriceIndex);
 
-        String countFormula = String.format("COUNTA('Asset List'!$%s$7:$%s$20000)", nameColLetter, nameColLetter);
+        String countFormula = String.format("COUNTA('Asset List'!$%s$7:$%s$%d)", nameColLetter, nameColLetter, maxRows);
 
-        String sumFormula = String.format("SUM('Asset List'!$%s$7:$%s$20000)", purchasePriceLetter, purchasePriceLetter);
+        String sumFormula = String.format("SUM('Asset List'!$%s$7:$%s$%d)", purchasePriceLetter, purchasePriceLetter, maxRows);
 
         writer.writeCellFormula(5, 1, countFormula);
         writer.writeCellFormula(5, 2, sumFormula);
