@@ -104,7 +104,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
 
     public List<OrgInfo> findBySiteUIDAndOrgType(String siteUID,Integer orgType);
-    
+
+    public OrgInfo findFirstBySiteUIDAndNameAndOrgType(String siteUID, String name, Integer orgType);
+
     public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
     public OrgInfo findFirstByParentUIDAndName(String parentUID, String name);
