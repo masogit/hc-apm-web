@@ -45,9 +45,20 @@ public class AssetFileImportSupportingService {
     @Transactional
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
 
-        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndShortName(selectedOrgToImport.getUid(), name);
+        boolean isShortName = isShortName(name);
 
-        if (orgInfo == null) {
+        OrgInfo orgInfo;
+
+        if (isShortName) {
+            //parent clinical
+            orgInfo = orgDao.findFirstByParentUIDAndShortName(selectedOrgToImport.getUid(), name);
+        } else {
+            //child clinical
+            orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), name, 4);
+        }
+
+        //only create new parent clinical org
+        if (orgInfo == null && isShortName) {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
             orgInfo = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, name, selectedOrgToImport, selectedOrgToImport.getOrgLevel());
             orgDao.save(orgInfo);
@@ -55,6 +66,10 @@ public class AssetFileImportSupportingService {
 
         return orgInfo;
 
+    }
+
+    public boolean isShortName(String orgName) {
+        return !orgName.contains("-");
     }
 
     @Transactional
@@ -363,7 +378,7 @@ public class AssetFileImportSupportingService {
         Map< String, Object> rowMap = (Map<String, Object>) item.get("rowData");
         String assetDeptName = ExcelDocument.getCellStringValue(rowMap.get("使用科室"));
         if (!StringUtils.isEmpty(assetDeptName)) {
-            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), assetDeptName);
+            OrgInfo orgInfo = importOrgIfNeeded(selectedOrgToImport, assetDeptName);
             if (orgInfo != null) {
                 assetInfo.setAssetDeptId(orgInfo.getId());
                 assetInfo.setAssetDeptUID(orgInfo.getUid());

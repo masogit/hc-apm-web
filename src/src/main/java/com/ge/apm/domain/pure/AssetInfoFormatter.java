@@ -317,7 +317,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getShortName();
+        return orgInfo.getName();
     }
 
     public Integer getAssetGroup() {
@@ -345,7 +345,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getShortName();
+        return orgInfo.getName();
     }
 
     public Integer getAssetOwnerId() {
