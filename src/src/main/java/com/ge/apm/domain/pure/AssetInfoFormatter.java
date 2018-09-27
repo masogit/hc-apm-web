@@ -539,8 +539,10 @@ public class AssetInfoFormatter {
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
+        String qrCode = parentAsset.getQrCode() == null ? "" : parentAsset.getQrCode();
 
-        return departNum + " / " + parentAsset.getName();
+
+        return parentAsset.getName()  + " / " + qrCode + " /" + departNum + " / " + parentAsset.getUid();
     }
 
     public Integer getInventoryStatus() {
