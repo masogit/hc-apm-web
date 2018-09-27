@@ -1,0 +1,49 @@
+当前使用的微信消息模版
+
+1. 工单消息提醒
+{{first.DATA}}
+工单编号：{{keyword1.DATA}}
+工单标题：{{keyword2.DATA}}
+时间：{{keyword3.DATA}}
+{{remark.DATA}}
+
+2. 待办任务提醒
+{{first.DATA}}
+待办内容：{{keyword1.DATA}}
+待办时间：{{keyword2.DATA}}
+{{remark.DATA}}
+
+3. 系统报警提醒
+{{first.DATA}}
+报警时间：{{keyword1.DATA}}
+报警提示：{{keyword2.DATA}}
+{{remark.DATA}}
+
+4. 审核结果通知
+{{first.DATA}}
+审核内容：{{keyword1.DATA}}
+审核结果：{{keyword2.DATA}}
+{{remark.DATA}}
+
+--- 暂时不用的模版
+5. 工单超时提醒
+{{first.DATA}}
+资产名称：{{keyword1.DATA}}
+报修时间：{{keyword2.DATA}}
+紧急程度：{{keyword3.DATA}}
+工单状态：{{keyword4.DATA}}
+当前责任人：{{keyword5.DATA}}
+{{remark.DATA}}
+
+生产环境配置的模版清单:
+Serial number	Template ID	Title	Primary industry	Secondary industry	Operation
+1	2kA5OwooKRn0ivh-TRUmDmNxsxhMnPhKGRC6OTmMD4A	工单超时提醒	IT科技	IT软件与服务
+2	4N0nfZ0fXstReD-FcBu-d6tUsTcwBEIND-0wmOh0cO8	故障通报通知	IT科技	IT软件与服务
+3	IPPSXdWqNux2gftXVn6mOeqOEP0NEA4QU2Ra8sIVVag	审核结果通知	IT科技	IT软件与服务
+4	JiYyS_fx_HpfLRA9Lnu6dWz65x94qmsX37OFBnl8jTQ	工单消息提醒	IT科技	IT软件与服务
+5	KzJXbpPaBbL3GxwSMW06h-zqfE4fdWViyRkPU6XAnvs	待办任务提醒	IT科技	IT软件与服务
+6	LZ9jg-amQ7lF9t6ydcYO8XDmS3m1w8BYSdADQVF_4JY	计划事件提醒	IT科技	IT软件与服务
+7	NNsJtVhorZl9ad-vI00E0vfkrpyHBy5JX72wjtcGlOA	服务派工通知	医疗护理	医药医疗
+8	SKSF8xhNet-nmwkyYyQ49Qqo3P8NqOad0TpCNB9YcV8	工单已派通知	医疗护理	医药医疗
+9	bFxiuNY8evEE56ds57ScBsOdJ0-W36441O_cvFhvn1E	系统报警提醒	IT科技	IT软件与服务
+10	bKXcCIxDYMGGqm0UrIPCPZe2mYp3OhWQRj6aOYib6fI	服务结束通知	医疗护理	医药医疗

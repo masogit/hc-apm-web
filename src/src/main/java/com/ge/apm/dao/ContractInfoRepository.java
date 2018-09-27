@@ -18,4 +18,6 @@ public interface ContractInfoRepository extends GenericRepositoryUUID<ContractIn
 
     @Query("select o from ContractInfo o where o.tenantUID = ?1 and o.contractType = 'Equipment'")
     public List<ContractInfo> findEquipmentContractByTenant(String tenantUID);
+
+    public ContractInfo findByIdAndContractTypeAndTenantUID(String id, String contractType, String tenantUID);
 }

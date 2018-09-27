@@ -32,7 +32,7 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetGroupSecondary')}">
         <h:panelGroup >
             <label class="label">#{msg.assetGroupSecondary}</label>
-            <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(assetInfoDetailController.selected.assetGroup), assetInfoDetailController.selected.assetGroupSecondary)}" readonly="true"/>
+            <p:inputText id="assetGroupSecondary" value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(assetInfoDetailController.selected.assetGroup), assetInfoDetailController.selected.assetGroupSecondary)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerName')}">
@@ -69,6 +69,18 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel3}</label>
             <p:inputText id="assetOwnerTel3" value="#{assetInfoDetailController.selected.assetOwnerTel3}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'pmOwnerName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerName}</label>
+            <p:inputText id="pmOwnerName" value="#{assetInfoDetailController.selected.pmOwnerName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'pmOwnerTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerTel}</label>
+            <p:inputText id="pmOwnerTel" value="#{assetInfoDetailController.selected.pmOwnerTel}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'siteUID')}">
