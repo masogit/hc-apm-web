@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="导出合同信息"/>
+            </div>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="exportForm">
+                <p:fieldset legend="#{msg.FilterCondition}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">*#{msg.hospitalId}</label>
+                            <p:inputText id="selectedOrgName"
+                                         value="#{contractInfoExportController.selectedOrg==null ? '': contractInfoExportController.selectedOrg.name}"
+                                         readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
+                                             class="btn btn-sm popupIconButton"/>
+                            <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                                            style="width:300px" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
+                                            value="#{contractInfoExportController.orgTree}"
+                                            selection="#{contractInfoExportController.selectedNode}" var="node"
+                                            selectionMode="single">
+                                        <p:ajax process="@this" event="select" update=":exportForm:selectedOrgName"
+                                                listener="#{contractInfoExportController.onSelectTreeNode}"
+                                                oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">*#{msg.contractType}</label>
+                            <p:selectOneMenu id="contractType" value="#{contractInfoExportController.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset legend="#{msg.FilterCondition}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">*合同开始时间(区间开始)</label>
+                            <p:calendar timeZone="GMT+8"  id="startDate_startFilter" value="#{contractInfoExportController.startDate_startFilter}" pattern="yyyy/MM/dd" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">*合同开始时间(区间结束)</label>
+                            <p:calendar timeZone="GMT+8"  id="startDate_endFilter" value="#{contractInfoExportController.startDate_endFilter}" pattern="yyyy/MM/dd" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">*合同结束时间(区间开始)</label>
+                            <p:calendar timeZone="GMT+8"  id="endDate_startFilter" value="#{contractInfoExportController.endDate_startFilter}" pattern="yyyy/MM/dd" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">*合同结束时间(区间结束)</label>
+                            <p:calendar timeZone="GMT+8"  id="endDate_endFilter" value="#{contractInfoExportController.endDate_endFilter}" pattern="yyyy/MM/dd" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:commandButton value="预览结果" actionListener="#{contractInfoExportController.previewData}" icon="ui-icon-arrowthick-1-s" validateClient="true" class="btn btn-sm btn-gray" update=":dataListForm :growl"/>
+            </h:form>
+
+            <h:form id="dataListForm">
+                <p:dataTable id="datalist" value="#{contractInfoExportController.contractResultList}" var="item"
+                             selection="#{contractInfoExportController.selectedItems}"
+                             rowKey="#{item.合同UID}" lazy="false" paginator="true" paginatorPosition="both"
+                             paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
+                             emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
+                    <p:column headerText="合同编号">
+                        <h:outputText value="#{item.合同编号}"/>
+                    </p:column>
+                    <p:column headerText="合同名称">
+                        <h:outputText value="#{item.合同名称}"/>
+                    </p:column>
+                    <p:column headerText="合同类型">
+                        <h:outputText value="#{fieldMsg.fieldValue('contractInfoType', item.合同类型)}"/>
+                    </p:column>
+                    <p:column headerText="开始时间">
+                        <h:outputText value="#{item.开始时间}"/>
+                    </p:column>
+                    <p:column headerText="结束时间">
+                        <h:outputText value="#{item.结束时间}"/>
+                    </p:column>
+                    <p:column headerText="合同总额">
+                        <h:outputText value="#{item.合同总额}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton ajax="false" value="合同列表全部导出" rendered="#{not empty contractInfoExportController.contractResultList}"
+                                         actionListener="#{contractInfoExportController.exportAll()}"
+                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                            <p:fileDownload value="#{contractInfoExportController.exportFile}"/>
+                        </p:commandButton>
+                        <p:commandButton ajax="false" value="合同列表选择导出" rendered="#{not empty contractInfoExportController.contractResultList}"
+                                         actionListener="#{contractInfoExportController.exportSelected()}"
+                                         icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                            <p:fileDownload value="#{contractInfoExportController.exportFile}"/>
+                        </p:commandButton>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

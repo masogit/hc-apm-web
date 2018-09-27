@@ -2203,7 +2203,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         sharedAssetReqDetail.setRentalTime(totalTime);
 
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetReqDetail);
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetType(), sharedAssetReqDetail);
         sharedAssetReqDetail.setTotalAmount(totalAmount);
         return sharedAssetReqDetail;
     }

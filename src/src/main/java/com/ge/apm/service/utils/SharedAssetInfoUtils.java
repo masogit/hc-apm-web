@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.domain.SharedAssetTypeAccesssory;
 
 import javaslang.Tuple2;
@@ -74,15 +75,31 @@ public class SharedAssetInfoUtils {
         return result;
     }
 
-    public static BigDecimal getTotalAmount(BigDecimal unit, SharedAssetReqDetail reqDetail) {
+    public static BigDecimal getTotalAmount(BigDecimal unit, SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Double unitPrice = reqDetail.getUnitPrice();
         if(unitPrice == null) {
             unitPrice = 0d;
         }
-        BigDecimal totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
-        if("2".equals(reqDetail.getChargingType())) {
-            totalAmount = unit.multiply(new BigDecimal(unitPrice)).divide(new BigDecimal(2));
+
+        BigDecimal totalAmount = BigDecimal.valueOf(0);
+
+        Double startDuration = sharedAssetType.getStartingDuration();
+        Double startPrice = sharedAssetType.getStartingPrice();
+        if(startDuration != null && startPrice != null) {//for 301医院起步价
+            if(unit.doubleValue() < startDuration) {
+                totalAmount = BigDecimal.valueOf(startPrice);
+            } else {
+                BigDecimal rentTimeMinusStartDuriation = unit.subtract(BigDecimal.valueOf(startDuration));
+                totalAmount = BigDecimal.valueOf(startPrice).add(rentTimeMinusStartDuriation.multiply(BigDecimal.valueOf(unitPrice)));
+            }
+        } else {//普通医院
+            totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
+            if("2".equals(reqDetail.getChargingType())) {
+                unit = unit.divide(BigDecimal.valueOf(2));
+                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+            }
         }
+
         return totalAmount;
     }
 
@@ -194,7 +211,7 @@ public class SharedAssetInfoUtils {
         return format.format(date);
     }
 
-    private static String getPdfUnitPrice(SharedAssetReqDetail reqDetail)
+    public static String getPdfUnitPrice(SharedAssetReqDetail reqDetail)
     {
         Double price = reqDetail.getUnitPrice();
         String chgType = reqDetail.getChargingType();
@@ -218,7 +235,7 @@ public class SharedAssetInfoUtils {
         return uniPrice;
     }
 
-    private static String getPdfStatus(AssetInfo asset)
+    public static String getPdfStatus(AssetInfo asset)
     {
         //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
         Integer status = asset.getStatus();
@@ -243,7 +260,7 @@ public class SharedAssetInfoUtils {
         return assetStatus;
     }
 
-    private static String getPdfAccessories(AssetInfo asset)
+    public static String getPdfAccessories(AssetInfo asset)
     {
         List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
         String accessories = "";
@@ -275,5 +292,17 @@ public class SharedAssetInfoUtils {
             }
         }
         return accessories;
+    }
+
+    public static String getPdfDatetime(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        return sdf.format(date);
+    }
+
+    public static Long getPdfRentTime(Date startDate, Date endDate) {
+        LocalDateTime startLDT = (startDate == null) ? LocalDateTime.now() : startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime endLDT = (endDate == null) ? LocalDateTime.now() : endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        long rentalTimeInMinutes = ChronoUnit.MINUTES.between(startLDT, endLDT);
+        return rentalTimeInMinutes;
     }
 }

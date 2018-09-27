@@ -296,15 +296,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        //非设备科的人导出的时候，导出部分数据
-        boolean allColumns = false;
-        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
-            allColumns = true;
-        }
-
-        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
-
-//        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
         List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
@@ -349,7 +340,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public List<AssetInfo> getExportList() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        return assetUids.isEmpty() ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUids);
+        List<AssetInfo> resultList;
+        if (assetUids.isEmpty()) {
+            resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
+        }else {
+            resultList = dao.findByUidIn(assetUids, lastPageSort);
+        }
+
+        return resultList;
     }
 
     public String getParentAssetNameByAssetId(int assetId) {

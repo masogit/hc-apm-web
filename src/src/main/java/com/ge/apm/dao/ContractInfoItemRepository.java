@@ -23,4 +23,6 @@ public interface ContractInfoItemRepository extends GenericRepositoryUUID<Contra
 
    @Query("select cii from ContractInfoItem cii, ContractInfo ci where cii.contractId = ci.id and cii.assetUid = ?1 and ci.contractType not in ('ZZB','ZYB','ZXB')")
    List<ContractInfoItem> getByAssetUidAndContractType(String assetUid);
+
+   List<ContractInfoItem> findByContractIdAndAssetUid(String contractId, String assetUid);
 }
