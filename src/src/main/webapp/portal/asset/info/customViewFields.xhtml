@@ -71,10 +71,10 @@
             <p:inputText id="assetOwnerTel3" value="#{assetInfoDetailController.selected.assetOwnerTel3}" readonly="true"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'pmOwnerId')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'pmOwnerName')}">
         <h:panelGroup >
-            <label class="label">#{msg.pmOwnerId}</label>
-            <p:inputText id="pmOwnerId" value="#{assetInfoDetailController.selected.pmOwnerName}" readonly="true"/>
+            <label class="label">#{msg.pmOwnerName}</label>
+            <p:inputText id="pmOwnerName" value="#{assetInfoDetailController.selected.pmOwnerName}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'pmOwnerTel')}">
