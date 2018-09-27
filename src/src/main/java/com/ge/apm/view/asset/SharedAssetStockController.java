@@ -126,6 +126,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         super.setSelected(asset);
     }
 
+    public void preparePrintVoucher(AssetInfo asset) {
+        sharedAssetStockService.generateVoucher(asset);
+    }
+
     public void forceLeaseAsset() {
         if(this.selected != null) {
             List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
