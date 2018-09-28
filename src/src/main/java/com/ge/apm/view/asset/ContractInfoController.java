@@ -78,5 +78,14 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("ContractEdit?action=Edit&selectedid=".concat(selected.getId()));
     }
+    public String importAction() {
+        return "contractImport/ContractImport?faces-redirect=true";
+    }
+    public String importItemAction() {
+        return "contractImport/ContractItemImport?faces-redirect=true";
+    }
+    public String exportAction() {
+        return "contractExport/ContractExport?faces-redirect=true";
+    }
 
 }

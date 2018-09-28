@@ -215,21 +215,22 @@ public class SharedAssetInfoUtils {
     {
         Double price = reqDetail.getUnitPrice();
         String chgType = reqDetail.getChargingType();
+        DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
 
         String uniPrice = null;
         //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
         if(chgType.equals("1"))
         {
-            uniPrice = price.toString() + "元/次";
+            uniPrice = df.format(price) + "元/次";
         }
         if(chgType.equals("2") || chgType.equals("4"))
         {
         	BigDecimal pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24)));
-            uniPrice = pr.toString() + "元/天";
+            uniPrice = df.format(pr) + "元/天";
         }
         if(chgType.equals("3"))
         {
-            uniPrice = price.toString() + "元/天";
+            uniPrice = df.format(price) + "元/天";
         }
 
         return uniPrice;
@@ -295,7 +296,7 @@ public class SharedAssetInfoUtils {
     }
 
     public static String getPdfDatetime(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(date);
     }
 

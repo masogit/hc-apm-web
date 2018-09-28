@@ -118,14 +118,14 @@
                          requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerId')}" >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerName')}" >
         <h:panelGroup >
-            <label class="label">#{msg.pmOwnerId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerId'].required? '*':''}</span></label>
-            <p:autoComplete id="pmOwnerId" value="#{assetInfoEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerId')}"
-                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerId'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+            <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
+            <p:autoComplete id="pmOwnerName" value="#{assetInfoEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerIdChange)" />
-                <p:ajax listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerIdChange)" />
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:column>
                     <h:outputText value="#{t.name}"/>
                 </p:column>
@@ -140,12 +140,12 @@
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required? '*':''}</span></label>
             <p:inputText id="pmOwnerTel" value="#{assetInfoEditController.selected.pmOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required}"
-                         requiredMessage="#{msg.pmOwnerTel} #{msg.ValidationRequire}" readonly="true" class="pmOwnerIdChange"/>
+                         requiredMessage="#{msg.pmOwnerTel} #{msg.ValidationRequire}" readonly="true" class="pmOwnerNameChange"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'siteUID')}" >
         <h:panelGroup>
-            <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+            <label class="label">#{msg.hospitalId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['siteUID'].required? '*':''}</span></label>
             <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
             <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id or !assetInfoEditController.needEdit('siteUID')}"/>
             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">

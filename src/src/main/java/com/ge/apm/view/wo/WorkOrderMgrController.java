@@ -178,6 +178,22 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
+    public String getStepImg(int step){
+        if(queryIndex==8 || queryIndex==7)
+            return "icons/5.png";
+        switch(step){
+            case 5: //待验收
+                return "icons/5.png";
+            case 8: //待审核
+                return "icons/4.png";
+            case 4: //维修中
+                return "icons/3.png";
+            case 3: //接单中
+                return "icons/2.png";
+            default:
+                return "icons/1.png";
+        }
+    }
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();

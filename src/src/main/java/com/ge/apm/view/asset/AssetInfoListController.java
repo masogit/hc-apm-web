@@ -21,6 +21,8 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoListController.class);
 
     private static final long serialVersionUID = -1L;
     private AssetInfoRepository dao = null;
@@ -293,27 +296,23 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        //非设备科的人导出的时候，导出部分数据
-        boolean allColumns = false;
-        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
-            allColumns = true;
-        }
-
-        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
-
-//        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
-        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+//        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
+        logger.info("load asset list to export");
         List<AssetInfo> assetList = getExportList();
 
         List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
                 exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
+        logger.info("start to export asset list to excel");
+
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
         template.exportAsset(assetList, sites, orgList, exportColumnFields);
+
+        logger.info("exported asset list to excel, start to get input stream");
 
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
@@ -341,7 +340,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public List<AssetInfo> getExportList() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        return assetUids.isEmpty() ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUids);
+        List<AssetInfo> resultList;
+        if (assetUids.isEmpty()) {
+            resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
+        }else {
+            resultList = dao.findByUidIn(assetUids, lastPageSort);
+        }
+
+        return resultList;
     }
 
     public String getParentAssetNameByAssetId(int assetId) {
