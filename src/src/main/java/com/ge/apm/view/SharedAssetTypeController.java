@@ -288,12 +288,21 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     }
 
     /**
-     *
-     * @return true if chargingType is day or times.
+     * @return true if chargingType is day or time.
      */
     public boolean disableStartingFields() {
         String chargingType = selected.getChargingType();
         return StringUtils.equals("1", chargingType) || StringUtils.equals("3", chargingType);
+    }
+
+    /**
+     * Reset value in starting fields, if charging type is day or time
+     */
+    public void onChargingTypeChange() {
+        if (disableStartingFields()) {
+            selected.setStartingPrice(null);
+            selected.setStartingDuration(null);
+        }
     }
 
     public void setFilterUnitPrice(String filterUnitPrice) {

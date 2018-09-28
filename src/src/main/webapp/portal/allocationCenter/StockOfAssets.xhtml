@@ -118,6 +118,11 @@
                                              update="forceReturnAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
                                              oncomplete="openForceReturnDialog(xhr, status, args)"/>
+                            <p:commandButton value="打印" ajax="false" 
+                            				 actionListener="#{sharedAssetStockController.printVoucher(asset)}"  
+                            				 rendered="#{sharedAssetStockController.validate301()}" >
+                                <p:fileDownload value="#{sharedAssetStockController.exportPdf}" />
+                            </p:commandButton>
                             
                         </p:column>
 
