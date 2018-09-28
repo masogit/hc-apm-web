@@ -1,5 +1,27 @@
 package com.ge.apm.service.sharedAsset;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.faces.model.SelectItem;
+
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -7,28 +29,17 @@ import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.dao.mapper.SharedAssetRequestMapper;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetRequest;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import javaslang.Tuple2;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.xpath.operations.Bool;
-import org.primefaces.model.TreeNode;
-import org.primefaces.ultima.domain.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
-import javax.faces.model.SelectItem;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import javaslang.Tuple2;
 
 @Service
 public class SharedAssetStockService {
@@ -178,55 +189,76 @@ public class SharedAssetStockService {
                                                                                             reqComment);
         return returnResponse;
     }
-
-    public void generateVoucher(AssetInfo asset) {
-        Map<String, String> voucherInfo = new HashMap<>();
+    
+    
+    //301医院则显示打印按钮
+    public boolean validate301()
+    {
+        boolean isTargetHospital = false;
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
-        voucherInfo.put("抬头", getVoucherTitle4Print(currentUser));
-        voucherInfo.put("经办人", currentUser.getName());
+        String hosName = getVoucherTitle4Print(currentUser, "301");
+        if(hosName.contains("中国人民解放军总医院"))
+        {
+            isTargetHospital = true;
+        }
+
+        return isTargetHospital;
+    }
+    
+
+    public void generateVoucher(AssetInfo asset, Map<String, String> voucherInfo) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
-        if(asset.getClinicalDeptUID().equals(asset.getAssetDeptUID())) {
-            SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
-            if(sharedAssetReqDetail != null) {
-                sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, sharedAssetReqDetail);
-                if(StringUtils.isNotBlank(sharedAssetReqDetail.getReturnId())) {//借出状态
-                    voucherInfo.put("借据ID", "");
-                    voucherInfo.put("设备编号", asset.getDepartNum());
-                    voucherInfo.put("设备名称", asset.getName());
-                    voucherInfo.put("设备型号", asset.getFunctionType());
-                    voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
-                    voucherInfo.put("租金", df.format(SharedAssetInfoUtils.getPdfUnitPrice(sharedAssetReqDetail)));
-                    voucherInfo.put("状态", SharedAssetInfoUtils.getPdfStatus(asset));
-                    voucherInfo.put("借用时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
-                    voucherInfo.put("附属物品", SharedAssetInfoUtils.getPdfAccessories(asset));
-                    voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
+        
+        SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
+        if(sharedAssetReqDetail != null) {
+            sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, sharedAssetReqDetail);
+            if(StringUtils.isBlank(sharedAssetReqDetail.getReturnId())) {//借出状态
+            	UserAccount currentUser = UserContextService.getCurrentUserAccount();
+                voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
+                voucherInfo.put("经办人", currentUser.getName());
+                voucherInfo.put("借据ID", "");
+                voucherInfo.put("设备编号", asset.getDepartNum());
+                voucherInfo.put("设备名称", asset.getName());
+                voucherInfo.put("设备型号", asset.getFunctionType());
+                voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
+                voucherInfo.put("租金", SharedAssetInfoUtils.getPdfUnitPrice(sharedAssetReqDetail));
+                voucherInfo.put("状态", SharedAssetInfoUtils.getPdfStatus(asset));
+                voucherInfo.put("借用时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
+                voucherInfo.put("附属物品", SharedAssetInfoUtils.getPdfAccessories(asset));
+                voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
+            } else {//可用，曾经借出或从未借出，若曾经借出，则计算最近一次借出的相关信息
+                BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
+                BigDecimal totalFee = sharedAssetReqDetail.getTotalAmount();
+                if(compensationAmount == null || compensationAmount.doubleValue() == 0d) {
+                    voucherInfo.put("赔偿费用", "/");
+                    voucherInfo.put("总计费用", df.format(totalFee));
                 } else {
-                    BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
-                    BigDecimal totalFee = sharedAssetReqDetail.getTotalAmount();
-                    if(compensationAmount == null || compensationAmount.doubleValue() == 0d) {
-                        voucherInfo.put("赔偿费用", "/");
-                        voucherInfo.put("总计费用", df.format(totalFee));
-                    } else {
-                        voucherInfo.put("赔偿费用", df.format(compensationAmount));
-                        voucherInfo.put("总计费用", df.format(totalFee.add(compensationAmount)));
-                    }
-                    voucherInfo.put("归还时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
-                    Long rentalTimeInMinutes = SharedAssetInfoUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
-                    String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
-                    voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
-                    voucherInfo.put("租赁费用", df.format(totalFee));
-                    voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
-                    voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
+                    voucherInfo.put("赔偿费用", df.format(compensationAmount));
+                    voucherInfo.put("总计费用", df.format(totalFee.add(compensationAmount)));
                 }
+                voucherInfo.put("归还时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
+                Long rentalTimeInMinutes = SharedAssetInfoUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
+                String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
+                voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
+                voucherInfo.put("租赁费用", df.format(totalFee));
+                voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
+                voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
             }
         }
     }
 
-    private String getVoucherTitle4Print(UserAccount currentUser) {
+    private String getVoucherTitle4Print(UserAccount currentUser, String flag) {
         List<String> orgUids = wfCfigDao.findDeptForSharedAsset(currentUser.getSiteUID());
         List<OrgInfo> allocDeptList = orgInfoRepository.findByUids(new HashSet<>(orgUids));
         OrgInfo allocDept = allocDeptList.stream().findFirst().get();
-        return allocDept.getParentOrg().getName() + allocDept.getName();
+        if(null != flag && flag.equals("301"))
+        {
+        	return allocDept.getOrgFullName();
+        }
+        else
+        {
+        	return allocDept.getParentOrg().getName() + allocDept.getName();
+        }
     }
 
     private SharedAssetReqDetail findLatestReqDetailByAsset(AssetInfo asset) {
