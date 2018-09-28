@@ -20,11 +20,12 @@ import com.ge.apm.domain.SharedAssetTypeAccesssory;
 
 import javaslang.Tuple2;
 
+@Deprecated
 public class SharedAssetInfoUtils {
 
     private static Logger log = Logger.getLogger(SharedAssetInfoUtils.class.getName());
 
-    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(SharedAssetReqDetail reqDetail) {
+    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Tuple2<BigDecimal, String> result = null;
         LocalDateTime beginLDT;
         LocalDateTime endLDT;
@@ -50,26 +51,41 @@ public class SharedAssetInfoUtils {
             totalTime = days + "天" + hours + "时" + minutes + "分";
         }
 
+        long startDurationInMinutes = 0l;
+        if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
+        }
+
         switch(reqDetail.getChargingType()) {
             case "1":
                 totalTime = "1次";
-                unit = new BigDecimal(1);
+                unit = BigDecimal.valueOf(1);
                 break;
             case "2":
-                unit = new BigDecimal(rentalTimeInMinutes / 30d);
+                //小时（半点）
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 break;
             case "3":
-                unit = new BigDecimal(rentalTimeInMinutes / (60 * 24d));
+                //天
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / (60 * 24d));
                 unit = unit.setScale(0, RoundingMode.UP);
                 totalTime = unit.longValue() + "天";
                 break;
             case "4":
-                unit = new BigDecimal(rentalTimeInMinutes / 60d);
+                //自然时间
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
                 break;
+            case "5":
+                //小时（整点）
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 60d);
+                unit = unit.setScale(0, RoundingMode.UP);
             default:
-                unit = new BigDecimal(0);
+                unit = BigDecimal.valueOf(0);
         }
         result = new Tuple2<>(unit, totalTime);
         return result;

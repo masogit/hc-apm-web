@@ -19,7 +19,7 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
     @Select("loadSharedAssets")
     List<AssetInfo> loadSharedAssets(Pagination page, @Param("ew") Wrapper<AssetInfo> wrapper);
 
-    @Select("SELECT ai.id,ai.uid,ai.depart_num,ai.name," +
+    @Select("SELECT ai.id,ai.uid,ai.depart_num,ai.name,ai.asset_dept_uid,ai.clinical_dept_uid," +
         "sat.swap_name as swap_name,sat.unit_price as unit_price,sat.charging_type as charging_type " +
         "FROM asset_info ai INNER JOIN shared_asset_type sat ON ai.shared_asset_type=sat.id " +
         "WHERE 1 = 1 ${ew.sqlSegment}")
