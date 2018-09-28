@@ -33,7 +33,7 @@ public class ContractItemImportController {
 
     private UploadedFile file;
 
-    private List<Map<String, Object>> importContractItemMap;
+    private List<Map<String, Object>> importContractItemMapList;
 
     private UaaService uaaService;
     private ContractItemImportService contractItemImportService;
@@ -67,11 +67,13 @@ public class ContractItemImportController {
                 return;
             }
 
-            importContractItemMap = contractItemImportService.getContractItemMapFromTemplate(doc, contractType);
+            importContractItemMapList = contractItemImportService.getContractItemMapFromTemplate(doc, contractType);
 
-            contractItemImportService.importData(importContractItemMap, contractType, currentUserAccount.getTenantUID());
+            contractItemImportService.importData(importContractItemMapList, contractType, currentUserAccount.getTenantUID());
 
-            errorContractItemList = contractItemImportService.filterErrorRecords(importContractItemMap);
+            errorContractItemList = contractItemImportService.filterErrorRecords(importContractItemMapList);
+
+            WebUtil.addSuccessMessage("导入完成");
 
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");

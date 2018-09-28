@@ -29,7 +29,7 @@ public class ContractImportService {
 
     public static final String EXCEL_CONTRACT_TEMPLATE_VERSION = "v1.0";
 
-    public static final String SHEET_SERVICE_CONTRACT = "Contract Service List";
+    public static final String SHEET_SERVICE_CONTRACT = "Contract List";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
 
@@ -73,7 +73,7 @@ public class ContractImportService {
             contractRow.setFieldDoubleValue("合同总额", "setAmount");
             contractRow.setFieldDateValue("开始时间", "setStartDate");
             contractRow.setFieldDateValue("结束时间", "setEndDate");
-            contractRow.setFieldIntegerValue("结束月数", "setEndMonths");
+            contractRow.setFieldIntegerValue("合同时间(月)", "setEndMonths");
 
             /*contractRow.setFieldStringValue("清单序号", "setListNum");
             contractRow.setFieldStringValue("报告号", "setReportNum");
@@ -98,9 +98,14 @@ public class ContractImportService {
             contractRow.setFieldDateValue("签字并盖合同专用章", "setSignContractDate");
             contractRow.setFieldDateValue("备注", "setComments");*/
 
+            if(contractInfoVO.isNull()){
+                break;
+            }
+
             map.put("contractInfoVO", contractInfoVO);
             map.put("rowData", rowMap);
             map.put("status", StringUtils.isEmpty(contractInfoVO.getId()) ? ImportStatus.New.name() : ImportStatus.Exist.name());
+            map.put("hashCode", contractInfoVO.hashCode());
 
             result.add(map);
         }
@@ -113,13 +118,16 @@ public class ContractImportService {
         return result;
     }
 
-    public void importData(List<Map<String, Object>> importContractMap) {
+    public void importData(List<Map<String, Object>> importContractMapList) {
 
         int row = 0;
         try {
-            for (Map<String, Object> item : importContractMap) {
+            for (Map<String, Object> item : importContractMapList) {
                 ++row;
-                importOneContract(item);
+                if(checkData(item, importContractMapList)) {
+                    importOneContract(item);
+                }
+
             }
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
@@ -136,64 +144,19 @@ public class ContractImportService {
     @Transactional
     protected void importOneContract(Map<String, Object> item) {
 
-        boolean hasNullData = false;
-
         ContractInfoVO contractInfoVO = (ContractInfoVO)item.get("contractInfoVO");
 
-        ContractRow.clearErrMessage(item);
+        //ContractRow.clearErrMessage(item);
+        //item.put("status", StringUtils.isEmpty(contractInfoVO.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
 
-        item.put("status", StringUtils.isEmpty(contractInfoVO.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
+        if(contractInfoVO.getEndMonths() != null){
+            Instant startDateInstant = contractInfoVO.getStartDate().toInstant();
+            ZoneId zone = ZoneId.systemDefault();
+            LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
+            LocalDate startLocalDate = startLocalDateTime.toLocalDate();
+            Instant scheduleDateInstant = startLocalDate.plus(contractInfoVO.getEndMonths(), ChronoUnit.MONTHS).plus(-1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
 
-        if(contractInfoVO.getName() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 合同名称为空");
-            hasNullData = true;
-        }
-
-        if(contractInfoVO.getStartDate() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 开始时间为空");
-            hasNullData = true;
-        }
-
-        if(contractInfoVO.getEndDate() == null && contractInfoVO.getEndMonths() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 结束时间为空和结束月数不能同时为空");
-            hasNullData = true;
-        }
-
-        if(!hasNullData){
-            if(contractInfoVO.getId() != null){
-                ContractInfo tempContractInfo = contractInfoDao.findOne(contractInfoVO.getId());
-                if(tempContractInfo == null){
-                    item.put("status", ImportStatus.Failure);
-                    ContractRow.addErrMessage(item, "错误: 无效的合同UID");
-                    return;
-                }
-            }
-
-            if(contractInfoVO.getSupplierName() != null){
-                Supplier supplier = supplierDao.findFirstByTenantUIDAndName(contractInfoVO.getTenantUID(), contractInfoVO.getSupplierName());
-                if(supplier == null){
-                    item.put("status", ImportStatus.Failure);
-                    ContractRow.addErrMessage(item, "错误: 不存在的供应商");
-                    return;
-                }else {
-                    contractInfoVO.setSupplierUid(supplier.getUid());
-                }
-            }
-
-            if(contractInfoVO.getEndMonths() != null){
-                Instant startDateInstant = contractInfoVO.getStartDate().toInstant();
-                ZoneId zone = ZoneId.systemDefault();
-                LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
-                LocalDate startLocalDate = startLocalDateTime.toLocalDate();
-                Instant scheduleDateInstant = startLocalDate.plus(contractInfoVO.getEndMonths(), ChronoUnit.MONTHS).plus(-1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
-
-                contractInfoVO.setEndDate(Date.from(scheduleDateInstant));
-            }
-        }else {
-            return;
+            contractInfoVO.setEndDate(Date.from(scheduleDateInstant));
         }
 
         ContractInfo newContractInfo = new ContractInfo();
@@ -204,11 +167,11 @@ public class ContractImportService {
 
     }
 
-    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importContractMap) {
+    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importContractMapList) {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        for (Map<String, Object> map: importContractMap) {
+        for (Map<String, Object> map: importContractMapList) {
 
             String importStatus = map.get("status").toString();
 
@@ -225,32 +188,65 @@ public class ContractImportService {
         return result;
     }
 
-    public Boolean checkData(List<Map<String, Object>> importContractMap) {
+    public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importContractMapList) {
 
-        HashSet<Boolean> result = new HashSet<>();
-        for (Map<String, Object> item: importContractMap) {
-            ContractInfo contractInfo = (ContractInfo) item.get("contractInfo");
+        boolean isValidateData = true;
 
-            if(contractInfo.getName() == null){
-                item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
-                ContractRow.addErrMessage(item, "错误: 合同名称为空");
-            }
+        ContractInfoVO contractInfoVO = (ContractInfoVO)item.get("contractInfoVO");
+        Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
 
-            if(contractInfo.getStartDate() == null){
-                item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
-                ContractRow.addErrMessage(item, "错误: 开始时间为空");
-            }
+        ContractRow.clearErrMessage(item);
 
-            if(contractInfo.getEndDate() == null){
-                item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
-                ContractRow.addErrMessage(item, "错误: 结束时间为空");
+        if(contractInfoVO.getName() == null){
+            item.put("status", ImportStatus.Failure);
+            ContractRow.addErrMessage(item, "错误: 合同名称为空");
+            isValidateData = false;
+        }
+
+        if(contractInfoVO.getStartDate() == null){
+            item.put("status", ImportStatus.Failure);
+            ContractRow.addErrMessage(item, "错误: 开始时间为空");
+            isValidateData = false;
+        }
+
+        if(contractInfoVO.getEndDate() == null && contractInfoVO.getEndMonths() == null){
+            item.put("status", ImportStatus.Failure);
+            ContractRow.addErrMessage(item, "错误: 结束时间为空和结束月数不能同时为空");
+            isValidateData = false;
+        }
+
+        if(contractInfoVO.getId() != null){
+            ContractInfo tempContractInfo = contractInfoDao.findOne(contractInfoVO.getId());
+            if(tempContractInfo == null){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "错误: 无效的合同UID");
+                isValidateData = false;
             }
         }
 
-        return result.isEmpty();
+        if(contractInfoVO.getSupplierName() != null){
+            Supplier supplier = supplierDao.findFirstByTenantUIDAndName(contractInfoVO.getTenantUID(), contractInfoVO.getSupplierName());
+            if(supplier == null){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "错误: 不存在的供应商");
+                isValidateData = false;
+            }else {
+                contractInfoVO.setSupplierUid(supplier.getUid());
+            }
+        }
+
+        for (Map<String, Object> tempContractMap: importContractMapList) {
+            ContractInfoVO tempContractInfoVO = (ContractInfoVO)tempContractMap.get("contractInfoVO");
+            Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
+            if(hashCode.equals(tempHashCode) && contractInfoVO.getLineNum() != tempContractInfoVO.getLineNum()){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "错误: 重复的数据");
+                isValidateData = false;
+                break;
+            }
+        }
+
+        return isValidateData;
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> errorContractList) {
