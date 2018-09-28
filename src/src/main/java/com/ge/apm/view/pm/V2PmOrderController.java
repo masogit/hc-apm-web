@@ -671,7 +671,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 if (pmOrderRule != null) {
                     unColl.setSchemaId(pmOrderRule.getPerformanceReport());
                 }
-                //将检查项的数据保存到UnstructuredDataCollection中.
+                //将检查项
+                // 的数据保存到UnstructuredDataCollection中.
                 while (it.hasNext()) {
                     Map.Entry<String, UnstructuredData> entry = it.next();
                     untest = entry.getValue();
