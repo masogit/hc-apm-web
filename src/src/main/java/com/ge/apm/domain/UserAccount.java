@@ -442,7 +442,10 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public boolean getIsActive() {
-		return isActive;
+		if(isActive==null)
+			return true;
+		else
+			return isActive;
 	}
 
 	public void setIsActive(boolean isActive) {
@@ -509,7 +512,10 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public Boolean getIsLocked() {
-		return isLocked;
+		if(isLocked==null)
+			return false;
+		else
+			return isLocked;
 	}
 
 	public void setIsLocked(Boolean isLocked) {
