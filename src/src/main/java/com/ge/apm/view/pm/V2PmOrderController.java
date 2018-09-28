@@ -701,11 +701,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
 
-    public void prepareAproval(String woid) {
+    /*public void prepareAproval(String woid) {
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+    }*/
+
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
+        approvedDetails.stream().forEach(item -> {
+            if (item.getApproved() == null) {
+                item.setApproved(false);
+            }
+            selectedMap.put(item.getId(), item.getApproved());
+        });
     }
+
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
