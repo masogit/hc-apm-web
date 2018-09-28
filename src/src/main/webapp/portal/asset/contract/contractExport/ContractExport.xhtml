@@ -50,7 +50,7 @@
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                 <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
                                 <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
-                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
+                                <!--<f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />-->
                                 <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -88,10 +88,10 @@
                         <h:outputText value="#{item.合同编号}"/>
                     </p:column>
                     <p:column headerText="合同名称">
-                        <h:outputText value="#{item.合同名称}"/>
+                        <h:outputText value="#{item.名称}"/>
                     </p:column>
                     <p:column headerText="合同类型">
-                        <h:outputText value="#{fieldMsg.fieldValue('contractInfoType', item.合同类型)}"/>
+                        <h:outputText value="#{item.合同类型}"/>
                     </p:column>
                     <p:column headerText="开始时间">
                         <h:outputText value="#{item.开始时间}"/>
