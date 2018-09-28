@@ -185,7 +185,7 @@
                                 <h:panelGroup id="parentAssetList">
                                     <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}" 
-                                                    requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
+                                                    requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
                                     </p:autoComplete>
                                 </h:panelGroup>
@@ -227,7 +227,7 @@
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
                                 <h:panelGroup id="qrCode" class="financingNum">
-                                    <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
+                                    <label class="label">#{msg.qrCode}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired}" 
                                                   requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}">
                                         <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />

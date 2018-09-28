@@ -43,7 +43,7 @@
                     <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
                     <p:ajax event="filter" listener="#{workOrderMgrController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
 
-                    <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
+                    <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -58,12 +58,6 @@
                     <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
-                    <!--<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.serviceRequest.fromDeptUID}">-->
-                        <!--<h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
-                    <!--</p:column>-->
-
-
-<!--update......-->
                     <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>
@@ -88,7 +82,23 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                  <!--  <p:column headerText="#{msg.currentStep}" width="266">-->
+                   <!-- <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 2)}" itemValue="#{fieldMsg.fieldValue('woSteps', 2)}"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps',
+                                3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 5)}" itemValue="#{fieldMsg.fieldValue('woSteps', 5)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
+                    </p:column>-->
+                    <p:column headerText="#{msg.currentStep}" width="266" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -99,9 +109,10 @@
                                 <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
                             </p:selectOneMenu>
                         </f:facet>
-                        <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
+                       <!-- <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>-->
+                        <p:graphicImage  width="265" height="38" name="#{workOrderMgrController.getStepImg(item.currentStepId)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.intExtType}">
+                    <p:column width="90" headerText="#{msg.intExtType}">
                         <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                     </p:column>
 <!--                        <p:column headerText="#{msg.currentPersonName}">
@@ -110,6 +121,7 @@
                     <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
                         <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                     </p:column>
+
                     <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
                         <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                     </p:column>

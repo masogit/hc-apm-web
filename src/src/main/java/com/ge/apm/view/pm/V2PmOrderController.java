@@ -54,6 +54,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -671,7 +672,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 if (pmOrderRule != null) {
                     unColl.setSchemaId(pmOrderRule.getPerformanceReport());
                 }
-                //将检查项的数据保存到UnstructuredDataCollection中.
+                //将检查项
+                // 的数据保存到UnstructuredDataCollection中.
                 while (it.hasNext()) {
                     Map.Entry<String, UnstructuredData> entry = it.next();
                     untest = entry.getValue();
@@ -701,11 +703,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
 
-    public void prepareAproval(String woid) {
+    /*public void prepareAproval(String woid) {
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+    }*/
+
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
+        approvedDetails.stream().forEach(item -> {
+            if (item.getApproved() == null) {
+                item.setApproved(false);
+            }
+            selectedMap.put(item.getId(), item.getApproved());
+        });
     }
+
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
@@ -1365,7 +1381,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
+            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
+
         }
     }
 
@@ -1485,11 +1503,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
     }
 
-    public void prepareEditAccDetail(String itemId) {
+    public void prepareEditAccDetail(String itemId) throws Exception{
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+
             itemDetail.setWoId(selectedPmOrder.getId());
+            itemDetail.setApplyTime(df.parse(new Date().toString()));
             supplierName = null;
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();

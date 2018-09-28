@@ -1516,7 +1516,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 --调剂中心计价方式
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '1', '次', null, null, -1, null, null, null, null, null, null, null, null, null);
-INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '2', '小时(半点/整点)', null, null, -1, null, null, null, null, null, null, null, null, null);
+INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '2', '小时(半点)', null, null, -1, null, null, null, null, null, null, null, null, null);
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '3', '天', null, null, -1, null, null, null, null, null, null, null, null, null);
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '4', '自然时间', null, null, -1, null, null, null, null, null, null, null, null, null);
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '5', '小时(整点)', null, null, -1, null, null, null, null, null, null, null, null, null);
@@ -1612,5 +1612,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'hasAssets', '租户下有关联资产，不能删除！', 'tenant cannot be deleted if having assets !', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'hasUsers', '租户下有关联用户，不能删除！', 'tenant cannot be deleted if having users !', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerId', '保养负责人', 'PM Owner Id', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerName', '保养负责人', 'PM Owner Name', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerTel', '保养负责人电话', 'PM Owner Tel', NULL, '-1');
