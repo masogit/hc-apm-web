@@ -258,19 +258,22 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     }
 
     public String getRentalTime(SharedAssetReqDetail reqDetail) {
-        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
+        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
+        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetType, reqDetail);
         return chargingUnitAndTotalTime._2;
     }
 
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
         SharedAssetRequest request = (StringUtils.isEmpty(reqDetail.getReturnId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
 
-        BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail)._1;
+        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
+
+        BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetType, reqDetail)._1;
         if ("1".equals(request.getType())) {//no charging for asset maintain
             unit = new BigDecimal(0);
         }
-        AssetInfo asset = asiDao.findByUid(reqDetail.getAssetInfoId());
-        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(asset.getSharedAssetTypeUid());
         BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetType, reqDetail);
         return totalAmount.doubleValue();
     }
