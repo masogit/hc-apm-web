@@ -442,10 +442,7 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public boolean getIsActive() {
-		if(isActive==null)
-			return true;
-		else
-			return isActive;
+		return isActive;
 	}
 
 	public void setIsActive(boolean isActive) {
