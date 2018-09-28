@@ -2188,7 +2188,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Date endTime = sharedAssetReqDetail.getChargingEndTime();
 
         String chargingType = item.getSharedAssetType().getChargingType();
-        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetReqDetail);
+        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(item.getSharedAssetType(), sharedAssetReqDetail);
         BigDecimal unit = unitAndTotalTime._1;
         String totalTime = unitAndTotalTime._2;
 
