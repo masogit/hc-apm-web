@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
@@ -32,8 +33,9 @@ public class CBoardControllerTest {
 
         assertEquals("http://apm-dev.hcdigital.com.cn", url);
 
-        String cboardUrl = url + "/bi1";
-        HttpOptions httpOptions = new HttpOptions(cboardUrl);
+//        String cboardUrl = url + "/bi/login.html";
+        String cboardUrl = url + "/hc-apm-cboard/login.html";
+        HttpGet httpOptions = new HttpGet(cboardUrl);
 
         HttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(httpOptions);
@@ -49,13 +51,25 @@ public class CBoardControllerTest {
 
         assertEquals("https://apm-dev.hcdigital.com.cn", url);
 
-        HttpOptions httpOptions = new HttpOptions(url);
+    }
 
-        HttpClient client = new DefaultHttpClient();
-        client.execute(httpOptions);
+    @Test
+    public void getCboardUrlForDev() throws IOException {
 
+        CBoardController controller = new CBoardController();
+        String url = controller.getCBoardUrl("http://apm-dev.hcdigital.com.cn/geapm/web/bi");
 
+        assertEquals("http://apm-dev.hcdigital.com.cn/hc-apm-cboard", url);
 
+    }
+
+    @Test
+    public void getCboardUrlForSIT() throws IOException {
+
+        CBoardController controller = new CBoardController();
+        String url = controller.getCBoardUrl("http://apm.hcdigital.com.cn/geapm/web/bi");
+
+        assertEquals("http://apm.hcdigital.com.cn/bi", url);
 
     }
 }

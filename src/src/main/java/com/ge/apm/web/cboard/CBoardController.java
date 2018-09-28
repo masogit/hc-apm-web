@@ -1,7 +1,10 @@
 package com.ge.apm.web.cboard;
 
 import com.ge.apm.service.security.TokenProvider;
-import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +23,8 @@ public class CBoardController {
     private static final Logger logger = LoggerFactory.getLogger(CBoardController.class);
     Pattern pattern = Pattern.compile("(https?://.*?)/.*?");
 
+    public static final String LOGIN_NAME_KEY = "login_name";
+
     @RequestMapping("/bi")
     public String redirect() throws UnsupportedEncodingException {
 
@@ -27,14 +33,14 @@ public class CBoardController {
         String url = request.getRequestURL().toString();
         logger.info("apm web url, {}", url);
 
-        String commonUrl = getCommonUrl(url);
+        String cBoardUrl = getCBoardUrl(url);
 
-        String loginName = UserContextService.getCurrentUserAccount().getLoginName();
+        String loginName = (String) request.getSession().getAttribute(LOGIN_NAME_KEY);
 
         TokenProvider tokenProvider = new TokenProvider();
         String token = tokenProvider.encode(loginName);
 
-        String resultUrl = commonUrl + "/hc-apm-cboard?token=" + token;
+        String resultUrl = cBoardUrl + "?token=" + token;
 
         //response.sendRedirect(redirectUrl);
 
@@ -50,5 +56,45 @@ public class CBoardController {
 
         return null;
 
+    }
+
+    public String getCBoardUrl(String url) {
+
+        String commonUrl = getCommonUrl(url);
+
+        String cboardUrl = commonUrl + "/bi/login.html";
+
+        //SIT, Prod use /bi link
+        if (isUrlOk(cboardUrl)) {
+            return commonUrl + "/bi";
+        }
+
+        //DEV use /hc-apm-cboard link
+        cboardUrl = commonUrl + "/hc-apm-cboard/login.html";
+
+        if (isUrlOk(cboardUrl)) {
+            return commonUrl + "/hc-apm-cboard";
+        }
+
+        return commonUrl;
+
+    }
+
+    public boolean isUrlOk(String url) {
+        HttpGet httpGet = new HttpGet(url);
+
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = null;
+        try {
+            response = client.execute(httpGet);
+        } catch (IOException e) {
+            return false;
+        }
+
+        if (response.getStatusLine().getStatusCode() == 200) {
+            return true;
+        }
+
+        return false;
     }
 }
