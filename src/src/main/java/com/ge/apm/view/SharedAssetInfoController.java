@@ -83,7 +83,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         //1、使用科室：调剂中心  所属科室：空
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
-        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
+//        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
 
         if (queryIndex == 1){
             //2、使用科室：任意科室  所属科室：调剂中心
