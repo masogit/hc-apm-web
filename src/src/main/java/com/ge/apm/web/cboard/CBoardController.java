@@ -40,7 +40,7 @@ public class CBoardController {
         TokenProvider tokenProvider = new TokenProvider();
         String token = tokenProvider.encode(loginName);
 
-        String resultUrl = cBoardUrl + "?token=" + token;
+        String resultUrl = cBoardUrl + "?Token=" + token;
 
         //response.sendRedirect(redirectUrl);
 
