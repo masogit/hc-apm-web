@@ -1504,13 +1504,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void prepareEditAccDetail(String itemId) throws Exception{
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
 
             itemDetail.setWoId(selectedPmOrder.getId());
-            itemDetail.setApplyTime(df.parse(new Date().toString()));
+
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+            itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             supplierName = null;
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
