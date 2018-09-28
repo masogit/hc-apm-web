@@ -19,7 +19,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500" >
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton attrDescListForm" />
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update="attrDescList"/>
 
                         <p:column headerText="子属性">
