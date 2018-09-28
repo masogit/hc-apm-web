@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.spi.http.HttpHandler;
 
+import com.ge.apm.web.cboard.CBoardController;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
@@ -172,6 +173,8 @@ public class LoginController extends LoginService {
             user.setIsActive(false);
             dao.save(user);
         }
+
+        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userName);
     }
     
     public String getHomePage() {

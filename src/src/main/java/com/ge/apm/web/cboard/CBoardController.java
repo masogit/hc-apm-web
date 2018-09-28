@@ -1,7 +1,6 @@
 package com.ge.apm.web.cboard;
 
 import com.ge.apm.service.security.TokenProvider;
-import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -24,6 +23,8 @@ public class CBoardController {
     private static final Logger logger = LoggerFactory.getLogger(CBoardController.class);
     Pattern pattern = Pattern.compile("(https?://.*?)/.*?");
 
+    public static final String LOGIN_NAME_KEY = "login_name";
+
     @RequestMapping("/bi")
     public String redirect() throws UnsupportedEncodingException {
 
@@ -34,7 +35,7 @@ public class CBoardController {
 
         String cBoardUrl = getCBoardUrl(url);
 
-        String loginName = UserContextService.getCurrentUserAccount().getLoginName();
+        String loginName = (String) request.getSession().getAttribute(LOGIN_NAME_KEY);
 
         TokenProvider tokenProvider = new TokenProvider();
         String token = tokenProvider.encode(loginName);
@@ -75,7 +76,7 @@ public class CBoardController {
             return commonUrl + "/hc-apm-cboard";
         }
 
-        return null;
+        return commonUrl;
 
     }
 
