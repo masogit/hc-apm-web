@@ -179,6 +179,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfo selectSite;
 
     public String getStepImg(int step){
+        if(queryIndex==8 || queryIndex==7)
+            return "icons/5.png";
         switch(step){
             case 5: //待验收
                 return "icons/5.png";
