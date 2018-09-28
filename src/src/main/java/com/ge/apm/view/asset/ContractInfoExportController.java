@@ -50,10 +50,8 @@ public class ContractInfoExportController {
     List<Map<String, Object>> contractItemResultList;
     private List<Map<String, Object>> selectedItems;
 
-    private Date startDate_startFilter;
-    private Date endDate_startFilter;
-    private Date startDate_endFilter;
-    private Date endDate_endFilter;
+    private Date startDateFilter;
+    private Date endDateFilter;
 
     @PostConstruct
     protected void init() {
@@ -82,29 +80,12 @@ public class ContractInfoExportController {
 
         this.selectedItems = null;
 
-        if (null == startDate_startFilter && null == endDate_startFilter && null == startDate_endFilter && null == endDate_endFilter) {
-            showMsgBox("合同开始时间范围和合同结束时间范围需任填一组（区间开始/区间结束）");
+        if (null == startDateFilter && null == endDateFilter) {
+            showMsgBox("合同开始时间和合同结束时间不能同时为空");
             return;
-        } else {
-            if ((null != startDate_startFilter && null == startDate_endFilter)) {
-                showMsgBox("请选择合同开始时间(区间开始)");
-                return;
-            }
-            if ((null == startDate_startFilter && null != startDate_endFilter)) {
-                showMsgBox("请选择合同开始时间(区间结束)");
-                return;
-            }
-            if (null != endDate_startFilter && null == endDate_endFilter) {
-                showMsgBox("请选择合同结束时间(区间开始)");
-                return;
-            }
-            if (null == endDate_startFilter && null != endDate_endFilter) {
-                showMsgBox("请选择合同结束时间(区间结束)");
-                return;
-            }
         }
 
-        contractResultList = contractExportService.createContractData(this.selectedOrg, this.contractType, startDate_startFilter, startDate_endFilter, endDate_startFilter, endDate_endFilter);
+        contractResultList = contractExportService.createContractData(this.selectedOrg, this.contractType, this.startDateFilter, this.endDateFilter);
     }
 
     public void exportAll(){
@@ -179,36 +160,20 @@ public class ContractInfoExportController {
         this.contractType = contractType;
     }
 
-    public Date getStartDate_startFilter() {
-        return startDate_startFilter;
+    public Date getStartDateFilter() {
+        return startDateFilter;
     }
 
-    public void setStartDate_startFilter(Date startDate_startFilter) {
-        this.startDate_startFilter = startDate_startFilter;
+    public void setStartDateFilter(Date startDateFilter) {
+        this.startDateFilter = startDateFilter;
     }
 
-    public Date getEndDate_startFilter() {
-        return endDate_startFilter;
+    public Date getEndDateFilter() {
+        return endDateFilter;
     }
 
-    public void setEndDate_startFilter(Date endDate_startFilter) {
-        this.endDate_startFilter = endDate_startFilter;
-    }
-
-    public Date getStartDate_endFilter() {
-        return startDate_endFilter;
-    }
-
-    public void setStartDate_endFilter(Date startDate_endFilter) {
-        this.startDate_endFilter = startDate_endFilter;
-    }
-
-    public Date getEndDate_endFilter() {
-        return endDate_endFilter;
-    }
-
-    public void setEndDate_endFilter(Date endDate_endFilter) {
-        this.endDate_endFilter = endDate_endFilter;
+    public void setEndDateFilter(Date endDateFilter) {
+        this.endDateFilter = endDateFilter;
     }
 
     public List<Map<String, Object>> getContractResultList() {

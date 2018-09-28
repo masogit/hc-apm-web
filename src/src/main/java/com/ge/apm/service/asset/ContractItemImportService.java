@@ -65,6 +65,10 @@ public class ContractItemImportService {
             contractItemRow.setFieldStringValue("合同UID", "setContractId");
             contractItemRow.setFieldStringValue("相关设备UID", "setAssetUid");
 
+            if(contractInfoItem.getContractId() == null && contractInfoItem.getAssetUid() == null){
+                break;
+            }
+
             map.put("contractInfoItem", contractInfoItem);
             map.put("rowData", rowMap);
             map.put("status", StringUtils.isEmpty(contractInfoItem.getId()) ? ContractItemImportService.ImportStatus.New.name() : ContractItemImportService.ImportStatus.Exist.name());
@@ -81,13 +85,15 @@ public class ContractItemImportService {
         return result;
     }
 
-    public void importData(List<Map<String, Object>> importContractItemMap, String contractType, String tenantUID) {
+    public void importData(List<Map<String, Object>> importContractItemMapList, String contractType, String tenantUID) {
 
         int row = 0;
         try {
-            for (Map<String, Object> item : importContractItemMap) {
+            for (Map<String, Object> item : importContractItemMapList) {
                 ++row;
-                importOneContractItem(item, contractType, tenantUID);
+                if(this.checkData(item, contractType, tenantUID)){
+                    importOneContractItem(item);
+                }
             }
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
@@ -102,53 +108,73 @@ public class ContractItemImportService {
     }
 
     @Transactional
-    protected void importOneContractItem(Map<String, Object> item, String contractType, String tenantUID) {
+    protected void importOneContractItem(Map<String, Object> item) {
+
+        ContractInfoItem contractInfoItem = (ContractInfoItem)item.get("contractInfoItem");
+
+        //ContractItemRow.clearErrMessage(item);
+        //item.put("status", StringUtils.isEmpty(contractInfoItem.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
+
+        contractInfoItemDao.save(contractInfoItem);
+
+    }
+
+    public boolean checkData(Map<String, Object> item, String contractType, String tenantUID) {
+
+        boolean isValidateData = true;
 
         ContractInfoItem contractInfoItem = (ContractInfoItem)item.get("contractInfoItem");
 
         ContractItemRow.clearErrMessage(item);
 
-        item.put("status", StringUtils.isEmpty(contractInfoItem.getId()) ? ImportStatus.Created.name() : ImportStatus.Exist.name());
-
+        ContractInfo contractInfo = null;
         if(contractInfoItem.getContractId() == null){
             item.put("status", ImportStatus.Failure);
             ContractItemRow.addErrMessage(item, "错误: 合同UID不能为空");
-            return;
+            isValidateData = false;
         }else{
-            ContractInfo contractInfo = contractInfoDao.findByIdAndContractTypeAndTenantUID(contractInfoItem.getContractId(), contractType, tenantUID);
+            contractInfo = contractInfoDao.findByIdAndContractTypeAndTenantUID(contractInfoItem.getContractId(), contractType, tenantUID);
             if(contractInfo == null){
                 item.put("status", ImportStatus.Failure);
                 ContractItemRow.addErrMessage(item, "错误: 无效的合同UID");
-                return;
+                isValidateData = false;
             }
         }
 
+        AssetInfo assetInfo = null;
         if(contractInfoItem.getAssetUid() == null){
             item.put("status", ImportStatus.Failure);
             ContractItemRow.addErrMessage(item, "错误: 相关设备UID不能为空");
-            return;
+            isValidateData = false;
         }else{
-            AssetInfo assetInfo = assetInfoDao.findByUidAndTenantUID(contractInfoItem.getAssetUid(), tenantUID);
-            if(assetInfo == null){
-                item.put("status", ImportStatus.Failure);
-                ContractItemRow.addErrMessage(item, "错误: 无效的相关设备UID");
-                return;
+            if(contractInfo != null){
+                assetInfo = assetInfoDao.findByUidAndTenantUID(contractInfoItem.getAssetUid(), tenantUID);
+                if(assetInfo == null || !assetInfo.getSiteUID().equals(contractInfo.getSiteUID())){
+                    item.put("status", ImportStatus.Failure);
+                    ContractItemRow.addErrMessage(item, "错误: 无效的相关设备UID");
+                    isValidateData = false;
+                }
             }
         }
 
-        List<ContractInfoItem> contractInfoItemList = contractInfoItemDao.findByContractIdAndAssetUid(contractInfoItem.getContractId(), contractInfoItem.getAssetUid());
-
-        if(contractInfoItemList.isEmpty()){
-            contractInfoItemDao.save(contractInfoItem);
+        if(contractInfo != null && assetInfo != null){
+            List<ContractInfoItem> contractInfoItemList = contractInfoItemDao.findByContractIdAndAssetUid(contractInfoItem.getContractId(), contractInfoItem.getAssetUid());
+            if(!contractInfoItemList.isEmpty()){
+                item.put("status", ImportStatus.Failure);
+                ContractItemRow.addErrMessage(item, "错误: 合同中已经存在该设备");
+                isValidateData = false;
+            }
         }
+
+        return isValidateData;
 
     }
 
-    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importContractItemMap) {
+    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importContractItemMapList) {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        for (Map<String, Object> map: importContractItemMap) {
+        for (Map<String, Object> map: importContractItemMapList) {
 
             String importStatus = map.get("status").toString();
 

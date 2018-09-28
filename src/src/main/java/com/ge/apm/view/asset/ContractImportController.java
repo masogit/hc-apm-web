@@ -36,7 +36,7 @@ public class ContractImportController {
 
     private UploadedFile file;
 
-    private List<Map<String, Object>> importContractMap;
+    private List<Map<String, Object>> importContractMapList;
 
     private UaaService uaaService;
 
@@ -78,11 +78,13 @@ public class ContractImportController {
                 return;
             }
 
-            importContractMap = contractImportService.getContractMapFromTemplate(doc, contractType, selectedOrg);
+            importContractMapList = contractImportService.getContractMapFromTemplate(doc, contractType, selectedOrg);
 
-            contractImportService.importData(importContractMap);
+            contractImportService.importData(importContractMapList);
 
-            errorContractList = contractImportService.filterErrorRecords(importContractMap);
+            errorContractList = contractImportService.filterErrorRecords(importContractMapList);
+
+            WebUtil.addSuccessMessage("导入完成");
 
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
@@ -142,14 +144,6 @@ public class ContractImportController {
 
     public void setFile(UploadedFile file) {
         this.file = file;
-    }
-
-    public List<Map<String, Object>> getImportContractMap() {
-        return importContractMap;
-    }
-
-    public void setImportContractMap(List<Map<String, Object>> importContractMap) {
-        this.importContractMap = importContractMap;
     }
 
     public String getContractType() {
