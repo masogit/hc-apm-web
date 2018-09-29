@@ -387,6 +387,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Transactional
     public String applyChange() {
+
+        //check whether parent asset is valid when editing
+        if (!isValidParentAsset()) {
+            WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
+            return "";
+        }
+
         if (selected.getUsageStatus() == null) {
             selected.setUsageStatus(3);
         }
@@ -793,6 +800,25 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (customConfig.getAssetsEditpageStatusFields().contains(fieldKey)) return true;
 
         return false;
+    }
+
+    public boolean isValidParentAsset() {
+        //check whether parent asset is valid when editing
+        if (selected.getId() != null) {
+            if (selected.getParentAssetId() != null) {
+                AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
+                if (assetInfo != null) {
+                    if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+                        return false;
+                    }
+                }//parent asset found
+
+            }//parent asset exists
+
+
+        }//editing
+
+        return true;
     }
 
     public boolean needEdit(String fieldKey) {
