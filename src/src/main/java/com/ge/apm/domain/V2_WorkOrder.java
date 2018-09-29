@@ -118,7 +118,7 @@ public class V2_WorkOrder implements Serializable {
     @JoinColumn(name = "wo_id")
     private List<V2_WorkOrder_Step> v2_workOrder_step_list;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
@@ -188,7 +188,10 @@ public class V2_WorkOrder implements Serializable {
 
     @Column(name = "ack_signature")
     private String ackSignature;
-    
+    @Column(name="approval_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date approvalDate;
     //维修价值
     @Column(name = "maintenance_value")
     private Double maintenanceValue;
@@ -560,7 +563,15 @@ public class V2_WorkOrder implements Serializable {
     public void setMaintenanceValue(Double maintenanceValue) {
         this.maintenanceValue = maintenanceValue;
     }
-    
+
+    public Date getApprovalDate() {
+        return approvalDate;
+    }
+
+    public void setApprovalDate(Date approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
