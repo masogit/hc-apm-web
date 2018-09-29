@@ -8,7 +8,6 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,17 +226,20 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     {
     	try 
 		{
-    		String fileName = null;
+    		String fileName = null;    		
     		Map<String, String> voucherInfo = sharedAssetStockService.generateVoucher(asset);
+    		
+    		//when no voucher_num, then take old template to print
+    		String prefix = StringUtils.isBlank(voucherInfo.get("借据ID")) ? "Shared_Asset" : voucherInfo.get("借据ID");
 	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
 	        {
-	            fileName = new String(("Shared_Asset_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+	            fileName = new String((prefix + "_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
 						+ ".pdf").getBytes(),"UTF-8");
 	            doExportToPdf(voucherInfo, "sharedAssetBorrowed.xsl", fileName);
 	        }
 	        else
 	        {
-				fileName = new String(("Shared_Asset_Return_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+				fileName = new String((prefix + "_Return_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
 						+ ".pdf").getBytes(),"UTF-8");
 				doExportToPdf(voucherInfo, "sharedAssetReturned.xsl", fileName );
 			}
