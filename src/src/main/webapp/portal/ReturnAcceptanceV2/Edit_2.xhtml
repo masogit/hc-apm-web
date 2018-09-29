@@ -142,8 +142,8 @@
                                 <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="费用(¥)" sortBy="#{item.cost}" >
-                            <h:outputText value="#{item.cost}"/>
+                        <p:column headerText="费用(¥)" >
+                            <h:outputText value="#{sharedAssetReqDetailV2Controller.getTotalAmount(item)}"/>
                         </p:column>
 <!--                        <p:column headerText="设备接收人" sortBy="#{item.accepter}"  >
                             <h:outputText value="#{item.accepter}"/>

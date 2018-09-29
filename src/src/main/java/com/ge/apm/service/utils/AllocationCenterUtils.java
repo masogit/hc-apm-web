@@ -56,8 +56,12 @@ public class AllocationCenterUtils {
         }
 
         long startDurationInMinutes = 0l;
+        double startPrice = 0d;
         if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
             startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
+        }
+        if(sharedAssetType.getStartingPrice() != null) {
+            startPrice = sharedAssetType.getStartingPrice();
         }
 
         chargeTimeInMinutes = rentalTimeInMinutes;
@@ -69,6 +73,7 @@ public class AllocationCenterUtils {
                 break;
             case "2":
                 //小时（半点）
+
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
@@ -77,7 +82,7 @@ public class AllocationCenterUtils {
                 } else {
                     totalAmount = unit.divide(BigDecimal.valueOf(2))
                                       .multiply(BigDecimal.valueOf(unitPrice))
-                                      .add(BigDecimal.valueOf(sharedAssetType.getStartingPrice()));
+                                      .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
             case "3":
@@ -92,14 +97,16 @@ public class AllocationCenterUtils {
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                  .add(BigDecimal.valueOf(startPrice));
                 break;
             case "5":
                 //小时（整点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(0, RoundingMode.UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                  .add(BigDecimal.valueOf(startPrice));
             default:
                 unit = BigDecimal.valueOf(0);
                 totalAmount = BigDecimal.valueOf(0);
