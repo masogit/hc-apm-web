@@ -9,6 +9,7 @@ import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class ContractExportService {
     private OrgInfoRepository orgInfoDao;
 
 
-    public List<Map<String, Object>> createContractData(OrgInfo selectedOrg, String contractType, Date startDate_startFilter, Date startDate_endFilter, Date endDate_startFilter, Date endDate_endFilter){
+    public List<Map<String, Object>> createContractData(OrgInfo selectedOrg, String contractType, Date startDateFilter, Date endDateFilter){
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
@@ -73,18 +74,11 @@ public class ContractExportService {
         }
 
         ZoneId zone = ZoneId.systemDefault();
-        if (startDate_startFilter != null) {
-            searchFilters.add(new SearchFilter("startDate", SearchFilter.Operator.GTE, startDate_startFilter));
+        if (startDateFilter != null) {
+            searchFilters.add(new SearchFilter("startDate", SearchFilter.Operator.GTE, startDateFilter));
         }
-        if (startDate_endFilter != null) {
-            LocalDate endDate = LocalDateTime.ofInstant(startDate_endFilter.toInstant(), zone).toLocalDate();
-            searchFilters.add(new SearchFilter("startDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
-        }
-        if (endDate_startFilter != null) {
-            searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.GTE, startDate_endFilter));
-        }
-        if (endDate_endFilter != null) {
-            LocalDate endDate = LocalDateTime.ofInstant(endDate_endFilter.toInstant(), zone).toLocalDate();
+        if (endDateFilter != null) {
+            LocalDate endDate = LocalDateTime.ofInstant(endDateFilter.toInstant(), zone).toLocalDate();
             searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
 
@@ -103,9 +97,9 @@ public class ContractExportService {
 
             Map<String, Object> contractInfoMap = new HashedMap();
             contractInfoMap.put("合同UID", contractInfo.getId());
-            contractInfoMap.put("合同名称", contractInfo.getName());
+            contractInfoMap.put("名称", contractInfo.getName());
             contractInfoMap.put("合同编号", contractInfo.getContractNum());
-            contractInfoMap.put("合同类型", contractInfo.getContractType());
+            contractInfoMap.put("合同类型", contractInfo.getContractType() != null ? FieldValueMessageController.fieldValue("contractInfoType", contractInfo.getContractType()) : "");
             contractInfoMap.put("所属院区", orgInfoDao.getByUid(contractInfo.getSiteUID()).getName());
             contractInfoMap.put("供应商", supplierName);
             contractInfoMap.put("合同总额", contractInfo.getAmount());

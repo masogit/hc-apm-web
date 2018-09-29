@@ -178,8 +178,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
-    public String getStepImg(int step){
+    public String getStepImg(int mode ,int step){
+       // if(mode== 2 || mode ==3 ){} 如果是抢单或抢单加手动模式
+
         switch(step){
+            case 7: //
+                return "icons/5.png";
+            case 6: //
+                return "icons/5.png";
             case 5: //待验收
                 return "icons/5.png";
             case 8: //待审核
@@ -188,6 +194,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 return "icons/3.png";
             case 3: //接单中
                 return "icons/2.png";
+            case 2:
+                if(mode== 2 || mode ==3 ){
+                    return "icons/2.png";
+                }
             default:
                 return "icons/1.png";
         }
