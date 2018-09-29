@@ -57,11 +57,19 @@ public class AllocationCenterUtils {
 
         long startDurationInMinutes = 0l;
         double startPrice = 0d;
+        //TODO will be deprecated once startDuration and startPrice have been save to request
         if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
             startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
         }
         if(sharedAssetType.getStartingPrice() != null) {
             startPrice = sharedAssetType.getStartingPrice();
+        }//TODO end
+
+        if(reqDetail.getStartingDuration() != null && reqDetail.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)reqDetail.getStartingDuration().doubleValue() * 60;
+        }
+        if(reqDetail.getStartingPrice() != null) {
+            startPrice = reqDetail.getStartingPrice();
         }
 
         chargeTimeInMinutes = rentalTimeInMinutes;
