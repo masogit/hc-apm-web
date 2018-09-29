@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,11 +36,11 @@ import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.SharedAssetInfoUtils;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import javaslang.Tuple2;
+import javaslang.Tuple3;
 
 @Service
 public class SharedAssetStockService {
@@ -133,11 +134,11 @@ public class SharedAssetStockService {
         return dropdownList;
     }
 
-    public SharedAssetRequest findRequestById(String borrowId) {
+    public SharedAssetRequest findRequestById(String requestId) {
         if(logger.isInfoEnabled()) {
-            logger.info("Borrow id: {}", borrowId);
+            logger.info("Request id: {}", requestId);
         }
-        SharedAssetRequest request = sharedAssetRequestMapper.findRequestById(borrowId);
+        SharedAssetRequest request = sharedAssetRequestMapper.findRequestById(requestId);
         if(logger.isInfoEnabled()) {
             logger.info("SharedAssetRequest: {}", request);
         }
@@ -206,8 +207,9 @@ public class SharedAssetStockService {
     }
     
 
-    public void generateVoucher(AssetInfo asset, Map<String, String> voucherInfo) {
+    public Map<String, String> generateVoucher(AssetInfo asset) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
+        Map<String, String> voucherInfo = new HashMap<>();
         
         SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
         if(sharedAssetReqDetail != null) {
@@ -216,15 +218,15 @@ public class SharedAssetStockService {
             	UserAccount currentUser = UserContextService.getCurrentUserAccount();
                 voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
                 voucherInfo.put("经办人", currentUser.getName());
-                voucherInfo.put("借据ID", "");
+                voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
                 voucherInfo.put("设备型号", asset.getFunctionType());
                 voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
-                voucherInfo.put("租金", SharedAssetInfoUtils.getPdfUnitPrice(sharedAssetReqDetail));
-                voucherInfo.put("状态", SharedAssetInfoUtils.getPdfStatus(asset));
-                voucherInfo.put("借用时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
-                voucherInfo.put("附属物品", SharedAssetInfoUtils.getPdfAccessories(asset));
+                voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
+                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(asset));
+                voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
+                voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(asset));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
             } else {//可用，曾经借出或从未借出，若曾经借出，则计算最近一次借出的相关信息
                 BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
@@ -236,15 +238,17 @@ public class SharedAssetStockService {
                     voucherInfo.put("赔偿费用", df.format(compensationAmount));
                     voucherInfo.put("总计费用", df.format(totalFee.add(compensationAmount)));
                 }
-                voucherInfo.put("归还时间", SharedAssetInfoUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
-                Long rentalTimeInMinutes = SharedAssetInfoUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
+                voucherInfo.put("归还时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
+                Long rentalTimeInMinutes = AllocationCenterUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
                 String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
                 voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
                 voucherInfo.put("租赁费用", df.format(totalFee));
                 voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
+                voucherInfo.put("借据ID", StringUtils.isBlank(sharedAssetReqDetail.getVoucherNum()) ? "" : sharedAssetReqDetail.getVoucherNum());
             }
         }
+        return  voucherInfo;
     }
 
     private String getVoucherTitle4Print(UserAccount currentUser, String flag) {
@@ -290,19 +294,27 @@ public class SharedAssetStockService {
                     logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetType().getChargingType());
                     reqDetail.setChargingType(asset.getSharedAssetType().getChargingType());
                 }
-                Tuple2<BigDecimal, String> chargingUnitAndRentTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
-                BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, asset.getSharedAssetType(), reqDetail);
-                reqDetail.setRentalTime(chargingUnitAndRentTime._2);
-                reqDetail.setTotalAmount(fee);
+                asset.setSharedAssetReqDetail(this.calcRentTimeAndFeeByReqDetail(asset, reqDetail));
             }
         }
     }
 
     private SharedAssetReqDetail calcRentTimeAndFeeByReqDetail(AssetInfo asset, SharedAssetReqDetail reqDetail) {
-        Tuple2<BigDecimal, String> chargingUnitAndRentTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
-        BigDecimal fee = SharedAssetInfoUtils.getTotalAmount(chargingUnitAndRentTime._1, asset.getSharedAssetType(), reqDetail);
-        reqDetail.setRentalTime(chargingUnitAndRentTime._2);
-        reqDetail.setTotalAmount(fee);
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(asset.getSharedAssetType(), reqDetail);
+        reqDetail.setRentalTime(billingDetail._2);
+        reqDetail.setTotalAmount(billingDetail._3);
+        if(StringUtils.isNotEmpty(reqDetail.getReturnId())) {
+            SharedAssetRequest returnReq = this.findRequestById(reqDetail.getReturnId());
+            if("1".equals(returnReq.getType())) {
+                reqDetail.setTotalAmount(BigDecimal.valueOf(0));
+            }
+        } else if(StringUtils.isNotEmpty(reqDetail.getBorrowId())){
+            //borrowId不应为空
+            SharedAssetRequest borrowReq = this.findRequestById(reqDetail.getBorrowId());
+            if("1".equals(borrowReq.getType())) {
+                reqDetail.setTotalAmount(BigDecimal.valueOf(0));
+            }
+        }
         return reqDetail;
     }
 

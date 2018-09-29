@@ -17,7 +17,14 @@
 		<fo:block>	
 						
 			<fo:block font-weight="bold" font-size="13px" margin-top="8.1cm" margin-left="1.2cm"  text-align="left" space-after="0.1cm">
-				还  时
+				还  时 
+				<xsl:choose>
+					<xsl:when test="借据ID/text()=''">
+					</xsl:when>
+					<xsl:otherwise>	
+						（<xsl:value-of select="借据ID"/>）
+					</xsl:otherwise>
+				</xsl:choose>
 			</fo:block>
 			
 			<fo:block wrap-option="wrap" font-size="13px" language="zh" text-align="left" margin-left="1cm" margin-right="1cm" space-after="1cm">
