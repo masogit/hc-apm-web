@@ -157,6 +157,64 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         asset.setSharedAssetReqDetail(reqDetail);
         super.setSelected(asset);
     }
+
+    public void forceLeaseAsset() {
+        if(this.selected != null) {
+            List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
+            OrgInfo assetDept = deptList.stream().filter(item -> item.getName().equals(leaseDeptName))
+                .findFirst()
+                .orElse(null);
+            try {
+                if(assetDept != null) {
+                    selected.setAssetDeptUID(assetDept.getUid());
+                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetStockService.forceLeaseAsset(selected);
+                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
+                    logger.info("****** force lease response ******");
+                    rspBody.forEach((k, v) -> logger.info("key: " + k + ", value: " + v));
+                }
+            } catch (Exception ex) {
+                logger.error("error: {}" + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void forceReturnAsset() {
+        if(this.selected != null) {
+            try {
+                ResponseEntity<LinkedHashMap> returnResponse = sharedAssetStockService.forceReturnAsset(selected);
+                LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
+                logger.info("****** force return response ******");
+                rspBody.forEach((k, v) -> logger.info("key: " + k + ", value: " + v));
+            } catch (Exception ex) {
+                logger.error("error: {}" + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void onLeaseDeptNameChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            leaseDeptName = (String) ((SelectEvent) event).getObject();
+        } else {
+            List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
+            if (!Strings.isNullOrEmpty(leaseDeptName) && !deptList.stream().anyMatch(item -> leaseDeptName.equals(item.getName()))) {
+                leaseDeptName = "";
+            }
+        }
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
+        List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
+                                                            || item.getName().contains(query)
+                                                            || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                                             .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName())
+            .distinct()
+            .collect(Collectors.toList());
+    }
     
     //301医院则显示打印按钮
     public boolean validate301()
@@ -226,64 +284,6 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         xStream.alias("map", HashedMap.class);
 
         return xStream.toXML(data);
-    }
-
-    public void forceLeaseAsset() {
-        if(this.selected != null) {
-            List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
-            OrgInfo assetDept = deptList.stream().filter(item -> item.getName().equals(leaseDeptName))
-                                                 .findFirst()
-                                                 .orElse(null);
-            try {
-                if(assetDept != null) {
-                    selected.setAssetDeptUID(assetDept.getUid());
-                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetStockService.forceLeaseAsset(selected);
-                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
-                    logger.info("****** force lease response ******");
-                    rspBody.forEach((k, v) -> logger.info("key: " + k + ", value: " + v));
-                }
-            } catch (Exception ex) {
-                logger.error("error: {}" + ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    public void forceReturnAsset() {
-        if(this.selected != null) {
-            try {
-                ResponseEntity<LinkedHashMap> returnResponse = sharedAssetStockService.forceReturnAsset(selected);
-                LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
-                logger.info("****** force return response ******");
-                rspBody.forEach((k, v) -> logger.info("key: " + k + ", value: " + v));
-            } catch (Exception ex) {
-                logger.error("error: {}" + ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    public void onLeaseDeptNameChange(AjaxBehaviorEvent event) {
-        if (event instanceof SelectEvent) {
-            leaseDeptName = (String) ((SelectEvent) event).getObject();
-        } else {
-            List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
-            if (!Strings.isNullOrEmpty(leaseDeptName) && !deptList.stream().anyMatch(item -> leaseDeptName.equals(item.getName()))) {
-                leaseDeptName = "";
-            }
-        }
-    }
-
-    public List<String> autoCompleteDeptName(String query) {
-        List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
-        List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
-                                                    || item.getName().contains(query)
-                                                    || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-                                             .collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res.stream().map(item -> item.getName())
-                            .distinct()
-                            .collect(Collectors.toList());
     }
 
 }
