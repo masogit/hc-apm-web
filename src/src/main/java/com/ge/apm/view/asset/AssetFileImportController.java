@@ -155,8 +155,7 @@ public class AssetFileImportController {
         List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
                 exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
-        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
         template.exportSampleAsset(orgList, exportColumnFields);
