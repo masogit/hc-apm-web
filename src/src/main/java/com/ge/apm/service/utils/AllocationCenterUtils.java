@@ -73,11 +73,10 @@ public class AllocationCenterUtils {
                 break;
             case "2":
                 //小时（半点）
-
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
-                if(chargeTimeInMinutes < 0) {
+                if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
                 } else {
                     totalAmount = unit.divide(BigDecimal.valueOf(2))
@@ -97,16 +96,24 @@ public class AllocationCenterUtils {
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
-                                  .add(BigDecimal.valueOf(startPrice));
+                if(chargeTimeInMinutes <= 0) {
+                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                } else {
+                    totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                      .add(BigDecimal.valueOf(startPrice));
+                }
                 break;
             case "5":
                 //小时（整点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(0, RoundingMode.UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
-                                  .add(BigDecimal.valueOf(startPrice));
+                if(chargeTimeInMinutes <= 0) {
+                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                } else {
+                    totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                      .add(BigDecimal.valueOf(startPrice));
+                }
             default:
                 unit = BigDecimal.valueOf(0);
                 totalAmount = BigDecimal.valueOf(0);
