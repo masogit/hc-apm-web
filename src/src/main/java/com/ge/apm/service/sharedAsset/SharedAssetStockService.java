@@ -3,13 +3,7 @@ package com.ge.apm.service.sharedAsset;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
@@ -208,8 +202,9 @@ public class SharedAssetStockService {
     }
     
 
-    public void generateVoucher(AssetInfo asset, Map<String, String> voucherInfo) {
+    public Map<String, String> generateVoucher(AssetInfo asset) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
+        Map<String, String> voucherInfo = new HashMap<>();
         
         SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
         if(sharedAssetReqDetail != null) {
@@ -218,7 +213,7 @@ public class SharedAssetStockService {
             	UserAccount currentUser = UserContextService.getCurrentUserAccount();
                 voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
                 voucherInfo.put("经办人", currentUser.getName());
-                voucherInfo.put("借据ID", "");
+                voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
                 voucherInfo.put("设备型号", asset.getFunctionType());
@@ -247,6 +242,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
             }
         }
+        return  voucherInfo;
     }
 
     private String getVoucherTitle4Print(UserAccount currentUser, String flag) {
