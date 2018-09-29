@@ -3,13 +3,18 @@ package com.ge.apm.service.sharedAsset;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
-import com.ge.apm.service.utils.AllocationCenterUtils;
-import javaslang.Tuple3;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -31,11 +36,11 @@ import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.SharedAssetInfoUtils;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import javaslang.Tuple2;
+import javaslang.Tuple3;
 
 @Service
 public class SharedAssetStockService {
@@ -240,6 +245,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("租赁费用", df.format(totalFee));
                 voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
+                voucherInfo.put("借据ID", StringUtils.isBlank(sharedAssetReqDetail.getVoucherNum()) ? "" : sharedAssetReqDetail.getVoucherNum());
             }
         }
         return  voucherInfo;
