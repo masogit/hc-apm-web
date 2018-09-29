@@ -85,7 +85,7 @@ public class AllocationCenterUtils {
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 if(chargeTimeInMinutes <= 0) {
-                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                    totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
                     totalAmount = unit.divide(BigDecimal.valueOf(2))
                                       .multiply(BigDecimal.valueOf(unitPrice))
@@ -105,7 +105,7 @@ public class AllocationCenterUtils {
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
                 if(chargeTimeInMinutes <= 0) {
-                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                    totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
                     totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
@@ -117,7 +117,7 @@ public class AllocationCenterUtils {
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 if(chargeTimeInMinutes <= 0) {
-                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                    totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
                     totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
