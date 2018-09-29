@@ -170,8 +170,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     	try 
 		{
     		String fileName = null;
-    		Map<String, String> voucherInfo = new HashMap<>();
-    		sharedAssetStockService.generateVoucher(asset, voucherInfo);
+    		Map<String, String> voucherInfo = sharedAssetStockService.generateVoucher(asset);
 	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
 	        {
 	            fileName = new String(("Shared_Asset_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 

@@ -7,8 +7,10 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import javaslang.Tuple3;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +45,7 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
     private List<String> selectedBorrowAccessoryList = null;
     private List<String> selectedReturnAccessoryList = null;
     AssetInfoRepository asiDao = null;
+    SharedAssetTypeRepository swapDao = null;
     SharedAssetReqTypeRepository apdDao = null;
     SharedAssetRequestRepository iouDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -51,6 +55,7 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
     protected void init() {
         dao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         asiDao = WebUtil.getBean(AssetInfoRepository.class);
+        swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
         iouDao = WebUtil.getBean(SharedAssetRequestRepository.class);
         SharedAssetRequestV2Controller sharedAssetRequestV2Controller = WebUtil.getBean(SharedAssetRequestV2Controller.class);
@@ -604,6 +609,13 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
      */
     public void setSelectedBorrowAccessoryList(List<String> selectedBorrowAccessoryList) {
         this.selectedBorrowAccessoryList = selectedBorrowAccessoryList;
+    }
+
+    public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
+        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+        SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+        return billingDetail._3.doubleValue();
     }
     
     
