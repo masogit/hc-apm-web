@@ -99,8 +99,12 @@
                     <p:column headerText="结束时间">
                         <h:outputText value="#{item.结束时间}"/>
                     </p:column>
+                    <p:column headerText="合同时间(月)">
+                        <h:outputText value="#{item.endMonths}"/>
+                    </p:column>
                     <p:column headerText="合同总额">
-                        <h:outputText value="#{item.合同总额}"/>
+                        <!--<h:outputText value="#{item.合同总额}"/>-->
+                        <p:inputNumber value="#{item.合同总额}" readonly="true"> </p:inputNumber>
                     </p:column>
 
                     <f:facet name="{Toolbar}">

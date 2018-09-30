@@ -15,11 +15,12 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AllocationCenterUtils {
 
-    private static Logger log = Logger.getLogger(AllocationCenterUtils.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(AllocationCenterUtils.class.getName());
 
     public static Tuple3<Long, String, BigDecimal> getBillingDetail(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Tuple3 billingDetail;
@@ -56,8 +57,13 @@ public class AllocationCenterUtils {
         }
 
         long startDurationInMinutes = 0l;
-        if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
-            startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
+        double startPrice = 0d;
+
+        if(reqDetail.getStartingDuration() != null && reqDetail.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)reqDetail.getStartingDuration().doubleValue() * 60;
+        }
+        if(reqDetail.getStartingPrice() != null) {
+            startPrice = reqDetail.getStartingPrice();
         }
 
         chargeTimeInMinutes = rentalTimeInMinutes;
@@ -72,12 +78,12 @@ public class AllocationCenterUtils {
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
-                if(chargeTimeInMinutes < 0) {
-                    totalAmount = BigDecimal.valueOf(sharedAssetType.getStartingPrice());
+                if(chargeTimeInMinutes <= 0) {
+                    totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
                     totalAmount = unit.divide(BigDecimal.valueOf(2))
                                       .multiply(BigDecimal.valueOf(unitPrice))
-                                      .add(BigDecimal.valueOf(sharedAssetType.getStartingPrice()));
+                                      .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
             case "3":
@@ -92,17 +98,32 @@ public class AllocationCenterUtils {
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                if(chargeTimeInMinutes <= 0) {
+                    totalAmount = BigDecimal.valueOf(startPrice);
+                } else {
+                    totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                      .add(BigDecimal.valueOf(startPrice));
+                }
                 break;
             case "5":
                 //小时（整点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(0, RoundingMode.UP);
-                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                if(chargeTimeInMinutes <= 0) {
+                    totalAmount = BigDecimal.valueOf(startPrice);
+                } else {
+                    totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                      .add(BigDecimal.valueOf(startPrice));
+                }
+                break;
             default:
                 unit = BigDecimal.valueOf(0);
                 totalAmount = BigDecimal.valueOf(0);
+        }
+
+        if(logger.isInfoEnabled()) {
+            logger.info("reqDetailId: {}, rentalTimeInMinutes: {}, totalAmount: {}, startDurationInMinutes: {}, startPrice: {}", reqDetail.getId(), rentalTimeInMinutes, totalAmount, startDurationInMinutes, startPrice);
         }
 
         billingDetail = new Tuple3(rentalTimeInMinutes, totalTime, totalAmount);

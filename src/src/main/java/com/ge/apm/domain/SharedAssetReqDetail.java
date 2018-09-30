@@ -172,6 +172,12 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "voucher_num", columnDefinition = "VARCHAR(16)")
     private String voucherNum;
 
+    @Column(name = "starting_price")
+    private Double startingPrice;//起步价
+
+    @Column(name = "starting_duration")
+    private Double startingDuration;//起步时长
+
     public String getId() {
         return id;
     }
@@ -692,5 +698,21 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setVoucherNum(String voucherNum) {
         this.voucherNum = voucherNum;
+    }
+
+    public Double getStartingPrice() {
+        return startingPrice;
+    }
+
+    public void setStartingPrice(Double startingPrice) {
+        this.startingPrice = startingPrice;
+    }
+
+    public Double getStartingDuration() {
+        return startingDuration;
+    }
+
+    public void setStartingDuration(Double startingDuration) {
+        this.startingDuration = startingDuration;
     }
 }

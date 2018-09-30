@@ -211,13 +211,13 @@ public class ContractImportService {
 
         if(contractInfoVO.getEndDate() == null && contractInfoVO.getEndMonths() == null){
             item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 结束时间为空和结束月数不能同时为空");
+            ContractRow.addErrMessage(item, "错误: 结束时间为空和合同时间(月)不能同时为空");
             isValidateData = false;
         }
 
         if(contractInfoVO.getId() != null){
             ContractInfo tempContractInfo = contractInfoDao.findOne(contractInfoVO.getId());
-            if(tempContractInfo == null){
+            if(tempContractInfo == null || !tempContractInfo.getContractType().equals(contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "错误: 无效的合同UID");
                 isValidateData = false;

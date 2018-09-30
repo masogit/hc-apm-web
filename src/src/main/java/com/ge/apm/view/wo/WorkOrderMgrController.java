@@ -178,16 +178,38 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
-    public String getStepImg(int mode ,int step){
-       // if(mode== 2 || mode ==3 ){} 如果是抢单或抢单加手动模式
+    public String getStepImg(V2_WorkOrder v2_workOrder){
+        Integer stepId =v2_workOrder.getCurrentStepId();
+int mode =v2_workOrder.getDispatchMode();
 
-        switch(step){
+
+        switch(stepId){
             case 7: //
-                return "icons/5.png";
+                if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
+                    if(v2_workOrder.getApprovalDate()==null){
+                        return  "icons/6.png";
+                    }
+                    return "icons/5.png";
+                }
+                else{//如果没有备件 则显审核图标显示为灰色的
+                    return "icons/6.png";
+                }
             case 6: //
-                return "icons/5.png";
+                if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
+                    return "icons/5.png";
+                }
+                else{//如果没有备件 则显审核图标显示为灰色的
+                    return "icons/6.png";
+                }
             case 5: //待验收
-                return "icons/5.png";
+            {
+                if( v2_workOrder.getV2_workOrder_detail_list().size()>0 && v2_workOrder.getApprovalDate()==null){//有备件 没有提交审核 则显审核图标显示为灰色的
+                    return "icons/6.png";
+                }
+               else{
+                   return "icons/5.png";
+                }
+            }
             case 8: //待审核
                 return "icons/4.png";
             case 4: //维修中
@@ -195,7 +217,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             case 3: //接单中
                 return "icons/2.png";
             case 2:
-                if(mode== 2 || mode ==3 ){
+                if(mode== 2 || mode ==3 ){//如果是抢单或抢单加手动模式
                     return "icons/2.png";
                 }
             default:

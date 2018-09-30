@@ -105,6 +105,8 @@ public class ContractExportService {
             contractInfoMap.put("合同总额", contractInfo.getAmount());
             contractInfoMap.put("开始时间", formatDate(contractInfo.getStartDate()));
             contractInfoMap.put("结束时间", formatDate(contractInfo.getEndDate()));
+            contractInfoMap.put("合同时间(月)", contractInfo.getEndMonths());
+            contractInfoMap.put("endMonths", contractInfo.getEndMonths());
 
             contractResultList.add(contractInfoMap);
         }
