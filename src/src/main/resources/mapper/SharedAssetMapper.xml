@@ -44,7 +44,7 @@
         <result column="req_unit_price" property="unitPrice"/>
         <result column="borrow_id" property="borrowId"/>
         <result column="return_id" property="returnId"/>
-        <result column="voucher_num" property="voucher_num"/>
+        <result column="voucher_num" property="voucherNum"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
