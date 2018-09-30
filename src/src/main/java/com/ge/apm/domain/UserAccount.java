@@ -509,7 +509,10 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
 	public Boolean getIsLocked() {
-		return isLocked;
+		if(isLocked==null)
+			return false;
+		else
+			return isLocked;
 	}
 
 	public void setIsLocked(Boolean isLocked) {
