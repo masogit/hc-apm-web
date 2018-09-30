@@ -180,9 +180,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
         Integer stepId =v2_workOrder.getCurrentStepId();
-int mode =v2_workOrder.getDispatchMode();
-
-
+        int mode =v2_workOrder.getDispatchMode();
         switch(stepId){
             case 7: //
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
