@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +15,6 @@ import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
-import com.ge.apm.service.utils.AllocationCenterUtils;
-import javaslang.Tuple3;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -37,11 +36,11 @@ import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.SharedAssetInfoUtils;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import javaslang.Tuple2;
+import javaslang.Tuple3;
 
 @Service
 public class SharedAssetStockService {
@@ -136,12 +135,12 @@ public class SharedAssetStockService {
     }
 
     public SharedAssetRequest findRequestById(String requestId) {
-        if(logger.isInfoEnabled()) {
-            logger.info("Request id: {}", requestId);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Request id: {}", requestId);
         }
         SharedAssetRequest request = sharedAssetRequestMapper.findRequestById(requestId);
-        if(logger.isInfoEnabled()) {
-            logger.info("SharedAssetRequest: {}", request);
+        if(logger.isDebugEnabled()) {
+            logger.debug("SharedAssetRequest: {}", request);
         }
         return request;
     }
@@ -208,8 +207,9 @@ public class SharedAssetStockService {
     }
     
 
-    public void generateVoucher(AssetInfo asset, Map<String, String> voucherInfo) {
+    public Map<String, String> generateVoucher(AssetInfo asset) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
+        Map<String, String> voucherInfo = new HashMap<>();
         
         SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
         if(sharedAssetReqDetail != null) {
@@ -218,7 +218,7 @@ public class SharedAssetStockService {
             	UserAccount currentUser = UserContextService.getCurrentUserAccount();
                 voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
                 voucherInfo.put("经办人", currentUser.getName());
-                voucherInfo.put("借据ID", "");
+                voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
                 voucherInfo.put("设备型号", asset.getFunctionType());
@@ -245,8 +245,10 @@ public class SharedAssetStockService {
                 voucherInfo.put("租赁费用", df.format(totalFee));
                 voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
+                voucherInfo.put("借据ID", StringUtils.isBlank(sharedAssetReqDetail.getVoucherNum()) ? "" : sharedAssetReqDetail.getVoucherNum());
             }
         }
+        return  voucherInfo;
     }
 
     private String getVoucherTitle4Print(UserAccount currentUser, String flag) {

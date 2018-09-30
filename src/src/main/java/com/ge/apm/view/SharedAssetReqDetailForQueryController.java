@@ -8,10 +8,12 @@ package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple2;
+import javaslang.Tuple3;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -260,22 +262,15 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     public String getRentalTime(SharedAssetReqDetail reqDetail) {
         AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
         SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
-        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetType, reqDetail);
-        return chargingUnitAndTotalTime._2;
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+        return billingDetail._2;
     }
 
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
-        SharedAssetRequest request = (StringUtils.isEmpty(reqDetail.getReturnId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
-
         AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
         SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
-
-        BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(sharedAssetType, reqDetail)._1;
-        if ("1".equals(request.getType())) {//no charging for asset maintain
-            unit = new BigDecimal(0);
-        }
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, sharedAssetType, reqDetail);
-        return totalAmount.doubleValue();
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+        return billingDetail._3.doubleValue();
     }
 
 }

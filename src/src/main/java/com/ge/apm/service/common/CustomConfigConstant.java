@@ -20,6 +20,11 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
+    //默认不使用的字段
+    static public List<String> getExtFields() {
+        return Arrays.asList("assetGroupSecondary");
+    }
+    
     static public List<String> getSysTemFields() {
         return Arrays.asList("name", "assetGroup","status");
     }
