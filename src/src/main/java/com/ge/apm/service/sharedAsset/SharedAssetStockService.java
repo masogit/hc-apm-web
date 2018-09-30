@@ -135,12 +135,12 @@ public class SharedAssetStockService {
     }
 
     public SharedAssetRequest findRequestById(String requestId) {
-        if(logger.isInfoEnabled()) {
-            logger.info("Request id: {}", requestId);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Request id: {}", requestId);
         }
         SharedAssetRequest request = sharedAssetRequestMapper.findRequestById(requestId);
-        if(logger.isInfoEnabled()) {
-            logger.info("SharedAssetRequest: {}", request);
+        if(logger.isDebugEnabled()) {
+            logger.debug("SharedAssetRequest: {}", request);
         }
         return request;
     }
