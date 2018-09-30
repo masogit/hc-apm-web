@@ -83,7 +83,7 @@
                         </h:outputText>
                     </p:column>
 
-                  <!--  <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                    <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -97,7 +97,7 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
                         <h:outputText value="#{item.currentStepId}"/>
-                    </p:column>-->
+                    </p:column>
                     <p:column headerText="#{msg.currentStep}" width="266" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
                         <f:facet name="filter">

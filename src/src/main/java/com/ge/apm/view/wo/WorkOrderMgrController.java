@@ -186,6 +186,9 @@ int mode =v2_workOrder.getDispatchMode();
         switch(stepId){
             case 7: //
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
+                    if(v2_workOrder.getApprovalDate()==null){
+                        return  "icons/6.png";
+                    }
                     return "icons/5.png";
                 }
                 else{//如果没有备件 则显审核图标显示为灰色的
