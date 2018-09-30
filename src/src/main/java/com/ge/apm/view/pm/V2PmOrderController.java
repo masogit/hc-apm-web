@@ -1309,8 +1309,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void approvePMorder() {
-        if (selectedPmOrder != null) { //selectedMapy有问题
-
+       if (selectedPmOrder != null) {
             if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
                     (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
                 WebUtil.addErrorMessage("审核不通过原因必须填写");
@@ -1324,7 +1323,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     item.setApproved(false);
                 }
             });
-            pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
+         pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
             approvedDetails = null;
         }
