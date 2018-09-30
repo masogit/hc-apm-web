@@ -1,5 +1,43 @@
 package com.ge.apm.view.asset;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.model.SelectItem;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -11,27 +49,17 @@ import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.sharedAsset.SharedAssetStockService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.wo.Map2XmlConverter;
+import com.ge.apm.view.wo.WorkOrderReportExportController;
 import com.google.common.base.Strings;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.mapper.DefaultMapper;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.model.SelectItem;
-import java.io.IOException;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -52,6 +80,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     private String leaseDeptName;
 
     private SharedAssetStockService sharedAssetStockService;
+    
+    @Getter
+    @Setter
+    private StreamedContent exportPdf;
 
     @Override
     protected BaseMapper<AssetInfo> getDAO() {
@@ -126,16 +158,12 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         super.setSelected(asset);
     }
 
-    public void preparePrintVoucher(AssetInfo asset) {
-        sharedAssetStockService.generateVoucher(asset);
-    }
-
     public void forceLeaseAsset() {
         if(this.selected != null) {
             List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
             OrgInfo assetDept = deptList.stream().filter(item -> item.getName().equals(leaseDeptName))
-                                                 .findFirst()
-                                                 .orElse(null);
+                .findFirst()
+                .orElse(null);
             try {
                 if(assetDept != null) {
                     selected.setAssetDeptUID(assetDept.getUid());
@@ -179,13 +207,83 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     public List<String> autoCompleteDeptName(String query) {
         List<OrgInfo> deptList = sharedAssetStockService.getOrgDeptList(super.selected.getSiteUID());
         List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
-                                                    || item.getName().contains(query)
-                                                    || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                                                            || item.getName().contains(query)
+                                                            || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                                              .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName())
-                            .distinct()
-                            .collect(Collectors.toList());
+            .distinct()
+            .collect(Collectors.toList());
+    }
+    
+    //301医院则显示打印按钮
+    public boolean validate301()
+    {
+    	return sharedAssetStockService.validate301();
+    }
+    
+    public void printVoucher(AssetInfo asset)
+    {
+    	try 
+		{
+    		String fileName = null;    		
+    		Map<String, String> voucherInfo = sharedAssetStockService.generateVoucher(asset);
+    		
+    		//when no voucher_num, then take old template to print
+    		String prefix = StringUtils.isBlank(voucherInfo.get("借据ID")) ? "Shared_Asset" : voucherInfo.get("借据ID");
+	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
+	        {
+	            fileName = new String((prefix + "_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+						+ ".pdf").getBytes(),"UTF-8");
+	            doExportToPdf(voucherInfo, "sharedAssetBorrowed.xsl", fileName);
+	        }
+	        else
+	        {
+				fileName = new String((prefix + "_Return_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 
+						+ ".pdf").getBytes(),"UTF-8");
+				doExportToPdf(voucherInfo, "sharedAssetReturned.xsl", fileName );
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+        }
+    }
+
+    private void doExportToPdf(Map<String, String> info, String xslName, String pdfName) {
+        try {
+            String woXml = getWoXml(info);
+
+            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/" + xslName).getPath());
+
+            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/fop.xml").getPath());
+
+            FopFactory fopFactory = FopFactory.newInstance(conf);
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            try {
+                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
+                Source src = new StreamSource(new StringReader(woXml));
+                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
+                Result res = new SAXResult(fop.getDefaultHandler());
+                transformer.transform(src, res);
+            } finally {
+                exportPdf = (new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, pdfName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getWoXml(Map<String, String> data) {
+        XStream xStream = new XStream(new DomDriver());
+        xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
+        xStream.alias("List", List.class);
+        xStream.alias("map", HashedMap.class);
+
+        return xStream.toXML(data);
     }
 
 }

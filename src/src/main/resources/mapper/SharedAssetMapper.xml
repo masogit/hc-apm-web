@@ -44,6 +44,7 @@
         <result column="req_unit_price" property="unitPrice"/>
         <result column="borrow_id" property="borrowId"/>
         <result column="return_id" property="returnId"/>
+        <result column="voucher_num" property="voucherNum"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -111,6 +112,7 @@
             sard.charging_end_time,
             sard.charging_type as req_charging_type,
             sard.unit_price as req_unit_price,
+            sard.voucher_num,
             sard.borrow_id,
             sard.return_id
             from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
