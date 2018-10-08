@@ -43,7 +43,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
@@ -68,7 +68,7 @@
                                         <h:panelGroup>
                                             <label class="label">#{msg.arrivalListManufacture}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['manufacture'].arrivalRequired? '*':''}</span></label>
                                             <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['manufacture'].arrivalRequired}" 
-                                                         requiredMessage="#{msg.arrivalListFunctionType} #{msg.ValidationRequire}"  disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                         requiredMessage="#{msg.arrivalListManufacture} #{msg.ValidationRequire}"  disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                                 <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
                                                 <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
                                             </p:autoComplete>
@@ -98,7 +98,7 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.vendor}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['vendor'].arrivalRequired? '*':''}</span></label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['vendor'].arrivalRequired}" 
-                                                         requiredMessage="#{msg.arrivalListFunctionType} #{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                         requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" />
                                         </p:autoComplete>
