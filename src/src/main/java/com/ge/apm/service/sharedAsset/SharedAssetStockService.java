@@ -116,6 +116,7 @@ public class SharedAssetStockService {
 
     public List<AssetInfo> loadAllSharedAssets(Pagination pageRequest, Wrapper<AssetInfo> wrapper) {
         List<AssetInfo> assetList = sharedAssetMapper.loadSharedAssets(pageRequest, wrapper);
+        processAssets(assetList);
         calcRentTimeAndFee(assetList);
         return assetList;
     }
@@ -285,6 +286,17 @@ public class SharedAssetStockService {
                                                             .findFirst()
                                                             .orElse(null);
         return sharedAssetReqDetail;
+    }
+
+    private void processAssets(List<AssetInfo> assets) {
+        // hide deptName if asset is owned by allocation center
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        for(AssetInfo asset : assets) {
+            if(allocationCenterUids.contains(asset.getAssetDeptUID())) {
+                asset.getAssetDeptOrg().setName("");
+            }
+        }
     }
 
     private void calcRentTimeAndFee(List<AssetInfo> assets) {
