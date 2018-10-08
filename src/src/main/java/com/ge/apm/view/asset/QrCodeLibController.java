@@ -173,7 +173,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         qrCodeService.createManyQrCode(tenantUID, selectedOrg.getSiteUID(), qrCodeNum);
         this.selectedOrg = null;
-        qrCodeNum = 0;
+        qrCodeNum = null;
 
     }
 
