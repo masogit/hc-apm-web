@@ -15,11 +15,12 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AllocationCenterUtils {
 
-    private static Logger log = Logger.getLogger(AllocationCenterUtils.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(AllocationCenterUtils.class.getName());
 
     public static Tuple3<Long, String, BigDecimal> getBillingDetail(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Tuple3 billingDetail;
@@ -57,13 +58,6 @@ public class AllocationCenterUtils {
 
         long startDurationInMinutes = 0l;
         double startPrice = 0d;
-        //TODO will be deprecated once startDuration and startPrice have been save to request
-        if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
-            startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
-        }
-        if(sharedAssetType.getStartingPrice() != null) {
-            startPrice = sharedAssetType.getStartingPrice();
-        }//TODO end
 
         if(reqDetail.getStartingDuration() != null && reqDetail.getStartingDuration() > 0) {
             startDurationInMinutes = (long)reqDetail.getStartingDuration().doubleValue() * 60;
@@ -122,9 +116,14 @@ public class AllocationCenterUtils {
                     totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
                 }
+                break;
             default:
                 unit = BigDecimal.valueOf(0);
                 totalAmount = BigDecimal.valueOf(0);
+        }
+
+        if(logger.isInfoEnabled()) {
+            logger.info("reqDetailId: {}, rentalTimeInMinutes: {}, totalAmount: {}, startDurationInMinutes: {}, startPrice: {}", reqDetail.getId(), rentalTimeInMinutes, totalAmount, startDurationInMinutes, startPrice);
         }
 
         billingDetail = new Tuple3(rentalTimeInMinutes, totalTime, totalAmount);
