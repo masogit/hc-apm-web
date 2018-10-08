@@ -82,7 +82,7 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                         </h:outputText>
                     </p:column>
-
+                    <!--当前处理步骤-->
                     <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
@@ -96,7 +96,7 @@
                             </p:selectOneMenu>
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
-                        <h:outputText value="#{item.currentStepId}"/>
+                        <!--<h:outputText value="#{item.currentStepId}"/>--><!--调试作用-->
                     </p:column>
                     <p:column headerText="#{msg.currentStep}" width="266" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
