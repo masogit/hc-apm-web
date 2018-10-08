@@ -122,13 +122,15 @@ public class SharedAssetStockService {
 
     public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel() {
         UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
 
         TreeNodeUtil.sortTreeNodeByName(rootNode);
 
         List<SelectItem> dropdownList = new ArrayList<>();
         if (rootNode != null) {
-            traverse(rootNode, dropdownList);
+            traverse(rootNode, dropdownList, allocationCenterUids);
         }
 
         return dropdownList;
@@ -190,8 +192,7 @@ public class SharedAssetStockService {
                                                                                             reqComment);
         return returnResponse;
     }
-    
-    
+
     //301医院则显示打印按钮
     public boolean validate301()
     {
@@ -318,15 +319,19 @@ public class SharedAssetStockService {
         return reqDetail;
     }
 
-    private void traverse(TreeNode node, List<SelectItem> itemList) {
+    private void traverse(TreeNode node, List<SelectItem> itemList, List<String> excludeItemList) {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
-        SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
-        itemList.add(selectItem);
+        if(excludeItemList.contains(orgInfo.getUid())) {
+            //exclude allocation centers from dropdown list
+        } else {
+            SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
+            itemList.add(selectItem);
+        }
 
         if (!node.isLeaf()) {
             for (TreeNode nodeItem : node.getChildren()) {
-                traverse(nodeItem, itemList);
+                traverse(nodeItem, itemList, excludeItemList);
             }
         }
     }
