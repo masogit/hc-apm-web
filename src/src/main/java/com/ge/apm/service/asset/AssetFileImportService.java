@@ -207,6 +207,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 result.add(map);
 
             }catch(Exception e){
+                logger.error(e.getMessage(), e);
                 throw new Exception("第"+dataRow+"行数据错误:" + e.getMessage());
             }
         }
