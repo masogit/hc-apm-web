@@ -34,6 +34,7 @@ import webapp.framework.web.WebUtil;
 
 import lombok.Getter;
 import lombok.Setter;
+
 /**
  *
  * @author 212579464
@@ -41,18 +42,21 @@ import lombok.Setter;
 @ManagedBean
 @ViewScoped
 public class CustomConfigController {
-
+    
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
-
+    
     @Getter
     private OrgInfo selectSite;
-    @Getter @Setter
+    @Getter
+    @Setter
     private CustomConfigObject customConfigObject;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> selectedAddFields;
-    @Getter @Setter
+    @Getter
+    @Setter
     private CustomConfigAssetField currentEditField;
     @Getter
     private CustomConfig customConfig;
@@ -60,13 +64,13 @@ public class CustomConfigController {
     private LinkedHashMap<String, String> allFields;
     @Getter
     private Map<String, String> configRoles;
-    @Getter 
+    @Getter
     private List<String> addFieldsList;
     @Getter
     private String addFieldsType;
     @Getter
     private Map<String, String> configInfo = new HashMap();
-
+    
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -78,7 +82,7 @@ public class CustomConfigController {
         selectedAddFields = new HashMap();
         loadConfigForSite(selectSite.getUid());
     }
-
+    
     private void loadConfigForSite(String siteUid) {
         customConfig = ccService.getCustomConfigBySite(siteUid);
         if (null == customConfig) {
@@ -88,7 +92,7 @@ public class CustomConfigController {
         }
         updateConfigInfo();
     }
-
+    
     public void prepareAddAssetField(String type) {
         addFieldsType = type;
         if (null == addFieldsList) {
@@ -171,7 +175,7 @@ public class CustomConfigController {
                 break;
         }
     }
-
+    
     public String getAddFieldsUpdateString() {
         switch (addFieldsType) {
             case "BasicFields":
@@ -215,7 +219,7 @@ public class CustomConfigController {
                 return "";
         }
     }
-
+    
     public void addAssetFields() {
         switch (addFieldsType) {
             case "BasicFields":
@@ -321,7 +325,7 @@ public class CustomConfigController {
         }
         cancelAddFields();
     }
-
+    
     public void cancelAddFields() {
         addFieldsType = "";
         addFieldsList.clear();
@@ -339,11 +343,11 @@ public class CustomConfigController {
         roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
         return res.toString();
     }
-
+    
     public void removeAssetField(String key) {
         ccService.removeAssetField(customConfigObject, key);
     }
-
+    
     public String getCustomConfigInfomation() {
         if (customConfig == null) {
             return "当前院区无配置,保存后创建";
@@ -359,7 +363,7 @@ public class CustomConfigController {
         }
         return res.toString();
     }
-
+    
     private void updateConfigInfo() {
         if (null != customConfig) {
             configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
@@ -368,7 +372,7 @@ public class CustomConfigController {
             configInfo.put("LastModifiedDate", customConfig.getLastModifiedDate() == null ? "" : DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
     }
-
+    
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         if (null != event) {
             if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
@@ -379,61 +383,65 @@ public class CustomConfigController {
             loadConfigForSite(selectSite.getUid());
         }
     }
-
+    
     public void onListPageFieldsReorder(ReorderEvent event) {
     }
-
+    
     public void saveChange() {
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
         updateConfigInfo();
     }
-
+    
     public void deleteConfig() {
         ccService.removeConfig(selectSite);
         loadConfigForSite(selectSite.getUid());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
     }
-
+    
     public boolean isSystemFields(String key) {
-        return CustomConfigConstant.getSysTemFields().contains(key);
+        return CustomConfigConstant.getSystemFields().contains(key);
     }
-
+    
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
         }
     }
-
+    
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
-
+    
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
     }
 
     //for 10.1 update
-    public void updateCustomFieldForArrivalRequired(){
-       com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
-       List<CustomConfig> allConfigList = customConfigDao.find();
-       
+    public void updateCustomFieldForArrivalRequired() {
+        com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
+        List<CustomConfig> allConfigList = customConfigDao.find();
+
 //       allConfigList.stream().forEach(item->{
 //           CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
 //           configObject.getAssetFields().entrySet().stream().filter(fielditem-> fielditem.getValue().isRequired()).forEach(fielditem-> {fielditem.getValue().setArrivalRequired(true);});
 //           item.setConfig(JSONObject.toJSONString(configObject));
 //       });
-       
-       allConfigList.stream().forEach(item->{
-           CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
-           CustomConfigConstant.getInstallRequiredFields().forEach(fielditem -> {
+        allConfigList.stream().forEach(item -> {
+            CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
+            
+            CustomConfigConstant.getSystemFields().forEach(fielditem -> {
+                configObject.getAssetFields().get(fielditem).setRequired(true);
                 configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
             });
-           item.setConfig(JSONObject.toJSONString(configObject));
-       });
-       customConfigDao.save(allConfigList);
-       WebUtil.addSuccessMessage("updated all config:"+ allConfigList.size());
+            CustomConfigConstant.getInstallRequiredFields().forEach(fielditem -> {
+                configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
+            });
+            item.setConfig(JSONObject.toJSONString(configObject));
+        });
+        customConfigDao.save(allConfigList);
+        WebUtil.addSuccessMessage("updated all config:" + allConfigList.size());
     }
     
 }
