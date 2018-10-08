@@ -179,10 +179,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfo selectSite;
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
+        if(v2_workOrder.getId().equalsIgnoreCase("1809291811"))
+            System.out.println();
         Integer stepId =v2_workOrder.getCurrentStepId();
-int mode =v2_workOrder.getDispatchMode();
-
-
+        int mode =v2_workOrder.getDispatchMode();
         switch(stepId){
             case 7: //
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
@@ -213,7 +213,13 @@ int mode =v2_workOrder.getDispatchMode();
             case 8: //待审核
                 return "icons/4.png";
             case 4: //维修中
+            {
+                if(v2_workOrder.getApprovalDate()!=null){
+                    return  "icons/4.png";
+                }
                 return "icons/3.png";
+            }
+
             case 3: //接单中
                 return "icons/2.png";
             case 2:
