@@ -784,6 +784,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
                                     //asdDao.save(assetDetaiVo);
+
+                                    logger.info("Asset Uid: " + infoVo.getUid() + ", start duration: " + swapTypeVo.getStartingDuration() + ", start price: " + swapTypeVo.getStartingPrice());
+                                    if(swapTypeVo.getStartingDuration() != null && swapTypeVo.getStartingPrice() != null) {
+                                        assetDetaiVo.setStartingDuration(swapTypeVo.getStartingDuration());
+                                        assetDetaiVo.setStartingPrice(swapTypeVo.getStartingPrice());
+                                    }
                                     
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
                                     
