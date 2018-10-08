@@ -30,7 +30,7 @@
                                         <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{assetArrivedListEditController.orgTree}" selection="#{assetArrivedListEditController.selectedNode}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
+                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm:selectedOrgName" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
                                                     <p:ajax process="@this" event="collapse"/>
 
@@ -42,40 +42,36 @@
                                         </p:overlayPanel>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <label class="label">#{msg.assetName}*</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"  
+                                                     />
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
+                                        <label class="label">#{msg.assetGroup}*</label>
                                         <p:selectOneMenu id="assetGroup" value="#{assetArrivedListEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" >
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.arrivalDate}<span style="color:red">*</span></label>
+                                        <label class="label">#{msg.arrivalDate}*</label>
                                         <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" 
                                                     required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
-                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['functionType']}" >
-                                        <h:panelGroup>
-                                            <label class="label">#{msg.arrivalListFunctionType}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['functionType'].arrivalRequired? '*':''}</span></label>
-                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" required="#{assetArrivedListEditController.customConfig.assetFields['functionType'].arrivalRequired}" 
-                                                         requiredMessage="#{msg.arrivalListFunctionType} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
-                                        </h:panelGroup>
-                                    </c:if>
-                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['manufacture']}" >
-                                        <h:panelGroup>
-                                            <label class="label">#{msg.arrivalListManufacture}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['manufacture'].arrivalRequired? '*':''}</span></label>
-                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['manufacture'].arrivalRequired}" 
-                                                         requiredMessage="#{msg.arrivalListManufacture} #{msg.ValidationRequire}"  disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                                <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
-                                                <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
-                                            </p:autoComplete>
-                                        </h:panelGroup>
-                                    </c:if>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.quantity}<span style="color:red">*</span></label>
+                                        <label class="label">#{msg.arrivalListFunctionType}</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.arrivalListManufacture}</label>
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true" 
+                                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                            <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                        </p:autoComplete>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.quantity}*</label>
                                         <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedListEditController.selected.quantity}"  readonly="#{assetArrivedListEditController.selected.status ne '1'}" required="true" requiredMessage="#{msg.quantity} #{msg.ValidationRequire}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -91,25 +87,23 @@
                                         <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.arrivalListContractPrice}<span style="color:red">#{assetArrivedListEditController.needInstorageCheck?'*':''}</span></label>
+                                        <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
                                         <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
-                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['vendor']}" >
                                     <h:panelGroup>
-                                        <label class="label">#{msg.vendor}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['vendor'].arrivalRequired? '*':''}</span></label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['vendor'].arrivalRequired}" 
-                                                         requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                        <label class="label">#{msg.vendor}</label>
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" 
+                                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" />
                                         </p:autoComplete>
                                     </h:panelGroup>
-                                        </c:if>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListAgent}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.ArrivalProcessType}<span style="color:red">*</span></label>
+                                        <label class="label">#{msg.ArrivalProcessType}*</label>
                                         <p:selectOneMenu  value="#{assetArrivedListEditController.selected.processType}" required="true" requiredMessage="#{msg.ArrivalProcessType}#{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.selected.status ne '1'}" >
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
