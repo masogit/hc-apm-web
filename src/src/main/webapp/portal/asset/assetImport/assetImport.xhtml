@@ -13,7 +13,9 @@
                 <p:outputLabel class="pageTitle" value="#{msg.Import}#{msg.AssetInfo}"/>
             </div>
             <div class="ui-g-12 card">
+                
                 <h:form id="importForm">
+                    <!--<p:ajaxStatus oncomplete="PF('statusDialog').show();" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />-->
                     <p:fieldset  legend="#{msg.ImportAssetDataFile}" id="uploaderContainer">
 
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -116,14 +118,14 @@
                                         <label class="label">当二维码为空时自动生成</label>
                                         <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
                                     </h:panelGroup>
-<!--                                    <h:panelGroup>
-                                        <label class="label">同时生成保养工单*</label>
-                                        <p:selectOneMenu  value="#{assetFileImportController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItem itemLabel="是" itemValue="true"/>
-                                            <f:selectItem itemLabel="否" itemValue="false"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>-->
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">同时生成保养工单*</label>
+                                                                            <p:selectOneMenu  value="#{assetFileImportController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
+                                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                                                <f:selectItem itemLabel="是" itemValue="true"/>
+                                                                                <f:selectItem itemLabel="否" itemValue="false"/>
+                                                                            </p:selectOneMenu>
+                                                                        </h:panelGroup>-->
                                 </h:panelGrid>
 
                             </h:panelGroup>
@@ -169,7 +171,9 @@
 
 
                         <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
+                            
+                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check"
+                                            onstart="PF('statusDialogForImport').show()" oncomplete="PF('statusDialogForImport').hide()" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}" />
                             <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
                                 <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
                             <!--</p:commandButton>-->
@@ -180,7 +184,7 @@
                             <!--<h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />-->
                             <!--<c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">-->
                                 <!--<h:outputText value="#{item}" />-->
-                            <!--</c:forEach>-->
+                        <!--</c:forEach>-->
                         <!--</h:panelGroup>-->
                     </p:panelGrid>
                 </h:form>
@@ -188,6 +192,10 @@
 
         </div>
 
+        
+    <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+        <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+    </p:dialog>
     </ui:define>
 
 </ui:composition>
