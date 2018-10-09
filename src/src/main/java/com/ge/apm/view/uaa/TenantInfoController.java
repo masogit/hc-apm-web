@@ -203,6 +203,15 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
     }
     
+    public void onWorkScheduleChange(){
+    	if(tenantConfig.getBlnWorkSchedule()){
+    		tenantConfig.setBlnPreventiveMaintainceMgmt(true);
+    	}
+    	else{
+    		tenantConfig.setBlnPreventiveMaintainceMgmt(false);
+    	}
+    }
+    
     public void onVersionChange(){
     	tenantConfig.setValueWithVersion(this.selectedVersion);
     }
@@ -213,7 +222,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     	tenantConfig=new TenantInfoConfig();
     	tenantConfig.setValueWithVersion(this.selectedVersion);
     }
-    
     private void parseTenantConfig(){
     	String configJsonStr=this.selected.getTenantConfig();
     	this.listVersions=TenantInfoConfig.getVersions();
@@ -264,6 +272,4 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void setSelectedVersion(String selectedVersion) {
 		this.selectedVersion = selectedVersion;
 	}
-    
-    
 }
