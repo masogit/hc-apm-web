@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +75,12 @@ public class ContractItemImportController {
 
             errorContractItemList = contractItemImportService.filterErrorRecords(importContractItemMapList);
 
-            WebUtil.addSuccessMessage("导入完成");
+            if(!errorContractItemList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "导入完成,注意有导入失败的记录！", "总共有"+errorContractItemList.size()+"条记录处理失败！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage("导入完成");
+            }
 
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");

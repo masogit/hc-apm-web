@@ -15,7 +15,7 @@
         <div class="ui-g-12 card">
             <h:form id="importForm">
                 <p:fieldset  legend="合同导入" id="uploaderContainer">
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
                             <label class="label">*#{msg.hospitalId}</label>
                             <p:inputText id="selectedOrgName"
@@ -55,7 +55,9 @@
                                 <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
                             </p:selectOneMenu>
                         </h:panelGroup>
+                    </p:panelGrid>
 
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>
                             <p:fileUpload  id="fileUpload" fileUploadListener="#{contractImportController.uploadDataFile}" value="#{contractImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
@@ -63,10 +65,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <p>说明</p>
-                            <p>1. <a href="APM_Contract_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>
-                            <p>2. 文件中填入要导入的合同数据</p>
-                            <p>3. 上传文件进行导入</p>
+                            <div style="white-space:pre">说明   1. <a href="APM_Contract_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>        2. 文件中填入要导入的合同数据        3. 上传文件进行导入</div>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -77,6 +76,7 @@
 
         <div class="ui-g-12 card">
             <h:form id="errorDataListForm">
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
                 <p:fieldset  legend="导入失败数据">
                     <p:dataTable id="errorDatalist" rendered="#{not empty contractImportController.errorContractList}" value="#{contractImportController.errorContractList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
