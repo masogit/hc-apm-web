@@ -37,12 +37,14 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">维修管理</label>
-                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" />
+                            <p:selectBooleanCheckbox id="idWorkOrderMgmtWithoutWorkSchedule" value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" >
+                            	<p:ajax event="change" listener="#{tenantInfoController.onWorkOrderMgmtWithoutWorkScheduleChange()}" update="idWorkSchedule"></p:ajax>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">排班管理</label>
-                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkSchedule}">
-                            	<p:ajax event="change" listener="#{tenantInfoController.onWorkScheduleChange()}" update="idPreventiveMaintainceMgmt"></p:ajax>
+                            <p:selectBooleanCheckbox id="idWorkSchedule" value="#{tenantInfoController.tenantConfig.blnWorkSchedule}">
+                            	<p:ajax event="change" listener="#{tenantInfoController.onWorkScheduleChange()}" update="idWorkOrderMgmtWithoutWorkSchedule"></p:ajax>
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
