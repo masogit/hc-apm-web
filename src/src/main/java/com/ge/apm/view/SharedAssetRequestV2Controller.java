@@ -194,8 +194,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
        setUserSearchFilters();
 
-       this.updateSearchFilter(new SearchFilter("type", SearchFilter.Operator.IsNull,null));//过滤借还维护的单子
-
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
             stateList.add("0");
