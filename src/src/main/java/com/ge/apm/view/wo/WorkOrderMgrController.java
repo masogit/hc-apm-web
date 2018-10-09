@@ -179,7 +179,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfo selectSite;
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
-        /*if(v2_workOrder.getServiceRequest().getSrNum().equalsIgnoreCase("1810081152"))
+       /* if(v2_workOrder.getServiceRequest().getSrNum().equalsIgnoreCase("1809291343"))
             System.out.println();*/
         Integer stepId =v2_workOrder.getCurrentStepId();
         int mode =v2_workOrder.getDispatchMode();
@@ -195,12 +195,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     return "icons/6.png";
                 }
             case 6: //
-                if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
-                    return "icons/5.png";
-                }
-                else{//如果没有备件 则显审核图标显示为灰色的
+                if(v2_workOrder.getV2_workOrder_detail_list().size()>0){
+                    if(v2_workOrder.getApprovalDate()==null) //有备件但未提交审核
+                    {
+                        return "icons/6.png";
+                    }else
+                        return "icons/5.png";
+                }else{//如果没有备件 则显审核图标显示为灰色的
                     return "icons/6.png";
                 }
+
             case 5: //待验收
             {
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0 && v2_workOrder.getApprovalDate()==null){//有备件 没有提交审核 则显审核图标显示为灰色的
