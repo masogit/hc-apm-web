@@ -207,9 +207,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     	if(tenantConfig.getBlnWorkSchedule()){
     		tenantConfig.setBlnWorkOrderMgmtWithoutWorkSchedule(true);
     	}
-    	else{
-    		tenantConfig.setBlnWorkOrderMgmtWithoutWorkSchedule(false);
-    	}
     }
     
     public void onVersionChange(){
