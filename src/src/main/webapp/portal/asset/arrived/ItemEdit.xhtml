@@ -175,7 +175,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">#{msg.clinicalDeptName}*</label>
+                                <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
                                     <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
                                     <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />

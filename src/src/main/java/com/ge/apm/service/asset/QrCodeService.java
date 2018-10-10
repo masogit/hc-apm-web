@@ -447,7 +447,7 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "";
         }
-        if (qrcode.length() > 16) {
+        if (qrcode.length() > 16 || qrcode.length()<4) {
             return "";
         }
 
@@ -629,17 +629,6 @@ public class QrCodeService {
 
     }
 
-    public void releaseQrCodeInUse(String qrCode, String siteUid) {
-        QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
-        if (qrCodeLib != null) {
-            int status = qrCodeLib.getStatus();
-            if (status == 3) {
-                qrCodeLib.setStatus(1);
-                qrCodeLibDao.save(qrCodeLib);
-            }
-
-        }
-    }
     
     public void releaseQrCode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
