@@ -25,8 +25,8 @@ public class CustomConfigConstant {
         return Arrays.asList("assetGroupSecondary");
     }
     
-    static public List<String> getSysTemFields() {
-        return Arrays.asList("name", "assetGroup","status");
+    static public List<String> getSystemFields() {
+        return Arrays.asList("name", "assetGroup","status","siteUID");
     }
     
     static public List<String> getInstallRequiredFields() {
