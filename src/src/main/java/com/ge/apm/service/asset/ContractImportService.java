@@ -217,9 +217,13 @@ public class ContractImportService {
 
         if(contractInfoVO.getId() != null){
             ContractInfo tempContractInfo = contractInfoDao.findOne(contractInfoVO.getId());
-            if(tempContractInfo == null || !tempContractInfo.getContractType().equals(contractInfoVO.getContractType())){
+            if(tempContractInfo == null){
                 item.put("status", ImportStatus.Failure);
                 ContractRow.addErrMessage(item, "错误: 无效的合同UID");
+                isValidateData = false;
+            }else if(!tempContractInfo.getContractType().equals(contractInfoVO.getContractType())){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "错误: 不允许更改合同类型");
                 isValidateData = false;
             }
         }

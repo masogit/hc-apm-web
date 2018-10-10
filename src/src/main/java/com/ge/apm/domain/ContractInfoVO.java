@@ -16,15 +16,12 @@ public class ContractInfoVO extends ContractInfo {
     }
 
     public boolean isNull() {
-        boolean flag = true;
+        boolean flag = false;
 
-        flag = this.getName() == null;
-        flag = this.getAmount() == null;
-        flag = this.getContractNum() == null;
-        flag = this.getStartDate() == null;
-        flag = this.getEndDate() == null;
-        flag = this.getEndMonths() == null;
-        flag = this.getSupplierName() == null;
+        if(this.getName() == null && this.getName() == null && this.getAmount() == null && this.getContractNum() == null && this.getStartDate() == null
+                && this.getEndDate() == null && this.getEndMonths() == null && this.getSupplierName() == null){
+            flag = true;
+        }
 
         return flag;
     }
