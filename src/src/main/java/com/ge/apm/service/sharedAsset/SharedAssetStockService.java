@@ -216,11 +216,20 @@ public class SharedAssetStockService {
         SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
         if(sharedAssetReqDetail != null) {
             sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, sharedAssetReqDetail);
+            voucherInfo.put("实际ID", sharedAssetReqDetail.getVoucherNum());
             if(StringUtils.isBlank(sharedAssetReqDetail.getReturnId())) {//借出状态
             	UserAccount currentUser = UserContextService.getCurrentUserAccount();
                 voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
                 voucherInfo.put("经办人", currentUser.getName());
-                voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
+                if(StringUtils.isBlank(sharedAssetReqDetail.getVoucherNum()))
+                {
+                	SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
+                	voucherInfo.put("借据ID", sdf.format(sharedAssetReqDetail.getChargingBeginTime()));
+                }
+                else
+                {
+                	voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
+                }
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
                 voucherInfo.put("设备型号", asset.getFunctionType());
