@@ -275,11 +275,11 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
             isValidate = false;
         }
-        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
-            isValidate = false;
-        }
+//        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
+//            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
+//            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
+//            isValidate = false;
+//        }
         if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
             if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
                 WebUtil.addErrorMessage("商务验收未通过");
