@@ -133,10 +133,14 @@ public class ContractItemImportService {
             ContractItemRow.addErrMessage(item, "错误: 合同UID不能为空");
             isValidateData = false;
         }else{
-            contractInfo = contractInfoDao.findByIdAndContractTypeAndTenantUID(contractInfoItem.getContractId(), contractType, tenantUID);
-            if(contractInfo == null){
+            contractInfo = contractInfoDao.findOne(contractInfoItem.getContractId());
+            if(contractInfo == null || !contractInfo.getTenantUID().equals(tenantUID)){
                 item.put("status", ImportStatus.Failure);
                 ContractItemRow.addErrMessage(item, "错误: 无效的合同UID");
+                isValidateData = false;
+            }else if(!contractInfo.getContractType().equals(contractType)){
+                item.put("status", ImportStatus.Failure);
+                ContractItemRow.addErrMessage(item, "错误: 合同类型和所选合同类型不一致");
                 isValidateData = false;
             }
         }
