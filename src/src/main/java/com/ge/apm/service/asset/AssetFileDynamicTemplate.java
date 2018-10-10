@@ -358,7 +358,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
-        int maxRows = assetList.size() > ASSET_FORMULA_DEFAULT_MAX_ROWS ? assetList.size() : ASSET_FORMULA_DEFAULT_MAX_ROWS;
+        int maxRows = assetList.size() + EXCEL_ASSET_HEADER_ROW > ASSET_FORMULA_DEFAULT_MAX_ROWS ? assetList.size() + EXCEL_ASSET_HEADER_ROW : ASSET_FORMULA_DEFAULT_MAX_ROWS;
         //write sum formula
         writeSummaryFormula(writer, exportFields, maxRows);
 
