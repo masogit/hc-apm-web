@@ -137,12 +137,12 @@ public class AllocationCenterUtils {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
 
         String uniPrice = null;
-        //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
+        //1.按次， 2.按小时(半点)/自然时间（60分钟）/按小时（整点）, 3.按天
         if(chgType.equals("1"))
         {
             uniPrice = df.format(price) + "元/次";
         }
-        if(chgType.equals("2") || chgType.equals("4"))
+        if(chgType.equals("2") || chgType.equals("4") || chgType.equals("5"))
         {
             BigDecimal pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24)));
             uniPrice = df.format(pr) + "元/天";
