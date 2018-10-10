@@ -171,6 +171,14 @@ public class AssetInstallationService {
                     contractItem.setAssetUid(temp.getAssetUID());
                     contractItemDao.save(contractItem);
                 }
+            }else{
+                //after reject;
+                ArrivalListItem temp = itemDao.findById(itemId);
+                if (!Strings.isNullOrEmpty(temp.getQrCode())) {
+                    qrCodeService.releaseQrCode(temp.getQrCode(), temp.getArrivalList().getSiteUID());
+                }
+                temp.setQrCode(null);
+                itemDao.save(temp);
             }
             return true;
         } else {
