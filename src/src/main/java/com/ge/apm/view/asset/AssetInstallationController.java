@@ -551,7 +551,7 @@ public class AssetInstallationController {
         if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
             String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
             if(Strings.isNullOrEmpty(availableQrcode)){
-                WebUtil.addErrorMessage("二维码不正确");
+//                WebUtil.addErrorMessage("二维码不正确");
                 arrivalListItem.setQrCode("");
             }else{
                 oldQrCode=arrivalListItem.getQrCode();
