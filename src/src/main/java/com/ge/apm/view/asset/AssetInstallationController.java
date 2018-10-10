@@ -275,11 +275,11 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
             isValidate = false;
         }
-        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
-            isValidate = false;
-        }
+//        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
+//            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
+//            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
+//            isValidate = false;
+//        }
         if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
             if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
                 WebUtil.addErrorMessage("商务验收未通过");
@@ -551,7 +551,7 @@ public class AssetInstallationController {
         if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
             String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
             if(Strings.isNullOrEmpty(availableQrcode)){
-                WebUtil.addErrorMessage("二维码不正确");
+//                WebUtil.addErrorMessage("二维码不正确");
                 arrivalListItem.setQrCode("");
             }else{
                 oldQrCode=arrivalListItem.getQrCode();
