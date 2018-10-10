@@ -447,7 +447,7 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "";
         }
-        if (qrcode.length() > 16 || qrcode.length()<4) {
+        if (qrcode.length() > 16) {
             return "";
         }
 
