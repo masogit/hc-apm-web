@@ -194,14 +194,18 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.aliasName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['aliasName'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}" required="#{assetInstallationController.customConfig.assetFields['aliasName'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['serialNum']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.serialNum}<span style="color:red">#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['departNum']}">
@@ -240,42 +244,57 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.systemId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}" required="#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.systemId} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.systemId} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['barcode']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.barcode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}" required="#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.barcode} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.barcode} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['modalityId']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.modalityId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}" required="#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['manufactDate']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.manufactDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['manufactDate'].arrivalRequired? '*':''}</span></label>
                                     <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.manufactDate}" required="#{assetInstallationController.customConfig.assetFields['manufactDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                                requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
+                                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:calendar>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['warrantyDate']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired? '*':''}</span></label>
                                     <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:calendar>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['installDate']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.InstallDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired? '*':''}</span></label>
                                     <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" required="#{assetInstallationController.customConfig.assetFields['installDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.installDate} #{msg.ValidationRequire}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                                requiredMessage="#{msg.installDate} #{msg.ValidationRequire}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:calendar>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName']}">
@@ -342,14 +361,18 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.locationCode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationCode'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="locationCode" value="#{assetInstallationController.arrivalListItem.locationCode}" required="#{assetInstallationController.customConfig.assetFields['locationCode'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['locationName']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.locationName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}" required="#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.locationName} #{msg.ValidationRequire}"/>
+                                                 requiredMessage="#{msg.locationName} #{msg.ValidationRequire}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['isPm']}">
@@ -359,6 +382,7 @@
                                                       requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}">
                                         <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
                             </c:if>
@@ -369,6 +393,7 @@
                                                       requiredMessage="#{msg.isAssetChecked} #{msg.ValidationRequire}">
                                         <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
                             </c:if>
@@ -376,7 +401,9 @@
                                 <h:panelGroup >
                                     <label class="label">#{msg.comments}<span style="color:red">#{assetInstallationController.customConfig.assetFields['comments'].arrivalRequired? '*':''}</span></label>
                                     <p:inputTextarea value="#{assetInstallationController.arrivalListItem.comments}"  maxlength="256" required="#{assetInstallationController.customConfig.assetFields['comments'].arrivalRequired}" 
-                                                     requiredMessage="#{msg.comments} #{msg.ValidationRequire}"/>
+                                                     requiredMessage="#{msg.comments} #{msg.ValidationRequire}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputTextarea>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>
@@ -558,13 +585,15 @@
                                                         </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">安装工时*</label>
-                                <p:inputNumber id="workHours" maxValue="999" value="#{assetInstallationController.arrivalListItem.workHours}" required="false" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" />
+                                <p:inputNumber id="workHours" maxValue="999" value="#{assetInstallationController.arrivalListItem.workHours}" required="true" requiredMessage="安装工时 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" >
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:inputNumber>
                             </h:panelGroup>
 
 
                         </p:panelGrid>
 
-                        <p:commandButton validateClient="false" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
+                        <p:commandButton immediate="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
                         <p:commandButton validateClient="false" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
@@ -603,6 +632,9 @@
             function handleComplete(xhr, status, args) {
                 if (args.ClinicalDeptName) {
                     $('#ItemEditDlgForm\\:clinicalDeptName').addClass("ui-state-error");
+                }
+                if (args.serialNum) {
+                    $('#ItemEditDlgForm\\:serialNum').addClass("ui-state-error");
                 }
                 if (args.workHours) {
                     var d = $('#ItemEditDlgForm\\:workHours');
