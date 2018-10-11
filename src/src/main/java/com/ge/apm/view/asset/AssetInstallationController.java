@@ -275,7 +275,7 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
             isValidate = false;
         }
-//        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
+//        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum()) && customConfig.assetFields.get("serialNum").isArrivalRequired()) {
 //            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
 //            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
 //            isValidate = false;
