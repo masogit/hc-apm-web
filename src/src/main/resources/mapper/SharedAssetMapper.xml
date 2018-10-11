@@ -71,6 +71,7 @@
                 oi.name as lease_org_name,
                 oi.name_py_code as org_name_py_code,
                 sat.swap_name as swap_name,
+                sard.voucher_num,
                 sard.charging_type as req_charging_type,
                 sard.unit_price as req_unit_price,
                 sard.charging_begin_time,
