@@ -81,7 +81,7 @@ public class AllocationCenterUtils {
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    totalAmount = unit.divide(BigDecimal.valueOf(2))
+                    totalAmount = unit.divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP)
                                       .multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
                 }
