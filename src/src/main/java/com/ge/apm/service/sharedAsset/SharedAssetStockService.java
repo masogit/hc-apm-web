@@ -107,7 +107,8 @@ public class SharedAssetStockService {
             .or().like("qr_code", searchCriteria)
             .or().like("serial_num", searchCriteria)
             .or().like("manufacture", searchCriteria)
-            .or().like("lease_org_name", searchCriteria);
+            .or().like("lease_org_name", searchCriteria)
+            .or().like("voucher_num", searchCriteria);
     }
 
     public Integer getTotalRowCount(Wrapper<AssetInfo> wrapper) {
