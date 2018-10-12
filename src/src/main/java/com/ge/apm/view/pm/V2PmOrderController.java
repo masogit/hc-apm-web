@@ -23,10 +23,12 @@ import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
@@ -39,6 +41,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -53,6 +56,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -74,6 +78,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
+    private String fileterOrgName;
+    private String fileterAssetDeptOrgName;
+
     private String supplierName;
     private AutoCompleteService autoCompleteService;
     private AssetInfoMgrService aimService;
@@ -990,6 +997,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         tableService = WebUtil.getBean(TableDefinitionService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         this.selectedMap = new HashMap();
 //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
@@ -1031,6 +1039,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         user = UserContextService.getCurrentUserAccount();
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
+        loadClinicalDeptList();
     }
 
     public void submitAppvalPmOrder() {
@@ -1374,6 +1383,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+
+        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+            //先获取 filterOrgName-手术科的 uid
+            List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
+            if(!filterOrg.isEmpty())
+                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, filterOrg, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -1482,6 +1502,58 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }
 
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+    //选定科室过滤
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
+    //搜索字串
+    private String oneSearchStr;
+    //选定的院区
+    private OrgInfo selectSite;
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfoTreeService orgInfoTreeService;
+    private Set<String> clinicalDeptOrgUidSet;
+
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+
+
+
+    }
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;
@@ -2126,5 +2198,77 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setAimService(AssetInfoMgrService aimService) {
         this.aimService = aimService;
+    }
+
+    public String getOneSearchStr() {
+        return oneSearchStr;
+    }
+
+    public void setOneSearchStr(String oneSearchStr) {
+        this.oneSearchStr = oneSearchStr;
+    }
+
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+
+    public List<OrgInfo> getClinicalDeptList() {
+        return clinicalDeptList;
+    }
+
+    public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+        this.clinicalDeptList = clinicalDeptList;
+    }
+
+    public OrgInfoTreeService getOrgInfoTreeService() {
+        return orgInfoTreeService;
+    }
+
+    public void setOrgInfoTreeService(OrgInfoTreeService orgInfoTreeService) {
+        this.orgInfoTreeService = orgInfoTreeService;
+    }
+
+    public Set<String> getClinicalDeptOrgUidSet() {
+        return clinicalDeptOrgUidSet;
+    }
+
+    public void setClinicalDeptOrgUidSet(Set<String> clinicalDeptOrgUidSet) {
+        this.clinicalDeptOrgUidSet = clinicalDeptOrgUidSet;
+    }
+
+    public String getFilterClinicalDeptOrg() {
+        return filterClinicalDeptOrg;
+    }
+
+    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
+        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
+    }
+
+    public String getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
+    }
+
+    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
+    }
+
+    public String getFileterAssetDeptOrgName() {
+        return fileterAssetDeptOrgName;
+    }
+
+    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
+        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
+    }
+
+    public String getFileterOrgName() {
+        return fileterOrgName;
+    }
+
+    public void setFileterOrgName(String fileterOrgName) {
+        this.fileterOrgName = fileterOrgName;
     }
 }
