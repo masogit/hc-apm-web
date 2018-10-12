@@ -101,7 +101,7 @@ public class AllocationCenterUtils {
             case "3":
                 //天
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / (60 * 24d));
-                unit = unit.setScale(4, RoundingMode.UP);
+                unit = unit.setScale(0, RoundingMode.UP);
                 totalTime = unit.longValue() + "天";
                 totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
                 break;
