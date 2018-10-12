@@ -180,9 +180,9 @@ public class AllocationCenterUtils {
         return assetStatus;
     }
 
-    public static String getPdfAccessories(AssetInfo asset)
+    public static String getPdfAccessories(SharedAssetReqDetail sharedAssetReqDetail)
     {
-        List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
+        List<SharedAssetTypeAccesssory> accList = sharedAssetReqDetail.getAccessoryList();
         String accessories = "";
 
         if(accList == null)
