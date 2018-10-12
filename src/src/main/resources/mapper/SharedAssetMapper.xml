@@ -16,6 +16,8 @@
         <result column="qr_code" property="qrCode"/>
         <result column="serial_num" property="serialNum"/>
         <result column="manufacture" property="manufacture"/>
+        <result column="asset_is_deleted" property="isDeleted"/>
+        <result column="asset_is_valid" property="isValid"/>
         <association property="assetDeptOrg" resultMap="orgInfoResult"/>
         <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
         <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
@@ -68,6 +70,8 @@
                 ai.qr_code,
                 ai.serial_num,
                 ai.manufacture,
+                ai.is_deleted as asset_is_deleted,
+                ai.is_valid as asset_is_valid,
                 oi.name as lease_org_name,
                 oi.name_py_code as org_name_py_code,
                 sat.swap_name as swap_name,
@@ -102,6 +106,8 @@
             ai.qr_code,
             ai.serial_num,
             ai.manufacture,
+            ai.is_deleted as asset_is_deleted,
+            ai.is_valid as asset_is_valid,
             oi.name as lease_org_name,
             oi.name_py_code as org_name_py_code,
             sat.id as sat_id,
