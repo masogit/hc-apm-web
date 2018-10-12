@@ -80,7 +80,7 @@ public class SharedAssetStockService {
             .or().in("clinical_dept_uid", orgUidList);
         ew.andNew()
             .eq("asset_is_deleted", false)
-            .or().eq("asset_is_valid", true);
+            .and().eq("asset_is_valid", true);
     }
 
     public void addFiltersByQueryType(Wrapper<AssetInfo> ew, int queryType) {
