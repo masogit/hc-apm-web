@@ -89,7 +89,7 @@ public class AllocationCenterUtils {
                 //小时（半点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
-                unit = unit.setScale(4, RoundingMode.UP);
+                unit = unit.setScale(0, RoundingMode.UP);
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
@@ -121,7 +121,7 @@ public class AllocationCenterUtils {
                 //小时（整点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
-                unit = unit.setScale(4, RoundingMode.UP);
+                unit = unit.setScale(0, RoundingMode.UP);
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
