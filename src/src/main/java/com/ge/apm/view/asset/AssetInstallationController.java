@@ -341,6 +341,7 @@ public class AssetInstallationController {
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
+            arrivalListItem = itemDao.findById(arrivalListItem.getId());
             if (aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
@@ -392,7 +393,7 @@ public class AssetInstallationController {
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            WebUtil.addSuccessMessage("修改成功");
+            arrivalListItem = itemDao.findById(arrivalListItem.getId());
         } else {
             WebUtil.addErrorMessage("不可修改");
         }
