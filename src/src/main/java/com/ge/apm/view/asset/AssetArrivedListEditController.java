@@ -272,6 +272,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             generateMap.clear();
         }
         saveEasyItem();
+        
     }
 
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
@@ -381,6 +382,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
         });
         itemDao.save(saveList);
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         WebUtil.addSuccessMessage("已保存");
     }
 

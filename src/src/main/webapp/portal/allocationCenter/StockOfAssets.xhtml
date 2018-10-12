@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -14,7 +15,7 @@
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="4">
-                        <p:inputText id="searchText" value="#{sharedAssetStockController.searchCriteria}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{sharedAssetStockController.searchCriteria}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室/借据ID" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":sharedAssetListForm searchButtons" />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
@@ -44,6 +45,10 @@
 
                         <p:ajax event="rowSelect" listener="#{sharedAssetStockController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{sharedAssetStockController.onFilter}" oncomplete="updateDatalist();"/>
+
+                        <p:column headerText="借据ID" sortBy="#{voucher_num}" filterBy="#{asset.voucher_num}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
+                        </p:column>
 
                         <p:column headerText="借用科室" sortBy="#{lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
                             <f:facet name="filter">

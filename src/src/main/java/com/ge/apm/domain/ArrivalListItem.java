@@ -6,7 +6,9 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +20,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 /**
  *
@@ -132,9 +139,22 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "work_hours")
     private Double workHours;
     
-    @Column(name = "last_modified_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+    
+    @Version
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
     
     
@@ -951,6 +971,30 @@ public class ArrivalListItem implements Serializable {
 
     public void setIsChecked(Boolean isChecked) {
         this.isChecked = isChecked;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
     
     
