@@ -238,7 +238,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
                 voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(asset));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
-                voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(asset));
+                voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(sharedAssetReqDetail));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
             } else {//可用，曾经借出或从未借出，若曾经借出，则计算最近一次借出的相关信息
                 BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
