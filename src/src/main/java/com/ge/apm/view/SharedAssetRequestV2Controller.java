@@ -4,11 +4,13 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedAsset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import javaslang.Tuple3;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
@@ -24,6 +26,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -190,8 +193,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //       setSearchFilter();
        
        setUserSearchFilters();
-
-       this.updateSearchFilter(new SearchFilter("type", SearchFilter.Operator.IsNull,null));//过滤借还维护的单子
 
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
@@ -538,10 +539,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     }
 
                                     sard.setChargingType(swapTypeVo.getChargingType());
-                                    sard.setUnitPrice(swapTypeVo.getUnitPrice());
+
+                                    if(sard.getUnitPrice() == null) {
+                                        sard.setUnitPrice(swapTypeVo.getUnitPrice());
+                                    }
                                     sard.setUnit(swapTypeVo.getUnit());
 
-                                    this.setCost(sard);
+//                                    this.setCost(sard);
+                                    //JIRA#3043
+                                    Double totalAmount = this.getTotalAmount(sard);
+                                    sard.setCost(totalAmount);
 
                                     //附件状态默认全选
                                     for(SharedAssetTypeAccesssory item:sard.getAccessoryList()){
@@ -781,6 +788,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
                                     //asdDao.save(assetDetaiVo);
+
+                                    logger.info("Asset Uid: " + infoVo.getUid() + ", start duration: " + swapTypeVo.getStartingDuration() + ", start price: " + swapTypeVo.getStartingPrice());
+                                    if(swapTypeVo.getStartingDuration() != null && swapTypeVo.getStartingPrice() != null) {
+                                        assetDetaiVo.setStartingDuration(swapTypeVo.getStartingDuration());
+                                        assetDetaiVo.setStartingPrice(swapTypeVo.getStartingPrice());
+                                    }
                                     
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
                                     
@@ -1768,6 +1781,36 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
         }
         return orgLoc.toString();
+    }
+
+    public Double getTotalAmount(SharedAssetRequest request) {
+        double totalAmount = 0d;
+        SharedAssetReqDetail reqDetail = null;
+        List<SharedAssetReqDetail> reqDetailList = null;
+        if("1".equals(request.getBehavior())) {//借用请求
+            reqDetailList = asdDao.findByBorrowId(request.getId());
+        } else {
+            reqDetailList = asdDao.findByReturnId(request.getId());
+        }
+        reqDetail = reqDetailList.stream().findFirst().orElse(null);
+        if(reqDetail != null) {
+            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+            SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+            totalAmount = billingDetail._3.doubleValue();
+        }
+        return totalAmount;
+    }
+
+    public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
+        double totalAmount = 0d;
+        if(reqDetail != null) {
+            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+            SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+            totalAmount = billingDetail._3.doubleValue();
+        }
+        return totalAmount;
     }
 
 }

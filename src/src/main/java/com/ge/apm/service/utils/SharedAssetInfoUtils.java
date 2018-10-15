@@ -15,15 +15,17 @@ import java.util.logging.Logger;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.domain.SharedAssetTypeAccesssory;
 
 import javaslang.Tuple2;
 
+@Deprecated
 public class SharedAssetInfoUtils {
 
     private static Logger log = Logger.getLogger(SharedAssetInfoUtils.class.getName());
 
-    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(SharedAssetReqDetail reqDetail) {
+    public static Tuple2<BigDecimal, String> getChargingUnitAndTotalTime(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Tuple2<BigDecimal, String> result = null;
         LocalDateTime beginLDT;
         LocalDateTime endLDT;
@@ -49,40 +51,71 @@ public class SharedAssetInfoUtils {
             totalTime = days + "天" + hours + "时" + minutes + "分";
         }
 
+        long startDurationInMinutes = 0l;
+        if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
+        }
+
         switch(reqDetail.getChargingType()) {
             case "1":
                 totalTime = "1次";
-                unit = new BigDecimal(1);
+                unit = BigDecimal.valueOf(1);
                 break;
             case "2":
-                unit = new BigDecimal(rentalTimeInMinutes / 30d);
+                //小时（半点）
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 break;
             case "3":
-                unit = new BigDecimal(rentalTimeInMinutes / (60 * 24d));
+                //天
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / (60 * 24d));
                 unit = unit.setScale(0, RoundingMode.UP);
                 totalTime = unit.longValue() + "天";
                 break;
             case "4":
-                unit = new BigDecimal(rentalTimeInMinutes / 60d);
+                //自然时间
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 60d);
                 unit = unit.setScale(2, RoundingMode.HALF_UP);
                 break;
+            case "5":
+                //小时（整点）
+                rentalTimeInMinutes = rentalTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(rentalTimeInMinutes / 60d);
+                unit = unit.setScale(0, RoundingMode.UP);
             default:
-                unit = new BigDecimal(0);
+                unit = BigDecimal.valueOf(0);
         }
         result = new Tuple2<>(unit, totalTime);
         return result;
     }
 
-    public static BigDecimal getTotalAmount(BigDecimal unit, SharedAssetReqDetail reqDetail) {
+    public static BigDecimal getTotalAmount(BigDecimal unit, SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Double unitPrice = reqDetail.getUnitPrice();
         if(unitPrice == null) {
             unitPrice = 0d;
         }
-        BigDecimal totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
-        if("2".equals(reqDetail.getChargingType())) {
-            totalAmount = unit.multiply(new BigDecimal(unitPrice)).divide(new BigDecimal(2));
+
+        BigDecimal totalAmount = BigDecimal.valueOf(0);
+
+        Double startDuration = sharedAssetType.getStartingDuration();
+        Double startPrice = sharedAssetType.getStartingPrice();
+        if(startDuration != null && startPrice != null) {//for 301医院起步价
+            if(unit.doubleValue() < startDuration) {
+                totalAmount = BigDecimal.valueOf(startPrice);
+            } else {
+                BigDecimal rentTimeMinusStartDuriation = unit.subtract(BigDecimal.valueOf(startDuration));
+                totalAmount = BigDecimal.valueOf(startPrice).add(rentTimeMinusStartDuriation.multiply(BigDecimal.valueOf(unitPrice)));
+            }
+        } else {//普通医院
+            totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
+            if("2".equals(reqDetail.getChargingType())) {
+                unit = unit.divide(BigDecimal.valueOf(2));
+                totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+            }
         }
+
         return totalAmount;
     }
 
@@ -126,48 +159,49 @@ public class SharedAssetInfoUtils {
             }
 
             long rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+            
 
             DecimalFormat df = new DecimalFormat("0.00"); //保留两位小数
             String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
 
-            Double compenAmount = reqDetail.getCompensationAmount();
-            Double rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
-            if(compenAmount == null || compenAmount == 0)
+            BigDecimal compenAmount = reqDetail.getCompensationAmount();
+            BigDecimal rentFee = getPdfTotalAmount(reqDetail, rentalTimeInMinutes);
+            if(compenAmount == null || compenAmount.doubleValue() == 0)
             {
             	info.put("赔偿费用", "/");
-            	info.put("总计费用", rentFee);
+            	info.put("总计费用", df.format(rentFee));
             }
             else
             {
-            	info.put("赔偿费用", compenAmount);
-            	info.put("总计费用", rentFee + compenAmount);
+            	info.put("赔偿费用", df.format(compenAmount));
+            	info.put("总计费用", df.format(rentFee.add(compenAmount)));
             }
             
             info.put("归还时间", reqDetail.getChargingEndTime() == null ? null :
                     getSplittedTime(reqDetail.getChargingEndTime(), "yyyy-MM-dd HH:mm:ss"));
             info.put("总租用期", rentalTimeInMinutes < 360 ? 0.25 : borrowDays);
-            info.put("租赁费用", rentFee);
+            info.put("租赁费用", df.format(rentFee));
             info.put("备注", reqDetail.getReqComment());
             //is_intact为true或者null时默认为完好
             info.put("还时状态", (reqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好"));
         }
     }
 
-    public static Double getPdfTotalAmount(SharedAssetReqDetail reqDetail, long minutes)
+    public static BigDecimal getPdfTotalAmount(SharedAssetReqDetail reqDetail, long minutes)
     {
-    	Double totalAmount = 0.0;
+    	BigDecimal totalAmount = new BigDecimal(0);
         //chgType: 1.按次， 2.按小时/自然时间（60分钟）,3. 按天 , 4. 自然时间
         //request.type: 1.维修, 2.补登记 , 3. NULL的时候正常计费
         if("1".equals(reqDetail.getReturnRequest().getType()))
         {
-            totalAmount = 0.0;
+            totalAmount = BigDecimal.valueOf(0);
         }
         else
         {
             //按自然时间计费时，若小于6小时，按6小时计算保底价
             if(reqDetail.getChargingType().equals("4") && minutes < 6*60)
             {
-                totalAmount = BigDecimal.valueOf(6).multiply(BigDecimal.valueOf(reqDetail.getUnitPrice())).doubleValue();
+                totalAmount = BigDecimal.valueOf(6).multiply(BigDecimal.valueOf(reqDetail.getUnitPrice()));
             }
             else
             {
@@ -193,31 +227,32 @@ public class SharedAssetInfoUtils {
         return format.format(date);
     }
 
-    private static String getPdfUnitPrice(SharedAssetReqDetail reqDetail)
+    public static String getPdfUnitPrice(SharedAssetReqDetail reqDetail)
     {
         Double price = reqDetail.getUnitPrice();
         String chgType = reqDetail.getChargingType();
+        DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
 
         String uniPrice = null;
         //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
         if(chgType.equals("1"))
         {
-            uniPrice = price.toString() + "元/次";
+            uniPrice = df.format(price) + "元/次";
         }
         if(chgType.equals("2") || chgType.equals("4"))
         {
-            Double pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24))).doubleValue();
-            uniPrice = pr.toString() + "元/天";
+        	BigDecimal pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24)));
+            uniPrice = df.format(pr) + "元/天";
         }
         if(chgType.equals("3"))
         {
-            uniPrice = price.toString() + "元/天";
+            uniPrice = df.format(price) + "元/天";
         }
 
         return uniPrice;
     }
 
-    private static String getPdfStatus(AssetInfo asset)
+    public static String getPdfStatus(AssetInfo asset)
     {
         //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
         Integer status = asset.getStatus();
@@ -242,7 +277,7 @@ public class SharedAssetInfoUtils {
         return assetStatus;
     }
 
-    private static String getPdfAccessories(AssetInfo asset)
+    public static String getPdfAccessories(AssetInfo asset)
     {
         List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
         String accessories = "";
@@ -274,5 +309,17 @@ public class SharedAssetInfoUtils {
             }
         }
         return accessories;
+    }
+
+    public static String getPdfDatetime(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(date);
+    }
+
+    public static Long getPdfRentTime(Date startDate, Date endDate) {
+        LocalDateTime startLDT = (startDate == null) ? LocalDateTime.now() : startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime endLDT = (endDate == null) ? LocalDateTime.now() : endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        long rentalTimeInMinutes = ChronoUnit.MINUTES.between(startLDT, endLDT);
+        return rentalTimeInMinutes;
     }
 }

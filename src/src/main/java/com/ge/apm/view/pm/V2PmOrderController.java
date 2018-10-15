@@ -54,6 +54,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -579,6 +580,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return mark;
     }
 
+    public boolean isBatchRob() {
+        boolean mark = false;
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k, v) -> {
+            result.getContent().stream().forEach(item -> {
+                if (item.getId().equalsIgnoreCase(k) && v == true)
+                    pmList.add(item);
+            });
+        });
+        if (pmList.size() > 0)
+            mark = pmList.stream().allMatch(item -> !item.getSimplify().equals(true));
+        return mark;
+    }
+
+
     public boolean isBatchTakePm() {
         // System.out.println(result);
         boolean mark = true;
@@ -655,7 +672,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 if (pmOrderRule != null) {
                     unColl.setSchemaId(pmOrderRule.getPerformanceReport());
                 }
-                //将检查项的数据保存到UnstructuredDataCollection中.
+                //将检查项
+                // 的数据保存到UnstructuredDataCollection中.
                 while (it.hasNext()) {
                     Map.Entry<String, UnstructuredData> entry = it.next();
                     untest = entry.getValue();
@@ -685,19 +703,35 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
 
-    public void prepareAproval(String woid) {
+    /*public void prepareAproval(String woid) {
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+    }*/
+
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
+        approvedDetails.stream().forEach(item -> {
+            if (item.getApproved() == null) {
+                item.setApproved(false);
+            }
+            selectedMap.put(item.getId(), item.getApproved());
+        });
     }
+
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
-            approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+            getNeedApprovalDetails().stream().filter(item -> !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+//            approvedDetails.stream().filter(item->item.getId().equals(id)).findFirst().get().setApproved(selectedMap.get(id));
         }
     }
+
 
     public void removeAttachmentByIdForRP(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -1062,7 +1096,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return dao;
     }
 
-    public void acceptWorkOrder() {
+    public void acceptWorkOrder(int type) {
         if (isChecked() == false) //如果是false说明不是批量的操作
         {
             Date planTime = selectedPmOrder.getPlanTime();
@@ -1079,7 +1113,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
                 return;
             }
-            pmOrderService.acceptWorkOrderBatch(currentPagePmOrders, selectedMap, planTimeForBatch);
+            pmOrderService.acceptWorkOrderBatch(currentPagePmOrders, selectedMap, planTimeForBatch,type);
         }
         cancel();
     }
@@ -1275,9 +1309,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void approvePMorder() {
-        if (selectedPmOrder != null) { //selectedMapy有问题
-
-            if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+       if (selectedPmOrder != null) {
+            if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
+                    (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
                 WebUtil.addErrorMessage("审核不通过原因必须填写");
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
@@ -1289,7 +1323,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     item.setApproved(false);
                 }
             });
-            pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
+         pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
             approvedDetails = null;
         }
@@ -1346,7 +1380,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
+            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
+
         }
     }
 
@@ -1466,11 +1502,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
     }
 
-    public void prepareEditAccDetail(String itemId) {
+    public void prepareEditAccDetail(String itemId) throws Exception{
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+
             itemDetail.setWoId(selectedPmOrder.getId());
+
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             supplierName = null;
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();

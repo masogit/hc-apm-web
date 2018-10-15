@@ -110,7 +110,11 @@
     </reporting>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.20</version>
+        </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -769,6 +773,11 @@
             <artifactId>mybatis-plus</artifactId>
             <version>2.1.9</version>
         </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
 
     <pluginRepositories>
@@ -802,6 +811,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*.properties</include>
+                    <include>mapper/*.xml</include>
                     <include>log4j.xml</include>
                 </includes>
                 <filtering>true</filtering>

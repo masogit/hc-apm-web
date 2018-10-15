@@ -5,10 +5,10 @@
  */
 package com.ge.apm.service.utils;
 
+import com.monitorjbl.xlsx.impl.StreamingCell;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -305,7 +306,7 @@ public class ExcelDocument implements AutoCloseable{
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:
-                return HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
+                return DateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
             case STRING:
                 return cell.getStringCellValue();
             case FORMULA:
@@ -323,7 +324,7 @@ public class ExcelDocument implements AutoCloseable{
             case BOOLEAN:
                 return null;
             case NUMERIC:
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     return null;
                 }
 
@@ -333,6 +334,19 @@ public class ExcelDocument implements AutoCloseable{
                 if (cell instanceof HSSFCell) {
                     cell.setCellType(CellType.STRING);
                     return cell.getStringCellValue();
+                }
+                if (cell instanceof StreamingCell) {
+                    StreamingCell streamingCell = (StreamingCell) cell;
+                    String result = null;
+                    try {
+                        Field field = StreamingCell.class.getDeclaredField("rawContents");
+                        field.setAccessible(true);
+                        result = (String)field.get(streamingCell);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return result;
                 }
                 return null;
             case STRING:

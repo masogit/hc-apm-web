@@ -786,6 +786,14 @@ public class ElectricSafetyData implements Serializable {
 			mapLabelAttributes=new HashMap<String,String>();
 		}
 		//
+//		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
+//		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
+//		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
+//		mapLabelAttributes.put("shellElectricLeakage_normal", "外壳漏电流");
+//		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
+//		mapLabelAttributes.put("originCheckDate", "测试仪日期");
+//		mapLabelAttributes.put("originCheckTime", "测试仪时间");
+		//
 //		mapLabelAttributes.put("checkType", "检测类型");
 //		mapLabelAttributes.put("type", "类别");
 //		mapLabelAttributes.put("name", "名称");

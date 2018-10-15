@@ -20,8 +20,17 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
-    static public List<String> getSysTemFields() {
-        return Arrays.asList("name", "assetGroup");
+    //默认不使用的字段
+    static public List<String> getExtFields() {
+        return Arrays.asList("assetGroupSecondary");
+    }
+    
+    static public List<String> getSystemFields() {
+        return Arrays.asList("name", "assetGroup","status","siteUID");
+    }
+    
+    static public List<String> getInstallRequiredFields() {
+        return Arrays.asList("serialNum");
     }
 
     static public List<String> getConfigRolesName() {
@@ -36,13 +45,14 @@ public class CustomConfigConstant {
             exportFields.put("设备名称", "name");
             exportFields.put("设备别名", "aliasName");
             exportFields.put("设备分类", "assetGroup");
+            exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
             exportFields.put("维修负责人", "assetOwnerName");
             exportFields.put(WebUtil.getMessage("assetOwnerTel"), "assetOwnerTel");
             exportFields.put("维修负责人2", "assetOwnerName2");
             exportFields.put(WebUtil.getMessage("assetOwnerTel2"), "assetOwnerTel2");
             exportFields.put("维修负责人3", "assetOwnerName3");
             exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
-            exportFields.put("院区", "siteUID");
+            exportFields.put("所属院区", "siteUID");
             exportFields.put("所属科室", "clinicalDeptName");
             exportFields.put("使用科室", "assetDeptName");
             exportFields.put("使用责任人", "clinicalOwnerName");
@@ -98,6 +108,8 @@ public class CustomConfigConstant {
             exportFields.put("上次计量日期", "lastMeteringDate");
             exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("资产价值分类", "assetValueCategory");
+            exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
+            exportFields.put(WebUtil.getMessage("pmOwnerTel"), "pmOwnerTel");
         }
         return exportFields;
     }
@@ -173,6 +185,8 @@ public class CustomConfigConstant {
             allFields.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
             allFields.put("warranty", WebUtil.getMessage("isWarrantyNotice"));
             allFields.put("assetValueCategory", WebUtil.getMessage("assetValueCategory"));
+            allFields.put("pmOwnerName", WebUtil.getMessage("pmOwnerName"));
+            allFields.put("pmOwnerTel", WebUtil.getMessage("pmOwnerTel"));
         }
         return allFields;
     }
@@ -184,7 +198,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
-                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "siteUID",
+                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor",
                 "maitanance", "maitananceTel", "nationalStandardCode");
     }
@@ -201,7 +215,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
-                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "siteUID", "clinicalDeptName",
+                "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
                 "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "maitanance", "maitananceTel", "nationalStandardCode");
     }
 
@@ -235,7 +249,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsMobilepageDetailFields() {
         return Arrays.asList("aliasName", "systemId", "manufacture", "vendor", "maitanance", "maitananceTel", "assetOwnerName", "assetOwnerTel",
-                "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "serialNum", "nationalStandardCode", "repairForm", "assetUsage",
+                "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "serialNum", "nationalStandardCode", "repairForm", "assetUsage",
                 "functionGrade", "functionGroup", "assetCode68", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
                 "isPm", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",

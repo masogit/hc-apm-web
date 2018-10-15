@@ -26,6 +26,7 @@
                         <p:commandButton value="已关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"  />
 
                     </h:panelGrid>
+
                     <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{v2PmOrderController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -169,6 +170,8 @@
                                 <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>
 
+                                <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量抢单"  rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
+                                </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="批量关单"  rendered="#{v2PmOrderController.queryIndex==6}" update="@(.closePmDialogClassBatch)" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
                                 </p:commandButton>
@@ -431,12 +434,36 @@
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="确认" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist @(.this)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog')"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder(1)}" value="确认" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist @(.this)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog')"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeOrderDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
+
+    <!--抢单对话框-->
+    <p:dialog class ="t1" id="robOrderDialog"  widgetVar="robOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="批量抢单对话框">
+        <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
+        <h:form id="robOrderDialogForm" >
+            <h:panelGroup id="display22">
+               <!-- <h:panelGroup rendered="#{not empty v2PmOrderController.selectedPmOrder and  v2PmOrderController.isChecked() eq false}" >
+                    <label class="label">计划完成时间*</label>
+                    <p:calendar timeZone="GMT+8" id="fillDate31" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                </h:panelGroup>-->
+
+                <h:panelGroup>
+                    <label class="label">批量计划完成时间*</label>
+                    <p:calendar timeZone="GMT+8" id="fillDate51" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                </h:panelGroup>
+                <br/>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder(2)}" value="确认" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist @(.this)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'robOrderDialog')"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('robOrderDialog').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
 <!--转单-->
         <p:dialog class ="transferOrderClass" id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单框"><!--转单对话框-->
             <h:form class ="transferOrderDialogClass" id="transferOrderDialogForm" >

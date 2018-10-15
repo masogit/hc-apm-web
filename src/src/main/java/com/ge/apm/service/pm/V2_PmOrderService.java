@@ -255,7 +255,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void dispatchWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,Date planTimeBatch){
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
-        pmList.stream().forEach(item->{
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+       /* pmList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 //确保批量接单后，批量接单按钮是灰色
                 hmPmOrder.put(item.getId(),false);
@@ -263,7 +264,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 pmListTmp.add(item);
             }
         });
-        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+
         pmListTmp.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("assign");
@@ -272,7 +273,19 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             formData.setStepId(item.getCurrentStepId());
             formData.setPmOrderId(item.getId());
             formDataList.add(formData);
+        });*/
+       //批量派工时 来自不同page的选择的  参考 acceptWorkOrderBatch 可以替换上面两端代码
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setActionType("assign");
+            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
+            formData.setStepId("Assign");
+            formData.setAssignee(currentPersonIdBatch);
+            formData.setPmOrderId(item.getKey());
+            formDataList.add(formData);
+            item.setValue(false);//将选中的true 设置为false 还原
         });
+
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"派单");
@@ -329,7 +342,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void reassignWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,String comments){
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
-        pmList.stream().forEach(item->{
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+       /* pmList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 //确保批量接单后，批量接单按钮是灰色
                 hmPmOrder.put(item.getId(),false);
@@ -337,7 +351,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 pmListTmp.add(item);
             }
         });
-        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+
         pmListTmp.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("reAssign");
@@ -346,7 +360,19 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             formData.setPmOrderId(item.getId());
             formData.setDesc(comments);
             formDataList.add(formData);
+        });*/
+
+          //批量转单时 来自不同page的选择的  参考 acceptWorkOrderBatch ，可以替换上面两端代码
+            hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setActionType("reAssign");
+            formData.setStepId("Maintain");
+            formData.setAssignee(currentPersonIdBatch);
+            formData.setPmOrderId(item.getKey());
+            formDataList.add(formData);
+            item.setValue(false);//将选中的true 设置为false 还原
         });
+
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"reAssign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
@@ -418,15 +444,18 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_PmOrder> pmList,Map<String, Boolean> hmPmOrder) {
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
-        pmList.stream().forEach(item->{
+        List<String> uidList = new ArrayList<String>();
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        batchPmOrderList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 hmPmOrder.put(item.getId(),false);
-                pmListTmp.add(item);
             }
         });
-        Double averageHours = totalManHours/pmListTmp.size();
+
+        Double averageHours = totalManHours/batchPmOrderList.size();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
-        pmListTmp.stream().forEach(item->{
+        batchPmOrderList.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setPmOrderId(item.getId());
             if(item.getSimplify()!=null && item.getSimplify()==true){
@@ -443,6 +472,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
+
         String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
@@ -504,31 +534,35 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         selectedPmOrder.setCurrentStepId("repair");
     }
-    public void acceptWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch) {
+    public void acceptWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch,int type) {
         String token = UserContextService.getAccessToken();
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
-        pmList.stream().forEach(item->{
-            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
-                //确保批量接单后，批量接单按钮是灰色
-                hmPmOrder.put(item.getId(),false);
-                //pmListTmp保存了所要提交的批量pmOrder
-                pmListTmp.add(item);
-            }
-        });
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
-        pmListTmp.stream().forEach(item->{
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("accept");
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
-            formData.setStepId(item.getCurrentStepId());//Accept
-            formData.setPmOrderId(item.getId());
+            if(type==1)
+                formData.setStepId("Accept");//抢单Assign和接单都是Accept
+            if(type==2)
+                formData.setStepId("Assign");//抢单Assign和接单都是Accept
+            formData.setPmOrderId(item.getKey());
             formDataList.add(formData);
+            item.setValue(false);//将选中的true 设置为false 还原
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"accept");
+        String res=srApi.invokePmOrderActionBatch(token,formDataList,"accept");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+            if(type==1)
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+            else
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"抢单");
+
         }else{
-            WebUtil.addSuccessMessage("批量接单成功");
+            if(type==1)
+                WebUtil.addSuccessMessage("批量接单成功");
+            else
+                WebUtil.addSuccessMessage("批量抢单成功");
+
             for(V2_PmOrder item:pmListTmp){
                 item.setCurrentStepId("repair");
             }

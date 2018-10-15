@@ -15,6 +15,8 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
     public Page<SharedAssetReqDetail> findByBorrowId(Pageable request, String borrowId);
     @Query("select o from SharedAssetReqDetail o  where o.sharedId = :sharedId")
     public List<SharedAssetReqDetail> findBySharedId(@Param("sharedId") String sharedId);
+    @Query("select o from SharedAssetReqDetail o  where o.borrowId = :borrowId")
+    public List<SharedAssetReqDetail> findByBorrowId(@Param("borrowId") String borrowId);
     @Query("select o from SharedAssetReqDetail o  where o.returnId = :returnId")
     public List<SharedAssetReqDetail> findByReturnId(@Param("returnId") String returnId);
     

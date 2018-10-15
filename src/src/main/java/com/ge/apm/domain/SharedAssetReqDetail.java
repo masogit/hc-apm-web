@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -145,7 +146,7 @@ public class SharedAssetReqDetail implements Serializable{
     private String rentalTime;
     
     @Transient
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "clinical_dept_uid", referencedColumnName = "uid", unique = true, insertable = false, updatable = false)
@@ -163,10 +164,19 @@ public class SharedAssetReqDetail implements Serializable{
     private Boolean intact = Boolean.TRUE;
 
     @Column(name = "compensation_amount", columnDefinition = "decimal(11,2)")
-    private Double compensationAmount;
+    private BigDecimal compensationAmount;
 
     @Column(name = "req_comment", columnDefinition = "VARCHAR(256)")
     private String reqComment;
+
+    @Column(name = "voucher_num", columnDefinition = "VARCHAR(16)")
+    private String voucherNum;
+
+    @Column(name = "starting_price")
+    private Double startingPrice;//起步价
+
+    @Column(name = "starting_duration")
+    private Double startingDuration;//起步时长
 
     public String getId() {
         return id;
@@ -626,11 +636,11 @@ public class SharedAssetReqDetail implements Serializable{
 		this.rentalTime = rentalTime;
 	}
 
-	public Double getTotalAmount() {
+	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
 
-	public void setTotalAmount(Double totalAmount) {
+	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 
@@ -666,11 +676,11 @@ public class SharedAssetReqDetail implements Serializable{
         this.intact = intact;
     }
 
-    public Double getCompensationAmount() {
+    public BigDecimal getCompensationAmount() {
         return compensationAmount;
     }
 
-    public void setCompensationAmount(Double compensationAmount) {
+    public void setCompensationAmount(BigDecimal compensationAmount) {
         this.compensationAmount = compensationAmount;
     }
 
@@ -680,5 +690,29 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setReqComment(String reqComment) {
         this.reqComment = reqComment;
+    }
+
+    public String getVoucherNum() {
+        return voucherNum;
+    }
+
+    public void setVoucherNum(String voucherNum) {
+        this.voucherNum = voucherNum;
+    }
+
+    public Double getStartingPrice() {
+        return startingPrice;
+    }
+
+    public void setStartingPrice(Double startingPrice) {
+        this.startingPrice = startingPrice;
+    }
+
+    public Double getStartingDuration() {
+        return startingDuration;
+    }
+
+    public void setStartingDuration(Double startingDuration) {
+        this.startingDuration = startingDuration;
     }
 }

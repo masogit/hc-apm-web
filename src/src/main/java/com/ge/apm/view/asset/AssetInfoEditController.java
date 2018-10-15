@@ -171,6 +171,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("assetOwner", selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId()));
         selectedObjectMap.put("assetOwner2", selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2()));
         selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
+        selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
         selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
@@ -313,6 +314,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setClinicalOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setClinicalOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
                 break;
+
+            case "pmOwner":
+                selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
+                selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
         }
     }
 
@@ -381,6 +387,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Transactional
     public String applyChange() {
+
+        //check whether parent asset is valid when editing
+        if (!isValidParentAsset()) {
+            WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
+            return "";
+        }
+
         if (selected.getUsageStatus() == null) {
             selected.setUsageStatus(3);
         }
@@ -787,6 +800,25 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (customConfig.getAssetsEditpageStatusFields().contains(fieldKey)) return true;
 
         return false;
+    }
+
+    public boolean isValidParentAsset() {
+        //check whether parent asset is valid when editing
+        if (selected.getId() != null) {
+            if (selected.getParentAssetId() != null) {
+                AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
+                if (assetInfo != null) {
+                    if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+                        return false;
+                    }
+                }//parent asset found
+
+            }//parent asset exists
+
+
+        }//editing
+
+        return true;
     }
 
     public boolean needEdit(String fieldKey) {

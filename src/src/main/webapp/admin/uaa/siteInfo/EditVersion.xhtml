@@ -35,17 +35,21 @@
                             <label class="label">设备档案</label>
                             <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnAssetMDM}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{tenantInfoController.selectedVersion!='通用版'}">
+                        <h:panelGroup>
                             <label class="label">维修管理</label>
-                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" />
+                            <p:selectBooleanCheckbox id="idWorkOrderMgmtWithoutWorkSchedule" value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmtWithoutWorkSchedule}" >
+                            	<p:ajax event="change" listener="#{tenantInfoController.onWorkOrderMgmtWithoutWorkScheduleChange()}" update="idWorkSchedule"></p:ajax>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{tenantInfoController.selectedVersion=='通用版'}">
-                            <label class="label">维修管理</label>
-                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnWorkOrderMgmt}" />
+                        <h:panelGroup>
+                            <label class="label">排班管理</label>
+                            <p:selectBooleanCheckbox id="idWorkSchedule" value="#{tenantInfoController.tenantConfig.blnWorkSchedule}">
+                            	<p:ajax event="change" listener="#{tenantInfoController.onWorkScheduleChange()}" update="idWorkOrderMgmtWithoutWorkSchedule"></p:ajax>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">预防维护</label>
-                            <p:selectBooleanCheckbox value="#{tenantInfoController.tenantConfig.blnPreventiveMaintainceMgmt}" />
+                            <p:selectBooleanCheckbox id="idPreventiveMaintainceMgmt" value="#{tenantInfoController.tenantConfig.blnPreventiveMaintainceMgmt}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">绩效分析</label>

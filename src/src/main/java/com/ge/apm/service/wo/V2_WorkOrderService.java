@@ -369,6 +369,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(4);
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
+        formData.setRepairResult(selectedWorkOrder.getRepairResult());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());

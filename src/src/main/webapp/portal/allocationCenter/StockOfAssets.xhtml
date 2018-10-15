@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="设备库存情况"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="4">
+                        <p:inputText id="searchText" value="#{sharedAssetStockController.searchCriteria}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室/借据ID" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" delay="1200" update=":sharedAssetListForm" />
+                        </p:inputText>
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":sharedAssetListForm"  rendered="#{empty sharedAssetStockController.searchCriteria}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":sharedAssetListForm :searchForm" actionListener="#{sharedAssetStockController.setSearchCriteria('')}" rendered="#{not empty sharedAssetStockController.searchCriteria}"/>
+                        </h:panelGroup>
+
+                    </h:panelGrid>
+                </h:form>
+
+                <h:form id="sharedAssetListForm">
+                    <h:panelGrid id="filterTab" columns="4">
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(-1)}" rendered="true" disabled="#{sharedAssetStockController.queryType == -1}" value="#{msg.All}"/>
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(1)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 1}" value="正常可借用"/>
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(2)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 2}" value="正常已借出"/>
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(3)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 3}" value="故障不可借用" />
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{sharedAssetStockController.lazyModel}" var="asset" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{sharedAssetStockController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{asset.id}" sortMode="single" sortOrder="descending" sortBy="asset_dept_uid"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                                 rowsPerPageTemplate="20,50,100,500" >
+
+                        <p:ajax event="rowSelect" listener="#{sharedAssetStockController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+                        <p:ajax event="filter" listener="#{sharedAssetStockController.onFilter}"/>
+
+                        <p:column headerText="借据ID" sortBy="#{voucher_num}" filterBy="#{asset.voucher_num}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
+                        </p:column>
+
+                        <p:column headerText="借用科室" sortBy="#{lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{sharedAssetStockController.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{asset.assetDeptOrg.name}"/>
+                        </p:column>
+
+                        <p:column headerText="设备名称" sortBy="#{asset_name}" filterBy="#{asset.asset_name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.name}"/>
+                        </p:column>
+
+                        <p:column headerText="设备编号" sortBy="#{asset_num}" filterBy="#{asset.asset_num}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.departNum}"/>
+                        </p:column>
+
+                        <p:column headerText="设备型号" sortBy="#{asset_function_type}" filterBy="#{asset.asset_function_type}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.functionType}"/>
+                        </p:column>
+
+                        <p:column headerText="调剂设备名称" sortBy="#{swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.sharedAssetType.swapName}"/>
+                        </p:column>
+
+                        <p:column headerText="计费开始时间" sortBy="#{charging_begin_time}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="计费结束时间" sortBy="#{charging_end_time}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.chargingEndTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="单价" sortBy="#{req_unit_price}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
+                        </p:column>
+
+                        <p:column headerText="计价方式" sortBy="#{req_charging_type}" filterBy="#{asset.req_charging_type}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetReqDetail.chargingType)=='' ? '' : fieldMsg.fieldValue('chargingType',asset.sharedAssetReqDetail.chargingType)}"/>
+                        </p:column>
+
+                        <p:column headerText="使用时长">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.rentalTime}"/>
+                        </p:column>
+
+                        <p:column headerText="当前费用">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.Actions}" width="16%">
+                            <p:commandButton value="强制调拨"
+                                             rendered="#{asset.canBorrow}"
+                                             update="forceLeaseAssetDialog"
+                                             actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
+                                             oncomplete="openForceLeaseDialog(xhr, status, args)"/>
+                            <p:commandButton value="强制归还"
+                                             rendered="#{asset.canReturn}"
+                                             update="forceReturnAssetDialog"
+                                             actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
+                                             oncomplete="openForceReturnDialog(xhr, status, args)"/>
+                            <p:commandButton value="打印" ajax="false" 
+                            				 actionListener="#{sharedAssetStockController.printVoucher(asset)}"  
+                            				 rendered="#{sharedAssetStockController.validate301()}" >
+                                <p:fileDownload value="#{sharedAssetStockController.exportPdf}" />
+                            </p:commandButton>
+                            
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}"/>
+                            <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"/>
+                        </f:facet>
+
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+
+        <ui:include src="forceLeaseAssetDialog.xhtml"/>
+        <ui:include src="forceReturnAssetDialog.xhtml"/>
+
+        <script>
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = '../asset/info/' + args.url;
+            }
+
+            function openForceLeaseDialog(xhr, status, args) {
+                console.log("openForceLeaseDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceLeaseAssetDialog').show()
+                }
+            }
+
+            function openForceReturnDialog(xhr, status, args) {
+                console.log("openForceReturnDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceReturnAssetDialog').show()
+                }
+            }
+        </script>
+    </ui:define>
+</ui:composition>

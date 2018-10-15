@@ -25,6 +25,12 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.faces.bean.ManagedBean;
@@ -406,6 +412,23 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public List<ContractInfoItem> getContractItemsList() {
         return allItemList.stream().filter(item -> !ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+    }
+
+    public void onChangeEndDate(){
+        if(this.selected.getStartDate() != null && this.selected.getEndMonths() != null){
+            Instant startDateInstant = new Date(this.selected.getStartDate().getTime()).toInstant();
+            ZoneId zone = ZoneId.systemDefault();
+            LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
+            LocalDate startLocalDate = startLocalDateTime.toLocalDate();
+
+            Instant scheduleDateInstant = startLocalDate.plus(this.selected.getEndMonths(), ChronoUnit.MONTHS).plus(-1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
+
+            this.selected.setEndDate(Date.from(scheduleDateInstant));
+        }
+    }
+
+    public void onChangeEndMonths(){
+        this.selected.setEndMonths(null);
     }
 
     //getter and setter
