@@ -6,10 +6,15 @@
 package com.ge.apm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.service.utils.ChargingType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -715,4 +720,129 @@ public class SharedAssetReqDetail implements Serializable{
     public void setStartingDuration(Double startingDuration) {
         this.startingDuration = startingDuration;
     }
+
+    public long getRentalTimeInMins() {
+        long rentalTimeInMinutes = 0L;
+
+        LocalDateTime beginLDT;
+        LocalDateTime endLDT;
+
+        if(this.getChargingEndTime() != null) {
+            endLDT = this.getChargingEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            endLDT = LocalDateTime.now();
+        }
+
+        if(this.getChargingBeginTime() != null) {
+            beginLDT = this.getChargingBeginTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            //总使用时长以分钟为单位
+            rentalTimeInMinutes = ChronoUnit.MINUTES.between(beginLDT, endLDT);
+            if(rentalTimeInMinutes < 0) {
+                rentalTimeInMinutes = 0L;
+            }
+        }
+
+        return rentalTimeInMinutes;
+    }
+
+    public String getFormattedRentalTime() {
+        StringBuilder formattedRentalTime = new StringBuilder();
+        long rentalTimeInMins = this.getRentalTimeInMins();
+        long days = 0L, hours = 0L, minutes = 0L;
+
+        days = rentalTimeInMins / (24 * 60);
+        hours = (rentalTimeInMins / 60) % 24;
+        minutes = rentalTimeInMins % 60;
+
+        switch(ChargingType.getChargingTypeByIndex(this.getChargingType())) {
+            case PAY_PER:
+                formattedRentalTime = new StringBuilder("1次");
+                break;
+            case PAY_HALF_HOUR:
+                formattedRentalTime.append(days).append("天").append(hours).append("时").append(minutes).append("分");
+                break;
+            case PAY_DAY:
+                BigDecimal rentalDays = BigDecimal.valueOf(rentalTimeInMins / (60 * 24d));
+                rentalDays = rentalDays.setScale(0, RoundingMode.UP);
+                formattedRentalTime.append(rentalDays.longValue()).append("天");
+                break;
+            case PAY_MINUTE:
+                formattedRentalTime.append(days).append("天").append(hours).append("时").append(minutes).append("分");
+                break;
+            case PAY_HOUR:
+                formattedRentalTime.append(days).append("天").append(hours).append("时").append(minutes).append("分");
+                break;
+            default:
+
+        }
+        return formattedRentalTime.toString();
+    }
+
+    public BigDecimal getOrderAmount() {
+        BigDecimal orderAmount = BigDecimal.valueOf(0);
+        Double unitPrice = this.getUnitPrice();
+        if(unitPrice == null) {
+            unitPrice = 0d;
+        }
+
+        long startDurationInMinutes = 0L;
+        double startPrice = 0d;
+        if(this.getStartingDuration() != null && this.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)(this.getStartingDuration().doubleValue() * 60);
+        }
+        if(this.getStartingPrice() != null) {
+            startPrice = this.getStartingPrice();
+        }
+
+        BigDecimal unit = BigDecimal.valueOf(1);
+        long chargeTimeInMinutes = this.getRentalTimeInMins();
+        switch(ChargingType.getChargingTypeByIndex(this.getChargingType())) {
+            case PAY_PER:
+                orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                break;
+            case PAY_HALF_HOUR:
+                chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
+                unit = unit.setScale(0, RoundingMode.UP);
+                if (chargeTimeInMinutes <= 0) {
+                    orderAmount = BigDecimal.valueOf(startPrice);
+                } else {
+                    orderAmount = BigDecimal.valueOf(unitPrice).divide(BigDecimal.valueOf(2))
+                                                            .multiply(unit)
+                                                            .add(BigDecimal.valueOf(startPrice));
+                }
+                break;
+            case PAY_DAY:
+                unit = BigDecimal.valueOf(chargeTimeInMinutes / (60 * 24d));
+                unit = unit.setScale(0, RoundingMode.UP);
+                orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                break;
+            case PAY_MINUTE:
+                chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
+                unit = unit.setScale(4, RoundingMode.HALF_UP);
+                if (chargeTimeInMinutes <= 0) {
+                    orderAmount = BigDecimal.valueOf(startPrice);
+                } else {
+                    orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                    .add(BigDecimal.valueOf(startPrice));
+                }
+                break;
+            case PAY_HOUR:
+                chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
+                unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
+                unit = unit.setScale(0, RoundingMode.UP);
+                if (chargeTimeInMinutes <= 0) {
+                    orderAmount = BigDecimal.valueOf(startPrice);
+                } else {
+                    orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                                    .add(BigDecimal.valueOf(startPrice));
+                }
+                break;
+            default:
+                orderAmount = BigDecimal.valueOf(0);
+        }
+        return orderAmount;
+    }
+
 }
