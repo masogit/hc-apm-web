@@ -317,7 +317,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getShortName();
+        return orgInfo.getName();
     }
 
     public Integer getAssetGroup() {
@@ -345,7 +345,7 @@ public class AssetInfoFormatter {
         OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
-        return orgInfo.getShortName();
+        return orgInfo.getName();
     }
 
     public Integer getAssetOwnerId() {
@@ -539,8 +539,10 @@ public class AssetInfoFormatter {
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
+        String qrCode = parentAsset.getQrCode() == null ? "" : parentAsset.getQrCode();
 
-        return departNum + " / " + parentAsset.getName();
+
+        return parentAsset.getName()  + " / " + qrCode + " /" + departNum + " / " + parentAsset.getUid();
     }
 
     public Integer getInventoryStatus() {
@@ -694,7 +696,7 @@ public class AssetInfoFormatter {
         map.put("维修负责人", this.getAssetOwnerName());
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
-        map.put("院区", this.getSiteName());
+        map.put("所属院区", this.getSiteName());
         map.put("所属科室", this.getClinicalDeptName());
         map.put("使用科室", this.getAssetDeptName());
         map.put("制造商", this.getManufacture());

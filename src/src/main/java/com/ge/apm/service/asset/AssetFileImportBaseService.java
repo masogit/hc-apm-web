@@ -122,10 +122,10 @@ public class AssetFileImportBaseService {
 
         importOrgMap.forEach(item -> {
             OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getShortName());
+            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
 
             if (orgInfo == null) {
-                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getShortName());
+                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
             }
 
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
@@ -182,8 +182,14 @@ public class AssetFileImportBaseService {
             return;
         } else {
             OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
-            newAsset.setClinicalDeptId(orgInfo.getId());
-            newAsset.setClinicalDeptUID(orgInfo.getUid());
+            if (orgInfo != null) {
+                //new child clinical will reach here
+                newAsset.setClinicalDeptId(orgInfo.getId());
+                newAsset.setClinicalDeptUID(orgInfo.getUid());
+            } else {
+                newAsset.setClinicalDeptName(null);
+            }
+
         }
 
         supportingService.setAssetDeptId(newAsset, selectedOrgToImport, item);
@@ -338,8 +344,6 @@ public class AssetFileImportBaseService {
 
     }
 
-
-
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
@@ -348,7 +352,8 @@ public class AssetFileImportBaseService {
         importOrgMap.forEach(item -> {
             OrgInfo newOrgInfo = (OrgInfo) item.get("org");
 
-            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+//            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
 
             item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
         });
@@ -398,6 +403,18 @@ public class AssetFileImportBaseService {
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
                 AssetRow.addErrMessage(item, "错误: 所属科室为空");
+            } else {
+
+                //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
+                if (!supportingService.isShortName(orgName)) {
+                    OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), orgName, 4);
+                    if (orgInfo == null) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 所属子科室没有找到");
+                    }
+                }
+
             }
 
             //check depart num to avoid duplicate when update

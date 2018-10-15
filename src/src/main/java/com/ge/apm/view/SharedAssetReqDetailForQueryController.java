@@ -8,10 +8,12 @@ package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import javaslang.Tuple2;
+import javaslang.Tuple3;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +48,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
     WorkflowConfigRepository wfCfigDao = null;
+    SharedAssetTypeRepository sharedAssetTypeRepository = null;
     private UaaService uuaService;
 
     private Date filterBeginTime;
@@ -97,6 +100,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         sharedDao = WebUtil.getBean(SharedAssetRequestRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -256,19 +260,33 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     }
 
     public String getRentalTime(SharedAssetReqDetail reqDetail) {
-        Tuple2<BigDecimal, String> chargingUnitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail);
-        return chargingUnitAndTotalTime._2;
+        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+        return billingDetail._2;
     }
 
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
-        SharedAssetRequest request = (StringUtils.isEmpty(reqDetail.getReturnId())) ? reqDetail.getLeaseRequest() : reqDetail.getReturnRequest();
-
-        BigDecimal unit = SharedAssetInfoUtils.getChargingUnitAndTotalTime(reqDetail)._1;
-        if ("1".equals(request.getType())) {//no charging for asset maintain
-            unit = new BigDecimal(0);
+        double totalAmount;
+        String returnReqId = reqDetail.getReturnId();
+        SharedAssetRequest request;
+        if(StringUtils.isNotEmpty(returnReqId)) {
+            //借出未归还
+            request = sharedDao.findById(returnReqId);
+        } else {
+            //已归还
+            request = sharedDao.findById(reqDetail.getBorrowId());
         }
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, reqDetail);
-        return totalAmount.doubleValue();
+        if("1".equals(request.getType())) {
+            totalAmount = 0d;
+        } else {
+            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+            SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
+            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+            totalAmount = billingDetail._3.doubleValue();
+        }
+
+        return totalAmount;
     }
 
 }

@@ -14,6 +14,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,13 +36,12 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author caoyong
  */
 @ManagedBean
 @ViewScoped
-public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType>{
-    
+public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType> {
+
     private UaaService uuaService;
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
@@ -61,25 +61,22 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
-        String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+        String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }    
-        else if ("View".equalsIgnoreCase(actionName)) {
+        } else if ("View".equalsIgnoreCase(actionName)) {
             prepareView();
-        }
-        else if ("Edit".equalsIgnoreCase(actionName)) {
-            
-            setSelected(dao.findById((String)UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
+        } else if ("Edit".equalsIgnoreCase(actionName)) {
+
+            setSelected(dao.findById((String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
             prepareEdit();
-        }
-        else if ("Delete".equalsIgnoreCase(actionName)) {
+        } else if ("Delete".equalsIgnoreCase(actionName)) {
             prepareDelete();
-        } 
+        }
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -94,16 +91,16 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         operation = "Edit.xhtml?actionName=Edit&selectedid=" + "1";
         return UrlEncryptController.encodeUrlParam(operation);
     }
-    
+
     public void getViewPageA(String pageName, String actionName) {
         operation = pageName + "?actionName=" + actionName + "&selectedid=" + selected.getId();
     }
-    
+
     public String getViewPageN(String pageName, String actionName) {
         operation = pageName + "?actionName=" + actionName + "&selectedid=" + selected.getId();
         return UrlEncryptController.encodeUrlParam(operation);
     }
-    
+
     public void onSelectSwapType() throws IOException {
         String url = "actionName=Edit&selectedid=" + selected.getId();
         url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
@@ -111,32 +108,29 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
-    
+
     @Override
     protected Page<SharedAssetType> loadData(PageRequest pageRequest) {
-//       setSearchFilter();
-       
-       setUserSearchFilters();
+        setUserSearchFilters();
 
         this.removeFilterOnField("unitPrice");
 
-        if (this.getFilterUnitPrice() != null && this.getFilterUnitPrice() != ""){
-           String[] split = this.getFilterUnitPrice().split("~");
-           searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.GTE,split[0]));
-           if (split.length == 2) {
-               if (!split[1].equals(""))
-                   searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.LTE, split[1]));
-           }
-       }
-        
-       if (this.searchFilters == null) {
+        if (StringUtils.isNotEmpty(this.getFilterUnitPrice())) {
+            String[] split = this.getFilterUnitPrice().split("~");
+            searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.GTE, split[0]));
+            if (split.length == 2) {
+                if (!split[1].equals(""))
+                    searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.LTE, split[1]));
+            }
+        }
+
+        if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
-       } else {
+        } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
-       }
+        }
     }
-    
-    
+
     public String getOperation() {
         return operation;
     }
@@ -144,38 +138,21 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     public void setOperation(String operation) {
         this.operation = operation;
     }
-   public  SharedAssetType getAccessoriesById(String uid){
-               SharedAssetType vo = dao.findById(uid);
-        
-        return vo;
+
+    public SharedAssetType getAccessoriesById(String uid) {
+        return dao.findById(uid);
     }
-     
 
     @Override
     public List<SharedAssetType> getItemList() {
         return dao.find();
     }
 
-    
-    
     @Override
     public void onBeforeSave(SharedAssetType object) {
         object.setAccessoryList(object.getAccessoryList());
-//        String accessoriesLong = object.getAccessoriesLong();
-//        String [] Str = accessoriesLong.split("\\|");
-//        
-//        if(Str.length>0){
-//            List<SwapTypeAttach> accessoriesList = new ArrayList<SwapTypeAttach>();
-//            for(int i=0;i<Str.length;i++){
-//                SwapTypeAttach vo = new SwapTypeAttach();
-//                vo.setName(Str[i]);
-//                accessoriesList.add(vo);
-//            }
-//            object.setAccessoriesAsList(accessoriesList);
-//        }
-        
     }
-    
+
     @Override
     public void onBeforeNewObject(SharedAssetType object) {
         object.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -189,12 +166,11 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
     @Override
     public void delete() {
-        if(dao.findAssetIsExist(this.selected.getId()).isEmpty()){
+        if (dao.findAssetIsExist(this.selected.getId()).isEmpty()) {
             dao.delete(selected);
-            WebUtil.addSuccessMessage("已成功删除: "+selected.getSwapName());
+            WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
             selected = null;
-        }
-        else{
+        } else {
             WebUtil.addErrorMessage("此调剂设备已在使用，请核实！");
         }
     }
@@ -202,78 +178,63 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        
     }
-    
-    
-    public  List<SharedAssetType> getSwapNameList(){
-    
-        List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-        
-        objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        
-        
-        return objectList;
+
+    public List<SharedAssetType> getSwapNameList() {
+        List<SharedAssetType> sharedAssetTypes = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        return sharedAssetTypes == null ? new ArrayList<>() : sharedAssetTypes;
     }
-    public  String getSharedAssetType(String id){
-        if(id!=null){
-        
-       SharedAssetType object = dao.findById(id);
-            if(object!=null){
-             return object.getSwapName();
-            }
-            else{
+
+    public String getSharedAssetType(String id) {
+        if (id != null) {
+            SharedAssetType object = dao.findById(id);
+            if (object != null) {
+                return object.getSwapName();
+            } else {
                 return null;
             }
         }
         return null;
     }
-    
-    public  List<SharedAssetType> getSwapNameReturnList(){
-    
-        List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
+
+    public List<SharedAssetType> getSwapNameReturnList() {
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-        
-        if(userOrg.getOrgType()==4){
-            objectList = dao.findbyClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid());
-        }
-        else{
-        	objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        }
-        
-        
-        return objectList;
-    }
-    
-    public int getSwapQty(String Uid,String clinicalDeptUid){
-        if(null == Uid||Uid.equalsIgnoreCase("")){
-            return 0;
-        }else{
-            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
-            objectList = dao.findbyBorrowQty(clinicalDeptUid,Uid);
 
+        List<SharedAssetType> objectList;
+        if (userOrg.getOrgType() == 4) {
+            objectList = dao.findbyClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID(), userOrg.getUid());
+        } else {
+            objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        }
+        return objectList == null ? new ArrayList<>() : objectList;
+    }
+
+    public int getSwapQty(String Uid, String clinicalDeptUid) {
+        if (null == Uid || Uid.equalsIgnoreCase("")) {
+            return 0;
+        } else {
+            List<AssetInfo> objectList = dao.findbyBorrowQty(clinicalDeptUid, Uid);
             return objectList.size();
         }
     }
-    
-    
-    public void onChanged(){
-//        assetApplyId =-1;
-        
+
+
+    public void onChanged() {
         SharedAssetTypeController swapTypeController = WebUtil.getBean(SharedAssetTypeController.class);
-        if(swapTypeController.getSelected()!=null){
-                    
+        if (swapTypeController.getSelected() != null) {
+
         }
-       
+
     }
-    
+
     private SharedAssetTypeAccesssory selectedAccessory;
+
     public SharedAssetTypeAccesssory getSelectedAccessory() {
         return selectedAccessory;
     }
@@ -282,34 +243,31 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         this.selectedAccessory = selectedAccessory;
     }
 
-    public void saveAccessory(){
+    public void saveAccessory() {
         List<SharedAssetTypeAccesssory> accessoryList = selected.getAccessoryList();
         if (accessoryList.size() > 0) {
             for (int i = 0; i < accessoryList.size(); i++) {
                 SharedAssetTypeAccesssory sata = accessoryList.get(i);
-                if (sata.getName().equals(selectedAccessory.getName())){
+                if (sata.getName().equals(selectedAccessory.getName())) {
                     accessoryList.remove(sata);
                     i--;
                 }
             }
-
         }
-
         selected.getAccessoryList().add(selectedAccessory);
     }
 
-    public void prepareCreateAccessory(){
+    public void prepareCreateAccessory() {
         crudActionName = "Create";
         selectedAccessory = new SharedAssetTypeAccesssory();
-//        selected.getAccessoryList().add(selectedAccessory);
     }
-    
-    public void prepareEditAccessory(){
+
+    public void prepareEditAccessory() {
         crudActionName = "Edit";
     }
-    
-    public void deleteAccessory(){
-        if(selectedAccessory!=null)
+
+    public void deleteAccessory() {
+        if (selectedAccessory != null)
             selected.getAccessoryList().remove(selectedAccessory);
     }
 
@@ -327,6 +285,24 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         if (filterUnitPriceFrom == null && filterUnitPriceTo == null)
             return null;
         return from + "~" + s;
+    }
+
+    /**
+     * @return true if chargingType is day or time.
+     */
+    public boolean disableStartingFields() {
+        String chargingType = selected.getChargingType();
+        return StringUtils.equals("1", chargingType) || StringUtils.equals("3", chargingType);
+    }
+
+    /**
+     * Reset value in starting fields, if charging type is day or time
+     */
+    public void onChargingTypeChange() {
+        if (disableStartingFields()) {
+            selected.setStartingPrice(null);
+            selected.setStartingDuration(null);
+        }
     }
 
     public void setFilterUnitPrice(String filterUnitPrice) {

@@ -27,6 +27,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -39,6 +40,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author 212547631
  */
 @Entity
+@Data
 @Table(name = "v2_pm_order")
 public class V2_PmOrder  implements Serializable {
 

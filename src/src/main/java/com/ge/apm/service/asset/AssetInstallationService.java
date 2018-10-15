@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javaslang.Tuple2;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -156,7 +158,9 @@ public class AssetInstallationService {
                     }
 
                     // See: YHAAO-2346: ignore verification & other document.
-                    if ("4".equals(item.getBoSubType()) && V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType())) return;
+                    if ("4".equals(item.getBoSubType()) && V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType())) {
+                        return;
+                    }
 
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
@@ -171,6 +175,14 @@ public class AssetInstallationService {
                     contractItem.setAssetUid(temp.getAssetUID());
                     contractItemDao.save(contractItem);
                 }
+            } else {
+                //after reject;
+                ArrivalListItem temp = itemDao.findById(itemId);
+                if (!Strings.isNullOrEmpty(temp.getQrCode())) {
+                    qrCodeService.releaseQrCode(temp.getQrCode(), temp.getArrivalList().getSiteUID());
+                }
+                temp.setQrCode(null);
+                itemDao.save(temp);
             }
             return true;
         } else {
@@ -178,12 +190,19 @@ public class AssetInstallationService {
         }
     }
 
-    public void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
-        arrivalListItem.setLastModifiedDate(new Date());
-        itemDao.save(arrivalListItem);
-        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 5);
+    public boolean saveOrUpdateItem(ArrivalListItem arrivalListItem) {
+//        arrivalListItem.setLastModifiedDate(new Date());
+        try {
+            itemDao.save(arrivalListItem);
+            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
+                qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 5);
+            }
+            WebUtil.addSuccessMessage("修改成功");
+            return true;
+        } catch (ObjectOptimisticLockingFailureException e) {
+            WebUtil.addErrorMessage("保存失败,数据已经被修改!");
         }
+        return false;
 
     }
 
@@ -210,7 +229,7 @@ public class AssetInstallationService {
     }
 
     public List<UserAccount> getWorkerList() {
-        return ucService.getWorkerList(0,"");
+        return ucService.getWorkerList(0, "");
     }
 
     public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {

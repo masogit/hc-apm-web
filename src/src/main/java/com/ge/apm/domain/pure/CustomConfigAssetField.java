@@ -19,6 +19,7 @@ public class CustomConfigAssetField {
     List<String> readRoles = Collections.EMPTY_LIST;
     List<String> editRoles = Collections.EMPTY_LIST;
     boolean required = false;
+    boolean arrivalRequired = false;
 
 
     public CustomConfigAssetField(String key,List<String> roles) {
@@ -77,6 +78,14 @@ public class CustomConfigAssetField {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    public boolean isArrivalRequired() {
+        return arrivalRequired;
+    }
+
+    public void setArrivalRequired(boolean arrivalRequired) {
+        this.arrivalRequired = arrivalRequired;
     }
 
 }

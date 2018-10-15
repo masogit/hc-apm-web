@@ -1,7 +1,6 @@
 package com.ge.apm.view.asset;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import javax.faces.bean.ViewScoped;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -34,18 +32,20 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.ContractInfoService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
 
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -59,7 +59,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private OrgInfo selectedOrg;
 
-    private QrCodeLibRepository qrcodeDao;
+//    private QrCodeLibRepository qrcodeDao;
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
@@ -75,7 +75,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private ArrivalListItem easyInstallItem;
 
-    private OrgInfoService orgService;
+//    private OrgInfoService orgService;
+    private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
 
@@ -104,6 +105,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private List<ContractInfo> contractList;
     private List<ContractInfoItem> contractItemList = new ArrayList();
 
+    @Getter
+    private CustomConfigObject customConfig;
+
     @Override
     protected void init() {
 
@@ -113,13 +117,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        orgService = WebUtil.getBean(OrgInfoService.class);
+//        orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
+//        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
@@ -163,6 +168,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             prepareEdit();
         }
 
+        customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
         suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         needInstorageCheck = userContextService.needInstorageCheck();
@@ -221,9 +227,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void submitArrivalList() {
-        if(!Strings.isNullOrEmpty(selected.getContractItemId())){
+        if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             ContractInfoItem contractInfoItem = contractService.getContractItem(selected.getContractItemId());
-            if(selected.getQuantity() > contractInfoItem.getContractAssetQuantity()){
+            if (selected.getQuantity() > contractInfoItem.getContractAssetQuantity()) {
                 WebUtil.addErrorMessage("到货数量多于合同数量!");
                 return;
             }
@@ -237,7 +243,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
-        if(!Strings.isNullOrEmpty(selected.getContractItemId())){
+        if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
         }
     }
@@ -245,6 +251,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onSelectOrgFromTree(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedOrg = (OrgInfo) node.getData();
+        if (null != selectedOrg) {
+            customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
+        }
     }
 
     public UserAccount getUserAccountByUid(String uid) {
@@ -263,6 +272,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             generateMap.clear();
         }
         saveEasyItem();
+        
     }
 
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
@@ -372,6 +382,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
         });
         itemDao.save(saveList);
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         WebUtil.addSuccessMessage("已保存");
     }
 
@@ -477,7 +488,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public List<Supplier> autoCompleteMaintainer(String query) {
         return autoCompleteService.autoCompleteMaintainer(query, suppliersList);
     }
-    
+
     public List<Supplier> autoCompleteManufacture(String query) {
         return autoCompleteService.autoCompleteManufacture(query, suppliersList);
     }
@@ -491,7 +502,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selected.setVendor(null);
         }
     }
-    
+
     public void onManufactureChange() {
         if (null != manufacture) {
             selected.setManufactureId(manufacture.getId().toString());
@@ -519,7 +530,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             contractItemList = contractService.getContractItems(selectedContractId).stream()
                     .filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
             //TODO 去除到货数量等于订购数量的条目
-        }else{
+        } else {
             contractItemList = new ArrayList();
             selectedContractItemId = null;
         }
@@ -692,6 +703,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setManufacture(Supplier manufacture) {
         this.manufacture = manufacture;
+    }
+
+    public CustomConfigObject getCustomConfig() {
+        return customConfig;
     }
 
 }

@@ -30,6 +30,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -487,6 +489,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "clinical_dept_name_py_code")
     private String clinicalDeptNamePyCode;
 
+    @Column(name = "pm_owner_id")
+    private Integer pmOwnerId;//保养负责人
+
+    @Column(name = "pm_owner_name")
+    private String pmOwnerName;
+
+    @Column(name = "pm_owner_tel")
+    private String pmOwnerTel;
+
+    @Column(name = "mvs_eqip")
+    private Integer mvsEqip;
+
     @Transient
     private int lineNum;
 
@@ -498,6 +512,15 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private SharedAssetType sharedAssetType;
+
+    @Transient
+    private OrgInfo assetDeptOrg;
+
+    @Transient
+    private Boolean canBorrow;
+
+    @Transient
+    private Boolean canReturn;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -523,7 +546,31 @@ public class AssetInfo implements ChineseName,Serializable {
 		this.sharedAssetType = sharedAssetType;
 	}
 
-	public Integer getAssetUsage() {
+    public OrgInfo getAssetDeptOrg() {
+        return assetDeptOrg;
+    }
+
+    public void setAssetDeptOrg(OrgInfo assetDeptOrg) {
+        this.assetDeptOrg = assetDeptOrg;
+    }
+
+    public Boolean getCanBorrow() {
+        Boolean rst = Boolean.FALSE;
+        if(this.clinicalDeptUID.equals(this.assetDeptUID) && (this.status == 1 || this.status == 3)) {
+            rst = Boolean.TRUE;
+        }
+        return rst;
+    }
+
+    public Boolean getCanReturn() {
+        Boolean rst = Boolean.FALSE;
+        if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+            rst = Boolean.TRUE;
+        }
+        return rst;
+    }
+
+    public Integer getAssetUsage() {
         return assetUsage;
     }
 
@@ -1556,7 +1603,39 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAssetValueCategory(String assetValueCategory) {
         this.assetValueCategory = assetValueCategory;
     }
-    
+
+    public Integer getPmOwnerId() {
+        return pmOwnerId;
+    }
+
+    public void setPmOwnerId(Integer pmOwnerId) {
+        this.pmOwnerId = pmOwnerId;
+    }
+
+    public String getPmOwnerName() {
+        return pmOwnerName;
+    }
+
+    public void setPmOwnerName(String pmOwnerName) {
+        this.pmOwnerName = pmOwnerName;
+    }
+
+    public String getPmOwnerTel() {
+        return pmOwnerTel;
+    }
+
+    public void setPmOwnerTel(String pmOwnerTel) {
+        this.pmOwnerTel = pmOwnerTel;
+    }
+
+    public Integer getMvsEqip() {
+        return mvsEqip;
+    }
+
+    public void setMvsEqip(Integer mvsEqip) {
+        this.mvsEqip = mvsEqip;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

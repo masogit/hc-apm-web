@@ -14,103 +14,147 @@
                 <p:outputLabel class="pageTitle" value="调剂设备"/>
             </div>
             <div class="ui-g-12 card">
-            
-            <h:form id="SwapTypeEditForm">
-                
-                    
-                <p:fieldset legend="调剂设备信息" style="margin-bottom:20px">
-                        
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetTypeController.selected != null}">
-                        
-                        <h:panelGroup>
-                            <label class='label'>调剂设备名称*</label>
-                            <p:inputText id="swapName" value="#{sharedAssetTypeController.selected.swapName}"  required="true" requiredMessage="调剂设备名称 #{msg.ValidationRequire}" />
-                        </h:panelGroup>
-                        
-                        <h:panelGroup>
-                            <label class='label'>单价*</label>
-                            <p:inputNumber id="unitPrice" value="#{sharedAssetTypeController.selected.unitPrice}" minValue="0" decimalPlaces="2"
-                                           required="true" requiredMessage="单价 #{msg.ValidationRequire}" />
-                            <!--<p:inputText id="unitPrice" value="#{sharedAssetTypeController.selected.unitPrice}"  required="true" requiredMessage="单价 #{msg.ValidationRequire}" />-->
-                        </h:panelGroup>
-                        
-                        <h:panelGroup>
-                            <label class='label'>计价方式*</label>
-                            <p:selectOneRadio id="chargingType" required="true"  value="#{sharedAssetTypeController.selected.chargingType}" requiredMessage="计价方式 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="小时(半点/整点)" itemValue="2" />
-                                <f:selectItem itemLabel="自然时间" itemValue="4" />
-                                <f:selectItem itemLabel="天" itemValue="3" />
-                                <f:selectItem itemLabel="次" itemValue="1" />
-                            </p:selectOneRadio>
-                        </h:panelGroup>
-                        
-                        <h:panelGroup>
-                            <label class='label'>创建人</label>
-                            <p:inputText id="createBy" value="#{sharedAssetTypeController.selected.createBy}"  required="true" readonly="true" requiredMessage="创建人 #{msg.ValidationRequire}" />
-                        </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class='label'>创建日期</label>
-                            <p:calendar id="createDate"  pattern="yyyy/MM/dd" value="#{sharedAssetTypeController.selected.createDate}" mindate="#{sharedAssetTypeController.selected.createDate}" maxdate="#{sharedAssetTypeController.selected.createDate}"  readonlyInput="true" showButtonPanel="true" navigator="true"/>
-                        </h:panelGroup>
+                <h:form id="SwapTypeEditForm">
 
-<!--                        <h:panelGroup>
-                            <label class='label'>附件名称（多条用"|"隔开）</label>
-                            <p:inputTextarea id="accessoriesLong" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetTypeController.selected.accessoriesLong}" />
-                        </h:panelGroup>-->
-                        <h:panelGroup>
-                        </h:panelGroup>    
-                        <h:panelGroup>
-                            <label class='label'>备注</label>
-                            <p:inputTextarea id="remark" rows="1"  cols="66"  queryDelay="750" minQueryLength="4" value="#{sharedAssetTypeController.selected.remark}" />
-                        </h:panelGroup>
-                        
-                    </p:panelGrid>
-                        
-                </p:fieldset>
-                <p:fieldset  legend="附件信息" style="margin-bottom:20px">
-                    <p:dataTable id="dataAccessory" value="#{sharedAssetTypeController.selected.accessoryList}" 
-                        var="item" widgetVar="varDataAccessory"
-                        rendered="#{sharedAssetTypeController.selected ne null}"
-                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                        paginatorTemplate="{Toolbar}"
-                        selectionMode="single" selection="#{sharedAssetTypeController.selectedAccessory}"
-                        lazy="false" rowKey="#{item.name.hashCode()}" emptyMessage="#{msg.noRecordFound}">
 
-                        <p:ajax event="rowSelect" update="createAccessoryButton editAccessoryButton deleteAccessoryButton"/>
-                        <!--<p:ajax event="cellEdit" listener="#{sharedAssetTypeController.save}"/>-->
-                        <p:column headerText="#{msg.id}">
-                            <h:outputText value="#{item.name.hashCode()}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.name}">
-                            <h:outputText value="#{item.name}" />
-                        </p:column>
-                        <p:column rendered="false">
-                            <p:rowEditor />
-                        </p:column>
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton id="createAccessoryButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{sharedAssetTypeController.prepareCreateAccessory}" update=":SharedAssetTypeAccesssoryEditDlg" oncomplete="PF('SharedAssetTypeAccesssoryEditDialog').show()"/>
-                            <p:commandButton id="editAccessoryButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.prepareEditAccessory}" update=":SharedAssetTypeAccesssoryEditDlg" oncomplete="PF('SharedAssetTypeAccesssoryEditDialog').show()" disabled="#{empty sharedAssetTypeController.selectedAccessory}"/>
-                            <p:commandButton id="deleteAccessoryButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{sharedAssetTypeController.deleteAccessory}" update="dataAccessory" disabled="#{empty sharedAssetTypeController.selectedAccessory}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
-                        </f:facet>
-                    </p:dataTable>
-                </p:fieldset>
-                                         
-                <h:panelGroup id="display">
-                    <br/>
-                    
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.save}" value="#{msg.Save}" action="List?faces-redirect=true" icon="ui-icon-check" />
-                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true"  icon="ui-icon-arrow-back"/>
-       
-                </h:panelGroup>
-            </h:form>
-                
+                    <p:fieldset legend="调剂设备信息" style="margin-bottom:20px">
+
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{sharedAssetTypeController.selected != null}">
+
+                            <h:panelGroup>
+                                <label class='label'>调剂设备名称*</label>
+                                <p:inputText id="swapName" value="#{sharedAssetTypeController.selected.swapName}"
+                                             required="true" requiredMessage="调剂设备名称 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>单价*</label>
+                                <p:inputNumber id="unitPrice" value="#{sharedAssetTypeController.selected.unitPrice}"
+                                               minValue="0" decimalPlaces="2"
+                                               required="true" requiredMessage="单价 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>计价方式*</label>
+                                <p:selectOneRadio id="chargingType" required="true"
+                                                  value="#{sharedAssetTypeController.selected.chargingType}"
+                                                  requiredMessage="计价方式 #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="小时(整点)" itemValue="5"/>
+                                    <f:selectItem itemLabel="小时(半点)" itemValue="2"/>
+                                    <f:selectItem itemLabel="自然时间" itemValue="4"/>
+                                    <f:selectItem itemLabel="天" itemValue="3"/>
+                                    <f:selectItem itemLabel="次" itemValue="1"/>
+                                    <p:ajax update="startingPeriod startingPrice"
+                                            listener="#{sharedAssetTypeController.onChargingTypeChange}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>起步价</label>
+                                <p:inputNumber id="startingPrice"
+                                               value="#{sharedAssetTypeController.selected.startingPrice}" minValue="0"
+                                               decimalPlaces="2" required="false"
+                                               readonly="#{sharedAssetTypeController.disableStartingFields()}"
+                                               requiredMessage="起步价 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>起步时长（小时）</label>
+                                <p:inputNumber id="startingPeriod"
+                                               value="#{sharedAssetTypeController.selected.startingDuration}"
+                                               minValue="0"
+                                               decimalPlaces="2" required="false"
+                                               readonly="#{sharedAssetTypeController.disableStartingFields()}"
+                                               requiredMessage="起步时长 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>创建人</label>
+                                <p:inputText id="createBy" value="#{sharedAssetTypeController.selected.createBy}"
+                                             required="true" readonly="true"
+                                             requiredMessage="创建人 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class='label'>创建日期</label>
+                                <p:calendar id="createDate" pattern="yyyy/MM/dd"
+                                            value="#{sharedAssetTypeController.selected.createDate}"
+                                            mindate="#{sharedAssetTypeController.selected.createDate}"
+                                            maxdate="#{sharedAssetTypeController.selected.createDate}"
+                                            readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class='label'>备注</label>
+                                <p:inputTextarea id="remark" rows="1" cols="66" queryDelay="750" minQueryLength="4"
+                                                 value="#{sharedAssetTypeController.selected.remark}"/>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+
+                    </p:fieldset>
+                    <p:fieldset legend="附件信息" style="margin-bottom:20px">
+                        <p:dataTable id="dataAccessory" value="#{sharedAssetTypeController.selected.accessoryList}"
+                                     var="item" widgetVar="varDataAccessory"
+                                     rendered="#{sharedAssetTypeController.selected ne null}"
+                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{Toolbar}"
+                                     selectionMode="single" selection="#{sharedAssetTypeController.selectedAccessory}"
+                                     lazy="false" rowKey="#{item.name.hashCode()}" emptyMessage="#{msg.noRecordFound}">
+
+                            <p:ajax event="rowSelect"
+                                    update="createAccessoryButton editAccessoryButton deleteAccessoryButton"/>
+                            <p:column headerText="#{msg.name}">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column rendered="false">
+                                <p:rowEditor/>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton id="createAccessoryButton" icon="ui-icon-plus"
+                                                 class="btn btn-sm btn-gray" title="#{msg.Create}"
+                                                 actionListener="#{sharedAssetTypeController.prepareCreateAccessory}"
+                                                 update=":SharedAssetTypeAccesssoryEditDlg"
+                                                 oncomplete="PF('SharedAssetTypeAccesssoryEditDialog').show()"/>
+                                <p:commandButton id="editAccessoryButton" icon="ui-icon-pencil"
+                                                 class="btn btn-sm btn-gray" title="#{msg.Edit}"
+                                                 actionListener="#{sharedAssetTypeController.prepareEditAccessory}"
+                                                 update=":SharedAssetTypeAccesssoryEditDlg"
+                                                 oncomplete="PF('SharedAssetTypeAccesssoryEditDialog').show()"
+                                                 disabled="#{empty sharedAssetTypeController.selectedAccessory}"/>
+                                <p:commandButton id="deleteAccessoryButton" process="@this" icon="ui-icon-close"
+                                                 title="#{msg.Delete}"
+                                                 actionListener="#{sharedAssetTypeController.deleteAccessory}"
+                                                 update="dataAccessory"
+                                                 disabled="#{empty sharedAssetTypeController.selectedAccessory}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                               icon="ui-icon-alert"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:fieldset>
+
+                    <h:panelGroup id="display">
+                        <br/>
+
+                        <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.save}"
+                                         value="#{msg.Save}" action="List?faces-redirect=true" icon="ui-icon-check"/>
+                        <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true"
+                                         icon="ui-icon-arrow-back"/>
+
+                    </h:panelGroup>
+                </h:form>
+
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
                 <ui:include src="EditAccessory.xhtml"/>
-         </div>  
-        </div> 
-    </ui:define>  
+            </div>
+        </div>
+    </ui:define>
 </ui:composition>
 
