@@ -125,6 +125,10 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetOwnerName3();
     }
 
+    public String getPmOwnerName() {
+        return assetInfo.getPmOwnerName();
+    }
+
     public String getAssetOwnerTel3() {
         return assetInfo.getAssetOwnerTel3();
     }
@@ -696,6 +700,7 @@ public class AssetInfoFormatter {
         map.put("维修负责人", this.getAssetOwnerName());
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
+        map.put("保养负责人", this.getPmOwnerName());
         map.put("所属院区", this.getSiteName());
         map.put("所属科室", this.getClinicalDeptName());
         map.put("使用科室", this.getAssetDeptName());
