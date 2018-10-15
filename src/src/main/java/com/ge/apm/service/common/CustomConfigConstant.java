@@ -52,7 +52,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("assetOwnerTel2"), "assetOwnerTel2");
             exportFields.put("维修负责人3", "assetOwnerName3");
             exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
-            exportFields.put("院区", "siteUID");
+            exportFields.put("所属院区", "siteUID");
             exportFields.put("所属科室", "clinicalDeptName");
             exportFields.put("使用科室", "assetDeptName");
             exportFields.put("使用责任人", "clinicalOwnerName");
