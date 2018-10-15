@@ -45,6 +45,7 @@ public class CustomConfigConstant {
             exportFields.put("设备名称", "name");
             exportFields.put("设备别名", "aliasName");
             exportFields.put("设备分类", "assetGroup");
+            exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
             exportFields.put("维修负责人", "assetOwnerName");
             exportFields.put(WebUtil.getMessage("assetOwnerTel"), "assetOwnerTel");
             exportFields.put("维修负责人2", "assetOwnerName2");
