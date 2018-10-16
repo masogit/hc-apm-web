@@ -5,7 +5,7 @@ import lombok.Setter;
 
 /**
  * 定义计费类型
- * @author Nick Liu
+ * @author nick
  */
 public enum ChargingType {
 

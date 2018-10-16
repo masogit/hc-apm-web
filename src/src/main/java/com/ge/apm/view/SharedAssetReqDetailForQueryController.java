@@ -259,13 +259,6 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.dao = dao;
     }
 
-    public String getRentalTime(SharedAssetReqDetail reqDetail) {
-        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
-        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
-        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
-        return billingDetail._2;
-    }
-
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
         double totalAmount;
         String returnReqId = reqDetail.getReturnId();
@@ -280,10 +273,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if("1".equals(request.getType())) {
             totalAmount = 0d;
         } else {
-            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
-            SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
-            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
-            totalAmount = billingDetail._3.doubleValue();
+            totalAmount = reqDetail.getRentalAmount().doubleValue();
         }
 
         return totalAmount;
