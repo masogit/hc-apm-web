@@ -312,7 +312,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         if (asset == null) {
             return;
         }
-        if (allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
+        if(!asset.getSiteUID().equals(selected.getSiteUID())){
+            WebUtil.addErrorMessage("只能添加合同所在院区的设备");
+        }else if(allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
             WebUtil.addErrorMessage("该设备已经存在");
         } else {
             ContractInfoItem newItem = new ContractInfoItem();
