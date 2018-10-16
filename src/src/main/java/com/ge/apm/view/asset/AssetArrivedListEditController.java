@@ -76,7 +76,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private ArrivalListItem easyInstallItem;
 
 //    private OrgInfoService orgService;
-    
     private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
@@ -130,7 +129,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
-        
+
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
 
@@ -150,7 +149,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             String listId = (String) UrlEncryptController.getValueFromMap(encodeStr, "listId");
             this.selected = dao.findById(listId);
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-            customConfig = ccService.getCurrentCustomConfig(selected.getSiteUID());
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
@@ -170,6 +168,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             prepareEdit();
         }
 
+        customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
         suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         needInstorageCheck = userContextService.needInstorageCheck();
@@ -244,7 +243,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
-        customConfig = ccService.getCurrentCustomConfig(selected.getSiteUID());
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
         }
@@ -253,6 +251,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onSelectOrgFromTree(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedOrg = (OrgInfo) node.getData();
+        if (null != selectedOrg) {
+            customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
+        }
     }
 
     public UserAccount getUserAccountByUid(String uid) {
@@ -271,6 +272,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             generateMap.clear();
         }
         saveEasyItem();
+        
     }
 
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
@@ -380,6 +382,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
         });
         itemDao.save(saveList);
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         WebUtil.addSuccessMessage("已保存");
     }
 

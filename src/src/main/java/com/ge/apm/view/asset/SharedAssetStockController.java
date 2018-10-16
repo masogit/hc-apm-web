@@ -230,7 +230,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     		Map<String, String> voucherInfo = sharedAssetStockService.generateVoucher(asset);
     		
     		//when no voucher_num, then take old template to print
-    		String prefix = StringUtils.isBlank(voucherInfo.get("借据ID")) ? "Shared_Asset" : voucherInfo.get("借据ID");
+    		String prefix = StringUtils.isBlank(voucherInfo.get("实际ID")) ? "Shared_Asset" : voucherInfo.get("实际ID");;
 	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
 	        {
 	            fileName = new String((prefix + "_Borrow_Info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) 

@@ -194,8 +194,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
        setUserSearchFilters();
 
-       this.updateSearchFilter(new SearchFilter("type", SearchFilter.Operator.IsNull,null));//过滤借还维护的单子
-
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
             stateList.add("0");
@@ -541,10 +539,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     }
 
                                     sard.setChargingType(swapTypeVo.getChargingType());
-                                    sard.setUnitPrice(swapTypeVo.getUnitPrice());
+
+                                    if(sard.getUnitPrice() == null) {
+                                        sard.setUnitPrice(swapTypeVo.getUnitPrice());
+                                    }
                                     sard.setUnit(swapTypeVo.getUnit());
 
-                                    this.setCost(sard);
+//                                    this.setCost(sard);
+                                    //JIRA#3043
+                                    Double totalAmount = this.getTotalAmount(sard);
+                                    sard.setCost(totalAmount);
 
                                     //附件状态默认全选
                                     for(SharedAssetTypeAccesssory item:sard.getAccessoryList()){
@@ -784,6 +788,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
                                     //asdDao.save(assetDetaiVo);
+
+                                    logger.info("Asset Uid: " + infoVo.getUid() + ", start duration: " + swapTypeVo.getStartingDuration() + ", start price: " + swapTypeVo.getStartingPrice());
+                                    if(swapTypeVo.getStartingDuration() != null && swapTypeVo.getStartingPrice() != null) {
+                                        assetDetaiVo.setStartingDuration(swapTypeVo.getStartingDuration());
+                                        assetDetaiVo.setStartingPrice(swapTypeVo.getStartingPrice());
+                                    }
                                     
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
                                     
@@ -1783,6 +1793,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             reqDetailList = asdDao.findByReturnId(request.getId());
         }
         reqDetail = reqDetailList.stream().findFirst().orElse(null);
+        if(reqDetail != null) {
+            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+            SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());
+            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+            totalAmount = billingDetail._3.doubleValue();
+        }
+        return totalAmount;
+    }
+
+    public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
+        double totalAmount = 0d;
         if(reqDetail != null) {
             AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
             SharedAssetType sharedAssetType = swapDao.findById(assetInfo.getSharedAssetTypeUid());

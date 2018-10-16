@@ -344,8 +344,6 @@ public class AssetFileImportBaseService {
 
     }
 
-
-
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
@@ -354,7 +352,8 @@ public class AssetFileImportBaseService {
         importOrgMap.forEach(item -> {
             OrgInfo newOrgInfo = (OrgInfo) item.get("org");
 
-            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+//            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
 
             item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
         });

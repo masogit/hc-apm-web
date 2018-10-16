@@ -38,8 +38,9 @@ public class CustomConfigObject {
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
         if (null == assetFields) {
-            assetFields = CustomConfigConstant.getAllFields().entrySet().stream().collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
-            CustomConfigConstant.getSysTemFields().forEach(item -> {
+            assetFields = CustomConfigConstant.getAllFields().entrySet().stream().filter(item -> !CustomConfigConstant.getExtFields().contains(item.getKey()))
+                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
+            CustomConfigConstant.getSystemFields().forEach(item -> {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
             });

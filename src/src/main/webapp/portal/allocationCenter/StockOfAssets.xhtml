@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -14,11 +15,11 @@
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="4">
-                        <p:inputText id="searchText" value="#{sharedAssetStockController.searchCriteria}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室" maxlength="100" style="width: 500px">
-                            <p:ajax event="keyup" update=":sharedAssetListForm searchButtons" />
+                        <p:inputText id="searchText" value="#{sharedAssetStockController.searchCriteria}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/借用科室/借据ID" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" delay="1200" update=":sharedAssetListForm" />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":sharedAssetListForm :searchForm"  rendered="#{empty sharedAssetStockController.searchCriteria}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":sharedAssetListForm"  rendered="#{empty sharedAssetStockController.searchCriteria}"/>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":sharedAssetListForm :searchForm" actionListener="#{sharedAssetStockController.setSearchCriteria('')}" rendered="#{not empty sharedAssetStockController.searchCriteria}"/>
                         </h:panelGroup>
 
@@ -39,11 +40,15 @@
                                  rowKey="#{asset.id}" sortMode="single" sortOrder="descending" sortBy="asset_dept_uid"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                                  rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" listener="#{sharedAssetStockController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
-                        <p:ajax event="filter" listener="#{sharedAssetStockController.onFilter}" oncomplete="updateDatalist();"/>
+                        <p:ajax event="filter" listener="#{sharedAssetStockController.onFilter}"/>
+
+                        <p:column headerText="借据ID" sortBy="#{voucher_num}" filterBy="#{asset.voucher_num}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
+                        </p:column>
 
                         <p:column headerText="借用科室" sortBy="#{lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
                             <f:facet name="filter">
@@ -132,7 +137,6 @@
                         </f:facet>
 
                     </p:dataTable>
-                    <p:remoteCommand name="updateDatalist" update=":sharedAssetListForm:datalist"/>
                 </h:form>
             </div>
         </div>

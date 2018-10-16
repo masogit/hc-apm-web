@@ -267,10 +267,26 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     }
 
     public Double getTotalAmount(SharedAssetReqDetail reqDetail) {
-        AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
-        SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
-        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
-        return billingDetail._3.doubleValue();
+        double totalAmount;
+        String returnReqId = reqDetail.getReturnId();
+        SharedAssetRequest request;
+        if(StringUtils.isNotEmpty(returnReqId)) {
+            //借出未归还
+            request = sharedDao.findById(returnReqId);
+        } else {
+            //已归还
+            request = sharedDao.findById(reqDetail.getBorrowId());
+        }
+        if("1".equals(request.getType())) {
+            totalAmount = 0d;
+        } else {
+            AssetInfo assetInfo = asiDao.findByUid(reqDetail.getAssetInfoId());
+            SharedAssetType sharedAssetType = sharedAssetTypeRepository.findById(assetInfo.getSharedAssetTypeUid());
+            Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(sharedAssetType, reqDetail);
+            totalAmount = billingDetail._3.doubleValue();
+        }
+
+        return totalAmount;
     }
 
 }

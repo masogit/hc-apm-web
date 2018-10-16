@@ -16,6 +16,8 @@
         <result column="qr_code" property="qrCode"/>
         <result column="serial_num" property="serialNum"/>
         <result column="manufacture" property="manufacture"/>
+        <result column="asset_is_deleted" property="isDeleted"/>
+        <result column="asset_is_valid" property="isValid"/>
         <association property="assetDeptOrg" resultMap="orgInfoResult"/>
         <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
         <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
@@ -45,6 +47,8 @@
         <result column="borrow_id" property="borrowId"/>
         <result column="return_id" property="returnId"/>
         <result column="voucher_num" property="voucherNum"/>
+        <result column="req_starting_duration" property="startingDuration"/>
+        <result column="req_starting_price" property="startingPrice"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -66,9 +70,12 @@
                 ai.qr_code,
                 ai.serial_num,
                 ai.manufacture,
+                ai.is_deleted as asset_is_deleted,
+                ai.is_valid as asset_is_valid,
                 oi.name as lease_org_name,
                 oi.name_py_code as org_name_py_code,
                 sat.swap_name as swap_name,
+                sard.voucher_num,
                 sard.charging_type as req_charging_type,
                 sard.unit_price as req_unit_price,
                 sard.charging_begin_time,
@@ -99,6 +106,8 @@
             ai.qr_code,
             ai.serial_num,
             ai.manufacture,
+            ai.is_deleted as asset_is_deleted,
+            ai.is_valid as asset_is_valid,
             oi.name as lease_org_name,
             oi.name_py_code as org_name_py_code,
             sat.id as sat_id,
@@ -113,6 +122,8 @@
             sard.charging_type as req_charging_type,
             sard.unit_price as req_unit_price,
             sard.voucher_num,
+            sard.starting_duration as req_starting_duration,
+            sard.starting_price as req_starting_price,
             sard.borrow_id,
             sard.return_id
             from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id

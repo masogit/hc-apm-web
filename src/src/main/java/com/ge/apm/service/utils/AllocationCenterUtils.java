@@ -15,11 +15,12 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AllocationCenterUtils {
 
-    private static Logger log = Logger.getLogger(AllocationCenterUtils.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(AllocationCenterUtils.class.getName());
 
     public static Tuple3<Long, String, BigDecimal> getBillingDetail(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail) {
         Tuple3 billingDetail;
@@ -57,19 +58,24 @@ public class AllocationCenterUtils {
 
         long startDurationInMinutes = 0l;
         double startPrice = 0d;
-        //TODO will be deprecated once startDuration and startPrice have been save to request
-        if(sharedAssetType.getStartingDuration() != null && sharedAssetType.getStartingDuration() > 0) {
-            startDurationInMinutes = (long)sharedAssetType.getStartingDuration().doubleValue() * 60l;
-        }
-        if(sharedAssetType.getStartingPrice() != null) {
-            startPrice = sharedAssetType.getStartingPrice();
-        }//TODO end
 
         if(reqDetail.getStartingDuration() != null && reqDetail.getStartingDuration() > 0) {
-            startDurationInMinutes = (long)reqDetail.getStartingDuration().doubleValue() * 60;
+            startDurationInMinutes = (long)(reqDetail.getStartingDuration().doubleValue() * 60);
         }
         if(reqDetail.getStartingPrice() != null) {
             startPrice = reqDetail.getStartingPrice();
+        }
+
+        if(reqDetail.getStartingDuration() == null) {
+            if(sharedAssetType.getStartingDuration() != null) {
+                startDurationInMinutes = (long)(sharedAssetType.getStartingDuration().doubleValue() * 60);
+            }
+        }
+
+        if(reqDetail.getStartingPrice() == null) {
+            if(sharedAssetType.getStartingPrice() != null) {
+                startPrice = sharedAssetType.getStartingPrice();
+            }
         }
 
         chargeTimeInMinutes = rentalTimeInMinutes;
@@ -87,7 +93,7 @@ public class AllocationCenterUtils {
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    totalAmount = unit.divide(BigDecimal.valueOf(2))
+                    totalAmount = unit.divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP)
                                       .multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
                 }
@@ -103,7 +109,7 @@ public class AllocationCenterUtils {
                 //自然时间
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
-                unit = unit.setScale(2, RoundingMode.HALF_UP);
+                unit = unit.setScale(4, RoundingMode.HALF_UP);
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
@@ -122,9 +128,14 @@ public class AllocationCenterUtils {
                     totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                       .add(BigDecimal.valueOf(startPrice));
                 }
+                break;
             default:
                 unit = BigDecimal.valueOf(0);
                 totalAmount = BigDecimal.valueOf(0);
+        }
+
+        if(logger.isInfoEnabled()) {
+            logger.info("reqDetailId: {}, rentalTimeInMinutes: {}, totalAmount: {}, startDurationInMinutes: {}, startPrice: {}", reqDetail.getId(), rentalTimeInMinutes, totalAmount, startDurationInMinutes, startPrice);
         }
 
         billingDetail = new Tuple3(rentalTimeInMinutes, totalTime, totalAmount);
@@ -138,12 +149,12 @@ public class AllocationCenterUtils {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
 
         String uniPrice = null;
-        //1.按次， 2.按小时/自然时间（60分钟）,3. 按天
+        //1.按次， 2.按小时(半点)/自然时间（60分钟）/按小时（整点）, 3.按天
         if(chgType.equals("1"))
         {
             uniPrice = df.format(price) + "元/次";
         }
-        if(chgType.equals("2") || chgType.equals("4"))
+        if(chgType.equals("2") || chgType.equals("4") || chgType.equals("5"))
         {
             BigDecimal pr = (BigDecimal.valueOf(price.doubleValue()).multiply(BigDecimal.valueOf(24)));
             uniPrice = df.format(pr) + "元/天";
@@ -181,9 +192,9 @@ public class AllocationCenterUtils {
         return assetStatus;
     }
 
-    public static String getPdfAccessories(AssetInfo asset)
+    public static String getPdfAccessories(SharedAssetReqDetail sharedAssetReqDetail)
     {
-        List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
+        List<SharedAssetTypeAccesssory> accList = sharedAssetReqDetail.getAccessoryList();
         String accessories = "";
 
         if(accList == null)
