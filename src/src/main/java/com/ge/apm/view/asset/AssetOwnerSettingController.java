@@ -6,15 +6,20 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetOwnerService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -38,6 +43,7 @@ public class AssetOwnerSettingController {
 
     private AssetOwnerService aoService;
     private UserCommonService userCommonService;
+    private CustomConfigService customConfigService;
 
     private AssetInfo queryAsset;
 
@@ -47,6 +53,9 @@ public class AssetOwnerSettingController {
     private Boolean isChanegeOwner;
     private Boolean isChanegeOwner2;
     private Boolean isChanegeOwner3;
+    private Boolean hasAssetGroupSecondary;
+
+    private UserAccount currentUser;
 
     @PostConstruct
     protected void init() {
@@ -54,7 +63,8 @@ public class AssetOwnerSettingController {
         acServie = WebUtil.getBean(AssetCreateService.class);
         aoService = WebUtil.getBean(AssetOwnerService.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
-        UserAccount currentUser = UserContextService.getCurrentUserAccount();
+        customConfigService = WebUtil.getBean(CustomConfigService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
         queryAsset.setHospitalId(currentUser.getHospitalId());
@@ -62,12 +72,23 @@ public class AssetOwnerSettingController {
         targetAssets = new ArrayList();
 
         availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
+
+        CustomConfigObject customConfigObject = customConfigService.getCurrentCustomConfig(currentUser.getSiteUID());
+        if(customConfigObject.getAssetFields() != null && customConfigObject.getAssetFields().containsKey("assetGroupSecondary")){
+            hasAssetGroupSecondary = Boolean.TRUE;
+        }else {
+            hasAssetGroupSecondary = Boolean.FALSE;
+        }
         //not display data initially
 //        getQueryAssetsList();
 
     }
 
     public void getQueryAssetsList() {
+        if(queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
+            availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
+            return;
+        }
         Page page = aoService.getAssetListEx(queryAsset);
         sourceAssets = new ArrayList<AssetInfo>(page.getContent());
         targetAssets.forEach((item)->{
@@ -82,6 +103,8 @@ public class AssetOwnerSettingController {
         if (needFilterFurther) {
             WebUtil.addSuccessMessage(WebUtil.getMessage("needFilterFurthur"));
         }
+
+        this.queryAsset.setAssetGroupSecondary(null);
     }
 
     public void onAssetsTransfer(TransferEvent event) {
@@ -114,6 +137,16 @@ public class AssetOwnerSettingController {
             aoService.updateAssetOwner(targetAssets, isChanegeOwner, ownerId, isChanegeOwner2, ownerId2, isChanegeOwner3, ownerId3);
             availableAssets.setTarget(targetAssets);
         }
+    }
+
+    public List<I18nMessage> loadAssetGroupSecondaryList(){
+        List<I18nMessage> assetGroupSecondaryList = new ArrayList<>();
+
+        if(queryAsset.getAssetGroup() != null){
+            assetGroupSecondaryList = FieldValueMessageController.doGetFieldValueList("assetGroupSecondary_" + queryAsset.getAssetGroup(), currentUser.getSiteId());
+        }
+
+        return assetGroupSecondaryList;
     }
 
     public void onCheckChange(){
@@ -184,4 +217,11 @@ public class AssetOwnerSettingController {
         isChanegeOwner3 = chanegeOwner3;
     }
 
+    public Boolean getHasAssetGroupSecondary() {
+        return hasAssetGroupSecondary;
+    }
+
+    public void setHasAssetGroupSecondary(Boolean hasAssetGroupSecondary) {
+        this.hasAssetGroupSecondary = hasAssetGroupSecondary;
+    }
 }
