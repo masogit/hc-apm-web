@@ -1,13 +1,16 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.V2_WorkOrder;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import webapp.framework.dao.GenericRepositoryUUID;
 
-import java.util.Collection;
-import java.util.List;
+import com.ge.apm.domain.V2_WorkOrder;
+
+import webapp.framework.dao.GenericRepositoryUUID;
 
 public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrder> {
 
@@ -53,4 +56,7 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     public List<Integer> getAssetsByNoTagGroup(Collection<String> c);
 
     public List<V2_WorkOrder> getByAssetIdAndStatusOrderByCloseTimeDesc(Integer assetId, Integer status);
+    
+    @Query(value="select distinct(o.*) from v2_work_order o where o.id in (?1)",nativeQuery=true)
+    public List<V2_WorkOrder> getWorkOrderById(Set<String> ids);
 }
