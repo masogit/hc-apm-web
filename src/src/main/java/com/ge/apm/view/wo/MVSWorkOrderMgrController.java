@@ -1,0 +1,163 @@
+package com.ge.apm.view.wo;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.V2_WorkOrderDetailRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.service.wo.MVSWorkOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
+
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
+/**
+ * Created by 212605082 on 2017/10/11.
+ */
+@ManagedBean
+@ViewScoped
+public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrder_Detail> implements Serializable, ServerEventInterface {
+
+	private V2_WorkOrderDetailRepository dao;
+	private MVSWorkOrderService service;
+	private I18nMessageRepository i18nDao;
+	private UserAccount currentUser;
+
+	@Override
+	protected void init() {
+		dao = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+		service = WebUtil.getBean(MVSWorkOrderService.class);
+		currentUser = UserContextService.getCurrentUserAccount();
+	}
+
+	@Override
+	protected GenericRepositoryUUID<V2_WorkOrder_Detail> getDAO() {
+		return dao;
+	}
+
+	@Override
+	protected Page<V2_WorkOrder_Detail> loadData(PageRequest pageRequest) {
+		List<SearchFilter> searchFilters = this.searchFilters;
+		if (searchFilters == null) {
+			searchFilters = new ArrayList<>();
+		}
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+		if (currentUser.getOrgLevel() != 0) {
+			if (currentUser.getOrgLevel() == 1) {
+				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+			} else if (currentUser.getOrgLevel() == 2) {
+				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+			} else {
+				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+			}
+		}
+		Page<V2_WorkOrder_Detail> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
+		if (pageRequest != null) {
+			List<V2_WorkOrder_Detail> listDetail = pageResult.getContent();
+			if (listDetail != null) {
+				service.supplementDetail(listDetail);
+			}
+		}
+		return pageResult;
+	}
+
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+
+	}
+
+	@Override
+	public void onBeforeNewObject(V2_WorkOrder_Detail object) {
+		super.onBeforeNewObject(object);
+	}
+
+	@Override
+	public void save() {
+		service.saveWorkOrder(this.selected.getV2WorkOrder());
+		super.save();
+		this.selected = null;
+	}
+
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+		super.delete();
+		this.selected = null;
+	}
+
+	@Override
+	protected String getActionMessage(String actionName) {
+		// TODO Auto-generated method stub
+		return WebUtil.getMessage("MVS设备维修记录 " + WebUtil.getMessage(actionName));
+	}
+	
+	private void filterResult(List<V2_WorkOrder_Detail> listDetail){
+		for(int i=0;i<listDetail.size();++i){
+			V2_WorkOrder_Detail tempDetail=listDetail.get(i);
+			V2_WorkOrder order=tempDetail.getV2WorkOrder();
+			AssetInfo asset=null;
+			Integer mvsEquip=null;
+			if(order!=null){
+				asset=order.getAssetInfo();
+			}
+			if(asset!=null){
+				mvsEquip=null;
+			}
+		}
+	}
+
+//	private void changeFilter(List<SearchFilter> searchFilters, PageRequest request) {
+//		if (searchFilters != null) {
+//			for (int i = 0; i < searchFilters.size(); ++i) {
+//				SearchFilter tempFilter = searchFilters.get(i);
+//				String name = tempFilter.fieldName;
+//				System.out.println(name);
+//				if (name.equals("v2WorkOrder.mvsType")) {
+//					
+//				} else if (name.equals("priority")) {
+//
+//				} else if (name.equals("v2WorkOrder.FEOwner.name")) {
+//
+//				} else if (name.equals("hospitalOrg.name")) {
+//
+//				} else if (name.equals("siteOrg.name")) {
+//
+//				} else if (name.equals("v2WorkOrder.assetInfo.departNum")) {
+//
+//				} else if (name.equals("v2WorkOrder.assetInfo.name")) {
+//
+//				} else if (name.equals("parts")) {
+//
+//				} else if (name.equals("apartsQuantity")) {
+//
+//				} else if (name.equals("mvsPrice")) {
+//
+//				} else if (name.equals("serialNum")) {
+//
+//				} else if (name.equals("invoiceNum")) {
+//
+//				} else if (name.equals("arrivedGood")) {
+//
+//				} else if (name.equals("arrivedGoodReturn")) {
+//
+//				}
+//			}
+//		}
+//	}
+	
+}
