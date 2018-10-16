@@ -19,7 +19,7 @@
                                 <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
                                 <f:facet name="header"  >
                                     <p:selectBooleanCheckbox itemLabel="勾选审批" id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
-                                        <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox)"/>
+                                        <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@this @(.selectCheckBox)"/>
                                     </p:selectBooleanCheckbox>
                                     <!--<h:outputText value="勾选审批" />-->
                                 </f:facet>

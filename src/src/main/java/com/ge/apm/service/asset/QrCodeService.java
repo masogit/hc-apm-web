@@ -437,7 +437,7 @@ public class QrCodeService {
     }
 
     /**
-     * 设置时检查, 不合法返回空值, 三码合一时创建新码
+     * 设置时检查, 不合法返回原因, 三码合一时创建新码
      *
      * @param qrcode
      * @param siteUid
@@ -448,6 +448,7 @@ public class QrCodeService {
             return "";
         }
         if (qrcode.length() > 16) {
+            WebUtil.addErrorMessage("二维码不能超过最大长度16位");
             return "";
         }
 
@@ -464,6 +465,7 @@ public class QrCodeService {
 
         } else {
             if (qrCodeLib == null) {
+                WebUtil.addErrorMessage("无此二维码");
                 return "";
             }
             if (qrCodeLib.getStatus() == 1) {
@@ -471,6 +473,7 @@ public class QrCodeService {
             }
         }
 
+        WebUtil.addErrorMessage("二维码已被使用");
         return "";
     }
 
@@ -629,17 +632,6 @@ public class QrCodeService {
 
     }
 
-    public void releaseQrCodeInUse(String qrCode, String siteUid) {
-        QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
-        if (qrCodeLib != null) {
-            int status = qrCodeLib.getStatus();
-            if (status == 3) {
-                qrCodeLib.setStatus(1);
-                qrCodeLibDao.save(qrCodeLib);
-            }
-
-        }
-    }
     
     public void releaseQrCode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);

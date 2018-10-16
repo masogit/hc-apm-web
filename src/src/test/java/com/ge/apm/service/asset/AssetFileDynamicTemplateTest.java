@@ -112,8 +112,10 @@ public class AssetFileDynamicTemplateTest {
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        List<AssetInfo> bigList = new ArrayList<>(20000);
-        for (int i = 0; i < 20000; i++) {
+        int big_list = 21000;
+
+        List<AssetInfo> bigList = new ArrayList<>(big_list);
+        for (int i = 0; i < big_list; i++) {
             double random = Math.random() * assetList.size();
             int which = Double.valueOf(random).intValue();
             bigList.add(assetList.get(which));

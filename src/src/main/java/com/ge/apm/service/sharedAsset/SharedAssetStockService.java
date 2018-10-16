@@ -78,6 +78,9 @@ public class SharedAssetStockService {
             .or().in("asset_hospital_uid", orgUidList)
             .or().in("asset_site_uid", orgUidList)
             .or().in("clinical_dept_uid", orgUidList);
+        ew.andNew()
+            .eq("asset_is_deleted", false)
+            .and().eq("asset_is_valid", true);
     }
 
     public void addFiltersByQueryType(Wrapper<AssetInfo> ew, int queryType) {
@@ -107,7 +110,8 @@ public class SharedAssetStockService {
             .or().like("qr_code", searchCriteria)
             .or().like("serial_num", searchCriteria)
             .or().like("manufacture", searchCriteria)
-            .or().like("lease_org_name", searchCriteria);
+            .or().like("lease_org_name", searchCriteria)
+            .or().like("voucher_num", searchCriteria);
     }
 
     public Integer getTotalRowCount(Wrapper<AssetInfo> wrapper) {
@@ -116,31 +120,34 @@ public class SharedAssetStockService {
 
     public List<AssetInfo> loadAllSharedAssets(Pagination pageRequest, Wrapper<AssetInfo> wrapper) {
         List<AssetInfo> assetList = sharedAssetMapper.loadSharedAssets(pageRequest, wrapper);
+        processAssets(assetList);
         calcRentTimeAndFee(assetList);
         return assetList;
     }
 
     public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel() {
         UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
 
         TreeNodeUtil.sortTreeNodeByName(rootNode);
 
         List<SelectItem> dropdownList = new ArrayList<>();
         if (rootNode != null) {
-            traverse(rootNode, dropdownList);
+            traverse(rootNode, dropdownList, allocationCenterUids);
         }
 
         return dropdownList;
     }
 
     public SharedAssetRequest findRequestById(String requestId) {
-        if(logger.isInfoEnabled()) {
-            logger.info("Request id: {}", requestId);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Request id: {}", requestId);
         }
         SharedAssetRequest request = sharedAssetRequestMapper.findRequestById(requestId);
-        if(logger.isInfoEnabled()) {
-            logger.info("SharedAssetRequest: {}", request);
+        if(logger.isDebugEnabled()) {
+            logger.debug("SharedAssetRequest: {}", request);
         }
         return request;
     }
@@ -190,8 +197,7 @@ public class SharedAssetStockService {
                                                                                             reqComment);
         return returnResponse;
     }
-    
-    
+
     //301医院则显示打印按钮
     public boolean validate301()
     {
@@ -214,11 +220,20 @@ public class SharedAssetStockService {
         SharedAssetReqDetail sharedAssetReqDetail = this.findLatestReqDetailByAsset(asset);
         if(sharedAssetReqDetail != null) {
             sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, sharedAssetReqDetail);
+            voucherInfo.put("实际ID", sharedAssetReqDetail.getVoucherNum());
             if(StringUtils.isBlank(sharedAssetReqDetail.getReturnId())) {//借出状态
             	UserAccount currentUser = UserContextService.getCurrentUserAccount();
                 voucherInfo.put("抬头", getVoucherTitle4Print(currentUser, null));
                 voucherInfo.put("经办人", currentUser.getName());
-                voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
+                if(StringUtils.isBlank(sharedAssetReqDetail.getVoucherNum()))
+                {
+                	SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
+                	voucherInfo.put("借据ID", sdf.format(sharedAssetReqDetail.getChargingBeginTime()));
+                }
+                else
+                {
+                	voucherInfo.put("借据ID", sharedAssetReqDetail.getVoucherNum());
+                }
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
                 voucherInfo.put("设备型号", asset.getFunctionType());
@@ -226,7 +241,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
                 voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(asset));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
-                voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(asset));
+                voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(sharedAssetReqDetail));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
             } else {//可用，曾经借出或从未借出，若曾经借出，则计算最近一次借出的相关信息
                 BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
@@ -286,6 +301,17 @@ public class SharedAssetStockService {
         return sharedAssetReqDetail;
     }
 
+    private void processAssets(List<AssetInfo> assets) {
+        // hide deptName if asset is owned by allocation center
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        for(AssetInfo asset : assets) {
+            if(allocationCenterUids.contains(asset.getAssetDeptUID())) {
+                asset.getAssetDeptOrg().setName("");
+            }
+        }
+    }
+
     private void calcRentTimeAndFee(List<AssetInfo> assets) {
         for(AssetInfo asset : assets) {
             SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
@@ -318,15 +344,19 @@ public class SharedAssetStockService {
         return reqDetail;
     }
 
-    private void traverse(TreeNode node, List<SelectItem> itemList) {
+    private void traverse(TreeNode node, List<SelectItem> itemList, List<String> excludeItemList) {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
-        SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
-        itemList.add(selectItem);
+        if(excludeItemList.contains(orgInfo.getUid())) {
+            //exclude allocation centers from dropdown list
+        } else {
+            SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
+            itemList.add(selectItem);
+        }
 
         if (!node.isLeaf()) {
             for (TreeNode nodeItem : node.getChildren()) {
-                traverse(nodeItem, itemList);
+                traverse(nodeItem, itemList, excludeItemList);
             }
         }
     }

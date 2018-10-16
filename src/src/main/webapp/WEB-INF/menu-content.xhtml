@@ -151,7 +151,8 @@
                 <p:menuitem id="um39" value="#{msg.DeviceROIAnalysis}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf"/>
                 <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf"/>
-                <p:menuitem id="um42" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
+                <p:menuitem id="um42" value="BI绩效分析平台" rendered="true" url="/web/bi"/>
+                <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin') and userContextService.versionContains('系统配置')}">

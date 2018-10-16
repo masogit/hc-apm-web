@@ -332,7 +332,7 @@ public class AssetFileImportSupportingService {
             }
 
             if (releaseable) {
-                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+                qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
             }
 
         });
@@ -369,7 +369,7 @@ public class AssetFileImportSupportingService {
         }
 
         if (releaseable) {
-            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
         }
 
     }

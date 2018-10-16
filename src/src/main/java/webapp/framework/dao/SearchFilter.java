@@ -44,6 +44,7 @@ public class SearchFilter {
         int hash = 7;
         hash = 29 * hash + Objects.hashCode(this.fieldName);
         hash = 29 * hash + Objects.hashCode(this.operator);
+        hash = 29 * hash + Objects.hashCode(this.conditionPath);
         return hash;
     }
 
@@ -63,6 +64,9 @@ public class SearchFilter {
             return false;
         }
         if (this.operator != other.operator) {
+            return false;
+        }
+        if (!Objects.equals(this.conditionPath, other.conditionPath)) {
             return false;
         }
         return true;
