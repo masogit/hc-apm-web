@@ -778,8 +778,8 @@ public class SharedAssetReqDetail implements Serializable{
         return formattedRentalTime.toString();
     }
 
-    public BigDecimal getOrderAmount() {
-        BigDecimal orderAmount = BigDecimal.valueOf(0);
+    public BigDecimal getRentalAmount() {
+        BigDecimal rentalAmount;
         Double unitPrice = this.getUnitPrice();
         if(unitPrice == null) {
             unitPrice = 0d;
@@ -798,16 +798,16 @@ public class SharedAssetReqDetail implements Serializable{
         long chargeTimeInMinutes = this.getRentalTimeInMins();
         switch(ChargingType.getChargingTypeByIndex(this.getChargingType())) {
             case PAY_PER:
-                orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                rentalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
                 break;
             case PAY_HALF_HOUR:
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 if (chargeTimeInMinutes <= 0) {
-                    orderAmount = BigDecimal.valueOf(startPrice);
+                    rentalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    orderAmount = BigDecimal.valueOf(unitPrice).divide(BigDecimal.valueOf(2))
+                    rentalAmount = BigDecimal.valueOf(unitPrice).divide(BigDecimal.valueOf(2))
                                                             .multiply(unit)
                                                             .add(BigDecimal.valueOf(startPrice));
                 }
@@ -815,16 +815,16 @@ public class SharedAssetReqDetail implements Serializable{
             case PAY_DAY:
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / (60 * 24d));
                 unit = unit.setScale(0, RoundingMode.UP);
-                orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
+                rentalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
                 break;
             case PAY_MINUTE:
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(4, RoundingMode.HALF_UP);
                 if (chargeTimeInMinutes <= 0) {
-                    orderAmount = BigDecimal.valueOf(startPrice);
+                    rentalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                    rentalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                     .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
@@ -833,16 +833,16 @@ public class SharedAssetReqDetail implements Serializable{
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
                 unit = unit.setScale(0, RoundingMode.UP);
                 if (chargeTimeInMinutes <= 0) {
-                    orderAmount = BigDecimal.valueOf(startPrice);
+                    rentalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    orderAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
+                    rentalAmount = unit.multiply(BigDecimal.valueOf(unitPrice))
                                     .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
             default:
-                orderAmount = BigDecimal.valueOf(0);
+                rentalAmount = BigDecimal.valueOf(0);
         }
-        return orderAmount;
+        return rentalAmount;
     }
 
 }
