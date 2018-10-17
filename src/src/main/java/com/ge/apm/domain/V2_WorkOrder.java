@@ -195,7 +195,14 @@ public class V2_WorkOrder implements Serializable {
     //维修价值
     @Column(name = "maintenance_value")
     private Double maintenanceValue;
-
+    
+    //MVS工单类型
+    @Column(name="mvs_type")
+    private Integer mvsType;
+    
+    @Transient
+    private UserAccount FEOwner;
+    
     public Integer getDispatchMode() {
         return dispatchMode;
     }
@@ -572,7 +579,23 @@ public class V2_WorkOrder implements Serializable {
         this.approvalDate = approvalDate;
     }
 
-    @Override
+	public Integer getMvsType() {
+		return mvsType;
+	}
+
+	public void setMvsType(Integer mvsType) {
+		this.mvsType = mvsType;
+	}
+
+	public UserAccount getFEOwner() {
+		return FEOwner;
+	}
+
+	public void setFEOwner(UserAccount fEOwner) {
+		FEOwner = fEOwner;
+	}
+
+	@Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);

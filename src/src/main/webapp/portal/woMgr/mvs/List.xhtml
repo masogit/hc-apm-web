@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="MVS维修设备管理" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="mvsWoMgrListForm">
+					<p:dataTable id="datalist" value="#{mVSWorkOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+						selection="#{mVSWorkOrderMgrController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+						<p:ajax event="rowSelect" update="editButton" />
+						<p:ajax event="filter" listener="#{mVSWorkOrderMgrController.onFilter}" />
+						<p:column headerText="报修时间">
+							<h:outputText value="#{item.v2WorkOrder.serviceRequest.requestTime}" />
+						</p:column>
+						<p:column headerText="MVS工单类型">
+							<h:outputText value="#{fieldMsg.fieldValue('mvsType', item.v2WorkOrder.mvsType)}"/>
+						</p:column>
+						<p:column headerText="普通/加急" filterBy="#{item.priority}" filterMatchMode="EQ">
+							<f:facet name="filter">
+						        <p:selectOneMenu onchange="PF('varDataList').filter()">
+						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="普通" itemValue="1" />
+						            <f:selectItem itemLabel="加急" itemValue="2" />
+						        </p:selectOneMenu>
+						    </f:facet>
+							<h:outputText value="#{fieldMsg.fieldValue('mvsPriority', item.priority)}"/>
+						</p:column>
+						<p:column headerText="FE工程师">
+							<h:outputText value="#{item.v2WorkOrder.FEOwner.name}" />
+						</p:column>
+						<p:column headerText="所属医院">
+							<h:outputText value="#{item.hospitalOrg.name}" />
+						</p:column>
+						<p:column headerText="所属院区">
+							<h:outputText value="#{item.siteOrg.name}" />
+						</p:column>
+						<p:column headerText="设备编号">
+							<h:outputText value="#{item.v2WorkOrder.assetInfo.departNum}" />
+						</p:column>
+						<p:column headerText="设备名称">
+							<h:outputText value="#{item.v2WorkOrder.assetInfo.name}" />
+						</p:column>
+						<p:column headerText="备件名称" filterBy="#{item.parts}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.parts}" />
+						</p:column>
+						<p:column headerText="数量" filterBy="#{item.apartsQuantity}" filterMatchMode="EQ">
+							<h:outputText value="#{item.apartsQuantity}" />
+						</p:column>
+						<p:column headerText="单价" filterBy="#{item.mvsPrice}" filterMatchMode="EQ">
+							<h:outputText value="#{item.mvsPrice}" />
+						</p:column>
+						<p:column headerText="序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.serialNum}" />
+						</p:column>
+						<p:column headerText="发票号" filterBy="#{item.invoiceNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.invoiceNum}" />
+						</p:column>
+						<p:column headerText="质保期">
+							<h:outputText value="#{item.warrantyDate}" />
+						</p:column>
+						<p:column headerText="采购时间">
+							<h:outputText value="#{item.purchaseTime}" />
+						</p:column>
+						<p:column headerText="发货时间">
+							<h:outputText value="#{item.deliverTime}" />
+						</p:column>
+						<p:column headerText="收货时间">
+							<h:outputText value="#{item.arrivedTime}" />
+						</p:column>
+						<p:column headerText="是否完好" filterBy="#{item.arrivedGood}" filterMatchMode="EQ">
+							<f:facet name="filter">
+						        <p:selectOneMenu onchange="PF('varDataList').filter()">
+						            <f:converter converterId="javax.faces.Boolean" />
+						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="是" itemValue="true" />
+						            <f:selectItem itemLabel="否" itemValue="false" />
+						        </p:selectOneMenu>
+						    </f:facet>
+							<h:outputText value="#{item.arrivedGood?'是':'否'}" />
+						</p:column>
+						<p:column headerText="好还/坏还" filterBy="#{item.arrivedGoodReturn}" filterMatchMode="EQ">
+							<f:facet name="filter">
+						        <p:selectOneMenu onchange="PF('varDataList').filter()">
+						            <f:converter converterId="javax.faces.Boolean" />
+						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="是" itemValue="true" />
+						            <f:selectItem itemLabel="否" itemValue="false" />
+						        </p:selectOneMenu>
+						    </f:facet>
+							<h:outputText value="#{item.arrivedGoodReturn?'是':'否'}" />
+						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton id="editButton" actionListener="#{mVSWorkOrderMgrController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+								update=":mvsWoMgrEditDlg" oncomplete="PF('mvsWoMgrEditDialog').show()"
+								disabled="#{empty mVSWorkOrderMgrController.selected.id}" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+		<ui:include src="Edit.xhtml" />
+	</ui:define>
+</ui:composition>
