@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.wo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,23 +63,18 @@ public class MVSWorkOrderService {
 			v2WorkOrderRepository.save(workOrder);
 		}
 	}
-
 	public void supplementDetail(List<V2_WorkOrder_Detail> listDetail) {
-		Set<String> setV2_WorkOrderUid = new HashSet<String>();
 		Map<String, V2_WorkOrder> mapV2_WorkOrder = new HashMap<String, V2_WorkOrder>();
-		List<V2_WorkOrder> listV2_WorkOrder = null;
+		List<V2_WorkOrder> listV2_WorkOrder = new ArrayList<V2_WorkOrder>();
 		//
 		Set<String> setOrgInfoUid = new HashSet<String>();
 		Map<String, OrgInfo> mapOrgInfo = new HashMap<String, OrgInfo>();
 		List<OrgInfo> listOrgInfo = null;
 		for (int i = 0; i < listDetail.size(); ++i) {
-			String temp = listDetail.get(i).getWoId();
-			if (StringUtils.isNotEmpty(temp)) {
-				setV2_WorkOrderUid.add(temp);
+			V2_WorkOrder tempWorkOrder=listDetail.get(i).getV2WorkOrder();
+			if(tempWorkOrder!=null){
+				listV2_WorkOrder.add(tempWorkOrder);
 			}
-		}
-		if (setV2_WorkOrderUid.size() > 0) {
-			listV2_WorkOrder = v2WorkOrderRepository.getWorkOrderById(setV2_WorkOrderUid);
 		}
 		if (listV2_WorkOrder != null) {
 			supplementWorkOrder(listV2_WorkOrder);
@@ -122,9 +118,67 @@ public class MVSWorkOrderService {
 				tempV2_WorkOrder_Detail.setSiteOrg(mapOrgInfo.get(siteUid));
 			}
 		}
-		//
-
 	}
+//	public void supplementDetail(List<V2_WorkOrder_Detail> listDetail) {
+//		Set<String> setV2_WorkOrderUid = new HashSet<String>();
+//		Map<String, V2_WorkOrder> mapV2_WorkOrder = new HashMap<String, V2_WorkOrder>();
+//		List<V2_WorkOrder> listV2_WorkOrder = null;
+//		//
+//		Set<String> setOrgInfoUid = new HashSet<String>();
+//		Map<String, OrgInfo> mapOrgInfo = new HashMap<String, OrgInfo>();
+//		List<OrgInfo> listOrgInfo = null;
+//		for (int i = 0; i < listDetail.size(); ++i) {
+//			String temp = listDetail.get(i).getWoId();
+//			if (StringUtils.isNotEmpty(temp)) {
+//				setV2_WorkOrderUid.add(temp);
+//			}
+//		}
+//		if (setV2_WorkOrderUid.size() > 0) {
+//			listV2_WorkOrder = v2WorkOrderRepository.getWorkOrderById(setV2_WorkOrderUid);
+//		}
+//		if (listV2_WorkOrder != null) {
+//			supplementWorkOrder(listV2_WorkOrder);
+//			for (int i = 0; i < listV2_WorkOrder.size(); ++i) {
+//				V2_WorkOrder tempV2_WorkOrder = listV2_WorkOrder.get(i);
+//				mapV2_WorkOrder.put(tempV2_WorkOrder.getId(), tempV2_WorkOrder);
+//				AssetInfo tempAsset=tempV2_WorkOrder.getAssetInfo();
+//				if(tempAsset!=null){
+//					String hospitalUid = tempAsset.getHospitalUID();
+//					String siteUid = tempAsset.getSiteUID();
+//					if (StringUtils.isNotEmpty(hospitalUid)) {
+//						setOrgInfoUid.add(hospitalUid);
+//					}
+//					if (StringUtils.isNotEmpty(siteUid)) {
+//						setOrgInfoUid.add(siteUid);
+//					}
+//				}
+//			}
+//		}
+//		if (setOrgInfoUid.size() > 0) {
+//			listOrgInfo = orgInfoRepository.findByUids(setOrgInfoUid);
+//		}
+//		if (listOrgInfo != null) {
+//			for (int i = 0; i < listOrgInfo.size(); ++i) {
+//				OrgInfo tempOrgInfo = listOrgInfo.get(i);
+//				mapOrgInfo.put(tempOrgInfo.getUid(), tempOrgInfo);
+//			}
+//		}
+//		for (int i = 0; i < listDetail.size(); ++i) {
+//			V2_WorkOrder_Detail tempV2_WorkOrder_Detail = listDetail.get(i);
+//			String temp = tempV2_WorkOrder_Detail.getWoId();
+//			if (StringUtils.isNotEmpty(temp)) {
+//				tempV2_WorkOrder_Detail.setV2WorkOrder(mapV2_WorkOrder.get(temp));
+//			}
+//			String hospitalUid = tempV2_WorkOrder_Detail.getHospitalUID();
+//			String siteUid = tempV2_WorkOrder_Detail.getSiteUID();
+//			if (StringUtils.isNotEmpty(hospitalUid)) {
+//				tempV2_WorkOrder_Detail.setHospitalOrg(mapOrgInfo.get(hospitalUid));
+//			}
+//			if (StringUtils.isNotEmpty(siteUid)) {
+//				tempV2_WorkOrder_Detail.setSiteOrg(mapOrgInfo.get(siteUid));
+//			}
+//		}
+//	}
 	
 	private void supplementWorkOrder(List<V2_WorkOrder> listWorkOrder){
 		Set<Integer> setUserAccountUid=new HashSet<Integer>();
