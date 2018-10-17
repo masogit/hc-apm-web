@@ -142,7 +142,9 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "mvs_price")
 	private Double mvsPrice;
     
-    @Transient
+//    @Transient
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
     private V2_WorkOrder v2WorkOrder;
     
     @Transient

@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.I18nMessageRepository;
@@ -66,6 +67,8 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
 			}
 		}
+		//eager
+		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEqip", SearchFilter.Operator.EQ, "1"));
 		Page<V2_WorkOrder_Detail> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
 		if (pageRequest != null) {
 			List<V2_WorkOrder_Detail> listDetail = pageResult.getContent();
@@ -88,7 +91,7 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 
 	@Override
 	public void save() {
-		service.saveWorkOrder(this.selected.getV2WorkOrder());
+//		service.saveWorkOrder(this.selected.getV2WorkOrder());
 		super.save();
 		this.selected = null;
 	}
@@ -106,20 +109,27 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 		return WebUtil.getMessage("MVS设备维修记录 " + WebUtil.getMessage(actionName));
 	}
 	
-	private void filterResult(List<V2_WorkOrder_Detail> listDetail){
-		for(int i=0;i<listDetail.size();++i){
-			V2_WorkOrder_Detail tempDetail=listDetail.get(i);
-			V2_WorkOrder order=tempDetail.getV2WorkOrder();
-			AssetInfo asset=null;
-			Integer mvsEquip=null;
-			if(order!=null){
-				asset=order.getAssetInfo();
-			}
-			if(asset!=null){
-				mvsEquip=null;
-			}
-		}
-	}
+//	private Page<V2_WorkOrder_Detail> filterResult(Page<V2_WorkOrder_Detail> pageDetail){
+//		List<V2_WorkOrder_Detail> listDetail=pageDetail.getContent();
+//		List<V2_WorkOrder_Detail> newListDetail=new ArrayList<V2_WorkOrder_Detail>();
+//		for(int i=0;i<listDetail.size();++i){
+//			V2_WorkOrder_Detail tempDetail=listDetail.get(i);
+//			V2_WorkOrder order=tempDetail.getV2WorkOrder();
+//			AssetInfo asset=null;
+//			Integer mvsEquip=null;
+//			if(order!=null){
+//				asset=order.getAssetInfo();
+//			}
+//			if(asset!=null){
+//				mvsEquip=asset.getMvsEqip();
+//			}
+//			if(mvsEquip!=null && mvsEquip==1){
+//				newListDetail.add(tempDetail);
+//			}
+//		}
+//		Page<V2_WorkOrder_Detail> newPage=new PageImpl<V2_WorkOrder_Detail>(newListDetail);
+//		return newPage;
+//	}
 
 //	private void changeFilter(List<SearchFilter> searchFilters, PageRequest request) {
 //		if (searchFilters != null) {
