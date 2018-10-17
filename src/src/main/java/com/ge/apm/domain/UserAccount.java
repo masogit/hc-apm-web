@@ -254,6 +254,10 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "active_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activeTime;
+	
+	//1:MVS Admin,2:MVS FE
+	@Column(name="mvs_role_type")
+	private Integer mvsRoleType;
 
 	@Transient
 	private Integer excelIdex;
@@ -651,6 +655,14 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setListUserOrgInfo(List<UserOrgInfo> listUserOrgInfo) {
 		this.listUserOrgInfo = listUserOrgInfo;
+	}
+
+	public Integer getMvsRoleType() {
+		return mvsRoleType;
+	}
+
+	public void setMvsRoleType(Integer mvsRoleType) {
+		this.mvsRoleType = mvsRoleType;
 	}
 
 	@Override
