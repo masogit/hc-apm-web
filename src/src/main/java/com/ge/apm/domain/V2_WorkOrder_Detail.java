@@ -74,6 +74,7 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedArriveTime;
 
+    //收货时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "arrived_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -113,6 +114,44 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "invoice_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date invoiceTime;
+    
+    //是否完好
+    @Column(name = "arrived_good")
+    private Boolean arrivedGood;
+    
+    //好还/坏还
+    @Column(name = "arrived_good_return")
+    private Boolean arrivedGoodReturn;
+    
+    //采购时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @Column(name = "purchase_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date purchaseTime;
+    
+    //发货时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @Column(name = "deliver_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deliverTime;
+    
+    //普通/加急,0普通，1加急
+    @Column(name="priority")
+    private String priority;
+    
+    @Column(name = "mvs_price")
+	private Double mvsPrice;
+    
+//    @Transient
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    private V2_WorkOrder v2WorkOrder;
+    
+    @Transient
+    private OrgInfo hospitalOrg;
+    
+    @Transient
+    private OrgInfo siteOrg;
 
     public String getInvoiceNum() {
         return invoiceNum;
@@ -315,7 +354,23 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.invoiceTime = invoiceTime;
     }
 
-    @Override
+    public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public Double getMvsPrice() {
+		return mvsPrice;
+	}
+
+	public void setMvsPrice(Double mvsPrice) {
+		this.mvsPrice = mvsPrice;
+	}
+
+	@Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -330,7 +385,63 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.partsType = partsType;
     }
 
-    @Override
+	public Boolean getArrivedGood() {
+		return arrivedGood;
+	}
+
+	public void setArrivedGood(Boolean arrivedGood) {
+		this.arrivedGood = arrivedGood;
+	}
+
+	public Boolean getArrivedGoodReturn() {
+		return arrivedGoodReturn;
+	}
+
+	public void setArrivedGoodReturn(Boolean arrivedGoodReturn) {
+		this.arrivedGoodReturn = arrivedGoodReturn;
+	}
+
+	public Date getPurchaseTime() {
+		return purchaseTime;
+	}
+
+	public void setPurchaseTime(Date purchaseTime) {
+		this.purchaseTime = purchaseTime;
+	}
+
+	public Date getDeliverTime() {
+		return deliverTime;
+	}
+
+	public void setDeliverTime(Date deliverTime) {
+		this.deliverTime = deliverTime;
+	}
+
+	public V2_WorkOrder getV2WorkOrder() {
+		return v2WorkOrder;
+	}
+
+	public void setV2WorkOrder(V2_WorkOrder v2WorkOrder) {
+		this.v2WorkOrder = v2WorkOrder;
+	}
+
+	public OrgInfo getHospitalOrg() {
+		return hospitalOrg;
+	}
+
+	public void setHospitalOrg(OrgInfo hospitalOrg) {
+		this.hospitalOrg = hospitalOrg;
+	}
+
+	public OrgInfo getSiteOrg() {
+		return siteOrg;
+	}
+
+	public void setSiteOrg(OrgInfo siteOrg) {
+		this.siteOrg = siteOrg;
+	}
+
+	@Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof V2_WorkOrder_Detail)) {

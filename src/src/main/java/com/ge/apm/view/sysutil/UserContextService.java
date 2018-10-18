@@ -299,6 +299,10 @@ public class UserContextService implements Serializable {
     public boolean getIsLocalAdmin() {
         return UserContextService.isLocalAdmin();
     }
+    
+    public boolean getIsMVSAdmin(){
+    	return UserContextService.isMVSAdmin();
+    }
 
     public static UserAccount getCurrentUserAccount() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -318,6 +322,17 @@ public class UserContextService implements Serializable {
     public static boolean isLocalAdmin() {
         UserAccount userAccount = getCurrentUserAccount();
         return userAccount.getIsLocalAdmin();
+    }
+    
+    public static boolean isMVSAdmin(){
+    	UserAccount userAccount=getCurrentUserAccount();
+    	Integer mvsRoleType=userAccount.getMvsRoleType();
+    	if(mvsRoleType!=null && mvsRoleType==1){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
     }
 
     public static int getUserID() {
