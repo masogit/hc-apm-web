@@ -447,6 +447,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				selected.setRepairHit(false);
 			else
 				selected.setRepairHit(true);
+
+			selected.setLastModifiedBy(currentUser.getName());
+			selected.setLastModifiedDate(new Date());
 			super.save();
 		}
 	}
