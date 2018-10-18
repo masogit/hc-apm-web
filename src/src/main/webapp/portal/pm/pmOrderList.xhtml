@@ -33,7 +33,7 @@
                                  rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.planTime}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rows="1" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
@@ -70,9 +70,17 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                        <!--所属科室-->
+                        <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" />
+                                    <p:ajax process="@this" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" update="pmTab:pmOrderListForm:datalist" />
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
 
                         <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
@@ -183,7 +191,7 @@
                         </f:facet>
                     </p:dataTable>
                 </h:form>
-                <ui:include  src="pmOrderView.xhtml"/>
+                <ui:include src="pmOrderView.xhtml"/>
                 <ui:include src="pmRepairCompleteDlg.xhtml"/>
                 <ui:include src="pmApproveDlg.xhtml"/>
                 <ui:include src="pmMoreAccDialogPrice.xhtml"/>

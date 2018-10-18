@@ -42,8 +42,13 @@
                                 <p:inputText value="#{contractInfoEditController.selected.contractNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.foreignTradeNum}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.foreignTradeNum}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.contractType}</label>
                                 <p:selectOneMenu id="contractType" value="#{contractInfoEditController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}" disabled="#{not empty contractInfoEditController.selected.id}">
+                                    <p:ajax process="@this" listener="#{contractInfoEditController.onContractTypeChange}"  update="@(.invoiceNum)" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
@@ -83,6 +88,10 @@
                                     <p:ajax listener="#{contractInfoEditController.onChangeEndDate}" update=":AssetContractEditForm:endTime"></p:ajax>
                                 </p:inputNumber>
                             </h:panelGroup>
+                             <h:panelGroup>
+                                <label class="label">#{msg.invoiceNum}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.invoiceNum}" class="invoiceNum" readonly="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
                             <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
@@ -121,6 +130,10 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.applyProjectName}</label>
                                 <p:inputText value="#{contractInfoEditController.selected.applyProjectName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.subjectProject}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.subjectProject}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.tenderType}</label>
