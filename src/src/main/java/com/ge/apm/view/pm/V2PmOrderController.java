@@ -33,6 +33,7 @@ import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
@@ -58,13 +59,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * v
@@ -160,6 +159,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String reportUid; //selected table base uid
     private Map<String, Object> selectedObjectMap = new HashMap();
 
+    private String queryAssetUid;
 
     public String getHead() {
         return head;
@@ -1001,6 +1001,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selectedMap = new HashMap();
 //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+            }
+        }
         if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
             if (Strings.isNullOrEmpty(query)) {
                 queryIndex = 8;
@@ -1016,6 +1023,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchList(queryIndex);
             }
         }
+
+
 
         /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
             String query = WebUtil.getRequestParameter("query");
@@ -1161,6 +1170,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
         if(queryIndex==10){
+            if (!Strings.isNullOrEmpty(queryAssetUid)) {
+                searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+            }
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
@@ -1256,6 +1268,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
+
         this.selected = null;
         //     Page<V2_PmOrder> result1 =dao.findBySearchFilter(this.searchFilters,null);
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
