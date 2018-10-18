@@ -52,6 +52,18 @@ public class ContractInfo implements Serializable {
     // 合同编号    
     @Column(name = "contract_num")
     private String contractNum;
+    
+    // 外贸合同号
+    @Column(name = "foreign_trade_num")
+    private String foreignTradeNum;
+    
+    // 发票号
+    @Column(name = "invoice_num")
+    private String invoiceNum;
+    
+    // 所属课题项目
+    @Column(name = "subject_project")
+    private String subjectProject;
 
     //开始时间
     @Basic(optional = true)
@@ -537,6 +549,30 @@ public class ContractInfo implements Serializable {
         this.lineNum = lineNum;
     }
 
+    public String getForeignTradeNum() {
+        return foreignTradeNum;
+    }
+
+    public void setForeignTradeNum(String foreignTradeNum) {
+        this.foreignTradeNum = foreignTradeNum;
+    }
+
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
+    }
+
+    public String getSubjectProject() {
+        return subjectProject;
+    }
+
+    public void setSubjectProject(String subjectProject) {
+        this.subjectProject = subjectProject;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;

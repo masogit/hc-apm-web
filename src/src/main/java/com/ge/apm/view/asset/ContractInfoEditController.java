@@ -432,6 +432,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public void onChangeEndMonths(){
         this.selected.setEndMonths(null);
     }
+    
+    public void onContractTypeChange(){
+        if(ContractInfo.ContractType.Equipment.toString().equals(selected.getContractType())){
+            selected.setInvoiceNum(null);
+        }
+    }
 
     //getter and setter
     public Map<String, Object> getSelectedObjectMap() {
