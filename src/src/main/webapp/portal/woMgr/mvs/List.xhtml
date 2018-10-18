@@ -100,6 +100,15 @@
 								update=":mvsWoMgrEditDlg" oncomplete="PF('mvsWoMgrEditDialog').show()"
 								disabled="#{empty mVSWorkOrderMgrController.selected.id}" />
 						</f:facet>
+						<f:facet name="{Toolbar}">
+							<!-- <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+								<p:dataExporter type="xlsx" target="datalist" fileName="MVSWorkOrderInfo_export" />
+							</p:commandButton> -->
+							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"
+								actionListener="#{mVSWorkOrderMgrController.exportAll()}" validateClient="true" update=":growl">
+								<p:fileDownload value="#{mVSWorkOrderMgrController.exportFile}" />
+							</p:commandButton>
+						</f:facet>
 					</p:dataTable>
 				</h:form>
 			</div>
