@@ -462,7 +462,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         QrCodeLib oldQRCodeLib = qrCodeService.findByQrCode(selected.getQrCode(), selected.getSiteUID());
         if (null != oldQRCodeLib) {
-            qrCodeService.discardQrCode(qrCode, selected.getSiteUID());
+            qrCodeService.releaseQrCode(oldQRCodeLib.getQrCode(), selected.getSiteUID());
         }
         qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
         selected.setQrCode(qrCode);
