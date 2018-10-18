@@ -1,12 +1,18 @@
 package com.ge.apm.view.wo;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +23,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.MVSWorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -37,6 +44,8 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 	private MVSWorkOrderService service;
 	private I18nMessageRepository i18nDao;
 	private UserAccount currentUser;
+	private List<V2_WorkOrder_Detail> listDetail;
+	private StreamedContent exportFile;
 
 	@Override
 	protected void init() {
@@ -71,7 +80,7 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEqip", SearchFilter.Operator.EQ, "1"));
 		Page<V2_WorkOrder_Detail> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
 		if (pageRequest != null) {
-			List<V2_WorkOrder_Detail> listDetail = pageResult.getContent();
+			listDetail = pageResult.getContent();
 			if (listDetail != null) {
 				service.supplementDetail(listDetail);
 			}
@@ -108,7 +117,35 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 		// TODO Auto-generated method stub
 		return WebUtil.getMessage("MVS设备维修记录 " + WebUtil.getMessage(actionName));
 	}
-	
+	public void exportAll(){
+		if(listDetail==null || listDetail.size()==0){
+			WebUtil.addErrorMessage("无数据");
+			return;
+		}
+		downloadFile(service.parseToMap(listDetail));
+	}
+    
+    private void downloadFile(List<Map<String,Object>> data){
+		try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/woMgr/mvs/APM_MVSWorkOrder_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = service.exportData(doc, data);
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "MVSWorkOrder.xlsx");
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+	}
+
+	public StreamedContent getExportFile() {
+		return exportFile;
+	}
+
+	public void setExportFile(StreamedContent exportFile) {
+		this.exportFile = exportFile;
+	}
+    
 //	private Page<V2_WorkOrder_Detail> filterResult(Page<V2_WorkOrder_Detail> pageDetail){
 //		List<V2_WorkOrder_Detail> listDetail=pageDetail.getContent();
 //		List<V2_WorkOrder_Detail> newListDetail=new ArrayList<V2_WorkOrder_Detail>();
