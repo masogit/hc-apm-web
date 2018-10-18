@@ -107,7 +107,7 @@
                     <!--test-->
                     <p:panel  header="内部保养记录">
                         <f:facet name="actions">
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=10&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
                         <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="创建人" >
