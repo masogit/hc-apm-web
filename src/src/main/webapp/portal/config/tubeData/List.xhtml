@@ -14,7 +14,7 @@
             	
             <div class="ui-g-12 card">
             <h:form id="searchForm">
-                <h:panelGrid id="searchPanel" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGrid id="searchPanel" columns="4" styleClass="ui-panelgrid-blank form-group">
                     <p:inputText id="searchText" value="#{tubeDataController.queryCondition}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/systemId" maxlength="100" style="width: 420px">
                         <p:ajax event="keyup" update=":TubeDataListForm :searchForm" />
                     </p:inputText>
