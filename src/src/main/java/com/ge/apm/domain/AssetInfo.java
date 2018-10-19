@@ -255,6 +255,13 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
     private Date factoryWarrantyDate;//质保日期
+    
+    @Column(name = "accept_date")
+    @Temporal(TemporalType.DATE)
+    private Date acceptDate;//验收日期
+    
+    @Column(name = "warranty_month")
+    private Integer warrantyMonth;//质保时间（月）
 
     @Size(max = 256)
     @Column(name = "qr_code")
@@ -1636,6 +1643,22 @@ public class AssetInfo implements ChineseName,Serializable {
         this.mvsEqip = mvsEqip;
     }
 
+    public Date getAcceptDate() {
+        return acceptDate;
+    }
+
+    public void setAcceptDate(Date acceptDate) {
+        this.acceptDate = acceptDate;
+    }
+
+    public Integer getWarrantyMonth() {
+        return warrantyMonth;
+    }
+
+    public void setWarrantyMonth(Integer warrantyMonth) {
+        this.warrantyMonth = warrantyMonth;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

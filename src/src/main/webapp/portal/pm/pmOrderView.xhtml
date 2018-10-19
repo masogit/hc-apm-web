@@ -170,7 +170,7 @@
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
-                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"  update="pictureList"   process="@this"> 下载文件
+                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > 下载文件
                                 </p:link>
                             </h:panelGrid>
                         </p:panel>

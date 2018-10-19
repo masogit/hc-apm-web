@@ -599,6 +599,21 @@
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'acceptDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.acceptDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['acceptDate'].required? '*':''}</span></label>
+            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}" 
+                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('acceptDate')}" 
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyMonth')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyMonth}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.warrantyMonth}" required="#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required}" 
+                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('warrantyMonth')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.installDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</span></label>

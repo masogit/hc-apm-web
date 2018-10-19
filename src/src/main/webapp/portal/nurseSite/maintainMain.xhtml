@@ -125,7 +125,7 @@
                 </p:dialog>
                 <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
                 	<h:form id="createMaintainForm">
-                		<h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                		<h:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
                 			<h:panelGroup  style="float:left">
                 				<label>请选择配置: </label>
 								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
