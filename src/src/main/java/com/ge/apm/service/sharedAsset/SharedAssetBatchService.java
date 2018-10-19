@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class SharedAssetBatchService {
             .or().in("ai.hospital_uid", orgUidList)
             .or().in("ai.site_uid", orgUidList)
             .or().in("clinical_dept_uid", orgUidList);
+        ew.andNew()
+            .eq("ai.is_deleted", false)
+            .and().eq("ai.is_valid", true);
     }
 
     public AssetInfo findSharedAsset2Lease(Wrapper<AssetInfo> ew, String searchCriteria) {
@@ -50,7 +55,7 @@ public class SharedAssetBatchService {
         ew.andNew().in("ai.asset_dept_uid", allocationCenterUids);
 
         logger.info("ew: " + ew.getSqlSegment());
-        AssetInfo ai = sharedAssetMapper.findSharedAssetByWrapper(ew);
+        AssetInfo ai = sharedAssetMapper.findSharedAsset(ew);
         logger.info("ai: " + ai);
         return ai;
     }
@@ -66,9 +71,16 @@ public class SharedAssetBatchService {
         ew.andNew().notIn("ai.asset_dept_uid", allocationCenterUids);
 
         logger.info("ew: " + ew.getSqlSegment());
-        AssetInfo ai = sharedAssetMapper.findSharedAssetByWrapper(ew);
+        AssetInfo ai = sharedAssetMapper.findSharedAsset(ew);
         logger.info("ai: " + ai);
         return ai;
+    }
+
+    public List<OrgInfo> getOrgDeptList() {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> orgInfos = uaaService.getOrgDeptList(user.getSiteUID(), user.getUid());
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+        return orgInfos;
     }
 
 }
