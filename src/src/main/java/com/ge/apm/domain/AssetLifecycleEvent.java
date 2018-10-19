@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -47,12 +46,12 @@ public class AssetLifecycleEvent implements Serializable {
     @Column(name = "status")
     private Integer status;
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private AssetInfo assetInfo;
-
     @Column(name = "report_storage_id")
     private String reportStorageId;
+
+    @JoinColumn(name = "report_object_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private V2_BlobObject reportObject;
 
     public String getId() {
         return id;
@@ -126,19 +125,19 @@ public class AssetLifecycleEvent implements Serializable {
         this.status = status;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
-    }
-
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
-    }
-
     public String getReportStorageId() {
         return reportStorageId;
     }
 
     public void setReportStorageId(String reportStorageId) {
         this.reportStorageId = reportStorageId;
+    }
+
+    public V2_BlobObject getReportObject() {
+        return reportObject;
+    }
+
+    public void setReportObject(V2_BlobObject reportObject) {
+        this.reportObject = reportObject;
     }
 }
