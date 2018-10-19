@@ -46,7 +46,7 @@ public class AssetLifecycleEvent implements Serializable {
     @Column(name = "status")
     private Integer status;
 
-    @JoinColumn(name = "report_object_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "report_object_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.EAGER)
     private V2_BlobObject reportObject;
 
