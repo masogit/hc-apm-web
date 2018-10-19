@@ -19,7 +19,7 @@
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
-                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
                                         <label class='label'>请求类型</label>
                                         <p:selectOneRadio id="chargingType" value="#{sharedAssetBatchController.requestType}" required="true" requiredMessage="#{msg.ValidationRequire}">
@@ -29,7 +29,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class='label'>下送 </label>
-                                        <!-- <p:selectBooleanCheckbox value="" /> -->
+                                        <p:selectBooleanCheckbox value="#{sharedAssetBatchController.willBeDelivered}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class='label'>批量输入</label>
@@ -49,11 +49,15 @@
                                                     showOn="button"
                                                     showButtonPanel="true"
                                                     navigator="true"/>
-                                        <!-- <p:inputText style="width: 100px;margin-left:10px " placeholder="设备接收人" value=""/>
-                                        <p:selectOneMenu style="margin-left:40px;" id="assetDeptUid" required="true" requiredMessage="#{msg.clinicalDeptUid} #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                        </p:selectOneMenu>-->
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">借用科室*</label>
+                                        <p:autoComplete dropdown="true" value="#{sharedAssetBatchController.leaseDeptName}"
+                                                        required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
+                                                        scrollHeight="300"  forceSelection="true" size="8"
+                                                        completeMethod="#{sharedAssetBatchController.autoCompleteDeptName}">
+                                            <p:ajax process="@this" listener="#{sharedAssetBatchController.onLeaseDeptNameChange}" event="itemSelect"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                 </p:panelGrid>
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -73,14 +77,14 @@
 
                                 <p:dataTable id="datalist" value="#{sharedAssetBatchController.lazyModel}" var="asset" widgetVar="varDataList"
                                              selectionMode="single" selection="#{sharedAssetBatchController.selected}"
-                                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                             lazy="true" paginator="false" paginatorPosition="top" paginatorAlwaysVisible="true"
                                              rowKey="#{asset.id}" sortMode="single" sortOrder="descending" sortBy="#{asset.id}"
                                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                              rows="20" emptyMessage="#{msg.noRecordFound}"
                                              rowsPerPageTemplate="20,50,100,500">
                                     <p:column headerText="单据号">
-                                        <h:outputText value="#{asset.departNum}"/>
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
                                     </p:column>
                                     <p:column headerText="设备编号">
                                         <h:outputText value="#{asset.departNum}"/>
@@ -89,12 +93,12 @@
                                         <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="计费结束时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingEndTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
@@ -185,12 +189,12 @@
                                         <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="计费结束时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingEndTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
