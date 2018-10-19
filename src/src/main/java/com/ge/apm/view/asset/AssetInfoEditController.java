@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import webapp.framework.util.TimeUtil;
 
 @ManagedBean
 @ViewScoped
@@ -392,6 +393,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
+        }
+        
+        //设置质保时间
+        if(null == selected.getWarrantyDate()){
+            if(selected.getAcceptDate() !=null && selected.getWarrantyMonth() != null){
+                selected.setWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
+            }
         }
 
         if (selected.getUsageStatus() == null) {

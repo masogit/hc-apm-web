@@ -393,6 +393,13 @@
                                     </h:outputText>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'acceptDate'}">
+                                <p:column headerText="#{msg.acceptDate}" >
+                                    <h:outputText value="#{item.acceptDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'arriveDate'}">
                                 <p:column headerText="#{msg.arriveDate}" >
                                     <h:outputText value="#{item.arriveDate}">
@@ -434,6 +441,11 @@
                             <c:if test="#{columnItem eq 'lifecycle'}">
                                 <p:column headerText="#{msg.lifecycle}">
                                     <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'warrantyMonth'}">
+                                <p:column headerText="#{msg.warrantyMonth}">
+                                    <h:outputText value="#{item.warrantyMonth}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'depreciationMethod'}">
