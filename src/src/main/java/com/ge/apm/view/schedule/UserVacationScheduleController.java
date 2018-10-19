@@ -1,6 +1,7 @@
 package com.ge.apm.view.schedule;
 
 import com.ge.apm.dao.UserScheduleRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserSchedule;
 import com.ge.apm.service.schedule.UserScheduleService;
@@ -117,12 +118,23 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
             return "";
         }
 
-        List<LinkedHashMap<String, Date>> resultList = userScheduleService.saveVacation(startDate, endDate, scheduleDateStage);
+        List<LinkedHashMap<String, Object>> resultList = userScheduleService.saveVacation(startDate, endDate, scheduleDateStage);
 
         if(!resultList.isEmpty()){
-            String msg = "无效的休假日期：";
-            for (Map<String, Date> msgMap : resultList) {
+            String msg = "";
+            int i = 0;
+            for (Map<String, Object> msgMap : resultList) {
+                List assetInfoList = (List<AssetInfo>) msgMap.get("assetInfoList");
+                if(i == 0){
+                    if(assetInfoList != null && !assetInfoList.isEmpty()){
+                        msg = ((Map)assetInfoList.get(0)).get("name") + "上只有你一个责任人或其他责任人都请假: ";
+                    }else{
+                        msg = "该日期已存在请假记录: ";
+                    }
+                }
                 msg += msgMap.get("invalidDate") + ";";
+
+                i++;
             }
             WebUtil.addErrorMessage(msg);
             return "";
