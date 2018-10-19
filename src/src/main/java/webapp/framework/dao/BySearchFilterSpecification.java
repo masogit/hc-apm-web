@@ -43,7 +43,9 @@ public class BySearchFilterSpecification {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.notEqual(expression, filter.value)));
                                 break;
                             case LIKE:
-                                predicates.add(new Tuple2(filter.conditionPath, builder.like(expression, "%" + filter.value + "%")));
+                                if(filter.value!=null){
+                                    predicates.add(new Tuple2(filter.conditionPath, builder.like(builder.lower(expression), "%" + filter.value.toString().toLowerCase() + "%")));
+                                }
                                 break;
                             case GT:
                                 predicates.add(new Tuple2(filter.conditionPath, builder.greaterThan(expression, (Comparable) filter.value)));

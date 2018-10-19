@@ -70,7 +70,7 @@
                         </h:panelGroup>
                 </p:panelGrid>
                     <!--<h:panelGroup gaolei>-->
-                <p:pickList width="70" rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
+                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
                             required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
                     <f:facet name="sourceCaption">待选设备</f:facet>

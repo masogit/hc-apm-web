@@ -354,6 +354,14 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'acceptDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.acceptDate}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.acceptDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'arriveDate')}">
         <h:panelGroup >
             <label class="label">#{msg.arriveDate}</label>
@@ -415,6 +423,13 @@
             <label class="label">#{msg.lifecycle}</label>
             <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.lifecycleInYear}" readonly="true">
                 <f:convertNumber maxFractionDigits="1" minFractionDigits="1" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyMonth')}">
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyMonth}</label>
+            <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.warrantyMonth}" readonly="true">
             </p:inputText>
         </h:panelGroup>
     </c:if>
