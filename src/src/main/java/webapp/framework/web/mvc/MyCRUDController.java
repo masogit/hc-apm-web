@@ -158,7 +158,7 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
                     break;
                 case LIKE:
                     if(filter.value!=null){
-                        ew.like("lower("+filter.getFieldFullName()+")", filter.value.toString().toLowerCase());
+                        ew.like("lower("+filter.fieldName+")", filter.value.toString().toLowerCase());
                     }
                     break;
                 case LT :
