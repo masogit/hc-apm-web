@@ -97,7 +97,7 @@ public class UserScheduleService {
         }
     }
 
-    public List<LinkedHashMap<String, Date>> saveVacation(Date startDate, Date endDate, String scheduleDateStage){
+    public List<LinkedHashMap<String, Object>> saveVacation(Date startDate, Date endDate, String scheduleDateStage){
 
         String token = UserContextService.getAccessToken();
         UserScheduleForm usForm = new UserScheduleForm();
@@ -106,7 +106,7 @@ public class UserScheduleService {
         usForm.setScheduleDateStage(scheduleDateStage);
         usForm.setType(SCHEDULE_TYPE_VACATION);
 
-        List<LinkedHashMap<String, Date>> resultList = requestApiService.createUserVacationRequest(token, usForm);
+        List<LinkedHashMap<String, Object>> resultList = requestApiService.createUserVacationRequest(token, usForm);
 
         return resultList;
 
@@ -115,7 +115,7 @@ public class UserScheduleService {
     @Transactional
     public Map<String, List<UserSchedule>> batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String batchType, UserAccount userAccount){
         Map<String, List<UserSchedule>> resultMap = new HashedMap();
-        List<UserSchedule> successList = new ArrayList<>();//没有创建成功排班记录
+        List<UserSchedule> successList = new ArrayList<>();//创建成功排班记录
         List<UserSchedule> failedList = new ArrayList<>();//没有创建成功排班记录
         Instant startDateInstant = startDate.toInstant();
         ZoneId zone = ZoneId.systemDefault();
