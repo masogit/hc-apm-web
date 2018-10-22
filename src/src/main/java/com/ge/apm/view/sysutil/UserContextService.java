@@ -11,6 +11,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.service.utils.ApmConstant;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -327,7 +328,7 @@ public class UserContextService implements Serializable {
     public static boolean isMVSAdmin(){
     	UserAccount userAccount=getCurrentUserAccount();
     	Integer mvsRoleType=userAccount.getMvsRoleType();
-    	if(mvsRoleType!=null && mvsRoleType==1){
+    	if(mvsRoleType!=null && mvsRoleType== ApmConstant.MVS_ROLE_ADMIN){
     		return true;
     	}
     	else{
@@ -338,7 +339,7 @@ public class UserContextService implements Serializable {
     public static boolean isMVSRole(){
         UserAccount userAccount=getCurrentUserAccount();
         Integer mvsRoleType=userAccount.getMvsRoleType();
-        if(mvsRoleType != null && (mvsRoleType == 1 || mvsRoleType == 2)){
+        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_FE)){
             return true;
         }
         else{
