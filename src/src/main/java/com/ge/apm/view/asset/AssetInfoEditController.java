@@ -39,6 +39,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private CustomConfigService ccService;
     private AssetInfoRepository dao;
+    private MvsAssetInfoRepository mvsAssetInfoDao;
     private UserCommonService ucService;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
@@ -90,6 +91,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
+        mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         configService = WebUtil.getBean(ConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -149,6 +151,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
+        }
+
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            MvsAssetInfo found = mvsAssetInfoDao.findByAssetUid(selected.getUid());
+            if (found != null) {
+                mvsAssetInfo = found;
+            }
         }
 
 
