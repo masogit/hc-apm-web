@@ -396,9 +396,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         
         //设置质保时间
-        if(null == selected.getWarrantyDate()){
+        if(null == selected.getFactoryWarrantyDate()){
             if(selected.getAcceptDate() !=null && selected.getWarrantyMonth() != null){
-                selected.setWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
+                selected.setFactoryWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
             }
         }
 
