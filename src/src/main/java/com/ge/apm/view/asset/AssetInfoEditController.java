@@ -8,6 +8,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.SupplierController;
@@ -38,6 +39,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private CustomConfigService ccService;
     private AssetInfoRepository dao;
+    private MvsAssetInfoRepository mvsAssetInfoDao;
     private UserCommonService ucService;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
@@ -56,6 +58,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
+    private MvsUtil mvsUtil;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -83,9 +86,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
 
+    private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
+        mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         configService = WebUtil.getBean(ConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -106,6 +112,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        mvsUtil = WebUtil.getBean(MvsUtil.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -144,6 +151,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
+        }
+
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            MvsAssetInfo found = mvsAssetInfoDao.findByAssetUid(selected.getUid());
+            if (found != null) {
+                mvsAssetInfo = found;
+            }
         }
 
 
@@ -437,6 +452,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
+
+        mvsUtil.copyToMvsTableIfMvsEquip(selected);
+
         if (resultStatus) {
             return getListPageLink();
         } else {
@@ -932,5 +950,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
         this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
+
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
     }
 }

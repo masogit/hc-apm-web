@@ -37,6 +37,7 @@ import webapp.framework.web.WebUtil;
 public class AssetInfoDetailController {
 
     private AssetInfoRepository assetDao;
+    private MvsAssetInfoRepository mvsAssetInfoDao;
     private OrgInfoRepository orgDao;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
@@ -53,12 +54,15 @@ public class AssetInfoDetailController {
 
     private List<String> readableFieldsList;
     private TreeNode parentsTree;
+
+    private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
     
     
 
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -79,6 +83,14 @@ public class AssetInfoDetailController {
             Supplier supplier = supplierDao.findById(selected.getSupplierId());
             if (supplier != null) {
                 selected.setVendorTel(supplier.getTel());
+            }
+        }
+
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            MvsAssetInfo found = mvsAssetInfoDao.findByAssetUid(selected.getUid());
+            if (found != null) {
+                mvsAssetInfo = found;
             }
         }
     }
@@ -206,4 +218,11 @@ public class AssetInfoDetailController {
         return customConfig;
     }
 
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
+    }
 }

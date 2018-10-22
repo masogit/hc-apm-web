@@ -21,9 +21,7 @@ public class MvsAssetInfo {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 64)
+    @Size(max = 64)
     @Column(name = "name")
     private String name;//设备名称
 
@@ -31,15 +29,15 @@ public class MvsAssetInfo {
     @Column(name = "alias_name")
     private String aliasName;//设备别名
 
-    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-    private String siteUID;//所属院区uuid
+//    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+//    private String siteUID;//所属院区uuid
 
     @Size(max = 64)
     @Column(name = "site_name")
     private String siteName;//所属院区
 
-    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
-    private String assetDeptUID;//使用科室uuid
+//    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
+//    private String assetDeptUID;//使用科室uuid
 
     @Size(max = 64)
     @Column(name = "asset_dept_name")
@@ -159,13 +157,13 @@ public class MvsAssetInfo {
         this.aliasName = aliasName;
     }
 
-    public String getSiteUID() {
-        return siteUID;
-    }
-
-    public void setSiteUID(String siteUID) {
-        this.siteUID = siteUID;
-    }
+//    public String getSiteUID() {
+//        return siteUID;
+//    }
+//
+//    public void setSiteUID(String siteUID) {
+//        this.siteUID = siteUID;
+//    }
 
     public String getSiteName() {
         return siteName;
@@ -175,13 +173,13 @@ public class MvsAssetInfo {
         this.siteName = siteName;
     }
 
-    public String getAssetDeptUID() {
-        return assetDeptUID;
-    }
-
-    public void setAssetDeptUID(String assetDeptUID) {
-        this.assetDeptUID = assetDeptUID;
-    }
+//    public String getAssetDeptUID() {
+//        return assetDeptUID;
+//    }
+//
+//    public void setAssetDeptUID(String assetDeptUID) {
+//        this.assetDeptUID = assetDeptUID;
+//    }
 
     public String getAssetDeptName() {
         return assetDeptName;

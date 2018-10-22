@@ -29,7 +29,11 @@ public class MvsUtil {
     @Autowired
     OrgInfoRepository orgInfoDao;
 
-    public void copyToMvsTable(AssetInfo assetInfo) {
+    public void copyToMvsTableIfMvsEquip(AssetInfo assetInfo) {
+
+        if (assetInfo == null) return;
+
+        if (assetInfo.getMvsEquip() == null || assetInfo.getMvsEquip() != 1) return;
 
         MvsAssetInfo foundExisting = mvsAssetInfoDao.findByAssetUid(assetInfo.getUid());
 
@@ -42,7 +46,7 @@ public class MvsUtil {
         mvsAssetInfo.setAliasName(assetInfo.getAliasName());
 
         //site org
-        mvsAssetInfo.setSiteUID(assetInfo.getSiteUID());
+//        mvsAssetInfo.setSiteUID(assetInfo.getSiteUID());
 
         OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
         if (siteOrg == null) {
@@ -52,7 +56,7 @@ public class MvsUtil {
         }
 
         //asset dept org
-        mvsAssetInfo.setAssetDeptUID(assetInfo.getAssetDeptUID());
+//        mvsAssetInfo.setAssetDeptUID(assetInfo.getAssetDeptUID());
 
         OrgInfo assetDeptOrg = orgInfoDao.findByUid(assetInfo.getAssetDeptUID());
         if (assetDeptOrg == null) {
