@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.*;
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -84,7 +85,7 @@ public class AssetContract implements Serializable {
     private String siteUID;
     
     
-    @JoinColumn(insertable=false,updatable=false, name = "asset_id", referencedColumnName = "id",nullable = true)
+    @JoinColumn(insertable=false,updatable=false, name = "asset_id", referencedColumnName = "id",nullable = true, foreignKey = @ForeignKey(NO_CONSTRAINT))
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private AssetInfo assetInfo;
