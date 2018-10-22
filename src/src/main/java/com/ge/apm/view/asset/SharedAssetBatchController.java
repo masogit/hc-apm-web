@@ -28,10 +28,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -76,6 +73,8 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     @Setter
     private String leaseDeptName;
 
+    private List<OrgInfo> leaseDeptList;
+
     private List<AssetInfo> leaseAssets = new LinkedList<>();
 
     private List<AssetInfo> returnAssets = new LinkedList<>();
@@ -91,12 +90,15 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return null;
     }
 
+    @Override
     protected void init() {
         logger.info("Start to initialize component");
         sharedAssetBatchService = WebUtil.getBean(SharedAssetBatchService.class);
         sharedAssetService = WebUtil.getBean(SharedAssetService.class);
+        leaseDeptList = sharedAssetBatchService.getOrgDeptList();
     }
 
+    @Override
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
         List<AssetInfo> result;
         if(submittedAssets.size() > 0) {
@@ -141,7 +143,14 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                     if(reqDetail == null) {
                         reqDetail = new SharedAssetReqDetail();
                         reqDetail.setChargingBeginTime(this.batchChargingBeginDate);
-                        reqDetail.setChargingEndTime(this.batchChargingEndDate);
+                        //记录借用科室到req_detail
+                        Optional<OrgInfo> leaseDept = leaseDeptList.stream()
+                                                .filter(dept -> leaseDeptName.equals(dept.getName()))
+                                                .findFirst();
+                        leaseDept.map(dept -> dept.getUid()).ifPresent(reqDetail::setClinicalDeptUid);
+                        leaseDept.map(dept -> dept.getName()).ifPresent(reqDetail::setClinicalDeptName);
+                        //记录下送到req_detail
+                        reqDetail.setWillBeDelivered(this.willBeDelivered);
                         ai.setSharedAssetReqDetail(reqDetail);
                     }
                     leaseAssets.add(ai);
@@ -197,16 +206,14 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         if (event instanceof SelectEvent) {
             leaseDeptName = (String) ((SelectEvent) event).getObject();
         } else {
-            List<OrgInfo> deptList = sharedAssetBatchService.getOrgDeptList();
-            if (!Strings.isNullOrEmpty(leaseDeptName) && !deptList.stream().anyMatch(item -> leaseDeptName.equals(item.getName()))) {
+            if (!Strings.isNullOrEmpty(leaseDeptName) && !leaseDeptList.stream().anyMatch(item -> leaseDeptName.equals(item.getName()))) {
                 leaseDeptName = "";
             }
         }
     }
 
     public List<String> autoCompleteDeptName(String query) {
-        List<OrgInfo> deptList = sharedAssetBatchService.getOrgDeptList();
-        List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
+        List<OrgInfo> res = leaseDeptList.stream().filter(item -> Strings.isNullOrEmpty(query)
                                             || item.getName().contains(query)
                                             || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                                             .collect(Collectors.toList());
@@ -214,6 +221,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return res.stream().map(item -> item.getName())
                             .distinct()
                             .collect(Collectors.toList());
+    }
+
+    public void removeLeaseRequest() {
+        this.leaseAssets.remove(this.selected);
     }
 
 }
