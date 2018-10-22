@@ -35,7 +35,7 @@ public class InventoryIssue implements Serializable {
     private String inventoryOrderId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "clinical_dept_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "clinical_dept_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = true)
     private OrgInfo clinicalDept;
 
     @ManyToOne

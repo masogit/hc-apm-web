@@ -265,6 +265,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void saveContract() {
+        if(null != selected.getContractNum()){
+            List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(),selected.getTenantUID());
+            if(null != contractList && !contractList.isEmpty()){
+                if(contractList.stream().anyMatch(item -> Objects.equals(item.getId(), selected.getId()) )){
+                    WebUtil.addErrorMessage("合同编号不能重复使用");
+                    return ;
+                }
+            }
+        }
+        
         selected = dao.save(this.selected);
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
