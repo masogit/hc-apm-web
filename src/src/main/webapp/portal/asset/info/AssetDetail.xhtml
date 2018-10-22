@@ -219,6 +219,9 @@
                         <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
                             <h:outputText value="#{item.contractInfo.amount}"/>
                         </p:column>
+                        <p:column headerText="#{msg.invoiceNum}"  >
+                            <h:outputText value="#{assetInfoDetailController.getContractInvoice(item.contractInfo)}"/>
+                        </p:column>
                         <p:column   >
                             <!--<p:commandLink action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.contractInfo.id))}" value="查看" />-->
                             <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.contractInfo.id))}">查看</p:link>
