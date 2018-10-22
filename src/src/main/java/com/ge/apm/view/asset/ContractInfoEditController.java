@@ -14,6 +14,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -86,6 +87,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
     private String attachmentType;
+    
+    private List<V2_WorkOrder_Detail> parts = new ArrayList();
 
     @Override
     protected void init() {
@@ -126,6 +129,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             selectedObjectMap.put("bidWinner", selected.getBidWinner() == null ? null : supplierDao.findByUid(selected.getBidWinner()));
             selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
 
+            if(ContractInfo.ContractType.Parts.toString().equals(selected.getContractType())){
+                parts = contractService.getPartsInfo(selected.getContractNum(),selected.getTenantUID());
+            }
         }
 
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
@@ -437,6 +443,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         if(ContractInfo.ContractType.Equipment.toString().equals(selected.getContractType())){
             selected.setInvoiceNum(null);
         }
+    }
+    
+    public String getPartsInvoiceNum(ContractInfoItem assetItem){
+        V2_WorkOrder_Detail part = parts.stream().filter(item -> Objects.equals(assetItem.getAssetUid(), item.getV2WorkOrder().getAssetInfo().getUid())).findAny().orElse(null);
+        return null==part? "": part.getInvoiceNum();
     }
 
     //getter and setter
