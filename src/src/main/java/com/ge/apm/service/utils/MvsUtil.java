@@ -62,15 +62,11 @@ public class MvsUtil {
         //site org
 //        mvsAssetInfo.setSiteUID(assetInfo.getSiteUID());
 
-        if (foundExisting == null) {
-            OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
-            if (siteOrg == null) {
-                logger.error("site org not found using site uid, {}", assetInfo.getSiteUID());
-            } else {
-                mvsAssetInfo.setSiteName(siteOrg.getName());
-            }
+        OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
+        if (siteOrg == null) {
+            logger.error("site org not found using site uid, {}", assetInfo.getSiteUID());
         } else {
-
+            mvsAssetInfo.setSiteName(siteOrg.getName());
         }
 
 
