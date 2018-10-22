@@ -183,6 +183,11 @@
                                     <h:outputText value="#{item.vendor}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'subjectProject'}">
+                                <p:column headerText="#{msg.vendor}" sortBy="#{item.subjectProject}" filterBy="#{item.subjectProject}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.subjectProject}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'status'}">
                                 <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
                                     <f:facet name="filter">

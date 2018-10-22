@@ -20,4 +20,6 @@ public interface ContractInfoRepository extends GenericRepositoryUUID<ContractIn
     public List<ContractInfo> findEquipmentContractByTenant(String tenantUID);
 
     public ContractInfo findByIdAndContractTypeAndTenantUID(String id, String contractType, String tenantUID);
+    
+    public List<ContractInfo> findByContractNumAndTenantUID(String id, String tenantUID);
 }
