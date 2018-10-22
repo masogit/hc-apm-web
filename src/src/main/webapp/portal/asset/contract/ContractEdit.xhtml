@@ -53,6 +53,7 @@
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Parts')}" itemValue="Parts"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -275,6 +276,9 @@
                             <p:column headerText="#{msg.arrivalListInvoiceNum}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{item.arrivalListItem.arrivalList.invoiceNum}" />
                             </p:column>
+                            <p:column headerText="#{msg.arrivalListInvoiceNum}" rendered="#{contractInfoEditController.selected.contractType eq 'Parts'}" >
+                                <h:outputText value="#{contractInfoEditController.getPartsInvoiceNum(item)}" />
+                            </p:column>
                             <p:column headerText="安装状态" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.arrivalListItem.installStatus)}" />
                             </p:column>
@@ -286,12 +290,12 @@
 <!--                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
                                 <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>-->
                                 <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
-                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
                                 <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{selectAssetController.prepareDialogCallback(contractInfoEditController, ':AssetContractEditForm:itemList')}" 
-                                                process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
+                                                process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
 
                         </p:dataTable>

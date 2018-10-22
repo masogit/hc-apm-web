@@ -8,11 +8,13 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
+import com.ge.apm.dao.V2_WorkOrderDetailRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ public class ContractInfoService {
     private ArrivalListRepository arrivalDao;
     @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private V2_WorkOrderDetailRepository partsDao;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -81,6 +85,11 @@ public class ContractInfoService {
         contractDao.delete(contract);
         
         return true;
+    }
+
+    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum,String tenantUid) {
+        
+        return partsDao.findByContractNum(contractNum,tenantUid);
     }
 
 }
