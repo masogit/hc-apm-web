@@ -50,6 +50,8 @@ public class AssetInfoDetailController {
     
     private List<String> readableFieldsList;
     private TreeNode parentsTree;
+
+    private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
     
     @PostConstruct
     protected void init() {
@@ -173,4 +175,11 @@ public class AssetInfoDetailController {
         return customConfig;
     }
 
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
+    }
 }
