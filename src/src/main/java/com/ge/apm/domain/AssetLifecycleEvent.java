@@ -46,6 +46,10 @@ public class AssetLifecycleEvent implements Serializable {
     @Column(name = "status")
     private Integer status;
 
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
     @JoinColumn(name = "report_object_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.EAGER)
     private V2_BlobObject reportObject;
@@ -120,6 +124,14 @@ public class AssetLifecycleEvent implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
     }
 
     public String getReportStorageId() {
