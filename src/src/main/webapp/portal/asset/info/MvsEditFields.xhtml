@@ -9,13 +9,84 @@
     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
         <h:panelGroup>
             <label class="label">#{msg.name}</label>
-            <p:autoComplete id="mvs_name" value="#{assetInfoEditController.mvsAssetInfo.name}"
-                            completeMethod="#{assetInfoEditController.completeAssetName}"/>
+            <p:inputText id="mvs_name" value="#{assetInfoEditController.mvsAssetInfo.name}" />
         </h:panelGroup>
 
         <h:panelGroup>
             <label class="label">#{msg.aliasName}</label>
             <p:inputText id="mvs_aliasName" value="#{assetInfoEditController.mvsAssetInfo.aliasName}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.hospitalId}</label>
+            <p:inputText id="mvs_siteName" value="#{assetInfoEditController.mvsAssetInfo.siteName}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.assetDeptName}</label>
+            <p:inputText id="mvs_assetDeptName" value="#{assetInfoEditController.mvsAssetInfo.assetDeptName}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.manufacture}</label>
+            <p:inputText id="mvs_manufacture" value="#{assetInfoEditController.mvsAssetInfo.manufacture}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.makerShortName}</label>
+            <p:inputText id="mvs_makerShortName" value="#{assetInfoEditController.mvsAssetInfo.makerShortName}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroup}</label>
+            <p:inputText id="mvs_assetGroup" value="#{assetInfoEditController.mvsAssetInfo.assetGroup}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.repairForm}</label>
+            <p:inputText id="mvs_repairForm" value="#{assetInfoEditController.mvsAssetInfo.repairForm}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.functionType}</label>
+            <p:inputText id="mvs_functionType" value="#{assetInfoEditController.mvsAssetInfo.functionType}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.serialNum}</label>
+            <p:inputText id="mvs_serialNum" value="#{assetInfoEditController.mvsAssetInfo.serialNum}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.systemId}</label>
+            <p:inputText id="mvs_systemId" value="#{assetInfoEditController.mvsAssetInfo.systemId}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.financingNum}</label>
+            <p:inputText id="mvs_financingNum" value="#{assetInfoEditController.mvsAssetInfo.financingNum}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:calendar id="mvs_factoryWarrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.factoryWarrantyDate}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:calendar id="mvs_warrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.warrantyDate}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.QRCode}</label>
+            <p:inputText id="mvs_QRCode" value="#{assetInfoEditController.mvsAssetInfo.qrCode}" />
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.comments}</label>
+            <p:inputText id="mvs_comments" value="#{assetInfoEditController.mvsAssetInfo.comments}" />
         </h:panelGroup>
 
     </p:panelGrid>
