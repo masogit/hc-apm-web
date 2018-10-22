@@ -158,7 +158,7 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 //				asset=order.getAssetInfo();
 //			}
 //			if(asset!=null){
-//				mvsEquip=asset.getMvsEqip();
+//				mvsEquip=asset.getMvsEquip();
 //			}
 //			if(mvsEquip!=null && mvsEquip==1){
 //				newListDetail.add(tempDetail);
