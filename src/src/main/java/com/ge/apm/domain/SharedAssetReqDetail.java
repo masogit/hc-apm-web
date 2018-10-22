@@ -183,6 +183,9 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "starting_duration")
     private Double startingDuration;//起步时长
 
+    @Column(name = "will_be_delivered")
+    private Boolean willBeDelivered = Boolean.FALSE;
+
     public String getId() {
         return id;
     }
@@ -719,6 +722,14 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setStartingDuration(Double startingDuration) {
         this.startingDuration = startingDuration;
+    }
+
+    public Boolean getWillBeDelivered() {
+        return willBeDelivered;
+    }
+
+    public void setWillBeDelivered(Boolean willBeDelivered) {
+        this.willBeDelivered = willBeDelivered;
     }
 
     public long getRentalTimeInMins() {
