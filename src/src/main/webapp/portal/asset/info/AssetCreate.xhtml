@@ -66,6 +66,9 @@
                             
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{not empty userContextService.isMVSRole()}">
+                        <ui:include src="MvsEditFields.xhtml"/>
+                    </p:fieldset>
 
                     <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
