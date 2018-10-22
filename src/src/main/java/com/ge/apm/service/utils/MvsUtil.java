@@ -41,9 +41,8 @@ public class MvsUtil {
         mvsAssetInfo.setName(assetInfo.getName());
         mvsAssetInfo.setAliasName(assetInfo.getAliasName());
 
+        //site org
         mvsAssetInfo.setSiteUID(assetInfo.getSiteUID());
-//
-
 
         OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
         if (siteOrg == null) {
@@ -52,7 +51,9 @@ public class MvsUtil {
             mvsAssetInfo.setSiteName(siteOrg.getName());
         }
 
+        //asset dept org
         mvsAssetInfo.setAssetDeptUID(assetInfo.getAssetDeptUID());
+
         OrgInfo assetDeptOrg = orgInfoDao.findByUid(assetInfo.getAssetDeptUID());
         if (assetDeptOrg == null) {
             logger.error("asset dept org not found using asset dept uid, {}", assetInfo.getAssetDeptUID());
