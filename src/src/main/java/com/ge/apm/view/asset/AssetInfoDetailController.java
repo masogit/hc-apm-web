@@ -10,6 +10,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -42,15 +43,19 @@ public class AssetInfoDetailController {
     private SupplierRepository supplierDao;
     private CustomConfigService ccService;
     private AssetInfoMgrService aimService;
+    private ContractInfoService contractService;
+    private ContractInfoItemRepository contractItemDao;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
-    
+
     private CustomConfigObject customConfig;
-    
+
     private List<String> readableFieldsList;
     private TreeNode parentsTree;
     
+    
+
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -60,6 +65,8 @@ public class AssetInfoDetailController {
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
+        contractService = WebUtil.getBean(ContractInfoService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -75,9 +82,9 @@ public class AssetInfoDetailController {
             }
         }
     }
-    
+
     public OrgInfo getOrgInfoByUid(String uid) {
-        if(Strings.isNullOrEmpty(uid)){
+        if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
         return orgDao.getByUid(uid);
@@ -99,7 +106,7 @@ public class AssetInfoDetailController {
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
     }
-    
+
     public String getContractListLink() {
         return "/portal/asset/contract/ContractList?assetId=" + selected.getId();
     }
@@ -107,11 +114,11 @@ public class AssetInfoDetailController {
     public String getContractAddLink() {
         return "/portal/asset/contract/ContractEdit?assetId=" + selected.getId() + "&actionName=Create";
     }
-    
+
     public String getListPageLink() {
         return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
     }
-    
+
     public String getParentAssetName() {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.assetDao.getById(this.selected.getParentAssetId());
@@ -126,27 +133,27 @@ public class AssetInfoDetailController {
         return "";
     }
 
-    public String getCustomConfigString(){
+    public String getCustomConfigString() {
         return JSONObject.toJSONString(customConfig);
     }
-    
-    public TreeNode getParentsRelationTree(){
-        if(parentsTree==null){
+
+    public TreeNode getParentsRelationTree() {
+        if (parentsTree == null) {
             parentsTree = aimService.getParentAssetTree(selected);
             TreeNodeUtil.expandTreeNode(parentsTree);
         }
         return parentsTree;
     }
-    
-    public boolean showParentsTree(){
+
+    public boolean showParentsTree() {
         TreeNode node = getParentsRelationTree();
-        if(node==null || node.getChildCount()==0){
+        if (node == null || node.getChildCount() == 0) {
             return false;
         }
-        return node.getChildren().stream().anyMatch(item-> item.getChildCount()>0);
+        return node.getChildren().stream().anyMatch(item -> item.getChildCount() > 0);
     }
-    
-    public String getDetailPageLink(String uid){
+
+    public String getDetailPageLink(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
                 + viewAsset.getId().toString()
@@ -155,11 +162,37 @@ public class AssetInfoDetailController {
         url = "AssetDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);
         return url;
     }
-    
-    public boolean needShow(String itemKey, String fieldKey){
+
+    public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
-    
+
+    public String getContractInvoice(ContractInfo contractInfo) {
+        if (null == contractInfo) {
+            return null;
+        }
+        switch (contractInfo.getContractType()) {
+            case "Full":
+            case "Other":
+            case "Artificial":
+                return contractInfo.getInvoiceNum();
+            case "Equipment":
+                List<ContractInfoItem> contractItemList =  contractItemDao.findByContractId(contractInfo.getId());
+                StringBuilder sb= new StringBuilder();
+                contractItemList.stream().filter(item -> item.getArrivalListItem()!=null && null !=item.getArrivalListItem().getArrivalList().getInvoiceNum())
+                        .forEach(item-> sb.append(item.getArrivalListItem().getArrivalList().getInvoiceNum()).append(" "));
+                return sb.toString();
+            case "Parts":
+                List<V2_WorkOrder_Detail> parts = contractService.getPartsInfo(contractInfo.getContractNum(),contractInfo.getTenantUID());
+                StringBuilder partsSb= new StringBuilder();
+                parts.stream().filter(item -> null !=item.getInvoiceNum())
+                        .forEach(item-> partsSb.append(item.getInvoiceNum()).append(" "));
+                return partsSb.toString();
+            default:
+        }
+        return null;
+    }
+
     //getter and setter
     public Boolean getTerminate() {
         return terminate;
