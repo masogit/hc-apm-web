@@ -51,6 +51,10 @@
                 </p:tab>
             </p:accordionPanel>
 
+            <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
+                <ui:include src="MvsViewFields.xhtml"/>
+            </p:fieldset>
+
             <h:form>
                 <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
 

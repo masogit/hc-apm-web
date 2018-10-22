@@ -79,7 +79,7 @@
                 <p:menuitem id="um200" value="维修工单报表" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.versionContains('排班管理')}"/>
                             <!--rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>-->
-                <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="false"/>
+                <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml"/>
                 <p:menuitem id="um220" value="报表模版管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
                 <p:menuitem id="um221" value="MVS维修设备管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')  or userContextService.isMVSAdmin()}"/>
             </p:submenu>
