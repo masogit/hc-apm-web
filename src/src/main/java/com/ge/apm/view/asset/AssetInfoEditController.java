@@ -8,6 +8,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.SupplierController;
@@ -56,6 +57,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
+    private MvsUtil mvsUtil;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -108,6 +110,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        mvsUtil = WebUtil.getBean(MvsUtil.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -439,6 +442,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
+
+        mvsUtil.copyToMvsTableIfMvsEquip(selected);
+
         if (resultStatus) {
             return getListPageLink();
         } else {
