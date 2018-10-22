@@ -335,6 +335,17 @@ public class UserContextService implements Serializable {
     	}
     }
 
+    public static boolean isMVSRole(){
+        UserAccount userAccount=getCurrentUserAccount();
+        Integer mvsRoleType=userAccount.getMvsRoleType();
+        if(mvsRoleType != null && (mvsRoleType == 1 || mvsRoleType == 2)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public static int getUserID() {
         UserAccount userAccount = getCurrentUserAccount();
         if (userAccount != null) {
