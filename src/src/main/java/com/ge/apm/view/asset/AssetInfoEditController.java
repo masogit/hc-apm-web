@@ -453,7 +453,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
 
-        mvsUtil.copyToMvsTableIfMvsEquip(selected);
+        mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         if (resultStatus) {
             return getListPageLink();

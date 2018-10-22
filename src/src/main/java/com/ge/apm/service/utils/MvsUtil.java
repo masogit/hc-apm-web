@@ -36,33 +36,43 @@ public class MvsUtil {
     @Autowired
     I18nMessageService i18nMessageService;
 
-    public void copyToMvsTableIfMvsEquip(AssetInfo assetInfo) {
+    public void copyToMvsTableIfMvsEquip(AssetInfo assetInfo, MvsAssetInfo updatedMvsAssetInfo) {
 
         if (assetInfo == null) return;
 
         if (assetInfo.getMvsEquip() == null || assetInfo.getMvsEquip() != 1) return;
 
-        MvsAssetInfo foundExisting = mvsAssetInfoDao.findByAssetUid(assetInfo.getUid());
-
-        if (foundExisting != null) return;
-
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
 
-        MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+        MvsAssetInfo foundExisting = mvsAssetInfoDao.findByAssetUid(assetInfo.getUid());
+
+        if (foundExisting != null && UserContextService.isMVSAdmin()) {
+            //only mvs admin can update
+            mvsAssetInfoDao.save(updatedMvsAssetInfo);
+            return;
+        }
+
 
         //below is 17 fields copied
+        MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
         mvsAssetInfo.setName(assetInfo.getName());
         mvsAssetInfo.setAliasName(assetInfo.getAliasName());
 
         //site org
 //        mvsAssetInfo.setSiteUID(assetInfo.getSiteUID());
 
-        OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
-        if (siteOrg == null) {
-            logger.error("site org not found using site uid, {}", assetInfo.getSiteUID());
+        if (foundExisting == null) {
+            OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
+            if (siteOrg == null) {
+                logger.error("site org not found using site uid, {}", assetInfo.getSiteUID());
+            } else {
+                mvsAssetInfo.setSiteName(siteOrg.getName());
+            }
         } else {
-            mvsAssetInfo.setSiteName(siteOrg.getName());
+
         }
+
 
         //asset dept org
 //        mvsAssetInfo.setAssetDeptUID(assetInfo.getAssetDeptUID());
