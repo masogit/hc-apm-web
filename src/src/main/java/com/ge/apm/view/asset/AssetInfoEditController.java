@@ -83,6 +83,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
 
+    private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -932,5 +934,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
         this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
+
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
     }
 }
