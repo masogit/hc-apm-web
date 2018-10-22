@@ -9,19 +9,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -30,8 +25,6 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -505,8 +498,8 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "pm_owner_tel")
     private String pmOwnerTel;
 
-    @Column(name = "mvs_eqip")
-    private Integer mvsEqip;
+    @Column(name = "mvs_equip")
+    private Integer mvsEquip;
     
     // 所属课题项目
     @Column(name = "subject_project")
@@ -1639,12 +1632,12 @@ public class AssetInfo implements ChineseName,Serializable {
         this.pmOwnerTel = pmOwnerTel;
     }
 
-    public Integer getMvsEqip() {
-        return mvsEqip;
+    public Integer getMvsEquip() {
+        return mvsEquip;
     }
 
-    public void setMvsEqip(Integer mvsEqip) {
-        this.mvsEqip = mvsEqip;
+    public void setMvsEquip(Integer mvsEquip) {
+        this.mvsEquip = mvsEquip;
     }
 
     public Date getAcceptDate() {
