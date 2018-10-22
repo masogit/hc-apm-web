@@ -507,6 +507,10 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "mvs_eqip")
     private Integer mvsEqip;
+    
+    // 所属课题项目
+    @Column(name = "subject_project")
+    private String subjectProject;
 
     @Transient
     private int lineNum;
@@ -1657,6 +1661,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setWarrantyMonth(Integer warrantyMonth) {
         this.warrantyMonth = warrantyMonth;
+    }
+
+    public String getSubjectProject() {
+        return subjectProject;
+    }
+
+    public void setSubjectProject(String subjectProject) {
+        this.subjectProject = subjectProject;
     }
     
     @Override

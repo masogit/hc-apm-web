@@ -244,6 +244,12 @@
             <p:inputText id="locationCode" value="#{assetInfoDetailController.selected.locationCode}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'subjectProject')}">
+        <h:panelGroup >
+            <label class="label">#{msg.subjectProject}</label>
+            <p:inputText id="locationCode" value="#{assetInfoDetailController.selected.subjectProject}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationName')}">
         <h:panelGroup >
             <label class="label">#{msg.locationName}</label>

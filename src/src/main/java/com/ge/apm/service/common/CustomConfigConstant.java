@@ -22,7 +22,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject");
     }
     
     static public List<String> getSystemFields() {
@@ -189,6 +189,7 @@ public class CustomConfigConstant {
             allFields.put("pmOwnerTel", WebUtil.getMessage("pmOwnerTel"));
             allFields.put("acceptDate", WebUtil.getMessage("acceptDate"));
             allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
+            allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
         }
         return allFields;
     }
