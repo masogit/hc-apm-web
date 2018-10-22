@@ -309,6 +309,13 @@
                          requiredMessage="#{msg.deviceName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('deviceName')}" />
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'subjectProject')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.subjectProject}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['subjectProject'].required? '*':''}</span></label>
+            <p:inputText  value="#{assetInfoEditController.selected.deviceName}" required="#{assetInfoEditController.customConfig.assetFields['subjectProject'].required}" 
+                         requiredMessage="#{msg.subjectProject} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('subjectProject')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemId')}" >
         <h:panelGroup>
             <label class="label">#{msg.systemId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemId'].required? '*':''}</span></label>
