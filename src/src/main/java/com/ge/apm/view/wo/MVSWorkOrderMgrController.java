@@ -77,7 +77,7 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 			}
 		}
 		//eager
-		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEqip", SearchFilter.Operator.EQ, "1"));
+		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEquip", SearchFilter.Operator.EQ, "1"));
 		Page<V2_WorkOrder_Detail> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
 		if (pageRequest != null) {
 			listDetail = pageResult.getContent();
