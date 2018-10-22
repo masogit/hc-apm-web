@@ -51,11 +51,13 @@ public class MvsAssetInfo {
     @Column(name = "make_short_name")
     private String makerShortName;//品牌/制造商简称
 
+    @Size(max = 128)
     @Column(name = "asset_group")
-    private Integer assetGroup;//设备分类
+    private String assetGroup;//设备分类
 
+    @Size(max = 128)
     @Column(name = "repair_form")
-    private Integer repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
+    private String repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
 
     @Column(name = "function_type")
     private String functionType;//设备型号
@@ -205,19 +207,19 @@ public class MvsAssetInfo {
         this.makerShortName = makerShortName;
     }
 
-    public Integer getAssetGroup() {
+    public String getAssetGroup() {
         return assetGroup;
     }
 
-    public void setAssetGroup(Integer assetGroup) {
+    public void setAssetGroup(String assetGroup) {
         this.assetGroup = assetGroup;
     }
 
-    public Integer getRepairForm() {
+    public String getRepairForm() {
         return repairForm;
     }
 
-    public void setRepairForm(Integer repairForm) {
+    public void setRepairForm(String repairForm) {
         this.repairForm = repairForm;
     }
 
