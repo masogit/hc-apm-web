@@ -44,11 +44,10 @@
                 </p:column>
 
                 <p:column headerText="报告">
-                    <c:if test="${not empty item.storageId}">
-                        <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
-                            <h:outputText value="下载"/>
-                        </p:link>
-                    </c:if>
+                    <p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}"
+                            rendered="#{not empty item.reportStorageId}">
+                        <h:outputText value="下载"/>
+                    </p:link>
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -64,6 +63,8 @@
                     PF('ActiveDlg').show();
                 }
             }
+
+
 
     </script>
 
