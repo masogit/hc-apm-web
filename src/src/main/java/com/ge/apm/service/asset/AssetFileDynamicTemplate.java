@@ -79,10 +79,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
 
-    int siteId;
+//    int siteId;
 
-    public AssetFileDynamicTemplate(int siteId) throws IOException {
-        siteId = siteId;
+    public AssetFileDynamicTemplate() throws IOException {
+//        this.siteId = siteId;
 
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
 
@@ -374,7 +374,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao, siteId);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             writer.writeRowData(startRow, rowMap);

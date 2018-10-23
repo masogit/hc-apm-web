@@ -8,8 +8,6 @@ import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.sun.org.apache.xml.internal.security.utils.I18n;
-import webapp.framework.web.WebUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,16 +28,14 @@ public class AssetInfoFormatter {
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao,
-                              I18nMessageRepository i18nDao,
-                              int siteId) {
+                              I18nMessageRepository i18nDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
         this.i18nDao = i18nDao;
-        this.siteId = siteId;
-
+        this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
     public Integer getAssetUsage() {
@@ -72,7 +68,7 @@ public class AssetInfoFormatter {
 
         if (assetInfo.getCapitalSource2() == null) return null;
 
-        I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("capitalSource2", String.valueOf(assetInfo.getCapitalSource2()), siteId);
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("capitalSource2", String.valueOf(assetInfo.getCapitalSource2()), siteId);
 
         if (msg != null) {
             return msg.getValueZh();
@@ -186,7 +182,7 @@ public class AssetInfoFormatter {
     public String getDeviceStatusAsString() {
         if (assetInfo.getDeviceStatus() == null) return null;
 
-        I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("deviceStatus", String.valueOf(assetInfo.getDeviceStatus()), siteId);
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("deviceStatus", String.valueOf(assetInfo.getDeviceStatus()), siteId);
 
         if (msg != null) {
             return msg.getValueZh();
@@ -638,13 +634,13 @@ public class AssetInfoFormatter {
         if (assetInfo.getWarranty() == null) return null;
 
         if (assetInfo.getWarranty()) {
-            I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("label", "True2Yes", siteId);
+            I18nMessage msg = I18nMessageService.getMessageByMsgKeyUsingDefaultConfigAsLowestPriority("True2Yes", siteId);
 
             if (msg != null) {
                 return msg.getValueZh();
             }
         } else {
-            I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("label", "False2No", siteId);
+            I18nMessage msg = I18nMessageService.getMessageByMsgKeyUsingDefaultConfigAsLowestPriority("False2No", siteId);
 
             if (msg != null) {
                 return msg.getValueZh();

@@ -48,7 +48,7 @@ public class AssetFileDynamicTemplateTest {
 
     @Before
     public void setup() throws IOException {
-        template = new AssetFileDynamicTemplate(-1);
+        template = new AssetFileDynamicTemplate();
     }
 
     @Test
