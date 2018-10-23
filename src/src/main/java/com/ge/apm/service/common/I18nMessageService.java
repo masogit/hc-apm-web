@@ -6,6 +6,12 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.service.DbMessageSource;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class I18nMessageService {
@@ -22,5 +28,56 @@ public class I18nMessageService {
         }
 
         return foundMsg;
+    }
+
+
+    public static List<I18nMessage> getMessagesByTypeUsingDefaultConfigAsLowestPriority(String msgType, int siteId) {
+
+        List<I18nMessage> msgList = getMessagesByType(msgType, siteId);
+
+        if(msgList.isEmpty() && siteId != -1){
+            msgList = getMessagesByType(msgType, -1);
+        }
+
+        return msgList;
+    }
+
+    public static List<I18nMessage> getMessagesByType(String msgType, int siteId){
+
+
+        Map<String, I18nMessage> cache = DbMessageSource.getMessageCache(siteId);
+        if(cache==null){
+
+            return Collections.EMPTY_LIST;
+        }
+
+//        msgType = msgType.toLowerCase();
+        List<I18nMessage> msgList = new ArrayList<I18nMessage>();
+        for(Map.Entry<String, I18nMessage> item: cache.entrySet()){
+            if(item.getValue().getMsgType().equals(msgType)){
+                msgList.add(item.getValue());
+            }
+        }
+
+        Collections.sort(msgList);
+
+        return msgList;
+    }
+
+    public static I18nMessage getMessagesByTypeUsingDefaultConfigAsLowestPriority(String msgType, String msgKey, int siteId) {
+
+        List<I18nMessage> msgList = getMessagesByType(msgType, siteId);
+
+        if(msgList.isEmpty() && siteId != -1){
+            msgList = getMessagesByType(msgType, -1);
+        }
+
+        for (I18nMessage msg: msgList) {
+            if (msg.getMsgKey().equals(msgKey)) {
+                return msg;
+            }
+        }
+
+        return null;
     }
 }

@@ -55,7 +55,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期",
             "维修商", "维修商电话", "二维码", "安装位置编码", "安装位置", "使用责任人", "备注",
             "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "核算类别", "是否急救设备", "是否进口设备", "当前状态",
-            "是否PM", "是否盘点", "资产价值分类", "UUID"
+            "是否PM", "是否盘点", "资产价值分类", "资产状态", "资金来源2", "是否对维保到期提醒", "UUID"
     };
 
     public static int MAX_FORMULA_ROWS = 5000;
@@ -79,7 +79,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
 
-    public AssetFileDynamicTemplate() throws IOException {
+    int siteId;
+
+    public AssetFileDynamicTemplate(int siteId) throws IOException {
+        siteId = siteId;
 
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
 
@@ -371,7 +374,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao, siteId);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             writer.writeRowData(startRow, rowMap);
