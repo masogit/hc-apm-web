@@ -36,6 +36,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfig> {
 
 	private static final long serialVersionUID = 1L;
+	public static final String ADMIN = "SuperAdmin,ITAdmin";
 	private WorkflowConfigRepository dao = null;
 	private UserAccountRepository userDao;
 	private UserAccount user;
@@ -58,6 +59,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
 	private Date telRepStart;
 	private Date telRepEnd;
+	private UserContextService userContextService;
 
 	@Override
 	protected void init() {
@@ -69,6 +71,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
+		userContextService =  WebUtil.getBean(UserContextService.class);
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
@@ -543,89 +546,85 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public List<OrgInfo> getHospitalList(String orgLevel) {
 		List<OrgInfo> result = null;
+
 		if(StringUtils.isNotEmpty(orgLevel)){
 			int level = Integer.parseInt(orgLevel);
 			Integer userLevel =  user.getOrgLevel() == null ? 0 : user.getOrgLevel();
 			List<SearchFilter> searchFilters = new ArrayList<>(5);
-			switch (userLevel){
-				case 0:  //当前人属于租户级
+			if(userContextService.hasAnyRole(ADMIN)){
+				if(0 == level){
 					searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-					if(0 == level){
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
-					}else if(1 == level){
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}else if(2 == level){
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}else if(3 == level){
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}
-					break;
-				case 1://当前人属于集团
-					if(0 == level){
+					searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+				}else if(1 == level){
+					searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+					searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+				}else if(2 == level){
+					searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+					searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+				}else if(3 == level){
+					searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+					searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+				}
+			}else{
+				switch (userLevel){
+					case 0:  //当前人属于租户级
 						searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
-					}else if(1 == level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}else if(2 == level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}else if(3 == level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}
-/*					if(userLevel >= level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}else{
-						searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}*/
-					break;
-				case 2:
-					if(0 == level){
-						searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
-					}else if(1 == level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}else if(2 == level){
-						searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}else if(3 == level){
-						searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}
-/*					if(userLevel >= level){
-						searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}else {
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}*/
-					break;
-				default:
-					if(0 == level){
-						searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
-					}else if(1 == level){
-						searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
-					}else if(2 == level){
-						searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
-					}else if(3 == level){
-						searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}
-/*					if(userLevel >= level){
-						searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}else {
-						searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-						searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
-					}*/
-					break;
+						if(0 == level){
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+						}else if(1 == level){
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+						}else if(2 == level){
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+						}else if(3 == level){
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+						}
+						break;
+					case 1://当前人属于集团
+						if(0 == level){
+							searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+						}else if(1 == level){
+							searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+						}else if(2 == level){
+							searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+						}else if(3 == level){
+							searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+						}
+						break;
+					case 2:
+						if(0 == level){
+							searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+						}else if(1 == level){
+							searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+						}else if(2 == level){
+							searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+						}else if(3 == level){
+							searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+						}
+						break;
+					default:
+						if(0 == level){
+							searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+						}else if(1 == level){
+							searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+						}else if(2 == level){
+							searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+						}else if(3 == level){
+							searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+							searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+						}
+						break;
+				}
 			}
 			result = orgInfoRepository.findBySearchFilter(searchFilters);
 		}
