@@ -152,7 +152,7 @@
                                             <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
-                                    <h:outputText value="#{assetInfoListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
+                                    <h:outputText value="#{item.assetDeptOrg.shortName}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'clinicalDeptName'}">
@@ -165,7 +165,7 @@
                                             <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
-                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                    <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'nationalStandardCode'}">
