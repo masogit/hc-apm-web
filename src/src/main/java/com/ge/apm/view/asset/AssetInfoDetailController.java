@@ -192,13 +192,15 @@ public class AssetInfoDetailController {
                 List<ContractInfoItem> contractItemList =  contractItemDao.findByContractId(contractInfo.getId());
                 StringBuilder sb= new StringBuilder();
                 contractItemList.stream().filter(item -> item.getArrivalListItem()!=null && null !=item.getArrivalListItem().getArrivalList().getInvoiceNum())
-                        .forEach(item-> sb.append(item.getArrivalListItem().getArrivalList().getInvoiceNum()).append(" "));
+                        .map(item -> item.getArrivalListItem().getArrivalList().getInvoiceNum()).distinct()
+                        .forEach(item-> sb.append(item).append(" "));
                 return sb.toString();
             case "Parts":
                 List<V2_WorkOrder_Detail> parts = contractService.getPartsInfo(contractInfo.getContractNum(),contractInfo.getTenantUID());
                 StringBuilder partsSb= new StringBuilder();
                 parts.stream().filter(item -> null !=item.getInvoiceNum())
-                        .forEach(item-> partsSb.append(item.getInvoiceNum()).append(" "));
+                        .map(item -> item.getInvoiceNum()).distinct()
+                        .forEach(item-> partsSb.append(item).append(" "));
                 return partsSb.toString();
             default:
         }

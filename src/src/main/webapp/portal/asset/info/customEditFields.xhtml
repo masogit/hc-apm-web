@@ -312,7 +312,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'subjectProject')}" >
         <h:panelGroup>
             <label class="label">#{msg.subjectProject}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['subjectProject'].required? '*':''}</span></label>
-            <p:inputText  value="#{assetInfoEditController.selected.deviceName}" required="#{assetInfoEditController.customConfig.assetFields['subjectProject'].required}" 
+            <p:inputText  value="#{assetInfoEditController.selected.subjectProject}" required="#{assetInfoEditController.customConfig.assetFields['subjectProject'].required}" 
                          requiredMessage="#{msg.subjectProject} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('subjectProject')}" />
         </h:panelGroup>
     </c:if>
