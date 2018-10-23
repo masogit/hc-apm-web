@@ -10,6 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -145,6 +147,7 @@ public class V2_WorkOrder_Detail implements Serializable {
 //    @Transient
     @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    @JsonIgnore
     private V2_WorkOrder v2WorkOrder;
     
     @Transient
