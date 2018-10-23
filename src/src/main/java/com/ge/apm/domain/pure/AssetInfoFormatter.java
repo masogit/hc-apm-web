@@ -5,8 +5,11 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.sun.org.apache.xml.internal.security.utils.I18n;
+import webapp.framework.web.WebUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -21,22 +24,22 @@ public class AssetInfoFormatter {
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
     private I18nMessageRepository i18nDao;
-
-//    private boolean assetGroupSecondarySupport;
+    private int siteId;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao,
-                              I18nMessageRepository i18nDao) {
+                              I18nMessageRepository i18nDao,
+                              int siteId) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
         this.i18nDao = i18nDao;
+        this.siteId = siteId;
 
-//        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
     }
 
     public Integer getAssetUsage() {
@@ -63,6 +66,19 @@ public class AssetInfoFormatter {
         String value = findMatchValue(assetInfo.getCapitalSource(), importService.capitalSourceList);
 
         return value;
+    }
+
+    public String getCapitalSource2AsString() {
+
+        if (assetInfo.getCapitalSource2() == null) return null;
+
+        I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("capitalSource2", String.valueOf(assetInfo.getCapitalSource2()), siteId);
+
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+
+        return null;
     }
 
     public Integer getRiskGrade() {
@@ -165,6 +181,18 @@ public class AssetInfoFormatter {
 
     public Integer getDeviceStatus() {
         return assetInfo.getDeviceStatus();
+    }
+
+    public String getDeviceStatusAsString() {
+        if (assetInfo.getDeviceStatus() == null) return null;
+
+        I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("deviceStatus", String.valueOf(assetInfo.getDeviceStatus()), siteId);
+
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+
+        return null;
     }
 
     public String getComments() {
@@ -606,6 +634,26 @@ public class AssetInfoFormatter {
         return assetInfo.getWarranty();
     }
 
+    public String getWarrantyAsString() {
+        if (assetInfo.getWarranty() == null) return null;
+
+        if (assetInfo.getWarranty()) {
+            I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("label", "True2Yes", siteId);
+
+            if (msg != null) {
+                return msg.getValueZh();
+            }
+        } else {
+            I18nMessage msg = I18nMessageService.getMessagesByTypeUsingDefaultConfigAsLowestPriority("label", "False2No", siteId);
+
+            if (msg != null) {
+                return msg.getValueZh();
+            }
+        }
+
+        return null;
+    }
+
     public String getMeteringNO() {
         return assetInfo.getMeteringNO();
     }
@@ -770,6 +818,9 @@ public class AssetInfoFormatter {
         map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
         map.put("设备分类2级", this.getAssetGroupSecondayName());
         map.put("资产价值分类", this.getAssetValueCategoryName());
+        map.put("资产状态", this.getDeviceStatusAsString());
+        map.put("资金来源2", this.getCapitalSource2AsString());
+        map.put("是否对维保到期提醒", this.getWarrantyAsString());
 
         map.put("UUID", this.getUid());
 

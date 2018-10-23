@@ -157,7 +157,7 @@ public class AssetFileImportController {
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(UserContextService.getCurrentUserAccount().getSiteId());
         template.exportSampleAsset(orgList, exportColumnFields);
 
         assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
