@@ -65,7 +65,7 @@ public class AssetFileExportService extends AssetFileImportBaseService {
 
         int startRow = AssetFileExportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao, -1);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, i18nDao);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             doc.writeRowData(AssetFileExportService.SHEET_ASSET, columnKeys, startRow, rowMap);

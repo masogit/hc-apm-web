@@ -309,7 +309,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         logger.info("start to export asset list to excel");
 
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(UserContextService.getCurrentUserAccount().getSiteId());
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
         template.exportAsset(assetList, sites, orgList, exportColumnFields);
 
         logger.info("exported asset list to excel, start to get input stream");

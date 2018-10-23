@@ -31,7 +31,7 @@ public class I18nMessageService {
     }
 
 
-    public static List<I18nMessage> getMessagesByTypeUsingDefaultConfigAsLowestPriority(String msgType, int siteId) {
+    public static List<I18nMessage> getMessageUsingDefaultConfigAsLowestPriority(String msgType, int siteId) {
 
         List<I18nMessage> msgList = getMessagesByType(msgType, siteId);
 
@@ -64,20 +64,49 @@ public class I18nMessageService {
         return msgList;
     }
 
-    public static I18nMessage getMessagesByTypeUsingDefaultConfigAsLowestPriority(String msgType, String msgKey, int siteId) {
+    /**
+     * except label, field_name,  msg will use msg type and msg key as its map key
+     * @param msgType
+     * @param msgKey
+     * @param siteId
+     * @return
+     */
+    public static I18nMessage getMessageUsingDefaultConfigAsLowestPriority(String msgType, String msgKey, int siteId) {
+        String propertyKey = String.format("%s-%s", msgType, msgKey);
+        propertyKey = propertyKey.toLowerCase();
 
-        List<I18nMessage> msgList = getMessagesByType(msgType, siteId);
+        Map<String, I18nMessage> siteCache = DbMessageSource.getMessageCache(siteId);
 
-        if(msgList.isEmpty() && siteId != -1){
-            msgList = getMessagesByType(msgType, -1);
+        I18nMessage msg = siteCache.get(propertyKey);
+        if (msg != null) {
+            return msg;
         }
 
-        for (I18nMessage msg: msgList) {
-            if (msg.getMsgKey().equals(msgKey)) {
-                return msg;
-            }
+        Map<String, I18nMessage> rootCache = DbMessageSource.getMessageCache(-1);
+        msg = rootCache.get(propertyKey);
+
+        return msg;
+    }
+
+    /**
+     * label, field_name msg type i18n message only use msg_key as its map key
+     * @param msgKey
+     * @param siteId
+     * @return
+     */
+    public static I18nMessage getMessageByMsgKeyUsingDefaultConfigAsLowestPriority(String msgKey, int siteId) {
+        String propertyKey = msgKey.toLowerCase();
+
+        Map<String, I18nMessage> siteCache = DbMessageSource.getMessageCache(siteId);
+
+        I18nMessage msg = siteCache.get(propertyKey);
+        if (msg != null) {
+            return msg;
         }
 
-        return null;
+        Map<String, I18nMessage> rootCache = DbMessageSource.getMessageCache(-1);
+        msg = rootCache.get(propertyKey);
+
+        return msg;
     }
 }
