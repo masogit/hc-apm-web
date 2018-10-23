@@ -127,13 +127,13 @@
                         <p:column headerText="使用时长">
                             <h:outputText value="#{item.getFormattedRentalTime()}"/>
                         </p:column>
-                        <p:column headerText="赔偿费用">
-                            <h:outputText value="#{item.compensationAmount}"/>
-                        </p:column>
                         <p:column headerText="租赁费用">
                             <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
                                 <f:convertNumber pattern="0.00"/>
                             </h:outputText>
+                        </p:column>
+                        <p:column headerText="赔偿费用">
+                            <h:outputText value="#{item.compensationAmount}"/>
                         </p:column>
                         <p:column headerText="总计费用">
                             <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">

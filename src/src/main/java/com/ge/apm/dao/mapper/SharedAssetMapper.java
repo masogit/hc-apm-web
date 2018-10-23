@@ -32,6 +32,6 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
         @Result(column = "unit_price", property = "sharedAssetType.unitPrice"),
         @Result(column = "charging_type", property = "sharedAssetType.chargingType")
     })
-    AssetInfo findSharedAssetByWrapper(@Param("ew") Wrapper<AssetInfo> wrapper);
+    AssetInfo findSharedAsset(@Param("ew") Wrapper<AssetInfo> wrapper);
 
 }
