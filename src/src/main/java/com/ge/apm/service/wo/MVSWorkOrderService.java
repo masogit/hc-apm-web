@@ -140,6 +140,16 @@ public class MVSWorkOrderService {
 			}
 			String hospitalUid = tempV2_WorkOrder_Detail.getHospitalUID();
 			String siteUid = tempV2_WorkOrder_Detail.getSiteUID();
+			try {
+				hospitalUid=tempV2_WorkOrder_Detail.getV2WorkOrder().getAssetInfo().getHospitalUID();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			try {
+				siteUid=tempV2_WorkOrder_Detail.getV2WorkOrder().getAssetInfo().getSiteUID();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			if (StringUtils.isNotEmpty(hospitalUid)) {
 				tempV2_WorkOrder_Detail.setHospitalOrg(mapOrgInfo.get(hospitalUid));
 			}
