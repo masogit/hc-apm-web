@@ -267,7 +267,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getV2WorkOrder().getMvsType()!=null) {
-						String result=WebUtil.getFieldValueMessage("mvsPriority", tempDetail.getV2WorkOrder().getMvsType()+"");
+						String result=WebUtil.getFieldValueMessage("mvsType", tempDetail.getV2WorkOrder().getMvsType()+"");
 						tempMap.put(HEADER_MVSTYPE, result);
 					}
 				} catch (Exception e) {
