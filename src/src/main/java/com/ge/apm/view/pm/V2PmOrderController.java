@@ -1169,10 +1169,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
-        if(queryIndex==10){
+
+        if(queryIndex==100){
+            //from asset detail page
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
             }
+        }
+        if(queryIndex==10){
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
