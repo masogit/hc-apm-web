@@ -66,16 +66,16 @@ public class MVSWorkOrderMgrController extends GenericCRUDUUIDController<V2_Work
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-		if (currentUser.getOrgLevel() != 0) {
-			if (currentUser.getOrgLevel() == 1) {
-				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-			} else if (currentUser.getOrgLevel() == 2) {
-				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
-			} else {
-				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-			}
-		}
+//		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+//		if (currentUser.getOrgLevel() != 0) {
+//			if (currentUser.getOrgLevel() == 1) {
+//				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+//			} else if (currentUser.getOrgLevel() == 2) {
+//				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+//			} else {
+//				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+//			}
+//		}
 		//eager
 		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEquip", SearchFilter.Operator.EQ, "1"));
 		Page<V2_WorkOrder_Detail> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
