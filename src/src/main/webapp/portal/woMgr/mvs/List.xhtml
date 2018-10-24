@@ -15,16 +15,27 @@
 
 						<p:ajax event="rowSelect" update="editButton" />
 						<p:ajax event="filter" listener="#{mVSWorkOrderMgrController.onFilter}" />
-						<p:column headerText="报修时间">
-							<h:outputText value="#{item.v2WorkOrder.serviceRequest.requestTime}" />
+						<p:column headerText="报修时间" sortBy="#{item.v2WorkOrder.serviceRequest.requestTime}" filterMatchMode="GTE">
+							<!-- <f:facet name="filter">
+						        <p:inputText id="filterrequestTime" widgetVar="varFilterrequestTime" />
+						    </f:facet> -->
+							<h:outputText value="#{item.v2WorkOrder.serviceRequest.requestTime}" >
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+							</h:outputText>
 						</p:column>
-						<p:column headerText="MVS工单类型">
+						<p:column headerText="MVS工单类型" filterBy="#{item.v2WorkOrder.mvsType}" filterMatchMode="EQ">
+							<f:facet name="filter">
+						        <p:selectOneMenu onchange="PF('varDataList').filter()">
+						        	<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						            <f:selectItems value="#{fieldMsg.getFieldValueList('mvsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+						        </p:selectOneMenu>
+						    </f:facet>
 							<h:outputText value="#{fieldMsg.fieldValue('mvsType', item.v2WorkOrder.mvsType)}"/>
 						</p:column>
 						<p:column headerText="普通/加急" filterBy="#{item.priority}" filterMatchMode="EQ">
 							<f:facet name="filter">
 						        <p:selectOneMenu onchange="PF('varDataList').filter()">
-						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						            <f:selectItem itemLabel="普通" itemValue="1" />
 						            <f:selectItem itemLabel="加急" itemValue="2" />
 						        </p:selectOneMenu>
@@ -40,10 +51,10 @@
 						<p:column headerText="所属院区">
 							<h:outputText value="#{item.siteOrg.name}" />
 						</p:column>
-						<p:column headerText="设备编号">
+						<p:column headerText="设备编号" filterBy="#{item.v2WorkOrder.assetInfo.departNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.v2WorkOrder.assetInfo.departNum}" />
 						</p:column>
-						<p:column headerText="设备名称">
+						<p:column headerText="设备名称" filterBy="#{item.v2WorkOrder.assetInfo.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.v2WorkOrder.assetInfo.name}" />
 						</p:column>
 						<p:column headerText="备件名称" filterBy="#{item.parts}" filterMatchMode="LIKE">
@@ -52,7 +63,7 @@
 						<p:column headerText="数量" filterBy="#{item.apartsQuantity}" filterMatchMode="EQ">
 							<h:outputText value="#{item.apartsQuantity}" />
 						</p:column>
-						<p:column headerText="单价" filterBy="#{item.mvsPrice}" filterMatchMode="EQ">
+						<p:column headerText="采购单价" filterBy="#{item.mvsPrice}" filterMatchMode="EQ">
 							<h:outputText value="#{item.mvsPrice}" />
 						</p:column>
 						<p:column headerText="序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
@@ -61,23 +72,41 @@
 						<p:column headerText="发票号" filterBy="#{item.invoiceNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.invoiceNum}" />
 						</p:column>
-						<p:column headerText="质保期">
+						<p:column headerText="质保期" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+						        <p:inputText id="filterwarrantyDate" widgetVar="varFilterwarrantyDate" />
+						    </f:facet>
 							<h:outputText value="#{item.warrantyDate}" />
 						</p:column>
-						<p:column headerText="采购时间">
-							<h:outputText value="#{item.purchaseTime}" />
+						<p:column headerText="采购时间" filterBy="#{item.purchaseTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+						        <p:inputText id="filterpurchaseTime" widgetVar="varFilterpurchaseTime" />
+						    </f:facet>
+							<h:outputText value="#{item.purchaseTime}" >
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+							</h:outputText>
 						</p:column>
-						<p:column headerText="发货时间">
-							<h:outputText value="#{item.deliverTime}" />
+						<p:column headerText="发货时间" filterBy="#{item.deliverTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+						        <p:inputText id="filterdeliverTime" widgetVar="varFilterdeliverTime" />
+						    </f:facet>
+							<h:outputText value="#{item.deliverTime}" >
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+							</h:outputText>
 						</p:column>
-						<p:column headerText="收货时间">
-							<h:outputText value="#{item.arrivedTime}" />
+						<p:column headerText="收货时间" filterBy="#{item.arrivedTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+						        <p:inputText id="filterarrivedTime" widgetVar="varFilterarrivedTime" />
+						    </f:facet>
+							<h:outputText value="#{item.arrivedTime}" >
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+							</h:outputText>
 						</p:column>
 						<p:column headerText="是否完好" filterBy="#{item.arrivedGood}" filterMatchMode="EQ">
 							<f:facet name="filter">
 						        <p:selectOneMenu onchange="PF('varDataList').filter()">
 						            <f:converter converterId="javax.faces.Boolean" />
-						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						            <f:selectItem itemLabel="是" itemValue="true" />
 						            <f:selectItem itemLabel="否" itemValue="false" />
 						        </p:selectOneMenu>
@@ -88,7 +117,7 @@
 							<f:facet name="filter">
 						        <p:selectOneMenu onchange="PF('varDataList').filter()">
 						            <f:converter converterId="javax.faces.Boolean" />
-						            <f:selectItem itemLabel="请选择" itemValue="" />
+						            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						            <f:selectItem itemLabel="是" itemValue="true" />
 						            <f:selectItem itemLabel="否" itemValue="false" />
 						        </p:selectOneMenu>
@@ -111,6 +140,56 @@
 						</f:facet>
 					</p:dataTable>
 				</h:form>
+				<!-- <p:overlayPanel widgetVar="panelFilterrequestTime" for=":mvsWoMgrListForm:datalist:filterrequestTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_requestTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_requestTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList','varFilterrequestTime','varStartTimeFrom_requestTime','varStartTimeTo_requestTime'); PF('panelFilterrequestTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterrequestTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel> -->
+				<p:overlayPanel widgetVar="panelFilterwarrantyDate" for=":mvsWoMgrListForm:datalist:filterwarrantyDate" dismissable="false">
+				    <h:panelGrid columns="2">
+				        <p:outputLabel value="#{msg.From}"/>
+				        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_warrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+				        <p:outputLabel value="#{msg.To}"/>
+				        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_warrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+				    </h:panelGrid>
+				    <p:commandButton onclick="setDateFilter('varDataList','varFilterwarrantyDate','varStartTimeFrom_warrantyDate','varStartTimeTo_warrantyDate'); PF('panelFilterwarrantyDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+				    <p:commandButton onclick="PF('panelFilterwarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterpurchaseTime" for=":mvsWoMgrListForm:datalist:filterpurchaseTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_purchaseTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_purchaseTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList','varFilterpurchaseTime','varStartTimeFrom_purchaseTime','varStartTimeTo_purchaseTime'); PF('panelFilterpurchaseTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterpurchaseTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterdeliverTime" for=":mvsWoMgrListForm:datalist:filterdeliverTime" dismissable="false">
+				    <h:panelGrid columns="2">
+				        <p:outputLabel value="#{msg.From}"/>
+				        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_deliverTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+				        <p:outputLabel value="#{msg.To}"/>
+				        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_deliverTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+				    </h:panelGrid>
+				    <p:commandButton onclick="setDateFilter('varDataList','varFilterdeliverTime','varStartTimeFrom_deliverTime','varStartTimeTo_deliverTime'); PF('panelFilterdeliverTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+				    <p:commandButton onclick="PF('panelFilterdeliverTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterarrivedTime" for=":mvsWoMgrListForm:datalist:filterarrivedTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_arrivedTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_arrivedTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList','varFilterarrivedTime','varStartTimeFrom_arrivedTime','varStartTimeTo_arrivedTime'); PF('panelFilterarrivedTime').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterarrivedTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
 			</div>
 		</div>
 		<ui:include src="Edit.xhtml" />
