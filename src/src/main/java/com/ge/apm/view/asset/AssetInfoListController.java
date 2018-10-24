@@ -166,6 +166,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
 
+        if (orgUids.isEmpty()) return;
+
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
         Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
