@@ -13,6 +13,7 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.UserAgentController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.sysutil.V2_WorkflowConfigController;
 import com.google.common.base.Strings;
 
 import java.util.*;
@@ -171,15 +172,23 @@ public class UserCommonService {
         return flag;
     }
 
-    public List<SearchFilter> getLoginUserFilters(Boolean isInsulate, Integer loginUserOrgType) {
+    public List<SearchFilter> getLoginUserFilters11(Boolean isInsulate, Integer loginUserOrgType) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        if(isInsulate){
-            return getUserLogicFilters(loginUserOrgType,user);
-        }else{
+        UserContextService userContextService =  WebUtil.getBean(UserContextService.class);
+        if(userContextService.hasAnyRole(V2_WorkflowConfigController.ADMIN)){
             List<SearchFilter> searchFilters = new ArrayList<>();
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
             return searchFilters;
+        }else {
+            if(isInsulate){
+                return getUserLogicFilters(loginUserOrgType,user);
+            }else{
+                List<SearchFilter> searchFilters = new ArrayList<>();
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                return searchFilters;
+            }
         }
+
 /*        UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if (isInsulate) {
