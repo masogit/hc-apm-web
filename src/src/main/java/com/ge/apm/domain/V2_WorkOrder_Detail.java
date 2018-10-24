@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "v2_work_order_detail")
@@ -148,6 +150,8 @@ public class V2_WorkOrder_Detail implements Serializable {
     @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
     @JsonIgnore
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @NotFound(action= NotFoundAction.IGNORE)
     private V2_WorkOrder v2WorkOrder;
     
     @Transient
