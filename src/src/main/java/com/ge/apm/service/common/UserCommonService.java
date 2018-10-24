@@ -174,20 +174,14 @@ public class UserCommonService {
 
     public List<SearchFilter> getLoginUserFilters(Boolean isInsulate, Integer loginUserOrgType) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        UserContextService userContextService =  WebUtil.getBean(UserContextService.class);
-        if(userContextService.hasAnyRole(V2_WorkflowConfigController.ADMIN)){
+        if(isInsulate){
+            return getUserLogicFilters(loginUserOrgType,user);
+        }else{
             List<SearchFilter> searchFilters = new ArrayList<>();
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
             return searchFilters;
-        }else {
-            if(isInsulate){
-                return getUserLogicFilters(loginUserOrgType,user);
-            }else{
-                List<SearchFilter> searchFilters = new ArrayList<>();
-                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-                return searchFilters;
-            }
         }
+
 
 /*        UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
