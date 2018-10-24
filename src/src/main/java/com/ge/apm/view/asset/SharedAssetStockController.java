@@ -46,7 +46,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
-import com.ge.apm.service.sharedAsset.SharedAssetStockService;
+import com.ge.apm.service.sharedasset.SharedAssetStockService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.wo.Map2XmlConverter;

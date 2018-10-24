@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -854,6 +855,35 @@ public class SharedAssetReqDetail implements Serializable{
                 rentalAmount = BigDecimal.valueOf(0);
         }
         return rentalAmount;
+    }
+
+    /**
+     * 设备归还时，chargingBeginTime <= now()
+     * @return
+     */
+    public Boolean validateChargingBeginTime() {
+        return this.chargingBeginTime.before(Date.from(Instant.now()));
+    }
+
+    /**
+     * 设备归还时，chargingBeginTime < chargingEndTime < now() + 2hours
+     * @return
+     */
+    public Boolean validateChargingEndTime() {
+        Boolean result = Boolean.FALSE;
+        if(this.chargingEndTime.after(this.chargingBeginTime) &&
+                this.chargingEndTime.before(Date.from(Instant.now().plus(2, ChronoUnit.HOURS)))) {
+            result = Boolean.TRUE;
+        }
+        return result;
+    }
+
+    /**
+     * 设备归还时，计费结束时间最大值
+     * @return
+     */
+    public Date getMaxChargingEndTime() {
+        return Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
     }
 
 }

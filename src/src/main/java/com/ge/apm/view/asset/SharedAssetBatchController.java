@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.service.sharedAsset.SharedAssetBatchService;
-import com.ge.apm.service.sharedAsset.SharedAssetService;
+import com.ge.apm.service.sharedasset.SharedAssetBatchService;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.RequestType;
 import com.google.common.base.Strings;
@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.tabview.Tab;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
@@ -28,9 +29,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author Nick Liu
+ * @since 2018.10.2 release
+ */
 @ManagedBean
 @ViewScoped
 public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
@@ -51,19 +58,11 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     @Getter
     @Setter
-    private Date createDate = new Date();
-
-    @Getter
-    @Setter
     private String remark;
 
     @Getter
     @Setter
-    private Date batchChargingBeginDate = new Date();
-
-    @Getter
-    @Setter
-    private Boolean willBeDelivered = Boolean.FALSE;
+    private Date batchChargingBeginDate;
 
     @Getter
     @Setter
@@ -71,9 +70,23 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     @Getter
     @Setter
+    private Boolean willBeDelivered = Boolean.FALSE;
+
+    @Getter
+    @Setter
     private String leaseDeptName;
 
     private List<OrgInfo> leaseDeptList;
+
+    @Getter
+    @Setter
+    private AssetInfo preAddAsset;
+
+    /*
+     * key   -> OrgInfo.uid
+     * value -> OrgInfo
+     */
+    private Map<String, OrgInfo> orgInfoMap;
 
     private List<AssetInfo> leaseAssets = new LinkedList<>();
 
@@ -96,6 +109,9 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         sharedAssetBatchService = WebUtil.getBean(SharedAssetBatchService.class);
         sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         leaseDeptList = sharedAssetBatchService.getOrgDeptList();
+        orgInfoMap = leaseDeptList.stream().collect(Collectors.toMap(OrgInfo::getUid, dept -> dept));
+        batchChargingBeginDate = Date.from(Instant.now());
+        batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
     }
 
     @Override
@@ -126,7 +142,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         logger.info("currentTabId: " + currentTabId);
     }
 
-    public void findAndSelectAsset4Lease() {
+    public void findAndSelectAsset2Lease() {
         logger.info("default value of willBeDelivered: {}", this.willBeDelivered);
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = leaseAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
@@ -134,12 +150,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                                                            || this.searchCriteria.equals(asset.getQrCode()));
             if(hasAdded) {
                 logger.info("Asset had been added");
+                WebUtil.addErrorMessage("设备已添加");
             } else {
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
-                AssetInfo ai = sharedAssetBatchService.findSharedAsset2Lease(ew, this.searchCriteria);
-                if(ai != null && StringUtils.isNotEmpty(ai.getUid())) {
-                    SharedAssetReqDetail reqDetail = ai.getSharedAssetReqDetail();
+                AssetInfo assetInfo = sharedAssetBatchService.findSharedAsset2Lease(ew, this.searchCriteria);
+                if(assetInfo != null && StringUtils.isNotEmpty(assetInfo.getUid())) {
+                    SharedAssetReqDetail reqDetail = assetInfo.getSharedAssetReqDetail();
                     if(reqDetail == null) {
                         reqDetail = new SharedAssetReqDetail();
                         reqDetail.setChargingBeginTime(this.batchChargingBeginDate);
@@ -151,27 +168,51 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                         leaseDept.map(dept -> dept.getName()).ifPresent(reqDetail::setClinicalDeptName);
                         //记录下送到req_detail
                         reqDetail.setWillBeDelivered(this.willBeDelivered);
-                        ai.setSharedAssetReqDetail(reqDetail);
+                        assetInfo.setSharedAssetReqDetail(reqDetail);
                     }
-                    leaseAssets.add(ai);
+
+                    leaseAssets.add(assetInfo);
+                } else {
+                    //TODO 未找到匹配设备
                 }
             }
         }
     }
 
-    public void findAndSelectAsset4Return() {
+    public void findAndSelectAsset2Return() {
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = returnAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
                                                             || this.searchCriteria.equals(asset.getFinancingNum())
                                                             || this.searchCriteria.equals(asset.getQrCode()));
             if(hasAdded) {
                 logger.info("Asset had been added");
+                WebUtil.addErrorMessage("设备已添加");
             } else {
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
-                AssetInfo ai = sharedAssetBatchService.findSharedAsset2Return(ew, this.searchCriteria);
-                if(ai != null && StringUtils.isNotEmpty(ai.getUid())) {
-                    returnAssets.add(ai);
+                AssetInfo assetInfo = sharedAssetBatchService.findSharedAsset2Return(ew, this.searchCriteria);
+                if(assetInfo != null && StringUtils.isNotEmpty(assetInfo.getUid())) {
+                    SharedAssetReqDetail reqDetail = sharedAssetBatchService.findReqDetailByAsset(assetInfo);
+                    if(reqDetail != null) {
+                        reqDetail.setChargingEndTime(this.batchChargingEndDate);
+                        assetInfo.setSharedAssetReqDetail(reqDetail);
+                        OrgInfo assetDept = orgInfoMap.get(assetInfo.getAssetDeptUID());
+                        assetInfo.setAssetDeptOrg(assetDept);
+                    }
+                } else {
+                    //TODO 未找到匹配设备
+                }
+
+                preAddAsset = assetInfo;
+
+                RequestContext context = RequestContext.getCurrentInstance();
+                if(this.validateReturnAsset(preAddAsset)) {
+                    logger.info("Asset {} pass validation", preAddAsset.getName());
+                    context.addCallbackParam("isValidReqDetail", Boolean.TRUE);
+                    returnAssets.add(assetInfo);
+                } else {
+                    logger.info("Asset {} fail validation", preAddAsset.getName());
+                    context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
                 }
             }
         }
@@ -223,8 +264,21 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                             .collect(Collectors.toList());
     }
 
-    public void removeLeaseRequest() {
+    public void removeLeaseReqDetail() {
         this.leaseAssets.remove(this.selected);
+    }
+
+    public void removeReturnReqDetail() {
+        this.returnAssets.remove(this.selected);
+    }
+
+    private Boolean validateReturnAsset(AssetInfo assetInfo) {
+        Boolean result = Boolean.FALSE;
+        SharedAssetReqDetail reqDetail = assetInfo.getSharedAssetReqDetail();
+        if(reqDetail != null) {
+            result = reqDetail.validateChargingBeginTime() && reqDetail.validateChargingEndTime();
+        }
+        return result;
     }
 
 }
