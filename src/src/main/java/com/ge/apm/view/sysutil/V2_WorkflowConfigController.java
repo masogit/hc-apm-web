@@ -244,9 +244,17 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
-		List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
-		if(CollectionUtils.isNotEmpty(this.searchFilters)){
-			searchFilters.addAll(this.searchFilters);
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		if(userContextService.hasAnyRole(V2_WorkflowConfigController.ADMIN)){
+			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+			if(CollectionUtils.isNotEmpty(this.searchFilters)){
+				searchFilters.addAll(this.searchFilters);
+			}
+		}else {
+			searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+			if(CollectionUtils.isNotEmpty(this.searchFilters)){
+				searchFilters.addAll(this.searchFilters);
+			}
 		}
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
