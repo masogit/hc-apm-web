@@ -262,6 +262,21 @@ public class AssetFileImportBaseService {
 
         }
 
+        //for Pm OwnerName
+        if (newAsset.getPmOwnerName() == null) {
+            AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + "未设置");
+        } else {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getPmOwnerName());
+            if (userAccounts.size() != 1) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
+                newAsset.setPmOwnerName(null);
+            } else {
+                newAsset.setPmOwnerId(userAccounts.get(0).getId());
+                newAsset.setPmOwnerTel(userAccounts.get(0).getTelephone());
+            }
+
+        }
+
         Supplier supplier;
         //导入供应商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
