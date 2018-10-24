@@ -24,7 +24,7 @@
 
                         <h:panelGroup>
                             <label class="label">预估单价(元)*</label>
-                            <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="实际价格(元) #{msg.ValidationRequire}">
+                            <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
                                 <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>
