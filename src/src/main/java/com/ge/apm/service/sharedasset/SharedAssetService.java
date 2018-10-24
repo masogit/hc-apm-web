@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.service.sharedAsset;
+package com.ge.apm.service.sharedasset;
 
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.SharedAssetRequest;
