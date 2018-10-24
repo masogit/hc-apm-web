@@ -112,7 +112,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         orgInfoMap = leaseDeptList.stream().collect(Collectors.toMap(OrgInfo::getUid, dept -> dept));
         batchChargingBeginDate = Date.from(Instant.now());
         batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
-        this.searchCriteria = "设备编号18080613";
     }
 
     @Override
