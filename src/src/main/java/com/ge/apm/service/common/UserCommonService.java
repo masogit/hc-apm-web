@@ -172,7 +172,7 @@ public class UserCommonService {
         return flag;
     }
 
-    public List<SearchFilter> getLoginUserFilters11(Boolean isInsulate, Integer loginUserOrgType) {
+    public List<SearchFilter> getLoginUserFilters(Boolean isInsulate, Integer loginUserOrgType) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         UserContextService userContextService =  WebUtil.getBean(UserContextService.class);
         if(userContextService.hasAnyRole(V2_WorkflowConfigController.ADMIN)){
