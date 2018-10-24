@@ -6,7 +6,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.sharedAsset.SharedAssetService;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
