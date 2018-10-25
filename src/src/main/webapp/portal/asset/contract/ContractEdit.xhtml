@@ -301,7 +301,7 @@
                     <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Parts'}">
                         <p:dataTable value="#{contractInfoEditController.partsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="20,50,100,500" rows="20" emptyMessage="#{msg.noRecordFound}" >
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.AssetName}">
