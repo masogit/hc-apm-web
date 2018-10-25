@@ -6,6 +6,7 @@
 package com.ge.apm.service.sharedasset;
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -76,44 +77,6 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
     }
 
-    public ResponseEntity<LinkedHashMap> borrowByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType) {
-        String url = getGatewayURL(GatewayURL.RENT_SHORTCUT);
-        url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
-        url = url.replace("{assetInfoUID}", assetInfoUID);
-        url = url.replace("{chargingBeginTime}", chargingBeginTime);
-        url = url.replace("{chargingEndTime}", chargingEndTime);
-        url = url.replace("{reqType}", reqType);
-        String token = UserContextService.getAccessToken();
-        HttpHeaders header = createHttpHeaders(token);
-        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        logger.info("Request URL: " + url);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
-        logger.info(JSON.toJSONString(response));
-        return response;
-    }
-
-    public ResponseEntity<LinkedHashMap> returnByShortcut(String clinicalDeptUID, String assetInfoUID, String chargingBeginTime, String chargingEndTime, String reqType,
-                                                          String isIntact, String compensationAmount, String reqComment) {
-        String url = getGatewayURL(GatewayURL.RETURN_SHORTCUT);
-        url = url.replace("{clinicalDeptUID}", clinicalDeptUID);
-        url = url.replace("{assetInfoUID}", assetInfoUID);
-        url = url.replace("{chargingBeginTime}", chargingBeginTime);
-        url = url.replace("{chargingEndTime}", chargingEndTime);
-        url = url.replace("{reqType}", reqType);
-        url = url.replace("{isIntact}", isIntact);
-        url = url.replace("{compensationAmount}", compensationAmount);
-        url = url.replace("{reqComment}", reqComment);
-        String token = UserContextService.getAccessToken();
-        HttpHeaders header = createHttpHeaders(token);
-        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        logger.info("Request URL: " + url);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-        logger.info("Create request " + (isOkay(response) ? "successfully." : "failed."));
-        logger.info(JSON.toJSONString(response));
-        return response;
-    }
-    
     public boolean onDuty() {
         String url = getGatewayURL(GatewayURL.ALLOCATION_ON_DUTY);
         String token = UserContextService.getAccessToken();
@@ -128,21 +91,26 @@ public class SharedAssetService extends MicroServiceInvoker {
                 .orElse(true);
     }
 
-    public ResponseEntity<LinkedHashMap> batchLeaseAssets(Map<String, Object> requestData) {
-        String url = getGatewayURL(GatewayURL.BATCH_LEASE_SHORTCUT);
+
+    public ResponseEntity<LinkedHashMap> leaseAssets(Map<String, Object> requestData) {
+        String url = getGatewayURL(GatewayURL.LEASE_SHORTCUT);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<Map> requestEntity = new HttpEntity<>(requestData, header);
         ResponseEntity<LinkedHashMap> responseEntity = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        logger.info("Create request " + (isOkay(responseEntity) ? "successfully." : "failed."));
+        logger.info(JSON.toJSONString(responseEntity));
         return responseEntity;
     }
 
-    public ResponseEntity<LinkedHashMap> batchReturnAssets(Map<String, Object> requestData) {
-        String url = getGatewayURL(GatewayURL.BATCH_RETURN_SHORTCUT);
+    public ResponseEntity<LinkedHashMap> returnAssets(Map<String, Object> requestData) {
+        String url = getGatewayURL(GatewayURL.RETURN_SHORTCUT);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<Map> requestEntity = new HttpEntity<>(requestData, header);
         ResponseEntity<LinkedHashMap> responseEntity = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        logger.info("Create request " + (isOkay(responseEntity) ? "successfully." : "failed."));
+        logger.info(JSON.toJSONString(responseEntity));
         return responseEntity;
     }
 }
