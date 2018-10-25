@@ -2,7 +2,7 @@
 package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.sharedAsset.SharedAssetService;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.UrlParamUtil;

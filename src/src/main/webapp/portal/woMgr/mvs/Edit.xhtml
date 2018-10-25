@@ -7,54 +7,55 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="mvsWoMgrEditDlg" widgetVar="mvsWoMgrEditDialog" modal="false" resizable="true" height="350" width="850" draggable="true" appendTo="@(body)" header="编辑">
+        <p:dialog id="mvsWoMgrEditDlg" widgetVar="mvsWoMgrEditDialog" modal="false" resizable="true" height="200" width="850" draggable="true" appendTo="@(body)" header="编辑">
             <h:form id="mvsWoMgrEditForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{mVSWorkOrderMgrController.selected != null}">
                     <!-- <h:panelGroup >
 					    <label class="label" >报修时间</label>
 					    <p:calendar value="#{mVSWorkOrderMgrController.selected.v2WorkOrder.serviceRequest.requestTime}" showOn="button" required="false" requiredMessage="日期不能为空" />
 					</h:panelGroup> -->
-					<h:panelGroup >
+					<!-- <h:panelGroup >
 					    <label class="label" >MVS工单类型</label>
 					    <p:selectOneMenu value="#{mVSWorkOrderMgrController.selected.v2WorkOrder.mvsType}" required="false" requiredMessage="请选择设备类型">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('mvsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
-					</h:panelGroup>
-					<h:panelGroup >
+					</h:panelGroup> -->
+					<!-- <h:panelGroup >
 					    <label class="label" >普通/加急</label>
+					    <h:outputText value="#{fieldMsg.fieldValue('mvsPriority', mVSWorkOrderMgrController.selected.priority)}"/>
 					    <p:selectOneMenu value="#{mVSWorkOrderMgrController.selected.priority}" required="false" requiredMessage="请选择设备类型">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('mvsPriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
-					</h:panelGroup>
+					</h:panelGroup> -->
 					<!-- <h:panelGroup >
 					    <label class="label" >FE工程师</label>
 					    <p:inputText value="#{mVSWorkOrderMgrController.selected.v2WorkOrder.FEOwner.name}" required="false" requiredMessage="项目名称不能为空"/>
 					</h:panelGroup> -->
-					<h:panelGroup >
+					<!-- <h:panelGroup >
 					    <label class="label" >数量</label>
 					    <p:inputNumber  decimalPlaces="0" maxValue="99999999" value="#{mVSWorkOrderMgrController.selected.apartsQuantity}" required="false" requiredMessage="单价(元) #{msg.ValidationRequire}" />
-					</h:panelGroup>
+					</h:panelGroup> -->
 					<h:panelGroup >
-					    <label class="label" >单价</label>
+					    <label class="label" >采购单价</label>
 					    <p:inputNumber  decimalPlaces="4" maxValue="99999999" value="#{mVSWorkOrderMgrController.selected.mvsPrice}" required="false" requiredMessage="单价(元) #{msg.ValidationRequire}" />
 					</h:panelGroup>
-					<h:panelGroup >
+					<!-- <h:panelGroup >
 					    <label class="label" >序列号</label>
 					    <p:inputText value="#{mVSWorkOrderMgrController.selected.serialNum}" required="false" requiredMessage="项目名称不能为空"/>
-					</h:panelGroup>
+					</h:panelGroup> -->
 					<h:panelGroup >
 					    <label class="label" >发票号</label>
 					    <p:inputText value="#{mVSWorkOrderMgrController.selected.invoiceNum}" required="false" requiredMessage="项目名称不能为空"/>
 					</h:panelGroup>
-					<h:panelGroup >
+					<!-- <h:panelGroup >
 					    <label class="label" >质保期</label>
 					    <p:calendar value="#{mVSWorkOrderMgrController.selected.warrantyDate}" showOn="button" pattern="MM/dd/yyyy" showButtonPanel="true" required="false" requiredMessage="日期不能为空" />
-					</h:panelGroup>
+					</h:panelGroup> -->
 					<h:panelGroup >
 					    <label class="label" >采购时间</label>
-					    <p:calendar value="#{mVSWorkOrderMgrController.selected.purchaseTime}" showOn="button" pattern="MM/dd/yyyy" showButtonPanel="true" required="false" requiredMessage="日期不能为空" />
+					    <p:calendar value="#{mVSWorkOrderMgrController.selected.purchaseTime}" showOn="button" pattern="MM/dd/yyyy HH:mm:ss" showButtonPanel="true" required="false" requiredMessage="日期不能为空" />
 					</h:panelGroup>
 					<h:panelGroup >
 					    <label class="label" >发货时间</label>
@@ -64,22 +65,22 @@
 					    <label class="label" >收货时间</label>
 					    <p:calendar value="#{mVSWorkOrderMgrController.selected.arrivedTime}" showOn="button" pattern="MM/dd/yyyy HH:mm:ss" showButtonPanel="true" required="false" requiredMessage="日期不能为空" />
 					</h:panelGroup>
-					<h:panelGroup >
+					<!-- <h:panelGroup >
 					    <label class="label" >是否完好</label>
 					    <p:selectOneMenu value="#{mVSWorkOrderMgrController.selected.arrivedGood}" required="false" requiredMessage="请选择设备类型">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItem itemLabel="是" itemValue="true" />
                             <f:selectItem itemLabel="否" itemValue="false" />
                         </p:selectOneMenu>
-					</h:panelGroup>
-					<h:panelGroup >
+					</h:panelGroup> -->
+					<!-- <h:panelGroup >
 					    <label class="label" >好还/坏还</label>
 					    <p:selectOneMenu value="#{mVSWorkOrderMgrController.selected.arrivedGoodReturn}" required="false" requiredMessage="请选择设备类型">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItem itemLabel="是" itemValue="true" />
                             <f:selectItem itemLabel="否" itemValue="false" />
                         </p:selectOneMenu>
-					</h:panelGroup>
+					</h:panelGroup> -->
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{mVSWorkOrderMgrController.save}" update=":mvsWoMgrEditDlg, :mvsWoMgrListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'mvsWoMgrEditDialog');"/>

@@ -12,16 +12,16 @@
             </div>
 
             <div class="ui-g 12 card">
-                <p:tabView>
+                <p:tabView id="tabView">
                     <p:ajax event="tabChange" listener="#{sharedAssetBatchController.onTabChange}" update="#{sharedAssetBatchController.currentTabId}"/>
                     
                     <p:tab title="批量借入" id="batchLease">
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
-                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
-                                        <label class='label'>请求类型</label>
+                                        <label class='label'>请求类型*</label>
                                         <p:selectOneRadio id="chargingType" value="#{sharedAssetBatchController.requestType}" required="true" requiredMessage="#{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="补登记" itemValue="2" />
                                             <f:selectItem itemLabel="维修借用（不收费）" itemValue="1" />
@@ -29,10 +29,10 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class='label'>下送 </label>
-                                        <!-- <p:selectBooleanCheckbox value="" /> -->
+                                        <p:selectBooleanCheckbox value="#{sharedAssetBatchController.willBeDelivered}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
-                                        <label class='label'>批量输入</label>
+                                        <label class='label'>计费开始时间*</label>
                                         <p:calendar pattern="yyyy/MM/dd HH:mm"
                                                     value="#{sharedAssetBatchController.batchChargingBeginDate}"
                                                     stepMinute="30"
@@ -42,18 +42,15 @@
                                                     showButtonPanel="true"
                                                     navigator="true"
                                                     required="true"/>
-                                        <p:calendar pattern="yyyy/MM/dd HH:mm"
-                                                    value="#{sharedAssetBatchController.batchChargingEndDate}"
-                                                    stepMinute="30"
-                                                    placeholder="计费结束时间"
-                                                    showOn="button"
-                                                    showButtonPanel="true"
-                                                    navigator="true"/>
-                                        <!-- <p:inputText style="width: 100px;margin-left:10px " placeholder="设备接收人" value=""/>
-                                        <p:selectOneMenu style="margin-left:40px;" id="assetDeptUid" required="true" requiredMessage="#{msg.clinicalDeptUid} #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                        </p:selectOneMenu>-->
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">借用科室*</label>
+                                        <p:autoComplete dropdown="true" value="#{sharedAssetBatchController.leaseDeptName}"
+                                                        required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
+                                                        scrollHeight="300"  forceSelection="true" size="8"
+                                                        completeMethod="#{sharedAssetBatchController.autoCompleteDeptName}">
+                                            <p:ajax process="@this" listener="#{sharedAssetBatchController.onLeaseDeptNameChange}" event="itemSelect"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                 </p:panelGrid>
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -67,7 +64,7 @@
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
                                                          update="batchLeaseForm:datalist"
-                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset4Lease}"/>
+                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Lease}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
 
@@ -75,12 +72,18 @@
                                              selectionMode="single" selection="#{sharedAssetBatchController.selected}"
                                              lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                              rowKey="#{asset.id}" sortMode="single" sortOrder="descending" sortBy="#{asset.id}"
-                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                              rows="20" emptyMessage="#{msg.noRecordFound}"
                                              rowsPerPageTemplate="20,50,100,500">
+
+                                    <p:ajax event="rowSelect" update="editButton deleteButton" />
+
                                     <p:column headerText="单据号">
-                                        <h:outputText value="#{asset.departNum}"/>
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
+                                    </p:column>
+                                    <p:column headerText="设备名称">
+                                        <h:outputText value="#{asset.name}"/>
                                     </p:column>
                                     <p:column headerText="设备编号">
                                         <h:outputText value="#{asset.departNum}"/>
@@ -89,12 +92,7 @@
                                         <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
-                                        <h:outputText value="">
-                                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                                        </h:outputText>
-                                    </p:column>
-                                    <p:column headerText="计费结束时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
@@ -104,6 +102,29 @@
                                     <p:column headerText="计价方式">
                                         <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
                                     </p:column>
+                                    <p:column headerText="下送" visible="false">
+                                        <h:outputText value="#{fieldMsg.fieldValue('label',asset.sharedAssetReqDetail.willBeDelivered)}"/>
+                                    </p:column>
+
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandButton id="editButton"
+                                                         icon="ui-icon-pencil"
+                                                         title="#{msg.Edit}"
+                                                         process="@this"
+                                                         update=":batchLeaseAssetDialog"
+                                                         oncomplete="PF('batchLeaseAssetDialog').show()"
+                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                        <p:commandButton id="deleteButton"
+                                                         icon="ui-icon-close"
+                                                         title="#{msg.Delete}"
+                                                         process="@this"
+                                                         update="tabView:batchLeaseForm:datalist"
+                                                         actionListener="#{sharedAssetBatchController.removeLeaseReqDetail()}"
+                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                                        </p:commandButton>
+                                    </f:facet>
+
                                 </p:dataTable>
 
                                 <p:commandButton id="confirm"
@@ -133,15 +154,6 @@
                                     <h:panelGroup >
                                         <label class='label'>批量输入</label>
                                         <p:calendar pattern="yyyy/MM/dd HH:mm"
-                                                    value="#{sharedAssetBatchController.batchChargingBeginDate}"
-                                                    stepMinute="30"
-                                                    placeholder="计费开始时间"
-                                                    readonlyInput="true"
-                                                    showOn="button"
-                                                    showButtonPanel="true"
-                                                    navigator="true"
-                                                    required="true"/>
-                                        <p:calendar pattern="yyyy/MM/dd HH:mm"
                                                     value="#{sharedAssetBatchController.batchChargingEndDate}"
                                                     stepMinute="30"
                                                     placeholder="计费结束时间"
@@ -149,11 +161,6 @@
                                                     showOn="button"
                                                     showButtonPanel="true"
                                                     navigator="true"/>
-                                        <!--<p:inputText style="width: 100px;margin-left:10px " placeholder="设备接收人" value=""/>
-                                        <p:selectOneMenu style="margin-left:40px;" id="assetDeptUid" required="true" requiredMessage="#{msg.clinicalDeptUid} #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                        </p:selectOneMenu> -->
                                     </h:panelGroup>
                                 </p:panelGrid>
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -162,8 +169,9 @@
                                         <p:commandButton style="zoom:0.8"
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
-                                                         update="batchReturnForm:datalist"
-                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset4Return}"/>
+                                                         update="batchReturnForm:datalist returnAssetValidator"
+                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Return}"
+                                                         oncomplete="openReturnAssetValidator(xhr, status, args)"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
 
@@ -171,12 +179,21 @@
                                              selectionMode="single" selection="#{sharedAssetBatchController.selected}"
                                              lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                              rowKey="#{asset.id}" sortMode="single" sortOrder="descending" sortBy="#{asset.id}"
-                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                              rows="20" emptyMessage="#{msg.noRecordFound}"
                                              rowsPerPageTemplate="20,50,100,500">
+
+                                    <p:ajax event="rowSelect" update="editButton deleteButton" />
+
                                     <p:column headerText="单据号">
-                                        <h:outputText value="#{asset.departNum}"/>
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
+                                    </p:column>
+                                    <p:column headerText="借用科室">
+                                        <h:outputText value="#{asset.assetDeptOrg.name}"/>
+                                    </p:column>
+                                    <p:column headerText="设备名称">
+                                        <h:outputText value="#{asset.name}"/>
                                     </p:column>
                                     <p:column headerText="设备编号">
                                         <h:outputText value="#{asset.departNum}"/>
@@ -185,21 +202,46 @@
                                         <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="计费结束时间">
-                                        <h:outputText value="">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.chargingEndTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="单价">
-                                        <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                                     </p:column>
                                     <p:column headerText="计价方式">
-                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
+                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetReqDetail.chargingType)}"/>
                                     </p:column>
+                                    <p:column headerText="使用时长">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.getFormattedRentalTime()}"/>
+                                    </p:column>
+                                    <p:column headerText="当前费用" visible="false">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.getRentalAmount()}"/>
+                                    </p:column>
+
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandButton id="editButton"
+                                                         icon="ui-icon-pencil"
+                                                         title="#{msg.Edit}"
+                                                         process="@this"
+                                                         update=":batchReturnAssetDialog"
+                                                         oncomplete="PF('batchReturnAssetDialog').show()"
+                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                        <p:commandButton id="deleteButton"
+                                                         icon="ui-icon-close"
+                                                         title="#{msg.Delete}"
+                                                         process="@this"
+                                                         update="tabView:batchReturnForm:datalist"
+                                                         actionListener="#{sharedAssetBatchController.removeReturnReqDetail()}"
+                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                                        </p:commandButton>
+                                    </f:facet>
                                 </p:dataTable>
 
                                 <p:commandButton id="confirm"
@@ -218,12 +260,25 @@
             </div>
         </div>
 
+        <ui:include src="batchLeaseAssetDialog.xhtml"/>
+        <ui:include src="batchReturnAssetDialog.xhtml"/>
+        <ui:include src="returnAssetValidator.xhtml"/>
+
         <script>
             function oncomplete(xhr, status, args) {
                 console.log("openForceLeaseDialog: " + args.validationFailed);
                 console.log("xhr:" + xhr);
                 console.log("args:" + args);
                 console.log("status:" + status);
+            }
+
+            function openReturnAssetValidator(xhr, status, args) {
+                console.log("" + args.isValidReqDetail);
+                if (args.isValidReqDetail || typeof(args.isValidReqDetail) == "undefined")  {
+                    console.log(args.isValidReqDetail);
+                } else {
+                    PF('returnAssetValidator').show()
+                }
             }
         </script>
 

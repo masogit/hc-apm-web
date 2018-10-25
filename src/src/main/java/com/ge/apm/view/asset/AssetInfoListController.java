@@ -155,7 +155,41 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         selected = null;
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
+
+        addMisingClinicalDeptOrg(currentPageAssets);
+
         return res;
+    }
+
+    private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
+        Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
+        Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
+        orgUids.addAll(orgUids2);
+
+        if (orgUids.isEmpty()) return;
+
+        List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
+
+        Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
+
+        currentPageAssets.stream().forEach(item -> {
+            if (item.getClinicalDeptUID() != null) {
+                OrgInfo found = orgInfoMap.get((item.getClinicalDeptUID()));
+                if (found != null) {
+                    item.setClinicalDeptOrg(found);
+                }
+
+            }
+
+            if (item.getAssetDeptUID() != null) {
+                OrgInfo found = orgInfoMap.get((item.getAssetDeptUID()));
+                if (found != null) {
+                    item.setAssetDeptOrg(found);
+                }
+
+            }
+        });
+
     }
 
     private void setUserSearchFilters() {

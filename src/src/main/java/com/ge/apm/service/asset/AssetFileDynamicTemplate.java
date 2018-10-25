@@ -52,10 +52,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             "设备编号", "设备名称", "设备别名", "维修负责人", "维修负责人2", "维修负责人3", "保养负责人", "所属院区", "所属科室", "使用科室", "制造商", "品牌/制造商简称",
             "设备标准名称", "注册证号", "供应商", "医疗器械分类", "医疗器械子分类", "设备分类", "设备分类2级", "主设备", "功能等级", "维修类型", "设备型号", "制造商序列号",
             "SystemID/厂商报修ID", "2010国家编码", "资产编号", "条码", "IT系统编号", "采购价格", "最终残值", "折旧算法", "使用年限",
-            "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期",
+            "出厂日期", "采购日期", "到货日期", "启用日期", "质保日期", "维保截止日期", "报废日期", "上次保养日期", "上次计量日期", "上次巡检日期", "验收日期", "质保时间（月）",
             "维修商", "维修商电话", "二维码", "安装位置编码", "安装位置", "使用责任人", "备注",
             "用途分类", "资金来源", "风险等级", "计量等级", "计量项目类别", "核算类别", "是否急救设备", "是否进口设备", "当前状态",
-            "是否PM", "是否盘点", "资产价值分类", "UUID"
+            "是否PM", "是否盘点", "资产价值分类", "资产状态", "资金来源2", "是否对维保到期提醒", "所属课题项目", "UUID"
     };
 
     public static int MAX_FORMULA_ROWS = 5000;
@@ -79,7 +79,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
 
+//    int siteId;
+
     public AssetFileDynamicTemplate() throws IOException {
+//        this.siteId = siteId;
 
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
 
@@ -141,20 +144,23 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        createDropdownWithNamedRange(1, "设备分类", assetGroup, false);
-        createDropdownWithNamedRange(2, "医疗器械分类", assetFunctionTypes, true);
-        createDropdownWithNamedRange(3, "折旧算法", depreciationMethod, true);
-        createDropdownWithNamedRange(4, "用途分类", assetUsageList, true);
-        createDropdownWithNamedRange(5, "资金来源", capitalSourceList, true);
-        createDropdownWithNamedRange(6, "计量等级", measureGradeList, true);
-        createDropdownWithNamedRange(7, "风险等级", riskGradeList, true);
-        createDropdownWithNamedRange(8, "是否急救设备", emergencyEquipmentList, true);
-        createDropdownWithNamedRange(9, "是否进口设备", importEquipmentList, true);
-        createDropdownWithNamedRange(10, "核算类别", accountingCategoryList, true);
-        createDropdownWithNamedRange(11, "计量项目类别", measuringItemCategoryList, true);
-        createDropdownWithNamedRange(12, "维修类型", repairFormList, true);
-        createDropdownWithNamedRange(13, "当前状态", assetStatusList, false);
-        createDropdownWithNamedRange(14, "资产价值分类", assetValueCategoryList, true);
+        int rowNum = 1;
+        createDropdownWithNamedRange(rowNum++, "设备分类", assetGroup, false);
+        createDropdownWithNamedRange(rowNum++, "医疗器械分类", assetFunctionTypes, true);
+        createDropdownWithNamedRange(rowNum++, "折旧算法", depreciationMethod, true);
+        createDropdownWithNamedRange(rowNum++, "用途分类", assetUsageList, true);
+        createDropdownWithNamedRange(rowNum++, "资金来源", capitalSourceList, true);
+        createDropdownWithNamedRange(rowNum++, "计量等级", measureGradeList, true);
+        createDropdownWithNamedRange(rowNum++, "风险等级", riskGradeList, true);
+        createDropdownWithNamedRange(rowNum++, "是否急救设备", emergencyEquipmentList, true);
+        createDropdownWithNamedRange(rowNum++, "是否进口设备", importEquipmentList, true);
+        createDropdownWithNamedRange(rowNum++, "核算类别", accountingCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, "计量项目类别", measuringItemCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, "维修类型", repairFormList, true);
+        createDropdownWithNamedRange(rowNum++, "当前状态", assetStatusList, false);
+        createDropdownWithNamedRange(rowNum++, "资产价值分类", assetValueCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, "资金来源2", capitalSource2List, true);
+        createDropdownWithNamedRange(rowNum++, "资产状态", deviceStatusList, true);
 
         dynamicListSheet.setSelected(false);
     }
@@ -164,9 +170,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(0).setCellValue("列表名称");
         row.createCell(1).setCellValue("列表");
 
-        createDropdownWithStaticList(1, "功能等级", true, "1", "2", "3");
-        createDropdownWithStaticList(2, "是否PM", true, "是", "否");
-        createDropdownWithStaticList(3, "是否盘点", true, "是", "否");
+        int rowNum = 1;
+        createDropdownWithStaticList(rowNum++, "功能等级", true, "1", "2", "3");
+        createDropdownWithStaticList(rowNum++, "是否PM", true, "是", "否");
+        createDropdownWithStaticList(rowNum++, "是否盘点", true, "是", "否");
+        createDropdownWithStaticList(rowNum++, "是否对维保到期提醒", true, "是", "否");
 
         staticListSheet.setSelected(false);
     }

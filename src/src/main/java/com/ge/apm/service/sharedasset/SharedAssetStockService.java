@@ -1,4 +1,4 @@
-package com.ge.apm.service.sharedAsset;
+package com.ge.apm.service.sharedasset;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;

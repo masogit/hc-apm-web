@@ -113,6 +113,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
                 assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
+                assetRow.setFieldStringValue("保养负责人", "setPmOwnerName");
                 assetRow.setFieldStringValue("所属科室", "setClinicalDeptName");
                 assetRow.setFieldStringValue("制造商", "setManufacture");
                 assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
@@ -184,6 +185,13 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldDropdownValueAsString("资产价值分类", "setAssetValueCategory", assetValueCategoryList, map, null);
 
+                assetRow.setFieldDropdownValue("资产状态", "setDeviceStatus", deviceStatusList, map, null);
+                assetRow.setFieldDropdownValue("资金来源2", "setCapitalSource2", capitalSource2List, map, null);
+                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", null);
+
+                assetRow.setFieldStringValue("所属课题项目", "setSubjectProject");
+                assetRow.setFieldDateValue("验收日期", "setAcceptDate");
+                assetRow.setFieldIntegerValue("质保时间（月）", "setWarrantyMonth");
 
                 if (StringUtils.isEmpty(asset.getUid())) {
 

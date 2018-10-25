@@ -60,6 +60,8 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
     public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
     public List<I18nMessage> assetValueCategoryList = FieldValueMessageController.getFieldValueList("assetValueCategory", siteId);
+    public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
+    public List<I18nMessage> deviceStatusList = FieldValueMessageController.getFieldValueList("deviceStatus", siteId);
 
     @Autowired
     protected AssetInfoRepository assetDao;
@@ -135,9 +137,14 @@ public class AssetFileImportBaseService {
         try {
 
             for (Map<String, Object> item: importAssetMap) {
+                if (row % 100 == 0) {
+                    logger.info("imported {} rows", row);
+                }
+
                 ++row;
                 importOneAsset(item, autoGenerateQrcode);
             }
+
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
             throw e;
@@ -255,6 +262,21 @@ public class AssetFileImportBaseService {
 
         }
 
+        //for Pm OwnerName
+        if (newAsset.getPmOwnerName() == null) {
+            AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + "未设置");
+        } else {
+            userAccounts = userDao.findByTenantUIDAndName(tenantUID, newAsset.getPmOwnerName());
+            if (userAccounts.size() != 1) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
+                newAsset.setPmOwnerName(null);
+            } else {
+                newAsset.setPmOwnerId(userAccounts.get(0).getId());
+                newAsset.setPmOwnerTel(userAccounts.get(0).getTelephone());
+            }
+
+        }
+
         Supplier supplier;
         //导入供应商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
@@ -352,7 +374,7 @@ public class AssetFileImportBaseService {
         importOrgMap.forEach(item -> {
             OrgInfo newOrgInfo = (OrgInfo) item.get("org");
 
-//            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+            //parent uid is not working for child clinical dept, so we use site id
             OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
 
             item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
