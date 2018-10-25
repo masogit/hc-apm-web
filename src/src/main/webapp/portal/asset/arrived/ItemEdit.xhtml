@@ -177,8 +177,8 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
-                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="@(.clinicalOwnerName) @(.parentAssetList) parentAssetList" />
+                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="@(.clinicalOwnerName) @(.parentAssetList) parentAssetList" />
                                 </p:autoComplete>
                             </h:panelGroup>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['parentAssetId']}">
@@ -345,7 +345,7 @@
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['clinicalOwnerName']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.clinicalOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired? '*':''}</span></label>
-                                    <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
+                                    <p:autoComplete class="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
                                                     requiredMessage="#{msg.clinicalOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
                                         <p:column>

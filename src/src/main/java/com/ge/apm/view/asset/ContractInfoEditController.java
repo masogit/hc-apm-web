@@ -48,6 +48,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javaslang.Tuple2;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -87,8 +88,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
     private String attachmentType;
-    
-    private List<V2_WorkOrder_Detail> parts = new ArrayList();
+
+    private List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> parts = new ArrayList();
 
     @Override
     protected void init() {
@@ -129,8 +130,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             selectedObjectMap.put("bidWinner", selected.getBidWinner() == null ? null : supplierDao.findByUid(selected.getBidWinner()));
             selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
 
-            if(ContractInfo.ContractType.Parts.toString().equals(selected.getContractType())){
-                parts = contractService.getPartsInfo(selected.getContractNum(),selected.getTenantUID());
+            if (ContractInfo.ContractType.Parts.toString().equals(selected.getContractType())) {
+                parts = contractService.getAssetPartsInfo(selected.getContractNum(), selected.getTenantUID());
             }
         }
 
@@ -265,16 +266,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void saveContract() {
-        if(null != selected.getContractNum()){
-            List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(),selected.getTenantUID());
-            if(null != contractList && !contractList.isEmpty()){
-                if(contractList.stream().anyMatch(item -> Objects.equals(item.getId(), selected.getId()) )){
+        if (null != selected.getContractNum()) {
+            List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(), selected.getTenantUID());
+            if (null != contractList && !contractList.isEmpty()) {
+                if (contractList.stream().anyMatch(item -> Objects.equals(item.getId(), selected.getId()))) {
                     WebUtil.addErrorMessage("合同编号不能重复使用");
-                    return ;
+                    return;
                 }
             }
         }
-        
+
         selected = dao.save(this.selected);
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
@@ -328,9 +329,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         if (asset == null) {
             return;
         }
-        if(!asset.getSiteUID().equals(selected.getSiteUID())){
+        if (!asset.getSiteUID().equals(selected.getSiteUID())) {
             WebUtil.addErrorMessage("只能添加合同所在院区的设备");
-        }else if(allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
+        } else if (allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
             WebUtil.addErrorMessage("该设备已经存在");
         } else {
             ContractInfoItem newItem = new ContractInfoItem();
@@ -365,10 +366,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return supplier == null ? null : supplier.getName();
     }
 
-    public String getDetailPageLink(ContractInfoItem item) {
+    public String getDetailPageLink(AssetInfo item) {
         String url = "";
-        if (null != item.getAssetInfo()) {
-            AssetInfo asset = item.getAssetInfo();
+        if (null != item) {
+            AssetInfo asset = item;
             url = "actionName=View&selectedid="
                     + asset.getId().toString()
                     + "&asset_name=" + asset.getName()
@@ -380,7 +381,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void viewContractItemPage(ContractInfoItem item) {
-        String url = getDetailPageLink(item);
+        String url = getDetailPageLink(item.getAssetInfo());
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
@@ -432,8 +433,17 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return allItemList.stream().filter(item -> !ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
-    public void onChangeEndDate(){
-        if(this.selected.getStartDate() != null && this.selected.getEndMonths() != null){
+    public List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> getPartsItemsList() {
+        if (selected != null && Objects.equals(selected.getContractType(), ContractInfo.ContractType.Parts.toString())) {
+            return contractService.getAssetPartsInfo(selected.getContractNum(), selected.getTenantUID());
+        }
+        else{
+            return null;
+        }
+    }
+
+    public void onChangeEndDate() {
+        if (this.selected.getStartDate() != null && this.selected.getEndMonths() != null) {
             Instant startDateInstant = new Date(this.selected.getStartDate().getTime()).toInstant();
             ZoneId zone = ZoneId.systemDefault();
             LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
@@ -445,20 +455,40 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
     }
 
-    public void onChangeEndMonths(){
+    public void onChangeEndMonths() {
         this.selected.setEndMonths(null);
     }
-    
-    public void onContractTypeChange(){
-        if(ContractInfo.ContractType.Equipment.toString().equals(selected.getContractType())){
+
+    public void onContractTypeChange() {
+        if (ContractInfo.ContractType.Equipment.toString().equals(selected.getContractType())) {
             selected.setInvoiceNum(null);
         }
     }
-    
-    public String getPartsInvoiceNum(ContractInfoItem assetItem){
-        V2_WorkOrder_Detail part = parts.stream().filter(item -> Objects.equals(assetItem.getAssetUid(), item.getV2WorkOrder().getAssetInfo().getUid())).findAny().orElse(null);
-        return null==part? "": part.getInvoiceNum();
+
+    public List<Object[]> getPartsList() {
+        return parts.stream().map(item -> new Object[]{item._1(), item._2()}).collect(Collectors.toList());
     }
+    
+//    public String getPartsInvoiceNum(ContractInfoItem assetItem){
+//        V2_WorkOrder_Detail part = parts.stream().filter(item -> Objects.equals(assetItem.getAssetUid(), item.getV2WorkOrder().getAssetInfo().getUid())).findAny().orElse(null);
+//        return null==part? "": part.getInvoiceNum();
+//    }
+//    public String getPartsFieldValueByAssetUid(String assetUid, String fieldKey) {
+//        Tuple2<String, V2_WorkOrder_Detail> detail = parts.stream().filter(item -> Objects.equals(item._1(), assetUid)).findAny().orElse(null);
+//        if (null == detail) {
+//            return null;
+//        }
+//        switch (fieldKey) {
+//            case "invoiceNum":
+//                return detail._2().getInvoiceNum();
+//            case "parts":
+//                return detail._2().getParts();
+//            case "apartsQuantity":
+//                return detail._2().getApartsQuantity().toString();
+//            default:
+//        }
+//        return null;
+//    }
 
     //getter and setter
     public Map<String, Object> getSelectedObjectMap() {
@@ -504,4 +534,5 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public void setSelectedContractItem(ContractInfoItem selectedContractItem) {
         this.selectedContractItem = selectedContractItem;
     }
+
 }

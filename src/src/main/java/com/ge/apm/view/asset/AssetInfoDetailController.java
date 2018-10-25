@@ -19,7 +19,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import javaslang.Tuple2;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -178,6 +180,10 @@ public class AssetInfoDetailController {
     public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
+    
+    public List<ContractInfo> getContractList(){
+        return contractService.getContractListByAsset(selected);
+    }
 
     public String getContractInvoice(ContractInfo contractInfo) {
         if (null == contractInfo) {
@@ -191,15 +197,16 @@ public class AssetInfoDetailController {
             case "Equipment":
                 List<ContractInfoItem> contractItemList =  contractItemDao.findByContractId(contractInfo.getId());
                 StringBuilder sb= new StringBuilder();
-                contractItemList.stream().filter(item -> item.getArrivalListItem()!=null && null !=item.getArrivalListItem().getArrivalList().getInvoiceNum())
+                contractItemList.stream().filter(item -> item.getAssetUid()!=null && item.getAssetUid().equals(selected.getUid()))
+                        .filter(item -> item.getArrivalListItem()!=null && null !=item.getArrivalListItem().getArrivalList().getInvoiceNum())
                         .map(item -> item.getArrivalListItem().getArrivalList().getInvoiceNum()).distinct()
                         .forEach(item-> sb.append(item).append(" "));
                 return sb.toString();
             case "Parts":
-                List<V2_WorkOrder_Detail> parts = contractService.getPartsInfo(contractInfo.getContractNum(),contractInfo.getTenantUID());
+                List<Tuple2<AssetInfo, V2_WorkOrder_Detail>>  parts = contractService.getAssetPartsInfo(contractInfo.getContractNum(),contractInfo.getTenantUID());
                 StringBuilder partsSb= new StringBuilder();
-                parts.stream().filter(item -> null !=item.getInvoiceNum())
-                        .map(item -> item.getInvoiceNum()).distinct()
+                parts.stream().filter(item -> Objects.equals(item._1().getUid(), selected.getUid()))
+                        .map(item -> item._2().getInvoiceNum()).distinct()
                         .forEach(item-> partsSb.append(item).append(" "));
                 return partsSb.toString();
             default:
