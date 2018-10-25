@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -15,6 +16,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.xpath.operations.Bool;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -90,9 +92,11 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     private List<AssetInfo> leaseAssets = new LinkedList<>();
 
+    private List<AssetInfo> submittedLeaseAssets;
+
     private List<AssetInfo> returnAssets = new LinkedList<>();
 
-    private List<AssetInfo> submittedAssets = new LinkedList<>();
+    private List<AssetInfo> submittedReturnAssets;
 
     private SharedAssetBatchService sharedAssetBatchService;
 
@@ -117,13 +121,17 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     @Override
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
         List<AssetInfo> result;
-        if(submittedAssets.size() > 0) {
-            result = submittedAssets;
-        } else {
-            if("batchReturn".equals(currentTabId)) {
+        if("batchReturn".equals(currentTabId)) {
+            if(submittedReturnAssets == null || returnAssets.size() > 0) {
                 result = returnAssets;
             } else {
+                result = submittedReturnAssets;
+            }
+        } else {
+            if(submittedLeaseAssets == null || leaseAssets.size() > 0) {
                 result = leaseAssets;
+            } else {
+                result = submittedLeaseAssets;
             }
         }
         lazyModel.setRowCount(result.size());
@@ -220,24 +228,51 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public void addAsset2ReturnList(AssetInfo assetInfo) {
-//        preAddAsset = null;
         returnAssets.add(assetInfo);
     }
 
     public void batchLeaseAssets() {
         if(leaseAssets != null && leaseAssets.size() > 0) {
-            sharedAssetBatchService.batchLeaseAssets(requestType, null ,leaseAssets);
+            String clinicalDeptUID = leaseDeptList.stream().filter(dept -> leaseDeptName.equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
+            ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchLeaseAssets(requestType, clinicalDeptUID ,leaseAssets);
+            Map responseBody = responseEntity.getBody();
+            if("OK".equals(responseBody.get("bizStatusCode"))) {
+                submittedLeaseAssets = leaseAssets;
+                leaseAssets = new LinkedList<>();
+
+                Map<String, Object> approvedLeaseRequest = (Map<String, Object>) responseBody.get("data");
+                List rentDetails = (List)approvedLeaseRequest.get("rentDetails");
+                for(Object rentDetail : rentDetails) {
+                    SharedAssetReqDetail reqDetail = JSON.parseObject(JSON.toJSONString(rentDetail), SharedAssetReqDetail.class);
+                    AssetInfo asset = submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().get();
+                    asset.setSharedAssetReqDetail(reqDetail);
+                }
+            }
         } else {
             //TODO 空提交
         }
     }
 
+    public void resetLeaseAssets() {
+        submittedLeaseAssets.clear();
+    }
+
     public void batchReturnAssets() {
         if(returnAssets != null && returnAssets.size() > 0) {
-            sharedAssetBatchService.batchReturnAssets(requestType, null, returnAssets);
+            String clinicalDeptUID = returnAssets.stream().findFirst().map(dept -> dept.getAssetDeptUID()).get();
+            ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchReturnAssets(requestType, clinicalDeptUID, returnAssets);
+            Map responseBody = responseEntity.getBody();
+            if("OK".equals(responseBody.get("bizStatusCode"))) {
+                submittedReturnAssets = returnAssets;
+                returnAssets = new LinkedList<>();
+            }
         } else {
             //TODO 空提交
         }
+    }
+
+    public void resetReturnAssets() {
+        returnAssets.clear();
     }
 
     public void onLeaseDeptNameChange(AjaxBehaviorEvent event) {
@@ -267,6 +302,22 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void removeReturnReqDetail() {
         this.returnAssets.remove(this.selected);
+    }
+
+    public Boolean enableLeaseSubmitBtn() {
+        Boolean result = Boolean.FALSE;
+        if(leaseAssets.size() > 0) {
+            result = Boolean.TRUE;
+        }
+        return result;
+    }
+
+    public Boolean enableReturnSubmitBtn() {
+        Boolean result = Boolean.FALSE;
+        if(returnAssets.size() > 0) {
+            result = Boolean.TRUE;
+        }
+        return result;
     }
 
     private Boolean validateReturnAsset(AssetInfo assetInfo) {

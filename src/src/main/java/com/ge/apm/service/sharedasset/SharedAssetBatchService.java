@@ -17,10 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -114,37 +113,37 @@ public class SharedAssetBatchService {
         return sharedAssetReqDetail;
     }
 
-    public ResponseEntity batchLeaseAssets(String requestType, String clinicalDeptUID, List<AssetInfo> leaseAssets) {
+    public ResponseEntity<LinkedHashMap> batchLeaseAssets(String requestType, String clinicalDeptUID, List<AssetInfo> leaseAssets) {
         Map<String, Object> reqData = new HashMap<>();
         reqData.put("clinicalDeptUID", clinicalDeptUID);
         reqData.put("type", requestType);
-        Map<String, String> reqDetails = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyymmddHHmmss");
+
+        List<Map<String, Object>> reqDetails = new LinkedList<>();
+        Map<String, Object> reqDetail;
         for(AssetInfo assetInfo : leaseAssets) {
-            reqDetails.put("assetInfoUID", assetInfo.getUid());
-            reqDetails.put("chargingBeginTime", sdf.format(assetInfo.getSharedAssetReqDetail().getChargingBeginTime()));
-            reqDetails.put("willBeDelivered", assetInfo.getSharedAssetReqDetail().getWillBeDelivered().toString());
+            reqDetail = assetInfo.buildLeaseReqDetail();
+            reqDetails.add(reqDetail);
         }
         reqData.put("details", reqDetails);
-        return sharedAssetService.batchLeaseAssets(reqData);
+        ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.leaseAssets(reqData);
+        return responseEntity;
     }
 
-    public ResponseEntity batchReturnAssets(String requestType, String clinicalDeptUID, List<AssetInfo> returnAssets) {
+    public ResponseEntity<LinkedHashMap> batchReturnAssets(String requestType, String clinicalDeptUID, List<AssetInfo> returnAssets) {
         Map<String, Object> reqData = new HashMap<>();
         reqData.put("clinicalDeptUID", clinicalDeptUID);
         reqData.put("type", requestType);
-        Map<String, String> reqDetails = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyymmddHHmmss");
-        for(AssetInfo assetInfo : returnAssets) {
-            reqDetails.put("assetInfoUID", assetInfo.getUid());
-            reqDetails.put("chargingBeginTime", sdf.format(assetInfo.getSharedAssetReqDetail().getChargingBeginTime()));
-            reqDetails.put("chargingEndTime", sdf.format(assetInfo.getSharedAssetReqDetail().getChargingEndTime()));
-            reqDetails.put("isIntact", assetInfo.getSharedAssetReqDetail().getIntact().toString());
-            reqDetails.put("compensationAmount", assetInfo.getSharedAssetReqDetail().getCompensationAmount().toString());
-            reqDetails.put("reqComment", assetInfo.getSharedAssetReqDetail().getReqComment());
-        }
 
-        return sharedAssetService.batchReturnAssets(reqData);
+        List<Map<String, Object>> reqDetails = new LinkedList<>();
+        Map<String, Object> reqDetail;
+        for(AssetInfo assetInfo : returnAssets) {
+            reqDetail = assetInfo.buildReturnReqDetail();
+            reqDetails.add(reqDetail);
+        }
+        reqData.put("details", reqDetails);
+
+        ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.returnAssets(reqData);
+        return responseEntity;
     }
 
 }
