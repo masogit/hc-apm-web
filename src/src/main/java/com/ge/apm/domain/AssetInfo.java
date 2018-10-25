@@ -3,10 +3,9 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -1710,5 +1709,43 @@ public class AssetInfo implements ChineseName,Serializable {
     	this.departNum=departNum;
     	this.serialNum=serialNum;
     	this.functionType=functionType;
+    }
+
+    public Map<String, Object> buildLeaseReqHeader() {
+        Map<String, Object> reqHeader = new HashMap<>();
+        reqHeader.put("clinicalDeptUID", this.getClinicalDeptUID());
+        reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        reqHeader.put("details", new LinkedList<Map<String, String>>());
+        return reqHeader;
+    }
+
+    public Map<String, Object> buildLeaseReqDetail() {
+        Map<String, Object> reqDetail = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        reqDetail.put("assetInfoUID", this.getUid());
+        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
+        reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
+        return reqDetail;
+    }
+
+
+    public Map<String, Object> buildReturnReqHeader() {
+        Map<String, Object> reqHeader = new HashMap<>();
+        reqHeader.put("clinicalDeptUID", this.getClinicalDeptUID());
+        reqHeader.put("type", this.getSharedAssetReqDetail().getReturnRequest().getType());
+        reqHeader.put("details", new LinkedList<Map<String, String>>());
+        return reqHeader;
+    }
+
+    public Map<String, Object> buildReturnReqDetail() {
+        Map<String, Object> reqDetail = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        reqDetail.put("assetInfoUID", this.getUid());
+        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
+        reqDetail.put("chargingEndTime", sdf.format(this.getSharedAssetReqDetail().getChargingEndTime()));
+        reqDetail.put("isIntact", this.getSharedAssetReqDetail().getIntact());
+        reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
+        reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
+        return reqDetail;
     }
 }

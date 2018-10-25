@@ -63,7 +63,7 @@
                                         <p:commandButton style="zoom:0.8"
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
-                                                         update="batchLeaseForm:datalist"
+                                                         update="batchLeaseForm:datalist batchLeaseForm:confirm"
                                                          actionListener="#{sharedAssetBatchController.findAndSelectAsset2Lease}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
@@ -131,11 +131,19 @@
                                                  validateClient="true"
                                                  ajax="true"
                                                  oncomplete="oncomplete(xhr, status, args)"
-                                                 actionListener="#{sharedAssetBatchController.batchLeaseAssets}"
-                                                 value="确认"
-                                                 update="batchLeaseForm:datalist">
+                                                 actionListener="#{sharedAssetBatchController.batchLeaseAssets()}"
+                                                 value="批量借用"
+                                                 update="batchLeaseForm:datalist batchLeaseForm:confirm"
+                                                 disabled="#{!sharedAssetBatchController.enableLeaseSubmitBtn()}">
                                     <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                                 </p:commandButton>
+                                <p:commandButton id="reset"
+                                                 validateClient="true"
+                                                 ajax="true"
+                                                 oncomplete="oncomplete(xhr, status, args)"
+                                                 actionListener="#{sharedAssetBatchController.resetLeaseAssets()}"
+                                                 value="重置"
+                                                 update="batchLeaseForm:datalist"/>
                             </h:form>
                         </p:fieldset>
                     </p:tab>
@@ -152,7 +160,7 @@
                                         </p:selectOneRadio>
                                     </h:panelGroup>
                                     <h:panelGroup >
-                                        <label class='label'>批量输入</label>
+                                        <label class='label'>计费结束时间</label>
                                         <p:calendar pattern="yyyy/MM/dd HH:mm"
                                                     value="#{sharedAssetBatchController.batchChargingEndDate}"
                                                     stepMinute="30"
@@ -169,7 +177,7 @@
                                         <p:commandButton style="zoom:0.8"
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
-                                                         update="batchReturnForm:datalist returnAssetValidator"
+                                                         update="batchReturnForm:datalist batchReturnForm:confirm returnAssetValidator"
                                                          actionListener="#{sharedAssetBatchController.findAndSelectAsset2Return}"
                                                          oncomplete="openReturnAssetValidator(xhr, status, args)"/>
                                     </h:panelGroup>
@@ -248,11 +256,19 @@
                                                  validateClient="true"
                                                  ajax="true"
                                                  oncomplete="oncomplete(xhr, status, args)"
-                                                 actionListener="#{sharedAssetBatchController.batchReturnAssets}"
-                                                 value="确认"
-                                                 update="batchReturnForm:datalist">
+                                                 actionListener="#{sharedAssetBatchController.batchReturnAssets()}"
+                                                 value="批量归还"
+                                                 update="batchReturnForm:datalist batchReturnForm:confirm"
+                                                 disabled="#{!sharedAssetBatchController.enableReturnSubmitBtn()}">
                                     <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                                 </p:commandButton>
+                                <p:commandButton id="reset"
+                                                 validateClient="true"
+                                                 ajax="true"
+                                                 oncomplete="oncomplete(xhr, status, args)"
+                                                 actionListener="#{sharedAssetBatchController.resetReturnAssets()}"
+                                                 value="重置"
+                                                 update="batchReturnForm:datalist"/>
                             </h:form>
                         </p:fieldset>
                     </p:tab>

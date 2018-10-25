@@ -14,9 +14,12 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +39,9 @@ public class SharedAssetBatchService {
 
     @Autowired
     private WorkflowConfigRepository wfCfigDao;
+
+    @Autowired
+    private SharedAssetService sharedAssetService;
 
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -105,6 +111,39 @@ public class SharedAssetBatchService {
         sharedAssetReqDetail = reqDetailList.stream().findFirst().get();
         logger.info("Retrieve req_detail from db: " + sharedAssetReqDetail);
         return sharedAssetReqDetail;
+    }
+
+    public ResponseEntity<LinkedHashMap> batchLeaseAssets(String requestType, String clinicalDeptUID, List<AssetInfo> leaseAssets) {
+        Map<String, Object> reqData = new HashMap<>();
+        reqData.put("clinicalDeptUID", clinicalDeptUID);
+        reqData.put("type", requestType);
+
+        List<Map<String, Object>> reqDetails = new LinkedList<>();
+        Map<String, Object> reqDetail;
+        for(AssetInfo assetInfo : leaseAssets) {
+            reqDetail = assetInfo.buildLeaseReqDetail();
+            reqDetails.add(reqDetail);
+        }
+        reqData.put("details", reqDetails);
+        ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.leaseAssets(reqData);
+        return responseEntity;
+    }
+
+    public ResponseEntity<LinkedHashMap> batchReturnAssets(String requestType, String clinicalDeptUID, List<AssetInfo> returnAssets) {
+        Map<String, Object> reqData = new HashMap<>();
+        reqData.put("clinicalDeptUID", clinicalDeptUID);
+        reqData.put("type", requestType);
+
+        List<Map<String, Object>> reqDetails = new LinkedList<>();
+        Map<String, Object> reqDetail;
+        for(AssetInfo assetInfo : returnAssets) {
+            reqDetail = assetInfo.buildReturnReqDetail();
+            reqDetails.add(reqDetail);
+        }
+        reqData.put("details", reqDetails);
+
+        ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.returnAssets(reqData);
+        return responseEntity;
     }
 
 }
