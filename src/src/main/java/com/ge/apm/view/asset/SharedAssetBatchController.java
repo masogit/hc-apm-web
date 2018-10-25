@@ -209,37 +209,34 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 if(this.validateReturnAsset(preAddAsset)) {
                     logger.info("Asset {} pass validation", preAddAsset.getName());
                     context.addCallbackParam("isValidReqDetail", Boolean.TRUE);
-                    returnAssets.add(assetInfo);
+                    addAsset2ReturnList(assetInfo);
                 } else {
                     logger.info("Asset {} fail validation", preAddAsset.getName());
+                    WebUtil.addErrorMessage("计费结束时间必须在计费开始时间之后，并在未来两小时内");
                     context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
                 }
             }
         }
     }
 
-    public void batchLeaseAssets() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String chargingBeginTimeStr, chargingEndTimeStr;
-        for(AssetInfo asset : leaseAssets) {
-            logger.info("信息: " + asset.getDepartNum());
-            Date chargingBeginTime = asset.getSharedAssetReqDetail().getChargingBeginTime();
-            Date chargingEndTime = asset.getSharedAssetReqDetail().getChargingEndTime();
+    public void addAsset2ReturnList(AssetInfo assetInfo) {
+//        preAddAsset = null;
+        returnAssets.add(assetInfo);
+    }
 
-            chargingBeginTimeStr = (chargingBeginTime == null) ? "" : sdf.format(chargingBeginTime);
-            chargingEndTimeStr = (chargingEndTime == null) ? "" : sdf.format(chargingEndTime);
-            ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(asset.getClinicalDeptUID(),
-                                                                                                asset.getAssetDeptUID(),
-                                                                                                chargingBeginTimeStr,
-                                                                                                chargingEndTimeStr,
-                                                                                                this.requestType);
-            logger.info("Response: " + borrowResponse);
+    public void batchLeaseAssets() {
+        if(leaseAssets != null && leaseAssets.size() > 0) {
+            sharedAssetBatchService.batchLeaseAssets(requestType, null ,leaseAssets);
+        } else {
+            //TODO 空提交
         }
     }
 
     public void batchReturnAssets() {
-        for(AssetInfo asset : returnAssets) {
-            logger.info("信息: " + asset.getDepartNum());
+        if(returnAssets != null && returnAssets.size() > 0) {
+            sharedAssetBatchService.batchReturnAssets(requestType, null, returnAssets);
+        } else {
+            //TODO 空提交
         }
     }
 

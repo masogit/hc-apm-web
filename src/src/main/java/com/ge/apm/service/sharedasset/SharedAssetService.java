@@ -127,6 +127,24 @@ public class SharedAssetService extends MicroServiceInvoker {
                 .map(data -> (Boolean) data.get("onDuty"))
                 .orElse(true);
     }
+
+    public ResponseEntity<LinkedHashMap> batchLeaseAssets(Map<String, Object> requestData) {
+        String url = getGatewayURL(GatewayURL.BATCH_LEASE_SHORTCUT);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(requestData, header);
+        ResponseEntity<LinkedHashMap> responseEntity = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        return responseEntity;
+    }
+
+    public ResponseEntity<LinkedHashMap> batchReturnAssets(Map<String, Object> requestData) {
+        String url = getGatewayURL(GatewayURL.BATCH_RETURN_SHORTCUT);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(requestData, header);
+        ResponseEntity<LinkedHashMap> responseEntity = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        return responseEntity;
+    }
 }
 
 
