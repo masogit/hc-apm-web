@@ -1100,9 +1100,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void addAcessItem() {
         if (!accessoryList.contains(itemDetail)) {
+            //合同价格"默认等于"预估单价
+           if(itemDetail.getClosedPrice()==null) {
+               itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+           }
             accessoryList.add(itemDetail);
         }
-//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
     public void updateAccessPrice(){

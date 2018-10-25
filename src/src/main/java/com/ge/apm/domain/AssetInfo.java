@@ -525,6 +525,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Boolean canReturn;
+
+    @Transient
+    private OrgInfo clinicalDeptOrg;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -572,6 +575,14 @@ public class AssetInfo implements ChineseName,Serializable {
             rst = Boolean.TRUE;
         }
         return rst;
+    }
+
+    public OrgInfo getClinicalDeptOrg() {
+        return clinicalDeptOrg;
+    }
+
+    public void setClinicalDeptOrg(OrgInfo clinicalDeptOrg) {
+        this.clinicalDeptOrg = clinicalDeptOrg;
     }
 
     public Integer getAssetUsage() {

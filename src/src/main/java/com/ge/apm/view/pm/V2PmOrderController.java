@@ -1169,10 +1169,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
-        if(queryIndex==10){
+
+        if(queryIndex==100){
+            //from asset detail page
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
             }
+        }
+        if(queryIndex==10){
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
@@ -1632,6 +1636,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void addAcessItem() {
         if (!accessoryList.contains(itemDetail)) {
+            //合同价格"默认等于"预估单价
+            if(itemDetail.getClosedPrice()==null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
             accessoryList.add(itemDetail);
         }
     }

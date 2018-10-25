@@ -140,6 +140,16 @@ public class MVSWorkOrderService {
 			}
 			String hospitalUid = tempV2_WorkOrder_Detail.getHospitalUID();
 			String siteUid = tempV2_WorkOrder_Detail.getSiteUID();
+			try {
+				hospitalUid=tempV2_WorkOrder_Detail.getV2WorkOrder().getAssetInfo().getHospitalUID();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			try {
+				siteUid=tempV2_WorkOrder_Detail.getV2WorkOrder().getAssetInfo().getSiteUID();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			if (StringUtils.isNotEmpty(hospitalUid)) {
 				tempV2_WorkOrder_Detail.setHospitalOrg(mapOrgInfo.get(hospitalUid));
 			}
@@ -249,7 +259,7 @@ public class MVSWorkOrderService {
 				Map<String, Object> tempMap = new HashMap<String, Object>();
 				try {
 					if (tempDetail.getV2WorkOrder().getServiceRequest().getRequestTime()!=null) {
-						tempMap.put(HEADER_REQUESTTIME, tempDetail.getV2WorkOrder().getServiceRequest().getRequestTime());
+						tempMap.put(HEADER_REQUESTTIME, sdf2.format(tempDetail.getV2WorkOrder().getServiceRequest().getRequestTime()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -257,7 +267,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getV2WorkOrder().getMvsType()!=null) {
-						String result=WebUtil.getFieldValueMessage("mvsPriority", tempDetail.getV2WorkOrder().getMvsType()+"");
+						String result=WebUtil.getFieldValueMessage("mvsType", tempDetail.getV2WorkOrder().getMvsType()+"");
 						tempMap.put(HEADER_MVSTYPE, result);
 					}
 				} catch (Exception e) {
@@ -360,7 +370,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getWarrantyDate()!=null) {
-						tempMap.put(HEADER_WARRANTYDATE, tempDetail.getWarrantyDate());
+						tempMap.put(HEADER_WARRANTYDATE, sdf.format(tempDetail.getWarrantyDate()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -368,7 +378,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getPurchaseTime()!=null) {
-						tempMap.put(HEADER_PURCHASETIME, tempDetail.getPurchaseTime());
+						tempMap.put(HEADER_PURCHASETIME, sdf2.format(tempDetail.getPurchaseTime()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -376,7 +386,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getDeliverTime()!=null) {
-						tempMap.put(HEADER_DELIVERTIME, tempDetail.getDeliverTime());
+						tempMap.put(HEADER_DELIVERTIME, sdf2.format(tempDetail.getDeliverTime()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -384,7 +394,7 @@ public class MVSWorkOrderService {
 
 				try {
 					if (tempDetail.getArrivedTime()!=null) {
-						tempMap.put(HEADER_ARRIVEDTIME,tempDetail.getArrivedTime());
+						tempMap.put(HEADER_ARRIVEDTIME,sdf2.format(tempDetail.getArrivedTime()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception

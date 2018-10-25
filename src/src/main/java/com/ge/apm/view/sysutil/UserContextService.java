@@ -246,12 +246,13 @@ public class UserContextService implements Serializable {
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
 
-        flagIsHospitalUser = true;
         UserAccount loginUser = getLoginUser();
-        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
-            //判断医院级别是否有调剂中心
-            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
-            if(list.size() == 0) flagIsHospitalUser = false;
+        //判断医院级别是否有调剂中心
+        List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
+        if(list.size() > 0) {
+            flagIsHospitalUser = Boolean.TRUE;
+        } else {
+            flagIsHospitalUser = Boolean.FALSE;
         }
         
         return flagIsHospitalUser;
