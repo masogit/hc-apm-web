@@ -32,7 +32,7 @@
             </p:panelGrid>
             <br/>
 
-            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{userVacationScheduleController.saveVacation}" update=":growl" icon="ui-icon-check"/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{userVacationScheduleController.saveVacationBefor}" update=":growl :vacationResultDlg" icon="ui-icon-check" oncomplete="saveVacationBefor(xhr, status, args)"/>
 
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('userWorkScheduleEditDialog').hide()"/>
         </h:form>
