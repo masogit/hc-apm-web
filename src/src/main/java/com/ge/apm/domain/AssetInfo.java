@@ -1713,7 +1713,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Map<String, Object> buildLeaseReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
-        reqHeader.put("clinicalDeptUID", this.getClinicalDeptUID());
+        reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
         reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
         reqHeader.put("details", new LinkedList<Map<String, String>>());
         return reqHeader;
@@ -1731,7 +1731,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public Map<String, Object> buildReturnReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
-        reqHeader.put("clinicalDeptUID", this.getClinicalDeptUID());
+        reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
         reqHeader.put("type", this.getSharedAssetReqDetail().getReturnRequest().getType());
         reqHeader.put("details", new LinkedList<Map<String, String>>());
         return reqHeader;
