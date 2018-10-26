@@ -266,7 +266,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void saveContract() {
-        if (null != selected.getContractNum()) {
+        if (!Strings.isNullOrEmpty(selected.getContractNum())) {
             List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(), selected.getTenantUID());
             if (null != contractList && !contractList.isEmpty()) {
                 if (contractList.stream().anyMatch(item -> !Objects.equals(item.getId(), selected.getId()))) {

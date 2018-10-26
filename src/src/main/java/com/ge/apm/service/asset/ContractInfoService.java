@@ -20,6 +20,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,17 +127,21 @@ public class ContractInfoService {
     }
 
     public List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> getAssetPartsInfo(String contractNum, String tenantUid) {
+        
+        if(Strings.isNullOrEmpty(contractNum)){
+            return new ArrayList(); 
+        }
         List<V2_WorkOrder> woList = partsDao.findWorkOrderByContractNum(contractNum, tenantUid);
         List<V2_PmOrder> pmList = partsDao.findPmOrderByContractNum(contractNum, tenantUid);
 
         List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> res = new ArrayList();
-        woList.stream().forEach(woItem -> {
+        woList.stream().distinct().forEach(woItem -> {
             woItem.getV2_workOrder_detail_list().stream().filter(detailItem -> Objects.equals(detailItem.getContractNum(), contractNum))
                     .forEach(detailItem -> {
                         res.add(new Tuple2<AssetInfo, V2_WorkOrder_Detail>(woItem.getAssetInfo(), detailItem));
                     });
         });
-        pmList.stream().forEach(pmItem -> {
+        pmList.stream().distinct().forEach(pmItem -> {
             pmItem.getDetails().stream().filter(detailItem -> Objects.equals(detailItem.getContractNum(), contractNum))
                     .forEach(detailItem -> {
                         res.add(new Tuple2<AssetInfo, V2_WorkOrder_Detail>(pmItem.getAssetInfo(), detailItem));
