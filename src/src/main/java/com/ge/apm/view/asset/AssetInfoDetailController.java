@@ -90,7 +90,7 @@ public class AssetInfoDetailController {
 
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
-            MvsAssetInfo found = mvsAssetInfoDao.findByAssetUid(selected.getUid());
+            MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
             if (found != null) {
                 mvsAssetInfo = found;
             }
