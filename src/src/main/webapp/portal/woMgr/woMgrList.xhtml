@@ -65,7 +65,6 @@
                             <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
                                 <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
-                                <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" />
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
@@ -113,9 +112,6 @@
                             </p:selectOneMenu>
                         </f:facet>
                         <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
-                    </p:column>
-                    <p:column width="90" headerText="#{msg.intExtType}">
-                        <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                     </p:column>
                     <!--当前处理步骤 for 全部-->
                     <p:column rendered="#{workOrderMgrController.queryIndex eq 11}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
