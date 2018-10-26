@@ -113,9 +113,6 @@
                         </f:facet>
                         <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
                     </p:column>
-                    <p:column width="90" headerText="#{msg.intExtType}">
-                        <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
-                    </p:column>
                     <!--当前处理步骤 for 全部-->
                     <p:column rendered="#{workOrderMgrController.queryIndex eq 11}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
