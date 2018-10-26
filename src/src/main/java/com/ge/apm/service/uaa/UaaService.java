@@ -784,8 +784,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
          orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //子科室
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 5)); //大科室
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
