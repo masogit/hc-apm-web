@@ -46,6 +46,11 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     private static final Logger logger = LoggerFactory.getLogger(SharedAssetBatchController.class);
 
+    public static final String BATCH_RETURN_TAB_ID = "batchReturn";
+    public static final String SERVICE_RESPONSE_STATUS_OK = "OK";
+    public static final String SERVICE_RESPONSE_BIZ_CODE = "bizStatusCode";
+    public static final String SERVICE_RESPONSE_RENT_DETAILS = "rentDetails";
+
     @Getter
     @Setter
     private String searchCriteria;
@@ -84,7 +89,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     @Setter
     private AssetInfo preAddAsset;
 
-    /*
+    /**
      * key   -> OrgInfo.uid
      * value -> OrgInfo
      */
@@ -115,13 +120,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         leaseDeptList = sharedAssetBatchService.getOrgDeptList();
         orgInfoMap = leaseDeptList.stream().collect(Collectors.toMap(OrgInfo::getUid, dept -> dept));
         batchChargingBeginDate = Date.from(Instant.now());
-        batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+        batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.MINUTES));
     }
 
     @Override
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
         List<AssetInfo> result;
-        if("batchReturn".equals(currentTabId)) {
+        if(BATCH_RETURN_TAB_ID.equals(currentTabId)) {
             if(submittedReturnAssets == null || returnAssets.size() > 0) {
                 result = returnAssets;
             } else {
@@ -140,14 +145,11 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void onTabChange(TabChangeEvent event) {
         Tab currentTab = event.getTab();
-
-        if(currentTab == null) {
+        if(event.getTab() == null) {
             currentTabId = "batchLease";
         } else {
             currentTabId = currentTab.getId();
         }
-
-        logger.info("currentTabId: " + currentTabId);
     }
 
     public void findAndSelectAsset2Lease() {
@@ -239,12 +241,12 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             String clinicalDeptUID = leaseDeptList.stream().filter(dept -> leaseDeptName.equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
             ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchLeaseAssets(requestType, clinicalDeptUID ,leaseAssets);
             Map responseBody = responseEntity.getBody();
-            if("OK".equals(responseBody.get("bizStatusCode"))) {
+            if(SERVICE_RESPONSE_STATUS_OK.equals(responseBody.get(SERVICE_RESPONSE_BIZ_CODE))) {
                 submittedLeaseAssets = leaseAssets;
                 leaseAssets = new LinkedList<>();
 
                 Map<String, Object> approvedLeaseRequest = (Map<String, Object>) responseBody.get("data");
-                List rentDetails = (List)approvedLeaseRequest.get("rentDetails");
+                List rentDetails = (List)approvedLeaseRequest.get(SERVICE_RESPONSE_RENT_DETAILS);
                 for(Object rentDetail : rentDetails) {
                     SharedAssetReqDetail reqDetail = JSON.parseObject(JSON.toJSONString(rentDetail), SharedAssetReqDetail.class);
                     AssetInfo asset = submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().get();
@@ -255,7 +257,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量借用失败"));
             }
         } else {
-            //TODO 空提交
+            //空提交, 通过页面组件disable了提交按钮
         }
     }
 
@@ -264,7 +266,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             String clinicalDeptUID = returnAssets.stream().findFirst().map(dept -> dept.getAssetDeptUID()).get();
             ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchReturnAssets(requestType, clinicalDeptUID, returnAssets);
             Map responseBody = responseEntity.getBody();
-            if("OK".equals(responseBody.get("bizStatusCode"))) {
+            if(SERVICE_RESPONSE_STATUS_OK.equals(responseBody.get(SERVICE_RESPONSE_BIZ_CODE))) {
                 submittedReturnAssets = returnAssets;
                 returnAssets = new LinkedList<>();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量归还成功"));
@@ -272,7 +274,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量归还成功"));
             }
         } else {
-            //TODO 空提交
+            //空提交, 通过页面组件disable了提交按钮
         }
     }
 
@@ -292,9 +294,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                                             || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                                             .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
-        return res.stream().map(item -> item.getName())
-                            .distinct()
-                            .collect(Collectors.toList());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
     public void removeLeaseReqDetail() {
@@ -302,6 +302,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public void resetLeaseAssets() {
+        super.selected = null;
         submittedLeaseAssets.clear();
     }
 
@@ -318,6 +319,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public void resetReturnAssets() {
+        super.selected = null;
         returnAssets.clear();
         this.assetDeptName = "";
     }
