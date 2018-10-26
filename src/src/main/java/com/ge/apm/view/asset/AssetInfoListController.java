@@ -242,6 +242,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
 
+        if (UserContextService.isMVSRole()) {
+            this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
+        }
+
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
