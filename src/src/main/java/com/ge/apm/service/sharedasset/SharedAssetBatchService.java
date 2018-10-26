@@ -70,7 +70,7 @@ public class SharedAssetBatchService {
         logger.info("ew: " + ew.getSqlSegment());
         List<AssetInfo> assetInfoList = sharedAssetMapper.findSharedAsset(ew);
         //目前根据业务规则，如根据输入能查询到的设备数量为0或1个
-        assetInfo = assetInfoList.stream().findFirst().get();
+        assetInfo = assetInfoList.stream().findFirst().orElse(null);
         logger.info("ai: " + assetInfo);
         return assetInfo;
     }
@@ -89,7 +89,7 @@ public class SharedAssetBatchService {
         logger.info("ew: " + ew.getSqlSegment());
         List<AssetInfo> assetInfoList = sharedAssetMapper.findSharedAsset(ew);
         //目前根据业务规则，如根据输入能查询到的设备数量为0或1个
-        assetInfo = assetInfoList.stream().findFirst().get();
+        assetInfo = assetInfoList.stream().findFirst().orElse(null);
         logger.info("ai: " + assetInfo);
         return assetInfo;
     }
@@ -108,7 +108,7 @@ public class SharedAssetBatchService {
         ew.orderBy("sard.charging_begin_time", true);
         List<SharedAssetReqDetail> reqDetailList = sharedAssetMapper.findReqDetailByAsset(ew);
         //正常情况下，即数据没有问题的情况下，一个设备仅对应一个未结束req_detail
-        sharedAssetReqDetail = reqDetailList.stream().findFirst().get();
+        sharedAssetReqDetail = reqDetailList.stream().findFirst().orElse(null);
         logger.info("Retrieve req_detail from db: " + sharedAssetReqDetail);
         return sharedAssetReqDetail;
     }
