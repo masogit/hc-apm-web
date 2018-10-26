@@ -1,5 +1,6 @@
 package com.ge.apm.service.sharedasset;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.WorkflowConfigRepository;
@@ -17,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -109,7 +108,7 @@ public class SharedAssetBatchService {
         List<SharedAssetReqDetail> reqDetailList = sharedAssetMapper.findReqDetailByAsset(ew);
         //正常情况下，即数据没有问题的情况下，一个设备仅对应一个未结束req_detail
         sharedAssetReqDetail = reqDetailList.stream().findFirst().orElse(null);
-        logger.info("Retrieve req_detail from db: " + sharedAssetReqDetail);
+        logger.info("Retrieve req_detail from db: " + JSON.toJSONString(sharedAssetReqDetail));
         return sharedAssetReqDetail;
     }
 
@@ -125,7 +124,9 @@ public class SharedAssetBatchService {
             reqDetails.add(reqDetail);
         }
         reqData.put("details", reqDetails);
+        logger.info("Sending data for batch lease assets: clinicalDeptUID : {}, requestType : {}", clinicalDeptUID, requestType);
         ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.leaseAssets(reqData);
+        logger.info("Recieving response for batch lease: " + JSON.toJSONString(responseEntity));
         return responseEntity;
     }
 
@@ -142,7 +143,9 @@ public class SharedAssetBatchService {
         }
         reqData.put("details", reqDetails);
 
+        logger.info("Sending data for batch return assets: clinicalDeptUID : {}, requestType : {}", clinicalDeptUID, requestType);
         ResponseEntity<LinkedHashMap> responseEntity = sharedAssetService.returnAssets(reqData);
+        logger.info("Recieving response for batch return: " + JSON.toJSONString(responseEntity));
         return responseEntity;
     }
 
