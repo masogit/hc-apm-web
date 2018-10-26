@@ -67,16 +67,30 @@
             <p:inputText id="mvs_financingNum" value="#{assetInfoEditController.mvsAssetInfo.financingNum}" readonly="#{!userContextService.isMVSAdmin()}"/>
         </h:panelGroup>
 
-        <h:panelGroup>
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
             <label class="label">#{msg.factoryWarrantyDate}</label>
             <p:calendar id="mvs_factoryWarrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
                         value="#{assetInfoEditController.mvsAssetInfo.factoryWarrantyDate}" readonly="#{!userContextService.isMVSAdmin()}"/>
         </h:panelGroup>
 
-        <h:panelGroup>
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
             <label class="label">#{msg.warrantyDate}</label>
             <p:calendar id="mvs_warrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
                         value="#{assetInfoEditController.mvsAssetInfo.warrantyDate}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:inputText id="mvs_factoryWarrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.factoryWarrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:inputText id="mvs_warrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.warrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
         </h:panelGroup>
 
         <h:panelGroup>
