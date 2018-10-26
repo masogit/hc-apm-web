@@ -36,7 +36,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfig> {
 
 	private static final long serialVersionUID = 1L;
-	public static final String ADMIN = "SuperAdmin,ITAdmin";
 	private WorkflowConfigRepository dao = null;
 	private UserAccountRepository userDao;
 	private UserAccount user;
@@ -50,7 +49,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
 	private OrgInfo selectedUserOrg;
-	private TenantInfo selectedTenant;
+	//private TenantInfo selectedTenant;
 	private TreeNode orgTree;
 	private TreeNode selectedNode;
 	private UaaService uaaService;
@@ -120,10 +119,10 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//判断登陆用户是否是LocalITAdmin(本地后台运营管理)
 		if(UserContextService.isInsulate()){
-			selectedTenant = tempTenantInfo;
+			//selectedTenant = tempTenantInfo;
 			orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
 		}else{
-			selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+			//selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 			OrgInfo rootOrg = new OrgInfo();
 			rootOrg.setId(-1);
 			rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -245,7 +244,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
 		List<SearchFilter> searchFilters = new ArrayList<>();
-		if(userContextService.hasAnyRole(V2_WorkflowConfigController.ADMIN)){
+		if(isInsulate){
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 			if(CollectionUtils.isNotEmpty(this.searchFilters)){
 				searchFilters.addAll(this.searchFilters);
@@ -559,7 +558,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			int level = Integer.parseInt(orgLevel);
 			Integer userLevel =  user.getOrgLevel() == null ? 0 : user.getOrgLevel();
 			List<SearchFilter> searchFilters = new ArrayList<>(5);
-			if(userContextService.hasAnyRole(ADMIN)){
+			if(!isInsulate){
 				if(0 == level){
 					searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 					searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
@@ -663,13 +662,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		this.selectedNode = selectedNode;
 	}
 
-	public TenantInfo getSelectedTenant() {
+/*	public TenantInfo getSelectedTenant() {
 		return selectedTenant;
 	}
 
 	public void setSelectedTenant(TenantInfo selectedTenant) {
 		this.selectedTenant = selectedTenant;
-	}
+	}*/
 
 	public OrgInfo getSelectedOrg() {
 		return selectedOrg;
