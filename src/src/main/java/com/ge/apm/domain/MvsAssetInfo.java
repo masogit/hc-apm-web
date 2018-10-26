@@ -16,10 +16,10 @@ import java.util.Date;
 public class MvsAssetInfo {
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+//    @GeneratedValue(generator = "uuid")
+//    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
-    private String id;
+    private String id;//资产UUID
 
     @Size(max = 64)
     @Column(name = "name")
@@ -95,11 +95,11 @@ public class MvsAssetInfo {
     @Column(name = "mvs_type")
     private String mvsType; //MVS 22 类分类
 
-    @Column(name = "asset_uid")
-    private String assetUid;//资产UUID
+//    @Column(name = "asset_uid")
+//    private String assetUid;//资产UUID
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false, unique = true)
+    @JoinColumn(name = "id", referencedColumnName = "uid", insertable = false, updatable = false, unique = true)
     @JsonBackReference
     private AssetInfo assetInfo;
 
@@ -111,13 +111,13 @@ public class MvsAssetInfo {
         this.id = id;
     }
 
-    public String getAssetUid() {
-        return assetUid;
-    }
-
-    public void setAssetUid(String assetUid) {
-        this.assetUid = assetUid;
-    }
+//    public String getAssetUid() {
+//        return assetUid;
+//    }
+//
+//    public void setAssetUid(String assetUid) {
+//        this.assetUid = assetUid;
+//    }
 
     public String getDeviceType() {
         return deviceType;
