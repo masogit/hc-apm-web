@@ -16,7 +16,6 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xpath.operations.Bool;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -27,10 +26,11 @@ import org.springframework.http.ResponseEntity;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -60,10 +60,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     @Getter
     @Setter
-    private String remark;
-
-    @Getter
-    @Setter
     private Date batchChargingBeginDate;
 
     @Getter
@@ -77,6 +73,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     @Getter
     @Setter
     private String leaseDeptName;
+
+    @Getter
+    @Setter
+    private String assetDeptName;
 
     private List<OrgInfo> leaseDeptList;
 
@@ -158,7 +158,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                                                            || this.searchCriteria.equals(asset.getQrCode()));
             if(hasAdded) {
                 logger.info("Asset had been added");
-                WebUtil.addErrorMessage("设备已添加");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, null, "设备已加入待借用列表"));
             } else {
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
@@ -181,7 +181,8 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
                     leaseAssets.add(assetInfo);
                 } else {
-                    //TODO 未找到匹配设备
+                    //未找到匹配设备
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, null, "未找到匹配设备"));
                 }
             }
         }
@@ -194,7 +195,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                                                             || this.searchCriteria.equals(asset.getQrCode()));
             if(hasAdded) {
                 logger.info("Asset had been added");
-                WebUtil.addErrorMessage("设备已添加");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, null, "设备已加入待归还列表"));
             } else {
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
@@ -207,28 +208,30 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                         OrgInfo assetDept = orgInfoMap.get(assetInfo.getAssetDeptUID());
                         assetInfo.setAssetDeptOrg(assetDept);
                     }
-                } else {
-                    //TODO 未找到匹配设备
-                }
 
-                preAddAsset = assetInfo;
+                    preAddAsset = assetInfo;
 
-                RequestContext context = RequestContext.getCurrentInstance();
-                if(this.validateReturnAsset(preAddAsset)) {
-                    logger.info("Asset {} pass validation", preAddAsset.getName());
-                    context.addCallbackParam("isValidReqDetail", Boolean.TRUE);
-                    addAsset2ReturnList(assetInfo);
+                    if(this.validateAssetDept(assetInfo)) {
+                        RequestContext context = RequestContext.getCurrentInstance();
+                        if(this.validateAssetChargingTIme(preAddAsset)) {
+                            logger.info("Asset {} pass validation", preAddAsset.getName());
+                            context.addCallbackParam("isValidReqDetail", Boolean.TRUE);
+                            addAsset2ReturnList(assetInfo);
+                        } else {
+                            logger.info("Asset {} fail validation", preAddAsset.getName());
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "计费结束时间必须在计费开始时间之后，并在未来两小时内"));
+                            context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
+                        }
+                    } else {
+                        //借用科室不匹配
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "借用科室不匹配"));
+                    }
                 } else {
-                    logger.info("Asset {} fail validation", preAddAsset.getName());
-                    WebUtil.addErrorMessage("计费结束时间必须在计费开始时间之后，并在未来两小时内");
-                    context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
+                    // 未找到匹配设备
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "未找到满足条件设备"));
                 }
             }
         }
-    }
-
-    public void addAsset2ReturnList(AssetInfo assetInfo) {
-        returnAssets.add(assetInfo);
     }
 
     public void batchLeaseAssets() {
@@ -247,14 +250,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                     AssetInfo asset = submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().get();
                     asset.setSharedAssetReqDetail(reqDetail);
                 }
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量借用成功"));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量借用失败"));
             }
         } else {
             //TODO 空提交
         }
-    }
-
-    public void resetLeaseAssets() {
-        submittedLeaseAssets.clear();
     }
 
     public void batchReturnAssets() {
@@ -265,14 +267,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             if("OK".equals(responseBody.get("bizStatusCode"))) {
                 submittedReturnAssets = returnAssets;
                 returnAssets = new LinkedList<>();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量归还成功"));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量归还成功"));
             }
         } else {
             //TODO 空提交
         }
-    }
-
-    public void resetReturnAssets() {
-        returnAssets.clear();
     }
 
     public void onLeaseDeptNameChange(AjaxBehaviorEvent event) {
@@ -300,8 +301,25 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         this.leaseAssets.remove(this.selected);
     }
 
+    public void resetLeaseAssets() {
+        submittedLeaseAssets.clear();
+    }
+
+    public void addAsset2ReturnList(AssetInfo assetInfo) {
+        returnAssets.add(assetInfo);
+        this.assetDeptName = orgInfoMap.get(assetInfo.getAssetDeptUID()).getName();
+    }
+
     public void removeReturnReqDetail() {
         this.returnAssets.remove(this.selected);
+        if(returnAssets.size() == 0) {
+            this.assetDeptName = "";
+        }
+    }
+
+    public void resetReturnAssets() {
+        returnAssets.clear();
+        this.assetDeptName = "";
     }
 
     public Boolean enableLeaseSubmitBtn() {
@@ -320,11 +338,21 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return result;
     }
 
-    private Boolean validateReturnAsset(AssetInfo assetInfo) {
+    private Boolean validateAssetChargingTIme(AssetInfo assetInfo) {
         Boolean result = Boolean.FALSE;
         SharedAssetReqDetail reqDetail = assetInfo.getSharedAssetReqDetail();
         if(reqDetail != null) {
             result = reqDetail.validateChargingBeginTime() && reqDetail.validateChargingEndTime();
+        }
+        return result;
+    }
+
+    private Boolean validateAssetDept(AssetInfo assetInfo) {
+        Boolean result = Boolean.TRUE;
+        //验证新加入设备的使用科室是否和之前加入到待归还列表中设备使用科室是否一致
+        if(returnAssets.size() > 0) {
+            AssetInfo assetInReturnList = returnAssets.stream().findFirst().get();
+            result = assetInReturnList.getAssetDeptUID().equals(assetInfo.getAssetDeptUID());
         }
         return result;
     }
