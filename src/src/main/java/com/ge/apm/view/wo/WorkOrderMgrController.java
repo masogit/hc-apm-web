@@ -17,6 +17,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -126,6 +127,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
+    private Map<String, Integer> woStatus = new HashMap<String, Integer>();
 
     protected void init() {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -165,7 +167,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         this.filterBySite = false;
         this.filterByHospital = false;
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
+ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
+
+
 
     }
 
@@ -179,13 +185,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfo selectSite;
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
-       /* if(v2_workOrder.getServiceRequest().getSrNum().equalsIgnoreCase("1809291343"))
-            System.out.println();*/
         Integer stepId =v2_workOrder.getCurrentStepId();
         int mode =v2_workOrder.getDispatchMode();
         switch(stepId){
-            case 7: //
-                if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
+            case 7: //待评价
+                return "icons/5.png";
+                /*if( v2_workOrder.getV2_workOrder_detail_list().size()>0){
                     if(v2_workOrder.getApprovalDate()==null){
                         return  "icons/6.png";
                     }
@@ -193,9 +198,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
                 else{//如果没有备件 则显审核图标显示为灰色的
                     return "icons/6.png";
-                }
+                }*/
             case 6: //
-                if(v2_workOrder.getV2_workOrder_detail_list().size()>0){
+                return "icons/5.png";
+                /*if(v2_workOrder.getV2_workOrder_detail_list().size()>0){
                     if(v2_workOrder.getApprovalDate()==null) //有备件但未提交审核
                     {
                         return "icons/6.png";
@@ -203,7 +209,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                         return "icons/5.png";
                 }else{//如果没有备件 则显审核图标显示为灰色的
                     return "icons/6.png";
-                }
+                }*/
 
             case 5: //待验收
             {
@@ -482,11 +488,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         )
 
      */
+    private void filterStepSet(Integer fillterStepId){
+        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+    }
+
+
+    /*stepName:StepId 报修:1 待派工: 2 , 待接单:3, 维修中:4 , 待验收:5 待关单:6 ， 待评价:7  , 待审核:8 ， 已计划: 0*/
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
         removeFilterOnField("status");
         removeFilterOnField("currentStepId");
+        removeFilterOnField("currentStepName");
         removeFilterOnField("currentPersonId");
         removeFilterOnField("dispatchMode");
         removeFilterOnField("srId");
@@ -497,7 +510,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         removeFilterOnField("assetInfo.assetOwnerId2");
         removeFilterOnField("assetInfo.assetOwnerId3");
         removeFilterOnField("assetInfo.uid");
-
+        Integer  fillterStepId;
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
@@ -594,6 +607,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
         } else if (queryIndex == 11) { //全部维修单
+            if(stepFileter!=null) {
+                fillterStepId = woStatus.get(stepFileter);
+                if (fillterStepId > 6) {
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                }
+                else {
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                }
+            }
 
         } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
@@ -601,19 +623,23 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         } else {//待办
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            if(stepFileter!=null) {
+                fillterStepId = woStatus.get(stepFileter);
+                if (fillterStepId > 6) {
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                }
+                else {
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                }
+            }
         }
-
         this.selected = null;
         Page<V2_WorkOrder> bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
-
         return   bySearchFilter;
-
     }
 
     @Override
     public void setSearchFilter() {
-
-
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
