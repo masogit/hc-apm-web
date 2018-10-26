@@ -244,7 +244,7 @@
 
                         </p:dataTable>
                     </p:fieldset>
-                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType ne 'Parts' } ">
+                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType ne 'Parts'}">
                         <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
