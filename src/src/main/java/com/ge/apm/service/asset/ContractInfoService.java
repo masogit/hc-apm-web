@@ -117,7 +117,10 @@ public class ContractInfoService {
                 .map(detailItem -> detailItem.getContractNum())).distinct().collect(Collectors.toList());
         partsContractsNumList.addAll(pmList.stream().flatMap(item -> item.getDetails().stream()
                 .map(detailItem -> detailItem.getContractNum())).distinct().collect(Collectors.toList()));
-        List<ContractInfo> resList = contractDao.findByContractNumIn(partsContractsNumList, asset.getTenantUID());
+        List<ContractInfo> resList = new ArrayList();
+        if(null != partsContractsNumList && !partsContractsNumList.isEmpty()){
+            resList.addAll(contractDao.findByContractNumIn(partsContractsNumList, asset.getTenantUID()));
+        }
         resList.addAll(contractItemDao.getByAssetUidAndContractType(asset.getUid()).stream().map(item -> item.getContractInfo()).distinct().collect(Collectors.toList()));
         return resList;
     }
