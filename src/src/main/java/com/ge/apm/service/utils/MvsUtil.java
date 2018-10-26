@@ -44,7 +44,7 @@ public class MvsUtil {
 
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
 
-        MvsAssetInfo foundExisting = mvsAssetInfoDao.findByAssetUid(assetInfo.getUid());
+        MvsAssetInfo foundExisting = mvsAssetInfoDao.findById(assetInfo.getUid());
 
         if (foundExisting != null && UserContextService.isMVSAdmin()) {
             //only mvs admin can update
@@ -108,7 +108,7 @@ public class MvsUtil {
         mvsAssetInfo.setWarrantyDate(assetInfo.getWarrantyDate());
         mvsAssetInfo.setQrCode(assetInfo.getQrCode());
         mvsAssetInfo.setComments(assetInfo.getComments());
-        mvsAssetInfo.setAssetUid(assetInfo.getUid());
+        mvsAssetInfo.setId(assetInfo.getUid());
 
         mvsAssetInfoDao.save(mvsAssetInfo);
     }

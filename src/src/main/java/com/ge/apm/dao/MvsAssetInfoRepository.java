@@ -5,6 +5,6 @@ import webapp.framework.dao.GenericRepository;
 
 public interface MvsAssetInfoRepository extends GenericRepository<MvsAssetInfo> {
 
-    public MvsAssetInfo findByAssetUid(String assetUid);
+    public MvsAssetInfo findById(String assetUid);
 
 }
