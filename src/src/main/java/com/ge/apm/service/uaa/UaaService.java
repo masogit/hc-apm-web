@@ -836,6 +836,36 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         }
         return deptList;
     }
+
+    public List<OrgInfo> getAllAccessibleClinicalDeptList() {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> sitesList = this.getUserAccessibleSiteList(user.getUid());
+        Set<String> sites = sitesList.stream().map(item -> item.getUid()).collect(Collectors.toSet());
+
+        List<OrgInfo> dropdownList = getClinicalDeptListByAnySiteLevel(sites);
+
+        return dropdownList;
+    }
+
+    public List<OrgInfo> getClinicalDeptListByAnySiteLevel(String siteUID) {
+        List<SearchFilter> orgFilters = new ArrayList<>();
+        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
+        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
+        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
+        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
+        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
+        return orgInfoDao.findBySearchFilter(orgFilters);
+    }
+
+    public List<OrgInfo> getClinicalDeptListByAnySiteLevel(Set<String> sites) {
+        List<SearchFilter> orgFilters = new ArrayList<>();
+        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, sites, "1*2+"));
+        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, sites, "1*2+"));
+        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, sites, "1*2+"));
+        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, sites, "1*2+"));
+        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
+        return orgInfoDao.findBySearchFilter(orgFilters);
+    }
     
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
         List<SearchFilter> orgFilters = new ArrayList<>();
