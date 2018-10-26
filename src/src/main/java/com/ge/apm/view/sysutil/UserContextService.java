@@ -37,6 +37,7 @@ import webapp.framework.web.service.UserContext;
 public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String ADMIN = "SuperAdmin,ITAdmin";
 
     private UserAccount userAccount = null;
 
@@ -505,7 +506,7 @@ public class UserContextService implements Serializable {
         UserAccount user = userContextService.getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        if(tenant.getInsulate() != null && tenant.getInsulate()) {
+        if(tenant.getInsulate() != null && tenant.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
             return true;
         }
         return false;
