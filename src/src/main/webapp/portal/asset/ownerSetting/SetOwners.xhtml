@@ -28,7 +28,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{assetOwnerSettingController.hasAssetGroupSecondary}">
-                                <label class="label">设备子分类</label>
+                                <label class="label">设备分类2级</label>
                                 <p:selectOneMenu id="assetGroupSecondary" value="#{assetOwnerSettingController.queryAsset.assetGroupSecondary}">
                                     <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
