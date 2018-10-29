@@ -64,7 +64,9 @@
 							<h:outputText value="#{item.apartsQuantity}" />
 						</p:column>
 						<p:column headerText="采购单价" filterBy="#{item.mvsPrice}" filterMatchMode="EQ">
-							<h:outputText value="#{item.mvsPrice}" />
+							<h:outputText value="#{item.mvsPrice}" >
+								<f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+							</h:outputText>
 						</p:column>
 						<p:column headerText="序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.serialNum}" />
