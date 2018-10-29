@@ -75,7 +75,7 @@ public class MVSWorkOrderService {
 	private static final String HEADER_ASSETNAME = "设备名称";
 	private static final String HEADER_PARTNAME = "备件名称";
 	private static final String HEADER_QUANTITY = "数量";
-	private static final String HEADER_PRICE = "单价";
+	private static final String HEADER_PRICE = "采购单价";
 	private static final String HEADER_SERIANUM = "序列号";
 	private static final String HEADER_INVOICENUM = "发票号";
 	private static final String HEADER_WARRANTYDATE = "质保期";
