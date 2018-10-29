@@ -1,11 +1,8 @@
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +10,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "mvs_asset_info")
-public class MvsAssetInfo {
+public class MvsAssetInfo implements Serializable {
 
     @Id
 //    @GeneratedValue(generator = "uuid")
@@ -98,9 +95,10 @@ public class MvsAssetInfo {
 //    @Column(name = "asset_uid")
 //    private String assetUid;//资产UUID
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", referencedColumnName = "uid", insertable = false, updatable = false, unique = true)
-    @JsonBackReference
+//    @OneToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "id", referencedColumnName = "uid", insertable = false, updatable = false, unique = true)
+//    @JsonBackReference
+    @Transient
     private AssetInfo assetInfo;
 
     public String getId() {
@@ -110,14 +108,6 @@ public class MvsAssetInfo {
     public void setId(String id) {
         this.id = id;
     }
-
-//    public String getAssetUid() {
-//        return assetUid;
-//    }
-//
-//    public void setAssetUid(String assetUid) {
-//        this.assetUid = assetUid;
-//    }
 
     public String getDeviceType() {
         return deviceType;
@@ -159,14 +149,6 @@ public class MvsAssetInfo {
         this.aliasName = aliasName;
     }
 
-//    public String getSiteUID() {
-//        return siteUID;
-//    }
-//
-//    public void setSiteUID(String siteUID) {
-//        this.siteUID = siteUID;
-//    }
-
     public String getSiteName() {
         return siteName;
     }
@@ -174,14 +156,6 @@ public class MvsAssetInfo {
     public void setSiteName(String siteName) {
         this.siteName = siteName;
     }
-
-//    public String getAssetDeptUID() {
-//        return assetDeptUID;
-//    }
-//
-//    public void setAssetDeptUID(String assetDeptUID) {
-//        this.assetDeptUID = assetDeptUID;
-//    }
 
     public String getAssetDeptName() {
         return assetDeptName;

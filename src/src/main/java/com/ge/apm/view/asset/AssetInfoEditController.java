@@ -155,8 +155,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
             MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
-            if (found != null) {
+            if (found != null ) {
                 mvsAssetInfo = found;
             }
         }
