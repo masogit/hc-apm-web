@@ -858,11 +858,13 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     }
 
     public List<OrgInfo> getClinicalDeptListByAnySiteLevel(Set<String> sites) {
+        List<String> siteList = new ArrayList<>(sites);
+
         List<SearchFilter> orgFilters = new ArrayList<>();
-        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, sites, "1*2+"));
-        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, sites, "1*2+"));
-        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, sites, "1*2+"));
-        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, sites, "1*2+"));
+        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, siteList, "1*2+"));
+        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, siteList, "1*2+"));
+        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, siteList, "1*2+"));
+        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteList, "1*2+"));
         orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
         return orgInfoDao.findBySearchFilter(orgFilters);
     }
