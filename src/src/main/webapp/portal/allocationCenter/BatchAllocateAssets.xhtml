@@ -139,12 +139,10 @@
                                     <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                                 </p:commandButton>
                                 <p:commandButton id="reset"
-                                                 validateClient="true"
-                                                 ajax="true"
-                                                 oncomplete="oncomplete(xhr, status, args)"
+                                                 process="@this"
                                                  actionListener="#{sharedAssetBatchController.resetLeaseAssets()}"
-                                                 value="重置"
-                                                 update="batchLeaseForm:datalist"/>
+                                                 value="重置列表"
+                                                 update="batchLeaseForm:datalist batchLeaseForm:confirm"/>
                             </h:form>
                         </p:fieldset>
                     </p:tab>
@@ -269,12 +267,11 @@
                                     <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                                 </p:commandButton>
                                 <p:commandButton id="reset"
-                                                 validateClient="true"
-                                                 ajax="true"
+                                                 process="@this"
                                                  oncomplete="oncomplete(xhr, status, args)"
                                                  actionListener="#{sharedAssetBatchController.resetReturnAssets()}"
-                                                 value="重置"
-                                                 update="batchReturnForm:datalist batchReturnForm:assetDept4Return"/>
+                                                 value="重置列表"
+                                                 update="batchReturnForm:datalist batchReturnForm:confirm batchReturnForm:assetDept4Return"/>
                             </h:form>
                         </p:fieldset>
                     </p:tab>
