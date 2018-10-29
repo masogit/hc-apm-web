@@ -78,10 +78,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private boolean terminate = false;
 
-    private String filterWarrantyDate = null;
-
-    private String filterAssetStatus = null;
-
     private Date varWarrantyDateTo = null;
     private String warrantyFormatTime = null;
     private Boolean needShowAssetApproval;
@@ -108,6 +104,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
+
+    //状态监控报表跳转参数
+    private String filterAssetStatus = null;
+    private String filterWarrantyDate = null;
+    private Integer assetId;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -578,6 +579,33 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return needShowAssetApproval;
     }
 
+    public void setAssetStatusFilter() {
+        if (filterAssetStatus == null && filterWarrantyDate == null) {
+            return;
+        }
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        /*if (filterAssetStatus != null) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
+        }
+        if (assetId != null) {
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
+        }*/
+        if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
+            Date warrantyDate = new Date();
+            //2个月内，则是保修到期时间在2个月后时间之前所有
+            Calendar c = Calendar.getInstance();
+            c.setTime(warrantyDate);
+            c.add(Calendar.MONTH, 2);
+            varWarrantyDateTo = c.getTime();
+            searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
+            searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
+            //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            //filterWarrantyDate = null;
+        }
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -701,5 +729,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondary(Integer assetGroupSecondary) {
         this.assetGroupSecondary = assetGroupSecondary;
+    }
+
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
     }
 }

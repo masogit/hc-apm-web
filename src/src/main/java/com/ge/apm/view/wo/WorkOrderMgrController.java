@@ -243,6 +243,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
                 return "icons/1.png";
         }
     }
+
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();
@@ -271,15 +272,13 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
-
-
-
-
     }
 
     private void loadClinicalDeptList() {
-        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+        /*clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
