@@ -8,20 +8,30 @@
 
     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-        <h:panelGroup>
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
             <label class="label">#{msg.mvsDeviceType}</label>
-            <p:selectOneMenu id="mvsDeviceType" value="#{assetInfoEditController.mvsAssetInfo.deviceType}">
+            <p:selectOneMenu id="mvsDeviceType" value="#{assetInfoEditController.mvsAssetInfo.deviceType}" readonly="#{!userContextService.isMVSAdmin()}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('mvsDeviceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
             </p:selectOneMenu>
         </h:panelGroup>
 
-        <h:panelGroup>
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
             <label class="label">#{msg.mvsAssetGroup}</label>
-            <p:selectOneMenu id="mvsAssetGroup" value="#{assetInfoEditController.mvsAssetInfo.mvsType}">
+            <p:selectOneMenu id="mvsAssetGroup" value="#{assetInfoEditController.mvsAssetInfo.mvsType}" readonly="#{!userContextService.isMVSAdmin()}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('mvsAssetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
             </p:selectOneMenu>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsDeviceType}</label>
+            <p:inputText id="mvsDeviceType_readonly" value="#{assetInfoDetailController.mvsAssetInfo.deviceType}" readonly="true"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsAssetGroup}</label>
+            <p:inputText id="mvsAssetGroup_readonly" value="#{assetInfoDetailController.mvsAssetInfo.mvsType}" readonly="true"/>
         </h:panelGroup>
 
         <h:panelGroup>

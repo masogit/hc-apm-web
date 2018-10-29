@@ -12,6 +12,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -40,6 +41,7 @@ public class AssetInfoDetailController {
 
     private AssetInfoRepository assetDao;
     private MvsAssetInfoRepository mvsAssetInfoDao;
+    private MvsUtil mvsUtil;
     private OrgInfoRepository orgDao;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
@@ -65,6 +67,7 @@ public class AssetInfoDetailController {
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
+        mvsUtil = WebUtil.getBean(MvsUtil.class);
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -90,6 +93,7 @@ public class AssetInfoDetailController {
 
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
             MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
             if (found != null) {
                 mvsAssetInfo = found;
