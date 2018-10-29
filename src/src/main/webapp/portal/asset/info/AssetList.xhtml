@@ -6,6 +6,15 @@
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:viewParam name="assetStatus" value="#{assetInfoListController.filterAssetStatus}"/>
+            <f:viewParam name="model" value="#{assetInfoListController.filterWarrantyDate}"/>
+            <f:viewParam name="assetId" value="#{assetInfoListController.assetId}"/>
+        </f:metadata>
+        <f:event type="preRenderView" listener="#{assetInfoListController.setAssetStatusFilter()}"/>
+    </ui:define>
+
     <ui:define name="content">
         <script type="text/javascript">
             function handleAssetGroupChange(selection) {
