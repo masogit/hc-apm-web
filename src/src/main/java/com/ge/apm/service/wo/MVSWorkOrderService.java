@@ -78,6 +78,7 @@ public class MVSWorkOrderService {
 	private static final String HEADER_PRICE = "采购单价";
 	private static final String HEADER_SERIANUM = "序列号";
 	private static final String HEADER_INVOICENUM = "发票号";
+	private static final String HEADER_COMMENT = "备注";
 	private static final String HEADER_WARRANTYDATE = "质保期";
 	private static final String HEADER_PURCHASETIME = "采购时间";
 	private static final String HEADER_DELIVERTIME = "发货时间";
@@ -367,7 +368,14 @@ public class MVSWorkOrderService {
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
-
+				try {
+					if (tempDetail.getComment()!=null) {
+						tempMap.put(HEADER_COMMENT, tempDetail.getComment());
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 				try {
 					if (tempDetail.getWarrantyDate()!=null) {
 						tempMap.put(HEADER_WARRANTYDATE, sdf.format(tempDetail.getWarrantyDate()));
