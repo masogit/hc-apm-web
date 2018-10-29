@@ -74,9 +74,7 @@
 						<p:column headerText="发票号" filterBy="#{item.invoiceNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.invoiceNum}" />
 						</p:column>
-						<p:column headerText="备注">
-							<h:outputText value="#{item.comment}" />
-						</p:column>
+						
 						<p:column headerText="质保期" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
 							<f:facet name="filter">
 						        <p:inputText id="filterwarrantyDate" widgetVar="varFilterwarrantyDate" />
@@ -128,6 +126,9 @@
 						        </p:selectOneMenu>
 						    </f:facet>
 							<h:outputText value="#{item.arrivedGoodReturn?'是':'否'}" />
+						</p:column>
+						<p:column headerText="备注">
+							<h:outputText value="#{item.comment}" />
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="editButton" actionListener="#{mVSWorkOrderMgrController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
