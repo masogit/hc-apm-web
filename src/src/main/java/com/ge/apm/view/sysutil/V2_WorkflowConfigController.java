@@ -165,8 +165,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(selectedUserOrg == null || selected == null){
 			return;
 		}
-		approveUserList.addAll(userCommonService.getWorkerList(0,selectedUserOrg.getUid()));
-/*
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
@@ -178,11 +176,10 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}else if(orgType == 3){
 				approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
 			}
-			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 		}else{
 			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
-			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
-		}*/
+		}
+		approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 	}
 	
 	public List<UserInfo> getUserList() {
