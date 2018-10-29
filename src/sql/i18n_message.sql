@@ -1635,3 +1635,35 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsPriority', '1', '普通', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsPriority', '2', '加急', 'Urgent', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'mvsDeviceType', 'MVS 设备大类', 'MVS 设备大类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'mvsAssetGroup', 'MVS专有设备分类', 'MVS专有设备分类', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsDeviceType', '1', 'DI', 'DI', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsDeviceType', '2', 'ULS', 'ULS', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsDeviceType', '3', 'Others', 'Others', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsDeviceType', '4', 'Component', 'Component', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '1', 'CT类', 'CT类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '2', '磁共振MRI', '磁共振MRI', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '3', '血管造影机DSA', '血管造影机DSA', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '4', '普放类', '普放类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '5', '超声影像类', '超声影像类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '6', '监护类', '监护类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '7', '呼吸类', '呼吸类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '8', '麻醉类', '麻醉类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '9', '软式内窥镜类', '软式内窥镜类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '10', '硬式内窥镜类', '硬式内窥镜类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '11', '血液净化类', '血液净化类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '12', '电刀、超声刀等医用刀类', '电刀、超声刀等医用刀类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '13', '灯床塔等手术室设备类', '灯床塔等手术室设备类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '14', '输注泵类', '输注泵类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '15', '检验室设备类', '检验室设备类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '16', '病理类', '病理类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '17', '消毒设备类', '消毒设备类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '18', '手术显微镜', '手术显微镜', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '19', '医用激光类', '医用激光类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '20', '核医学类', '核医学类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '21', '放疗类', '放疗类', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '22', '其他类', '其他类', NULL, '-1');
+
