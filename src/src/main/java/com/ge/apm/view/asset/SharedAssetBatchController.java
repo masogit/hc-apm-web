@@ -120,7 +120,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         leaseDeptList = sharedAssetBatchService.getOrgDeptList();
         orgInfoMap = leaseDeptList.stream().collect(Collectors.toMap(OrgInfo::getUid, dept -> dept));
         batchChargingBeginDate = Date.from(Instant.now());
-        batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.MINUTES));
+        batchChargingEndDate = Date.from(Instant.now().plus(2, ChronoUnit.SECONDS));
     }
 
     @Override
@@ -303,7 +303,12 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void resetLeaseAssets() {
         super.selected = null;
-        submittedLeaseAssets.clear();
+        if(submittedLeaseAssets != null && submittedLeaseAssets.size() > 0) {
+            submittedLeaseAssets.clear();
+        }
+        if(leaseAssets.size() > 0) {
+            leaseAssets.clear();
+        }
     }
 
     public void addAsset2ReturnList(AssetInfo assetInfo) {
@@ -320,8 +325,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void resetReturnAssets() {
         super.selected = null;
-        returnAssets.clear();
         this.assetDeptName = "";
+        if(submittedReturnAssets != null && submittedReturnAssets.size() > 0) {
+            submittedReturnAssets.clear();
+        }
+        if(returnAssets.size() > 0) {
+            returnAssets.clear();
+        }
     }
 
     public Boolean enableLeaseSubmitBtn() {

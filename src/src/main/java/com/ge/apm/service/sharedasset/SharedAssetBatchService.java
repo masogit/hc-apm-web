@@ -66,6 +66,9 @@ public class SharedAssetBatchService {
 
         ew.andNew().in("ai.asset_dept_uid", allocationCenterUids);
 
+        ew.andNew().eq("ai.status", 1)
+                .or().eq("ai.status", 3);
+
         logger.info("ew: " + ew.getSqlSegment());
         List<AssetInfo> assetInfoList = sharedAssetMapper.findSharedAsset(ew);
         //目前根据业务规则，如根据输入能查询到的设备数量为0或1个
