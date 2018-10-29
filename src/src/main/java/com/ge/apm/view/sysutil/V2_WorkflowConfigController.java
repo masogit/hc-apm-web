@@ -138,7 +138,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-	private boolean isNullOrBelongs(String uid,Set<String> uids){
+/*	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
 			return true;
 		}
@@ -146,7 +146,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
 		return userCommonService.getIncludeOrgInfo(isInsulate,loginUserOrgType,uid,parentUID,orgType);
@@ -165,6 +165,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(selectedUserOrg == null || selected == null){
 			return;
 		}
+		approveUserList.addAll(userCommonService.getWorkerList(0,selectedUserOrg.getUid()));
+/*
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
@@ -180,7 +182,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
 			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
-		}
+		}*/
 	}
 	
 	public List<UserInfo> getUserList() {
@@ -245,12 +247,12 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
 		List<SearchFilter> searchFilters = new ArrayList<>();
 		if(isInsulate){
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+			searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
 			if(CollectionUtils.isNotEmpty(this.searchFilters)){
 				searchFilters.addAll(this.searchFilters);
 			}
 		}else {
-			searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 			if(CollectionUtils.isNotEmpty(this.searchFilters)){
 				searchFilters.addAll(this.searchFilters);
 			}
