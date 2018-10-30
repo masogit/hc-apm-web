@@ -422,6 +422,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setUsageStatus(3);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
+            if ("DFQ".equals(getAssetCodeConfig())) {
+                //删除资产编号时候会清除二维码
+                if (StringUtils.isNotEmpty(selected.getQrCode())) {
+                    qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
+                }
+            }
             selected.setQrCode(null);
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
