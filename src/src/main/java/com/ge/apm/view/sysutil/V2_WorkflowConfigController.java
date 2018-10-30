@@ -165,17 +165,35 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(selectedUserOrg == null || selected == null){
 			return;
 		}
-/*        Integer orgType = selectedUserOrg.getOrgType();
-        if(orgType == 0){
-            approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
-        }else if(orgType == 1) {
-            approveUserList = userDao.getAssetHeadAndStaffByInstitutionUID(selectedUserOrg.getInstitutionUID());
-        }else if(orgType == 2){
-            approveUserList = userDao.getAssetHeadAndStaffByHospitalUID(selectedUserOrg.getHospitalUID());
-        }else if(orgType == 3){
-            approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
-        }*/
-		if(isInsulate){
+		TenantInfo tenant = tenantInfoRepository.findByuid(selectedUserOrg.getTenantUID());
+		if(tenant.getInsulate() != null && tenant.getInsulate()){
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+				approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
+			}else if(orgType == 1) {
+				approveUserList = userDao.getAssetHeadAndStaffByInstitutionUID(selectedUserOrg.getInstitutionUID());
+			}else if(orgType == 2){
+				approveUserList = userDao.getAssetHeadAndStaffByHospitalUID(selectedUserOrg.getHospitalUID());
+			}else if(orgType == 3){
+				approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
+			}
+		}else{
+			if(isInsulate){
+				Integer orgType = selectedUserOrg.getOrgType();
+				if(orgType == 0){
+					approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
+				}else if(orgType == 1) {
+					approveUserList = userDao.getAssetHeadAndStaffByInstitutionUID(selectedUserOrg.getInstitutionUID());
+				}else if(orgType == 2){
+					approveUserList = userDao.getAssetHeadAndStaffByHospitalUID(selectedUserOrg.getHospitalUID());
+				}else if(orgType == 3){
+					approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
+				}
+			}else{
+				approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
+			}
+		}
+/*		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
 				approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
@@ -188,7 +206,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 		}else{
 			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
-		}
+		}*/
 		approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 	}
 	
