@@ -221,7 +221,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                             addAsset2ReturnList(assetInfo);
                         } else {
                             logger.info("Asset {} fail validation", preAddAsset.getName());
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "计费结束时间必须在计费开始时间之后，并在未来两小时内"));
                             context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
                         }
                     } else {
@@ -354,6 +353,18 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         Boolean result = Boolean.FALSE;
         SharedAssetReqDetail reqDetail = assetInfo.getSharedAssetReqDetail();
         if(reqDetail != null) {
+            if(reqDetail.validateChargingBeginTime()) {
+                //TODO
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "计费开始时间必须在当前时间之前"));
+                return false;
+            }
+            if(reqDetail.validateChargingEndTime()) {
+                //TODO
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "计费结束时间必须在计费开始时间之后，并在未来两小时内"));
+                return false;
+            }
             result = reqDetail.validateChargingBeginTime() && reqDetail.validateChargingEndTime();
         }
         return result;

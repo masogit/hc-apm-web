@@ -33,6 +33,7 @@
                         <label class="label">计费开始时间*</label>
                         <p:calendar timeZone="GMT+8"
                                     id="chargingBeginTime"
+                                    binding="#{chargingBeginTimeComponent}"
                                     pattern="yyyy/MM/dd HH:mm:ss"
                                     value="#{sharedAssetStockController.selected.sharedAssetReqDetail.chargingBeginTime}"
                                     maxdate="#{sharedAssetStockController.maxChargingBeginTime}"
@@ -59,7 +60,10 @@
                                     readonlyInput="true"
                                     locale= "zh"
                                     required="true"
-                                    requiredMessage="计费结束时间 #{msg.ValidationRequire}"/>
+                                    requiredMessage="计费结束时间 #{msg.ValidationRequire}">
+                            <f:validator validatorId="chargingTimeValidator" />
+                            <f:attribute name="chargingBeginTimeComponent" value="#{chargingBeginTimeComponent}" />
+                        </p:calendar>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">设备状态完好</label>
