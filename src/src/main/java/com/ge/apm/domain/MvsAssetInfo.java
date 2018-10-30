@@ -13,8 +13,6 @@ import java.util.Date;
 public class MvsAssetInfo implements Serializable {
 
     @Id
-//    @GeneratedValue(generator = "uuid")
-//    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;//资产UUID
 
@@ -26,19 +24,17 @@ public class MvsAssetInfo implements Serializable {
     @Column(name = "alias_name")
     private String aliasName;//设备别名
 
-//    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-//    private String siteUID;//所属院区uuid
-
     @Size(max = 64)
     @Column(name = "site_name")
     private String siteName;//所属院区
 
-//    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
-//    private String assetDeptUID;//使用科室uuid
-
     @Size(max = 64)
-    @Column(name = "asset_dept_name")
-    private String assetDeptName;//使用科室
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//所属科室
+
+//    @Size(max = 64)
+//    @Column(name = "asset_dept_name")
+//    private String assetDeptName;//使用科室
 
     @Size(max = 64)
     @Column(name = "manufacture")
@@ -157,13 +153,21 @@ public class MvsAssetInfo implements Serializable {
         this.siteName = siteName;
     }
 
-    public String getAssetDeptName() {
-        return assetDeptName;
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
     }
 
-    public void setAssetDeptName(String assetDeptName) {
-        this.assetDeptName = assetDeptName;
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
     }
+
+//    public String getAssetDeptName() {
+//        return assetDeptName;
+//    }
+//
+//    public void setAssetDeptName(String assetDeptName) {
+//        this.assetDeptName = assetDeptName;
+//    }
 
     public String getManufacture() {
         return manufacture;
@@ -260,4 +264,6 @@ public class MvsAssetInfo implements Serializable {
     public void setComments(String comments) {
         this.comments = comments;
     }
+
+
 }
