@@ -21,20 +21,19 @@ public class AssetInfoFormatter {
     private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
-    private I18nMessageRepository i18nDao;
+//    private I18nMessageRepository i18nDao;
     private int siteId;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
-                              OrgInfoRepository orgDao,
-                              I18nMessageRepository i18nDao) {
+                              OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
-        this.i18nDao = i18nDao;
+//        this.i18nDao = i18nDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
@@ -694,12 +693,12 @@ public class AssetInfoFormatter {
     public String getAssetGroupSecondayName() {
         if (assetInfo.getAssetGroup() == null || assetInfo.getAssetGroupSecondary() == null) return null;
 
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
-
         String msgType = "assetGroupSecondary_" + assetInfo.getAssetGroup();
-        I18nMessage i18nMessage = i18nDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, String.valueOf(assetInfo.getAssetGroupSecondary()), UserContextService.getCurrentUserAccount().getSiteId());
-        if (i18nMessage == null) return null;
-        return i18nMessage.getValueZh();
+
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority(msgType, String.valueOf(assetInfo.getAssetGroupSecondary()), siteId);
+        if (msg == null) return null;
+
+        return msg.getValueZh();
     }
 
     public String getAssetValueCategoryName() {
