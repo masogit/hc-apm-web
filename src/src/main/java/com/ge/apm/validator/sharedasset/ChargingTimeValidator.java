@@ -24,6 +24,7 @@ public class ChargingTimeValidator implements Validator {
 
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+        logger.info("ChargingTimeValidator");
         if(value == null) {
             logger.warn("计费结束时间为空");
             return;
@@ -33,6 +34,17 @@ public class ChargingTimeValidator implements Validator {
 
         Date chargingBeginTime = (Date) chargingBeginTimeComponent.getValue();
         Date chargingEndTime = (Date) value;
+
+        if(chargingBeginTime.before(Date.from(Instant.now()))) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("pass time validation");
+            }
+        } else {
+            chargingBeginTimeComponent.setValid(false);
+            throw new ValidatorException(new FacesMessage(
+                    FacesMessage.SEVERITY_ERROR, "计费开始时间必须在当前时间之前",null
+            ));
+        }
 
         if(chargingEndTime.after(chargingBeginTime) && chargingEndTime.before(Date.from(Instant.now().plus(2, ChronoUnit.HOURS)))) {
             if(logger.isDebugEnabled()) {
