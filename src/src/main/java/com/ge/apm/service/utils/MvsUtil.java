@@ -74,11 +74,11 @@ public class MvsUtil {
 
 
         //asset dept org
-        OrgInfo assetDeptOrg = orgInfoDao.findByUid(assetInfo.getAssetDeptUID());
-        if (assetDeptOrg == null) {
-            logger.error("asset dept org not found using asset dept uid, {}", assetInfo.getAssetDeptUID());
+        OrgInfo clinicalDeptOrg = orgInfoDao.findByUid(assetInfo.getClinicalDeptUID());
+        if (clinicalDeptOrg == null) {
+            logger.error("clinical dept org not found using clnical dept uid, {}", assetInfo.getClinicalDeptUID());
         } else {
-            mvsAssetInfo.setAssetDeptName(assetDeptOrg.getName());
+            mvsAssetInfo.setClinicalDeptName(clinicalDeptOrg.getName());
         }
 
         mvsAssetInfo.setManufacture(assetInfo.getManufacture());
