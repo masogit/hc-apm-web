@@ -16,7 +16,7 @@
                     <p:ajax event="tabChange" listener="#{sharedAssetBatchController.onTabChange}" update="#{sharedAssetBatchController.currentTabId}"/>
                     
                     <p:tab title="批量借入" id="batchLease">
-                        <p:messages id="batchLeaseMessages" showDetail="false" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchLeaseMessages" showDetail="true" showSummary="false" closable="true" autoUpdate="true"/>
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
@@ -148,7 +148,7 @@
                     </p:tab>
 
                     <p:tab title="批量归还" id="batchReturn">
-                        <p:messages id="batchReturnMessages" showDetail="false" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchReturnMessages" showDetail="true" showSummary="false" closable="true" autoUpdate="true"/>
                         <p:fieldset legend="归还明细信息" style="margin-bottom:20px">
                             <h:form id="batchReturnForm">
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
