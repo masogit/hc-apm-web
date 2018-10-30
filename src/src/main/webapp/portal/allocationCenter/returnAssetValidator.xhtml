@@ -26,7 +26,7 @@
                                     binding="#{chargingBeginTimeComponent}"
                                     pattern="yyyy/MM/dd HH:mm:ss"
                                     value="#{sharedAssetBatchController.preAddAsset.sharedAssetReqDetail.chargingBeginTime}"
-                                    maxdate="#{sharedAssetBatchController.batchChargingBeginDate}"
+                                    maxdate="#{sharedAssetBatchController.preAddAsset.sharedAssetReqDetail.getMaxChargingBeginTime()}"
                                     showOn="button"
                                     showButtonPanel="true"
                                     navigator="true"
