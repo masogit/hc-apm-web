@@ -19,7 +19,7 @@
                         <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">实际价格(元)*</label>
+                        <label class="label">合同(元)*</label>
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" required="true" requiredMessage="实际价格(元) #{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <!--update-->
@@ -67,7 +67,7 @@
                         <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">实际价格(元)*</label>
+                        <label class="label">合同价格(元)*</label>
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" readonly="true" />
                     </h:panelGroup>
 
