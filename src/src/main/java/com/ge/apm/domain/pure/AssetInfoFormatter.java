@@ -20,7 +20,7 @@ public class AssetInfoFormatter {
     private List<OrgInfo> sites;
     private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
-    private OrgInfoRepository orgDao;
+//    private OrgInfoRepository orgDao;
 //    private I18nMessageRepository i18nDao;
     private int siteId;
 
@@ -32,7 +32,7 @@ public class AssetInfoFormatter {
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
-        this.orgDao = orgDao;
+//        this.orgDao = orgDao;
 //        this.i18nDao = i18nDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
@@ -239,13 +239,11 @@ public class AssetInfoFormatter {
     }
 
     public String getSiteName() {
-        for (OrgInfo orgInfo: sites) {
-            if (this.getSiteUID().equals(orgInfo.getUid())) {
-                return orgInfo.getName();
-            }
-        }
 
-        return null;
+        OrgInfo orgInfo = findDeptOrg(this.getSiteUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
     }
 
     public String getName() {
@@ -341,7 +339,7 @@ public class AssetInfoFormatter {
     public String getClinicalDeptName() {
         if (assetInfo.getClinicalDeptUID() == null) return null;
 
-        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
+        OrgInfo orgInfo = findDeptOrg(assetInfo.getClinicalDeptUID());
         if (orgInfo == null) return null;
 
         return orgInfo.getName();
@@ -369,7 +367,7 @@ public class AssetInfoFormatter {
 
     public String getAssetDeptName() {
         if (assetInfo.getAssetDeptUID() == null) return null;
-        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
+        OrgInfo orgInfo = findDeptOrg(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
         return orgInfo.getName();
@@ -726,6 +724,20 @@ public class AssetInfoFormatter {
         for (I18nMessage msg: msgList) {
             if (msg.getMsgKey().equals(item)) {
                 return msg.getValueZh();
+            }
+        }
+
+        return null;
+    }
+
+    private OrgInfo findDeptOrg(String orgUid) {
+        if (sites == null || sites.isEmpty()) {
+            return null;
+        }
+
+        for (OrgInfo orgInfo: sites) {
+            if (orgInfo.getUid().equals(orgUid)) {
+                return orgInfo;
             }
         }
 
