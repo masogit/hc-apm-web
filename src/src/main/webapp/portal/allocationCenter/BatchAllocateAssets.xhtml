@@ -16,7 +16,7 @@
                     <p:ajax event="tabChange" listener="#{sharedAssetBatchController.onTabChange}" update="#{sharedAssetBatchController.currentTabId}"/>
                     
                     <p:tab title="批量借入" id="batchLease">
-                        <p:messages id="batchLeaseMessages" showDetail="true" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchLeaseMessages" showDetail="false" closable="true" autoUpdate="true"/>
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
@@ -58,6 +58,7 @@
                                         <p:inputText value="#{sharedAssetBatchController.searchCriteria}"
                                                      placeholder="资产编号/设备编号/二维码"
                                                      required="true"
+                                                     requiredMessage="请输入资产编号/设备编号/二维码"
                                                      maxlength="100"
                                                      style="width: 175px"/>
                                         <p:commandButton style="zoom:0.8"
@@ -147,7 +148,7 @@
                     </p:tab>
 
                     <p:tab title="批量归还" id="batchReturn">
-                        <p:messages id="batchReturnMessages" showDetail="true" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchReturnMessages" showDetail="false" closable="true" autoUpdate="true"/>
                         <p:fieldset legend="归还明细信息" style="margin-bottom:20px">
                             <h:form id="batchReturnForm">
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -171,7 +172,12 @@
                                 </p:panelGrid>
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup >
-                                        <p:inputText value="#{sharedAssetBatchController.searchCriteria}" placeholder="资产编号/设备编号/二维码" maxlength="100" style="width: 175px"/>
+                                        <p:inputText value="#{sharedAssetBatchController.searchCriteria}"
+                                                     placeholder="资产编号/设备编号/二维码"
+                                                     required="true"
+                                                     requiredMessage="请输入资产编号/设备编号/二维码"
+                                                     maxlength="100"
+                                                     style="width: 175px"/>
                                         <p:commandButton style="zoom:0.8"
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
