@@ -879,6 +879,14 @@ public class SharedAssetReqDetail implements Serializable{
     }
 
     /**
+     * 设备归还时，计费开始时间最大值
+     * @return
+     */
+    public Date getMaxChargingBeginTime() {
+        return Date.from(Instant.now());
+    }
+
+    /**
      * 设备归还时，计费结束时间最大值
      * @return
      */
