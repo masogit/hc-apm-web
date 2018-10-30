@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.ge.apm.service.utils.RequestType;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
@@ -79,6 +82,14 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     @Setter
     private String leaseDeptName;
 
+    @Getter
+    @Setter
+    private Date maxChargingBeginTime;
+
+    @Getter
+    @Setter
+    private Date maxChargingEndTime;
+
     private SharedAssetStockService sharedAssetStockService;
     
     @Getter
@@ -90,11 +101,13 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         return null;
     }
 
+    @Override
     protected void init() {
         logger.info("Start to initialize component");
         sharedAssetStockService = WebUtil.getBean(SharedAssetStockService.class);
     }
 
+    @Override
     protected List<AssetInfo> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
         logger.info("thread: {}, searchCriteria: {}", Thread.currentThread().getId(), this.searchCriteria);
         Wrapper ew = new EntityWrapper();
@@ -132,9 +145,11 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
         if(reqDetail == null) {
             reqDetail = new SharedAssetReqDetail();
-            reqDetail.setChargingBeginTime(new Date());//默认计费开始时间为系统当前时间
+            //默认计费开始时间为系统当前时间
+            reqDetail.setChargingBeginTime(new Date());
             SharedAssetRequest leaseRequest = new SharedAssetRequest();
-            leaseRequest.setType("2");//默认请求类型:补登记
+            //默认请求类型:补登记
+            leaseRequest.setType(RequestType.REQ_FOR_RECORD.getIndex());
             reqDetail.setLeaseRequest(leaseRequest);
         }
         asset.setSharedAssetReqDetail(reqDetail);
@@ -146,8 +161,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         SharedAssetRequest leaseRequest = sharedAssetStockService.findRequestById(asset.getSharedAssetReqDetail().getBorrowId());
         if(reqDetail.getReturnRequest() == null) {
             SharedAssetRequest returnRequest = new SharedAssetRequest();
-            if(leaseRequest.getType() == null) {//默认请求类型和强制调拨类型相同
-                returnRequest.setType("2");//默认请求类型:补登记
+            //默认请求类型和强制调拨类型相同
+            if(leaseRequest.getType() == null) {
+                //默认请求类型:补登记
+                returnRequest.setType(RequestType.REQ_FOR_RECORD.getIndex());
             } else {
                 returnRequest.setType(leaseRequest.getType());
             }
@@ -156,6 +173,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         reqDetail.setChargingEndTime(new Date());
         asset.setSharedAssetReqDetail(reqDetail);
         super.setSelected(asset);
+
+        //设置最迟计费开始时间和最迟计费结束时间
+        maxChargingBeginTime = Date.from(Instant.now());
+        maxChargingEndTime = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
     }
 
     public void forceLeaseAsset() {
