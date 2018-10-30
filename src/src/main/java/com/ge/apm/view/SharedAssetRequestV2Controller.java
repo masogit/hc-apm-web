@@ -5,12 +5,15 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
+import com.ge.apm.service.utils.ChargingType;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import javaslang.Tuple3;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
@@ -21,6 +24,7 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -29,6 +33,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,6 +69,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String filterApplyTime = null;
     
     private UserAccount selectedAssignee;
+
+    @Getter
+    @Setter
+    private SharedAssetReqDetail preSelectReqDetail;
 
      public String getFilterApplyTime() {
         return filterApplyTime;
@@ -515,7 +525,36 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         WebUtil.addErrorMessage("获取该设备借用信息有误！");
                                         return; 
                                     }
-                                    SharedAssetReqDetail sard = detail_list.get(0);
+
+                                    if(preSelectReqDetail == null) {
+                                        preSelectReqDetail = detail_list.get(0);
+                                    }
+                                    RequestContext context = RequestContext.getCurrentInstance();
+                                    //半点计费结束时间需要特殊处理
+                                    if(ChargingType.PAY_HALF_HOUR.getIndex().equals(preSelectReqDetail.getChargingType())) {
+                                        //时间往前推
+                                        preSelectReqDetail.setChargingEndTime(this.setEndTime(times));
+                                    } else {
+                                        preSelectReqDetail.setChargingEndTime(times);
+                                    }
+                                    // perform validation for charging begin time
+                                    if(preSelectReqDetail.validateChargingBeginTime()) {
+                                        //TODO
+                                    } else {
+                                        WebUtil.addErrorMessage("计费开始时间必须在当前时间之前");
+                                        context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
+                                        return;
+                                    }
+                                    // perform validation for charging end time
+                                    if(preSelectReqDetail.validateChargingEndTime()) {
+                                        //TODO
+                                    } else {
+                                        WebUtil.addErrorMessage("计费结束时间必须在计费开始时间之后，并在未来两小时内");
+                                        context.addCallbackParam("isValidReqDetail", Boolean.FALSE);
+                                        return;
+                                    }
+
+                                    SharedAssetReqDetail sard = preSelectReqDetail;
                                     sard.setReturnId(Uid);
                                     sard.setAssetInfoId(infoVo.getUid());
                                     sard.setAssetName(infoVo.getName());
@@ -527,13 +566,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     String swaptypeid = applySwapType.getSharedAssetTypeId();
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
 
-                                    //时间往前推
-                                    if ("2".equals(swapTypeVo.getChargingType())){
-                                        sard.setChargingEndTime(this.setEndTime(times));
-                                    }else {
-                                        sard.setChargingEndTime(times);
-
-                                    }
                                     if(times==null){
                                         sard.setChargingEndTime(this.setEndTime(new Date()));
                                     }
@@ -577,6 +609,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         sardList.add(sard);
                                         selectedSard = sard;
                                     }
+                                    //should be safe to release preSelectReqDetail
+                                    preSelectReqDetail = null;
                                      
                                     //更改使用科室
 
@@ -1811,6 +1845,22 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             totalAmount = billingDetail._3.doubleValue();
         }
         return totalAmount;
+    }
+
+    public Date getMaxChargingBeginTime(SharedAssetReqDetail reqDetail) {
+        Date maxChargingBeginTime = new Date();
+        if(ChargingType.PAY_HALF_HOUR.getIndex().equals(reqDetail)) {
+            maxChargingBeginTime = this.setBeginTime(maxChargingBeginTime);
+        }
+        return maxChargingBeginTime;
+    }
+
+    public Date getMaxChargingEndTime(SharedAssetReqDetail reqDetail) {
+        Date maxChargingEndTime = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));;
+        if(ChargingType.PAY_HALF_HOUR.getIndex().equals(reqDetail)) {
+            maxChargingEndTime = this.setEndTime(maxChargingEndTime);
+        }
+        return maxChargingEndTime;
     }
 
 }

@@ -128,11 +128,13 @@
                         </h:panelGroup>
                         <h:panelGroup >
 <!--                            <p:growl id="growl2" showDetail="true" sticky="false" life="0"/> -->
-                            <p:messages id="messages" closable="true" style="width: 900px" />
+                            <p:messages id="messages" closable="true" autoUpdate="true" style="width: 900px" />
                              
                             <p:inputText id="applyAssetInfo" maxlength="100" style="width: 200px" placeholder="资产编号/设备编号/二维码"  value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
-                            <p:commandButton icon="ui-icon-search" class="btn btn-sm btn-gray" update="datalistDetail datalistOperation , messages"  
+                            <p:commandButton icon="ui-icon-search" class="btn btn-sm btn-gray"
+                                             update="datalistDetail datalistOperation , messages returnAssetValidator"
                                              action="#{sharedAssetRequestV2Controller.getAssetInfoR(sharedAssetRequestV2Controller.selected.msgEndTime)}"
+                                             oncomplete="openReturnAssetValidator(xhr, status, args)"
                                              actionListener="hideGrowl()"/>
                             
                         </h:panelGroup>
@@ -213,6 +215,7 @@
                 <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
                 <ui:include src="Msg.xhtml"/>
+                <ui:include src="returnAssetValidator.xhtml"/>
          </div>  
         </div> 
         <script>
@@ -223,6 +226,15 @@
                     
                 } else {
                     this.location.href = url;
+                }
+            }
+
+            function openReturnAssetValidator(xhr, status, args) {
+                console.log("openReturnAssetValidator" + args);
+                if (args.isValidReqDetail || typeof(args.isValidReqDetail) == "undefined")  {
+                    console.log(args.isValidReqDetail);
+                } else {
+                    PF('returnAssetValidator').show()
                 }
             }
 
