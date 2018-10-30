@@ -497,6 +497,16 @@
                                     <h:outputText value="#{item.isChecked?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'pmOwnerName'}">
+                                <p:column headerText="#{msg.pmOwnerName}" sortBy="#{item.pmOwnerName}" filterBy="#{item.pmOwnerName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.pmOwnerName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'pmOwnerTel'}">
+                                <p:column headerText="#{msg.pmOwnerTel}" sortBy="#{item.pmOwnerTel}" filterBy="#{item.pmOwnerTel}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.pmOwnerTel}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
