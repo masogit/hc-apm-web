@@ -41,7 +41,7 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
      * @param wrapper
      * @return
      */
-    @Select("SELECT ai.id,ai.uid,ai.depart_num,ai.name,ai.asset_dept_uid,ai.clinical_dept_uid," +
+    @Select("SELECT ai.id,ai.uid,ai.depart_num,ai.financing_num,ai.qr_code,ai.name,ai.asset_dept_uid,ai.clinical_dept_uid," +
             "sat.swap_name as swap_name,sat.unit_price as unit_price,sat.charging_type as charging_type " +
             "FROM asset_info ai INNER JOIN shared_asset_type sat ON ai.shared_asset_type=sat.id " +
             "WHERE 1 = 1 ${ew.sqlSegment}")
@@ -50,6 +50,8 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
         @Result(column = "uid", property = "uid"),
         @Result(column = "name", property = "name"),
         @Result(column = "depart_num", property = "departNum"),
+        @Result(column = "financing_num", property = "financingNum"),
+        @Result(column = "qr_code", property = "qrCode"),
         @Result(column = "asset_dept_uid", property = "assetDeptUID"),
         @Result(column = "swap_name", property = "sharedAssetType.swapName"),
         @Result(column = "unit_price", property = "sharedAssetType.unitPrice"),
