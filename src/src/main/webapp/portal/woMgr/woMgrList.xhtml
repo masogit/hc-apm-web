@@ -31,8 +31,7 @@
                     <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
                 </h:panelGrid>
 
-                <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
-                             selectionMode="single" selection="#{workOrderMgrController.selected}"
+                <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{workOrderMgrController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
