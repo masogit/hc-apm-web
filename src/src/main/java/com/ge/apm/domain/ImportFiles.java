@@ -28,8 +28,8 @@ import org.hibernate.annotations.Type;
 @Table(name = "import_files")
 public class ImportFiles {
 
-    public enum ImportFileType { EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel } 
-    
+    public enum ImportFileType { EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf }
+
     public static final String STATUS_COMPLETED = "COMPLETED";
     public static final String STATUS_STARTING = "STARTING";
     public static final String STATUS_STARTED = "STARTED";
@@ -50,7 +50,7 @@ public class ImportFiles {
     @Size(min = 1, max = 128)
     @Column(name = "file_name")
     private String fileName;
-    
+
     //文件保存路径
     @Size(min = 1, max = 128)
     @Column(name = "file_path")
@@ -172,7 +172,7 @@ public class ImportFiles {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
-    
+
 
     @Override
     public int hashCode() {
