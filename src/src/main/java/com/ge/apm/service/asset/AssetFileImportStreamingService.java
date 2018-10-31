@@ -187,7 +187,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldDropdownValue("资产状态", "setDeviceStatus", deviceStatusList, map, null);
                 assetRow.setFieldDropdownValue("资金来源2", "setCapitalSource2", capitalSource2List, map, null);
-                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", null);
+                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", true);
 
                 assetRow.setFieldStringValue("所属课题项目", "setSubjectProject");
                 assetRow.setFieldDateValue("验收日期", "setAcceptDate");
