@@ -150,15 +150,15 @@ public class AssetFileImportController {
     public void exportAssetExcelTemplate() throws IOException {
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         //field name using english
-        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         //field name using chinese
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
-        template.exportSampleAsset(orgList, exportColumnFields);
+        template.exportSampleAsset(orgList, exportFields);
 
         assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
     }

@@ -335,7 +335,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportExcel() throws IOException {
 
-        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 //        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
@@ -345,13 +345,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("load asset list to export");
         List<AssetInfo> assetList = getExportList();
 
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
-        template.exportAsset(assetList, sites, orgList, exportColumnFields);
+        template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
 

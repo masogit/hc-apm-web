@@ -127,6 +127,22 @@ public class CustomConfigService {
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
+    public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        List<String> exportFields = config.getAssetFields().entrySet().stream()
+                .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+                .map(Entry::getKey).collect(Collectors.toList());
+
+        //uuid is required to export, but not in custom config fields, so include it here.
+        exportFields.add("UUID");
+
+        List<String> localizedExportFields = CustomConfigConstant.getExportFields().entrySet().stream()
+                .filter(item -> exportFields.contains(item.getValue()))
+                .map(Entry::getKey)
+                .collect(Collectors.toList());
+
+        return localizedExportFields;
+    }
+
     public void removeAssetField(CustomConfigObject customConfigObject, String key) {
 
         if (CustomConfigConstant.getSystemFields().contains(key)) {
