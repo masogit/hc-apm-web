@@ -129,6 +129,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Map<String, Object> selectedObjectMap = new HashMap();
     private Map<String, Integer> woStatus = new HashMap<String, Integer>();
 
+    //选定科室过滤
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
+    //搜索字串
+    private String oneSearchStr;
+    //选定的院区
+    private OrgInfo selectSite;
+
     protected void init() {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
@@ -176,13 +184,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
     ///////////////////////////////////////////start
-//选定科室过滤
-    private String filterClinicalDeptOrg;
-    private String filterAssetDeptOrg;
-    //搜索字串
-    private String oneSearchStr;
-    //选定的院区
-    private OrgInfo selectSite;
+
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
         Integer stepId =v2_workOrder.getCurrentStepId();
@@ -252,20 +254,22 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
+
+
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+            fileterOrgName = (String) ((SelectEvent) event).getObject();
         }
 
-        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
-            filterClinicalDeptOrg = null;
+        if (!Strings.isNullOrEmpty(fileterOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterOrgName.equals(item.getName()))) {
+            fileterOrgName = null;
         }
 
-        if (filterClinicalDeptOrg != null) {
-            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+        if (fileterOrgName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(fileterOrgName)).collect(Collectors.toList());
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
@@ -338,36 +342,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
     }
 
-    public String getFileterOrgName() {
-        return fileterOrgName;
-    }
 
-    public void setFileterOrgName(String fileterOrgName) {
-        this.fileterOrgName = fileterOrgName;
-    }
-
-    public String getFileterAssetDeptOrgName() {
-        return fileterAssetDeptOrgName;
-    }
-
-    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
-        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
-    }
-    public void onSupplierChange() {
-        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
-        if (supplier == null)
-            itemDetail.setSupplier(supplierName);
-        else
-            itemDetail.setSupplier(supplier.getName());
-    }
-
-    public String getManHourShow() {
-        if (hourRequired) {
-            return "工时(小时)*";
-        } else {
-            return "工时(小时)";
-        }
-    }
 
     private Boolean isRating;
 
@@ -1586,6 +1561,46 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
     public void setSelectSite(OrgInfo selectSite) {
         this.selectSite = selectSite;
+    }
+
+
+    public String getFilterClinicalDeptOrg() {
+        return filterClinicalDeptOrg;
+    }
+
+    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
+        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
+    }
+
+    public String getFileterOrgName() {
+        return fileterOrgName;
+    }
+
+    public void setFileterOrgName(String fileterOrgName) {
+        this.fileterOrgName = fileterOrgName;
+    }
+
+    public String getFileterAssetDeptOrgName() {
+        return fileterAssetDeptOrgName;
+    }
+
+    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
+        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
+    }
+    public void onSupplierChange() {
+        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+        if (supplier == null)
+            itemDetail.setSupplier(supplierName);
+        else
+            itemDetail.setSupplier(supplier.getName());
+    }
+
+    public String getManHourShow() {
+        if (hourRequired) {
+            return "工时(小时)*";
+        } else {
+            return "工时(小时)";
+        }
     }
 }
 
