@@ -21,6 +21,8 @@
                                         value="#{sharedAssetRequestV2Controller.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true"
                                         showButtonPanel="true" navigator="true" rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType == '2'}"/>
                             <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm"  value="#{sharedAssetRequestV2Controller.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true"
+                                        mindate="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}"
+                                        maxdate="#{sharedAssetRequestV2Controller.getMaxChargingEndTime(sharedAssetRequestV2Controller.selectedSard)}"
                                         showButtonPanel="true" navigator="true" rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType != '2'}"/>
                         </h:panelGroup>
                         <h:panelGroup>

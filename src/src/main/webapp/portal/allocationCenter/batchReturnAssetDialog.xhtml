@@ -23,9 +23,9 @@
                         <label class="label">计费开始时间*</label>
                         <p:calendar timeZone="GMT+8"
                                     id="chargingBeginTime"
-                                    binding="#{chargingBeginTimeComponent}"
+                                    binding="#{beginTimeAtBatchReturn}"
                                     pattern="yyyy/MM/dd HH:mm:ss"
-                                    value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.chargingBeginTime}"
+                                    value="#{sharedAssetBatchController.preAddAsset.sharedAssetReqDetail.chargingBeginTime}"
                                     maxdate="#{sharedAssetBatchController.preAddAsset.sharedAssetReqDetail.getMaxChargingBeginTime()}"
                                     showOn="button"
                                     showButtonPanel="true"
@@ -52,7 +52,7 @@
                                     required="true"
                                     requiredMessage="计费结束时间 #{msg.ValidationRequire}">
                             <f:validator validatorId="chargingTimeValidator" />
-                            <f:attribute name="chargingBeginTimeComponent" value="#{chargingBeginTimeComponent}" />
+                            <f:attribute name="chargingBeginTimeComponent" value="#{beginTimeAtBatchReturn}" />
                         </p:calendar>
                     </h:panelGroup>
                     <h:panelGroup>
