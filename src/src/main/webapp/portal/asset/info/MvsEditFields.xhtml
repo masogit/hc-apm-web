@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsDeviceType}</label>
+            <p:selectOneMenu id="mvsDeviceType" value="#{assetInfoEditController.mvsAssetInfo.deviceType}" readonly="#{!userContextService.isMVSAdmin()}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('mvsDeviceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsAssetGroup}</label>
+            <p:selectOneMenu id="mvsAssetGroup" value="#{assetInfoEditController.mvsAssetInfo.mvsType}" readonly="#{!userContextService.isMVSAdmin()}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('mvsAssetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsDeviceType}</label>
+            <p:inputText id="mvsDeviceType_readonly" value="#{assetInfoDetailController.mvsAssetInfo.deviceType}" readonly="true"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.mvsAssetGroup}</label>
+            <p:inputText id="mvsAssetGroup_readonly" value="#{assetInfoDetailController.mvsAssetInfo.mvsType}" readonly="true"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.name}</label>
+            <p:inputText id="mvs_name" value="#{assetInfoEditController.mvsAssetInfo.name}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.aliasName}</label>
+            <p:inputText id="mvs_aliasName" value="#{assetInfoEditController.mvsAssetInfo.aliasName}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.hospitalId}</label>
+            <p:inputText id="mvs_siteName" value="#{assetInfoEditController.mvsAssetInfo.siteName}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalDeptName}</label>
+            <p:inputText id="mvs_clinicalDeptName" value="#{assetInfoEditController.mvsAssetInfo.clinicalDeptName}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.manufacture}</label>
+            <p:inputText id="mvs_manufacture" value="#{assetInfoEditController.mvsAssetInfo.manufacture}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.makerShortName}</label>
+            <p:inputText id="mvs_makerShortName" value="#{assetInfoEditController.mvsAssetInfo.makerShortName}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroup}</label>
+            <p:inputText id="mvs_assetGroup" value="#{assetInfoEditController.mvsAssetInfo.assetGroup}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.repairForm}</label>
+            <p:inputText id="mvs_repairForm" value="#{assetInfoEditController.mvsAssetInfo.repairForm}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.functionType}</label>
+            <p:inputText id="mvs_functionType" value="#{assetInfoEditController.mvsAssetInfo.functionType}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.serialNum}</label>
+            <p:inputText id="mvs_serialNum" value="#{assetInfoEditController.mvsAssetInfo.serialNum}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.systemId}</label>
+            <p:inputText id="mvs_systemId" value="#{assetInfoEditController.mvsAssetInfo.systemId}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.financingNum}</label>
+            <p:inputText id="mvs_financingNum" value="#{assetInfoEditController.mvsAssetInfo.financingNum}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:calendar id="mvs_factoryWarrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.factoryWarrantyDate}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:calendar id="mvs_warrantyDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.warrantyDate}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:inputText id="mvs_factoryWarrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.factoryWarrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:inputText id="mvs_warrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.warrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.QRCode}</label>
+            <p:inputText id="mvs_QRCode" value="#{assetInfoEditController.mvsAssetInfo.qrCode}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <label class="label">#{msg.comments}</label>
+            <p:inputText id="mvs_comments" value="#{assetInfoEditController.mvsAssetInfo.comments}" readonly="#{!userContextService.isMVSAdmin()}"/>
+        </h:panelGroup>
+
+    </p:panelGrid>
+
+
+</ui:composition>

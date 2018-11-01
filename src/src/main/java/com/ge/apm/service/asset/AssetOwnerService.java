@@ -8,12 +8,14 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,12 +65,14 @@ public class AssetOwnerService {
     public Page getAssetListEx(AssetInfo queryAsset) {
 
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-        OrgInfoFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        OrgInfoFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-        OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
-//        OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
+        //OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
+        //OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
+
         if (null != queryAsset.getAssetGroup()) {
             OrgInfoFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+        }
+        if(null != queryAsset.getAssetGroupSecondary()){
+            OrgInfoFilters.add(new SearchFilter("assetGroupSecondary", SearchFilter.Operator.EQ, queryAsset.getAssetGroupSecondary()));
         }
         if (null != queryAsset.getClinicalDeptUID()) {
             OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptUID()));
@@ -83,19 +87,21 @@ public class AssetOwnerService {
             OrgInfoFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId3()));
         }
 
+        OrgInfoFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        OrgInfoFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         OrgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         OrgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
-        if (null == queryAsset.getClinicalDeptUID()) {
-            OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
         //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
         Pageable pageable = new PageRequest(0, 5000);
         Page page = assetDao.findBySearchFilter(OrgInfoFilters, pageable);
+
         return page;
     }
 

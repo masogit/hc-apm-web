@@ -238,7 +238,7 @@
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{detailItem.apartsQuantity}" />
                                     </p:column>
-                                    <p:column headerText="#{msg.accessoryPrice}">
+                                    <p:column headerText="预估单价(元)">
                                         <h:outputText value="#{detailItem.partsPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
@@ -278,7 +278,7 @@
                                     <p:column headerText="到货">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
                                     </p:column>
-                                    <p:column headerText="实际价格(元)">
+                                    <p:column headerText="合同价格(元)">
                                         <h:outputText value="#{detailItem.closedPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>

@@ -22,13 +22,13 @@ public class UserScheduleRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public List<LinkedHashMap<String, Date>> createUserVacationRequest(String token, UserScheduleForm formData ){
+    public List<LinkedHashMap<String, Object>> createUserVacationRequest(String token, UserScheduleForm formData ){
         HttpEntity<UserScheduleForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.USER_VACATION_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-            return (List<LinkedHashMap<String, Date>>) responseMap.get("data");
+            return (List<LinkedHashMap<String, Object>>) responseMap.get("data");
         } else {
             return null;
         }

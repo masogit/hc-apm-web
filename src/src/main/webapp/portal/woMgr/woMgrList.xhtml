@@ -31,8 +31,7 @@
                     <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
                 </h:panelGrid>
 
-                <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
-                             selectionMode="single" selection="#{workOrderMgrController.selected}"
+                <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{workOrderMgrController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -58,13 +57,16 @@
                     <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
+                    <!--所属科室-->
                     <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                             <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
                                 <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
+
                                 <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" />
+
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
@@ -98,8 +100,8 @@
                         <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
                         <h:outputText value="#{item.currentStepId}"/>
                     </p:column>-->
-                    <!--当前处理步骤-->
-                    <p:column headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                    <!--当前处理步骤 for 待办-->
+                    <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
@@ -113,9 +115,29 @@
                         </f:facet>
                         <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
                     </p:column>
+                    <!--当前处理步骤 for 全部-->
+                    <p:column rendered="#{workOrderMgrController.queryIndex eq 11}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 2)}" itemValue="#{fieldMsg.fieldValue('woSteps', 2)}"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 5)}" itemValue="#{fieldMsg.fieldValue('woSteps', 5)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
+                    </p:column>
                     <p:column width="90" headerText="#{msg.intExtType}">
                         <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                     </p:column>
+
+
+
+
 <!--                        <p:column headerText="#{msg.currentPersonName}">
                         <h:outputText value="#{item.currentPersonName}"/>
                     </p:column>-->

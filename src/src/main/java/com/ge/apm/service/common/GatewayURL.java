@@ -44,9 +44,9 @@ public enum GatewayURL {
     ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList?requestId={requestId}"),
     ALLOCATION_ON_DUTY("/hcapmworkflowservice/api/apm/allocation/onDuty"),
     REMOTE_ASSIGN_REQUEST("/hcapmworkflowservice/api/apm/allocation/assign?requestId={requestId}&assigneeUID={assigneeUID}"),
-    RENT_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}"),
-    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut?clinicalDeptUID={clinicalDeptUID}&assetInfoUID={assetInfoUID}&reqType={reqType}&chargingBeginTime={chargingBeginTime}&chargingEndTime={chargingEndTime}&isIntact={isIntact}&compensationAmount={compensationAmount}&reqComment={reqComment}"),
-    REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}");
+    REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}"),
+    LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
+    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut");
 
     private final String url;
 

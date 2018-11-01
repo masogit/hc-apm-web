@@ -6,7 +6,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.sharedAsset.SharedAssetService;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.SupplierController;
@@ -2087,6 +2087,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 		this.selected = asset;
 	}
 
+	@Deprecated
 	public void forceReturnAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -2110,18 +2111,19 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                         + isIntact + ","
                         + compensationAmount + ","
                         + reqComment);
-                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType(),
-                                                                                            isIntact.toString(), compensationAmount.toString(), reqComment);
-                    LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
-                    log.info("****** force return response ******");
-                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
+//                    ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getReturnRequest().getType(),
+//                                                                                            isIntact.toString(), compensationAmount.toString(), reqComment);
+//                    LinkedHashMap<String, Object> rspBody = returnResponse.getBody();
+//                    log.info("****** force return response ******");
+//                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
 	}
-	
+
+	@Deprecated
 	public void forceAllocateAsset() {
 		if(this.selected != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -2134,10 +2136,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 			    if(assetDept != null) {
                     selected.setAssetDeptUID(assetDept.getUid());
                     log.info("assetDeptUID, assetInfoUID, chargingBeginTime, chargingEndTime, reqType： " + selected.getAssetDeptUID() + "," + selected.getUid() + ", " + beginTimeStr + ", " + endTimeStr + ", " + selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
-                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
-                    log.info("****** force allocate response ******");
-                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
+//                    ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(selected.getAssetDeptUID(), selected.getUid(), beginTimeStr, endTimeStr, selected.getSharedAssetReqDetail().getLeaseRequest().getType());
+//                    LinkedHashMap<String, Object> rspBody = borrowResponse.getBody();
+//                    log.info("****** force allocate response ******");
+//                    rspBody.forEach((k, v) -> log.info("key: " + k + ", value: " + v));
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();

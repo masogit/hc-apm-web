@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.sysutil;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.ImportFiles;
 import com.ge.apm.domain.UserAccount;
@@ -70,6 +71,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     }
 
     public void uploadDataFile(FileUploadEvent event) {
+        if(StringUtils.equalsIgnoreCase(fileType, ImportFiles.ImportFileType.SrReportPdf.toString())){
+            WebUtil.addErrorMessage("不支持服务报告类型文件上传，保存失败!");
+            return;
+        }
         if (this.fileList == null) {
             fileList = new ArrayList();
         }
@@ -101,7 +106,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
             dao.delete(file);
         }
     }
-    
+
     public void removeFile(Integer index) {
         fileService.deleteBatchUploadedFile(fileList.get(index)._1.getFilePath());
         fileList.remove(fileList.get(index));

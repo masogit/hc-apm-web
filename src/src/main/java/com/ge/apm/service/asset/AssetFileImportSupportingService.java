@@ -266,7 +266,10 @@ public class AssetFileImportSupportingService {
             asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
             asset.setIsValid(true);
-            asset.setDeviceStatus(0);
+            if (asset.getDeviceStatus() == null) {
+                asset.setDeviceStatus(0);
+            }
+
             asset.setIsDeleted(Boolean.FALSE);
 
             asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());

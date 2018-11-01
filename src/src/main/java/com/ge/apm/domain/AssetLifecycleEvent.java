@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,122 +11,141 @@ import java.util.Date;
  * Created by lsg on 31/1/2018.
  */
 @Entity
-@Table(name="asset_lifecycle_event")
+@Table(name = "asset_lifecycle_event")
 public class AssetLifecycleEvent implements Serializable {
 
-	@Id
-	@GeneratedValue(generator = "uuid")
-	@GenericGenerator(name = "uuid", strategy = "uuid")
-	@Column(name="id")
-	private String id;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name = "id")
+    private String id;
 
-	@Column(name="asset_uid")
-	private String assetUid;
+    @Column(name = "asset_uid")
+    private String assetUid;
 
-	@Column(name="asset_id")
-	private Integer assetId;
+    @Column(name = "asset_id")
+    private Integer assetId;
 
-	@Column(name="asset_name")
-	private String assetName;
+    @Column(name = "asset_name")
+    private String assetName;
 
-	@Column(name="event_type")
-	private Integer eventType; // 1-workOrder,2-pmOrder,3-外部工单(emg-external_work_order),4-外部保养,5-外部远程保养(ePM)
+    @Column(name = "event_type")
+    private Integer eventType; // 1-workOrder,2-pmOrder,3-外部工单(emg-external_work_order),4-外部保养,5-外部远程保养(ePM)
 
-	@Column(name="event_uid")
-	private String eventUid;
+    @Column(name = "event_uid")
+    private String eventUid;
 
-	@Column(name="create_time")
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date createTime;
+    @Column(name = "create_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
-	@Column(name="description")
-	private String description;
+    @Column(name = "description")
+    private String description;
 
-	@Column(name="status")
-	private Integer status;
+    @Column(name = "status")
+    private Integer status;
 
-	@JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
-	@ManyToOne(fetch = FetchType.EAGER)
-	private AssetInfo assetInfo;
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
 
-	public String getId() {
-		return id;
-	}
+    @JoinColumn(name = "report_object_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private V2_BlobObject reportObject;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getAssetUid() {
-		return assetUid;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setAssetUid(String assetUid) {
-		this.assetUid = assetUid;
-	}
+    public String getAssetUid() {
+        return assetUid;
+    }
 
-	public Integer getAssetId() {
-		return assetId;
-	}
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
 
-	public void setAssetId(Integer assetId) {
-		this.assetId = assetId;
-	}
+    public Integer getAssetId() {
+        return assetId;
+    }
 
-	public String getAssetName() {
-		return assetName;
-	}
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
+    }
 
-	public void setAssetName(String assetName) {
-		this.assetName = assetName;
-	}
+    public String getAssetName() {
+        return assetName;
+    }
 
-	public Integer getEventType() {
-		return eventType;
-	}
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
 
-	public void setEventType(Integer eventType) {
-		this.eventType = eventType;
-	}
+    public Integer getEventType() {
+        return eventType;
+    }
 
-	public String getEventUid() {
-		return eventUid;
-	}
+    public void setEventType(Integer eventType) {
+        this.eventType = eventType;
+    }
 
-	public void setEventUid(String eventUid) {
-		this.eventUid = eventUid;
-	}
+    public String getEventUid() {
+        return eventUid;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setEventUid(String eventUid) {
+        this.eventUid = eventUid;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Integer getStatus() {
-		return status;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+    public Integer getStatus() {
+        return status;
+    }
 
-	public AssetInfo getAssetInfo() {
-		return assetInfo;
-	}
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
-	public void setAssetInfo(AssetInfo assetInfo) {
-		this.assetInfo = assetInfo;
-	}
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    public String getReportStorageId() {
+        if (reportObject != null) {
+            return reportObject.getObjectStorageId();
+        }
+        return "";
+    }
+
+    public V2_BlobObject getReportObject() {
+        return reportObject;
+    }
+
+    public void setReportObject(V2_BlobObject reportObject) {
+        this.reportObject = reportObject;
+    }
 }

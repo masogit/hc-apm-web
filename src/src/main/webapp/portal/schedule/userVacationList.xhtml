@@ -63,6 +63,18 @@
 
                 </h:form>
 
+                <p:dialog header="休假注意" id="vacationResultDlg" widgetVar="vacationResultDialog" minHeight="40" appendTo="@this" modal="true" closable="false">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">和排班记录冲突的休假日期(是否继续休假)：</label>
+                            <h:outputText value="#{userVacationScheduleController.vacationInfo}" style="color: red"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:commandButton validateClient="true" value="确认" action="#{userVacationScheduleController.saveVacation}" icon="ui-icon-check" update=":userVacationScheduleListForm:datalist" oncomplete="PF('vacationResultDialog').hide()"/>
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('vacationResultDialog').hide()"/>
+                </p:dialog>
+
                 <ui:include src="userVacationEdit.xhtml"/>
                 <ui:include src="auditVacation.xhtml"/>
             </div>
@@ -78,6 +90,17 @@
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterScheduleDate', 'varScheduleDateFrom', 'varScheduleDateTo'); PF('panelFilterScheduleDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterScheduleDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
+
+        <script>
+            function saveVacationBefor(xhr, status, args){
+                if(args.flag == "Success"){
+                    //location.href = "workSchedule.xhtml";
+                }else if(args.flag == "Failed"){
+                    PF("userVacationScheduleEditDialog").hide();
+                    PF("vacationResultDialog").show();
+                }
+            }
+        </script>
 
     </ui:define>
 

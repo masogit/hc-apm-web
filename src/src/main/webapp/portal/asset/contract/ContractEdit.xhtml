@@ -42,12 +42,18 @@
                                 <p:inputText value="#{contractInfoEditController.selected.contractNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.foreignTradeNum}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.foreignTradeNum}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.contractType}</label>
                                 <p:selectOneMenu id="contractType" value="#{contractInfoEditController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}" disabled="#{not empty contractInfoEditController.selected.id}">
+                                    <p:ajax process="@this" listener="#{contractInfoEditController.onContractTypeChange}"  update="invoiceNum" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Parts')}" itemValue="Parts"  />
                                     <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -82,6 +88,12 @@
                                 <p:inputNumber decimalPlaces="0" maxValue="99" id="endMonths" value="#{contractInfoEditController.selected.endMonths}">
                                     <p:ajax listener="#{contractInfoEditController.onChangeEndDate}" update=":AssetContractEditForm:endTime"></p:ajax>
                                 </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup id="invoiceNum">
+                                <h:panelGroup  rendered="#{contractInfoEditController.selected.contractType ne 'Parts' and ( contractInfoEditController.selected.contractType ne 'Equipment')}">
+                                    <label class="label" >#{msg.invoiceNum}</label>
+                                    <p:inputText value="#{contractInfoEditController.selected.invoiceNum}" class="invoiceNum"/>
+                                </h:panelGroup>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
@@ -232,7 +244,7 @@
 
                         </p:dataTable>
                     </p:fieldset>
-                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id}">
+                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType ne 'Parts'}">
                         <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -251,7 +263,7 @@
                                 <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                             </p:column>
                             <p:column headerText="#{msg.arrivalDate}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
-                                <h:outputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.arrivalDate}">
+                                <h:outputText  value="#{item.arrivalListItem.arrivalList.arrivalDate}">
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
                             </p:column>
@@ -259,12 +271,12 @@
                                 <h:outputText  value="#{contractInfoEditController.isOnTimeArrival(item)}" />
                             </p:column>
                             <p:column headerText="#{msg.AssetArrivalListClinicalAckDate}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
-                                <h:outputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.clinicalAckDate}" >
+                                <h:outputText value="#{item.arrivalListItem.clinicalAckDate}" >
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="#{msg.arrivalListInvoiceNum}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
-                                <h:outputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.invoiceNum}" />
+                                <h:outputText value="#{item.arrivalListItem.arrivalList.invoiceNum}" />
                             </p:column>
                             <p:column headerText="安装状态" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.arrivalListItem.installStatus)}" />
@@ -274,16 +286,48 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-<!--                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>-->
-                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
-                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
                                 <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{selectAssetController.prepareDialogCallback(contractInfoEditController, ':AssetContractEditForm:itemList')}" 
-                                                process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
+                                                process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
+
+                        </p:dataTable>
+                    </p:fieldset>
+
+                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Parts'}">
+                        <p:dataTable value="#{contractInfoEditController.partsList}" var="item"
+                                     rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="20,50,100,500" rows="20" emptyMessage="#{msg.noRecordFound}" >
+                            <p:ajax event="rowSelect" />
+                            <p:column headerText="#{msg.AssetName}">
+                                <h:outputText value="#{item[0].name}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.serialNum}">
+                                <h:outputText value="#{item[0].serialNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalDeptName}"  >
+                                <h:outputText value="#{item[0].clinicalDeptName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.name}" >
+                                <h:outputText value="#{item[1].parts}" />
+                            </p:column>
+                            <p:column headerText="#{msg.arrivalListInvoiceNum}" >
+                                <h:outputText value="#{item[1].invoiceNum}" />
+                            </p:column>
+                            <p:column headerText="数量" >
+                                <h:outputText value="#{item[1].apartsQuantity}" />
+                            </p:column>
+                            <p:column width="140" >
+                                <f:facet name="header" >
+                                    <h:outputText value="操作" />
+                                </f:facet>
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item[0])}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                            </p:column>
 
                         </p:dataTable>
                     </p:fieldset>
@@ -296,49 +340,6 @@
 
         </div>
         <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-        <!--        <p:dialog id="viewContractItemDlg" widgetVar="viewContractItemDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="查看设备">
-                    <h:form id="viewContractItemForm" >
-                        <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
-                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                <h:panelGroup>
-                                    <label class="label">#{msg.contractAssetName}</label>
-                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.contractAssetName}" readonly="true"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.serialNum}</label>
-                                    <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.serialNum}" readonly="true"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.arrivalDate}</label>
-                                    <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.arrivalDate}" readonly="true">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                    </p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
-                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.clinicalAckDate}" readonly="true">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                    </p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">保修时长(年)</label>
-                                    <p:inputNumber value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyYear}" readonly="true" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.factoryWarrantyDate}</label>
-                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyDate}" readonly="true">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                    </p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.invoiceNum}" readonly="true" />
-                                </h:panelGroup>
-        
-                            </p:panelGrid>
-                        </h:panelGroup>
-                    </h:form>
-                </p:dialog>-->
         <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="添加/修改采购设备">
             <h:form id="addPurchaseForm" >
                 <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">

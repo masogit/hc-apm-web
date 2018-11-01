@@ -8,6 +8,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.SupplierController;
@@ -30,6 +31,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import webapp.framework.util.TimeUtil;
 
 @ManagedBean
 @ViewScoped
@@ -37,6 +39,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private CustomConfigService ccService;
     private AssetInfoRepository dao;
+    private MvsAssetInfoRepository mvsAssetInfoDao;
     private UserCommonService ucService;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
@@ -55,6 +58,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
+    private MvsUtil mvsUtil;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -82,9 +86,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
 
+    private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
+        mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         configService = WebUtil.getBean(ConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -105,6 +112,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         supplierController = WebUtil.getBean(SupplierController.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        mvsUtil = WebUtil.getBean(MvsUtil.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -143,6 +151,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
+        }
+
+        //ge mvc data
+        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
+            MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
+            if (found != null ) {
+                mvsAssetInfo = found;
+            }
         }
 
 
@@ -258,7 +275,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
+//        res.sort(new PinYinComparatorByName());
         return res;
     }
 
@@ -393,11 +410,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
         }
+        
+        //设置质保时间
+        if(null == selected.getFactoryWarrantyDate()){
+            if(selected.getAcceptDate() !=null && selected.getWarrantyMonth() != null){
+                selected.setFactoryWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
+            }
+        }
 
         if (selected.getUsageStatus() == null) {
             selected.setUsageStatus(3);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
+            if ("DFQ".equals(getAssetCodeConfig())) {
+                //删除资产编号时候会清除二维码
+                if (StringUtils.isNotEmpty(selected.getQrCode())) {
+                    qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
+                }
+            }
             selected.setQrCode(null);
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
@@ -429,6 +459,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
+
+        mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
+
         if (resultStatus) {
             return getListPageLink();
         } else {
@@ -462,7 +495,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         QrCodeLib oldQRCodeLib = qrCodeService.findByQrCode(selected.getQrCode(), selected.getSiteUID());
         if (null != oldQRCodeLib) {
-            qrCodeService.discardQrCode(qrCode, selected.getSiteUID());
+            qrCodeService.releaseQrCode(oldQRCodeLib.getQrCode(), selected.getSiteUID());
         }
         qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
         selected.setQrCode(qrCode);
@@ -924,5 +957,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
         this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
+
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
     }
 }

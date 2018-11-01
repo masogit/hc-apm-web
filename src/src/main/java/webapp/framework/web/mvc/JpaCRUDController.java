@@ -245,6 +245,15 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
                 this.setRowCount(rowCount);
                 List<E> listObject = pg.getContent();
 
+                if (rowCount > 0 && listObject.size() == 0) {
+                    //select the last page, then filter using some column, the original pageNumber is still used, so sometimes no data displayed.
+                    PageRequest newPageRequest = new PageRequest(0, pageRequest.getPageSize(), pageRequest.getSort());
+                    pg = doLoadData(newPageRequest);
+                    rowCount = (int) pg.getTotalElements();
+                    this.setRowCount(rowCount);
+                    listObject = pg.getContent();
+                }
+
                 return listObject;
             }
         };

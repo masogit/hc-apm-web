@@ -56,7 +56,7 @@ public class AllocationCenterUtils {
             totalTime = days + "天" + hours + "时" + minutes + "分";
         }
 
-        long startDurationInMinutes = 0l;
+        long startDurationInMinutes = 0L;
         double startPrice = 0d;
 
         if(reqDetail.getStartingDuration() != null && reqDetail.getStartingDuration() > 0) {
@@ -79,13 +79,13 @@ public class AllocationCenterUtils {
         }
 
         chargeTimeInMinutes = rentalTimeInMinutes;
-        switch(reqDetail.getChargingType()) {
-            case "1":
+        switch(ChargingType.getChargingTypeByIndex(reqDetail.getChargingType())) {
+            case PAY_PER:
                 totalTime = "1次";
                 unit = BigDecimal.valueOf(1);
                 totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
                 break;
-            case "2":
+            case PAY_HALF_HOUR:
                 //小时（半点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 30d);
@@ -93,19 +93,19 @@ public class AllocationCenterUtils {
                 if(chargeTimeInMinutes <= 0) {
                     totalAmount = BigDecimal.valueOf(startPrice);
                 } else {
-                    totalAmount = unit.divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP)
-                                      .multiply(BigDecimal.valueOf(unitPrice))
-                                      .add(BigDecimal.valueOf(startPrice));
+                    totalAmount = BigDecimal.valueOf(unitPrice).divide(BigDecimal.valueOf(2))
+                                                               .multiply(unit)
+                                                               .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
-            case "3":
+            case PAY_DAY:
                 //天
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / (60 * 24d));
                 unit = unit.setScale(0, RoundingMode.UP);
                 totalTime = unit.longValue() + "天";
                 totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));
                 break;
-            case "4":
+            case PAY_MINUTE:
                 //自然时间
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
@@ -117,7 +117,7 @@ public class AllocationCenterUtils {
                                       .add(BigDecimal.valueOf(startPrice));
                 }
                 break;
-            case "5":
+            case PAY_HOUR:
                 //小时（整点）
                 chargeTimeInMinutes = chargeTimeInMinutes - startDurationInMinutes;
                 unit = BigDecimal.valueOf(chargeTimeInMinutes / 60d);
@@ -135,7 +135,7 @@ public class AllocationCenterUtils {
         }
 
         if(logger.isInfoEnabled()) {
-            logger.info("reqDetailId: {}, rentalTimeInMinutes: {}, totalAmount: {}, startDurationInMinutes: {}, startPrice: {}", reqDetail.getId(), rentalTimeInMinutes, totalAmount, startDurationInMinutes, startPrice);
+            logger.info("reqDetailId: {}, rentalTimeInMinutes: {}, unitPrice: {}, totalAmount: {}, startDurationInMinutes: {}, startPrice: {}", reqDetail.getId(), rentalTimeInMinutes, unitPrice, totalAmount, startDurationInMinutes, startPrice);
         }
 
         billingDetail = new Tuple3(rentalTimeInMinutes, totalTime, totalAmount);

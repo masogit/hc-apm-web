@@ -23,7 +23,7 @@
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update="attrDescList"/>
 
                         <p:column headerText="子属性">
-                            <h:outputText value="#{attrDesc.name}" sortBy="#{attrDesc.name}"  filterBy="#{attrDesc.name}" filterMatchMode="LIKE"/>
+                            <h:outputText value="#{attrDesc.name}" />
                         </p:column>
                         <p:column headerText="子属性描述">
                             <h:outputText value="#{attrDesc.description}"/>

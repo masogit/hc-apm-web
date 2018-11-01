@@ -5,6 +5,7 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -19,24 +20,21 @@ public class AssetInfoFormatter {
     private List<OrgInfo> sites;
     private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
-    private OrgInfoRepository orgDao;
-    private I18nMessageRepository i18nDao;
-
-//    private boolean assetGroupSecondarySupport;
+//    private OrgInfoRepository orgDao;
+//    private I18nMessageRepository i18nDao;
+    private int siteId;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
-                              OrgInfoRepository orgDao,
-                              I18nMessageRepository i18nDao) {
+                              OrgInfoRepository orgDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
-        this.orgDao = orgDao;
-        this.i18nDao = i18nDao;
-
-//        this.assetGroupSecondarySupport = assetGroupSecondarySupport;
+//        this.orgDao = orgDao;
+//        this.i18nDao = i18nDao;
+        this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
     public Integer getAssetUsage() {
@@ -63,6 +61,19 @@ public class AssetInfoFormatter {
         String value = findMatchValue(assetInfo.getCapitalSource(), importService.capitalSourceList);
 
         return value;
+    }
+
+    public String getCapitalSource2AsString() {
+
+        if (assetInfo.getCapitalSource2() == null) return null;
+
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("capitalSource2", String.valueOf(assetInfo.getCapitalSource2()), siteId);
+
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+
+        return null;
     }
 
     public Integer getRiskGrade() {
@@ -125,6 +136,10 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetOwnerName3();
     }
 
+    public String getPmOwnerName() {
+        return assetInfo.getPmOwnerName();
+    }
+
     public String getAssetOwnerTel3() {
         return assetInfo.getAssetOwnerTel3();
     }
@@ -161,6 +176,18 @@ public class AssetInfoFormatter {
 
     public Integer getDeviceStatus() {
         return assetInfo.getDeviceStatus();
+    }
+
+    public String getDeviceStatusAsString() {
+        if (assetInfo.getDeviceStatus() == null) return null;
+
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("deviceStatus", String.valueOf(assetInfo.getDeviceStatus()), siteId);
+
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+
+        return null;
     }
 
     public String getComments() {
@@ -212,13 +239,11 @@ public class AssetInfoFormatter {
     }
 
     public String getSiteName() {
-        for (OrgInfo orgInfo: sites) {
-            if (this.getSiteUID().equals(orgInfo.getUid())) {
-                return orgInfo.getName();
-            }
-        }
 
-        return null;
+        OrgInfo orgInfo = findDeptOrg(this.getSiteUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
     }
 
     public String getName() {
@@ -314,7 +339,7 @@ public class AssetInfoFormatter {
     public String getClinicalDeptName() {
         if (assetInfo.getClinicalDeptUID() == null) return null;
 
-        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getClinicalDeptUID());
+        OrgInfo orgInfo = findDeptOrg(assetInfo.getClinicalDeptUID());
         if (orgInfo == null) return null;
 
         return orgInfo.getName();
@@ -342,7 +367,7 @@ public class AssetInfoFormatter {
 
     public String getAssetDeptName() {
         if (assetInfo.getAssetDeptUID() == null) return null;
-        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getAssetDeptUID());
+        OrgInfo orgInfo = findDeptOrg(assetInfo.getAssetDeptUID());
         if (orgInfo == null) return null;
 
         return orgInfo.getName();
@@ -602,6 +627,26 @@ public class AssetInfoFormatter {
         return assetInfo.getWarranty();
     }
 
+    public String getWarrantyAsString() {
+        if (assetInfo.getWarranty() == null) return null;
+
+        if (assetInfo.getWarranty()) {
+            I18nMessage msg = I18nMessageService.getMessageByMsgKeyUsingDefaultConfigAsLowestPriority("True2Yes", siteId);
+
+            if (msg != null) {
+                return msg.getValueZh();
+            }
+        } else {
+            I18nMessage msg = I18nMessageService.getMessageByMsgKeyUsingDefaultConfigAsLowestPriority("False2No", siteId);
+
+            if (msg != null) {
+                return msg.getValueZh();
+            }
+        }
+
+        return null;
+    }
+
     public String getMeteringNO() {
         return assetInfo.getMeteringNO();
     }
@@ -646,12 +691,12 @@ public class AssetInfoFormatter {
     public String getAssetGroupSecondayName() {
         if (assetInfo.getAssetGroup() == null || assetInfo.getAssetGroupSecondary() == null) return null;
 
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
-
         String msgType = "assetGroupSecondary_" + assetInfo.getAssetGroup();
-        I18nMessage i18nMessage = i18nDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, String.valueOf(assetInfo.getAssetGroupSecondary()), UserContextService.getCurrentUserAccount().getSiteId());
-        if (i18nMessage == null) return null;
-        return i18nMessage.getValueZh();
+
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority(msgType, String.valueOf(assetInfo.getAssetGroupSecondary()), siteId);
+        if (msg == null) return null;
+
+        return msg.getValueZh();
     }
 
     public String getAssetValueCategoryName() {
@@ -685,7 +730,21 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap(boolean allColumns) {
+    private OrgInfo findDeptOrg(String orgUid) {
+        if (sites == null || sites.isEmpty()) {
+            return null;
+        }
+
+        for (OrgInfo orgInfo: sites) {
+            if (orgInfo.getUid().equals(orgUid)) {
+                return orgInfo;
+            }
+        }
+
+        return null;
+    }
+
+    public Map<String, Object> buildExcelColumnKeyValueMap() {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -696,6 +755,7 @@ public class AssetInfoFormatter {
         map.put("维修负责人", this.getAssetOwnerName());
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
+        map.put("保养负责人", this.getPmOwnerName());
         map.put("所属院区", this.getSiteName());
         map.put("所属科室", this.getClinicalDeptName());
         map.put("使用科室", this.getAssetDeptName());
@@ -720,17 +780,11 @@ public class AssetInfoFormatter {
         map.put("2010国家编码", this.getNationalStandardCode());
         map.put("IT系统编号", this.getModalityId());
 
-        if (allColumns) {
-            map.put("采购价格", this.getPurchasePrice());
-            map.put("最终残值", this.getSalvageValue());
-            map.put("使用年限", this.getLifecycleInYear());
-            map.put("折旧算法", this.getDepreciationMethodAsString());
-        } else {
-            map.put("采购价格", null);
-            map.put("最终残值", null);
-            map.put("使用年限", null);
-            map.put("折旧算法", null);
-        }
+        map.put("采购价格", this.getPurchasePrice());
+        map.put("最终残值", this.getSalvageValue());
+        map.put("使用年限", this.getLifecycleInYear());
+        map.put("折旧算法", this.getDepreciationMethodAsString());
+
 
         map.put("出厂日期", this.getManufactDate());
         map.put("采购日期", this.getPurchaseDate());
@@ -765,6 +819,12 @@ public class AssetInfoFormatter {
         map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
         map.put("设备分类2级", this.getAssetGroupSecondayName());
         map.put("资产价值分类", this.getAssetValueCategoryName());
+        map.put("资产状态", this.getDeviceStatusAsString());
+        map.put("资金来源2", this.getCapitalSource2AsString());
+        map.put("是否对维保到期提醒", this.getWarrantyAsString());
+        map.put("所属课题项目", assetInfo.getSubjectProject());
+        map.put("质保时间（月）", assetInfo.getWarrantyMonth());
+        map.put("验收日期", assetInfo.getAcceptDate());
 
         map.put("UUID", this.getUid());
 

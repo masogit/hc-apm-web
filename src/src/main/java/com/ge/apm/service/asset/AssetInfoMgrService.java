@@ -70,6 +70,8 @@ public class AssetInfoMgrService {
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
+        asset.setFinancingNum(null);
+        asset.setDepartNum(null);
         asset.setQrCode(null);
         assetDao.save(asset);
     }

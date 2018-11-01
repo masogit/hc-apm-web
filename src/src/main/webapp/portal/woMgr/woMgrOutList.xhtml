@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -7,49 +8,54 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition>
-            <div class="ui-g-12 card">
-                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+    <div class="ui-g-12 card">
+        <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
-                <h:form id="woMgrOutListForm">
+        <h:form id="woMgrOutListForm">
 
-                    <p:dataTable id="datalist" value="#{assetLifecycleEventController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{assetLifecycleEventController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
+            <p:dataTable id="datalist" value="#{assetLifecycleEventController.lazyModel}" var="item"
+                         widgetVar="varDataList"
+                         selectionMode="single" selection="#{assetLifecycleEventController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{assetLifecycleEventController.onSelectAssetLifecycleEvent}"/>
-                        <p:ajax event="filter" listener="#{assetLifecycleEventController.onFilter}"/>
+                <p:ajax event="rowSelect" listener="#{assetLifecycleEventController.onSelectAssetLifecycleEvent}"/>
+                <p:ajax event="filter" listener="#{assetLifecycleEventController.onFilter}"/>
 
-                      <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
-                        </p:column>
+                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                          filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetName}"/>
+                </p:column>
 
-                        <p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.eventUid}"/>
-                        </p:column>
-                        <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.createTime}"/>
-                        </p:column>
-                              <p:column headerText="状态">
-                                  <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
-                              </p:column>
-                        <!--
-                                              <p:column headerText="请求编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
-                                                  <h:outputText value="#{item.srNum}"/>
-                                              </p:column>-->
-                    </p:dataTable>
-                </h:form>
+                <p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}"
+                          filterMatchMode="LIKE">
+                    <h:outputText value="#{item.eventUid}"/>
+                </p:column>
+                <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
+                          filterMatchMode="LIKE">
+                    <h:outputText value="#{item.createTime}"/>
+                </p:column>
+                <p:column headerText="状态">
+                    <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
+                </p:column>
 
-            </div>
+                <p:column headerText="报告">
+                    <p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}"
+                            rendered="#{not empty item.reportStorageId}">
+                        <h:outputText value="下载"/>
+                    </p:link>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+    </div>
 
 
-
-
-        <script>
+    <script>
             afterPageLoad = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 var isActive = "#{userContextService.isActive()}";
@@ -57,8 +63,10 @@
                     PF('ActiveDlg').show();
                 }
             }
-        </script>
 
+
+
+    </script>
 
 </ui:composition>
 </html>
