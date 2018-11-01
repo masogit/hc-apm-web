@@ -21,7 +21,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ContractInfo implements Serializable {
 
     public enum ContractType {
-        Full, Artificial, Other, Equipment
+        Full, Artificial, Other, Equipment, Parts
     }
 
     public enum PriceType {
@@ -52,6 +52,15 @@ public class ContractInfo implements Serializable {
     // 合同编号    
     @Column(name = "contract_num")
     private String contractNum;
+    
+    // 外贸合同号
+    @Column(name = "foreign_trade_num")
+    private String foreignTradeNum;
+    
+    // 发票号
+    @Column(name = "invoice_num")
+    private String invoiceNum;
+    
 
     //开始时间
     @Basic(optional = true)
@@ -535,6 +544,22 @@ public class ContractInfo implements Serializable {
 
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
+    }
+
+    public String getForeignTradeNum() {
+        return foreignTradeNum;
+    }
+
+    public void setForeignTradeNum(String foreignTradeNum) {
+        this.foreignTradeNum = foreignTradeNum;
+    }
+
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
     }
 
     @Override

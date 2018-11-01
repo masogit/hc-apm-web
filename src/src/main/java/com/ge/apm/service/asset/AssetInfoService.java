@@ -74,12 +74,6 @@ public class AssetInfoService {
         return assetList;
     }
 
-    public List<ContractInfoItem> getContractList(String assetUid) {
-//        return contractDao.findByAssetId(assetId);
-            //return contractItemDao.findByAssetUid(assetUid);
-        return contractItemDao.getByAssetUidAndContractType(assetUid);
-    }
-
     public List<OrgInfo> getHospitalList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         return uaaService.getUserAccessibleSiteList(user.getUid());

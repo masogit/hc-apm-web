@@ -98,7 +98,7 @@
                             <p:column headerText="#{msg.accessoryQuantity}">
                                 <h:outputText value="#{detailItem.apartsQuantity}"/>
                             </p:column>
-                            <p:column headerText="#{msg.accessoryPrice}">
+                            <p:column headerText="预估单价(元)">
                                 <h:outputText value="#{detailItem.partsPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
@@ -138,7 +138,7 @@
                             <p:column headerText="到货">
                                 <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" rendered="#{detailItem.id ne '000'}"/>
                             </p:column>
-                            <p:column headerText="实际价格(元)">
+                            <p:column headerText="合同价格(元)">
                                 <h:outputText value="#{detailItem.closedPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
@@ -170,7 +170,7 @@
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
-                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"  update="pictureList"   process="@this"> 下载文件
+                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > 下载文件
                                 </p:link>
                             </h:panelGrid>
                         </p:panel>

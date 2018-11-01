@@ -177,12 +177,12 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
-                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
+                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
                                 </p:autoComplete>
                             </h:panelGroup>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['parentAssetId']}">
-                                <h:panelGroup id="parentAssetList">
+                                <h:panelGroup id="parentAssetList" class="parentAssetList">
                                     <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}" 
                                                     requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
@@ -222,11 +222,11 @@
                                     <label class="label">#{msg.financingNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired}" 
                                                   requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}">
-                                        <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
-                                        <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
+                                        <p:ajax event="keyup" process="@this" update="@(.generateFinancingNum)"/>
+                                        <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="@(.generateFinancingNum) @(.financingNum)"/>
                                     </p:inputText>
-                                    <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
-                                                     update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
+                                    <p:commandButton  validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
+                                                     update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@(.financingNum)"/>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
@@ -302,7 +302,7 @@
                                     <label class="label">#{msg.assetOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName'].arrivalRequired}" 
                                                     requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                        <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
+                                        <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="@(.assetOwnerName2) @(.assetOwnerName3)" process="@this"/>
                                         <p:column>
                                             <h:outputText value="#{t.name}"/>
                                         </p:column>
@@ -313,7 +313,7 @@
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName2']}">
-                                <h:panelGroup >
+                                <h:panelGroup class="assetOwnerName2">
                                     <label class="label">#{msg.assetOwnerName2}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName2'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete id="assetOwnerName2" value="#{assetInstallationController.owner2}" converter="userAccountConverter" dropdown="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName2'].arrivalRequired}" 
                                                     requiredMessage="#{msg.assetOwnerName2} #{msg.ValidationRequire}" forceSelection="true" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
@@ -328,7 +328,7 @@
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetOwnerName3']}">
-                                <h:panelGroup >
+                                <h:panelGroup class="assetOwnerName3">
                                     <label class="label">#{msg.assetOwnerName3}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetOwnerName3'].arrivalRequired? '*':''}</span></label>
                                     <p:autoComplete id="assetOwnerName3" value="#{assetInstallationController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['assetOwnerName3'].arrivalRequired}" 
                                                     requiredMessage="#{msg.assetOwnerName3} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
@@ -345,7 +345,7 @@
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['clinicalOwnerName']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.clinicalOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired? '*':''}</span></label>
-                                    <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
+                                    <p:autoComplete class="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
                                                     requiredMessage="#{msg.clinicalOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
                                         <p:column>
@@ -595,7 +595,7 @@
 
                         <p:commandButton immediate="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
-                        <p:commandButton validateClient="false" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
+                        <p:commandButton immediate="true" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInstallationController.returnAction}" immediate="true" />

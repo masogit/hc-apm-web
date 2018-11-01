@@ -3,25 +3,19 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -30,8 +24,6 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -255,6 +247,13 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
     private Date factoryWarrantyDate;//质保日期
+    
+    @Column(name = "accept_date")
+    @Temporal(TemporalType.DATE)
+    private Date acceptDate;//验收日期
+    
+    @Column(name = "warranty_month")
+    private Integer warrantyMonth;//质保时间（月）
 
     @Size(max = 256)
     @Column(name = "qr_code")
@@ -498,8 +497,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "pm_owner_tel")
     private String pmOwnerTel;
 
-    @Column(name = "mvs_eqip")
-    private Integer mvsEqip;
+    @Column(name = "mvs_equip")
+    private Integer mvsEquip;
+    
+    // 所属课题项目
+    @Column(name = "subject_project")
+    private String subjectProject;
 
     @Transient
     private int lineNum;
@@ -521,6 +524,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Boolean canReturn;
+
+    @Transient
+    private OrgInfo clinicalDeptOrg;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -568,6 +574,14 @@ public class AssetInfo implements ChineseName,Serializable {
             rst = Boolean.TRUE;
         }
         return rst;
+    }
+
+    public OrgInfo getClinicalDeptOrg() {
+        return clinicalDeptOrg;
+    }
+
+    public void setClinicalDeptOrg(OrgInfo clinicalDeptOrg) {
+        this.clinicalDeptOrg = clinicalDeptOrg;
     }
 
     public Integer getAssetUsage() {
@@ -1628,14 +1642,38 @@ public class AssetInfo implements ChineseName,Serializable {
         this.pmOwnerTel = pmOwnerTel;
     }
 
-    public Integer getMvsEqip() {
-        return mvsEqip;
+    public Integer getMvsEquip() {
+        return mvsEquip;
     }
 
-    public void setMvsEqip(Integer mvsEqip) {
-        this.mvsEqip = mvsEqip;
+    public void setMvsEquip(Integer mvsEquip) {
+        this.mvsEquip = mvsEquip;
     }
 
+    public Date getAcceptDate() {
+        return acceptDate;
+    }
+
+    public void setAcceptDate(Date acceptDate) {
+        this.acceptDate = acceptDate;
+    }
+
+    public Integer getWarrantyMonth() {
+        return warrantyMonth;
+    }
+
+    public void setWarrantyMonth(Integer warrantyMonth) {
+        this.warrantyMonth = warrantyMonth;
+    }
+
+    public String getSubjectProject() {
+        return subjectProject;
+    }
+
+    public void setSubjectProject(String subjectProject) {
+        this.subjectProject = subjectProject;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1671,5 +1709,43 @@ public class AssetInfo implements ChineseName,Serializable {
     	this.departNum=departNum;
     	this.serialNum=serialNum;
     	this.functionType=functionType;
+    }
+
+    public Map<String, Object> buildLeaseReqHeader() {
+        Map<String, Object> reqHeader = new HashMap<>();
+        reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
+        reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        reqHeader.put("details", new LinkedList<Map<String, String>>());
+        return reqHeader;
+    }
+
+    public Map<String, Object> buildLeaseReqDetail() {
+        Map<String, Object> reqDetail = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        reqDetail.put("assetInfoUID", this.getUid());
+        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
+        reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
+        return reqDetail;
+    }
+
+
+    public Map<String, Object> buildReturnReqHeader() {
+        Map<String, Object> reqHeader = new HashMap<>();
+        reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
+        reqHeader.put("type", this.getSharedAssetReqDetail().getReturnRequest().getType());
+        reqHeader.put("details", new LinkedList<Map<String, String>>());
+        return reqHeader;
+    }
+
+    public Map<String, Object> buildReturnReqDetail() {
+        Map<String, Object> reqDetail = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        reqDetail.put("assetInfoUID", this.getUid());
+        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
+        reqDetail.put("chargingEndTime", sdf.format(this.getSharedAssetReqDetail().getChargingEndTime()));
+        reqDetail.put("isIntact", this.getSharedAssetReqDetail().getIntact());
+        reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
+        reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
+        return reqDetail;
     }
 }

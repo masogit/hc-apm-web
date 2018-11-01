@@ -40,7 +40,16 @@ public class FieldValueMessageController implements Serializable{
     public static String fieldValue(String fieldName, String msgKey){
         return doGetFieldValue(fieldName, msgKey);
     }
-    
+    public static List<I18nMessage> getFieldValueListByMsgType(String fieldName){
+        Integer instId = -1;
+        try{
+            instId = UserContextService.getCurrentUserAccount().getSiteId();
+        }
+        catch(Exception ex){
+        }
+
+        return getFieldValueList(fieldName, instId);
+    }
     public  List<I18nMessage> getFieldValueList(String fieldName){
         Integer instId = -1;
         try{

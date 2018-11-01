@@ -14,7 +14,7 @@
                     <p:fieldset id="basic" legend="公共配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup>
-                                <label class="label">#{msg.orgId}*</label>
+                                <label class="label">#{msg.hospitalId}*</label>
                                 <p:inputText id="selectedUserOrgName" value="#{v2_WorkflowConfigController.getOrgFullName(v2_WorkflowConfigController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                                 <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                                 <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">

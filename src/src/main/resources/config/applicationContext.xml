@@ -22,224 +22,222 @@
 
 			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
-  <description><![CDATA[
+    <description><![CDATA[
 		Main entry point for spring configuration
 	]]></description>
 
-  <task:executor id="taskExecutor" pool-size="5"/>
-  <task:scheduler id="taskScheduler" pool-size="5"/>
-  <task:annotation-driven executor="taskExecutor" scheduler="taskScheduler"/>
-  <!-- context -->
-  <context:component-scan base-package="webapp.framework,com.ge.apm"
-                          name-generator="webapp.framework.util.WithoutTrailingImplBeanNameGenerator">
-    <!-- Let springmvc context scan the web package -->
-    <context:exclude-filter type="regex" expression="webapp/framework/web/.*,com/ge/apm/web/.*"/>
-  </context:component-scan>
-  <context:property-placeholder
-          location="classpath*:database.properties,classpath*:hibernate.properties,classpath*:risPacs.properties"/>
+    <task:executor id="taskExecutor" pool-size="5"/>
+    <task:scheduler id="taskScheduler" pool-size="5"/>
+    <task:annotation-driven executor="taskExecutor" scheduler="taskScheduler"/>
+    <!-- context -->
+    <context:component-scan base-package="webapp.framework,com.ge.apm"
+                            name-generator="webapp.framework.util.WithoutTrailingImplBeanNameGenerator">
+        <!-- Let springmvc context scan the web package -->
+        <context:exclude-filter type="regex" expression="webapp/framework/web/.*,com/ge/apm/web/.*"/>
+    </context:component-scan>
+    <context:property-placeholder
+            location="classpath*:database.properties,classpath*:hibernate.properties,classpath*:risPacs.properties"/>
 
-  <!-- security -->
-  <security:authentication-manager>
-    <security:authentication-provider user-service-ref="userDetailsService"/>
-  </security:authentication-manager>
-  <security:global-method-security jsr250-annotations="enabled"/>
+    <!-- security -->
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userDetailsService"/>
+    </security:authentication-manager>
+    <security:global-method-security jsr250-annotations="enabled"/>
 
-  <!-- spring transaction -->
-  <tx:annotation-driven/>
+    <!-- spring transaction -->
+    <tx:annotation-driven/>
 
-  <bean id="cloudCfg" class="com.ge.apm.service.utils.CloudCfg"/>
+    <bean id="cloudCfg" class="com.ge.apm.service.utils.CloudCfg"/>
 
-  <!-- datasource -->
-  <bean id="risDataSource" class="org.apache.commons.dbcp.BasicDataSource"
-        destroy-method="close"
-        lazy-init="true"
-        p:defaultAutoCommit="true"
-        p:initialSize="1"
-        p:maxActive="20"
-        p:maxIdle="5"
-        p:maxWait="10000"
-        p:poolPreparedStatements="true"
-        p:removeAbandoned="true"
-        p:removeAbandonedTimeout="60"
-        p:testOnBorrow="true" p:testOnReturn="true" p:testWhileIdle="true"
-        p:validationQuery="select 1" p:timeBetweenEvictionRunsMillis="1000" p:minEvictableIdleTimeMillis="1000">
-    <property name="driverClassName" value="org.postgresql.Driver" />
-    <property name="url" value="#{systemEnvironment['PG_URL'] ?: cloudCfg.jdbcUrl}"/>
-    <property name="username" value="#{systemEnvironment['PG_USERNAME'] ?: cloudCfg.jdbcUserName}"/>
-    <property name="password" value="#{systemEnvironment['PG_PASSWORD'] ?: cloudCfg.jdbcPassword}"/>
-  </bean>
-
-  <!--
-    <bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-      <property name="url" value="#{cloudCfg.jdbcUrl}"/>
-      <property name="username" value="#{cloudCfg.jdbcUserName}"/>
-      <property name="password" value="#{cloudCfg.jdbcPassword}"/>
-      <property name="initialSize" value="1"/>
-      <property name="minIdle" value="1"/>
-      <property name="maxActive" value="50"/>
-      <!- -<property name="maxWait" value="60000"/>- ->
-      <property name="timeBetweenEvictionRunsMillis" value="60000"/>
-      <property name="minEvictableIdleTimeMillis" value="300000"/>
-      <property name="validationQuery" value="SELECT 'x'"/>
-      <property name="testWhileIdle" value="true"/>
-      <property name="testOnBorrow" value="false"/>
-      <property name="testOnReturn" value="false"/>
-      <property name="removeAbandoned" value="true"/>
-      <property name="removeAbandonedTimeout" value="10"/>
-      <property name="logAbandoned" value="true"/>
-      <property name="poolPreparedStatements" value="true"/>
-      <property name="maxPoolPreparedStatementPerConnectionSize" value="5000"/>
-      <property name="proxyFilters">
-        <list>
-          <ref bean="statFilter"/>
-          <ref bean="wallFilter"/>
-          <ref bean="slf4jLogFilter"/>
-        </list>
-      </property>
+    <!-- datasource -->
+    <bean id="risDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close"
+          lazy-init="true"
+          p:defaultAutoCommit="true"
+          p:initialSize="1"
+          p:maxActive="20"
+          p:maxIdle="5"
+          p:maxWait="10000"
+          p:poolPreparedStatements="true"
+          p:removeAbandoned="true"
+          p:removeAbandonedTimeout="60"
+          p:testOnBorrow="true" p:testOnReturn="true" p:testWhileIdle="true"
+          p:validationQuery="select 1" p:timeBetweenEvictionRunsMillis="1000" p:minEvictableIdleTimeMillis="1000">
+      <property name="driverClassName" value="org.postgresql.Driver" />
+      <property name="url" value="#{systemEnvironment['PG_URL'] ?: cloudCfg.jdbcUrl}"/>
+      <property name="username" value="#{systemEnvironment['PG_USERNAME'] ?: cloudCfg.jdbcUserName}"/>
+      <property name="password" value="#{systemEnvironment['PG_PASSWORD'] ?: cloudCfg.jdbcPassword}"/>
     </bean>
-  -->
 
-  <bean id="statFilter" class="com.alibaba.druid.filter.stat.StatFilter">
-    <property name="logSlowSql" value="true"/>
-    <property name="slowSqlMillis" value="5000"/>
-    <property name="mergeSql" value="true"/>
-  </bean>
+    <!--<bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="#{cloudCfg.jdbcUrl}"/>
+        <property name="username" value="#{cloudCfg.jdbcUserName}"/>
+        <property name="password" value="#{cloudCfg.jdbcPassword}"/>
+        <property name="initialSize" value="1"/>
+        <property name="minIdle" value="1"/>
+        <property name="maxActive" value="50"/>
+        <property name="maxWait" value="60000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="removeAbandoned" value="true"/>
+        <property name="removeAbandonedTimeout" value="10"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="5000"/>
+        <property name="proxyFilters">
+            <list>
+                <ref bean="statFilter"/>
+                <ref bean="wallFilter"/>
+                <ref bean="slf4jLogFilter"/>
+            </list>
+        </property>
+    </bean>-->
 
-  <bean id="wallFilter" class="com.alibaba.druid.wall.WallFilter">
-    <property name="dbType" value="postgresql"/>
-    <property name="logViolation" value="true"/>
-    <property name="throwException" value="false"/>
-  </bean>
+    <bean id="statFilter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="logSlowSql" value="true"/>
+        <property name="slowSqlMillis" value="5000"/>
+        <property name="mergeSql" value="true"/>
+    </bean>
 
-  <bean id="slf4jLogFilter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
-    <property name="statementExecutableSqlLogEnable" value="true"/>
-    <property name="connectionLogErrorEnabled" value="true"/>
-    <property name="statementLogErrorEnabled" value="true"/>
-    <property name="resultSetLogErrorEnabled" value="true"/>
-  </bean>
+    <bean id="wallFilter" class="com.alibaba.druid.wall.WallFilter">
+        <property name="dbType" value="postgresql"/>
+        <property name="logViolation" value="true"/>
+        <property name="throwException" value="false"/>
+    </bean>
 
-  <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor"/>
+    <bean id="slf4jLogFilter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+        <property name="statementExecutableSqlLogEnable" value="true"/>
+        <property name="connectionLogErrorEnabled" value="true"/>
+        <property name="statementLogErrorEnabled" value="true"/>
+        <property name="resultSetLogErrorEnabled" value="true"/>
+    </bean>
 
-  <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
-        scope="prototype">
-    <property name="patterns">
-      <list>
-        <value>com.ge.apm.*</value>
-      </list>
-    </property>
-  </bean>
+    <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor"/>
 
-  <aop:config proxy-target-class="true">
-    <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/>
-  </aop:config>
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+          scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>com.ge.apm.*</value>
+            </list>
+        </property>
+    </bean>
 
-
-  <bean id="connectionProvider" class="com.github.davidmoten.rx.jdbc.ConnectionProviderFromDataSource" destroy-method="close">
-    <constructor-arg ref="risDataSource"/>
-  </bean>
-
-  <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:shared="true"/>
-  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="ehcache"/>
-  <cache:annotation-driven cache-manager="cacheManager"/>
-  <!-- jmx -->
-  <context:mbean-server/>
-  <context:mbean-export registration="ignoreExisting" default-domain="ri"/>
-
-  <!-- jdbc template -->
-  <bean id="jdbcTemplate"
-        class="org.springframework.jdbc.core.JdbcTemplate" abstract="false" lazy-init="false" autowire="default">
-    <property name="dataSource">
-      <ref bean="risDataSource"/>
-    </property>
-  </bean>
-
-  <!-- jpa -->
-  <jpa:repositories base-package="webapp.framework.dao,com.ge.apm.dao"
-                    factory-class="webapp.framework.dao.GenericRepositoryFactoryBean"
-                    transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
-
-  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
-        p:entityManagerFactory-ref="entityManagerFactory">
-    <description>Please read http://www.springframework.org/docs/reference/transaction.html</description>
-  </bean>
-  <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-    <description>Allow spring to configure hibernate specific settings</description>
-  </bean>
+    <aop:config proxy-target-class="true">
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/>
+    </aop:config>
 
 
-  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-        p:dataSource-ref="risDataSource"
-        p:persistenceUnitName="risSiPU"
-        p:jpaVendorAdapter-ref="hibernateJpaVendorAdapter">
-    <property name="jpaProperties">
-      <props>
-        <!--#hibernate.dialect=org.hibernate.dialect.DerbyDialect-->
-        <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
-        <prop key="hibernate.connection.useUnicode">true</prop>
-        <prop key="hibernate.connection.charSet">UTF-8</prop>
+    <bean id="connectionProvider" class="com.github.davidmoten.rx.jdbc.ConnectionProviderFromDataSource" destroy-method="close">
+        <constructor-arg ref="risDataSource"/>
+    </bean>
 
-        <!--# 2d level cache-->
-        <prop key="hibernate.cache.use_query_cache">true</prop>
-        <prop key="hibernate.cache.use_second_level_cache">true</prop>
-        <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.EhCacheRegionFactory</prop>
-        <prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:shared="true"/>
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="ehcache"/>
+    <cache:annotation-driven cache-manager="cacheManager"/>
+    <!-- jmx -->
+    <context:mbean-server/>
+    <context:mbean-export registration="ignoreExisting" default-domain="ri"/>
 
-        <!--# misc-->
-        <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
-        <prop key="hibernate.jdbc.use_scrollable_resultset">false</prop>
-        <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
-        <prop key="hibernate.jdbc.fetch_size">300</prop>
+    <!-- jdbc template -->
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.core.JdbcTemplate" abstract="false" lazy-init="false" autowire="default">
+        <property name="dataSource">
+            <ref bean="risDataSource"/>
+        </property>
+    </bean>
 
-        <!--# logging debug information-->
-        <prop key="hibernate.show_sql">false</prop>
-        <prop key="hibernate.format_sql">true</prop>
-        <prop key="hibernate.generate_statistics">false</prop>
-        <prop key="hibernate.use_sql_comments">false</prop>
-        <prop key="hibernate.hbm2ddl.auto">update</prop>
-      </props>
-    </property>
-  </bean>
-  <util:property-path id="sessionFactory" path="entityManagerFactory.sessionFactory"/>
+    <!-- jpa -->
+    <jpa:repositories base-package="webapp.framework.dao,com.ge.apm.dao"
+                      factory-class="webapp.framework.dao.GenericRepositoryFactoryBean"
+                      transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
 
-  <!-- bean validation -->
-  <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
-        p:validationMessageSource-ref="messageSource">
-    <description>NA</description>
-  </bean>
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+          p:entityManagerFactory-ref="entityManagerFactory">
+        <description>Please read http://www.springframework.org/docs/reference/transaction.html</description>
+    </bean>
+    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <description>Allow spring to configure hibernate specific settings</description>
+    </bean>
 
-  <!-- localization -->
-  <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
-        p:fallbackToSystemLocale="false"
-        p:useCodeAsDefaultMessage="true"
-        p:defaultEncoding="UTF-8">
-    <description>Base message source to handle internationalization</description>
-    <property name="basenames">
-      <list>
-        <value>classpath:config.properties</value>
-      </list>
-    </property>
-  </bean>
 
-  <util:properties id="wxProperties" location="classpath:/wx.properties"/>
-  <util:properties id="urlProperties" location="classpath:/url.properties"/>
-  <util:properties id="ratingProperties" location="classpath:/rating.properties"/>
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+          p:dataSource-ref="risDataSource"
+          p:persistenceUnitName="risSiPU"
+          p:jpaVendorAdapter-ref="hibernateJpaVendorAdapter">
+        <property name="jpaProperties">
+            <props>
+                <!--#hibernate.dialect=org.hibernate.dialect.DerbyDialect-->
+                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+                <prop key="hibernate.connection.useUnicode">true</prop>
+                <prop key="hibernate.connection.charSet">UTF-8</prop>
 
-  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-    <property name="basePackage" value="com.ge.apm.dao.mapper"/>
-    <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
-  </bean>
+                <!--# 2d level cache-->
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.EhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
 
-  <bean id="httpClientFactory"
-        class="org.springframework.http.client.SimpleClientHttpRequestFactory">
-    <property name="connectTimeout" value="10000" />
-    <property name="readTimeout" value="100000" />
-  </bean>
+                <!--# misc-->
+                <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
+                <prop key="hibernate.jdbc.use_scrollable_resultset">false</prop>
+                <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
+                <prop key="hibernate.jdbc.fetch_size">300</prop>
 
-  <!--RestTemplate -->
-  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-    <constructor-arg ref="httpClientFactory" />
-  </bean>
-  
+                <!--# logging debug information-->
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.generate_statistics">false</prop>
+                <prop key="hibernate.use_sql_comments">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+    <util:property-path id="sessionFactory" path="entityManagerFactory.sessionFactory"/>
+
+    <!-- bean validation -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+          p:validationMessageSource-ref="messageSource">
+        <description>NA</description>
+    </bean>
+
+    <!-- localization -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+          p:fallbackToSystemLocale="false"
+          p:useCodeAsDefaultMessage="true"
+          p:defaultEncoding="UTF-8">
+        <description>Base message source to handle internationalization</description>
+        <property name="basenames">
+            <list>
+                <value>classpath:config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <util:properties id="wxProperties" location="classpath:/wx.properties"/>
+    <util:properties id="urlProperties" location="classpath:/url.properties"/>
+    <util:properties id="ratingProperties" location="classpath:/rating.properties"/>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ge.apm.dao.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="httpClientFactory"
+          class="org.springframework.http.client.SimpleClientHttpRequestFactory">
+        <property name="connectTimeout" value="10000" />
+        <property name="readTimeout" value="100000" />
+    </bean>
+
+    <!--RestTemplate -->
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <constructor-arg ref="httpClientFactory" />
+    </bean>
+
     <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
         <property name="dataSource" ref="risDataSource"/>
         <property name="typeAliasesPackage" value="com.baomidou.mybatisplus.test.h2.entity"/>
@@ -297,5 +295,5 @@
     <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ge.apm.dao.mapper"/>
     </bean>
-  
+
 </beans>

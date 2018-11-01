@@ -29,7 +29,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
-            <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}" >
+            <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}">
                 <p:ajax  listener="#{assetInfoEditController.onAssetGroupChange()}" update="@(.assetGroupChange)" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -39,7 +39,9 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroupSecondary')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetGroupSecondary}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetGroupSecondary'].required? '*':''}</span></label>
-            <p:selectOneMenu id="assetGroupSecondary" value="#{assetInfoEditController.selected.assetGroupSecondary}" required="#{assetInfoEditController.customConfig.assetFields['assetGroupSecondary'].required}" requiredMessage="#{msg.assetGroupSecondary} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroupSecondary')}" class="assetGroupChange">
+            <p:selectOneMenu id="assetGroupSecondary" value="#{assetInfoEditController.selected.assetGroupSecondary}"
+                             required="#{assetInfoEditController.customConfig.assetFields['assetGroupSecondary'].required}" requiredMessage="#{msg.assetGroupSecondary} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroupSecondary')}"
+                             class="assetGroupChange">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{assetInfoEditController.assetGroupSecondaryList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
@@ -307,6 +309,13 @@
             <label class="label">#{msg.deviceName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['deviceName'].required? '*':''}</span></label>
             <p:inputText id="deviceName" value="#{assetInfoEditController.selected.deviceName}" required="#{assetInfoEditController.customConfig.assetFields['deviceName'].required}" 
                          requiredMessage="#{msg.deviceName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('deviceName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'subjectProject')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.subjectProject}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['subjectProject'].required? '*':''}</span></label>
+            <p:inputText  value="#{assetInfoEditController.selected.subjectProject}" required="#{assetInfoEditController.customConfig.assetFields['subjectProject'].required}" 
+                         requiredMessage="#{msg.subjectProject} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('subjectProject')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemId')}" >
@@ -597,6 +606,21 @@
             <p:calendar timeZone="GMT+8"  id="arriveDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}" 
                          requiredMessage="#{msg.arriveDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('arriveDate')}" 
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'acceptDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.acceptDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['acceptDate'].required? '*':''}</span></label>
+            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}" 
+                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('acceptDate')}" 
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyMonth')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyMonth}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.warrantyMonth}" required="#{assetInfoEditController.customConfig.assetFields['warrantyMonth'].required}" 
+                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('warrantyMonth')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >

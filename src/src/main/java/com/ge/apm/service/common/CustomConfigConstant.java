@@ -5,11 +5,9 @@
  */
 package com.ge.apm.service.common;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import webapp.framework.web.WebUtil;
+
+import java.util.*;
 
 /**
  *
@@ -22,7 +20,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject");
     }
     
     static public List<String> getSystemFields() {
@@ -37,50 +35,67 @@ public class CustomConfigConstant {
         return Arrays.asList("HospitalHead", "AssetHead", "DeptHead", "AssetStaff", "ClinicalStaff");
     }
 
-    public static HashMap<String, String> getExportFields() {
+    public static Map<String, String> getExportFields() {
         if (null == exportFields) {
-            exportFields = new HashMap();
-            exportFields.put("制造商序列号", "serialNum");
+            exportFields = new LinkedHashMap();
             exportFields.put("设备编号", "departNum");
             exportFields.put("设备名称", "name");
             exportFields.put("设备别名", "aliasName");
-            exportFields.put("设备分类", "assetGroup");
-            exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
             exportFields.put("维修负责人", "assetOwnerName");
-            exportFields.put(WebUtil.getMessage("assetOwnerTel"), "assetOwnerTel");
             exportFields.put("维修负责人2", "assetOwnerName2");
-            exportFields.put(WebUtil.getMessage("assetOwnerTel2"), "assetOwnerTel2");
             exportFields.put("维修负责人3", "assetOwnerName3");
-            exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
+            exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
             exportFields.put("所属院区", "siteUID");
             exportFields.put("所属科室", "clinicalDeptName");
             exportFields.put("使用科室", "assetDeptName");
-            exportFields.put("使用责任人", "clinicalOwnerName");
-            exportFields.put(WebUtil.getMessage("clinicalOwnerTel"), "clinicalOwnerTel");
             exportFields.put("制造商", "manufacture");
             exportFields.put("品牌/制造商简称", "makerShortName");
-            exportFields.put("供应商", "vendor");
-            exportFields.put("维修商", "maitanance");
-            exportFields.put("维修商电话", "maitananceTel");
-            exportFields.put("2010国家编码", "nationalStandardCode");
-            exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
+
             exportFields.put("设备标准名称", "deviceName");
-            exportFields.put("SystemID/厂商报修ID", "systemId");
-            exportFields.put("资产编号", "financingNum");
-            exportFields.put("条码", "barcode");
             exportFields.put("注册证号", "registrationNo");
-            exportFields.put("IT系统编号", "modalityId");
-            exportFields.put("二维码", "qrCode");
-            exportFields.put("设备型号", "functionType");
+            exportFields.put("供应商", "vendor");
             exportFields.put("医疗器械分类", "functionGroup");
             exportFields.put("医疗器械子分类", "assetCode68");
+            exportFields.put("设备分类", "assetGroup");
+            exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
+            exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
             exportFields.put("功能等级", "functionGrade");
             exportFields.put("维修类型", "repairForm");
+            exportFields.put("设备型号", "functionType");
+            exportFields.put("制造商序列号", "serialNum");
+
+            exportFields.put("SystemID/厂商报修ID", "systemId");
+            exportFields.put("2010国家编码", "nationalStandardCode");
+            exportFields.put("资产编号", "financingNum");
+            exportFields.put("条码", "barcode");
+            exportFields.put("IT系统编号", "modalityId");
+            exportFields.put("采购价格", "purchasePrice");
+            exportFields.put("最终残值", "salvageValue");
+            exportFields.put("使用年限", "lifecycle");
+            exportFields.put("折旧算法", "depreciationMethod");
+
+            exportFields.put("出厂日期", "manufactDate");
+            exportFields.put("采购日期", "purchaseDate");
+            exportFields.put("到货日期", "arriveDate");
+            exportFields.put("启用日期", "installDate");
+            exportFields.put("质保日期", "factoryWarrantyDate");
+            exportFields.put("维保截止日期", "warrantyDate");
+            exportFields.put("报废日期", "terminateDate");
+            exportFields.put("上次保养日期", "lastPmDate");
+            exportFields.put("上次巡检日期", "lastQaDate");
+            exportFields.put("上次计量日期", "lastMeteringDate");
+            exportFields.put("验收日期", "acceptDate");
+            exportFields.put("质保时间（月）", "warrantyMonth");
+
+            exportFields.put("维修商", "maitanance");
+            exportFields.put("维修商电话", "maitananceTel");
+            exportFields.put("二维码", "qrCode");
             exportFields.put("安装位置编码", "locationCode");
             exportFields.put("安装位置", "locationName");
-            exportFields.put("当前状态", "status");
-            exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
+            exportFields.put("使用责任人", "clinicalOwnerName");
             exportFields.put("备注", "comments");
+
+
             exportFields.put("用途分类", "assetUsage");
             exportFields.put("资金来源", "capitalSource");
             exportFields.put(WebUtil.getMessage("capitalSource2"), "capitalSource2");
@@ -90,26 +105,22 @@ public class CustomConfigConstant {
             exportFields.put("是否进口设备", "importEquipment");
             exportFields.put("计量项目类别", "measuringItemCategory");
             exportFields.put("核算类别", "accountingCategory");
-            exportFields.put("出厂日期", "manufactDate");
-            exportFields.put("采购日期", "purchaseDate");
-            exportFields.put("到货日期", "arriveDate");
-            exportFields.put("启用日期", "installDate");
-            exportFields.put("质保日期", "factoryWarrantyDate");
-            exportFields.put("维保截止日期", "warrantyDate");
-            exportFields.put("报废日期", "terminateDate");
-            exportFields.put("采购价格", "purchasePrice");
-            exportFields.put("最终残值", "salvageValue");
-            exportFields.put("使用年限", "lifecycle");
-            exportFields.put("折旧算法", "depreciationMethod");
+            exportFields.put("当前状态", "status");
+
             exportFields.put("是否PM", "isPm");
             exportFields.put("是否盘点", "isChecked");
-            exportFields.put("上次保养日期", "lastPmDate");
-            exportFields.put("上次巡检日期", "lastQaDate");
-            exportFields.put("上次计量日期", "lastMeteringDate");
-            exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("资产价值分类", "assetValueCategory");
-            exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
-            exportFields.put(WebUtil.getMessage("pmOwnerTel"), "pmOwnerTel");
+            exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
+            exportFields.put("是否对维保到期提醒", "warranty");
+            exportFields.put("所属课题项目", "subjectProject");
+
+            exportFields.put("UUID", "UUID");
+
+//            exportFields.put(WebUtil.getMessage("assetOwnerTel"), "assetOwnerTel");
+//            exportFields.put(WebUtil.getMessage("assetOwnerTel2"), "assetOwnerTel2");
+//            exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
+//            exportFields.put(WebUtil.getMessage("clinicalOwnerTel"), "clinicalOwnerTel");
+//            exportFields.put(WebUtil.getMessage("pmOwnerTel"), "pmOwnerTel");
         }
         return exportFields;
     }
@@ -187,6 +198,9 @@ public class CustomConfigConstant {
             allFields.put("assetValueCategory", WebUtil.getMessage("assetValueCategory"));
             allFields.put("pmOwnerName", WebUtil.getMessage("pmOwnerName"));
             allFields.put("pmOwnerTel", WebUtil.getMessage("pmOwnerTel"));
+            allFields.put("acceptDate", WebUtil.getMessage("acceptDate"));
+            allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
+            allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
         }
         return allFields;
     }

@@ -1,4 +1,4 @@
-package com.ge.apm.service.sharedAsset;
+package com.ge.apm.service.sharedasset;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -167,34 +167,37 @@ public class SharedAssetStockService {
         String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
         logger.info("assetDeptUID: {}, assetInfoUID: {}, chargingBeginTime: {}, chargingEndTime: {}, reqType: {}",
                         asset.getAssetDeptUID(), asset.getUid() , beginTimeStr , endTimeStr , asset.getSharedAssetReqDetail().getLeaseRequest().getType());
-        ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.borrowByShortcut(asset.getAssetDeptUID(),
-                                                                                            asset.getUid(),
-                                                                                            beginTimeStr,
-                                                                                            endTimeStr,
-                                                                                            asset.getSharedAssetReqDetail().getLeaseRequest().getType());
+
+        //Build lease request data
+        Map<String, Object> reqData = asset.buildLeaseReqHeader();
+        Map<String, Object> reqDetail = asset.buildLeaseReqDetail();
+        List reqDetailList = (List) reqData.get("details");
+        reqDetailList.add(reqDetail);
+
+        ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.leaseAssets(reqData);
         return borrowResponse;
     }
 
     public ResponseEntity<LinkedHashMap> forceReturnAsset(AssetInfo asset) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
-        Date chargingBeginTime = reqDetail.getChargingBeginTime();
-        Date chargingEndTime = reqDetail.getChargingEndTime();
+        SharedAssetReqDetail requestDetail = asset.getSharedAssetReqDetail();
+        Date chargingBeginTime = requestDetail.getChargingBeginTime();
+        Date chargingEndTime = requestDetail.getChargingEndTime();
         String beginTimeStr = (chargingBeginTime == null) ? "" : formatter.format(chargingBeginTime);
         String endTimeStr = (chargingEndTime == null) ? "" : formatter.format(chargingEndTime);
-        Boolean isIntact = reqDetail.getIntact();
-        BigDecimal compensationAmount = reqDetail.getCompensationAmount();
-        String reqComment = reqDetail.getReqComment();
+        Boolean isIntact = requestDetail.getIntact();
+        BigDecimal compensationAmount = requestDetail.getCompensationAmount();
+        String reqComment = requestDetail.getReqComment();
         logger.info("assetDeptUID: {}, assetInfoUID: {}, chargingBeginTime: {}, chargingEndTime: {}, reqType: {}, intact: {}, compensationAmount: {}, reqComment: {}",
                         asset.getAssetDeptUID(), asset.getUid(), beginTimeStr, endTimeStr, asset.getSharedAssetReqDetail().getReturnRequest().getType(), isIntact.toString(), compensationAmount.toString(), reqComment);
-        ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnByShortcut(asset.getAssetDeptUID(),
-                                                                                            asset.getUid(),
-                                                                                            beginTimeStr,
-                                                                                            endTimeStr,
-                                                                                            asset.getSharedAssetReqDetail().getReturnRequest().getType(),
-                                                                                            isIntact.toString(),
-                                                                                            compensationAmount.toString(),
-                                                                                            reqComment);
+
+        //Build return request data
+        Map<String, Object> reqData = asset.buildReturnReqHeader();
+        Map<String, Object> reqDetail = asset.buildReturnReqDetail();
+        List reqDetailList = (List) reqData.get("details");
+        reqDetailList.add(reqDetail);
+
+        ResponseEntity<LinkedHashMap> returnResponse = sharedAssetService.returnAssets(reqData);
         return returnResponse;
     }
 

@@ -78,10 +78,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private boolean terminate = false;
 
-    private String filterWarrantyDate = null;
-
-    private String filterAssetStatus = null;
-
     private Date varWarrantyDateTo = null;
     private String warrantyFormatTime = null;
     private Boolean needShowAssetApproval;
@@ -108,6 +104,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
+
+    //状态监控报表跳转参数
+    private String filterAssetStatus = null;
+    private String filterWarrantyDate = null;
+    private Integer assetId;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -155,7 +156,41 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         selected = null;
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
+
+        addMisingClinicalDeptOrg(currentPageAssets);
+
         return res;
+    }
+
+    private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
+        Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
+        Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
+        orgUids.addAll(orgUids2);
+
+        if (orgUids.isEmpty()) return;
+
+        List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
+
+        Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
+
+        currentPageAssets.stream().forEach(item -> {
+            if (item.getClinicalDeptUID() != null) {
+                OrgInfo found = orgInfoMap.get((item.getClinicalDeptUID()));
+                if (found != null) {
+                    item.setClinicalDeptOrg(found);
+                }
+
+            }
+
+            if (item.getAssetDeptUID() != null) {
+                OrgInfo found = orgInfoMap.get((item.getAssetDeptUID()));
+                if (found != null) {
+                    item.setAssetDeptOrg(found);
+                }
+
+            }
+        });
+
     }
 
     private void setUserSearchFilters() {
@@ -166,15 +201,17 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
 
-        if (!this.hasFilterOnField("siteUID")) {
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        if (!UserContextService.isMVSRole()) {
+            if (!this.hasFilterOnField("siteUID")) {
+                UserAccount user = UserContextService.getCurrentUserAccount();
+                List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            }
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -208,6 +245,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
 
+        if (UserContextService.isMVSRole()) {
+            this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
+        }
+
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
@@ -234,8 +275,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void loadClinicalDeptList() {
-        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                .stream().filter(item -> item.getOrgType() == 4 || item.getOrgType() == 5).collect(Collectors.toList());
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -294,23 +335,23 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportExcel() throws IOException {
 
-        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 //        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
-        List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         logger.info("load asset list to export");
         List<AssetInfo> assetList = getExportList();
 
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
-        template.exportAsset(assetList, sites, orgList, exportColumnFields);
+        template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
 
@@ -538,6 +579,33 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return needShowAssetApproval;
     }
 
+    public void setAssetStatusFilter() {
+        if (filterAssetStatus == null && filterWarrantyDate == null) {
+            return;
+        }
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        /*if (filterAssetStatus != null) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
+        }
+        if (assetId != null) {
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
+        }*/
+        if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
+            Date warrantyDate = new Date();
+            //2个月内，则是保修到期时间在2个月后时间之前所有
+            Calendar c = Calendar.getInstance();
+            c.setTime(warrantyDate);
+            c.add(Calendar.MONTH, 2);
+            varWarrantyDateTo = c.getTime();
+            searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
+            searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
+            //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            //filterWarrantyDate = null;
+        }
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -661,5 +729,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetGroupSecondary(Integer assetGroupSecondary) {
         this.assetGroupSecondary = assetGroupSecondary;
+    }
+
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
     }
 }

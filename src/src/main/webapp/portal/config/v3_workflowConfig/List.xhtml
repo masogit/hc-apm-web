@@ -23,22 +23,47 @@
 
                     <p:ajax event="rowSelect"  listener= "#{v2_WorkflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/>
-                    
+
                     <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
                         <h:outputText value="#{v2_WorkflowConfigController.getTenantName(item.tenantUID)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{v2_WorkflowConfigController.getHospitalList('0')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
+
                      <p:column headerText="集团" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}" filterMatchMode="EQ">
-                        <h:outputText value="#{v2_WorkflowConfigController.getInsNameByUId(item.institutionUID)}"/>
+                         <h:outputText value="#{v2_WorkflowConfigController.getInsNameByUId(item.institutionUID)}"/>
+                         <f:facet name="filter">
+                             <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                 <f:selectItems value="#{v2_WorkflowConfigController.getHospitalList('1')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                             </p:selectOneMenu>
+                         </f:facet>
                     </p:column>
-                    <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}" filterMatchMode="EQ">
-                        <h:outputText value="#{v2_WorkflowConfigController.getHospitalNameByUId(item.hospitalUID)}"/>
-                    </p:column>
-                    <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
-                        <h:outputText value="#{v2_WorkflowConfigController.getSiteNameByUId(item.siteUID)}" />
-                    </p:column>
+                   <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}" filterMatchMode="EQ">
+                       <h:outputText value="#{v2_WorkflowConfigController.getHospitalNameByUId(item.hospitalUID)}"/>
+                       <f:facet name="filter">
+                           <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+                               <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                               <f:selectItems value="#{v2_WorkflowConfigController.getHospitalList('2')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                           </p:selectOneMenu>
+                       </f:facet>
+                   </p:column>
+                   <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                       <h:outputText value="#{v2_WorkflowConfigController.getSiteNameByUId(item.siteUID)}" />
+                       <f:facet name="filter">
+                           <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+                               <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                               <f:selectItems value="#{v2_WorkflowConfigController.getHospitalList('3')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                           </p:selectOneMenu>
+                       </f:facet>
+                   </p:column>
 <!--                      <p:column headerText="#{msg.dispatchMode}" sortBy="#{item.dispatchMode}" filterBy="#{item.dispatchMode}" filterMatchMode="EQ">
-                         <h:outputText value="#{fieldMsg.fieldValue('dispatchMode',item.dispatchMode)}"/>
-                    </p:column> -->
+                    <h:outputText value="#{fieldMsg.fieldValue('dispatchMode',item.dispatchMode)}"/>
+               </p:column> -->
                     <p:column headerText="维修#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName}"/>
                     </p:column>

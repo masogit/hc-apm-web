@@ -11,6 +11,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.service.utils.ApmConstant;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -36,6 +37,7 @@ import webapp.framework.web.service.UserContext;
 public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String ADMIN = "SuperAdmin,ITAdmin";
 
     private UserAccount userAccount = null;
 
@@ -245,12 +247,13 @@ public class UserContextService implements Serializable {
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
 
-        flagIsHospitalUser = true;
         UserAccount loginUser = getLoginUser();
-        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
-            //判断医院级别是否有调剂中心
-            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
-            if(list.size() == 0) flagIsHospitalUser = false;
+        //判断医院级别是否有调剂中心
+        List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getSiteUID());
+        if(list.size() > 0) {
+            flagIsHospitalUser = Boolean.TRUE;
+        } else {
+            flagIsHospitalUser = Boolean.FALSE;
         }
         
         return flagIsHospitalUser;
@@ -299,6 +302,10 @@ public class UserContextService implements Serializable {
     public boolean getIsLocalAdmin() {
         return UserContextService.isLocalAdmin();
     }
+    
+    public boolean getIsMVSAdmin(){
+    	return UserContextService.isMVSAdmin();
+    }
 
     public static UserAccount getCurrentUserAccount() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -318,6 +325,28 @@ public class UserContextService implements Serializable {
     public static boolean isLocalAdmin() {
         UserAccount userAccount = getCurrentUserAccount();
         return userAccount.getIsLocalAdmin();
+    }
+    
+    public static boolean isMVSAdmin(){
+    	UserAccount userAccount=getCurrentUserAccount();
+    	Integer mvsRoleType=userAccount.getMvsRoleType();
+    	if(mvsRoleType!=null && mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    }
+
+    public static boolean isMVSRole(){
+        UserAccount userAccount=getCurrentUserAccount();
+        Integer mvsRoleType=userAccount.getMvsRoleType();
+        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE)){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public static int getUserID() {
@@ -477,7 +506,7 @@ public class UserContextService implements Serializable {
         UserAccount user = userContextService.getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        if(tenant.getInsulate() != null && tenant.getInsulate()) {
+        if(tenant.getInsulate() != null && tenant.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
             return true;
         }
         return false;

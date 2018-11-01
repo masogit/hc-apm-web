@@ -1,10 +1,12 @@
 package com.ge.apm.view.schedule;
 
 import com.ge.apm.dao.UserScheduleRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserSchedule;
 import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,11 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -48,6 +55,7 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
     private String queryStr;
 
     private String auditInfo;
+    private String vacationInfo;
 
     @Override
     protected void init() {
@@ -111,25 +119,88 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
-    public String saveVacation(){
+    public boolean saveVacation(){
 
-        if(!isValideDate()){
-            return "";
+        Calendar calender = Calendar.getInstance();
+        calender.setTime(new Date());
+        calender.add(Calendar.DAY_OF_MONTH, -1);
+
+        if (startDate.before(calender.getTime())) {
+            WebUtil.addErrorMessage("开始日期不能早于当前日期");
+            return false;
+        }
+        if (endDate.before(startDate)) {
+            WebUtil.addErrorMessage("结束日期不能早于开始日期");
+            return false;
         }
 
-        List<LinkedHashMap<String, Date>> resultList = userScheduleService.saveVacation(startDate, endDate, scheduleDateStage);
+        List<LinkedHashMap<String, Object>> resultList = userScheduleService.saveVacation(startDate, endDate, scheduleDateStage);
 
         if(!resultList.isEmpty()){
-            String msg = "无效的休假日期：";
-            for (Map<String, Date> msgMap : resultList) {
+            String msg = "";
+            int i = 0;
+            for (Map<String, Object> msgMap : resultList) {
+                List assetInfoList = (List<AssetInfo>) msgMap.get("assetInfoList");
+                if(i == 0){
+                    if(assetInfoList != null && !assetInfoList.isEmpty()){
+                        msg = ((Map)assetInfoList.get(0)).get("name") + "上只有你一个责任人或其他责任人都请假: ";
+                    }else{
+                        msg = "该日期已存在请假记录: ";
+                    }
+                }
                 msg += msgMap.get("invalidDate") + ";";
+
+                i++;
             }
             WebUtil.addErrorMessage(msg);
-            return "";
+            return false;
         }
 
-        return "userVacationList?faces-redirect=true";
+        //return "userVacationList?faces-redirect=true";
+        return true;
     }
+
+    //检查请假日期是否有排班记录
+    public String saveVacationBefor(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        Instant startDateInstant = startDate.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
+        LocalDate startLocalDate = startLocalDateTime.toLocalDate();
+
+        Instant endDateInstant = endDate.toInstant();
+        LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDateInstant, zone);
+        LocalDate endLocalDate = endLocalDateTime.toLocalDate();
+
+        long daysDiff = ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1;
+
+        Instant scheduleDateInstant_temp;
+
+        //验证所有日期
+        vacationInfo = "";
+        for(int i = 0 ; i < daysDiff ; i++) {
+            scheduleDateInstant_temp = startLocalDate.plus(i, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
+
+            List<UserSchedule> tempUserScheduleList =  userScheduleService.getUserWorkList(currentUser, Date.from(scheduleDateInstant_temp), scheduleDateStage);
+
+            for (UserSchedule us : tempUserScheduleList) {
+                vacationInfo += sdf.format(us.getScheduleDate()) + ";";
+            }
+        }
+
+        if("".equals(vacationInfo)){
+            requestContext.addCallbackParam("flag", "Success");
+            if(this.saveVacation()){
+                return "userVacationList?faces-redirect=true";
+            }
+        }else{
+            requestContext.addCallbackParam("flag", "Failed");
+        }
+        return "";
+    }
+
 
     public void approveVacation(boolean isApproved){
         if(isApproved){
@@ -142,28 +213,13 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
         userScheduleService.saveVacationSchedule(this.selected);
     }
 
-    public void validateAudit(){
+    public boolean validateAudit(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         this.auditInfo = "";
 
         List<UserSchedule> tempUserScheduleList =  userScheduleService.getUserWorkList(this.selected.getUserAccount(), this.selected.getScheduleDate(), this.selected.getScheduleDateStage());
         for (UserSchedule us : tempUserScheduleList) {
             auditInfo += us.getUserAccount().getName() + " " + sdf.format(us.getScheduleDate()) + "有排班记录！";
-            break;
-        }
-    }
-
-    public boolean isValideDate(){
-        Calendar calender = Calendar.getInstance();
-        calender.setTime(new Date());
-        calender.add(Calendar.DAY_OF_MONTH, -1);
-
-        if (startDate.before(calender.getTime())) {
-            WebUtil.addErrorMessage("开始日期不能早于当前日期");
-            return false;
-        }
-        if (endDate.before(startDate)) {
-            WebUtil.addErrorMessage("结束日期不能早于开始日期");
             return false;
         }
 
@@ -240,5 +296,13 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
 
     public void setScheduleDateStage(String scheduleDateStage) {
         this.scheduleDateStage = scheduleDateStage;
+    }
+
+    public String getVacationInfo() {
+        return vacationInfo;
+    }
+
+    public void setVacationInfo(String vacationInfo) {
+        this.vacationInfo = vacationInfo;
     }
 }

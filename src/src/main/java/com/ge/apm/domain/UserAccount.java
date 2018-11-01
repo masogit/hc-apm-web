@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.service.utils.ApmConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -254,6 +255,10 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "active_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activeTime;
+	
+	//1:MVS Admin,2:MVS FE
+	@Column(name="mvs_role_type")
+	private Integer mvsRoleType;
 
 	@Transient
 	private Integer excelIdex;
@@ -544,6 +549,15 @@ public class UserAccount implements ChineseName, Serializable {
 				userRoleNames.add("SiteAdmin");
 			if (this.isLocalAdmin)
 				userRoleNames.add("LocalAdmin");
+
+			//add mvs role
+			if (this.getMvsRoleType() != null) {
+				if (this.getMvsRoleType() == 1) {
+					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_ADMIN);
+				} else {
+					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_FE);
+				}
+			}
 		}
 
 		return userRoleNames;
@@ -651,6 +665,14 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setListUserOrgInfo(List<UserOrgInfo> listUserOrgInfo) {
 		this.listUserOrgInfo = listUserOrgInfo;
+	}
+
+	public Integer getMvsRoleType() {
+		return mvsRoleType;
+	}
+
+	public void setMvsRoleType(Integer mvsRoleType) {
+		this.mvsRoleType = mvsRoleType;
 	}
 
 	@Override
