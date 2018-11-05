@@ -28,10 +28,10 @@
                     <p:outputLabel class="pageTitle" value="设备计费情况"/>
                 </div>
                 <div class="ui-g-12 card">
-                    <!--<h:form id="searchForm">
+                    <h:form id="searchForm">
                         <h:panelGrid id="searchPanel" columns="2">
                             <p:inputText id="searchText" value="#{sharedAssetReqDetailForQueryController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
-                                <p:ajax event="keyup" update=":IouListForm searchButtons" />
+                                <p:ajax event="keyup" delay="1200" update=":IouListForm searchButtons" />
                             </p:inputText>
                             <h:panelGroup id='searchButtons'>
                                 <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty sharedAssetReqDetailForQueryController.oneSearchStr}"/>
@@ -39,7 +39,7 @@
                             </h:panelGroup>
 
                         </h:panelGrid>
-                    </h:form>-->
+                    </h:form>
             <h:form id="IouListForm">
 
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
