@@ -253,10 +253,9 @@ public class AssetFileImportSupportingService {
 
     }
 
-    public void markDefautValue(OrgInfo selectedOrgToImport, AssetInfo asset, Date now) {
+    public void markDefautValue(OrgInfo selectedOrgToImport, AssetInfo asset, Date now, boolean isNeedAudit) {
         if (StringUtils.isEmpty(asset.getUid())) {
-
-
+            // new
             asset.setSiteId(selectedOrgToImport.getSiteId());
             asset.setHospitalId(selectedOrgToImport.getId());
 
@@ -266,10 +265,6 @@ public class AssetFileImportSupportingService {
             asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
             asset.setIsValid(true);
-            if (asset.getDeviceStatus() == null) {
-                asset.setDeviceStatus(0);
-            }
-
             asset.setIsDeleted(Boolean.FALSE);
 
             asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
@@ -277,10 +272,23 @@ public class AssetFileImportSupportingService {
             asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
             asset.setLastModifiedDate(now);
 
-        } else {
+            if (asset.getDeviceStatus() == null) {
+                asset.setDeviceStatus(0);
+            }
 
+            //only new asset need to set this
+            if(isNeedAudit){
+                asset.setUsageStatus(2); //待审核
+            } else {
+                asset.setUsageStatus(3); //已建档
+            }
+
+        } else {
+            //update
             asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
             asset.setLastModifiedDate(now);
+
+            cleanRelatedFieldsWhenUpdating(asset);
         }
     }
 
@@ -387,6 +395,17 @@ public class AssetFileImportSupportingService {
                 assetInfo.setAssetDeptUID(orgInfo.getUid());
             }
         }
+    }
+
+    public String tryFormatQrCodeIfPossible(Map<String, ExcelDocument.ValueWrapper> rowMap, AssetInfo assetInfo) {
+        String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
+        if (!StringUtils.isEmpty(inputQrcode) && inputQrcode.length() > 16) {
+            inputQrcode = inputQrcode.replace("-", "");
+        }
+
+        assetInfo.setQrCode(inputQrcode);
+
+        return inputQrcode;
     }
 
 }
