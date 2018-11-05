@@ -38,6 +38,8 @@ public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
+    public static final String MVS_ADMIN="MVSAdmin";
+    private static final String MVS_FE="MVSFE";
 
     private UserAccount userAccount = null;
 
@@ -109,10 +111,11 @@ public class UserContextService implements Serializable {
         return UserContextService.checkRole(role);
     }
 
+    //add MVSAdmin,MVSFE
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
         List<String> userRoles = user.getRoleNames();
-
+        Integer mvsRoleType=user.getMvsRoleType();
         String[] roles = roleList.split(",");
         for (String role : roles) {
             role = role.trim();
@@ -120,25 +123,26 @@ public class UserContextService implements Serializable {
             if (roleAllowed) {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    public boolean hasNotAnyRole(String roleList) {
-        UserAccount user = getLoginUser();
-        List<String> userRoles = user.getRoleNames();
-
-        String[] roles = roleList.split(",");
-        for (String role : roles) {
-            role = role.trim();
-            boolean roleAllowed = userRoles.contains(role);
-            if (roleAllowed) {
-                return false;
+            else{
+            	if(mvsRoleType!=null){
+            		if(role.equals(MVS_ADMIN)){
+                		if(mvsRoleType==1){
+                			return true;
+                		}
+                	}
+            		else if(role.equals(MVS_FE)){
+            			if(mvsRoleType==2){
+            				return true;
+            			}
+            		}
+            	}
             }
         }
-
-        return true;
+        return false;
+    }
+    //add MVSAdmin,MVSFE
+    public boolean hasNotAnyRole(String roleList) {
+        return !hasAnyRole(roleList);
     }
     
     public boolean versionContains(String menuNameList){
