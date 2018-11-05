@@ -183,7 +183,7 @@
             </p:submenu>
 			<p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin')  or userContextService.isMVSAdmin()}">
 				<p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
-				<p:menuitem id="um3002" value="MVS维修设备管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
+				<p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
 			</p:submenu>
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;"
