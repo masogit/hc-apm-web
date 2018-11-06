@@ -1297,7 +1297,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                 apdDao.save(selected.getSartList());
 
-                asdDao.save(selected.getSardList());
+                String voucherNum = sharedAssetService.getVoucherNum();
+                for(SharedAssetReqDetail sard : selected.getSardList()) {
+                    logger.info("voucherNum :" + voucherNum + ", for sard:" + sard.getId());
+                    sard.setVoucherNum(voucherNum);
+                    voucherNum = String.format("%06d", Integer.parseInt(voucherNum) + 1);
+                }
+               asdDao.save(selected.getSardList());
 
                //调用微服务
                try {
