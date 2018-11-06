@@ -6,6 +6,33 @@
 				<p:outputLabel class="pageTitle" value="MVS维修设备管理" />
 			</div>
 			<div class="ui-g-12 card ">
+				<h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup >
+                            <p:commandButton id="btnOrg" value="#{empty mVSWorkOrderMgrController.selectSite? '所有租户':mVSWorkOrderMgrController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(0)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{mVSWorkOrderMgrController.onSelectSiteTreeNode}" update=":mvsWoMgrListForm :searchForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <!-- <p:inputText id="searchText" value="#{mVSWorkOrderMgrController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg searchButtons " />
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg"  rendered="#{empty mVSWorkOrderMgrController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg" actionListener="#{mVSWorkOrderMgrController.setOneSearchStr('')}" rendered="#{not empty mVSWorkOrderMgrController.oneSearchStr}"/>
+                        </h:panelGroup> -->
+                    </h:panelGrid>
+                </h:form>
 				<h:form id="mvsWoMgrListForm">
 					<p:dataTable id="datalist" value="#{mVSWorkOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{mVSWorkOrderMgrController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -45,9 +72,9 @@
 						<p:column headerText="FE工程师">
 							<h:outputText value="#{item.v2WorkOrder.FEOwner.name}" />
 						</p:column>
-						<p:column headerText="所属医院">
+						<!-- <p:column headerText="所属医院">
 							<h:outputText value="#{item.hospitalOrg.name}" />
-						</p:column>
+						</p:column> -->
 						<p:column headerText="所属院区">
 							<h:outputText value="#{item.siteOrg.name}" />
 						</p:column>

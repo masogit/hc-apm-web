@@ -125,6 +125,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public int countByParentUIDAndOrgType(String parentUid, int orgType);
 
+    @Query(value = "select o.* from org_info o ",nativeQuery = true)
+    public List<OrgInfo> findAllAsList();
 
-
+    @Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo",nativeQuery = false)
+    public List<OrgInfo> findSimpleAllAsList();
 }
