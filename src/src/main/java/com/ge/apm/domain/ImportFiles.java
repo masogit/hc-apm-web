@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,18 +18,18 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 /**
- *
  * @author 212579464
  */
 @Entity
 @Table(name = "import_files")
 public class ImportFiles {
 
-    public enum ImportFileType { EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf }
+    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrExcel, FeAssetExcel}
 
     public static final String STATUS_COMPLETED = "COMPLETED";
     public static final String STATUS_STARTING = "STARTING";
