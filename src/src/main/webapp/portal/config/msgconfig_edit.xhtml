@@ -57,7 +57,7 @@
 
                         </p:panelGrid>
                     </p:tab>
-                    <p:commandButton validateClient="true" actionListener="#{msgConfigController.saveMsgTenant}" value="#{msg.Save}" update="MsgConfigForm :growl"  icon="ui-icon-check"/>
+                    <p:commandButton validateClient="false" actionListener="#{msgConfigController.saveMsgTenant}" value="#{msg.Save}" update="MsgConfigForm :growl"  icon="ui-icon-check" oncomplete=""/>
                 </h:form>
             </div>
         </div>
