@@ -64,17 +64,17 @@ public class AssetFileDynamicTemplateTest {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = customConfigService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         List<AssetInfo> assetList = assetInfoDao.findByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        template.exportAsset(assetList, sites, clinicalDeptList, exportColumnFields);
+        template.exportAsset(assetList, sites, clinicalDeptList, exportFields);
 
         template.writeToFile(new File("./asset_list.xlsx"));
     }
@@ -84,14 +84,14 @@ public class AssetFileDynamicTemplateTest {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = customConfigService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        template.exportSampleAsset(clinicalDeptList, exportColumnFields);
+        template.exportSampleAsset(clinicalDeptList, exportFields);
 
         template.writeToFile(new File("./asset_sample.xlsx"));
     }
@@ -102,10 +102,10 @@ public class AssetFileDynamicTemplateTest {
 
         CustomConfigObject customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        List<String> exportFields = customConfigService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = customConfigService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
+//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
 
         List<OrgInfo> clinicalDeptList = orgInfoDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         List<OrgInfo> sites = orgInfoDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -121,7 +121,7 @@ public class AssetFileDynamicTemplateTest {
             bigList.add(assetList.get(which));
         }
 
-        template.exportAsset(bigList, sites, clinicalDeptList, exportColumnFields);
+        template.exportAsset(bigList, sites, clinicalDeptList, exportFields);
 
         template.writeToFile(new File("./asset__big_list.xlsx"));
     }

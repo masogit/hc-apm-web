@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.jfree.util.Log;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -793,6 +794,9 @@ public class ElectricSafetyService {
 				field.setAccessible(true);
 				try {
 					result = field.get(data);
+					if(result!=null){
+						result=parseDouble(result);
+					}
 					field.setAccessible(access);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -802,6 +806,24 @@ public class ElectricSafetyService {
 			}
 		}
 		return result;
+	}
+	
+	private double parseDouble(Object obj){
+		String str=obj.toString();
+		if(StringUtils.isNotEmpty(str)){
+			int length=str.length();
+			while(length>0){
+				try {
+					return Double.parseDouble(str);
+				} catch (Exception e) {
+					// TODO: handle exception
+					LOGGER.error(e.getMessage());
+				}
+				str=str.substring(1, str.length());
+				length=str.length();
+			}
+		}
+		return 0;
 	}
 	
 	private void setCheckType(String str,ElectricSafetyData data){

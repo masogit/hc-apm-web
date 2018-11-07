@@ -71,7 +71,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
         Date now = new Date();
 
         List<Map<String, Object>> result = new ArrayList<>();
-        int keyRow = 6;
+
         int dataRow = 7;
 
         Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator = doc.iterator();
@@ -98,11 +98,6 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
-                }
-
-                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode) && !inputQrcode.equals(asset.getQrCode())) {
-                    asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
                 AssetRow assetRow = new AssetRow(asset, rowMap);
@@ -187,26 +182,15 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldDropdownValue("资产状态", "setDeviceStatus", deviceStatusList, map, null);
                 assetRow.setFieldDropdownValue("资金来源2", "setCapitalSource2", capitalSource2List, map, null);
-                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", null);
+                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", true);
 
                 assetRow.setFieldStringValue("所属课题项目", "setSubjectProject");
                 assetRow.setFieldDateValue("验收日期", "setAcceptDate");
                 assetRow.setFieldIntegerValue("质保时间（月）", "setWarrantyMonth");
 
-                if (StringUtils.isEmpty(asset.getUid())) {
+                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
-                    //only new asset need to set this
-                    asset.setUsageStatus(3); //已建档
-
-                    if(isNeedAudit){
-                        asset.setUsageStatus(2); //待审核
-                    }
-
-                } else {
-                    supportingService.cleanRelatedFieldsWhenUpdating(asset);
-                }
-
-                supportingService.markDefautValue(selectedOrgToImport, asset, now);
+                supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
 
                 map.put("asset", asset);
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
@@ -229,6 +213,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
         return result;
     }
+
+
 
     public boolean checkDocVersion(ExcelDocumentStreamingReader doc) {
         return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(doc.getVersion());
