@@ -120,7 +120,7 @@ public class ElectricSafetyData implements Serializable {
 	@Column(name = "protect_ground_impedance_ref_val")
 	private String protectGroundImpedanceRefVal;
 	
-//	21,——》等效设备漏电流（单位：μA）
+//	21,——》设备漏电流（单位：μA）
 	@Column(name="equipment_electric_leakage")
 	private String equipmentElectricLeakage;
 	
@@ -128,13 +128,13 @@ public class ElectricSafetyData implements Serializable {
 	@Column(name="equipment_electric_leakage_ref_val")
 	private String equipmentElectricLeakageRefVal;
 	
-//	23,——》患者漏电流（应用部分加电）（单位：μA）
+//	23,——》患者漏电流（单位：μA）
 	@Column(name = "patient_electric_leakage_app")
 	private String patientElectricLeakage_app;
 //	24,——》患者漏电流（应用部分加电）参考值（<50.0μA）
 	@Column(name = "patient_electric_leakage_ref_val_app")
 	private String patientElectricLeakageRefVal_app;
-//	25,——》对地漏电流（正常状态）（单位：mA）
+//	25,——》对地漏电流（单位：mA）
 	@Column(name = "ground_electric_leakage_normal")
 	private String groundElectricLeakage_normal;
 //	26,——》对地漏电流（正常状态）参考值（<0.5mA）
@@ -801,11 +801,11 @@ public class ElectricSafetyData implements Serializable {
 //		mapLabelAttributes.put("appGroupCount", "应用组数");
 		mapLabelAttributes.put("protectGroundImpedance", "保护接地阻抗");
 //		mapLabelAttributes.put("protectGroundImpedanceRefVal", "保护接地阻抗参考值");
-		mapLabelAttributes.put("equipmentElectricLeakage", "等效设备漏电流");
+		mapLabelAttributes.put("equipmentElectricLeakage", "设备漏电流");
 //		mapLabelAttributes.put("equipmentElectricLeakageRefVal", "等效设备漏电流参考值");
-		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流(应用部分加电)");
+		mapLabelAttributes.put("patientElectricLeakage_app", "患者漏电流");
 //		mapLabelAttributes.put("patientElectricLeakageRefVal_app", "患者漏电流(应用部分加电)参考值");
-		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流(正常状态)");
+		mapLabelAttributes.put("groundElectricLeakage_normal", "对地漏电流");
 //		mapLabelAttributes.put("groundElectricLeakageRefVal_normal", "对地漏电流(正常状态)参考值");
 		mapLabelAttributes.put("groundElectricLeakage_singleError", "对地漏电流(单一故障状态)");
 //		mapLabelAttributes.put("groundElectricLeakageRefVal_singleError", "对地漏电流(单一故障状态)参考值");
