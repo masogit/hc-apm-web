@@ -273,7 +273,7 @@
                                         <label class="label">#{msg.parentAsset}</label>
 
                                         <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetCreateController.selectedObjectMap['parentAsset']}" completeMethod="#{assetCreateController.completeParentAssetId}"
-                                                        forceSelection="true" var="t" itemLabel="#{t.name}/#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
+                                                        forceSelection="true" var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                                             <p:ajax event="itemSelect" listener="#{assetCreateController.onParentAssetChange()}"/>
                                             <p:ajax listener="#{assetCreateController.onParentAssetChange()}" />
                                         </p:autoComplete>
