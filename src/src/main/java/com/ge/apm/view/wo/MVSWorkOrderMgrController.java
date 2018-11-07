@@ -52,7 +52,7 @@ public class MVSWorkOrderMgrController extends MyCRUDController<MVSAssetInfoOver
 	private MVSWorkOrderService service;
 	private I18nMessageRepository i18nDao;
 	private UserAccount currentUser;
-	private List<V2_WorkOrder_Detail> listDetail;
+	private List<MVSAssetInfoOverview> listDetail;
 	private List<SearchFilter> listNewSearchFilter;
 	@Getter
 	@Setter
@@ -80,12 +80,9 @@ public class MVSWorkOrderMgrController extends MyCRUDController<MVSAssetInfoOver
 			this.searchFilters = new HashSet<SearchFilter>();
 		}
 		updateFilter();
-		int rowCount=this.lazyModel.getRowCount();
-		if(rowCount==0){
-			this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
-		}
-		List<MVSAssetInfoOverview> listResult = dao.getAll(searchFilters,sortField,isAscending,pageRequest.getLimit(),pageRequest.getOffset());
-		return listResult;
+		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
+		listDetail = dao.getAll(searchFilters,sortField,isAscending,pageRequest.getLimit(),pageRequest.getOffset());
+		return listDetail;
 	}
 
 	@Override
@@ -96,14 +93,15 @@ public class MVSWorkOrderMgrController extends MyCRUDController<MVSAssetInfoOver
 	@Override
 	public void save() {
 		// service.saveWorkOrder(this.selected.getV2WorkOrder());
-		super.save();
+		this.dao.updateObj(this.selected);
+		WebUtil.addSuccessMessage(getActionMessage("Updated"));
 		this.selected = null;
 	}
 
 	@Override
 	public void delete() {
 		// TODO Auto-generated method stub
-		super.delete();
+//		super.delete();
 		this.selected = null;
 	}
 
