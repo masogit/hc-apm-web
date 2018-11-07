@@ -115,6 +115,20 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Response: {}" ,JSON.toJSONString(responseEntity));
         return responseEntity;
     }
+
+    public String getVoucherNum() {
+        String url = getGatewayURL(GatewayURL.GET_VOUCHER_NUM);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+        ResponseEntity<LinkedHashMap> responseEntity = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        logger.info("Create request " + (isOkay(responseEntity) ? "successfully." : "failed."));
+        logger.info("Response: {}" ,JSON.toJSONString(responseEntity));
+        LinkedHashMap<String, String> body = responseEntity.getBody();
+        String voucherNum = body.get("data");
+        logger.info("voucherNum: {}", voucherNum);
+        return voucherNum;
+    }
 }
 
 
