@@ -48,6 +48,12 @@ public class MsgConfigController extends JpaCRUDController<MsgTenant> implements
     private MsgRepository msgRepository;
     public List<MsgConfigVO> msgVOList;
 
+    @Getter
+    @Setter
+    private LinkedHashMap<String, String> allFields = new LinkedHashMap<String,String>();
+
+
+
 
     @Override
     protected void init(){
@@ -56,14 +62,13 @@ public class MsgConfigController extends JpaCRUDController<MsgTenant> implements
         msgRepository  = WebUtil.getBean(MsgRepository.class);
         msgNameList = msgRepository.find().stream().map(item->item.getMsgName()).collect(Collectors.toList());
 
+        msgNameList.stream().forEach(item->allFields.put(item,item));
 
         List<String> selectedMsg = msgRepository.findByTenantUid(userContextService.getLoginUser().getTenantUID());
         msgNameList.stream().forEach(item->selectedMsgFields.put(item,false));
 
 
    selectedMsg.stream().filter(item->selectedMsgFields.containsKey(item)).filter(item->selectedMsgFields.put(item,true)).collect(Collectors.toList());
-      /*  System.out.println();
-        msgNameList.stream().forEach(item->selectedMsgFields.put(item,true));*/
         msgVOList = getMsgConfigVO(userContextService.getLoginUser().getTenantUID());
 
 
