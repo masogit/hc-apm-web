@@ -188,7 +188,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDateValue("验收日期", "setAcceptDate");
                 assetRow.setFieldIntegerValue("质保时间（月）", "setWarrantyMonth");
 
-                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
+                assetRow.setFieldStringValue("二维码", "setQrCode");
+//                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
                 supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
 
