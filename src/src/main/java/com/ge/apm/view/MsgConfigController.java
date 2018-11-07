@@ -122,7 +122,7 @@ public List<MsgConfigVO> getMsgConfigVO(String tenantUID){
                 msgCTDao.save(msgT);
             }
         }
-
+        WebUtil.addSuccessMessage("消息配置保存成功");
     }
 
 
