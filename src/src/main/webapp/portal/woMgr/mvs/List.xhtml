@@ -6,6 +6,33 @@
 				<p:outputLabel class="pageTitle" value="MVS维修设备管理" />
 			</div>
 			<div class="ui-g-12 card ">
+				<h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup >
+                            <p:commandButton id="btnOrg" value="#{empty mVSWorkOrderMgrController.selectSite? '所有租户':mVSWorkOrderMgrController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(0)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{mVSWorkOrderMgrController.onSelectSiteTreeNode}" update=":mvsWoMgrListForm :searchForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <!-- <p:inputText id="searchText" value="#{mVSWorkOrderMgrController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg searchButtons " />
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg"  rendered="#{empty mVSWorkOrderMgrController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg" actionListener="#{mVSWorkOrderMgrController.setOneSearchStr('')}" rendered="#{not empty mVSWorkOrderMgrController.oneSearchStr}"/>
+                        </h:panelGroup> -->
+                    </h:panelGrid>
+                </h:form>
 				<h:form id="mvsWoMgrListForm">
 					<p:dataTable id="datalist" value="#{mVSWorkOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{mVSWorkOrderMgrController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -15,22 +42,22 @@
 
 						<p:ajax event="rowSelect" update="editButton" />
 						<p:ajax event="filter" listener="#{mVSWorkOrderMgrController.onFilter}" />
-						<p:column headerText="报修时间" sortBy="#{item.v2WorkOrder.serviceRequest.requestTime}" filterMatchMode="GTE">
+						<p:column headerText="报修时间" sortBy="#{item.v2WorkOrderServiceRequestRequestTime}" filterMatchMode="GTE">
 							<!-- <f:facet name="filter">
 						        <p:inputText id="filterrequestTime" widgetVar="varFilterrequestTime" />
 						    </f:facet> -->
-							<h:outputText value="#{item.v2WorkOrder.serviceRequest.requestTime}" >
+							<h:outputText value="#{item.v2WorkOrderServiceRequestRequestTime}" >
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="MVS工单类型" filterBy="#{item.v2WorkOrder.mvsType}" filterMatchMode="EQ">
+						<p:column headerText="MVS工单类型" filterBy="#{item.v2WorkOrderMvsType}" filterMatchMode="EQ">
 							<f:facet name="filter">
 						        <p:selectOneMenu onchange="PF('varDataList').filter()">
 						        	<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						            <f:selectItems value="#{fieldMsg.getFieldValueList('mvsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 						        </p:selectOneMenu>
 						    </f:facet>
-							<h:outputText value="#{fieldMsg.fieldValue('mvsType', item.v2WorkOrder.mvsType)}"/>
+							<h:outputText value="#{fieldMsg.fieldValue('mvsType', item.v2WorkOrderMvsType)}"/>
 						</p:column>
 						<p:column headerText="普通/加急" filterBy="#{item.priority}" filterMatchMode="EQ">
 							<f:facet name="filter">
@@ -42,26 +69,23 @@
 						    </f:facet>
 							<h:outputText value="#{fieldMsg.fieldValue('mvsPriority', item.priority)}"/>
 						</p:column>
-						<p:column headerText="FE工程师">
-							<h:outputText value="#{item.v2WorkOrder.FEOwner.name}" />
-						</p:column>
-						<p:column headerText="所属医院">
-							<h:outputText value="#{item.hospitalOrg.name}" />
+						<p:column headerText="FE工程师" filterBy="#{item.v2WorkOrderFEOwnerNamePyCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.v2WorkOrderFEOwnerName}" />
 						</p:column>
 						<p:column headerText="所属院区">
-							<h:outputText value="#{item.siteOrg.name}" />
+							<h:outputText value="#{item.siteOrgName}" />
 						</p:column>
-						<p:column headerText="设备编号" filterBy="#{item.v2WorkOrder.assetInfo.departNum}" filterMatchMode="LIKE">
-							<h:outputText value="#{item.v2WorkOrder.assetInfo.departNum}" />
+						<p:column headerText="设备编号" filterBy="#{item.v2WorkOrderAssetInfoDepartNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.v2WorkOrderAssetInfoDepartNum}" />
 						</p:column>
-						<p:column headerText="设备名称" filterBy="#{item.v2WorkOrder.assetInfo.name}" filterMatchMode="LIKE">
-							<h:outputText value="#{item.v2WorkOrder.assetInfo.name}" />
+						<p:column headerText="设备名称" filterBy="#{item.v2WorkOrderAssetInfoNamePyCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.v2WorkOrderAssetInfoName}" />
 						</p:column>
 						<p:column headerText="备件名称" filterBy="#{item.parts}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.parts}" />
 						</p:column>
-						<p:column headerText="数量" filterBy="#{item.apartsQuantity}" filterMatchMode="EQ">
-							<h:outputText value="#{item.apartsQuantity}" />
+						<p:column headerText="数量" filterBy="#{item.partsQuantity}" filterMatchMode="EQ">
+							<h:outputText value="#{item.partsQuantity}" />
 						</p:column>
 						<p:column headerText="采购单价" filterBy="#{item.mvsPrice}" filterMatchMode="EQ">
 							<h:outputText value="#{item.mvsPrice}" >
@@ -74,12 +98,13 @@
 						<p:column headerText="发票号" filterBy="#{item.invoiceNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.invoiceNum}" />
 						</p:column>
-						
 						<p:column headerText="质保期" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
 							<f:facet name="filter">
 						        <p:inputText id="filterwarrantyDate" widgetVar="varFilterwarrantyDate" />
 						    </f:facet>
-							<h:outputText value="#{item.warrantyDate}" />
+							<h:outputText value="#{item.warrantyDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd" />
+							</h:outputText>
 						</p:column>
 						<p:column headerText="采购时间" filterBy="#{item.purchaseTime}" filterMatchMode="GTE">
 							<f:facet name="filter">

@@ -1,9 +1,13 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -200,6 +204,11 @@ public class V2_WorkOrder implements Serializable {
     @Column(name="mvs_type")
     private Integer mvsType;
     
+//    @JoinColumn(name = "currentPersonId", referencedColumnName = "id", insertable = false, updatable = false)
+//    @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.DETACH)
+//    @JsonIgnore
+//    @org.hibernate.annotations.ForeignKey(name = "none")
+//    @NotFound(action= NotFoundAction.IGNORE)
     @Transient
     private UserAccount FEOwner;
     
