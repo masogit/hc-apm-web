@@ -4,12 +4,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.provider.V2WorkOrderDetailProvider;
 import com.ge.apm.domain.MVSAssetInfoOverview;
 
@@ -21,5 +19,8 @@ public interface V2WorkOrderDetailMapper extends BaseMapper<MVSAssetInfoOverview
 
 	@SelectProvider(type = V2WorkOrderDetailProvider.class,method = "getAllCount")
 	public Integer getAllCount(@Param("filters") Set<SearchFilter> filters);
+	
+	@Update("update v2_work_order_detail set mvs_price=#{mvsPrice},invoice_num=#{invoiceNum},purchase_time=#{purchaseTime},deliver_time=#{deliverTime},arrived_time=#{arrivedTime} where id=#{id}")
+	public Integer updateObj(MVSAssetInfoOverview mvsAssetInfoOverview);
 
 }

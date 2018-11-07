@@ -55,6 +55,7 @@ public class V2WorkOrderDetailProvider {
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
 				addDefaultFilter(sb, searchFilter);
+				addFilter(sb, searchFilter);
 			}
 			sb.append(" 1=1 ");
 			sb.append(")");

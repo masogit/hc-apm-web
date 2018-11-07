@@ -26,17 +26,15 @@ import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.dao.WorkOrderCoworkerRepository;
 import com.ge.apm.dao.WorkOrderDetailRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.MVSAssetInfoOverview;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
 
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.service.MessageUtil;
 
 @Service
 public class MVSWorkOrderService {
@@ -250,25 +248,25 @@ public class MVSWorkOrderService {
 		}
 	}
 
-	public List<Map<String, Object>> parseToMap(List<V2_WorkOrder_Detail> listDetail) {
+	public List<Map<String, Object>> parseToMap(List<MVSAssetInfoOverview> listDetail) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
 		if (listDetail != null && listDetail.size() > 0) {
 			for (int i = 0; i < listDetail.size(); ++i) {
-				V2_WorkOrder_Detail tempDetail = listDetail.get(i);
+				MVSAssetInfoOverview tempDetail = listDetail.get(i);
 				Map<String, Object> tempMap = new HashMap<String, Object>();
 				try {
-					if (tempDetail.getV2WorkOrder().getServiceRequest().getRequestTime()!=null) {
-						tempMap.put(HEADER_REQUESTTIME, sdf2.format(tempDetail.getV2WorkOrder().getServiceRequest().getRequestTime()));
+					if (tempDetail.getV2WorkOrderServiceRequestRequestTime()!=null) {
+						tempMap.put(HEADER_REQUESTTIME, sdf2.format(tempDetail.getV2WorkOrderServiceRequestRequestTime()));
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
 				try {
-					if (tempDetail.getV2WorkOrder().getMvsType()!=null) {
-						String result=WebUtil.getFieldValueMessage("mvsType", tempDetail.getV2WorkOrder().getMvsType()+"");
+					if (tempDetail.getV2WorkOrderMvsType()!=null) {
+						String result=WebUtil.getFieldValueMessage("mvsType", tempDetail.getV2WorkOrderMvsType()+"");
 						tempMap.put(HEADER_MVSTYPE, result);
 					}
 				} catch (Exception e) {
@@ -290,40 +288,40 @@ public class MVSWorkOrderService {
 					// TODO: handle exception
 				}
 				try {
-					if (tempDetail.getV2WorkOrder().getFEOwner().getName()!=null) {
-						tempMap.put(HEADER_FEOWNER, tempDetail.getV2WorkOrder().getFEOwner().getName());
+					if (tempDetail.getV2WorkOrderFEOwnerName()!=null) {
+						tempMap.put(HEADER_FEOWNER, tempDetail.getV2WorkOrderFEOwnerName());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
 				try {
-					if (tempDetail.getHospitalOrg().getName()!=null) {
-						tempMap.put(HEADER_HOSPITAL, tempDetail.getHospitalOrg().getName());
+					if (tempDetail.getHospitalOrgName()!=null) {
+						tempMap.put(HEADER_HOSPITAL, tempDetail.getHospitalOrgName());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
 				try {
-					if (tempDetail.getSiteOrg().getName()!=null) {
-						tempMap.put(HEADER_SITE, tempDetail.getSiteOrg().getName());
+					if (tempDetail.getSiteOrgName()!=null) {
+						tempMap.put(HEADER_SITE, tempDetail.getSiteOrgName());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
 				try {
-					if (tempDetail.getV2WorkOrder().getAssetInfo().getDepartNum()!=null) {
-						tempMap.put(HEADER_DEPARTNUM, tempDetail.getV2WorkOrder().getAssetInfo().getDepartNum());
+					if (tempDetail.getV2WorkOrderAssetInfoDepartNum()!=null) {
+						tempMap.put(HEADER_DEPARTNUM, tempDetail.getV2WorkOrderAssetInfoDepartNum());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
 				try {
-					if (tempDetail.getV2WorkOrder().getAssetInfo().getName()!=null) {
-						tempMap.put(HEADER_ASSETNAME, tempDetail.getV2WorkOrder().getAssetInfo().getName());
+					if (tempDetail.getV2WorkOrderAssetInfoName()!=null) {
+						tempMap.put(HEADER_ASSETNAME, tempDetail.getV2WorkOrderAssetInfoName());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -338,8 +336,8 @@ public class MVSWorkOrderService {
 				}
 
 				try {
-					if (tempDetail.getApartsQuantity()!=null) {
-						tempMap.put(HEADER_QUANTITY,tempDetail.getApartsQuantity());
+					if (tempDetail.getPartsQuantity()!=null) {
+						tempMap.put(HEADER_QUANTITY,tempDetail.getPartsQuantity());
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
