@@ -46,7 +46,8 @@ public enum GatewayURL {
     REMOTE_ASSIGN_REQUEST("/hcapmworkflowservice/api/apm/allocation/assign?requestId={requestId}&assigneeUID={assigneeUID}"),
     REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}"),
     LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
-    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut");
+    RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
+    GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum");
 
     private final String url;
 

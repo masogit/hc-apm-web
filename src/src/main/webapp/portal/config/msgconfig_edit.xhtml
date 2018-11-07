@@ -16,45 +16,12 @@
 
 
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(0)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(0)]}"   />
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(1)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(1)]}"   />
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(2)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(2)]}"   />
-                            </h:panelGroup>
+                            <c:forEach items="#{msgConfigController.msgNameList}" var="item">
+                                <h:panelGroup >
+                                    <p:selectBooleanCheckbox itemLabel="#{msgConfigController.allFields[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
+                                </h:panelGroup>
 
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(3)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(3)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(4)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(4)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(5)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(5)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(6)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(6)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(7)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(7)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(8)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(8)]}"   />
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <p:selectBooleanCheckbox itemLabel="#{msgConfigController.msgNameList.get(9)}" value="#{msgConfigController.selectedMsgFields[msgConfigController.msgNameList.get(9)]}"   />
-                            </h:panelGroup>
-
-
+                            </c:forEach>
                         </p:panelGrid>
                     </p:tab>
                     <p:commandButton validateClient="false" actionListener="#{msgConfigController.saveMsgTenant}" value="#{msg.Save}" update="MsgConfigForm :growl"  icon="ui-icon-check" oncomplete=""/>
