@@ -18,8 +18,8 @@ public class MsgConfig {
     private Integer id;
 
     @Size(max = 256)
-    @Column(name = "msg_name_en")
-    private String msgNameEn;
+    @Column(name = "msg_bind_field")
+    private String msgBindField;
 
     @Size(max = 256)
     @Column(name = "msg_name")
@@ -42,11 +42,5 @@ public class MsgConfig {
         this.msgName = msgName;
     }
 
-    public String getMsgNameEn() {
-        return msgNameEn;
-    }
 
-    public void setMsgNameEn(String msgNameEn) {
-        this.msgNameEn = msgNameEn;
-    }
 }
