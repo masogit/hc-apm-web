@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
@@ -61,6 +62,9 @@ public class SharedAssetStockService {
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+    
+    @Autowired
+	AssetInfoRepository assetInfoRepository;
 
     @Autowired
     private WorkflowConfigRepository wfCfigDao;
@@ -215,6 +219,10 @@ public class SharedAssetStockService {
         return isTargetHospital;
     }
     
+    public AssetInfo getRealTimeAssetInfo(String uid)
+    {
+    	return assetInfoRepository.findByUid(uid);
+    }
 
     public Map<String, String> generateVoucher(AssetInfo asset) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
@@ -242,7 +250,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("设备型号", asset.getFunctionType());
                 voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
-                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(asset));
+                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(getRealTimeAssetInfo(asset.getUid())));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
                 voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(sharedAssetReqDetail));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());

@@ -103,6 +103,15 @@
                                     <p:column headerText="计价方式">
                                         <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
                                     </p:column>
+                                    <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableLeasePrintCol()}">
+										<p:commandButton value="打印" ajax="false"
+											actionListener="#{sharedAssetStockController.printVoucher(asset)}"
+											rendered="true">
+											<p:fileDownload
+												value="#{sharedAssetStockController.exportPdf}" />
+										</p:commandButton>
+                                    </p:column>
+                                    
                                     <p:column headerText="下送" visible="false">
                                         <h:outputText value="#{fieldMsg.fieldValue('label',asset.sharedAssetReqDetail.willBeDelivered)}"/>
                                     </p:column>
@@ -142,7 +151,8 @@
                                                  process="@this"
                                                  actionListener="#{sharedAssetBatchController.resetLeaseAssets()}"
                                                  value="重置列表"
-                                                 update="batchLeaseForm:datalist batchLeaseForm:confirm"/>
+                                                 update="batchLeaseForm:datalist batchLeaseForm:confirm">
+                                </p:commandButton>
                             </h:form>
                         </p:fieldset>
                     </p:tab>
@@ -236,6 +246,15 @@
                                     <p:column headerText="使用时长">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getFormattedRentalTime()}"/>
                                     </p:column>
+                                    <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableReturnPrintCol()}">
+										<p:commandButton value="打印" ajax="false"
+											actionListener="#{sharedAssetStockController.printVoucher(asset)}"
+											rendered="true">
+											<p:fileDownload
+												value="#{sharedAssetStockController.exportPdf}" />
+										</p:commandButton>
+                                    </p:column>
+                                    
                                     <p:column headerText="当前费用" visible="false">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getRentalAmount()}"/>
                                     </p:column>
