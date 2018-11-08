@@ -100,12 +100,22 @@
                         </h:panelGrid>
                     </p:fieldset>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{tenantInfoController.save}" value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SiteInfoEditDialog');"/>
+                    <p:commandButton validateClient="true"  actionListener="#{tenantInfoController.save}" value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('SiteInfoEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
+        <script type="text/javascript">
+            function handleTenantInfo(xhr, status, args) {
+                var valid = true;
+                if (args.tenantEstablished) {
+                    valid = false;
+                }
+                if (valid) {
+                    handleSubmit(args, 'SiteInfoEditDlg');
+                }
+            }
+        </script>
     </ui:composition>
 </html>

@@ -1,13 +1,19 @@
 package com.ge.apm.view.uaa;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -18,13 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.TenantInfoConfig;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
@@ -40,15 +39,19 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     TenantInfoConfig tenantConfig;
     List<String> listVersions;
     String selectedVersion;
-    private AssetInfoRepository assetInfoRepository;
+    AssetInfoRepository assetInfoRepository;
+    TableDefinitionRepository tbDao;
+
 
     @Override
     protected void init() {
+
         filterBySite = false;
         loginUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tbDao=WebUtil.getBean(TableDefinitionRepository.class);
     }
 
     @Override
@@ -66,7 +69,33 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    public static File[] getResourceFolderFiles(String folder) {
 
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(folder);
+        String path = url.getPath();
+        return new File(path).listFiles();
+
+    }
+    private HashMap<String,String> fhMap = new HashMap<String,String>();
+    public void loadTemplateFile(){
+        String rstr="";
+        for (File f : getResourceFolderFiles("/templateFile/")) {
+            try {
+
+                BufferedReader br = new BufferedReader(new FileReader(f));
+                String str = null;
+                while ((str = br.readLine()) != null) {
+                    rstr += str;
+                }
+                fhMap.put(f.getName(),rstr);
+                // tmplst.add(rstr);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     @Override
     public List<TenantInfo> getItemList() {
         return dao.getAllOrderByName();
@@ -85,11 +114,44 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     	super.prepareEdit();
     	parseTenantConfig();
     }
-    
+
+    @Transactional
     @Override
     public void save() {
-    	// TODO Auto-generated method stub
+        boolean valid = true;
+        //如果租户已经创建过则退出
+        /*List<TenantInfo> byName = dao.getByName(this.selected.getName());
+        if(byName.size()>0) {
+            WebUtil.addErrorMessage(byName.get(0).getName()+"租户已经创建过了");
+            RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
+            valid = false;
+        }
+        if (!valid) {
+            return;
+        }*/
+        //加载模版文件
+        loadTemplateFile();
     	this.selected.setTenantConfig(generateTenantConfig());
+    	String config=generateTenantConfig();
+    	//如果是通用版 则要增加模版配置
+        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
+    	if(config.contains("通用版")){
+    	    //将模版插入TableDefinition, 先从数据库里查有没有该模版，有的话就将其
+            //加入tbList to be saved
+            fhMap.entrySet().stream().forEach(item->{
+                List<TableDefinition> td =tbDao.findTD(item.getKey(),UserContextService.getCurrentUserAccount().getTenantUID());
+               if(td.size()==0 ) {
+                   TableDefinition tb = new TableDefinition();
+                   tb.setName(item.getKey());
+                   tb.setSchema(item.getValue());
+                   tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
+                   tb.setCreatedDate(new Date());
+                   tbList.add(tb);
+               }
+            });
+            if(tbList.size()>0)
+                 tbDao.save(tbList);
+        }
     	super.save();
     }
 
