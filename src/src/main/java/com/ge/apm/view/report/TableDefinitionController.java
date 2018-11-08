@@ -3,13 +3,23 @@ package com.ge.apm.view.report;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TableDefinitionRepository;
 
+import java.io.*;
+import java.net.URL;
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.OrgInfo;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.ResourceUtils;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.service.report.TableDefinitionService;
@@ -35,8 +45,10 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
     private String createType = "JSON";
 
+
     @Override
     protected void init() {
+
 
         dao = WebUtil.getBean(TableDefinitionRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -52,7 +64,8 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
         Set<String> idc = new HashSet<>();
         for (TableDefinition item : this.getItemList()) {
-            idc.add(item.getSiteUID());
+            if(null!=item.getSiteUID())
+                idc.add(item.getSiteUID());
         }
         if (!idc.isEmpty()) {
             List<OrgInfo> orgs = orgDao.findByUids(idc);

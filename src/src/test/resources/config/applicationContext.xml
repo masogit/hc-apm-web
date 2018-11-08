@@ -220,9 +220,12 @@
     </property>
   </bean>
 
+
+
   <util:properties id="wxProperties" location="classpath:/wx.properties"/>
   <util:properties id="urlProperties" location="classpath:/url.properties"/>
   <util:properties id="ratingProperties" location="classpath:/rating.properties"/>
+  <util:properties id="templatefolder" location="classpath:/templateFile/"/>-->
 
   <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
     <property name="basePackage" value="com.ge.apm.dao.mapper"/>
