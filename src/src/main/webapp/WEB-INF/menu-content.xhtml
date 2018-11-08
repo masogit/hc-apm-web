@@ -33,16 +33,16 @@
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.isHospitalUser() and userContextService.versionContains('设备调剂')}">
                 <!--<p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
-                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
-                <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead')}"/>
+                <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
                 <!--<p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
-                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
-                <p:menuitem id="um904" value="归还受理" outcome="/portal/ReturnAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead')}"/>
+                <p:menuitem id="um904" value="归还受理" outcome="/portal/ReturnAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
                 <p:menuitem id="um190" value="借还维护" outcome="/portal/sharedAssetRequest/List.xhtml" rendered="false"/>
-                <p:menuitem id="um910" value="设备批量调剂" outcome="/portal/allocationCenter/BatchAllocateAssets.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um910" value="设备批量调剂" outcome="/portal/allocationCenter/BatchAllocateAssets.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
                 <!--<p:menuitem id="um906" value="在借设备查询" outcome="/portal/BorrowApplyV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,AssetHead')}"/>-->
-                <p:menuitem id="um907" value="设备计费情况" outcome="/portal/ReturnAcceptanceV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,DeptHead,AssetHead')}"/>
-                <p:menuitem id="um908" value="设备库存情况" outcome="/portal/allocationCenter/StockOfAssets.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um907" value="设备计费情况" outcome="/portal/ReturnAcceptanceV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,DeptHead,AssetStaff,AssetHead')}"/>
+                <p:menuitem id="um908" value="设备库存情况" outcome="/portal/allocationCenter/StockOfAssets.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
 <!--<p:menuitem id="um905" value="调剂设备json测试" outcome="/portal/SharedAssetTypeAcc/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>-->
                 <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um909" value="调剂名称设置" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
@@ -160,6 +160,8 @@
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
                 <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasRole('SiteAdmin')}"/>
 
+
+
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false}"/>
@@ -175,6 +177,7 @@
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml"/>
                 <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml"/>
                 <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml"/>
+                <p:menuitem id="um506" value="消息配置" outcome="/portal/config/msgconfig_edit.xhtml"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin')}"/>
