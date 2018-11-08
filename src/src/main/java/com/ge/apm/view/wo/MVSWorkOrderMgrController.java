@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -26,7 +27,6 @@ import com.ge.apm.dao.mapper.V2WorkOrderDetailMapper;
 import com.ge.apm.domain.MVSAssetInfoOverview;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.MVSWorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -144,21 +144,26 @@ public class MVSWorkOrderMgrController extends MyCRUDController<MVSAssetInfoOver
 	private void updateFilter() {
 		searchFilters.add(new SearchFilter("v2WorkOrder.assetInfo.mvsEquip", SearchFilter.Operator.EQ, "1"));
 		Iterator<SearchFilter> it=searchFilters.iterator();
+		Set<SearchFilter> copySearchFilter=new HashSet<SearchFilter>();
 		while(it.hasNext()){
 			SearchFilter tempFilter =it.next();
 			if (tempFilter.fieldName.equals("v2WorkOrder.assetInfo.siteUID")) {
-				searchFilters.remove(tempFilter);
+				continue;
 			} else if (tempFilter.fieldName.equals("v2WorkOrder.assetInfo.hospitalUID")) {
-				searchFilters.remove(tempFilter);
+				continue;
 			} else if (tempFilter.fieldName.equals("v2WorkOrder.assetInfo.institutionUID")) {
-				searchFilters.remove(tempFilter);
+				continue;
 			} else if (tempFilter.fieldName.equals("v2WorkOrder.assetInfo.tenantUID")) {
-				searchFilters.remove(tempFilter);
+				continue;
+			}
+			else{
+				copySearchFilter.add(tempFilter);
 			}
 		}
 		if (listNewSearchFilter != null) {
-			searchFilters.addAll(listNewSearchFilter);
+			copySearchFilter.addAll(listNewSearchFilter);
 		}
+		searchFilters=copySearchFilter;
 	}
 
 	private void downloadFile(List<Map<String, Object>> data) {
