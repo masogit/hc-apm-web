@@ -100,58 +100,39 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     public List<TenantInfo> getItemList() {
         return dao.getAllOrderByName();
     }
-    
-    @Override
-    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+
+    String type="";
+
+    public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
     	// TODO Auto-generated method stub
     	super.prepareCreate();
     	setDefaultValueForConfig();
+    	this.type=type;
     }
     
-    @Override
-    public void prepareEdit() {
+    //@Override
+    public void prepareEdit(String type) {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
     	parseTenantConfig();
+        this.type=type;
     }
 
     @Transactional
     @Override
     public void save() {
-        boolean valid = true;
-        //如果租户已经创建过则退出
-        /*List<TenantInfo> byName = dao.getByName(this.selected.getName());
-        if(byName.size()>0) {
-            WebUtil.addErrorMessage(byName.get(0).getName()+"租户已经创建过了");
-            RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
-            valid = false;
+
+        if(type.equalsIgnoreCase("create"))
+        {//如果租户已经创建过则退出
+            List<TenantInfo> byName = dao.getByName(this.selected.getName());
+            if(byName.size()>0) {
+                WebUtil.addErrorMessage(byName.get(0).getName()+"租户已经创建过了");
+                RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
+              return ;
+                }
         }
-        if (!valid) {
-            return;
-        }*/
-        //加载模版文件
-        loadTemplateFile();
-    	this.selected.setTenantConfig(generateTenantConfig());
-    	String config=generateTenantConfig();
-    	//如果是通用版 则要增加模版配置
-        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
-    	if(config.contains("通用版")){
-    	    //将模版插入TableDefinition, 先从数据库里查有没有该模版，有的话就将其
-            //加入tbList to be saved
-            fhMap.entrySet().stream().forEach(item->{
-                List<TableDefinition> td =tbDao.findTD(item.getKey(),UserContextService.getCurrentUserAccount().getTenantUID());
-               if(td.size()==0 ) {
-                   TableDefinition tb = new TableDefinition();
-                   tb.setName(item.getKey());
-                   tb.setSchema(item.getValue());
-                   tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
-                   tb.setCreatedDate(new Date());
-                   tbList.add(tb);
-               }
-            });
-            if(tbList.size()>0)
-                 tbDao.save(tbList);
-        }
+
+        this.selected.setTenantConfig(generateTenantConfig());
     	super.save();
     }
 
@@ -216,10 +197,58 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         orgDao.save(org);
+
+        String config=generateTenantConfig();
+        //如果是通用版 则要增加模版配置
+        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
+        if(config.contains("通用版")){
+            //加载模版文件
+            loadTemplateFile();
+            //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+            fhMap.entrySet().stream().forEach(item->{
+                List<TableDefinition> td =tbDao.findTD(item.getKey(),tenant.getUid());
+                if(td.size()==0 ) {
+                    TableDefinition tb = new TableDefinition();
+                    tb.setName(item.getKey());
+                    tb.setSchema(item.getValue());
+                   // tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
+                    tb.setTenantUID(tenant.getUid());
+                    tb.setCreatedDate(new Date());
+                    tbList.add(tb);
+                }
+            });
+            if(tbList.size()>0)
+                tbDao.save(tbList);
+        }
+
+
     }
 
     @Transactional
     public void onAfterUpdateObject(TenantInfo tenant, boolean isOK) {
+        System.out.println(tenant);
+        /*如果由非通用版改成通用版，查找tabledef表(tenantUid,name)有没有存在模版，没有的话添加*/
+        String config=generateTenantConfig();
+
+        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
+        if(config.contains("通用版")){
+            //加载模版文件
+            loadTemplateFile();
+            //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+            fhMap.entrySet().stream().forEach(item->{
+                List<TableDefinition> td =tbDao.findTD(item.getKey(),tenant.getUid());
+                if(td.size()==0 ) {
+                    TableDefinition tb = new TableDefinition();
+                    tb.setName(item.getKey());
+                    tb.setSchema(item.getValue());
+                    tb.setTenantUID(tenant.getUid());
+                    tb.setCreatedDate(new Date());
+                    tbList.add(tb);
+                }
+            });
+            if(tbList.size()>0)
+                tbDao.save(tbList);
+        }
         if(!isOK){
             return;
         }
