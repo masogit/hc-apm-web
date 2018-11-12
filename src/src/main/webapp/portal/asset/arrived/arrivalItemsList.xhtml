@@ -23,7 +23,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm"/>
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm technologyReportButton businessReportButton clinicalReportButton"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
@@ -79,8 +79,17 @@
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
 
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
+                            </p:commandButton>-->
+                            <p:commandButton ajax="false" id="technologyReportButton" icon="ui-icon-extlink" value="技术验收报告" title="技术验收报告" actionListener="#{assetArrivedItemsController.exportReport('technology')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
+                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton ajax="false" id="businessReportButton" icon="ui-icon-extlink" value="商务验收报告" title="商务验收报告" actionListener="#{assetArrivedItemsController.exportReport('business')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
+                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton ajax="false" id="clinicalReportButton" icon="ui-icon-extlink" value="临床验收报告" title="临床验收报告" actionListener="#{assetArrivedItemsController.exportReport('clinical')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
+                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
