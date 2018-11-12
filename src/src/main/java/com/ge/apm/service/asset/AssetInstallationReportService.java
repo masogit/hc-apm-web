@@ -88,7 +88,7 @@ public class AssetInstallationReportService {
     //导出一条记录
     public StreamedContent exportDocx(Map<String, Object> data, byte[] templateBytes, String reportType) throws IOException {
 
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, reportType, true));
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, reportType, false));
 
         return streamedContent;
     }
