@@ -196,8 +196,12 @@ public class AssetInstallationController {
         String owner3UID = arrivalListItem.getAssetOwnerUID3();
         String useOwnerUID = arrivalListItem.getClinicalOwnerUid();
         if (Strings.isNullOrEmpty(owner1UID)) {
-            arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
-            owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+            if (UserContextService.checkRole("AssetStaff")) { //3363 
+                arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
+                owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+            }else{
+                owner1 = new UserAccount();
+            }
         } else {
             owner1 = aiService.getUserAccountByUid(owner1UID);
         }
