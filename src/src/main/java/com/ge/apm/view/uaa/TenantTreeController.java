@@ -5,25 +5,25 @@
  */
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.client.api.Request.BeginListener;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-import webapp.framework.dao.SearchFilter;
+
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -36,8 +36,8 @@ public class TenantTreeController {
 
 	UaaService uaaService = WebUtil.getBean(UaaService.class);
 	private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
-
-	private TreeNode tenantOrgTree;
+	private AssetInfoRepository assestInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+	private static TreeNode tenantOrgTree;
 	private TreeNode selectedTenantOrgNode;
 
 	@PostConstruct
@@ -53,6 +53,33 @@ public class TenantTreeController {
 		TreeNode rootNode = new DefaultTreeNode("org", null, null);
 		List<OrgInfo> orgList = orgDao.findSimpleAllAsList().stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
 		buildTree(orgList, rootNode);
+//		expandedByOrgType(rootNode);
+		OrgInfo rootOrg = new OrgInfo();
+		rootOrg.setOrgType(0);
+		rootOrg.setOrgLevel(0);
+		rootOrg.setId(-1);
+		rootOrg.setName(WebUtil.getMessage("AllTenants"));
+		rootNode.getChildren().add(0, new DefaultTreeNode("org", rootOrg, null));
+		return rootNode;
+	}
+	
+	public TreeNode createTenantOrgTree1() {
+		TreeNode rootNode = new DefaultTreeNode("org", null, null);
+		List<OrgInfo> orgList = orgDao.findSimpleAllAsList().stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+		List<String> listTenantUid=assestInfoRepository.findMVSTenantUid();
+		List<OrgInfo> newOrgList=new ArrayList<OrgInfo>();
+		if(orgList!=null && orgList.size()>0 && listTenantUid!=null && listTenantUid.size()>0){
+			for(int i=0;i<orgList.size();++i){
+				OrgInfo tempOrgInfo=orgList.get(i);
+				if(listTenantUid.contains(tempOrgInfo.getTenantUID())){
+					newOrgList.add(tempOrgInfo);
+				}
+			}
+		}
+		if(newOrgList.size()==0){
+			newOrgList=orgList;
+		}
+		buildTree(newOrgList, rootNode);
 //		expandedByOrgType(rootNode);
 		OrgInfo rootOrg = new OrgInfo();
 		rootOrg.setOrgType(0);
@@ -104,8 +131,13 @@ public class TenantTreeController {
 	}
 
 	public TreeNode buildTenantTree(Integer type) {
-		if (null == tenantOrgTree) {
-			tenantOrgTree = createTenantOrgTree();
+		if(tenantOrgTree==null){
+			if(type.equals(0)){
+				tenantOrgTree = createTenantOrgTree();
+			}
+			else if(type.equals(1)){
+				tenantOrgTree = createTenantOrgTree1();
+			}
 		}
 		return tenantOrgTree;
 	}

@@ -129,5 +129,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findAllAsList();
 
     @Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo",nativeQuery = false)
-    public List<OrgInfo> findSimpleAllAsList();
+    public Set<OrgInfo> findSimpleAllAsList();
+    
+    @Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo where siteUID in ?1 ",nativeQuery = false)
+    public Set<OrgInfo> findSimpleAllBySiteUid(Set<String> siteUid);
 }

@@ -98,10 +98,14 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     private List<AssetInfo> leaseAssets = new LinkedList<>();
 
     private List<AssetInfo> submittedLeaseAssets;
+    
+    private List<AssetInfo> printLeaseAssets;
 
     private List<AssetInfo> returnAssets = new LinkedList<>();
 
     private List<AssetInfo> submittedReturnAssets;
+    
+    private List<AssetInfo> printReturnAssets;
 
     private SharedAssetBatchService sharedAssetBatchService;
 
@@ -154,6 +158,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void findAndSelectAsset2Lease() {
         logger.info("default value of willBeDelivered: {}", this.willBeDelivered);
+       
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = leaseAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
                                                            || this.searchCriteria.equals(asset.getFinancingNum())
@@ -162,6 +167,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 logger.info("Asset had been added");
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, null, "设备已加入待借用列表"));
             } else {
+            	printLeaseAssets = new LinkedList<>();
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
                 AssetInfo assetInfo = sharedAssetBatchService.findSharedAsset2Lease(ew, this.searchCriteria);
@@ -191,6 +197,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public void findAndSelectAsset2Return() {
+    	
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = returnAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
                                                             || this.searchCriteria.equals(asset.getFinancingNum())
@@ -199,6 +206,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 logger.info("Asset had been added");
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, null, "设备已加入待归还列表"));
             } else {
+            	printReturnAssets = new LinkedList<>();
                 Wrapper ew = new EntityWrapper();
                 sharedAssetBatchService.buildDefaultFilters(ew);
                 AssetInfo assetInfo = sharedAssetBatchService.findSharedAsset2Return(ew, this.searchCriteria);
@@ -242,6 +250,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             Map responseBody = responseEntity.getBody();
             if(SERVICE_RESPONSE_STATUS_OK.equals(responseBody.get(SERVICE_RESPONSE_BIZ_CODE))) {
                 submittedLeaseAssets = leaseAssets;
+                printLeaseAssets = leaseAssets;
                 leaseAssets = new LinkedList<>();
 
                 Map<String, Object> approvedLeaseRequest = (Map<String, Object>) responseBody.get("data");
@@ -267,6 +276,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             Map responseBody = responseEntity.getBody();
             if(SERVICE_RESPONSE_STATUS_OK.equals(responseBody.get(SERVICE_RESPONSE_BIZ_CODE))) {
                 submittedReturnAssets = returnAssets;
+                printReturnAssets = returnAssets;
                 returnAssets = new LinkedList<>();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量归还成功"));
             } else {
@@ -341,6 +351,24 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return result;
     }
 
+    public Boolean enableLeasePrintCol()
+    {
+    	 Boolean result = Boolean.FALSE;
+         if(printLeaseAssets != null && printLeaseAssets.size() > 0) {
+             result = Boolean.TRUE;
+         }
+         return result;
+    }
+    
+    public Boolean enableReturnPrintCol()
+    {
+    	 Boolean result = Boolean.FALSE;
+         if(printReturnAssets != null && printReturnAssets.size() > 0) {
+             result = Boolean.TRUE;
+         }
+         return result;
+    }
+    
     public Boolean enableReturnSubmitBtn() {
         Boolean result = Boolean.FALSE;
         if(returnAssets.size() > 0) {

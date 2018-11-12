@@ -68,6 +68,25 @@ public class AssetFileImportSupportingService {
 
     }
 
+    @Transactional
+    public OrgInfo findOrgOnly(OrgInfo selectedOrgToImport, String name) {
+
+        boolean isShortName = isShortName(name);
+
+        OrgInfo orgInfo;
+
+        if (isShortName) {
+            //parent clinical
+            orgInfo = orgDao.findFirstByParentUIDAndShortName(selectedOrgToImport.getUid(), name);
+        } else {
+            //child clinical
+            orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), name, 4);
+        }
+
+        return orgInfo;
+
+    }
+
     public boolean isShortName(String orgName) {
         return !orgName.contains("-");
     }
