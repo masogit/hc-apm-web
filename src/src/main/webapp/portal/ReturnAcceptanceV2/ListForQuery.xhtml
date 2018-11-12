@@ -133,7 +133,9 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="赔偿费用">
-                            <h:outputText value="#{item.compensationAmount}"/>
+                            <h:outputText value="#{item.compensationAmount}">
+                                <f:convertNumber pattern="0.00"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="总计费用">
                             <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">

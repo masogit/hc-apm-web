@@ -258,3 +258,16 @@ update tenant_info set tenant_config='{"menuList":["安装验收","设备档案"
 --v10.1
 update tenant_info set tenant_config ='{"menuList":["安装验收","设备档案","设备调剂","维修管理","排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}' where tenant_config='{"menuList":["安装验收","设备档案","设备调剂","维修管理(不含排班管理)","维修排班管理","预防维护","绩效分析","系统配置","知识文档","护士站","计量管理"],"edition":"通用版"}';
 update asset_info set pm_owner_id = asset_owner_id, pm_owner_name = asset_owner_name, pm_owner_tel = asset_owner_tel where asset_owner_id is not null;
+
+--v11.1
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(1, '设备编号', 'departNum');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(2, '资产名称', 'assetName');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(3, '当前位置', 'assetLocation');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(4, '所属科室', 'clinicalDeptName');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(5, '紧急程度', 'casePriority');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(6, '报修人', 'requestorName');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(7, '维修人', 'currentPersonName');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(8, '启用日期', 'installDate');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(9, '质保日期', 'factoryWarrantyDate');
+INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
+
