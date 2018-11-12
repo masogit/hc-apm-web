@@ -27,6 +27,11 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
         public TableDefinition findByBaseId(String baseId);
     public TableDefinition findById(String ID);
 
+    public TableDefinition findTableByNameAndSchemaAndSiteUID(String name,String schema,String SiteUid);
+
+    @Query("select o from TableDefinition o where o.name = ?1  and o.siteUID= ?2")
+    public List<TableDefinition> findTD(String name,String SiteUid);
+
     public List<TableDefinition> getByBaseId(String baseId);
 
 	@Query(value = "select td.* from table_definition td where td.status='Released' and td.base_id in (\n" +
