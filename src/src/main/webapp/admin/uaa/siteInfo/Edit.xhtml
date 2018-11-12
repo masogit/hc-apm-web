@@ -67,18 +67,19 @@
                         </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.tenantType}</label>
-                            <p:selectOneMenu value="#{tenantInfoController.selected.type}" >
+                            <p:selectOneMenu value="#{tenantInfoController.selected.type}">
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">版本</label>
                             <p:selectOneMenu value="#{tenantInfoController.selectedVersion}" >
-                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
-                                <p:ajax listener="#{tenantInfoController.onVersionChange}"></p:ajax>
+                                <p:ajax listener="#{tenantInfoController.onVersionChange}" update="SiteInfoEditForm"></p:ajax>
                                 <f:selectItems value="#{tenantInfoController.listVersions}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                             </p:selectOneMenu>
+                            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  disabled="#{tenantInfoController.disableCreateTemplateBt}" rendered="#{tenantInfoController.createOrEdit()}" actionListener="#{tenantInfoController.addTemplateFile()}" value="添加模版" update="SiteInfoEditForm :growl" icon="ui-icon-check" oncomplete="handleAddTemplateFiles(xhr, status, args);"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">&nbsp;</label>
@@ -101,15 +102,12 @@
                     </p:fieldset>
                     <br/>
                     <p:commandButton validateClient="true"  actionListener="#{tenantInfoController.save()}" value="#{msg.Save}" update=":growl" icon="ui-icon-check" oncomplete="handleTenantInfo(xhr, status, args);"/>
-                    &nbsp;&nbsp;
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('SiteInfoEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
         <script type="text/javascript">
             function handleTenantInfo(xhr, status, args) {
-              /*  handleSubmit(args, 'SiteInfoEditDialog');*/
-
                 var valid = true;
                 if (args.tenantEstablished) {
                     valid = false;
@@ -118,6 +116,11 @@
                     handleSubmit(args, 'SiteInfoEditDialog');
                 }
             }
+
+            function handleAddTemplateFiles(xhr, status, args){
+            }
+
+
         </script>
     </ui:composition>
 </html>
