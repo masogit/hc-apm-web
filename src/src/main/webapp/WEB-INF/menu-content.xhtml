@@ -44,8 +44,8 @@
                 <p:menuitem id="um907" value="设备计费情况" outcome="/portal/ReturnAcceptanceV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,DeptHead,AssetStaff,AssetHead')}"/>
                 <p:menuitem id="um908" value="设备库存情况" outcome="/portal/allocationCenter/StockOfAssets.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
 <!--<p:menuitem id="um905" value="调剂设备json测试" outcome="/portal/SharedAssetTypeAcc/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>-->
-                <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
-                <p:menuitem id="um909" value="调剂名称设置" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
+                <p:menuitem id="um909" value="调剂名称设置" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead')}"/>
             </p:submenu>
             <!--<p:submenu id="um074" label="调剂中心" icon="fa fa-folder-open-o"-->
                        <!--rendered="#{userContextService.hasRole('SuperAdmin') }">-->
