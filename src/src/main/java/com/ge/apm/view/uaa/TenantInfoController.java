@@ -14,6 +14,8 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -41,7 +43,21 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     String selectedVersion;
     AssetInfoRepository assetInfoRepository;
     TableDefinitionRepository tbDao;
+    boolean tempAlready=false;
+    String type="";
 
+
+    @Getter
+    @Setter
+    private boolean disableCreateTemplateBt=false; //如果编辑状态初是'通用版' ，添加模版按钮就设置为灰色
+
+    public boolean createOrEdit(){
+        if("create".equalsIgnoreCase(type)){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
     @Override
     protected void init() {
@@ -101,7 +117,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         return dao.getAllOrderByName();
     }
 
-    String type="";
 
     public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
     	// TODO Auto-generated method stub
@@ -116,12 +131,20 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     	super.prepareEdit();
     	parseTenantConfig();
         this.type=type;
+        if(selectedVersion.equalsIgnoreCase("通用版")){
+            isGeneralVersion=true;
+            tempAlready=true;
+            disableCreateTemplateBt=false;
+        }else{
+            isGeneralVersion=false;
+            disableCreateTemplateBt=true;
+        }
+        tempAlready=false;
     }
 
     @Transactional
     @Override
     public void save() {
-
         if(type.equalsIgnoreCase("create"))
         {//如果租户已经创建过则退出
             List<TenantInfo> byName = dao.getByName(this.selected.getName());
@@ -131,10 +154,43 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
               return ;
                 }
         }
-
         this.selected.setTenantConfig(generateTenantConfig());
     	super.save();
     }
+
+    public void addTemplateFile(){
+        if(tempAlready){  //该条件判断只能防止在修改租户对话框中反复'添加模版'，但是当'通用'改成'非通用' 再改回'通用'这种情况下 添加模版还是会重复添加
+            WebUtil.addSuccessMessage("该租户模版已经添加");
+            RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
+            return ;
+        }else{
+            List<TableDefinition> tbList = new ArrayList<TableDefinition>();
+            if (selectedVersion.contains("通用版")) {
+                //加载模版文件
+                loadTemplateFile();//fill fhMap
+                //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+                fhMap.entrySet().stream().forEach(item -> {
+                    List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
+                    if (td.size() == 0) {
+                        TableDefinition tb = new TableDefinition();
+                        tb.setName(item.getKey());
+                        tb.setSchema(item.getValue());
+                        tb.setTenantUID(selected.getUid());
+                        tb.setCreatedDate(new Date());
+                        tbList.add(tb);
+                    }
+                });
+                if (tbList.size() > 0)
+                    tbDao.save(tbList);
+            }
+            tempAlready = true;
+            //模版添加完后 将'添加模版'按钮变灰
+            disableCreateTemplateBt=true;
+            WebUtil.addSuccessMessage("模版添加完成,请务必保存");
+        }
+    }
+
+
 
     @Override
     public void delete(){
@@ -200,8 +256,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
         String config=generateTenantConfig();
         //如果是通用版 则要增加模版配置
-        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
+
         if(config.contains("通用版")){
+            List<TableDefinition> tbList= new ArrayList<TableDefinition>();
             //加载模版文件
             loadTemplateFile();
             //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
@@ -226,12 +283,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
     @Transactional
     public void onAfterUpdateObject(TenantInfo tenant, boolean isOK) {
-        System.out.println(tenant);
         /*如果由非通用版改成通用版，查找tabledef表(tenantUid,name)有没有存在模版，没有的话添加*/
         String config=generateTenantConfig();
 
         List<TableDefinition> tbList= new ArrayList<TableDefinition>();
-        if(config.contains("通用版")){
+       /* if(config.contains("通用版")){
             //加载模版文件
             loadTemplateFile();
             //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
@@ -248,7 +304,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             });
             if(tbList.size()>0)
                 tbDao.save(tbList);
-        }
+        }*/
         if(!isOK){
             return;
         }
@@ -304,9 +360,21 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     		tenantConfig.setBlnWorkSchedule(false);
     	}
     }
-    
+    public boolean isGeneralVersion;
     public void onVersionChange(){
+        /*如果版本是'通用' 则无论版本后面如何选择 '添加模版'按钮都是灰色*/
+
+        if(!isGeneralVersion) {
+            if (this.selectedVersion.equalsIgnoreCase("通用版")) {
+                disableCreateTemplateBt = false;
+            } else {
+                disableCreateTemplateBt = true;
+            }
+        }else{
+            disableCreateTemplateBt=true;
+        }
     	tenantConfig.setValueWithVersion(this.selectedVersion);
+
     }
     
     private void setDefaultValueForConfig(){
@@ -365,4 +433,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void setSelectedVersion(String selectedVersion) {
 		this.selectedVersion = selectedVersion;
 	}
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }
