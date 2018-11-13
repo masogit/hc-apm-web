@@ -72,7 +72,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true"
                                      value="确认"
-                                     update="tabView:batchReturnForm:datalist"
+                                     update="tabView:batchReturnForm:datalist tabView:batchReturnForm:confirm"
                                      icon="ui-icon-check"
                                      oncomplete="handleSubmit(args, 'batchReturnAssetDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('batchReturnAssetDialog').hide()"/>

@@ -29,7 +29,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "import_files")
 public class ImportFiles {
 
-    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrExcel, FeAssetExcel}
+    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel}
 
     public static final String STATUS_COMPLETED = "COMPLETED";
     public static final String STATUS_STARTING = "STARTING";

@@ -260,14 +260,14 @@ update tenant_info set tenant_config ='{"menuList":["安装验收","设备档案
 update asset_info set pm_owner_id = asset_owner_id, pm_owner_name = asset_owner_name, pm_owner_tel = asset_owner_tel where asset_owner_id is not null;
 
 --v11.1
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(1, '设备编号', 'departNum');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(2, '资产名称', 'assetName');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(3, '当前位置', 'assetLocation');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(4, '所属科室', 'clinicalDeptName');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(5, '紧急程度', 'casePriority');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(6, '报修人', 'requestorName');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(7, '维修人', 'currentPersonName');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(8, '启用日期', 'installDate');
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field) VALUES(9, '质保日期', 'factoryWarrantyDate');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(1, '设备编号', 'departNum', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(2, '资产名称', 'assetName', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(3, '当前位置', 'assetLocation', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(4, '所属科室', 'clinicalDeptName', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(5, '紧急程度', 'casePriority', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(6, '报修人', 'requestorName', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(7, '维修人', 'currentPersonName', '0');
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(8, '启用日期', 'installDate', NULL);
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保日期', 'factoryWarrantyDate', NULL);
 INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
 

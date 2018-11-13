@@ -49,6 +49,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     public static final String BATCH_RETURN_TAB_ID = "batchReturn";
     public static final String SERVICE_RESPONSE_STATUS_OK = "OK";
     public static final String SERVICE_RESPONSE_BIZ_CODE = "bizStatusCode";
+    public static final String SERVICE_RESPONSE_MSG = "message";
     public static final String SERVICE_RESPONSE_RENT_DETAILS = "rentDetails";
 
     @Getter
@@ -98,13 +99,13 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     private List<AssetInfo> leaseAssets = new LinkedList<>();
 
     private List<AssetInfo> submittedLeaseAssets;
-    
-    private List<AssetInfo> printLeaseAssets;
 
     private List<AssetInfo> returnAssets = new LinkedList<>();
 
     private List<AssetInfo> submittedReturnAssets;
     
+    private List<AssetInfo> printLeaseAssets;
+
     private List<AssetInfo> printReturnAssets;
 
     private SharedAssetBatchService sharedAssetBatchService;
@@ -158,7 +159,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
 
     public void findAndSelectAsset2Lease() {
         logger.info("default value of willBeDelivered: {}", this.willBeDelivered);
-       
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = leaseAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
                                                            || this.searchCriteria.equals(asset.getFinancingNum())
@@ -197,7 +197,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public void findAndSelectAsset2Return() {
-    	
         if(StringUtils.isNotEmpty(this.searchCriteria)) {
             Boolean hasAdded = returnAssets.stream().anyMatch(asset -> this.searchCriteria.equals(asset.getDepartNum())
                                                             || this.searchCriteria.equals(asset.getFinancingNum())
@@ -262,7 +261,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 }
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量借用成功"));
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量借用失败"));
+                StringBuilder errorMsg = new StringBuilder("批量借用失败");
+                errorMsg.append(":");
+                errorMsg.append(responseBody.get(SERVICE_RESPONSE_MSG));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, errorMsg.toString()));
             }
         } else {
             //空提交, 通过页面组件disable了提交按钮
@@ -280,7 +282,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 returnAssets = new LinkedList<>();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量归还成功"));
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量归还成功"));
+                StringBuilder errorMsg = new StringBuilder("批量归还失败");
+                errorMsg.append(":");
+                errorMsg.append(responseBody.get(SERVICE_RESPONSE_MSG));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, errorMsg.toString()));
             }
         } else {
             //空提交, 通过页面组件disable了提交按钮
@@ -351,24 +356,6 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return result;
     }
 
-    public Boolean enableLeasePrintCol()
-    {
-    	 Boolean result = Boolean.FALSE;
-         if(printLeaseAssets != null && printLeaseAssets.size() > 0) {
-             result = Boolean.TRUE;
-         }
-         return result;
-    }
-    
-    public Boolean enableReturnPrintCol()
-    {
-    	 Boolean result = Boolean.FALSE;
-         if(printReturnAssets != null && printReturnAssets.size() > 0) {
-             result = Boolean.TRUE;
-         }
-         return result;
-    }
-    
     public Boolean enableReturnSubmitBtn() {
         Boolean result = Boolean.FALSE;
         if(returnAssets.size() > 0) {
@@ -408,4 +395,22 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         return result;
     }
 
+    public Boolean enableLeasePrintCol()
+    {
+    	 Boolean result = Boolean.FALSE;
+         if(printLeaseAssets != null && printLeaseAssets.size() > 0) {
+             result = Boolean.TRUE;
+         }
+         return result;
+    }
+    
+    public Boolean enableReturnPrintCol()
+    {
+    	 Boolean result = Boolean.FALSE;
+         if(printReturnAssets != null && printReturnAssets.size() > 0) {
+             result = Boolean.TRUE;
+         }
+         return result;
+    }
+    
 }

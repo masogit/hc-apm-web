@@ -112,7 +112,16 @@
 							
 							<fo:table-cell border-style="solid" number-columns-spanned="2" border-width="0.5px">
 								<fo:block font-weight="bold" margin-left="-0.7cm" margin-right="-1.2cm">
-								借时状况：□  下送：□
+								借时状况：□  下送：
+									<xsl:choose>
+											<xsl:when test="下送/text()='true'">
+												<fo:external-graphic content-width="10pt" content-height="10pt" overflow="hidden" src="./checkbox.png" left="2cm">		
+												</fo:external-graphic>
+											</xsl:when>
+											<xsl:otherwise>	
+												□
+											</xsl:otherwise>
+									</xsl:choose>
 								</fo:block>
 							</fo:table-cell>							
 						</fo:table-row>
