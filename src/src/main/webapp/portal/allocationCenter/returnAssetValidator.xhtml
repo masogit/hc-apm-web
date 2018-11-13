@@ -72,7 +72,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true"
                                      value="确认"
-                                     update="tabView:batchReturnForm:datalist"
+                                     update="tabView:batchReturnForm:datalist tabView:batchReturnForm:confirm"
                                      icon="ui-icon-check"
                                      actionListener="#{sharedAssetBatchController.addAsset2ReturnList(sharedAssetBatchController.preAddAsset)}"
                                      oncomplete="handleSubmit(args, 'returnAssetValidator');"/>
