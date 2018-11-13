@@ -91,7 +91,9 @@ public class CBoardController {
             return false;
         }
 
-        if (response.getStatusLine().getStatusCode() == 200) {
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if ( statusCode >= 200 && statusCode < 300) {
             return true;
         }
 
