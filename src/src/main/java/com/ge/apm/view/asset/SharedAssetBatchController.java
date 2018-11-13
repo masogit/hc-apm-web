@@ -49,6 +49,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     public static final String BATCH_RETURN_TAB_ID = "batchReturn";
     public static final String SERVICE_RESPONSE_STATUS_OK = "OK";
     public static final String SERVICE_RESPONSE_BIZ_CODE = "bizStatusCode";
+    public static final String SERVICE_RESPONSE_MSG = "message";
     public static final String SERVICE_RESPONSE_RENT_DETAILS = "rentDetails";
 
     @Getter
@@ -262,7 +263,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 }
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量借用成功"));
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量借用失败"));
+                StringBuilder errorMsg = new StringBuilder("批量借用失败");
+                errorMsg.append(":");
+                errorMsg.append(responseBody.get(SERVICE_RESPONSE_MSG));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, errorMsg.toString()));
             }
         } else {
             //空提交, 通过页面组件disable了提交按钮
@@ -280,7 +284,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 returnAssets = new LinkedList<>();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量归还成功"));
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "批量归还成功"));
+                StringBuilder errorMsg = new StringBuilder("批量归还失败");
+                errorMsg.append(":");
+                errorMsg.append(responseBody.get(SERVICE_RESPONSE_MSG));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, errorMsg.toString()));
             }
         } else {
             //空提交, 通过页面组件disable了提交按钮
