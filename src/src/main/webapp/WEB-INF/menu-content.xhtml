@@ -131,25 +131,25 @@
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}"
                             outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>
-                <p:menuitem id="um171" value="#{msg.FailureAnalysis}" url="/portal/analysis/reports.xhtml#/FailureAnalysis"/>
-                <p:menuitem id="um172" value="#{msg.StaffPerformance}" url="/portal/analysis/reports.xhtml#/StaffPerf" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead')}"/>
-                <p:menuitem id="um173" value="#{msg.MaintenanceCost}" url="/portal/analysis/reports.xhtml#/MaintenanceCost" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                <p:menuitem id="um171" value="#{msg.FailureAnalysis}" url="/portal/analysis/reports.xhtml#/FailureAnalysis" rendered="false"/>
+                <p:menuitem id="um172" value="#{msg.StaffPerformance}" url="/portal/analysis/reports.xhtml#/StaffPerf" rendered="false"/>
+                <p:menuitem id="um173" value="#{msg.MaintenanceCost}" url="/portal/analysis/reports.xhtml#/MaintenanceCost" rendered="false"/>
                 <p:menuitem id="um19" value="#{msg.DeviceMaintainanceCostAnalysis}" rendered="false"
                             outcome="/empty"/>
                 <p:menuitem id="um21" value="#{msg.SparePartsConsumptionAnalysis}" rendered="false"
                             outcome="/home"/>
                 <p:menuitem id="um22" value="#{msg.ProcessAnalysis}"
-                            url="/portal/analysis/reports.xhtml#/ProcessAnalysis" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                            url="/portal/analysis/reports.xhtml#/ProcessAnalysis" rendered="false"/>
                 <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}"
                             url="/portal/analysis/reports.xhtml#/ScanDetails" 
-                            rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                            rendered="false"/>
                <p:menuitem id="um151" value="CT球管预测" rendered="#{userContextService.isAgentTenant()}" outcome="/portal/config/tubeData/List.xhtml"/>
                 <p:menuitem id="um50" value="设备绩效配置" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um51" value="设备绩效导入" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
-                <p:menuitem id="um52" value="设备绩效报表" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um52" value="设备绩效报表" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="false"/>
                 <p:menuitem id="um39" value="#{msg.DeviceROIAnalysis}" rendered="false" outcome="/empty"/>
-                <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf"/>
-                <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf"/>
+                <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf" rendered="false"/>
+                <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf" rendered="false"/>
                 <p:menuitem id="um42" value="BI绩效分析平台" rendered="true" url="/web/bi"/>
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
@@ -177,7 +177,7 @@
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml"/>
                 <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml"/>
                 <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml"/>
-                <p:menuitem id="um506" value="消息配置" outcome="/portal/config/msgconfig_edit.xhtml"/>
+                <p:menuitem id="um506" value="维修消息配置" outcome="/portal/config/msgconfig_edit.xhtml"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin')}"/>
