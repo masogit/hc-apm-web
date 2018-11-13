@@ -1,13 +1,21 @@
 package com.ge.apm.view.uaa;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -18,13 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.TenantInfoConfig;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
@@ -40,15 +41,33 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     TenantInfoConfig tenantConfig;
     List<String> listVersions;
     String selectedVersion;
-    private AssetInfoRepository assetInfoRepository;
+    AssetInfoRepository assetInfoRepository;
+    TableDefinitionRepository tbDao;
+    boolean tempAlready=false;
+    String type="";
+
+
+    @Getter
+    @Setter
+    private boolean disableCreateTemplateBt=false; //如果编辑状态初是'通用版' ，添加模版按钮就设置为灰色
+
+    public boolean createOrEdit(){
+        if("create".equalsIgnoreCase(type)){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
     @Override
     protected void init() {
+
         filterBySite = false;
         loginUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tbDao=WebUtil.getBean(TableDefinitionRepository.class);
     }
 
     @Override
@@ -66,31 +85,116 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    public static File[] getResourceFolderFiles(String folder) {
 
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(folder);
+        String path = url.getPath();
+        return new File(path).listFiles();
+
+    }
+    private HashMap<String,String> fhMap = new HashMap<String,String>();
+    public void loadTemplateFile(){
+        String rstr="";
+        for (File f : getResourceFolderFiles("/templateFile/")) {
+            try {
+
+                BufferedReader br = new BufferedReader(new FileReader(f));
+                String str = null;
+                while ((str = br.readLine()) != null) {
+                    rstr += str;
+                }
+                fhMap.put(f.getName(),rstr);
+                // tmplst.add(rstr);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     @Override
     public List<TenantInfo> getItemList() {
         return dao.getAllOrderByName();
     }
-    
-    @Override
-    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+
+
+    public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
     	// TODO Auto-generated method stub
     	super.prepareCreate();
     	setDefaultValueForConfig();
+    	this.type=type;
     }
-    
+
     @Override
     public void prepareEdit() {
+        // TODO Auto-generated method stub
+        super.prepareEdit();
+        parseTenantConfig();
+    }
+
+    public void prepareEdit(String type) {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
     	parseTenantConfig();
+        this.type=type;
+        if(selectedVersion.equalsIgnoreCase("通用版")){
+            isGeneralVersion=true;
+            tempAlready=true;
+            disableCreateTemplateBt=false;
+        }else{
+            isGeneralVersion=false;
+            disableCreateTemplateBt=true;
+        }
+        tempAlready=false;
     }
-    
+
+    @Transactional
     @Override
     public void save() {
-    	// TODO Auto-generated method stub
-    	this.selected.setTenantConfig(generateTenantConfig());
+        if(type.equalsIgnoreCase("create"))
+        {//如果租户已经创建过则退出
+            List<TenantInfo> byName = dao.getByName(this.selected.getName());
+            if(byName.size()>0) {
+                WebUtil.addErrorMessage(byName.get(0).getName()+"租户已经创建过了");
+                RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
+              return ;
+                }
+        }
+        this.selected.setTenantConfig(generateTenantConfig());
     	super.save();
+    }
+
+    public void addTemplateFile(){
+        if(tempAlready){  //该条件判断只能防止在修改租户对话框中反复'添加模版'，但是当'通用'改成'非通用' 再改回'通用'这种情况下 添加模版还是会重复添加
+            WebUtil.addSuccessMessage("该租户模版已经添加");
+            RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
+            return ;
+        }else{
+            List<TableDefinition> tbList = new ArrayList<TableDefinition>();
+            if (selectedVersion.contains("通用版")) {
+                //加载模版文件
+                loadTemplateFile();//fill fhMap
+                //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+                fhMap.entrySet().stream().forEach(item -> {
+                    List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
+                    if (td.size() == 0) {
+                        TableDefinition tb = new TableDefinition();
+                        tb.setName(item.getKey());
+                        tb.setSchema(item.getValue());
+                        tb.setTenantUID(selected.getUid());
+                        tb.setCreatedDate(new Date());
+                        tb.setStatus("Released");
+                        tbList.add(tb);
+                    }
+                });
+                if (tbList.size() > 0)
+                    tbDao.save(tbList);
+            }
+            tempAlready = true;
+            //模版添加完后 将'添加模版'按钮变灰
+            disableCreateTemplateBt=true;
+            WebUtil.addSuccessMessage("模版添加完成,请务必保存");
+        }
     }
 
     @Override
@@ -154,10 +258,41 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         orgDao.save(org);
+
+        String config=generateTenantConfig();
+        //如果是通用版 则要增加模版配置
+
+        if(config.contains("通用版")){
+            List<TableDefinition> tbList= new ArrayList<TableDefinition>();
+            //加载模版文件
+            loadTemplateFile();
+            //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+            fhMap.entrySet().stream().forEach(item->{
+                List<TableDefinition> td =tbDao.findTD(item.getKey(),tenant.getUid());
+                if(td.size()==0 ) {
+                    TableDefinition tb = new TableDefinition();
+                    tb.setName(item.getKey());
+                    tb.setSchema(item.getValue());
+                   // tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
+                    tb.setTenantUID(tenant.getUid());
+                    tb.setCreatedDate(new Date());
+                    tb.setStatus("Released");
+                    tbList.add(tb);
+                }
+            });
+            if(tbList.size()>0)
+                tbDao.save(tbList);
+        }
+
+
     }
 
     @Transactional
     public void onAfterUpdateObject(TenantInfo tenant, boolean isOK) {
+        /*如果由非通用版改成通用版，查找tabledef表(tenantUid,name)有没有存在模版，没有的话添加*/
+        String config=generateTenantConfig();
+
+        List<TableDefinition> tbList= new ArrayList<TableDefinition>();
         if(!isOK){
             return;
         }
@@ -213,9 +348,21 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     		tenantConfig.setBlnWorkSchedule(false);
     	}
     }
-    
+    public boolean isGeneralVersion;
     public void onVersionChange(){
+        /*如果版本是'通用' 则无论版本后面如何选择 '添加模版'按钮都是灰色*/
+
+        if(!isGeneralVersion) {
+            if (this.selectedVersion.equalsIgnoreCase("通用版")) {
+                disableCreateTemplateBt = false;
+            } else {
+                disableCreateTemplateBt = true;
+            }
+        }else{
+            disableCreateTemplateBt=true;
+        }
     	tenantConfig.setValueWithVersion(this.selectedVersion);
+
     }
     
     private void setDefaultValueForConfig(){
@@ -274,4 +421,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void setSelectedVersion(String selectedVersion) {
 		this.selectedVersion = selectedVersion;
 	}
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

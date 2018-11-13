@@ -42,5 +42,11 @@ public class MsgConfig {
         this.msgName = msgName;
     }
 
+    public String getMsgBindField() {
+        return msgBindField;
+    }
 
+    public void setMsgBindField(String msgBindField) {
+        this.msgBindField = msgBindField;
+    }
 }

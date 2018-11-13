@@ -140,9 +140,9 @@ public class V2WorkOrderDetailProvider {
 		} else if (tempColumn.equals("v2WorkOrderAssetInfoDepartNum")) {
 			sb.append("e.depart_num like '%" + value + "%' and ");
 		} else if (tempColumn.equals("v2WorkOrderAssetInfoNamePyCode")) {
-			sb.append("e.name_py_code like '%" + value + "%' and ");
+			sb.append("(e.name_py_code like '%" + value + "%' or e.name like '%" + value + "%') and ");
 		} else if (tempColumn.equals("v2WorkOrderFEOwnerNamePyCode")) {
-			sb.append("d.name_py_code like '%" + value + "%' and ");
+			sb.append("(d.name_py_code like '%" + value + "%' or d.name like '%" + value + "%') and ");
 		}
 	}
 }

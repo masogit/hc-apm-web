@@ -52,7 +52,8 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
         Set<String> idc = new HashSet<>();
         for (TableDefinition item : this.getItemList()) {
-            idc.add(item.getSiteUID());
+            if(null!=item.getSiteUID())
+                idc.add(item.getSiteUID());
         }
         if (!idc.isEmpty()) {
             List<OrgInfo> orgs = orgDao.findByUids(idc);
