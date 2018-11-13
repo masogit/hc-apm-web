@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -140,7 +141,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         if(selectedVersion.equalsIgnoreCase("通用版")){
             isGeneralVersion=true;
             tempAlready=true;
-            disableCreateTemplateBt=false;
         }else{
             isGeneralVersion=false;
             disableCreateTemplateBt=true;
@@ -163,37 +163,46 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         this.selected.setTenantConfig(generateTenantConfig());
     	super.save();
     }
-
+    List<TableDefinition> tbList = new ArrayList<TableDefinition>();
     public void addTemplateFile(){
         if(tempAlready){  //该条件判断只能防止在修改租户对话框中反复'添加模版'，但是当'通用'改成'非通用' 再改回'通用'这种情况下 添加模版还是会重复添加
             WebUtil.addSuccessMessage("该租户模版已经添加");
             RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
             return ;
         }else{
-            List<TableDefinition> tbList = new ArrayList<TableDefinition>();
+
             if (selectedVersion.contains("通用版")) {
                 //加载模版文件
                 loadTemplateFile();//fill fhMap
                 //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
+            tbList = new ArrayList<>();
                 fhMap.entrySet().stream().forEach(item -> {
                     List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
                     if (td.size() == 0) {
                         TableDefinition tb = new TableDefinition();
+                        tb.setTenantUID(selected.getUid());
+                        tb.setInstitutionUID(selected.getUid());
+                        tb.setHospitalUID(selected.getUid());
+                        tb.setSiteUID(selected.getUid());
+                        tb.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
+                        tb.setInstrumentKeyValues("{}");
+                        tb.setCreatedDate(new Date());
+                        tb.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
                         tb.setName(item.getKey());
                         tb.setSchema(item.getValue());
-                        tb.setTenantUID(selected.getUid());
-                        tb.setCreatedDate(new Date());
-                        tb.setStatus("Released");
                         tbList.add(tb);
                     }
                 });
-                if (tbList.size() > 0)
+                if (tbList.size() > 0) {
                     tbDao.save(tbList);
+                }
+                tbList.stream().forEach(item->item.setBaseId(item.getId()));
+                tbDao.save(tbList);
             }
             tempAlready = true;
             //模版添加完后 将'添加模版'按钮变灰
             disableCreateTemplateBt=true;
-            WebUtil.addSuccessMessage("模版添加完成,请务必保存");
+            WebUtil.addSuccessMessage("模版添加完成");
         }
     }
 
@@ -271,19 +280,25 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                 List<TableDefinition> td =tbDao.findTD(item.getKey(),tenant.getUid());
                 if(td.size()==0 ) {
                     TableDefinition tb = new TableDefinition();
+                    tb.setTenantUID(tenant.getUid());
+                    tb.setInstitutionUID(tenant.getUid());
+                    tb.setHospitalUID(tenant.getUid());
+                    tb.setSiteUID(tenant.getUid());
+                    tb.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
+                    tb.setInstrumentKeyValues("{}");
+                    tb.setCreatedDate(new Date());
+                    tb.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
                     tb.setName(item.getKey());
                     tb.setSchema(item.getValue());
-                   // tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
-                    tb.setTenantUID(tenant.getUid());
-                    tb.setCreatedDate(new Date());
-                    tb.setStatus("Released");
                     tbList.add(tb);
                 }
             });
-            if(tbList.size()>0)
+            if (tbList.size() > 0) {
                 tbDao.save(tbList);
+            }
+            tbList.stream().forEach(item->item.setBaseId(item.getId()));
+            tbDao.save(tbList);
         }
-
 
     }
 
@@ -350,14 +365,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     }
     public boolean isGeneralVersion;
     public void onVersionChange(){
-        /*如果版本是'通用' 则无论版本后面如何选择 '添加模版'按钮都是灰色*/
-
-        if(!isGeneralVersion) {
-            if (this.selectedVersion.equalsIgnoreCase("通用版")) {
-                disableCreateTemplateBt = false;
-            } else {
-                disableCreateTemplateBt = true;
-            }
+        if (this.selectedVersion.equalsIgnoreCase("通用版")) {
+            disableCreateTemplateBt = false;
         }else{
             disableCreateTemplateBt=true;
         }
