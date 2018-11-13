@@ -183,6 +183,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                         tb.setSchema(item.getValue());
                         tb.setTenantUID(selected.getUid());
                         tb.setCreatedDate(new Date());
+                        tb.setStatus("Released");
                         tbList.add(tb);
                     }
                 });
@@ -195,8 +196,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             WebUtil.addSuccessMessage("模版添加完成,请务必保存");
         }
     }
-
-
 
     @Override
     public void delete(){
@@ -277,6 +276,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                    // tb.setSiteUID(UserContextService.getCurrentUserAccount().getTenantUID());
                     tb.setTenantUID(tenant.getUid());
                     tb.setCreatedDate(new Date());
+                    tb.setStatus("Released");
                     tbList.add(tb);
                 }
             });
@@ -293,24 +293,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         String config=generateTenantConfig();
 
         List<TableDefinition> tbList= new ArrayList<TableDefinition>();
-       /* if(config.contains("通用版")){
-            //加载模版文件
-            loadTemplateFile();
-            //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
-            fhMap.entrySet().stream().forEach(item->{
-                List<TableDefinition> td =tbDao.findTD(item.getKey(),tenant.getUid());
-                if(td.size()==0 ) {
-                    TableDefinition tb = new TableDefinition();
-                    tb.setName(item.getKey());
-                    tb.setSchema(item.getValue());
-                    tb.setTenantUID(tenant.getUid());
-                    tb.setCreatedDate(new Date());
-                    tbList.add(tb);
-                }
-            });
-            if(tbList.size()>0)
-                tbDao.save(tbList);
-        }*/
         if(!isOK){
             return;
         }
