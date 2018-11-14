@@ -1,8 +1,6 @@
 package com.ge.apm.view.uaa;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -99,15 +97,16 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         String rstr="";
         for (File f : getResourceFolderFiles("/templateFile/")) {
             try {
-
-                BufferedReader br = new BufferedReader(new FileReader(f));
+                FileInputStream in = new FileInputStream(f);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in,"GBK"));
                 String str = null;
+                int count;
+                StringBuffer xmlTemplate = new StringBuffer();
                 while ((str = br.readLine()) != null) {
                     rstr += str;
                 }
                 fhMap.put(f.getName(),rstr);
-                // tmplst.add(rstr);
-
+                rstr="";
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -201,7 +200,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             }
             tempAlready = true;
             //模版添加完后 将'添加模版'按钮变灰
-            disableCreateTemplateBt=true;
+           // disableCreateTemplateBt=true;
             WebUtil.addSuccessMessage("模版添加完成");
         }
     }
