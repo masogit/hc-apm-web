@@ -29,7 +29,7 @@ public class TableResultReportService {
     public static Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         Map<String, Object> resMap = new HashMap<>();
         table.getGroups().forEach(group -> {
-            group.getItems().stream().filter(item -> !Strings.isNullOrEmpty(item.getResKey()) && item.getExp() != null).forEach(item -> {
+            group.getItems().stream().filter(item -> !Strings.isNullOrEmpty(item.getResKey()) && item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule"))).forEach(item -> {
                 switch (item.getExp().get("rule")) {
                     case "RangeRule": {
                         resMap.put(item.getResKey(), getResultForRangeRule(tableValue, item));
