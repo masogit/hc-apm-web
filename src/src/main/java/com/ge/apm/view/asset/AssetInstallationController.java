@@ -5,22 +5,24 @@
  */
 package com.ge.apm.view.asset;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.asset.*;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 
 import com.ge.apm.dao.ArrivalListItemRepository;
@@ -39,15 +41,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.GbCodeService;
-import com.ge.apm.service.asset.QrCodeService;
-import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
@@ -115,6 +108,10 @@ public class AssetInstallationController {
 
     private ConfigService configService;
 
+    private AssetInstallationReportService assetInstallationReportService;
+
+    private StreamedContent exportFile;
+
     @Getter@Setter
     private String exportQrCodeTemplateId;
 
@@ -150,7 +147,7 @@ public class AssetInstallationController {
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
-        
+        assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
@@ -541,7 +538,7 @@ public class AssetInstallationController {
     }
 
     public void onUseOwnerNameChange() {
-        arrivalListItem.setClinicalOwnerUid(useOwner.getId() == null ? null : useOwner.getUid());
+        arrivalListItem.setClinicalOwnerUid(useOwner == null ? null : useOwner.getUid());
     }
 
     public void onQrCodeChange(){
@@ -694,11 +691,37 @@ public class AssetInstallationController {
         return ownerList;
     }
 
+    public void exportReport(String reportType){
+        //List<ArrivalListItem> tempList = new ArrayList();
+        //tempList.add(this.selected);
+        try{
+            Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
+            //List<Map<String, Object>> data = assetInstallationReportService.createReportDataList(tempList);
+            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
+
+            if(templateBytes != null){
+                exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
+                //exportFile = assetInstallationReportService.exportZip(data, templateBytes, reportType);
+            }
+        }catch (IOException e) {
+            Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
+            WebUtil.addErrorMessage("导出失败");
+        }
+    }
+
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
 
-//    public ArrivalListItem getArrivalListItem() {
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+    //    public ArrivalListItem getArrivalListItem() {
 //        return arrivalListItem;
 //    }
 //

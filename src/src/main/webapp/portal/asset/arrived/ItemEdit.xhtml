@@ -594,6 +594,17 @@
                         </p:panelGrid>
 
                         <p:commandButton immediate="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
+                        <p:splitButton id="reportButton" value="下载验收报告" immediate="true">
+                            <p:menuitem immediate="true" ajax="false" value="技术验收报告" icon="pi pi-star" actionListener="#{assetInstallationController.exportReport('technology')}">
+                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                            </p:menuitem>
+                            <p:menuitem immediate="true" value="商务验收报告" ajax="false" icon="pi pi-star" actionListener="#{assetInstallationController.exportReport('business')}">
+                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                            </p:menuitem>
+                            <p:menuitem immediate="true" value="临床验收报告" ajax="false" icon="pi pi-star" actionListener="#{assetInstallationController.exportReport('clinical')}">
+                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                            </p:menuitem>
+                        </p:splitButton>
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
                         <p:commandButton immediate="true" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>

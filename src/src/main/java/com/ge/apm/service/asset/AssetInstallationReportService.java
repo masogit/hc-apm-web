@@ -50,7 +50,7 @@ public class AssetInstallationReportService {
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
         reportData.put("financing_num", arrivalListItem.getFinancingNum());//设备财产编号
         reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
-        reportData.put("manufact_num", "");//出厂编号
+        reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
 
         //技术验收
@@ -161,13 +161,19 @@ public class AssetInstallationReportService {
 
     private String buildFileName(Map<String, Object> data, String reportType, boolean isEncoding){
 
-        String assetName = data.get("asset_name").toString();
-        assetName = StringUtils.replace(assetName, "\\", "-");
-        assetName = StringUtils.replace(assetName, "/", "-");
+        String assetName = "";
+        if(data.get("asset_name") != null){
+            assetName = data.get("asset_name").toString();
+            assetName = StringUtils.replace(assetName, "\\", "-");
+            assetName = StringUtils.replace(assetName, "/", "-");
+        }
 
-        String financingNum = data.get("financing_num").toString();
-        assetName = StringUtils.replace(assetName, "\\", "-");
-        assetName = StringUtils.replace(assetName, "/", "-");
+        String financingNum = "";
+        if(data.get("financing_num") != null){
+            financingNum = data.get("financing_num").toString();
+            financingNum = StringUtils.replace(assetName, "\\", "-");
+            financingNum = StringUtils.replace(assetName, "/", "-");
+        }
 
         String reportTypeTitle = "";
         if(REPORT_TYPE_TECHNOLOGY.equals(reportType)){

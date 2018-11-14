@@ -65,10 +65,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private TreeNode selectedNode;
 
-    private AssetInstallationReportService assetInstallationReportService;
-
-    private StreamedContent exportFile;
-
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
@@ -76,7 +72,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-        assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
 
         addDateTimeFields("arrivalList.arrivalDate");
     }
@@ -253,24 +248,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
     }
 
-    public void exportReport(String reportType){
-        //List<ArrivalListItem> tempList = new ArrayList();
-        //tempList.add(this.selected);
-        try{
-            Map<String, Object> data = assetInstallationReportService.createReportData(this.selected);
-           //List<Map<String, Object>> data = assetInstallationReportService.createReportDataList(tempList);
-            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
-
-            if(templateBytes != null){
-                exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
-                //exportFile = assetInstallationReportService.exportZip(data, templateBytes, reportType);
-            }
-        }catch (IOException e) {
-            logger.error("Fail to export", e);
-            WebUtil.addErrorMessage("导出失败");
-        }
-    }
-
     public void setArrivalFormatTime(String arrivalFormatTime) {
         this.arrivalFormatTime = arrivalFormatTime;
     }
@@ -297,13 +274,5 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
-    }
-
-    public StreamedContent getExportFile() {
-        return exportFile;
-    }
-
-    public void setExportFile(StreamedContent exportFile) {
-        this.exportFile = exportFile;
     }
 }

@@ -82,15 +82,6 @@
                             <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>-->
-                            <p:commandButton ajax="false" id="technologyReportButton" icon="ui-icon-extlink" value="技术验收报告" title="技术验收报告" actionListener="#{assetArrivedItemsController.exportReport('technology')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
-                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
-                            </p:commandButton>
-                            <p:commandButton ajax="false" id="businessReportButton" icon="ui-icon-extlink" value="商务验收报告" title="商务验收报告" actionListener="#{assetArrivedItemsController.exportReport('business')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
-                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
-                            </p:commandButton>
-                            <p:commandButton ajax="false" id="clinicalReportButton" icon="ui-icon-extlink" value="临床验收报告" title="临床验收报告" actionListener="#{assetArrivedItemsController.exportReport('clinical')}" disabled="#{empty assetArrivedItemsController.selected || assetArrivedItemsController.selected.installStatus != 'instorage'}">
-                                <p:fileDownload value="#{assetArrivedItemsController.exportFile}"/>
-                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
