@@ -247,7 +247,7 @@ public class SharedAssetStockService {
                 }
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
-                voucherInfo.put("设备型号", asset.getFunctionType());
+                voucherInfo.put("设备型号", getRealTimeAssetInfo(asset.getUid()).getFunctionType());
                 voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
                 voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(getRealTimeAssetInfo(asset.getUid())));
@@ -268,7 +268,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("归还时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
                 Long rentalTimeInMinutes = AllocationCenterUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
                 String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
-                voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
+                voucherInfo.put("总租用期", borrowDays);
                 voucherInfo.put("租赁费用", df.format(totalFee));
                 voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");
