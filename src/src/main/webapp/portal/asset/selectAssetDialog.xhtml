@@ -32,7 +32,7 @@
                     <p:tab title="#{msg.searchAsset}" id="tabSerch">
                         <h:panelGrid id="searchGrid" columns="8">
                             <p:inputText id="search_LIKE_name" placeholder="#{msg.assetName}"/>
-                            <p:inputText id="search_LIKE_financingNum" placeholder="#{msg.financingNum}"/>
+                            <p:inputText id="idOneSearchStr" value="#{selectAssetController.oneSearchStr}" placeholder="#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}" maxlength="100" style="width: 300px"/>
 
 <!--                            <p:selectOneMenu id="search_EQ_assetOwnerId">
                                 <f:selectItem itemLabel="#{msg.selectAssetOwner}"/>
