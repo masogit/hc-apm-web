@@ -95,6 +95,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     private HashMap<String,String> fhMap = new HashMap<String,String>();
     public void loadTemplateFile(){
         String rstr="";
+        fhMap = new HashMap<String,String>();
         for (File f : getResourceFolderFiles("/templateFile/")) {
             try {
                 FileInputStream in = new FileInputStream(f);
@@ -169,12 +170,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
             return ;
         }else{
-
             if (selectedVersion.contains("通用版")) {
                 //加载模版文件
-                loadTemplateFile();//fill fhMap
+                loadTemplateFile();
                 //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
-            tbList = new ArrayList<>();
+                tbList = new ArrayList<>();
                 fhMap.entrySet().stream().forEach(item -> {
                     List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
                     if (td.size() == 0) {
