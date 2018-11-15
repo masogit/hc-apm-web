@@ -176,8 +176,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                 //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
                 tbList = new ArrayList<>();
                 fhMap.entrySet().stream().forEach(item -> {
-                    List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
-                    if (td.size() == 0) {
+                    //List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
+                   // if (td.size() == 0) {
                         TableDefinition tb = new TableDefinition();
                         tb.setTenantUID(selected.getUid());
                         tb.setInstitutionUID(selected.getUid());
@@ -190,7 +190,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                         tb.setName(item.getKey());
                         tb.setSchema(item.getValue());
                         tbList.add(tb);
-                    }
+                 //   }
                 });
                 if (tbList.size() > 0) {
                     tbDao.save(tbList);
