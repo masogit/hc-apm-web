@@ -101,12 +101,13 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                 FileInputStream in = new FileInputStream(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(in,"GBK"));
                 String str = null;
-                int count;
                 StringBuffer xmlTemplate = new StringBuffer();
                 while ((str = br.readLine()) != null) {
                     rstr += str;
                 }
-                fhMap.put(f.getName(),rstr);
+String fileName=f.getName();
+                int num =fileName.substring(fileName.lastIndexOf(".")).length();
+                fhMap.put(fileName.substring(0, fileName.length()-num)  ,rstr);
                 rstr="";
             } catch (Exception e) {
                 e.printStackTrace();
