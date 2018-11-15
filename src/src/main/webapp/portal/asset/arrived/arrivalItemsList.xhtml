@@ -23,7 +23,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm technologyReportButton businessReportButton clinicalReportButton"/>
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
