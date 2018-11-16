@@ -171,8 +171,8 @@ public class AssetInstallationReportService {
         String financingNum = "";
         if(data.get("financing_num") != null){
             financingNum = data.get("financing_num").toString();
-            financingNum = StringUtils.replace(assetName, "\\", "-");
-            financingNum = StringUtils.replace(assetName, "/", "-");
+            financingNum = StringUtils.replace(financingNum, "\\", "-");
+            financingNum = StringUtils.replace(financingNum, "/", "-");
         }
 
         String reportTypeTitle = "";
