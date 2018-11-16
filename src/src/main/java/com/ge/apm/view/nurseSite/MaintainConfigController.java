@@ -286,6 +286,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void onFilterChange(){
 		boolean search=false;
 		List<SearchFilter> listSearchFilter=new ArrayList<SearchFilter>();
+		listSearchFilter.add(new SearchFilter("status",SearchFilter.Operator.NE,"4","1*"));
+		listSearchFilter.add(new SearchFilter("isValid",SearchFilter.Operator.EQ,true,"1*"));
+		listSearchFilter.add(new SearchFilter("isDeleted",SearchFilter.Operator.EQ,false,"1*"));
 		if(StringUtils.isNotEmpty(assetInfoName)){
 			SearchFilter tempFilter=new SearchFilter("name",SearchFilter.Operator.LIKE,assetInfoName,"1*");
 			listSearchFilter.add(tempFilter);
