@@ -271,7 +271,4 @@ INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(8
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保日期', 'factoryWarrantyDate', NULL);
 INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
 
-update v2_service_request set nearest_sr_days = -1 , nearest_sr_id = '' where asset_id in(
-select asset_id from v2_service_request group by asset_id having count(1) < 2
-);
 
