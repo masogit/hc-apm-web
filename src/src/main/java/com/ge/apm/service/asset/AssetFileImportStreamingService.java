@@ -43,7 +43,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
             String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门名称"));
 
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
-                break;
+                continue;
             }
 
             OrgInfo org = new OrgInfo();
