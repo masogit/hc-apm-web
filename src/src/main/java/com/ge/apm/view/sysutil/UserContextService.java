@@ -385,6 +385,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
+            if(isIBCustomer())
+                return "portal/woMgr/workOrderList.xhtml";
+            
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
         }
@@ -489,6 +492,17 @@ public class UserContextService implements Serializable {
         }
     }
 
+    public boolean isNotIBCustomer(){
+        return !isIBCustomer();
+    }
+
+    public boolean isIBCustomer(){
+        UserAccount currentUser = getLoginUser();
+        int siteId= currentUser.getSiteId();
+        if(siteId!=46) return false; // not in GE IB Tenant
+        return !(currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()));
+    }
+    
     public static boolean isOnlyLocalITAdmin() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
