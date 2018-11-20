@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
@@ -61,6 +62,9 @@ public class SharedAssetStockService {
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+    
+    @Autowired
+	AssetInfoRepository assetInfoRepository;
 
     @Autowired
     private WorkflowConfigRepository wfCfigDao;
@@ -215,6 +219,10 @@ public class SharedAssetStockService {
         return isTargetHospital;
     }
     
+    public AssetInfo getRealTimeAssetInfo(String uid)
+    {
+    	return assetInfoRepository.findByUid(uid);
+    }
 
     public Map<String, String> generateVoucher(AssetInfo asset) {
         DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
@@ -239,13 +247,14 @@ public class SharedAssetStockService {
                 }
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
-                voucherInfo.put("设备型号", asset.getFunctionType());
+                voucherInfo.put("设备型号", getRealTimeAssetInfo(asset.getUid()).getFunctionType());
                 voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
-                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(asset));
+                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(getRealTimeAssetInfo(asset.getUid())));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
                 voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(sharedAssetReqDetail));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
+                voucherInfo.put("下送", sharedAssetReqDetail.getWillBeDelivered() == null ? null : sharedAssetReqDetail.getWillBeDelivered().toString());
             } else {//可用，曾经借出或从未借出，若曾经借出，则计算最近一次借出的相关信息
                 BigDecimal compensationAmount = sharedAssetReqDetail.getCompensationAmount();
                 BigDecimal totalFee = sharedAssetReqDetail.getTotalAmount();
@@ -259,7 +268,7 @@ public class SharedAssetStockService {
                 voucherInfo.put("归还时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingEndTime()));
                 Long rentalTimeInMinutes = AllocationCenterUtils.getPdfRentTime(sharedAssetReqDetail.getChargingBeginTime(), sharedAssetReqDetail.getChargingEndTime());
                 String borrowDays = rentalTimeInMinutes < 360 ? "0.25" : df.format((double)rentalTimeInMinutes/(24*60));
-                voucherInfo.put("总租用期", rentalTimeInMinutes < 360 ? "0.25" : borrowDays);
+                voucherInfo.put("总租用期", borrowDays);
                 voucherInfo.put("租赁费用", df.format(totalFee));
                 voucherInfo.put("备注", sharedAssetReqDetail.getReqComment());
                 voucherInfo.put("还时状态", sharedAssetReqDetail.getIntact() == Boolean.FALSE ? "损坏" : "完好");

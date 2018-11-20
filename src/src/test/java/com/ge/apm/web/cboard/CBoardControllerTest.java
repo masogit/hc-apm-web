@@ -72,4 +72,14 @@ public class CBoardControllerTest {
         assertEquals("http://apm.hcdigital.com.cn/bi", url);
 
     }
+
+    @Test
+    public void getCboardUrlForStaging() throws IOException {
+
+        CBoardController controller = new CBoardController();
+        String url = controller.getCBoardUrl("http://apm-stg.gechs.cn/geapm/web/bi");
+
+        assertEquals("http://apm-stg.gechs.cn/bi", url);
+
+    }
 }

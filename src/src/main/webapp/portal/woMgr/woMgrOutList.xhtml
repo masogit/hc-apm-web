@@ -44,10 +44,10 @@
                 </p:column>
 
                 <p:column headerText="报告">
-                    <p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}"
-                            rendered="#{not empty item.reportStorageId}">
-                        <h:outputText value="下载"/>
-                    </p:link>
+                    <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download"
+                                     rendered="#{not empty item.reportStorageId}">
+                        <p:fileDownload value="#{assetLifecycleEventController.getAnonymousReport(item.reportStorageId)}" />
+                    </p:commandButton>
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -63,7 +63,6 @@
                     PF('ActiveDlg').show();
                 }
             }
-
 
 
     </script>
