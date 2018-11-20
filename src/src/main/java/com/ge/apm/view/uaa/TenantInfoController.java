@@ -95,17 +95,19 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     private HashMap<String,String> fhMap = new HashMap<String,String>();
     public void loadTemplateFile(){
         String rstr="";
+        fhMap = new HashMap<String,String>();
         for (File f : getResourceFolderFiles("/templateFile/")) {
             try {
                 FileInputStream in = new FileInputStream(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(in,"GBK"));
                 String str = null;
-                int count;
                 StringBuffer xmlTemplate = new StringBuffer();
                 while ((str = br.readLine()) != null) {
                     rstr += str;
                 }
-                fhMap.put(f.getName(),rstr);
+String fileName=f.getName();
+                int num =fileName.substring(fileName.lastIndexOf(".")).length();
+                fhMap.put(fileName.substring(0, fileName.length()-num)  ,rstr);
                 rstr="";
             } catch (Exception e) {
                 e.printStackTrace();
@@ -169,15 +171,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
             RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
             return ;
         }else{
-
             if (selectedVersion.contains("通用版")) {
                 //加载模版文件
-                loadTemplateFile();//fill fhMap
+                loadTemplateFile();
                 //将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be saved
-            tbList = new ArrayList<>();
+                tbList = new ArrayList<>();
                 fhMap.entrySet().stream().forEach(item -> {
-                    List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
-                    if (td.size() == 0) {
+                    //List<TableDefinition> td = tbDao.findTD(item.getKey(), selected.getUid());
+                   // if (td.size() == 0) {
                         TableDefinition tb = new TableDefinition();
                         tb.setTenantUID(selected.getUid());
                         tb.setInstitutionUID(selected.getUid());
@@ -190,7 +191,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
                         tb.setName(item.getKey());
                         tb.setSchema(item.getValue());
                         tbList.add(tb);
-                    }
+                 //   }
                 });
                 if (tbList.size() > 0) {
                     tbDao.save(tbList);

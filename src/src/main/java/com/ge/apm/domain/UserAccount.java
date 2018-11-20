@@ -260,6 +260,12 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name="mvs_role_type")
 	private Integer mvsRoleType;
 
+	@Column(name = "is_ge_op")
+	private Boolean isGeOp;
+        
+	@Column(name = "ge_sso")
+	private String geSso;
+        
 	@Transient
 	private Integer excelIdex;
 
@@ -1030,4 +1036,22 @@ public class UserAccount implements ChineseName, Serializable {
 	public void setListImportUserOrgInfo(List<UserOrgInfo> listImportUserOrgInfo) {
 		this.listImportUserOrgInfo = listImportUserOrgInfo;
 	}
+
+    public Boolean getIsGeOp() {
+        return isGeOp;
+    }
+
+    public void setIsGeOp(Boolean isGeOp) {
+        this.isGeOp = isGeOp;
+    }
+
+    public String getGeSso() {
+        return geSso;
+    }
+
+    public void setGeSso(String geSso) {
+        this.geSso = geSso;
+    }
+        
+        
 }

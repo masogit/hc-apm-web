@@ -164,15 +164,15 @@ public class AssetInstallationReportService {
         String assetName = "";
         if(data.get("asset_name") != null){
             assetName = data.get("asset_name").toString();
-            assetName = StringUtils.replace(assetName, "\\", "-");
-            assetName = StringUtils.replace(assetName, "/", "-");
+            assetName = StringUtils.replace(assetName, "\\", "_");
+            assetName = StringUtils.replace(assetName, "/", "_");
         }
 
         String financingNum = "";
         if(data.get("financing_num") != null){
             financingNum = data.get("financing_num").toString();
-            financingNum = StringUtils.replace(assetName, "\\", "-");
-            financingNum = StringUtils.replace(assetName, "/", "-");
+            financingNum = StringUtils.replace(financingNum, "\\", "_");
+            financingNum = StringUtils.replace(financingNum, "/", "_");
         }
 
         String reportTypeTitle = "";
