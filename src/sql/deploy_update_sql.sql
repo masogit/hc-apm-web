@@ -271,3 +271,4 @@ INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(8
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保日期', 'factoryWarrantyDate', NULL);
 INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
 
+

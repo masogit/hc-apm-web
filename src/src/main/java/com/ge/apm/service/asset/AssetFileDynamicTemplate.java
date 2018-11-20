@@ -399,7 +399,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void writeSampleAsset(List<String> exportFields) {
+    public void writeSampleAsset(List<String> exportFields, List<OrgInfo> clinicalDeptList) {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
@@ -415,7 +415,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
-        writer.writeRowData(startRow, buildSampleAsset());
+        writer.writeRowData(startRow, buildSampleAsset(clinicalDeptList));
 
         workBook.setForceFormulaRecalculation(true);
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
@@ -453,7 +453,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
         writeMetaData(exportFields);
         writeClinicalDeptList(clinicalDeptList);
-        writeSampleAsset(exportFields);
+        writeSampleAsset(exportFields, clinicalDeptList);
     }
 
     public InputStream getInputStream() throws IOException {
@@ -475,6 +475,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int nameIndex = exportFields.indexOf("设备名称");
         int purchasePriceIndex = exportFields.indexOf("采购价格");
+
+        if (nameIndex == -1 || purchasePriceIndex == -1) return;
 
         String nameColLetter = CellReference.convertNumToColString(nameIndex);
         String purchasePriceLetter = CellReference.convertNumToColString(purchasePriceIndex);
@@ -526,7 +528,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public Map<String, Object> buildSampleAsset() {
+    public Map<String, Object> buildSampleAsset(List<OrgInfo> clinicalDeptList) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -535,7 +537,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put("设备别名", "XXXX");
         map.put("维修负责人", "张三");
         map.put("维修负责人2", "李四");
-        map.put("所属科室", "放射科");
+        map.put("所属科室", clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
         map.put("制造商", "XXX医疗器械有限公司");
         map.put("供应商", "XX医疗设备有限公司");
 
