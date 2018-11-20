@@ -78,7 +78,7 @@
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um085" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.isNotIBCustomer()}"/>
                 <p:menuitem id="um200" value="维修工单报表" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.isNotIBCustomer() and (userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))}"/>
-                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#userContextService.isNotIBCustomer() and {userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.versionContains('排班管理')}"/>
+                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.versionContains('排班管理')}"/>
                 <p:menuitem id="um202" value="休假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um220" value="报表模版管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
             </p:submenu>
