@@ -188,7 +188,7 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(item, "错误: 科室为空");
             return;
         } else {
-            OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
+            OrgInfo orgInfo = supportingService.findOrgOnly(selectedOrgToImport, orgName);
             if (orgInfo != null) {
                 //new child clinical will reach here
                 newAsset.setClinicalDeptId(orgInfo.getId());

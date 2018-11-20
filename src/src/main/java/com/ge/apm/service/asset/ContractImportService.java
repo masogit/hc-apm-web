@@ -199,6 +199,12 @@ public class ContractImportService {
 
         ContractRow.clearErrMessage(item);
 
+        if(contractInfoVO.getContractNum() == null){
+            item.put("status", ImportStatus.Failure);
+            ContractRow.addErrMessage(item, "错误: 合同编号为空");
+            isValidateData = false;
+        }
+
         if(contractInfoVO.getName() == null){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "错误: 合同名称为空");
@@ -215,6 +221,27 @@ public class ContractImportService {
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "错误: 结束时间为空和合同时间(月)不能同时为空");
             isValidateData = false;
+        }
+
+        if(contractInfoVO.getContractNum() != null) {
+            List<ContractInfo> contractInfoList = contractInfoDao.findByContractNumAndTenantUID(contractInfoVO.getContractNum(), contractInfoVO.getTenantUID());
+
+            if(contractInfoVO.getId() != null) {
+                for(ContractInfo ci : contractInfoList){
+                    if(!contractInfoVO.getId().equals(ci.getId())){
+                        item.put("status", ImportStatus.Failure);
+                        ContractRow.addErrMessage(item, "错误: 合同编号不能重复");
+                        isValidateData = false;
+                        break;
+                    }
+                }
+            }else {
+                if(!contractInfoList.isEmpty()){
+                    item.put("status", ImportStatus.Failure);
+                    ContractRow.addErrMessage(item, "错误: 合同编号不能重复");
+                    isValidateData = false;
+                }
+            }
         }
 
         if(contractInfoVO.getId() != null){

@@ -762,6 +762,12 @@ public class SharedAssetReqDetail implements Serializable{
         long rentalTimeInMins = this.getRentalTimeInMins();
         long days = 0L, hours = 0L, minutes = 0L;
 
+        long startDurationInMinutes = 0L;
+        if(this.getStartingDuration() != null && this.getStartingDuration() > 0) {
+            startDurationInMinutes = (long)(this.getStartingDuration().doubleValue() * 60);
+            rentalTimeInMins = (rentalTimeInMins > startDurationInMinutes) ? rentalTimeInMins : startDurationInMinutes;
+        }
+
         days = rentalTimeInMins / (24 * 60);
         hours = (rentalTimeInMins / 60) % 24;
         minutes = rentalTimeInMins % 60;
