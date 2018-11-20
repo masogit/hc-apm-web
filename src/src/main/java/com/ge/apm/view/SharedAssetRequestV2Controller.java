@@ -624,8 +624,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     //更改使用科室
 
                                     if(userOrg.getOrgType()==3 || userOrg.getOrgType()==4){
-                                        infoVo.setClinicalDeptName(userOrg.getName());
-                                        infoVo.setAssetDeptUID(userOrg.getUid());
+                                        depts.stream().findFirst().ifPresent(infoVo::setAssetDeptUID);
+                                        String clinicalDeptUid = infoVo.getClinicalDeptUID();
+                                        if(StringUtils.isNotBlank(clinicalDeptUid)) {
+                                            OrgInfo clinicalDept = orgInfoDao.findByUid(clinicalDeptUid);
+                                            infoVo.setClinicalDeptName(clinicalDept.getName());
+                                        }
                                     }
 
                                     //asiDao.save(infoVo);
