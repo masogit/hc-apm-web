@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -32,6 +34,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
 
     private UaaService uuaService;
     private AssetInstallationService aiService;
+    private String oneSearchStr;
 
     @Override
     protected void init() {
@@ -212,6 +215,17 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         }
     }
     
+    @Override
+    public void setSearchFilter() {
+    	// TODO Auto-generated method stub
+    	super.setSearchFilter();
+    	if (StringUtils.isNotEmpty(oneSearchStr)) {
+            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+    }
+    
      public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
     }
@@ -239,4 +253,15 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     public void setSelectedNodes(TreeNode[] selectedNodes) {
         this.selectedNodes = selectedNodes;
     }
+
+
+	public String getOneSearchStr() {
+		return oneSearchStr;
+	}
+
+
+	public void setOneSearchStr(String oneSearchStr) {
+		this.oneSearchStr = oneSearchStr;
+	}
+    
 }

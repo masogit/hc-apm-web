@@ -381,6 +381,13 @@ public class TableCreateController extends TieWebSheetBean {
         if (!Strings.isNullOrEmpty(editTableItem.getKey())) {
             editTableItem.setResKey(editTableItem.getKey().concat("_res"));
         }
+        
+        if(editTableItem.getExp() != null ){
+            if(Strings.isNullOrEmpty(editTableItem.getExp().get("rule"))){
+                editTableItem.getExp().clear();
+                editTableItem.setResKey(null);
+            }
+        }
     }
 
     public void cancelUpload() {

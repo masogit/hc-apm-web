@@ -88,6 +88,15 @@ public class MvsAssetInfo implements Serializable {
     @Column(name = "mvs_type")
     private String mvsType; //MVS 22 类分类
 
+    @Column(name = "contract_start_date")
+    @Temporal(TemporalType.DATE)
+    private Date contractStartDate; //MVS 合同开始
+
+
+    @Column(name = "contract_end_date")
+    @Temporal(TemporalType.DATE)
+    private Date contractEndDate; //MVS 合同结束
+
 //    @Column(name = "asset_uid")
 //    private String assetUid;//资产UUID
 
@@ -265,5 +274,19 @@ public class MvsAssetInfo implements Serializable {
         this.comments = comments;
     }
 
+    public Date getContractStartDate() {
+        return contractStartDate;
+    }
 
+    public void setContractStartDate(Date contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
+
+    public Date getContractEndDate() {
+        return contractEndDate;
+    }
+
+    public void setContractEndDate(Date contractEndDate) {
+        this.contractEndDate = contractEndDate;
+    }
 }

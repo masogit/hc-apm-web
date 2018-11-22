@@ -1287,7 +1287,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6877', '1', '血管内导管', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6877', '2', '导丝和管鞘', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6877', '3', '栓塞器材', NULL, NULL, '-1');
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6899', '其他', NULL, NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6899', '1', '其他', NULL, NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'all', '全部', 'All', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'newrepair', '新增报修', 'New repair', NULL, '-1');
@@ -1406,6 +1407,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'PMResultExcel', '保养结果', '保养结果', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UpTimeExcel', '开机时间', '开机时间', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'SrReportPdf', '服务报告', '服务报告', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'SrExcel', '服务请求报表', '服务请求报表', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetFeExcel', 'FE列表', 'FE List', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetOLEExcel', 'OLE列表', 'OLE List', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetSalesExcel', 'Sales列表', 'Sales List', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileProcessStatus', 'FAILEDUPLOAD', '上传失败', '上传失败', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileProcessStatus', 'STARTING', '待处理', '待处理', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileProcessStatus', 'STARTED', '已开始', '已开始', NULL, '-1');
@@ -1668,3 +1673,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '21', '放疗类', '放疗类', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('mvsAssetGroup', '22', '其他类', '其他类', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'AllTenants', '所有租户', 'All Tenants', NULL, '-1');

@@ -1,19 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.util.JsonUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -23,8 +22,13 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -38,9 +42,12 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
     private UaaService uaaService;
 
+    private FileDownloadService fileDownloadService;
+
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
 
@@ -86,10 +93,24 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         if (status != null) {
             {
                 strStatus = StringUtils.removeEnd(status.get(0).toString(), "状态: ");
-                strStatus = strStatus.replace("状态：","");
+                strStatus = strStatus.replace("状态：", "");
             }
 
         }
         return strStatus;
+    }
+
+    public StreamedContent getAnonymousReport(String reportStorageId) {
+        try {
+            StreamedContent file = fileDownloadService.getFile(reportStorageId);
+            String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getName());
+            String contentType = file.getContentType();
+            InputStream stream = file.getStream();
+            byte[] bytes = IOUtils.toByteArray(stream);
+            return new DefaultStreamedContent((new ByteArrayInputStream(bytes)), contentType, fileName);
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+        }
+        return null;
     }
 }

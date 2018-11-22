@@ -88,9 +88,9 @@
                         <h:outputText value="#{item.insulate? msg.True2Yes : msg.False2No }"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate('create')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editVersionButton" icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditVersionDlg" oncomplete="PF('SiteInfoEditVersionDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Edit}" actionListener="#{tenantInfoController.delete}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

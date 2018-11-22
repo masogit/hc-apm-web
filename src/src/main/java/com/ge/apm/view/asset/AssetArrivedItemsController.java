@@ -1,12 +1,16 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ArrivalListItemRepository;
-import java.util.List;
+
+import java.io.IOException;
+import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.asset.AssetInstallationReportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import org.primefaces.component.tree.Tree;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +30,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -272,5 +275,4 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
-
 }

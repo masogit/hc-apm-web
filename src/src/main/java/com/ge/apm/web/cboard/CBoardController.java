@@ -76,7 +76,7 @@ public class CBoardController {
             return commonUrl + "/hc-apm-cboard";
         }
 
-        return commonUrl;
+        return commonUrl + "/bi";
 
     }
 
@@ -88,10 +88,14 @@ public class CBoardController {
         try {
             response = client.execute(httpGet);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+
             return false;
         }
 
-        if (response.getStatusLine().getStatusCode() == 200) {
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if ( statusCode >= 200 && statusCode < 300) {
             return true;
         }
 

@@ -400,5 +400,20 @@ public class OrgInfo implements Serializable, ChineseName {
     public void setShortNamePyCode(String shortNamePyCode) {
         this.shortNamePyCode = shortNamePyCode;
     }
+
+	public OrgInfo(Integer id,String uid,String name,String namePyCode,String tenantUID,String institutionUID,String hospitalUID,String siteUID,String parentUID,Integer orgLevel,Integer orgType) {
+		super();
+		this.id = id;
+		this.uid = uid;
+		this.tenantUID = tenantUID;
+		this.institutionUID = institutionUID;
+		this.hospitalUID = hospitalUID;
+		this.siteUID = siteUID;
+		this.parentUID = parentUID;
+		this.orgLevel = orgLevel;
+		this.orgType = orgType;
+		this.name = name;
+		this.namePyCode = namePyCode;
+	}
     
 }

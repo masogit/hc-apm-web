@@ -198,7 +198,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                     supportingService.cleanRelatedFieldsWhenUpdating(asset);
                 }
 
-                supportingService.markDefautValue(selectedOrgToImport, asset, now);
+                supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
 
                 map.put("asset", asset);
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);

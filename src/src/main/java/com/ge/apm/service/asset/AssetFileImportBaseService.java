@@ -188,7 +188,7 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(item, "错误: 科室为空");
             return;
         } else {
-            OrgInfo orgInfo = supportingService.importOrgIfNeeded(selectedOrgToImport, orgName);
+            OrgInfo orgInfo = supportingService.findOrgOnly(selectedOrgToImport, orgName);
             if (orgInfo != null) {
                 //new child clinical will reach here
                 newAsset.setClinicalDeptId(orgInfo.getId());
@@ -317,12 +317,17 @@ public class AssetFileImportBaseService {
                     financingNum
             );
 
-            if (!financingNum.startsWith("error:")) {
-                newAsset.setFinancingNum(financingNum);
-            } else {
+            if (financingNum == null) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "取资产编码失败！请检查相应微服务");
+                return;
+            }
+            else if (financingNum.startsWith("error:")) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, financingNum);
                 return;
+            } else {
+                newAsset.setFinancingNum(financingNum);
             }
 
         }
