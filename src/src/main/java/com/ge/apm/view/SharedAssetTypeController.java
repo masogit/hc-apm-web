@@ -178,7 +178,12 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        /* JIRA#3445
+         * Since access control for shared_asset_type is in site_uid level, so retrieve site_uid from current user for access check
+         * List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+         */
+        List<String> orgUidList = new ArrayList<>();
+        orgUidList.add(user.getSiteUID());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
