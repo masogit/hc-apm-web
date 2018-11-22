@@ -247,9 +247,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     {
     	try 
 		{
-    		String fileName = null;    		
+    		String fileName = null; 
+    		//get real time asset info by assetUId, as asset got from html returned by microservice may not be the latest
     		Map<String, String> voucherInfo = sharedAssetStockService.generateVoucher(asset);
-    		
+    		asset = sharedAssetStockService.getRealTimeAssetInfo(asset.getUid());
     		//when no voucher_num, then take old template to print
     		String prefix = StringUtils.isBlank(voucherInfo.get("实际ID")) ? "Shared_Asset" : voucherInfo.get("实际ID");;
 	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))

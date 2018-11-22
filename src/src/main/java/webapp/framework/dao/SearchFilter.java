@@ -317,5 +317,9 @@ public class SearchFilter {
         }
         return params;
     }
-    
+    @Override
+    public String toString() {
+    	// TODO Auto-generated method stub
+    	return fieldName+" "+operator+" "+value+" "+tableAlias;
+    }
 }

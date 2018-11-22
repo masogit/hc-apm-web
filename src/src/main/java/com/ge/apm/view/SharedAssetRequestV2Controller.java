@@ -60,6 +60,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     SharedAssetTypeRepository swapDao = null;
     WorkflowConfigRepository wfCfigDao = null;
     SharedAssetConfigRepository sharedAssetConfigDao = null;
+    UserRoleRepository userRoleRepository = null;
     String p=null;
     private String operation;
     
@@ -162,6 +163,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
+        userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
@@ -488,6 +490,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             List<String> depts = dao.findDeptForSharedAsset(this.selected.getSiteUID());
             String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+            List<UserRole> userRoleList = userRoleRepository.findByUserId(UserContextService.getCurrentUserAccount().getId());
+            //if current user has role like AssetHead(2), AssetStaff(3), SharedAssetMgmt(10), this user will be treated as allocation center admin
+            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole -> userRole.getRoleId() == 2
+                                                                         || userRole.getRoleId() == 3
+                                                                         || userRole.getRoleId() == 10);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
                 String assetDeptUID = infoVo.getAssetDeptUID();
@@ -502,9 +509,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     WebUtil.addWarnMessage("该设备已归还！");
                     return; 
                 }
-                else if(!depts.contains(userOrg.getUid())){
-                    WebUtil.addErrorMessage("当前角色非调剂中心人员，请核实后操作！");
-                    return; 
+                else if(!isAllocationCenterAdmin){
+                    if(!depts.contains(userOrg.getUid())) {
+                        WebUtil.addErrorMessage("当前角色非调剂中心人员，请核实后操作！");
+                        return;
+                    }
                 }
                
                 else{
@@ -614,9 +623,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                      
                                     //更改使用科室
 
-                                    if(userOrg.getOrgType()==4){
-                                        infoVo.setClinicalDeptName(userOrg.getName());
-                                        infoVo.setAssetDeptUID(userOrg.getUid());
+                                    if(userOrg.getOrgType()==3 || userOrg.getOrgType()==4){
+                                        depts.stream().findFirst().ifPresent(infoVo::setAssetDeptUID);
+                                        String clinicalDeptUid = infoVo.getClinicalDeptUID();
+                                        if(StringUtils.isNotBlank(clinicalDeptUid)) {
+                                            OrgInfo clinicalDept = orgInfoDao.findByUid(clinicalDeptUid);
+                                            infoVo.setClinicalDeptName(clinicalDept.getName());
+                                        }
                                     }
 
                                     //asiDao.save(infoVo);
@@ -748,6 +761,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             List<String> depts = dao.findDeptForSharedAsset(this.selected.getSiteUID());
             String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+            List<UserRole> userRoleList = userRoleRepository.findByUserId(UserContextService.getCurrentUserAccount().getId());
+            //if current user has role like AssetHead(2), AssetStaff(3), SharedAssetMgmt(10), this user will be treated as allocation center admin
+            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole -> userRole.getRoleId() == 2
+                                                                            || userRole.getRoleId() == 3
+                                                                            || userRole.getRoleId() == 10);
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
                 String ClinicalDeptUID = infoVo.getAssetDeptUID();
@@ -763,9 +781,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     WebUtil.addWarnMessage("该设备已借出！");
                     return; 
                 }
-                else if(!depts.contains(userOrg.getUid())){
-                    WebUtil.addErrorMessage("当前角色非调剂中心人员，请核实后操作！");
-                    return; 
+                else if(!isAllocationCenterAdmin){
+                    if(!depts.contains(userOrg.getUid())) {
+                        WebUtil.addErrorMessage("当前角色非调剂中心人员，请核实后操作！");
+                        return;
+                    }
                 }
                 else{
                     if(sartList.size()>0){
@@ -1297,7 +1317,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                 apdDao.save(selected.getSartList());
 
-                asdDao.save(selected.getSardList());
+                String voucherNum = sharedAssetService.getVoucherNum();
+                for(SharedAssetReqDetail sard : selected.getSardList()) {
+                    logger.info("voucherNum :" + voucherNum + ", for sard:" + sard.getId());
+                    sard.setVoucherNum(voucherNum);
+                    voucherNum = String.format("%06d", Integer.parseInt(voucherNum) + 1);
+                }
+               asdDao.save(selected.getSardList());
 
                //调用微服务
                try {

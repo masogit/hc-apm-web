@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="消息配置项"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id ="MsgConfigForm" style="margin-top: 20px;">
+                    <p:tab title="消息配置选项" class="ui-g-12" >
+
+
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <c:forEach items="#{msgConfigController.msgNameList}" var="item">
+                                <h:panelGroup >
+                                    <p:selectBooleanCheckbox itemLabel="#{msgConfigController.allFields[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
+                                </h:panelGroup>
+
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:tab>
+                    <p:commandButton validateClient="false" actionListener="#{msgConfigController.saveMsgTenant}" value="#{msg.Save}" update="MsgConfigForm :growl"  icon="ui-icon-check" oncomplete=""/>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

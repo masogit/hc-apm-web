@@ -130,6 +130,32 @@
             <p:inputText id="mvs_comments" value="#{assetInfoEditController.mvsAssetInfo.comments}" readonly="#{!userContextService.isMVSAdmin()}"/>
         </h:panelGroup>
 
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">合同开始日期</label>
+            <p:calendar id="mvs_contractStartDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.contractStartDate}" />
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{userContextService.isMVSAdmin()}">
+            <label class="label">合同结束日期</label>
+            <p:calendar id="mvs_contractEndDate" timeZone="GMT+8" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                        value="#{assetInfoEditController.mvsAssetInfo.contractEndDate}" />
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">合同开始日期</label>
+            <p:inputText id="mvs_contractStartDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.contractStartDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
+            <label class="label">合同结束日期</label>
+            <p:inputText id="mvs_contractEndDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.contractEndDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+
     </p:panelGrid>
 
 

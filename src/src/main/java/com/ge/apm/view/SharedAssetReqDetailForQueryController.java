@@ -130,11 +130,11 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 																					                .filter(item -> item.getOrgType() == 4)  
 																					                .map(item -> item.getUid())  
 																					                .collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
     }
     
@@ -146,7 +146,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
         if (wfCfigList != null && wfCfigList.size() > 0) {
-            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.NE,orgUid));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.NE,orgUid));
         }
 
         if (queryIndex == 0){
@@ -160,8 +160,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("assetNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
         if (queryIndex == 1){
             this.updateSearchFilter(new SearchFilter("chargingEndTime", SearchFilter.Operator.IsNull,null));
@@ -278,5 +278,16 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
         return totalAmount;
     }
+
+    @Override
+    public void updateSearchFilter(SearchFilter searchFilter) {
+        List existedFilters = this.searchFilters.stream()
+                .filter(item -> searchFilter.fieldName.equals(item.fieldName) && searchFilter.operator.compareTo(item.operator) == 0)
+                .collect(Collectors.toList());
+        this.searchFilters.removeAll(existedFilters);
+        searchFilters.add(searchFilter);
+    }
+
+
 
 }
