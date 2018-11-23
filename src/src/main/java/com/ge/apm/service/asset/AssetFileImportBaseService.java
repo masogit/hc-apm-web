@@ -401,18 +401,6 @@ public class AssetFileImportBaseService {
                 }
             }
 
-            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
-                    boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-                    if (!isAvailable) {
-                        item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
-                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
-                        continue;
-                    }
-                }
-            }
-
             if (null == newAsset.getAssetGroup()) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
@@ -477,8 +465,36 @@ public class AssetFileImportBaseService {
 
             }
 
+            //check QrCode
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
+                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                        //三码合一情况下，需要创建新的二维码
+                        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), selectedOrgToImport.getUid());
+                        if (qrCodeLib != null) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                            continue;
+                        }
+                    } else {
+                        //非三码合一情况下，二维码需要已发行
+                        boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                        if (!isAvailable) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                            continue;
+                        }
+                    }
+
+                }
+            }
+
 
         }
+
+
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
