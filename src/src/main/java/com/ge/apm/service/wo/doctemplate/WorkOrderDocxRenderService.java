@@ -2,14 +2,21 @@ package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
+import com.ge.apm.dao.ServiceRequestMsgRepository;
+import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.service.asset.BlobFileService;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class WorkOrderDocxRenderService {
@@ -19,6 +26,14 @@ public class WorkOrderDocxRenderService {
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
     static final Map<String, String> COPY_KEY_MAPPING = new HashMap<>();
+
+    @Autowired
+    private BlobFileService blobService;
+
+    @Autowired
+    private ServiceRequestMsgRepository serviceRequestMsgRepository;
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static {
         COPY_KEY_MAPPING.put("device_name", "设备名称");
@@ -99,16 +114,50 @@ public class WorkOrderDocxRenderService {
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
 
+        putServiceRequestMessage(target, (String) source.get("woId"));
+
         return target;
     }
 
     private void mapESign(Map<String, Object> source, Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
-        if (source.containsKey(key)) {
-            target.put(key, new PictureRenderData(100, 75, "mock.png", (byte[]) source.get(key)));
+        byte[] blob = getBlob(source, key);
+        if (blob != null) {
+            target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
             target.put(eSignTitleKey, eSignTitleValue);
         } else {
             target.put(key, EMPTY_PICTURE);
             target.put(eSignTitleKey, "");
         }
+    }
+
+    private byte[] getBlob(Map<String, Object> map, String key) {
+        if (map.containsKey(key)) {
+            String storageId = (String) map.get(key);
+            if (StringUtils.isNotEmpty(storageId)) {
+                try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
+                    return IOUtils.toByteArray(stream);
+                } catch (IOException ignore) {
+                    //ignore
+                }
+            }
+        }
+        return null;
+    }
+
+    private void putServiceRequestMessage(Map<String, Object> workOrderMap, String id) {
+        List<ServiceRequestMsg> serviceRequestMsgs = serviceRequestMsgRepository.findBySrIdOrderBySendTime(id);
+        List<Map<String, Object>> srMsgs = new ArrayList<>();
+        for (ServiceRequestMsg srMessage : serviceRequestMsgs) {
+            Map<String, Object> map = new HashedMap();
+            map.put("sendTime", formatDate(srMessage.getSendTime()));
+            map.put("senderUserName", srMessage.getSenderUserName());
+            map.put("message", srMessage.getMessage());
+            srMsgs.add(map);
+        }
+        workOrderMap.put("serviceRequestMessages", srMsgs);
+    }
+
+    private String formatDate(Date date) {
+        return date != null ? sdf.format(date) : "";
     }
 }
