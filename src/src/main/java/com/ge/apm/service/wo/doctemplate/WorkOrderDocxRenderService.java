@@ -76,7 +76,6 @@ public class WorkOrderDocxRenderService {
 
         COPY_KEY_MAPPING.put("part_table", "备件信息");
         COPY_KEY_MAPPING.put("proceed_table", "维修流程");
-        COPY_KEY_MAPPING.put("audit_table", "serviceRequestMessages");
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
@@ -154,7 +153,7 @@ public class WorkOrderDocxRenderService {
             map.put("message", srMessage.getMessage());
             srMsgs.add(map);
         }
-        workOrderMap.put("serviceRequestMessages", srMsgs);
+        workOrderMap.put("audit_table", srMsgs);
     }
 
     private String formatDate(Date date) {
