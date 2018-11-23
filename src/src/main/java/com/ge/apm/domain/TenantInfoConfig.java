@@ -122,7 +122,6 @@ public class TenantInfoConfig {
 		}
 	}
 	private void buildRoot() {
-		System.out.println("buildRoot");
 		List<TenantInfoConfigItem> tempMenuList=new ArrayList<TenantInfoConfigItem>(menuList);
 		root = new DefaultTreeNode("root",null, null);
 		buildChildren(root,tempMenuList);
