@@ -266,7 +266,11 @@ public class TenantInfoConfig {
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.批量导入资产数据"), "设备档案.批量导入资产数据", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.盘点工单"), "设备档案.盘点工单", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂"), "设备调剂", true));
+			//add
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.借用申请"), "设备调剂.借用申请", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.借用受理"), "设备调剂.借用受理", true));
+			//add
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.归还申请"), "设备调剂.归还申请", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.归还受理"), "设备调剂.归还受理", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.设备批量调剂"), "设备调剂.设备批量调剂", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.设备计费情况"), "设备调剂.设备计费情况", true));
@@ -276,6 +280,8 @@ public class TenantInfoConfig {
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装"), "到货安装", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.到货清单"), "到货安装.到货清单", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.安装入库"), "到货安装.安装入库", true));
+			//add
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.核对入库"), "到货安装.核对入库", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程"), "维修流程", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.维修工作台"), "维修流程.维修工作台", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.设备消息订阅"), "维修流程.设备消息订阅", true));
@@ -301,6 +307,8 @@ public class TenantInfoConfig {
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("知识文档.文档管理"), "知识文档.文档管理", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析"), "绩效分析", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.状态监控"), "绩效分析.状态监控", true));
+			//add
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.CT球管预测"), "绩效分析.CT球管预测", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.设备绩效配置"), "绩效分析.设备绩效配置", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.设备绩效导入"), "绩效分析.设备绩效导入", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.BI绩效分析平台"), "绩效分析.BI绩效分析平台", true));
@@ -342,7 +350,11 @@ public class TenantInfoConfig {
 			mapVersion.put("设备档案.批量导入资产数据", "批量导入资产数据");
 			mapVersion.put("设备档案.盘点工单", "盘点工单");
 			mapVersion.put("设备调剂", "设备调剂");
+			//add
+			mapVersion.put("设备调剂.借用申请", "借用申请");
 			mapVersion.put("设备调剂.借用受理", "借用受理");
+			//add
+			mapVersion.put("设备调剂.归还申请", "归还申请");
 			mapVersion.put("设备调剂.归还受理", "归还受理");
 			mapVersion.put("设备调剂.设备批量调剂", "设备批量调剂");
 			mapVersion.put("设备调剂.设备计费情况", "设备计费情况");
@@ -352,6 +364,8 @@ public class TenantInfoConfig {
 			mapVersion.put("到货安装", "到货安装");
 			mapVersion.put("到货安装.到货清单", "到货清单");
 			mapVersion.put("到货安装.安装入库", "安装入库");
+			//add
+			mapVersion.put("到货安装.核对入库", "核对入库");
 			mapVersion.put("维修流程", "维修流程");
 			mapVersion.put("维修流程.维修工作台", "维修工作台");
 			mapVersion.put("维修流程.设备消息订阅", "设备消息订阅");
@@ -377,6 +391,8 @@ public class TenantInfoConfig {
 			mapVersion.put("知识文档.文档管理", "文档管理");
 			mapVersion.put("绩效分析", "绩效分析");
 			mapVersion.put("绩效分析.状态监控", "状态监控");
+			//add
+			mapVersion.put("绩效分析.CT球管预测", "CT球管预测");
 			mapVersion.put("绩效分析.设备绩效配置", "设备绩效配置");
 			mapVersion.put("绩效分析.设备绩效导入", "设备绩效导入");
 			mapVersion.put("绩效分析.BI绩效分析平台", "BI绩效分析平台");
