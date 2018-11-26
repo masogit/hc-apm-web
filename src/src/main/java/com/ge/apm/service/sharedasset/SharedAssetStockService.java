@@ -159,6 +159,15 @@ public class SharedAssetStockService {
     public List<OrgInfo> getOrgDeptList(String siteUid) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgInfos = uaaService.getOrgDeptList(siteUid, user.getUid());
+        if(orgInfos.size() == 0) {
+            List<String> allocationDepts = uaaService.getRegulatorUidsBySiteUid(user.getSiteUID());
+            orgInfos = uaaService.getClinicalDeptListBySiteUID(user.getSiteUID());
+            if(allocationDepts != null && allocationDepts.size() > 0) {
+                orgInfos = orgInfos.stream()
+                        .filter(item -> !allocationDepts.contains(item.getUid()))
+                        .collect(Collectors.toList());
+            }
+        }
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);
         return orgInfos;
     }
