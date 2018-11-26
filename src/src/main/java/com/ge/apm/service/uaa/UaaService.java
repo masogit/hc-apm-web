@@ -828,10 +828,10 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         if(logger.isDebugEnabled()) {
             logger.debug("deptList: " + deptList.stream().map(item -> item.getUid()).collect(Collectors.joining(",")));
         }
-        List<String> regulatorUids = this.getRegulatorUidsBySiteUid(siteUid);
-        if(regulatorUids != null && regulatorUids.size() > 0) {
+        List<String> allocationDepts = this.getRegulatorUidsBySiteUid(siteUid);
+        if(allocationDepts != null && allocationDepts.size() > 0) {
             deptList = deptList.stream()
-                                .filter(item -> !regulatorUids.contains(item.getUid()))
+                                .filter(item -> !allocationDepts.contains(item.getUid()))
                                 .collect(Collectors.toList());
         }
         return deptList;
