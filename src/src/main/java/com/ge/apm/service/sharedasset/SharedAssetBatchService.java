@@ -99,6 +99,15 @@ public class SharedAssetBatchService {
     public List<OrgInfo> getOrgDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgInfos = uaaService.getOrgDeptList(user.getSiteUID(), user.getUid());
+        if(orgInfos.size() == 0) {
+            List<String> allocationDepts = uaaService.getRegulatorUidsBySiteUid(user.getSiteUID());
+            orgInfos = uaaService.getClinicalDeptListBySiteUID(user.getSiteUID());
+            if(allocationDepts != null && allocationDepts.size() > 0) {
+                orgInfos = orgInfos.stream()
+                                    .filter(item -> !allocationDepts.contains(item.getUid()))
+                                    .collect(Collectors.toList());
+            }
+        }
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);
         return orgInfos;
     }
