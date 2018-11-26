@@ -44,8 +44,6 @@ public class WorkOrderExportService {
     @Autowired
     ServiceRequestRepository serviceRequestDao;
     @Autowired
-    ServiceRequestMsgRepository serviceRequestMsgRepository;
-    @Autowired
     private V2_WorkOrderRepository v2WorkOrderDao;
     @Autowired
     private V2_WorkOrderStepRepository v2WorkOrderStepDao;
@@ -63,8 +61,6 @@ public class WorkOrderExportService {
     UserAccountRepository userAccountDao;
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
-    @Autowired
-    private BlobFileService blobService;
 
     public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList) {
 
@@ -213,8 +209,6 @@ public class WorkOrderExportService {
                 parts.add(part);
             }
 
-            putServiceRequestMessage(workOrder, workOrderMap);
-
             workOrderMap.put("维修备件", info);
             workOrderMap.put("备件总费用", infoTotalPrice);
             workOrderMap.put("其他费用", workOrder.getOtherExpense());
@@ -320,25 +314,8 @@ public class WorkOrderExportService {
 
     private void putBlob(Map<String, Object> workOrderMap, String storageId, String key) {
         if (storageId != null) {
-            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
-                workOrderMap.put(key, IOUtils.toByteArray(stream));
-            } catch (IOException ignore) {
-                //ignore
-            }
+            workOrderMap.put(key, key);
         }
-    }
-
-    private void putServiceRequestMessage(V2_WorkOrder workOrder, Map<String, Object> workOrderMap) {
-        List<ServiceRequestMsg> serviceRequestMsgs = serviceRequestMsgRepository.findBySrIdOrderBySendTime(workOrder.getId());
-        List<Map<String, Object>> srMsgs = new ArrayList<>();
-        for (ServiceRequestMsg srMessage : serviceRequestMsgs) {
-            Map<String, Object> map = new HashedMap();
-            map.put("sendTime", formatDate(srMessage.getSendTime()));
-            map.put("senderUserName", srMessage.getSenderUserName());
-            map.put("message", srMessage.getMessage());
-            srMsgs.add(map);
-        }
-        workOrderMap.put("serviceRequestMessages", srMsgs);
     }
 
     private String formatDate(Date date) {
