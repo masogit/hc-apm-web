@@ -1,30 +1,30 @@
 package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.*;
-
-import java.util.*;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import com.ge.apm.domain.*;
-import com.ge.apm.service.orginfo.OrgInfoService;
-import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.common.UserCommonService;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.web.mvc.JpaCRUDController;
+import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.ge.apm.service.orginfo.OrgInfoService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
-import webapp.framework.web.WebUtil;
-import org.primefaces.util.TreeUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.service.UserContext;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -36,6 +36,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     UserAccount userAccount;
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoService orgInfoService;
+    private OrgInfoTreeService orgInfoTreeService;
+    private OrgInfoClinicalDeptService clinicalDeptService;
     private UserOrgInfoRepository userOrgDao;
 
     private boolean acShow = false;
@@ -59,6 +61,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
 
         findPerson();
@@ -410,6 +414,17 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return false;
         }
 
+        boolean canDeleteable;
+        if (selected.getOrgType() == 4) {
+            canDeleteable = canDeleteClinicalDept();
+        } else {
+            canDeleteable = canDeleteOrgExceptClinicalDept();
+        }
+
+        return canDeleteable;
+    }
+
+    private boolean canDeleteOrgExceptClinicalDept() {
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
         checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
@@ -446,8 +461,51 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
             return false;
         }
+
+        return true;
+
+    }
+
+    private boolean canDeleteClinicalDept() {
+
+        List<OrgInfo> clinicalsDeptOrg = clinicalDeptService.collectChildClinicalDept(selected);
+
+        List<String> clinicalsDeptUids = clinicalsDeptOrg.stream().map(org -> org.getUid()).collect(Collectors.toList());
+        List<Integer> clinicalsDeptIds = clinicalsDeptOrg.stream().map(org -> org.getId()).collect(Collectors.toList());
+
+        List<SearchFilter> checkFilters = new ArrayList<>();
+
+        checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+        List<UserAccount> userList = userDao.findBySearchFilter(checkFilters);
+        if (userList != null && !userList.isEmpty()) {
+            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+            return false;
+        }
+
+        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        checkFilters.clear();
+
+        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
+        if (assetList != null && !assetList.isEmpty()) {
+            WebUtil.addErrorMessage("该组织下有资产存在,不能删除.");
+            return false;
+        }
+        QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
+        checkFilters.clear();
+
+        checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.IN, clinicalsDeptIds, "1+"));
+        List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
+        if (qrcodeList != null && !qrcodeList.isEmpty()) {
+            WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
+            return false;
+        }
+
         return true;
     }
+
     private String preName;
 
     public void onSelectTreeNode(NodeSelectEvent event) {
