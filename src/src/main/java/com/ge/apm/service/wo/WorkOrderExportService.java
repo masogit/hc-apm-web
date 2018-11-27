@@ -196,7 +196,8 @@ public class WorkOrderExportService {
                     String invoceTimeStr = formatDate(workOrderDetail.getInvoiceTime());
                     Double partsPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
                     String supplier = workOrderDetail.getSupplier() != null ? workOrderDetail.getSupplier() : "";
-                    info += workOrderDetail.getParts() + ",数量:" + tempQuantity + ",单价:" + tempPrice + ",合同号:" + workOrderDetail.getContractNum() + ",发票号:" + workOrderDetail.getContractNum() + ",开票日期:" + invoceTimeStr + ",预计价格:" + partsPrice + ",供应商:" + supplier + ",备注:" + workOrderDetail.getComment() + ";";
+
+                    info += workOrderDetail.getParts() + ",数量:" + tempQuantity + ",合同单价:" + tempPrice + ",合同号:" + workOrderDetail.getContractNum() + ",发票号:" + workOrderDetail.getInvoiceNum() + ",开票日期:" + invoceTimeStr + ",预计价格:" + partsPrice + ",供应商:" + supplier + ",备注:" + workOrderDetail.getComment() + ";";
                     infoTotalPrice += tempQuantity * tempPrice;
                 }
 
