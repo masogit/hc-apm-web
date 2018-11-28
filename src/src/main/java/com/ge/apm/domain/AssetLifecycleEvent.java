@@ -52,7 +52,22 @@ public class AssetLifecycleEvent implements Serializable {
 
     @JoinColumn(name = "report_object_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.EAGER)
-    private V2_BlobObject reportObject;
+    private V2_BlobObject srReport;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pm_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    private V2_BlobObject pmReport;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "checklist_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    private V2_BlobObject checkListReport;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sha_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    private V2_BlobObject shaReport;
 
     public String getId() {
         return id;
@@ -135,17 +150,41 @@ public class AssetLifecycleEvent implements Serializable {
     }
 
     public String getReportStorageId() {
-        if (reportObject != null) {
-            return reportObject.getObjectStorageId();
+        if (srReport != null) {
+            return srReport.getObjectStorageId();
         }
         return "";
     }
 
-    public V2_BlobObject getReportObject() {
-        return reportObject;
+    public V2_BlobObject getSrReport() {
+        return srReport;
     }
 
-    public void setReportObject(V2_BlobObject reportObject) {
-        this.reportObject = reportObject;
+    public void setSrReport(V2_BlobObject srReport) {
+        this.srReport = srReport;
+    }
+
+    public V2_BlobObject getPmReport() {
+        return pmReport;
+    }
+
+    public void setPmReport(V2_BlobObject pmReport) {
+        this.pmReport = pmReport;
+    }
+
+    public V2_BlobObject getCheckListReport() {
+        return checkListReport;
+    }
+
+    public void setCheckListReport(V2_BlobObject checkListReport) {
+        this.checkListReport = checkListReport;
+    }
+
+    public V2_BlobObject getShaReport() {
+        return shaReport;
+    }
+
+    public void setShaReport(V2_BlobObject shaReport) {
+        this.shaReport = shaReport;
     }
 }
