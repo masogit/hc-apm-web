@@ -4,10 +4,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import net.sf.ehcache.hibernate.management.impl.BeanUtils;
@@ -55,6 +52,16 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
         }
 
         return false;
+    }
+
+    public Optional<SearchFilter> getFilterOnField(String fieldName) {
+        for (SearchFilter filter : searchFilters) {
+            if (fieldName.equals(filter.fieldName)) {
+                return Optional.of(filter);
+            }
+        }
+
+        return Optional.empty();
     }
     
     public void updateSearchFilter(SearchFilter searchFilter){
