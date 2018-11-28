@@ -115,11 +115,13 @@ public class ContractInfoService {
         List<V2_WorkOrder> woList = woDao.findByAssetId(asset.getId());
         List<V2_PmOrder> pmList = pmDao.getByAssetUid(asset.getUid());
         List<String> partsContractsNumList = woList.stream().flatMap(item -> item.getV2_workOrder_detail_list().stream()
+                .filter(detailItem -> !Strings.isNullOrEmpty(detailItem.getContractNum()))
                 .map(detailItem -> detailItem.getContractNum())).distinct().collect(Collectors.toList());
         partsContractsNumList.addAll(pmList.stream().flatMap(item -> item.getDetails().stream()
+                .filter(detailItem -> !Strings.isNullOrEmpty(detailItem.getContractNum()))
                 .map(detailItem -> detailItem.getContractNum())).distinct().collect(Collectors.toList()));
         List<ContractInfo> resList = new ArrayList();
-        if(null != partsContractsNumList && !partsContractsNumList.isEmpty()){
+        if(!partsContractsNumList.isEmpty()){
             resList.addAll(contractDao.findByContractNumIn(partsContractsNumList, asset.getTenantUID()));
         }
         resList.addAll(contractItemDao.getByAssetUidAndContractType(asset.getUid()).stream().map(item -> item.getContractInfo()).distinct().collect(Collectors.toList()));

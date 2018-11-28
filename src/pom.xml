@@ -24,7 +24,7 @@
         <hibernate.version>4.2.6.Final</hibernate.version>
         <spring.version>4.2.0.RELEASE</spring.version>
         <spring-security.version>3.1.4.RELEASE</spring-security.version>
-        <primefaces.version>6.2</primefaces.version>
+        <primefaces.version>6.3-SNAPSHOT</primefaces.version>
 
         <hibernate-validator.version>5.3.4.Final</hibernate-validator.version>
         <spring-data-jpa.version>1.5.2.RELEASE</spring-data-jpa.version>
@@ -295,13 +295,21 @@
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>${primefaces.version}</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/primefaces-6.3-SNAPSHOT.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.primefaces</groupId>
+                    <artifactId>primefaces</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.primefaces.themes</groupId>
             <artifactId>all-themes</artifactId>
             <version>1.0.10</version>
             <scope>system</scope>
-            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/all-themes-1.0.10.jar      </systemPath>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/all-themes-1.0.10.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.primefaces</groupId>
