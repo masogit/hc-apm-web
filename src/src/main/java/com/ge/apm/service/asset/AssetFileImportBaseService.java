@@ -416,8 +416,11 @@ public class AssetFileImportBaseService {
 
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
-                item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误: 所属科室为空");
+                //新增的时候不允许为空，更新的时候允许为空。
+                if (StringUtils.isEmpty(newAsset.getUid())) {
+                    item.put("status", ImportStatus.CheckFail);
+                    AssetRow.addErrMessage(item, "错误: 所属科室为空");
+                }
             } else {
 
                 //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
