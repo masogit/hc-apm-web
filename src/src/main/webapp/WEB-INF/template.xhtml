@@ -50,7 +50,9 @@
     <ui:include src="./google-analytics.xhtml"/>
 
     <p:growl id="growl" showDetail="false" showSummary="true"
-             rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}"/>
+             rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}">
+        <p:autoUpdate />
+    </p:growl>
     <div class="layout-wrapper #{guestPreferences.menuLayout}">
         <ui:include src="./menu.xhtml"/>
         <ui:include src="/authorization.xhtml"/>
