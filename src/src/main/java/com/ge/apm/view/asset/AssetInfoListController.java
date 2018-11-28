@@ -216,6 +216,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -243,6 +244,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+        }
+
+        Optional<SearchFilter> nameFilterOptional = this.getFilterOnField("name");
+        if (nameFilterOptional.isPresent() && !nameFilterOptional.get().conditionPath.equals("1*3+")) {
+
+            SearchFilter nameFilter = nameFilterOptional.get();
+            nameFilter.conditionPath = "1*name+";
+            this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameFilter.value, nameFilter.conditionPath));
         }
 
         if (UserContextService.isMVSRole()) {
@@ -287,6 +296,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.oneSearchStr = oneSearchStr;
         if (oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
+            this.removeFilterOnField("namePyCode");
             this.removeFilterOnField("departNum");
             this.removeFilterOnField("financingNum");
             this.removeFilterOnField("qrCode");

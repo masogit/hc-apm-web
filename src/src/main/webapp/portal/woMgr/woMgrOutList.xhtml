@@ -39,6 +39,10 @@
                           filterMatchMode="LIKE">
                     <h:outputText value="#{item.createTime}"/>
                 </p:column>
+                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}"
+                          filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.systemId}"/>
+                </p:column>
                 <p:column headerText="状态">
                     <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
                 </p:column>
