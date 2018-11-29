@@ -381,7 +381,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
 
             if (aiMgrService.isInDispenceCenter(assetInfo)) {
-                WebUtil.addErrorMessage("操作失败，设备名称[%s]为在借中的调剂设备，请先归还！", assetInfo.getName());
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
 
@@ -458,7 +458,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
 
             if (aiMgrService.isInDispenceCenter(assetInfo)) {
-                WebUtil.addErrorMessage("操作失败，设备名称[%s]为在借中的调剂设备，请先归还！", assetInfo.getName());
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
 
