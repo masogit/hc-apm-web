@@ -300,9 +300,9 @@ public class TenantInfoConfig {
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.attribute"), "config.attribute", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.repairMessage"), "config.repairMessage", true));
 			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.captureDataMessage"), "config.captureDataMessage", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.mvs"), "config.mvs", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.info"), "config.info", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.purchase"), "config.purchase", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs"), "mvs", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs.info"), "mvs.info", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs.purchase"), "mvs.purchase", true));
 		}
 		return listOriginVersionInfo;
 	}
@@ -380,9 +380,9 @@ public class TenantInfoConfig {
 			mapVersion.put("config.attribute", "属性配置");
 			mapVersion.put("config.repairMessage", "维修消息配置");
 			mapVersion.put("config.captureDataMessage", "小屏消息配置");
-			mapVersion.put("config.mvs", "MVS设备管理");
-			mapVersion.put("config.info", "基本信息");
-			mapVersion.put("config.purchase", "采购管理");
+			mapVersion.put("mvs", "MVS设备管理");
+			mapVersion.put("mvs.info", "基本信息");
+			mapVersion.put("mvs.purchase", "采购管理");
 		}
 		return mapVersion;
 	}
