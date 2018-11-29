@@ -51,10 +51,14 @@
                 </p:column>
 
                 <p:column headerText="报告">
-                    <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download"
-                                     rendered="#{not empty item.reportStorageId}">
-                        <p:fileDownload value="#{assetLifecycleEventController.getAnonymousReport(item.reportStorageId)}" />
-                    </p:commandButton>
+                    <p:repeat value="#{item.reports}" var="report">
+                        <p:commandButton value="#{msg.download}" ajax="false"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);"
+                                         icon="ui-icon-file-download">
+                            <p:fileDownload
+                                    value="#{assetLifecycleEventController.getAnonymousReport(report.storageId)}"/>
+                        </p:commandButton>
+                    </p:repeat>
                 </p:column>
             </p:dataTable>
         </h:form>
