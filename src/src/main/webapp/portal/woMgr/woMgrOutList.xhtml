@@ -50,9 +50,9 @@
                     <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
                 </p:column>
 
-                <p:column headerText="报告">
+                <p:column headerText="报告下载">
                     <p:repeat value="#{item.reports}" var="report">
-                        <p:commandButton value="#{msg.download}" ajax="false"
+                        <p:commandButton ajax="false"
                                          onclick="PrimeFaces.monitorDownload(start, stop);"
                                          icon="ui-icon-file-download">
                             <p:fileDownload
