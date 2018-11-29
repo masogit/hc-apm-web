@@ -14,7 +14,7 @@
 					<label class="label">版本</label>
 					<p:selectOneMenu value="#{tenantInfoController.tenantConfig.edition}">
 						<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
-						<f:selectItems value="#{tenantInfoController.tenantConfig.getListVersionName()}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 					</p:selectOneMenu>
 				</h:panelGroup>
 			</p:panelGrid>
