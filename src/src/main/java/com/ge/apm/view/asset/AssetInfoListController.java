@@ -379,6 +379,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if (assetInfo == null) {
                 continue;
             }
+
+            if (aiMgrService.isInDispenceCenter(assetInfo)) {
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+                continue;
+            }
+
             assetInfo.setStatus(4);
             dao.save(assetInfo);
         }
@@ -450,6 +456,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+
+            if (aiMgrService.isInDispenceCenter(assetInfo)) {
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+                continue;
+            }
+
             assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());

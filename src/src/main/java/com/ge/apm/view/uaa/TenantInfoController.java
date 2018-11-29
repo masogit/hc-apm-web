@@ -144,6 +144,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseTenantConfig();
+		this.type="edit";
 	}
 
 	public void prepareEdit(String type) {
@@ -151,7 +152,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type = type;
-		if (this.tenantConfig.getEdition().equalsIgnoreCase("通用版")) {
+		if (this.tenantConfig.getEdition().equalsIgnoreCase(TenantInfoConfig.VERSION_COMMON)) {
 			isGeneralVersion = true;
 			tempAlready = true;
 		} else {
@@ -185,7 +186,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
 			return;
 		} else {
-			if (this.tenantConfig.getEdition().contains("通用版")) {
+			if (this.tenantConfig.getEdition().contains(TenantInfoConfig.VERSION_COMMON)) {
 				// 加载模版文件
 				loadTemplateFile();
 				// 将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be
@@ -284,7 +285,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		String config = tenantConfig.getJSONStr();
 		// 如果是通用版 则要增加模版配置
 
-		if (config.contains("通用版")) {
+		if (config.contains(TenantInfoConfig.VERSION_COMMON)) {
 			List<TableDefinition> tbList = new ArrayList<TableDefinition>();
 			// 加载模版文件
 			loadTemplateFile();
@@ -369,7 +370,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public boolean isGeneralVersion;
 
 	public void onVersionChange() {
-		if (this.tenantConfig.getEdition().equalsIgnoreCase("通用版")) {
+		if (this.tenantConfig.getEdition().equalsIgnoreCase(TenantInfoConfig.VERSION_COMMON)) {
 			disableCreateTemplateBt = false;
 		} else {
 			disableCreateTemplateBt = true;

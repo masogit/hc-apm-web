@@ -21,9 +21,9 @@ public class TenantInfoConfig {
 	private TreeNode root;
 	private static List<TenantInfoConfigItem> listOriginVersionInfo;
 	private static List<String> listVersionName;
-	public static final String VERSION_FUNCTION = "业务版";
-	public static final String VERSION_COMMON = "通用版";
-	public static final String VERSION_ULTRASOUND = "超声科室版";
+	public static final String VERSION_FUNCTION = "business";
+	public static final String VERSION_COMMON = "common";
+	public static final String VERSION_ULTRASOUND = "ultrasound";
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static Map<String, String> mapVersion;
 
@@ -76,43 +76,19 @@ public class TenantInfoConfig {
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
 			} else if (edition.equals(VERSION_ULTRASOUND) || edition.equals(VERSION_FUNCTION)) {
-				if (key.equals("维修流程.排班管理")) {
+				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("设备调剂")) {
+				if (key.equals("assetAdjust")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("设备调剂.借用受理")) {
+				if (key.contains("assetAdjust.")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("设备调剂.归还受理")) {
+				if (key.equals("nurseSite")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("设备调剂.设备批量调剂")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("设备调剂.设备计费情况")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("设备调剂.设备库存情况")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("设备调剂.调剂设备配置")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("设备调剂.调剂名称设置")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("护士站")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("护士站.日常维护")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("护士站.日常维护设置")) {
-					tempItem.setValue(false);
-				}
-				if (key.equals("护士站.日常维护报表")) {
+				if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
 				}
 			}
@@ -254,83 +230,79 @@ public class TenantInfoConfig {
 		Map<String, String> mapKeyLabel = getMapVersionKeyLabel();
 		if (listOriginVersionInfo == null) {
 			listOriginVersionInfo = new ArrayList<TenantInfoConfigItem>();
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("我的主页"), "我的主页", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案"), "设备档案", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.基本信息"), "设备档案.基本信息", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.设备分布分析"), "设备档案.设备分布分析", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.合同管理"), "设备档案.合同管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.供应商管理"), "设备档案.供应商管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.报废资产"), "设备档案.报废资产", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.新增资产建档"), "设备档案.新增资产建档", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.资产审核"), "设备档案.资产审核", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.批量导入资产数据"), "设备档案.批量导入资产数据", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备档案.盘点工单"), "设备档案.盘点工单", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂"), "设备调剂", true));
-			//add
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.借用申请"), "设备调剂.借用申请", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.借用受理"), "设备调剂.借用受理", true));
-			//add
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.归还申请"), "设备调剂.归还申请", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.归还受理"), "设备调剂.归还受理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.设备批量调剂"), "设备调剂.设备批量调剂", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.设备计费情况"), "设备调剂.设备计费情况", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.设备库存情况"), "设备调剂.设备库存情况", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.调剂设备配置"), "设备调剂.调剂设备配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("设备调剂.调剂名称设置"), "设备调剂.调剂名称设置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装"), "到货安装", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.到货清单"), "到货安装.到货清单", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.安装入库"), "到货安装.安装入库", true));
-			//add
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("到货安装.核对入库"), "到货安装.核对入库", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程"), "维修流程", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.维修工作台"), "维修流程.维修工作台", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.设备消息订阅"), "维修流程.设备消息订阅", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.维修工单报表"), "维修流程.维修工单报表", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.排班管理"), "维修流程.排班管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.休假管理"), "维修流程.休假管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("维修流程.报表模版管理"), "维修流程.报表模版管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护"), "预防维护", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.保养工作台"), "预防维护.保养工作台", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.保养规则"), "预防维护.保养规则", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.资产规则管理"), "预防维护.资产规则管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.电气安全数据导入"), "预防维护.电气安全数据导入", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.报告模版管理"), "预防维护.报告模版管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("预防维护.报表模版管理"), "预防维护.报表模版管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("计量管理"), "计量管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("计量管理.计量类别设置"), "计量管理.计量类别设置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("计量管理.计量信息"), "计量管理.计量信息", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("护士站"), "护士站", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("护士站.日常维护"), "护士站.日常维护", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("护士站.日常维护设置"), "护士站.日常维护设置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("护士站.日常维护报表"), "护士站.日常维护报表", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("知识文档"), "知识文档", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("知识文档.文档管理"), "知识文档.文档管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析"), "绩效分析", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.状态监控"), "绩效分析.状态监控", true));
-			//add
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.CT球管预测"), "绩效分析.CT球管预测", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.设备绩效配置"), "绩效分析.设备绩效配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.设备绩效导入"), "绩效分析.设备绩效导入", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("绩效分析.BI绩效分析平台"), "绩效分析.BI绩效分析平台", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置"), "系统配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.租户管理"), "系统配置.租户管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.组织机构管理"), "系统配置.组织机构管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.用户管理"), "系统配置.用户管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.批量数据导入"), "系统配置.批量数据导入", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.设备消息订阅"), "系统配置.设备消息订阅", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.二维码管理"), "系统配置.二维码管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.二维码模版管理"), "系统配置.二维码模版管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.维修责任人设置"), "系统配置.维修责任人设置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.设备标签"), "系统配置.设备标签", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.维修工程师群组"), "系统配置.维修工程师群组", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.流程配置项"), "系统配置.流程配置项", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.自定义配置"), "系统配置.自定义配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.属性配置"), "系统配置.属性配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.维修消息配置"), "系统配置.维修消息配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("系统配置.小屏消息配置"), "系统配置.小屏消息配置", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("MVS设备管理"), "MVS设备管理", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("MVS设备管理.基本信息"), "MVS设备管理.基本信息", true));
-			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("MVS设备管理.采购管理"), "MVS设备管理.采购管理", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("homePage"), "homePage", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset"), "asset", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.info"), "asset.info", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.analysis"), "asset.analysis", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.mgt"), "asset.mgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.supplierMgt"), "asset.supplierMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.scrap"), "asset.scrap", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.create"), "asset.create", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.audit"), "asset.audit", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.batchImportData"), "asset.batchImportData", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("asset.inventory"), "asset.inventory", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust"), "assetAdjust", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.borrowApply"), "assetAdjust.borrowApply", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.borrowAccept"), "assetAdjust.borrowAccept", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.returnApply"), "assetAdjust.returnApply", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.returnAccept"), "assetAdjust.returnAccept", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.batch"), "assetAdjust.batch", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.cost"), "assetAdjust.cost", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.stock"), "assetAdjust.stock", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.config"), "assetAdjust.config", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("assetAdjust.nameConfig"), "assetAdjust.nameConfig", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("install"), "install", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("install.list"), "install.list", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("install.store"), "install.store", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("install.check"), "install.check", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair"), "repair", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.workbench"), "repair.workbench", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.message"), "repair.message", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.report"), "repair.report", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.workSchedule"), "repair.workSchedule", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.vacationMgt"), "repair.vacationMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("repair.reportMgt"), "repair.reportMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain"), "maintain", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.workbench"), "maintain.workbench", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.rule"), "maintain.rule", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.assetMgt"), "maintain.assetMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.electricDataImport"), "maintain.electricDataImport", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.reportMgt"), "maintain.reportMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("maintain.reportMgt"), "maintain.reportMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("measure"), "measure", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("measure.categoryConfig"), "measure.categoryConfig", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("measure.info"), "measure.info", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("nurseSite"), "nurseSite", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("nurseSite.maintain"), "nurseSite.maintain", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("nurseSite.config"), "nurseSite.config", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("nurseSite.report"), "nurseSite.report", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("knowledge"), "knowledge", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("knowledge.mgt"), "knowledge.mgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance"), "performance", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance.scan"), "performance.scan", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance.CT"), "performance.CT", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance.config"), "performance.config", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance.import"), "performance.import", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("performance.BI"), "performance.BI", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config"), "config", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.tenant"), "config.tenant", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.org"), "config.org", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.user"), "config.user", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.batchImportData"), "config.batchImportData", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.assetMessage"), "config.assetMessage", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.qrCode"), "config.qrCode", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.qrCodeMgt"), "config.qrCodeMgt", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.repairOwner"), "config.repairOwner", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.assetMark"), "config.assetMark", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.engineerGroup"), "config.engineerGroup", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.workFlow"), "config.workFlow", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.custom"), "config.custom", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.attribute"), "config.attribute", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.repairMessage"), "config.repairMessage", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("config.captureDataMessage"), "config.captureDataMessage", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs"), "mvs", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs.info"), "mvs.info", true));
+			listOriginVersionInfo.add(new TenantInfoConfigItem(mapKeyLabel.get("mvs.purchase"), "mvs.purchase", true));
 		}
 		return listOriginVersionInfo;
 	}
@@ -338,83 +310,79 @@ public class TenantInfoConfig {
 	private static Map<String, String> getMapVersionKeyLabel() {
 		if (mapVersion == null) {
 			mapVersion = new HashMap<String, String>();
-			mapVersion.put("我的主页", "我的主页");
-			mapVersion.put("设备档案", "设备档案");
-			mapVersion.put("设备档案.基本信息", "基本信息");
-			mapVersion.put("设备档案.设备分布分析", "设备分布分析");
-			mapVersion.put("设备档案.合同管理", "合同管理");
-			mapVersion.put("设备档案.供应商管理", "供应商管理");
-			mapVersion.put("设备档案.报废资产", "报废资产");
-			mapVersion.put("设备档案.新增资产建档", "新增资产建档");
-			mapVersion.put("设备档案.资产审核", "资产审核");
-			mapVersion.put("设备档案.批量导入资产数据", "批量导入资产数据");
-			mapVersion.put("设备档案.盘点工单", "盘点工单");
-			mapVersion.put("设备调剂", "设备调剂");
-			//add
-			mapVersion.put("设备调剂.借用申请", "借用申请");
-			mapVersion.put("设备调剂.借用受理", "借用受理");
-			//add
-			mapVersion.put("设备调剂.归还申请", "归还申请");
-			mapVersion.put("设备调剂.归还受理", "归还受理");
-			mapVersion.put("设备调剂.设备批量调剂", "设备批量调剂");
-			mapVersion.put("设备调剂.设备计费情况", "设备计费情况");
-			mapVersion.put("设备调剂.设备库存情况", "设备库存情况");
-			mapVersion.put("设备调剂.调剂设备配置", "调剂设备配置");
-			mapVersion.put("设备调剂.调剂名称设置", "调剂名称设置");
-			mapVersion.put("到货安装", "到货安装");
-			mapVersion.put("到货安装.到货清单", "到货清单");
-			mapVersion.put("到货安装.安装入库", "安装入库");
-			//add
-			mapVersion.put("到货安装.核对入库", "核对入库");
-			mapVersion.put("维修流程", "维修流程");
-			mapVersion.put("维修流程.维修工作台", "维修工作台");
-			mapVersion.put("维修流程.设备消息订阅", "设备消息订阅");
-			mapVersion.put("维修流程.维修工单报表", "维修工单报表");
-			mapVersion.put("维修流程.排班管理", "排班管理");
-			mapVersion.put("维修流程.休假管理", "休假管理");
-			mapVersion.put("维修流程.报表模版管理", "报表模版管理");
-			mapVersion.put("预防维护", "预防维护");
-			mapVersion.put("预防维护.保养工作台", "保养工作台");
-			mapVersion.put("预防维护.保养规则", "保养规则");
-			mapVersion.put("预防维护.资产规则管理", "资产规则管理");
-			mapVersion.put("预防维护.电气安全数据导入", "电气安全数据导入");
-			mapVersion.put("预防维护.报告模版管理", "报告模版管理");
-			mapVersion.put("预防维护.报表模版管理", "报表模版管理");
-			mapVersion.put("计量管理", "计量管理");
-			mapVersion.put("计量管理.计量类别设置", "计量类别设置");
-			mapVersion.put("计量管理.计量信息", "计量信息");
-			mapVersion.put("护士站", "护士站");
-			mapVersion.put("护士站.日常维护", "日常维护");
-			mapVersion.put("护士站.日常维护设置", "日常维护设置");
-			mapVersion.put("护士站.日常维护报表", "日常维护报表");
-			mapVersion.put("知识文档", "知识文档");
-			mapVersion.put("知识文档.文档管理", "文档管理");
-			mapVersion.put("绩效分析", "绩效分析");
-			mapVersion.put("绩效分析.状态监控", "状态监控");
-			//add
-			mapVersion.put("绩效分析.CT球管预测", "CT球管预测");
-			mapVersion.put("绩效分析.设备绩效配置", "设备绩效配置");
-			mapVersion.put("绩效分析.设备绩效导入", "设备绩效导入");
-			mapVersion.put("绩效分析.BI绩效分析平台", "BI绩效分析平台");
-			mapVersion.put("系统配置", "系统配置");
-			mapVersion.put("系统配置.租户管理", "租户管理");
-			mapVersion.put("系统配置.组织机构管理", "组织机构管理");
-			mapVersion.put("系统配置.用户管理", "用户管理");
-			mapVersion.put("系统配置.批量数据导入", "批量数据导入");
-			mapVersion.put("系统配置.设备消息订阅", "设备消息订阅");
-			mapVersion.put("系统配置.二维码管理", "二维码管理");
-			mapVersion.put("系统配置.二维码模版管理", "二维码模版管理");
-			mapVersion.put("系统配置.维修责任人设置", "维修责任人设置");
-			mapVersion.put("系统配置.设备标签", "设备标签");
-			mapVersion.put("系统配置.维修工程师群组", "维修工程师群组");
-			mapVersion.put("系统配置.流程配置项", "流程配置项");
-			mapVersion.put("系统配置.自定义配置", "自定义配置");
-			mapVersion.put("系统配置.属性配置", "属性配置");
-			mapVersion.put("系统配置.维修消息配置", "维修消息配置");
-			mapVersion.put("系统配置.小屏消息配置", "小屏消息配置");
-			mapVersion.put("MVS设备管理", "MVS设备管理");
-			mapVersion.put("MVS设备管理.基本信息", "基本信息");
-			mapVersion.put("MVS设备管理.采购管理", "采购管理");
+			mapVersion.put("homePage", "我的主页");
+			mapVersion.put("asset", "设备档案");
+			mapVersion.put("asset.info", "基本信息");
+			mapVersion.put("asset.analysis", "设备分布分析");
+			mapVersion.put("asset.mgt", "合同管理");
+			mapVersion.put("asset.supplierMgt", "供应商管理");
+			mapVersion.put("asset.scrap", "报废资产");
+			mapVersion.put("asset.create", "新增资产建档");
+			mapVersion.put("asset.audit", "资产审核");
+			mapVersion.put("asset.batchImportData", "批量导入资产数据");
+			mapVersion.put("asset.inventory", "盘点工单");
+			mapVersion.put("assetAdjust", "设备调剂");
+			mapVersion.put("assetAdjust.borrowApply", "借用申请");
+			mapVersion.put("assetAdjust.borrowAccept", "借用受理");
+			mapVersion.put("assetAdjust.returnApply", "归还申请");
+			mapVersion.put("assetAdjust.returnAccept", "归还受理");
+			mapVersion.put("assetAdjust.batch", "设备批量调剂");
+			mapVersion.put("assetAdjust.cost", "设备计费情况");
+			mapVersion.put("assetAdjust.stock", "设备库存情况");
+			mapVersion.put("assetAdjust.config", "调剂设备配置");
+			mapVersion.put("assetAdjust.nameConfig", "调剂名称设置");
+			mapVersion.put("install", "到货安装");
+			mapVersion.put("install.list", "到货清单");
+			mapVersion.put("install.store", "安装入库");
+			mapVersion.put("install.check", "核对入库");
+			mapVersion.put("repair", "维修流程");
+			mapVersion.put("repair.workbench", "维修工作台");
+			mapVersion.put("repair.message", "设备消息订阅");
+			mapVersion.put("repair.report", "维修工单报表");
+			mapVersion.put("repair.workSchedule", "排班管理");
+			mapVersion.put("repair.vacationMgt", "休假管理");
+			mapVersion.put("repair.reportMgt", "报表模版管理");
+			mapVersion.put("maintain", "预防维护");
+			mapVersion.put("maintain.workbench", "保养工作台");
+			mapVersion.put("maintain.rule", "保养规则");
+			mapVersion.put("maintain.assetMgt", "资产规则管理");
+			mapVersion.put("maintain.electricDataImport", "电气安全数据导入");
+			mapVersion.put("maintain.reportMgt", "报告模版管理");
+			mapVersion.put("maintain.reportMgt", "报表模版管理");
+			mapVersion.put("measure", "计量管理");
+			mapVersion.put("measure.categoryConfig", "计量类别设置");
+			mapVersion.put("measure.info", "计量信息");
+			mapVersion.put("nurseSite", "护士站");
+			mapVersion.put("nurseSite.maintain", "日常维护");
+			mapVersion.put("nurseSite.config", "日常维护设置");
+			mapVersion.put("nurseSite.report", "日常维护报表");
+			mapVersion.put("knowledge", "知识文档");
+			mapVersion.put("knowledge.mgt", "文档管理");
+			mapVersion.put("performance", "绩效分析");
+			mapVersion.put("performance.scan", "状态监控");
+			mapVersion.put("performance.CT", "CT球管预测");
+			mapVersion.put("performance.config", "设备绩效配置");
+			mapVersion.put("performance.import", "设备绩效导入");
+			mapVersion.put("performance.BI", "BI绩效分析平台");
+			mapVersion.put("config", "系统配置");
+			mapVersion.put("config.tenant", "租户管理");
+			mapVersion.put("config.org", "组织机构管理");
+			mapVersion.put("config.user", "用户管理");
+			mapVersion.put("config.batchImportData", "批量数据导入");
+			mapVersion.put("config.assetMessage", "设备消息订阅");
+			mapVersion.put("config.qrCode", "二维码管理");
+			mapVersion.put("config.qrCodeMgt", "二维码模版管理");
+			mapVersion.put("config.repairOwner", "维修责任人设置");
+			mapVersion.put("config.assetMark", "设备标签");
+			mapVersion.put("config.engineerGroup", "维修工程师群组");
+			mapVersion.put("config.workFlow", "流程配置项");
+			mapVersion.put("config.custom", "自定义配置");
+			mapVersion.put("config.attribute", "属性配置");
+			mapVersion.put("config.repairMessage", "维修消息配置");
+			mapVersion.put("config.captureDataMessage", "小屏消息配置");
+			mapVersion.put("mvs", "MVS设备管理");
+			mapVersion.put("mvs.info", "基本信息");
+			mapVersion.put("mvs.purchase", "采购管理");
 		}
 		return mapVersion;
 	}
