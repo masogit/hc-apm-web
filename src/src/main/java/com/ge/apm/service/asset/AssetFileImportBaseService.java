@@ -184,9 +184,12 @@ public class AssetFileImportBaseService {
 
         String orgName = newAsset.getClinicalDeptName();
         if (StringUtils.isEmpty(orgName)) {
-            item.put("status", ImportStatus.Failure);
-            AssetRow.addErrMessage(item, "错误: 科室为空");
-            return;
+            if (StringUtils.isEmpty(newAsset.getUid())) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "错误: 科室为空");
+                return;
+            }
+
         } else {
             OrgInfo orgInfo = supportingService.findOrgOnly(selectedOrgToImport, orgName);
             if (orgInfo != null) {
@@ -420,6 +423,9 @@ public class AssetFileImportBaseService {
                 if (StringUtils.isEmpty(newAsset.getUid())) {
                     item.put("status", ImportStatus.CheckFail);
                     AssetRow.addErrMessage(item, "错误: 所属科室为空");
+                } else {
+                    newAsset.setClinicalDeptId(null);
+                    newAsset.setClinicalDeptUID(null);
                 }
             } else {
 

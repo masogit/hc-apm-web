@@ -9,27 +9,19 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -65,6 +57,11 @@ public class AssetInfoMgrService {
             return;
         }
 
+        if (isInDispenceCenter(asset)) {
+            WebUtil.addErrorMessage("操作失败，该设备为在借中的调剂设备，请先归还！");
+            return;
+        }
+
         if (asset.getQrCode() != null) {
             qrCodeService.releaseQrCode(asset.getQrCode(), asset.getSiteUID());
         }
@@ -74,6 +71,24 @@ public class AssetInfoMgrService {
         asset.setDepartNum(null);
         asset.setQrCode(null);
         assetDao.save(asset);
+    }
+
+    public boolean isInDispenceCenter(AssetInfo assetInfo) {
+        WorkflowConfig workflowConfig = configService.findConfigBySite(assetInfo.getSiteUID());
+
+        String deptUid = null;
+        if (workflowConfig != null) {
+            deptUid = workflowConfig.getDeptForSharedAsset();
+        }
+        if (StringUtils.isEmpty(deptUid)) {
+            return false;
+        }
+
+        if (deptUid.equals(assetInfo.getClinicalDeptUID()) && (assetInfo.getAssetDeptUID() != null && !deptUid.equals(assetInfo.getAssetDeptUID()))) {
+            return true;
+        }
+
+        return false;
     }
 
     public List<AssetInfo> getParentsAssetsList(AssetInfo asset) {

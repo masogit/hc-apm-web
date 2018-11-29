@@ -183,6 +183,10 @@ public class WebUtil implements ApplicationContextAware {
         addErrorMessage(String.format(getMessage(msgKey), obj));
     }
 
+    public static void addErrorMessageWithParams(String msg, Object... obj) {
+        addErrorMessage(String.format(msg, obj));
+    }
+
     public static void addErrorMessageKey(String msgKey) {
         addErrorMessage(getMessage(msgKey));
     }
