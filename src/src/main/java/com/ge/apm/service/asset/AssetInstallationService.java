@@ -244,6 +244,10 @@ public class AssetInstallationService {
     public Supplier getSupplierById(Integer supplierId) {
         return Optional.ofNullable(supplierDao.findById(supplierId)).orElse(null);
     }
+    
+    public Supplier getSupplierByUid(String supplierUid){
+    	return supplierDao.getByUid(supplierUid);
+    }
 
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(tenantUid, siteUid, 1);
