@@ -18,7 +18,7 @@
                          selectionMode="single" selection="#{assetLifecycleEventController.selected}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
@@ -56,6 +56,11 @@
                         <p:fileDownload value="#{assetLifecycleEventController.getAnonymousReport(item.reportStorageId)}" />
                     </p:commandButton>
                 </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                        <p:dataExporter type="xlsx" target="datalist" fileName="woMgr_export"/>
+                    </p:commandButton>
+                </f:facet>
             </p:dataTable>
         </h:form>
 
