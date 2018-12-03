@@ -267,9 +267,9 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="#{msg.inTimeArrived}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                            <!-- <p:column headerText="#{msg.inTimeArrived}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText  value="#{contractInfoEditController.isOnTimeArrival(item)}" />
-                            </p:column>
+                            </p:column> -->
                             <p:column headerText="#{msg.AssetArrivalListClinicalAckDate}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{item.arrivalListItem.clinicalAckDate}" >
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
