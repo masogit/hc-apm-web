@@ -20,6 +20,7 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.common.SearchService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -73,6 +74,7 @@ public class SearchController {
 	List<AssetInfo> listUnSelectedAssetInfo;
 	List<AssetInfo> listSelectedAssetInfo;
 	UaaService uaaService;
+	AssetInstallationService aiService;
 
 	@PostConstruct
 	private void init() {
@@ -80,6 +82,7 @@ public class SearchController {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		searchService = WebUtil.getBean(SearchService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
+		aiService = WebUtil.getBean(AssetInstallationService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
 		orgSite = null;
 		orgDepart = null;
@@ -103,6 +106,7 @@ public class SearchController {
 		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(currentUser.getSiteUID(), currentUser.getUid());
 		orgTree = new DefaultTreeNode("org", null, null);
 		orgTree.getChildren().add(subTree);
+		selectedOrg=aiService.getOrgInfoByUid(currentUser.getSiteUID());
 	}
 
 	public void fetchSiteOrgList() {
@@ -160,7 +164,6 @@ public class SearchController {
 
 	public void onAssetGroupChange() {
 		onChange();
-
 	}
 
 	public void onThreeQrCodeChange() {
@@ -211,20 +214,6 @@ public class SearchController {
 	private void generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
 		if (type == 1) {
-			if (orgSite != null) {
-				listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, orgSite.getUid(), "1*"));
-			}
-			if (orgDepart != null) {
-				listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, orgDepart.getUid(), "1*"));
-			}
-			if (StringUtils.isNotEmpty(assetGroup)) {
-				listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
-			}
-			if (StringUtils.isNotEmpty(threeQrCode)) {
-				listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
-				listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
-				listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
-			}
 			if(selectedOrg!=null){
 				int type=selectedOrg.getOrgType();
 				if(type==0){
@@ -239,8 +228,18 @@ public class SearchController {
 				else if(type==3){
 					listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
 				}
+				if (orgDepart != null) {
+					listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, orgDepart.getUid(), "1*"));
+				}
+				if (StringUtils.isNotEmpty(assetGroup)) {
+					listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
+				}
+				if (StringUtils.isNotEmpty(threeQrCode)) {
+					listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
+					listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
+					listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
+				}
 			}
-			blnThreeQrCode = true;
 		}
 	}
 
