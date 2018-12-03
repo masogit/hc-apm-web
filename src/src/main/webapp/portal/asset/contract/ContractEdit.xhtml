@@ -286,13 +286,13 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
-                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
+                                <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item.assetInfo)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
-                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{selectAssetController.prepareDialogCallback(contractInfoEditController, ':AssetContractEditForm:itemList')}" 
-                                                process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
+                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1, ':AssetContractEditForm:itemList')}" 
+                                                process="@this" update=":searchDlg" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
 
                         </p:dataTable>
@@ -339,7 +339,7 @@
             </div>
 
         </div>
-        <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+        <ui:include src="/portal/asset/searchDiv.xhtml"/>
         <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="添加/修改采购设备">
             <h:form id="addPurchaseForm" >
                 <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
