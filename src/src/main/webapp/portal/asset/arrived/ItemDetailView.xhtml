@@ -238,85 +238,60 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset  legend="#{msg.AssetArrivalListAckInfo}" rendered="#{not empty assetArrivedItemsController.selected and assetArrivedItemsController.selected.arrivalList.processType ne 'Easy'}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
-                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
+                                <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}">
+                                <label class="label">#{msg.AssetArrivalListBusinessAckDate}</label>
+                                <p:inputText  value="#{assetArrivedItemsController.selected.businessAckDate}"  readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <p:dataList id="pictureList1" value="#{assetArrivedItemsController.getAckPicList('business')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">相关附件</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}">
-                            <label class="label">#{msg.AssetArrivalListBusinessAckDate}</label>
-                            <p:inputText  value="#{assetArrivedItemsController.selected.businessAckDate}"  readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
-                        </h:panelGroup>
-                    </p:panelGrid>
-                    <p:dataGrid var="businessPicItem" value="#{assetArrivedItemsController.getAckPicList('business')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.businessAckStatus ne 'none'}">
-                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
-                        <p:panel  style="text-align:center">
-                            <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(businessPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
-                            </h:panelGrid>
-                        </p:panel>
-                    </p:dataGrid>
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                         <h:panelGroup>
-                            <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
-                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.clinicalAckStatus)}" />
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
+                                <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.clinicalAckStatus)}" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.clinicalAckDate}">
+                                <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
+                                <p:inputText  value="#{assetArrivedItemsController.selected.clinicalAckDate}"  readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <p:dataList id="pictureList2" value="#{assetArrivedItemsController.getAckPicList('clinical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">相关附件</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.clinicalAckDate}">
-                            <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
-                            <p:inputText  value="#{assetArrivedItemsController.selected.clinicalAckDate}"  readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
-                        </h:panelGroup>
-                    </p:panelGrid>
-                    <p:dataGrid var="clinicalPicItem" value="#{assetArrivedItemsController.getAckPicList('clinical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.clinicalAckStatus ne 'none'}">
-                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
-                        <p:panel  style="text-align:center">
-                            <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(clinicalPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
-                            </h:panelGrid>
-                        </p:panel>
-                    </p:dataGrid>
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
                         <h:panelGroup>
-                            <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
-                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.technicalAckStatus)}" />
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.technicalAckDate}">
-                            <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
-                            <p:inputText  value="#{assetArrivedItemsController.selected.technicalAckDate}" rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}" readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
+                                <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.technicalAckStatus)}" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.technicalAckDate}">
+                                <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
+                                <p:inputText  value="#{assetArrivedItemsController.selected.technicalAckDate}" rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <p:dataList id="pictureList3" value="#{assetArrivedItemsController.getAckPicList('technical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">相关附件</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:dataGrid var="technicalPicItem" value="#{assetArrivedItemsController.getAckPicList('technical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.technicalAckStatus ne 'none'}">
-                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
-                        <p:panel  style="text-align:center">
-                            <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(technicalPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
-                            </h:panelGrid>
-                        </p:panel>
-                    </p:dataGrid>
 
                 </p:fieldset>
-<!--                <p:fieldset legend="相关报告" rendered="#{not empty assetArrivedItemsController.selected and assetArrivedItemsController.selected.arrivalList.processType ne 'Easy'}">
-                    <p:dataList id="reportList" value="#{commonReportController.getReportList(assetArrivedItemsController.selected.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
-                #{commonReportController.getTemplateName(reportItem.schemaId)}
-
-                <h:outputText id="installDate" value="#{reportItem.createdDate}" >
-                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                </h:outputText>
-                <p:link value="查看" target="_blank" outcome="/portal/reporter/ViewReport.xhtml?faces-redirect=true">
-                    <f:param name="reportId" value="#{reportItem.id}" />
-                </p:link>
-            </p:dataList>
-        </p:fieldset>-->
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-
-                </p:panelGrid>
             </p:fieldset>
         </h:form>
         <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
