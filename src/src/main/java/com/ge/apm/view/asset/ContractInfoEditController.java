@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
@@ -90,6 +91,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private String attachmentType;
 
     private List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> parts = new ArrayList();
+    private List<AssetInfo> listSelectedAssetInfo=new ArrayList<AssetInfo>();
 
     @Override
     protected void init() {
@@ -325,31 +327,60 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        AssetInfo asset = (AssetInfo) eventObject;
-        if (asset == null) {
-            return;
-        }
-        if (!asset.getSiteUID().equals(selected.getSiteUID())) {
-            WebUtil.addErrorMessage("只能添加合同所在院区的设备");
-        } else if (allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
-            WebUtil.addErrorMessage("该设备已经存在");
-        } else {
-            ContractInfoItem newItem = new ContractInfoItem();
-            newItem.setAssetUid(asset.getUid());
-            newItem.setAssetInfo(asset);
-            newItem.setContractId(selected.getId());
-            newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
-            allItemList.add(newItem);
-        }
+    	if(eventName.equals("assetListSelected")){
+    		List<AssetInfo> listAsset=(List<AssetInfo>)eventObject;
+    		if(listAsset!=null){
+    			for(int i=0;i<listAsset.size();++i){
+    				AssetInfo tempAsset=listAsset.get(i);
+    				if(listSelectedAssetInfo.contains(tempAsset)){
+    					
+    				}
+    				else{
+    					listSelectedAssetInfo.add(tempAsset);
+    					ContractInfoItem newItem = new ContractInfoItem();
+    	                newItem.setAssetUid(tempAsset.getUid());
+    	                newItem.setAssetInfo(tempAsset);
+    	                newItem.setContractId(selected.getId());
+    	                newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+    	                allItemList.add(newItem);
+    				}
+    			}
+    		}
+    	}
+    	else{
+    		AssetInfo asset = (AssetInfo) eventObject;
+            if (asset == null) {
+                return;
+            }
+            if (!asset.getSiteUID().equals(selected.getSiteUID())) {
+                WebUtil.addErrorMessage("只能添加合同所在院区的设备");
+            } else if (allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
+                WebUtil.addErrorMessage("该设备已经存在");
+            } else {
+                ContractInfoItem newItem = new ContractInfoItem();
+                newItem.setAssetUid(asset.getUid());
+                newItem.setAssetInfo(asset);
+                newItem.setContractId(selected.getId());
+                newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+                allItemList.add(newItem);
+            }
+    	}
     }
 
-    public void remomveContractItem(ContractInfoItem item) {
+    public void remomveContractItem(AssetInfo assetInfo) {
 //        ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
-        allItemList.remove(item);
-        if (!Strings.isNullOrEmpty(item.getId())) {
-//            contractItemDao.delete(item);
-            removedItemList.add(item);
-        }
+    	listSelectedAssetInfo.remove(assetInfo);
+    	for(int i=0;i>-1 && i<allItemList.size();++i){
+    		ContractInfoItem tempItem=allItemList.get(i);
+    		if(tempItem.getAssetInfo().equals(assetInfo)){
+    			allItemList.remove(i);
+    			if(StringUtils.isNotEmpty(tempItem.getId())){
+        			removedItemList.add(tempItem);
+        		}
+    			--i;
+    			return;
+    		}
+    	}
     }
 
     public boolean canRemovePucheseItem(ContractInfoItem contractItem) {

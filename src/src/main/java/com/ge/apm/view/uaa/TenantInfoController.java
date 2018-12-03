@@ -379,9 +379,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void parseTenantConfig() {
 		String configJsonStr = this.selected.getTenantConfig();
-		if (StringUtils.isNotEmpty(configJsonStr)) {
-			tenantConfig = TenantInfoConfig.parseStr(configJsonStr);
-		}
+		tenantConfig = TenantInfoConfig.parseStr(configJsonStr);
 	}
 
 	public TenantInfoConfig getTenantConfig() {
