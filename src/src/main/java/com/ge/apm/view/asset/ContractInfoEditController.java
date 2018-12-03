@@ -128,6 +128,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             prepareEdit();
             attachements = blobService.findBlobObjectsByBoUid(selected.getId());
             allItemList = contractService.getContractItems(selected.getId());
+            if(allItemList!=null){
+            	for(int i=0;i<allItemList.size();++i){
+            		AssetInfo tempAsset=allItemList.get(i).getAssetInfo();
+            		if(tempAsset!=null){
+            			listSelectedAssetInfo.add(tempAsset);
+            		}
+            	}
+            }
             selectedObjectMap.put("supplier", selected.getSupplierUid() == null ? null : supplierDao.findByUid(selected.getSupplierUid()));
             selectedObjectMap.put("bidWinner", selected.getBidWinner() == null ? null : supplierDao.findByUid(selected.getBidWinner()));
             selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
