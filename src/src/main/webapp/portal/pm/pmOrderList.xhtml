@@ -51,8 +51,7 @@
                         </p:column>
 
 
-                        <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
+                        <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
 
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
@@ -120,7 +119,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
                         <!--待接单 3-->
@@ -132,14 +131,14 @@
                         </p:column>
 
                         <!--待抢单tab 31-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}" exportable="false">
                             <p:commandButton  class="finishButton" value="完成" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
                             <p:commandButton  class="competeButton" disabled="#{v2PmOrderController.isChecked()}" value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,'抢单对话框')}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <!--已计划 0-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">
                             <p:commandButton value="保养" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
@@ -149,10 +148,10 @@
 
 
                         <!--待审核 8-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}" exportable="false">
                             <p:commandButton value="审核" actionListener="#{v2PmOrderController.prepareAproval(item.id)}" update="@(.pmapproveDialogCls)" oncomplete="PF('pmapproveDialog').show()"/>
                         </p:column>
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}" exportable="false">
                             <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:pmOrderListForm @(.closePmDialogClass)" oncomplete="PF('closePmDialog').show()" />
                         </p:column>
 
@@ -172,7 +171,7 @@
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('transferOrderDialog').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
                                 </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
@@ -201,7 +200,12 @@
     <!--批量保养完成对话框-->
     <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
         <h:form id="pmrepairCompleteDialogFormBatch" class="pmrepairCompleteDialogFormclsBatch" >
-            <h:panelGroup  id="display5" style="height:500px">
+            <h:panelGroup rendered="#{v2PmOrderController.sameType() eq false}" id="display61" style="color:red;font-size:15px">
+                 <center>批量完成只能对2级保养进行操作，请不要选择3级保养</center>
+
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{v2PmOrderController.sameType()}" id="display5" style="height:500px">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">结束保养时间*</label>
