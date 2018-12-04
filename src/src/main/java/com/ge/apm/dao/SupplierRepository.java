@@ -1,7 +1,11 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.Supplier;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+
+import com.ge.apm.domain.Supplier;
+
 import webapp.framework.dao.GenericRepository;
 
 public interface SupplierRepository extends GenericRepository<Supplier> {
@@ -13,6 +17,9 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     public Supplier getBySiteIdAndName(int siteId, String name);
     
     public Supplier findByUid(String uid);
+    
+    @Query(value="select o.* from supplier o where o.uid=?1 limit 1",nativeQuery=true)
+    public Supplier getByUid(String uid);
 
     public List<Supplier> findBySupplierTAndTenantUID(Boolean supplierT, String tenantUid);
     public List<Supplier> findByMaintainerTAndTenantUID(Boolean maintainerT, String tenantUid);
