@@ -98,7 +98,7 @@ public class SearchController {
 			blnOrgTree=true;
 //			fetchSiteOrgList();
 			fetchOrgTree();
-			fetchListOriginAssetInfo();
+			fetchDeptOrgList(selectedOrg);
 		}
 	}
 	
