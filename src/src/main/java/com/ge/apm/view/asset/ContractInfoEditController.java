@@ -344,13 +344,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     					
     				}
     				else{
-    					listSelectedAssetInfo.add(tempAsset);
-    					ContractInfoItem newItem = new ContractInfoItem();
-    	                newItem.setAssetUid(tempAsset.getUid());
-    	                newItem.setAssetInfo(tempAsset);
-    	                newItem.setContractId(selected.getId());
-    	                newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
-    	                allItemList.add(newItem);
+    					if(tempAsset.getSiteUID().equals(selected.getSiteUID())){
+    						WebUtil.addErrorMessage("只能添加合同所在院区的设备");
+    					}
+    					else{
+    						listSelectedAssetInfo.add(tempAsset);
+        					ContractInfoItem newItem = new ContractInfoItem();
+        	                newItem.setAssetUid(tempAsset.getUid());
+        	                newItem.setAssetInfo(tempAsset);
+        	                newItem.setContractId(selected.getId());
+        	                newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+        	                allItemList.add(newItem);
+    					}
     				}
     			}
     		}
