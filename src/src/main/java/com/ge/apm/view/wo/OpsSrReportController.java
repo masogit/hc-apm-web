@@ -23,9 +23,13 @@ import java.util.List;
 @ViewScoped
 public class OpsSrReportController extends GenericCRUDUUIDController<AssetLifecycleEvent> implements Serializable {
 
+    public static final int SR_CLOSED = 2;
     private AssetLifecycleEventRepository assetLifecycleEventRepository;
 
-    private static final List<Integer> EVENT_TYPE_LIST = Arrays.asList(3, 4, 5);
+    public static final int SR_REPAIR = 3;
+    public static final int SR_PM = 4;
+    public static final int SR_REMOTE_PM = 5;
+    private static final List<Integer> EVENT_TYPE_LIST = Arrays.asList(SR_REPAIR, SR_PM, SR_REMOTE_PM);
 
     protected void init() {
         assetLifecycleEventRepository = WebUtil.getBean(AssetLifecycleEventRepository.class);
@@ -41,7 +45,7 @@ public class OpsSrReportController extends GenericCRUDUUIDController<AssetLifecy
         this.setSearchFilter();
         this.selected = null;
         searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.IN, EVENT_TYPE_LIST));
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, SR_CLOSED));
         searchFilters.add(new SearchFilter("reports", SearchFilter.Operator.IsEmpty, null));
         return assetLifecycleEventRepository.findBySearchFilter(searchFilters, pageRequest);
     }
