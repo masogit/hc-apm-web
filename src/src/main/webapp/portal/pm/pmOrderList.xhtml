@@ -200,9 +200,13 @@
     <!--批量保养完成对话框-->
     <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
         <h:form id="pmrepairCompleteDialogFormBatch" class="pmrepairCompleteDialogFormclsBatch" >
-            <h:panelGroup rendered="#{v2PmOrderController.sameType() eq false}" id="display61" style="color:red;font-size:15px">
-                 <center>批量完成只能对2级保养进行操作，请不要选择3级保养</center>
+            <h:panelGroup rendered="#{v2PmOrderController.sameType() eq false}" id="display61"  style="font-size:15px">
 
+                <h:panelGroup>
+                    <br/>
+                    <br/>
+                    <center><i class="pi pi-exclamation-triangle"></i>批量完成只能对2级保养进行操作，请不要选择3级保养工单</center>
+                </h:panelGroup>
             </h:panelGroup>
 
             <h:panelGroup rendered="#{v2PmOrderController.sameType()}" id="display5" style="height:500px">
