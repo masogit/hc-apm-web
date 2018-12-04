@@ -204,7 +204,7 @@
                                     <label class="label">#{msg.serialNum}<span style="color:red">#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired}" 
                                                  requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}">
-                                    <p:ajax process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
@@ -226,7 +226,7 @@
                                         <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="@(.generateFinancingNum) @(.financingNum)"/>
                                     </p:inputText>
                                     <p:commandButton  validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
-                                                     update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@(.financingNum)"/>
+                                                      update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@(.financingNum)"/>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
@@ -245,7 +245,7 @@
                                     <label class="label">#{msg.systemId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}" required="#{assetInstallationController.customConfig.assetFields['systemId'].arrivalRequired}" 
                                                  requiredMessage="#{msg.systemId} #{msg.ValidationRequire}">
-                                    <p:ajax process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
@@ -254,7 +254,7 @@
                                     <label class="label">#{msg.barcode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}" required="#{assetInstallationController.customConfig.assetFields['barcode'].arrivalRequired}" 
                                                  requiredMessage="#{msg.barcode} #{msg.ValidationRequire}">
-                                    <p:ajax process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
@@ -263,7 +263,7 @@
                                     <label class="label">#{msg.modalityId}<span style="color:red">#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}" required="#{assetInstallationController.customConfig.assetFields['modalityId'].arrivalRequired}" 
                                                  requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}">
-                                    <p:ajax process="@this" update="@this"/>
+                                        <p:ajax process="@this" update="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
@@ -446,110 +446,81 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <!--                    <p:fieldset legend="设备图片">
-                                            <p:dataGrid id="pictureList0" var="fileitem" value="#{assetInstallationController.getAckPicList('asset')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                                                <f:facet name="header">#{msg.addPic}</f:facet>
-                                                <p:panel  style="text-align:center">
-                                                    <h:panelGrid columns="1" style="width:100%" >
-                                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
-                                                        <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList0" icon="ui-icon-clear"   rendered="#{fileitem.boType ne 'ArrivalList'}"  title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                                        </p:commandButton>   
-                                                    </h:panelGrid>
-                                                </p:panel>
-                                            </p:dataGrid>
-                                            <p:fileUpload id="asset" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                                          multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                                        </p:fieldset>-->
+
                     <p:fieldset legend="#{msg.AssetArrivalListAckInfo}" rendered="#{assetInstallationController.arrivalListItem.arrivalList.processType eq 'Normal'}">
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="businessAck">
-                            <h:panelGroup>
-                                <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
-                                <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
-                                    <p:ajax process="@this" update="businessAck" listener="#{assetInstallationController.onAckChange('business')}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                </p:selectOneRadio>
-                            </h:panelGroup>
-                            <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.businessAckStatus eq 'pass'}">
-                                <label class="label">#{msg.AssetArrivalListBusinessAckDate}</label>
-                                <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.businessAckDate}" 
-                                            mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:dataGrid id="pictureList1" var="fileitem" value="#{assetInstallationController.getAttachList('business')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                            <f:facet name="header">#{msg.addPic}</f:facet>
-                            <p:panel  style="text-align:center">
-                                <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup id="businessAck">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
+                                    <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
+                                        <p:ajax process="@this" update="businessAck" listener="#{assetInstallationController.onAckChange('business')}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.businessAckStatus eq 'pass'}">
+                                    <label class="label">#{msg.AssetArrivalListBusinessAckDate}</label>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.businessAckDate}" 
+                                                mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                </h:panelGroup>
+                                <p:dataList id="pictureList1" value="#{assetInstallationController.getAttachList('business')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}</f:facet>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList1" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>   
-                                </h:panelGrid>
-
-                            </p:panel>
-
-                        </p:dataGrid>
-                        <p:fileUpload id="typebusiness" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="true"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="clinicalAck">
-                            <h:panelGroup>
-                                <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
-                                <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
-                                    <p:ajax process="@this" update="clinicalAck" listener="#{assetInstallationController.onAckChange('clinical')}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                </p:selectOneRadio>
+                                    </p:commandButton> 
+                                </p:dataList>
+                                <p:fileUpload id="typebusiness" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                              multiple="true"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
-                            <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.clinicalAckStatus eq 'pass'}">
-                                <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
-                                <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.clinicalAckDate}" 
-                                            mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:dataGrid id="pictureList2" var="fileitem" value="#{assetInstallationController.getAttachList('clinical')}" emptyMessage="#{msg.noRecordFound}" columns="5" layout="grid">
-                            <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
-                            <p:panel  style="text-align:center">
-                                <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+
+                            <h:panelGroup id="clinicalAck">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
+                                    <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
+                                        <p:ajax process="@this" update="clinicalAck" listener="#{assetInstallationController.onAckChange('clinical')}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.clinicalAckStatus eq 'pass'}">
+                                    <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.clinicalAckDate}" 
+                                                mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                </h:panelGroup>
+                                <p:dataList id="pictureList2" value="#{assetInstallationController.getAttachList('clinical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}</f:facet>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList2" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>   
-                                </h:panelGrid>
-
-                            </p:panel>
-
-                        </p:dataGrid>
-                        <p:fileUpload id="typeclinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="true"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="TechnicalAck">
-                            <h:panelGroup>
-                                <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
-                                <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
-                                    <p:ajax process="@this" update="TechnicalAck" listener="#{assetInstallationController.onAckChange('technical')}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                </p:selectOneRadio>
+                                </p:dataList>
+                                <p:fileUpload id="typeclinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                              multiple="true"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
-                            <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.technicalAckStatus eq 'pass'}">
-                                <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
-                                <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.technicalAckDate}" 
-                                            mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:dataGrid id="pictureList3" var="fileitem" value="#{assetInstallationController.getAttachList('technical')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                            <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
-                            <p:panel  style="text-align:center">
-                                <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+
+                            <h:panelGroup id="TechnicalAck">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
+                                    <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
+                                        <p:ajax process="@this" update="TechnicalAck" listener="#{assetInstallationController.onAckChange('technical')}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup   rendered="#{assetInstallationController.arrivalListItem.technicalAckStatus eq 'pass'}">
+                                    <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.technicalAckDate}" 
+                                                mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                </h:panelGroup>
+                                <p:dataList id="pictureList3" value="#{assetInstallationController.getAttachList('technical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}</f:facet>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList3" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>   
-                                </h:panelGrid>
-
-                            </p:panel>
-
-                        </p:dataGrid>
-                        <p:fileUpload id="typetechnical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="true"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                    </p:commandButton>    
+                                </p:dataList>
+                                <p:fileUpload id="typetechnical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                              multiple="true"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
 
 
                     </p:fieldset>
@@ -575,14 +546,6 @@
                     <!--</p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <!--                            <h:panelGroup>
-                                                            <label class="label">同时生成保养工单*</label>
-                                                            <p:selectOneMenu  value="#{assetInstallationController.arrivalListItem.isGeneratePmOrder}" id="IsGeneratePmOrder" required="false"  requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
-                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                <f:selectItem itemLabel="是" itemValue="true"/>
-                                                                <f:selectItem itemLabel="否" itemValue="false"/>
-                                                            </p:selectOneMenu>
-                                                        </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">安装工时*</label>
                                 <p:inputNumber id="workHours" maxValue="999" value="#{assetInstallationController.arrivalListItem.workHours}" required="true" requiredMessage="安装工时 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" >
@@ -592,7 +555,7 @@
                         </p:panelGrid>
 
                         <p:commandButton immediate="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
-                        <p:menuButton id="reportButton" value="导出验收报告模版" immediate="true">
+                        <p:menuButton id="reportButton" value="导出验收报告模版" style="padding: 5px">
                             <p:menuitem immediate="true" ajax="false" value="技术验收报告" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('technology')}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
@@ -604,10 +567,10 @@
                             </p:menuitem>
                         </p:menuButton>
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
-                        <p:commandButton immediate="true" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
+                        <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInstallationController.returnAction}" immediate="true" />
+                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="#{assetInstallationController.returnAction}" immediate="true" />
 
                     </h:panelGroup>
 

@@ -123,14 +123,14 @@
                                                          process="@this"
                                                          update=":batchLeaseAssetDialog"
                                                          oncomplete="PF('batchLeaseAssetDialog').show()"
-                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableLeaseSubmitBtn() eq false)}"/>
                                         <p:commandButton id="deleteButton"
                                                          icon="ui-icon-close"
                                                          title="#{msg.Delete}"
                                                          process="@this"
                                                          update="tabView:batchLeaseForm:datalist"
                                                          actionListener="#{sharedAssetBatchController.removeLeaseReqDetail()}"
-                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableLeaseSubmitBtn() eq false)}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                                         </p:commandButton>
                                     </f:facet>
@@ -266,14 +266,14 @@
                                                          process="@this"
                                                          update=":batchReturnAssetDialog"
                                                          oncomplete="PF('batchReturnAssetDialog').show()"
-                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableReturnSubmitBtn() eq false)}"/>
                                         <p:commandButton id="deleteButton"
                                                          icon="ui-icon-close"
                                                          title="#{msg.Delete}"
                                                          process="@this"
                                                          update="tabView:batchReturnForm:datalist tabView:batchReturnForm:assetDept4Return tabView:batchReturnForm:confirm"
                                                          actionListener="#{sharedAssetBatchController.removeReturnReqDetail()}"
-                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableReturnSubmitBtn() eq false)}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                                         </p:commandButton>
                                     </f:facet>
