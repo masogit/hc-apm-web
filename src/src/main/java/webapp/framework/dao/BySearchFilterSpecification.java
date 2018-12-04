@@ -79,6 +79,9 @@ public class BySearchFilterSpecification {
                             case IsNotNull:
                                 predicates.add(new Tuple2(filter.conditionPath, expression.isNotNull()));
                                 break;
+                            case IsEmpty:
+                                predicates.add(new Tuple2(filter.conditionPath, builder.isEmpty(expression)));
+                                break;
                         }
                     }
 

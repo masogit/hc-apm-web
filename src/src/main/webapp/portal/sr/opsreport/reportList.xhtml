@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="preRenderView">
+        <!--        <f:metadata>
+                    <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
+                    <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
+                </f:metadata>
+                <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
+    </ui:define>
+
+    <ui:define name="head">
+        <h:outputStylesheet name="css/wo_steps.css"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="SR报告未上传 #{msg.List}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <p:messages autoUpdate="true" closable="true" showDetail="false"/>
+
+                <h:form id="dispatchListForm">
+                    <p:dataTable id="datalist" value="#{opsSrReportController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{opsSrReportController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{opsSrReportController.onFilter}"/>
+
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+
+                        <p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.eventUid}"/>
+                        </p:column>
+                        <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createTime}"/>
+                        </p:column>
+                        <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}"
+                                  filterBy="#{item.assetInfo.systemId}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.systemId}"/>
+                        </p:column>
+                        <!--<p:column headerText="状态">-->
+                        <!--<h:outputText value="#{fieldMsg.fieldValue('status',item.status)}"/>-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="报告已上传" filterMatchMode="ISEMPTY" filterBy="#{item.reports}">-->
+                        <!--<f:facet name="filter">-->
+                        <!--<p:selectOneMenu onchange="PF('varDataList').filter()" >-->
+                        <!--<f:converter converterId="javax.faces.Boolean" />-->
+                        <!--<f:selectItem itemLabel="#{msg.All}" itemValue="" />-->
+                        <!--<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />-->
+                        <!--<f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />-->
+                        <!--</p:selectOneMenu>-->
+                        <!--</f:facet>-->
+                        <!--<p:repeat value="#{item.reports}" var="report">-->
+                        <!--<p:commandButton ajax="false"-->
+                        <!--onclick="PrimeFaces.monitorDownload(start, stop);"-->
+                        <!--icon="ui-icon-file-download">-->
+                        <!--<p:fileDownload-->
+                        <!--value="#{opsSrReportController.getAnonymousReport(report.storageId)}"/>-->
+                        <!--</p:commandButton>-->
+                        <!--</p:repeat>-->
+                        <!--</p:column>-->
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="sr_missing_report_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>
