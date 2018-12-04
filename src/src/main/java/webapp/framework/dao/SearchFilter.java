@@ -21,7 +21,7 @@ public class SearchFilter {
     public static final String searchFilterPrefix = ":search_";
 
     public enum Operator {
-        EQ, LIKE, GT, LT, GTE, LTE, NE, IN,IsNull, IsNotNull, NotIN
+        EQ, LIKE, GT, LT, GTE, LTE, NE, IN,IsNull, IsNotNull, NotIN, IsEmpty
     }
 
     public String tableAlias;
@@ -291,6 +291,9 @@ public class SearchFilter {
                 break;
             case IsNotNull:
                 where = sqlFieldName + " is not null";
+                break;
+            case IsEmpty:
+                where = sqlFieldName + " is empty";
                 break;
         }
     

@@ -150,6 +150,8 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
             searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GT, filterValue));
         else if("GTE".equals(matchMode))
             searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, filterValue));
+        else if("ISEMPTY".equals(matchMode))
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsEmpty, filterValue));
         else
             logger.warn("**** filterMatchMode not supported: "+ matchMode);
     }
