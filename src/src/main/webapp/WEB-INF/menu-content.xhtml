@@ -139,13 +139,8 @@
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('config')}">
-                <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.tenant')}"/>
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.org')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.user')}"/>
-                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasRole('SiteAdmin') and userContextService.versionContains('config.batchImportData')}"/>
-
-
-
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.versionContains('config.assetMessage')}"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false and userContextService.versionContains('config.org')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false and userContextService.versionContains('config.user')}"/>
@@ -172,6 +167,14 @@
 				<p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('mvs.info')}"/>
 				<p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.versionContains('mvs.purchase')}"/>
 			</p:submenu>
+
+            <!--Super admin and GE OP only-->
+            <p:submenu id="um4000" label="APM平台管理" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}">
+                <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
+                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
+                <p:menuitem id="um4100" value="SR报告清单" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
+            </p:submenu>
+
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
 
