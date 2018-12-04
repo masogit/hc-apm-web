@@ -298,10 +298,8 @@ public class TenantInfoConfig {
 			mapVersion.put("performance.import", "设备绩效导入");
 			mapVersion.put("performance.BI", "BI绩效分析平台");
 			mapVersion.put("config", "系统配置");
-			mapVersion.put("config.tenant", "租户管理");
 			mapVersion.put("config.org", "组织机构管理");
 			mapVersion.put("config.user", "用户管理");
-			mapVersion.put("config.batchImportData", "批量数据导入");
 			mapVersion.put("config.assetMessage", "设备消息订阅");
 			mapVersion.put("config.qrCode", "二维码管理");
 			mapVersion.put("config.qrCodeMgt", "二维码模版管理");
