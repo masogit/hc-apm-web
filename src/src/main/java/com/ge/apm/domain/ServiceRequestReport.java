@@ -8,6 +8,11 @@ import java.util.Date;
 @Entity
 @Table(name = "service_request_report")
 public class ServiceRequestReport {
+
+    public static final int REPORT_TYPE_SR = 1;
+    public static final int REPORT_TYPE_PM = 2;
+    public static final int REPORT_TYPE_OTHER = 3;
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -33,6 +38,17 @@ public class ServiceRequestReport {
     private Date createdDate;
 
     public ServiceRequestReport() {
+    }
+
+    public String getDisplayName() {
+        switch (type) {
+            case REPORT_TYPE_SR:
+                return "SR report";
+            case REPORT_TYPE_PM:
+                return "PM report";
+            default:
+                return "Other report";
+        }
     }
 
     public String getId() {

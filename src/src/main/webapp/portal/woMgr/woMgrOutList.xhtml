@@ -50,12 +50,10 @@
 
                 <p:column headerText="报告下载">
                     <p:repeat value="#{item.reports}" var="report">
-                        <p:commandButton ajax="false"
-                                         onclick="PrimeFaces.monitorDownload(start, stop);"
-                                         icon="ui-icon-file-download">
-                            <p:fileDownload
-                                    value="#{assetLifecycleEventController.getAnonymousReport(report.storageId)}"/>
-                        </p:commandButton>
+                        <p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
+                            <h:outputText value="#{report.displayName}"/>
+                        </p:link>
+                        <br/>
                     </p:repeat>
                 </p:column>
                 <f:facet name="{Toolbar}">
