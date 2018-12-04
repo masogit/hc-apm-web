@@ -134,7 +134,9 @@ public class SearchController {
 	}
 
 	private void onChange() {
-		generateListFilter();
+		if(!generateListFilter()){
+			return;
+		}
 		if (type == 1) {
 			fetchListOriginAssetInfo();
 		}
@@ -211,7 +213,7 @@ public class SearchController {
 		}
 	}
 
-	private void generateListFilter() {
+	private boolean generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
 		if (type == 1) {
 			if(selectedOrg!=null){
@@ -240,7 +242,11 @@ public class SearchController {
 					listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
 				}
 			}
+			if(listSearchFilter.size()>1){
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public UserAccount getCurrentUser() {
