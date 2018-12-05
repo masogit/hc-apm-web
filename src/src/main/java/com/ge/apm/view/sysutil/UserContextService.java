@@ -500,11 +500,12 @@ public class UserContextService implements Serializable {
         UserAccount currentUser = getLoginUser();
         int siteId= currentUser.getSiteId();
         if(siteId!=46) return false; // not in GE IB Tenant
-        return !(currentUser.getGeSso()!=null || isGeOp(currentUser));
+        return !(currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()));
     }
 
-    public boolean isGeOp(UserAccount currentUser) {
-        return Boolean.TRUE.equals(currentUser.getIsGeOp());
+    public boolean isGeOp() {
+        UserAccount currentUser = getLoginUser();
+        return currentUser != null && Boolean.TRUE.equals(currentUser.getIsGeOp());
     }
 
     public static boolean isOnlyLocalITAdmin() {
