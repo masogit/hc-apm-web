@@ -139,7 +139,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                 }
-                contractList = contractService.getContractListByTenant(selected.getTenantUID());
+                contractList = contractService.getContractListBySite(selected.getSiteUID());
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
