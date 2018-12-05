@@ -24,6 +24,12 @@ public interface ContractInfoRepository extends GenericRepositoryUUID<ContractIn
     
     @Query("select o from ContractInfo o where o.siteUID = ?1 and o.contractType = 'Equipment'")
     public List<ContractInfo> findEquipmentContractBySite(String siteUID);
+    
+    @Query("select o from ContractInfo o where o.hospitalUID = ?1 and o.contractType = 'Equipment'")
+    public List<ContractInfo> findEquipmentContractByHospital(String hospitalUID);
+    
+    @Query("select o from ContractInfo o where o.institutionUID = ?1 and o.contractType = 'Equipment'")
+    public List<ContractInfo> findEquipmentContractByInstitution(String institutionUID);
 
     public ContractInfo findByIdAndContractTypeAndTenantUID(String id, String contractType, String tenantUID);
     
