@@ -45,6 +45,12 @@ public class AssetLifecycleEvent implements Serializable {
 
     @Column(name = "description")
     private String description;
+    
+  //Schedule Date
+    @Column(name = "schedule_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    Date scheduleDate;
 
     @Column(name = "status")
     private Integer status;
@@ -145,4 +151,12 @@ public class AssetLifecycleEvent implements Serializable {
     public void setReports(List<ServiceRequestReport> reports) {
         this.reports = reports;
     }
+
+	public Date getScheduleDate() {
+		return scheduleDate;
+	}
+
+	public void setScheduleDate(Date scheduleDate) {
+		this.scheduleDate = scheduleDate;
+	}
 }
