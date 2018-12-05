@@ -18,9 +18,11 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.common.SearchService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -75,15 +77,18 @@ public class SearchController {
 	List<AssetInfo> listSelectedAssetInfo;
 	UaaService uaaService;
 	AssetInstallationService aiService;
-
+	ContractInfoService contractInfoService;
+	String contractInfoId;
 	@PostConstruct
 	private void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		searchService = WebUtil.getBean(SearchService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
+		contractInfoService = WebUtil.getBean(ContractInfoService.class);
 		aiService = WebUtil.getBean(AssetInstallationService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
+		
 		orgSite = null;
 		orgDepart = null;
 		assetType = "";
@@ -103,7 +108,17 @@ public class SearchController {
 	}
 	
 	private void fetchOrgTree(){
-		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(currentUser.getSiteUID(), currentUser.getUid());
+		String siteUid=currentUser.getSiteUID();
+		String uid=currentUser.getUid();
+		if(type==1){
+			if(StringUtils.isNotEmpty(contractInfoId)){
+				ContractInfo contractInfo=contractInfoService.getContractInfo(contractInfoId);
+				if(contractInfo!=null){
+					siteUid=contractInfo.getSiteUID();
+				}
+			}
+		}
+		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid, uid);
 		orgTree = new DefaultTreeNode("org", null, null);
 		orgTree.getChildren().add(subTree);
 		selectedOrg=aiService.getOrgInfoByUid(currentUser.getSiteUID());
@@ -198,10 +213,13 @@ public class SearchController {
 		}
 	}
 
-	public void prepareDialogCallback(ServerEventInterface callingController, int type, String updateViewIDs) {
+	public void prepareDialogCallback(ServerEventInterface callingController, int type, Object obj, String updateViewIDs) {
 		this.type = type;
 		this.callingController = callingController;
 		this.updateViewIDs = updateViewIDs;
+		if(type==1){
+			this.contractInfoId=(String)obj;
+		}
 		showDialog = true;
 		init();
 	}
