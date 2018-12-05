@@ -104,6 +104,7 @@ public class SearchController {
 //			fetchSiteOrgList();
 			fetchOrgTree();
 			fetchDeptOrgList(selectedOrg);
+			fetchListOriginAssetInfo();
 		}
 	}
 	
@@ -118,7 +119,7 @@ public class SearchController {
 				}
 			}
 		}
-		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid, uid);
+		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid);
 		orgTree = new DefaultTreeNode("org", null, null);
 		orgTree.getChildren().add(subTree);
 		selectedOrg=aiService.getOrgInfoByUid(currentUser.getSiteUID());
@@ -505,6 +506,14 @@ public class SearchController {
 
 	public void setSelectedNode(TreeNode selectedNode) {
 		this.selectedNode = selectedNode;
+	}
+
+	public String getContractInfoId() {
+		return contractInfoId;
+	}
+
+	public void setContractInfoId(String contractInfoId) {
+		this.contractInfoId = contractInfoId;
 	}
 
 }
