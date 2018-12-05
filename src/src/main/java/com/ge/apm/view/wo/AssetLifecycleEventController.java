@@ -111,6 +111,15 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         return strStatus;
     }
 
+    public String getStatusLabel(AssetLifecycleEvent alse) {
+        switch (alse.getStatus()){
+            case 1: return "Open";
+            case 2: return "Close";
+            case 3: return "Cancelled";
+        }
+        return "";
+    }
+
     public StreamedContent getAnonymousReport(String reportStorageId) {
         try {
             StreamedContent file = fileDownloadService.getFile(reportStorageId);
