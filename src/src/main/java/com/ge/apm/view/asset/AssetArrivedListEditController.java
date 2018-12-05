@@ -139,7 +139,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                 }
-                contractList = contractService.getContractListByTenant(selected.getTenantUID());
+                contractList = contractService.getContractListBySite(selected.getSiteUID());
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -540,7 +540,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setContractItemId(selectedContractItem.getId());
         this.selected.setAssetName(selectedContractItem.getContractAssetName());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
+//        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
         this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());

@@ -953,6 +953,14 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 
         return rootNode;
     }
+    
+    public TreeNode getOrgTreeByParentIdWithSelectedChildren(String parentOrgId) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getOrgInfosByParentId(parentOrgId);
+        TreeNode rootNode = buildOrgTreeByParentIdWithSelectedChildren(orgInfoFullList,orgInfoFullList);
+
+        return rootNode;
+    }
 
     public TreeNode buildOrgTreeByParentIdWithSelectedChildren(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
 
