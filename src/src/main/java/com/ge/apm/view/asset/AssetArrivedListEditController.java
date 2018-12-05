@@ -88,6 +88,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
+    UserAccount currentUser;
 
     private List<V2_BlobObject> attachList;
 
@@ -128,6 +129,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
+        currentUser=UserContextService.getCurrentUserAccount();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -139,7 +141,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                 }
-                contractList = contractService.getContractListBySite(selected.getSiteUID());
+                contractList = contractService.getContractListByUser(currentUser);
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
