@@ -249,6 +249,33 @@ public class UserAccountService {
 	public String getLoginNameByUid(String uid) {
 		return Optional.ofNullable(userAccountRepository.getByUid(uid).getName()).orElse("");
 	}
+	public boolean isSiteUser(UserAccount user) {
+		if (!user.getSiteUID().equals(user.getHospitalUID())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isHospitalUser(UserAccount user) {
+		if (!user.getHospitalUID().equals(user.getInstitutionUID())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isInstitutionUser(UserAccount user) {
+		if (!user.getInstitutionUID().equals(user.getTenantUID())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isTenantUser(UserAccount user) {
+		return !isInstitutionUser(user);
+	}
 
 	@Transactional
 	public void updateUserOrg(String userUid, Set<OrgInfo> selectedOrgList) {

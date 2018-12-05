@@ -5,6 +5,15 @@
  */
 package com.ge.apm.service.asset;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
@@ -16,21 +25,15 @@ import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.ContractInfoItem;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.service.uaa.UserAccountService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
 import javaslang.Tuple2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -53,6 +56,8 @@ public class ContractInfoService {
     private V2_WorkOrderRepository woDao;
     @Autowired
     private V2_PmOrderRepository pmDao;
+    @Autowired
+    private UserAccountService userAccountService;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -66,8 +71,19 @@ public class ContractInfoService {
         return contractDao.findEquipmentContractByTenant(tenantUID);
     }
     
-    public List<ContractInfo> getContractListBySite(String siteUID){
-    	return contractDao.findEquipmentContractBySite(siteUID);
+    public List<ContractInfo> getContractListByUser(UserAccount user){
+    	if(userAccountService.isSiteUser(user)){
+    		return contractDao.findEquipmentContractBySite(user.getSiteUID());
+    	}
+    	else if(userAccountService.isHospitalUser(user)){
+    		return contractDao.findEquipmentContractByHospital(user.getHospitalUID());
+    	}
+    	else if(userAccountService.isInstitutionUser(user)){
+    		return contractDao.findEquipmentContractByInstitution(user.getInstitutionUID());
+    	}
+    	else{
+    		return contractDao.findEquipmentContractByTenant(user.getTenantUID());
+    	}
     }
 
     public void contractItemArrival(List<ArrivalListItem> arrivalItemList) {
