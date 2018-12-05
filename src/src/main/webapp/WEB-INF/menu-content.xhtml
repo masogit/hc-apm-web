@@ -169,10 +169,10 @@
 			</p:submenu>
 
             <!--Super admin and GE OP only-->
-            <p:submenu id="um4000" label="APM平台管理" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}">
-                <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
-                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
-                <p:menuitem id="um4100" value="SR报告清单" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.isGeOp()}"/>
+            <p:submenu id="um4000" label="APM平台管理" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp')}">
+                <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp') }"/>
+                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp')}"/>
+                <p:menuitem id="um4100" value="SR报告清单" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp')}"/>
             </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
