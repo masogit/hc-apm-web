@@ -291,7 +291,7 @@
                             </p:column>
 
                             <f:facet name="{Toolbar}">
-                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1, ':AssetContractEditForm:itemList')}" 
+                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1,item.contractId, ':AssetContractEditForm:itemList')}" 
                                                 process="@this" update=":searchDlg" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
 
