@@ -78,7 +78,7 @@ public class SearchController {
 	UaaService uaaService;
 	AssetInstallationService aiService;
 	ContractInfoService contractInfoService;
-	String contractInfoId;
+	String contractInfoSiteUID;
 	@PostConstruct
 	private void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -112,17 +112,14 @@ public class SearchController {
 		String siteUid=currentUser.getSiteUID();
 		String uid=currentUser.getUid();
 		if(type==1){
-			if(StringUtils.isNotEmpty(contractInfoId)){
-				ContractInfo contractInfo=contractInfoService.getContractInfo(contractInfoId);
-				if(contractInfo!=null){
-					siteUid=contractInfo.getSiteUID();
-				}
+			if(StringUtils.isNotEmpty(contractInfoSiteUID)){
+				siteUid=contractInfoSiteUID;
 			}
 		}
 		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid);
 		orgTree = new DefaultTreeNode("org", null, null);
 		orgTree.getChildren().add(subTree);
-		selectedOrg=aiService.getOrgInfoByUid(currentUser.getSiteUID());
+		selectedOrg=aiService.getOrgInfoByUid(siteUid);
 	}
 
 	public void fetchSiteOrgList() {
@@ -219,7 +216,7 @@ public class SearchController {
 		this.callingController = callingController;
 		this.updateViewIDs = updateViewIDs;
 		if(type==1){
-			this.contractInfoId=(String)obj;
+			this.contractInfoSiteUID=(String)obj;
 		}
 		showDialog = true;
 		init();
@@ -508,12 +505,5 @@ public class SearchController {
 		this.selectedNode = selectedNode;
 	}
 
-	public String getContractInfoId() {
-		return contractInfoId;
-	}
-
-	public void setContractInfoId(String contractInfoId) {
-		this.contractInfoId = contractInfoId;
-	}
 
 }
