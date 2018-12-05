@@ -57,9 +57,17 @@ public class ContractInfoService {
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
     }
+    
+    public ContractInfo getContractInfo(String id) {
+        return contractDao.findById(id);
+    }
 
     public List<ContractInfo> getContractListByTenant(String tenantUID) {
         return contractDao.findEquipmentContractByTenant(tenantUID);
+    }
+    
+    public List<ContractInfo> getContractListBySite(String siteUID){
+    	return contractDao.findEquipmentContractBySite(siteUID);
     }
 
     public void contractItemArrival(List<ArrivalListItem> arrivalItemList) {
