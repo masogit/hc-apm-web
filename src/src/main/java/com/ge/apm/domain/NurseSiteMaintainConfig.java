@@ -80,7 +80,7 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	@JsonBackReference
 	private UserAccount modifyBy;
 	
-	@Column(name="check_items")
+	@Column(name="check_items",columnDefinition="text")
 	private String checkItems;
 	
 	@Column(name="check_items_detail",columnDefinition="text")
