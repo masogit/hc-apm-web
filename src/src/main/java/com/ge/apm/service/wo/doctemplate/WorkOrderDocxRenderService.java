@@ -3,7 +3,9 @@ package com.ge.apm.service.wo.doctemplate;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.ServiceRequestMsgRepository;
+import com.ge.apm.dao.V2_WorkOrderStepRepository;
 import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.BlobFileService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
@@ -32,6 +34,9 @@ public class WorkOrderDocxRenderService {
 
     @Autowired
     private ServiceRequestMsgRepository serviceRequestMsgRepository;
+
+    @Autowired
+    private V2_WorkOrderStepRepository v2WorkOrderStepDao;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -72,7 +77,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_cohour1", "工时1");
         COPY_KEY_MAPPING.put("fix_cohour2", "工时2");
 
-        COPY_KEY_MAPPING.put("fix_man_hour", "工时");
+        COPY_KEY_MAPPING.put("fix_man_hour", "维修工程师工时");
 
         COPY_KEY_MAPPING.put("part_table", "备件信息");
         COPY_KEY_MAPPING.put("proceed_table", "维修流程");
@@ -113,6 +118,7 @@ public class WorkOrderDocxRenderService {
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
 
+        putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
 
         return target;
@@ -154,6 +160,23 @@ public class WorkOrderDocxRenderService {
             srMsgs.add(map);
         }
         workOrderMap.put("audit_table", srMsgs);
+    }
+
+    private void putWorkOrderStep(Map<String, Object> workOrderMap, String id){
+
+        List<V2_WorkOrder_Step> steps = v2WorkOrderStepDao.findByWorkOrder(id);
+        List<Map<String, Object>> woSteps = new ArrayList<>();
+        for (V2_WorkOrder_Step step : steps) {
+            Map<String, Object> woStep = new HashedMap();
+            woStep.put("步骤名称", step.getStepName());
+            woStep.put("责任人", step.getOwnerName());
+            woStep.put("开始时间", formatDate(step.getStartTime()));
+            woStep.put("结束时间", formatDate(step.getEndTime()));
+            woStep.put("处理描述", step.getComments());
+            woSteps.add(woStep);
+        }
+
+        workOrderMap.put("proceed_table", woSteps);
     }
 
     private String formatDate(Date date) {

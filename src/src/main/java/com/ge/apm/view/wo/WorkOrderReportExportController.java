@@ -152,11 +152,11 @@ public class WorkOrderReportExportController implements Serializable {
         }
     }
 
-    private void exportWoData(List<Map<String, Object>> data) {
+    private void exportWoData(List<Map<String, Object>> workOrderdata) {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/APM_WorkOrder_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = workOrderExportService.exportData(doc, data);
+            Boolean exportFlag = workOrderExportService.exportData(doc, workOrderdata, workOrderExportService.createPartsData(workOrderdata));
             if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "WorkOrderData.xlsx");
             }
@@ -236,7 +236,8 @@ public class WorkOrderReportExportController implements Serializable {
                 return;
             }
 
-            workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
+            //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
+            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
         }
 
     }

@@ -82,12 +82,6 @@ public class NurseSiteMaintainConfigItem implements Serializable {
 	@JsonBackReference
 	private UserAccount modifyBy;
 	
-	@Column(name="check_items")
-	private String checkItems;
-	
-	@Column(name="check_items_detail",columnDefinition="text")
-	private String checkItemsDetail;
-	
 	//1:day,2:week,3:month,4:year
 	@Column(name="type")
 	private Integer type;
@@ -196,15 +190,6 @@ public class NurseSiteMaintainConfigItem implements Serializable {
 		this.modifyBy = modifyBy;
 	}
 
-	public String getCheckItems() {
-		return checkItems;
-	}
-
-	public void setCheckItems(String checkItems) {
-		this.checkItems = checkItems;
-	}
-
-
 	public Integer getType() {
 		return type;
 	}
@@ -219,14 +204,6 @@ public class NurseSiteMaintainConfigItem implements Serializable {
 
 	public void setTypeValue(String typeValue) {
 		this.typeValue = typeValue;
-	}
-
-	public String getCheckItemsDetail() {
-		return checkItemsDetail;
-	}
-
-	public void setCheckItemsDetail(String checkItemsDetail) {
-		this.checkItemsDetail = checkItemsDetail;
 	}
 	public String getParentId() {
 		return parentId;
