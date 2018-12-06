@@ -101,14 +101,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         String strStatus = null;
         JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
         if (parse != null) {
-            JSONArray status = (JSONArray) parse.get("messages");
-            if (status != null) {
-                {
-                    strStatus = StringUtils.removeEnd(status.get(0).toString(), "状态: ");
-                    strStatus = strStatus.replace("状态：", "");
-                }
-
-            }
+            strStatus = parse.getString("status");
         }
         return strStatus;
     }
