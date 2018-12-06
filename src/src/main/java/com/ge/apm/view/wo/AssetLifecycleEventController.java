@@ -74,7 +74,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
         this.setSearchFilter();
         this.selected = null;
-        this.selecteItems=null;
+        this.selecteItems = null;
         searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "3"));//3外部维修
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -100,24 +100,17 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     public String getMsStatus(AssetLifecycleEvent alse) {
         String strStatus = null;
         JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
-        JSONArray status = (JSONArray) parse.get("messages");
-        if (status != null) {
-            {
-                strStatus = StringUtils.removeEnd(status.get(0).toString(), "状态: ");
-                strStatus = strStatus.replace("状态：", "");
-            }
+        if (parse != null) {
+            JSONArray status = (JSONArray) parse.get("messages");
+            if (status != null) {
+                {
+                    strStatus = StringUtils.removeEnd(status.get(0).toString(), "状态: ");
+                    strStatus = strStatus.replace("状态：", "");
+                }
 
+            }
         }
         return strStatus;
-    }
-
-    public String getStatusLabel(AssetLifecycleEvent alse) {
-        switch (alse.getStatus()){
-            case 1: return "Open";
-            case 2: return "Close";
-            case 3: return "Cancelled";
-        }
-        return "";
     }
 
     public StreamedContent getAnonymousReport(String reportStorageId) {
@@ -134,54 +127,54 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         return null;
     }
 
-    public StreamedContent downloadSelectedReport(){
-    	if(selecteItems==null || selecteItems.size()==0){
-    		WebUtil.addErrorMessage("请选择需要下载报告的工单！");
-    		return null;
-    	}
-    	Set<String> setReportIds=new HashSet<String>();
-    	for(int i=0;i<selecteItems.size();++i){
-			List<ServiceRequestReport> listReport=selecteItems.get(i).getReports();
-			if(listReport!=null && listReport.size()>0){
-				ServiceRequestReport tempReport=listReport.get(i);
-				String reportStorageId=tempReport.getStorageId();
-				if(StringUtils.isNotEmpty(reportStorageId)){
-					setReportIds.add(reportStorageId);
-				}
-			}
-		}
-    	if(setReportIds.size()==0){
-    		WebUtil.addErrorMessage("工单报告为空！");
-    		return null;
-    	}
-    	try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)){
-    		Iterator<String> it=setReportIds.iterator();
-    		while(it.hasNext()){
-    			String reportStorageId=it.next();
-    			StreamedContent file = fileDownloadService.getFile(reportStorageId);
+    public StreamedContent downloadSelectedReport() {
+        if (selecteItems == null || selecteItems.size() == 0) {
+            WebUtil.addErrorMessage("请选择需要下载报告的工单！");
+            return null;
+        }
+        Set<String> setReportIds = new HashSet<String>();
+        for (int i = 0; i < selecteItems.size(); ++i) {
+            List<ServiceRequestReport> listReport = selecteItems.get(i).getReports();
+            if (listReport != null && listReport.size() > 0) {
+                ServiceRequestReport tempReport = listReport.get(i);
+                String reportStorageId = tempReport.getStorageId();
+                if (StringUtils.isNotEmpty(reportStorageId)) {
+                    setReportIds.add(reportStorageId);
+                }
+            }
+        }
+        if (setReportIds.size() == 0) {
+            WebUtil.addErrorMessage("工单报告为空！");
+            return null;
+        }
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)) {
+            Iterator<String> it = setReportIds.iterator();
+            while (it.hasNext()) {
+                String reportStorageId = it.next();
+                StreamedContent file = fileDownloadService.getFile(reportStorageId);
                 String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getName());
                 String contentType = file.getContentType();
                 InputStream stream = file.getStream();
                 zout.putNextEntry(new ZipEntry(fileName));
                 byte[] bytes = IOUtils.toByteArray(stream);
-                if(bytes!=null){
+                if (bytes != null) {
                     IOUtils.write(bytes, zout);
                 }
-    		}
-    		zout.closeEntry();
-    		return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
+            }
+            zout.closeEntry();
+            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
         } catch (Exception e) {
             WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
         }
-    	return null;
+        return null;
     }
 
-	public List<AssetLifecycleEvent> getSelecteItems() {
-		return selecteItems;
-	}
+    public List<AssetLifecycleEvent> getSelecteItems() {
+        return selecteItems;
+    }
 
-	public void setSelecteItems(List<AssetLifecycleEvent> selecteItems) {
-		this.selecteItems = selecteItems;
-	}
-    
+    public void setSelecteItems(List<AssetLifecycleEvent> selecteItems) {
+        this.selecteItems = selecteItems;
+    }
+
 }
