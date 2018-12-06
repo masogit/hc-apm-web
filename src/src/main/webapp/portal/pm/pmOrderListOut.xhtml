@@ -39,7 +39,7 @@
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                 </p:column>
                 <p:column headerText="状态">
-                    <h:outputText value="#{assetLifecycleEventController.getStatusLabel(item)}"/>
+                    <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
                 </p:column>
 
 				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}" filterBy="#{item.scheduleDate}" filterMatchMode="LIKE">
