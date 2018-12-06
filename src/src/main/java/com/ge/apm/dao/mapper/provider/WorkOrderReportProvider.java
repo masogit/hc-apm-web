@@ -242,10 +242,10 @@ public class WorkOrderReportProvider {
         sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
             "(select im.value_zh from i18n_message im where concat(wo.status,'') = im.msg_key and im.msg_type='status') as statusName, " +
             "sr.hospital_name as hospitalName,ai.clinical_dept_name as assetClinicalDeptName,ai.manufacture as assetManufacture, " +
-            "ai.make_short_name as assetMakerShortName,ai.qr_code as qrCode, " +
+            "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,ai.location_name as locationName, " +
             "(select im.value_zh from i18n_message im where concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
             "(select im.value_zh from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType') as assetFunctionGroupName, " +
-            "(select im.value_zh from i18n_message im where concat(ai.asset_code68,'') = im.msg_key and im.msg_type=(select im.msg_type from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType')) as assetCode68Name, " +
+            "(select im.value_zh from i18n_message im where concat(ai.asset_code68,'') = im.msg_key and im.msg_type=(select im.msg_key from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType')) as assetCode68Name, " +
             "ai.function_type as assetFunctionType,wo.current_person_name as currentPersonName, " +
             "(select im.value_zh from i18n_message im where concat(wo.current_step_id,'') = im.msg_key and im.msg_type='woSteps') as currentStepName, " +
             "sr.requestor_name as requestorName,sr.request_time as requestTime,sr.request_reason as requestReason, " +
@@ -255,7 +255,8 @@ public class WorkOrderReportProvider {
             "(select im.value_zh from i18n_message im where concat(wo.repair_type,'') = im.msg_key and im.msg_type='repairType') as repairTypeName, " +
             "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepOwnerName, " +
             "(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepStartTime, " +
-            "wo.checkin_time as checkinTime,wo.total_man_hour as totalManHour, " +
+            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1) as workStepEndTime, " +
+            "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
             "(select string_agg(concat(wod.parts,concat(',数量：',concat(wod.parts_quantity,concat(',合同单价:',concat(wod.parts_price, concat(',合同号:',concat(wod.contract_num,concat(',发票号:',concat(wod.invoice_num,concat(',开票日期:',concat(to_char(wod.invoice_time,'YYYY-mm-ss HH:mm:ss'),concat(',预计价格:',concat(wod.parts_price,concat(',供应商:',concat(wod.supplier,concat(',备注:',concat(wod.comment,';'))))))))))))))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
             "(select sum(wod.parts_quantity * wod.parts_price) from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as partsTotalPrice, " +
             "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
@@ -266,7 +267,9 @@ public class WorkOrderReportProvider {
             "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
             "(select string_agg(concat(woc.man_hours),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
             "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, " +
+            "(select ua.telephone from user_account ua where ua.id = sr.requestor_id) as telephone," +
             "(select aft.fault_name from asset_fault_type aft where aft.id=wo.case_type) as caseTypeName, " +
+            "(select im.value_zh from i18n_message im where concat(ai.status,'') = im.msg_key and im.msg_type='assetStatus') as assetStatusName," +
             "wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment " +
             "from v2_work_order wo, v2_service_request sr, asset_info ai " +
             "where wo.sr_id = sr.id and ai.id = wo.asset_id "
