@@ -3,8 +3,10 @@ package com.ge.apm.service.wo.doctemplate;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.ServiceRequestMsgRepository;
+import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
 import com.ge.apm.dao.V2_WorkOrderStepRepository;
 import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.domain.V2_WorkOrderCoworker;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.BlobFileService;
 import org.apache.commons.collections.map.HashedMap;
@@ -38,6 +40,9 @@ public class WorkOrderDocxRenderService {
     @Autowired
     private V2_WorkOrderStepRepository v2WorkOrderStepDao;
 
+    @Autowired
+    V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static {
@@ -59,7 +64,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("issue_desc", "故障描述");
 
         COPY_KEY_MAPPING.put("fix_status", "工单状态");
-        COPY_KEY_MAPPING.put("fix_hours", "维修工时");
+        COPY_KEY_MAPPING.put("fix_hours", "维修总工时");
         COPY_KEY_MAPPING.put("fix_fee", "维修总费用");
         COPY_KEY_MAPPING.put("fix_other_fee", "其他费用");
         COPY_KEY_MAPPING.put("fix_ext_fee", "外修费用");
@@ -120,6 +125,7 @@ public class WorkOrderDocxRenderService {
 
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
+        putWorkOrderCoworker(target, (String) source.get("woId"));
 
         return target;
     }
@@ -177,6 +183,17 @@ public class WorkOrderDocxRenderService {
         }
 
         workOrderMap.put("proceed_table", woSteps);
+    }
+
+    private void putWorkOrderCoworker(Map<String, Object> workOrderMap, String id){
+        List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(id);
+
+        int i = 0;
+        for (V2_WorkOrderCoworker woc : workOrderList) {
+            i++;
+            workOrderMap.put("工时" + String.valueOf(i), woc.getManHours());
+            workOrderMap.put("协作者" + String.valueOf(i), woc.getCowokerUserName());
+        }
     }
 
     private String formatDate(Date date) {
