@@ -242,7 +242,7 @@ public class WorkOrderReportProvider {
         sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
             "(select im.value_zh from i18n_message im where concat(wo.status,'') = im.msg_key and im.msg_type='status') as statusName, " +
             "sr.hospital_name as hospitalName,ai.clinical_dept_name as assetClinicalDeptName,ai.manufacture as assetManufacture, " +
-            "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,ai.location_name as locationName, " +
+            "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
             "(select im.value_zh from i18n_message im where concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
             "(select im.value_zh from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType') as assetFunctionGroupName, " +
             "(select im.value_zh from i18n_message im where concat(ai.asset_code68,'') = im.msg_key and im.msg_type=(select im.msg_key from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType')) as assetCode68Name, " +
