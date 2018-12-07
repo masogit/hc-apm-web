@@ -9,44 +9,46 @@
 
 		<h:form id="pmOrderListFormOut">
 
-			<p:dataTable id="datalist" value="#{assetLifecycleEventController4.lazyModel}" var="item" widgetVar="varDataList"
-				selection="#{assetLifecycleEventController4.selecteItems}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-				rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+			<p:dataTable id="datalist" value="#{assetLifecycleEvent4Controller.lazyModel}" var="item" widgetVar="varDataList"
+				selection="#{assetLifecycleEvent4Controller.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+				rowKey="#{item.id}" selectionMode="single"
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
-				<p:column selectionMode="multiple" style="width:32px;text-align:center" />
-				<p:ajax event="rowSelect" listener="#{assetLifecycleEventController4.onSelectAssetLifecycleEvent}" />
-				<p:ajax event="filter" listener="#{assetLifecycleEventController4.onFilter}" />
-				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetName}"/>
-                </p:column>
-
-                <p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.eventUid}"/>
-                </p:column>
-                <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.createTime}"/>
-                </p:column>
-                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.systemId}"/>
-                </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
-                </p:column>
-                <p:column headerText="状态">
-                    <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
-                </p:column>
-
-				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}" filterBy="#{item.scheduleDate}" filterMatchMode="LIKE">
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
+					<!-- <f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{assetLifecycleEvent4Controller.blnAllSelected}" >
+							<p:ajax listener="#{assetLifecycleEvent4Controller.onSelectAllItemsEvent()}" update="selectCheckBoxItem"></p:ajax>
+						</p:selectBooleanCheckbox>
+					</f:facet> -->
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItem">
+						<p:ajax listener="#{assetLifecycleEvent4Controller.onItemSelect()}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</p:column>
+				<p:ajax event="filter" listener="#{assetLifecycleEvent4Controller.onFilter}" />
+				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetName}" />
+				</p:column>
+				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.eventUid}" />
+				</p:column>
+				<p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.createTime}" />
+				</p:column>
+				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.systemId}" />
+				</p:column>
+				<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+					filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+				</p:column>
+				<p:column headerText="状态">
+					<h:outputText value="#{assetLifecycleEvent4Controller.getMsStatus(item)}" />
+				</p:column>
+				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
 					<h:outputText value="#{item.scheduleDate}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 					</h:outputText>
-
 				</p:column>
 
 				<p:column headerText="报告下载">
@@ -61,27 +63,13 @@
 					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
 						<p:dataExporter type="xlsx" target="datalist" fileName="PmOrder_export" />
 					</p:commandButton>
-					<p:commandButton title="报告下载" icon="ui-icon-file-download" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
-						<p:fileDownload value="#{assetLifecycleEventController4.downloadSelectedReport()}" />
+					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false" actionListener="#{assetLifecycleEvent4Controller.downloadSelectedReport()}" process="datalist" update=":growl">
+						<p:fileDownload value="#{assetLifecycleEvent4Controller.exportFile}" />
 					</p:commandButton>
 				</f:facet>
 			</p:dataTable>
 		</h:form>
-
 	</div>
-
-
-	<script>
-            afterPageLoad = function () {
-                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
-                var isActive = "#{userContextService.isActive()}";
-                if(isActive == '1'){
-                    PF('ActiveDlg').show();
-                }
-            }
-
-
-    </script>
 
 </ui:composition>
 </html>
