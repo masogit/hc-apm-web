@@ -63,6 +63,9 @@ public class AssetLifecycleEvent implements Serializable {
     @JoinColumn(name = "alce_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<ServiceRequestReport> reports = new ArrayList<>();
+    
+    @Transient
+    private boolean blnSelected=false;
 
     public String getId() {
         return id;
@@ -158,5 +161,13 @@ public class AssetLifecycleEvent implements Serializable {
 
 	public void setScheduleDate(Date scheduleDate) {
 		this.scheduleDate = scheduleDate;
+	}
+
+	public boolean isBlnSelected() {
+		return blnSelected;
+	}
+
+	public void setBlnSelected(boolean blnSelected) {
+		this.blnSelected = blnSelected;
 	}
 }
