@@ -16,12 +16,12 @@
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
-					<!-- <f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}" >
-							<p:ajax listener="#{assetLifecycleEvent5Controller.onSelectAllItemsEvent()}" update="selectCheckBoxItem"></p:ajax>
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}" onchange="updateSelectAllCheckBoxPmRemote();">
+							<p:ajax listener="#{assetLifecycleEvent5Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
-					</f:facet> -->
-					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItem">
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemPmRemote">
 						<p:ajax listener="#{assetLifecycleEvent5Controller.onItemSelect()}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
@@ -71,6 +71,18 @@
 		</h:form>
 
 	</div>
-
+<script>
+	//<![CDATA[
+            function updateSelectAllCheckBoxPmRemote() {
+                var selectAllHeader=$("#pmTab\\:pmOrderListFormRemote\\:datalist\\:selectCheckBoxHeaderPmRemote_input")[0];
+                var checked=selectAllHeader.checked;
+                $('[id$="selectCheckBoxItemPmRemote"] input').each(function(index,obj){
+                	if(obj.checked!=checked){
+                		$(obj).trigger("click");
+                	}
+                });
+            }
+          //]]>
+    </script>
 </ui:composition>
 </html>

@@ -16,12 +16,12 @@
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent3Controller.selected}">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
-					<!-- <f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}" >
-							<p:ajax listener="#{assetLifecycleEvent3Controller.onSelectAllItemsEvent()}" update=":woTab:woMgrOutListForm:datalist:selectCheckBoxItem"></p:ajax>
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}" onchange="updateSelectAllCheckBoxWo();">
+							<p:ajax listener="#{assetLifecycleEvent3Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
-					</f:facet> -->
-					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItem">
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
 						<p:ajax listener="#{assetLifecycleEvent3Controller.onItemSelect()}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
@@ -69,6 +69,7 @@
 
 
 	<script>
+	//<![CDATA[
             afterPageLoad = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 var isActive = "#{userContextService.isActive()}";
@@ -76,7 +77,16 @@
                     PF('ActiveDlg').show();
                 }
             };
-
+            function updateSelectAllCheckBoxWo() {
+                var selectAllHeader=$("#woTab\\:woMgrOutListForm\\:datalist\\:selectCheckBoxHeaderWo_input")[0];
+                var checked=selectAllHeader.checked;
+                $('[id$="selectCheckBoxItemWo"] input').each(function(index,obj){
+                	if(obj.checked!=checked){
+                		$(obj).trigger("click");
+                	}
+                });
+            }
+          //]]>
     </script>
 </ui:composition>
 </html>
