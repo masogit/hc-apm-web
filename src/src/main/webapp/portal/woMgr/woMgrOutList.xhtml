@@ -35,7 +35,9 @@
                 </p:column>
                 <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
                           filterMatchMode="LIKE">
-                    <h:outputText value="#{item.createTime}"/>
+                    <h:outputText value="#{item.createTime}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                    </h:outputText>
                 </p:column>
                 <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}"
                           filterMatchMode="LIKE">
