@@ -207,7 +207,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         });
         boolean result=false;
          if(orderNumList.size()>0) {
-             result = dao.getBatchPmOrderList(orderNumList).stream().allMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
              if(result){
                  WebUtil.addErrorMessage("审核中的工单,无法操作");
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForApproval", true);
@@ -233,7 +233,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         });
         boolean result=false;
         if(orderNumList.size()>0) {
-            result = dao.getBatchPmOrderList(orderNumList).stream().allMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
+            result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
             if(result){
                 WebUtil.addErrorMessage("审核中的工单,无法批量转单");
                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForTransfer", true);
