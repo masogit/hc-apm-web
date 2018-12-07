@@ -52,7 +52,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
 	protected FileDownloadService fileDownloadService;
 	protected List<AssetLifecycleEvent> listSelectedItems;
-	protected List<AssetLifecycleEvent> listCurrentItems;
 	protected StreamedContent exportFile;
 	protected boolean blnAllSelected;
     protected void init() {
@@ -78,12 +77,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         this.selected = null;
         addFilter();
         Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
-        if(pageRequest!=null){
-        	listCurrentItems=pageResult.getContent();
-        }
-        else{
-        	listCurrentItems=null;
-        }
         return pageResult;
     }
 
@@ -103,16 +96,24 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
 
     public void onSelectAllItemsEvent() {
+    	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
     			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
     			tempEvent.setBlnSelected(blnAllSelected);
     		}
     	}
+    	if(blnAllSelected){
+    		this.listSelectedItems=new ArrayList<AssetLifecycleEvent>(listCurrentItems);
+    	}
+    	else{
+    		this.listSelectedItems=null;
+    	}
     }
     
     public void onItemSelect(){
     	listSelectedItems=new ArrayList<AssetLifecycleEvent>();
+    	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
     			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
@@ -156,7 +157,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
 
     public void downloadSelectedReport(){
-    	onItemSelect();
     	if(listSelectedItems==null || listSelectedItems.size()==0){
     		WebUtil.addErrorMessage("请选择需要下载报告的工单！");
     		return;

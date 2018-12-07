@@ -16,12 +16,12 @@
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
-					<!-- <f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader" value="#{assetLifecycleEvent4Controller.blnAllSelected}" >
-							<p:ajax listener="#{assetLifecycleEvent4Controller.onSelectAllItemsEvent()}" update="selectCheckBoxItem"></p:ajax>
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmOut" class="selectCheckBoxHeader" value="#{assetLifecycleEvent4Controller.blnAllSelected}" onchange="updateSelectAllCheckBoxPmOut();">
+							<p:ajax listener="#{assetLifecycleEvent4Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
-					</f:facet> -->
-					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItem">
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemPmOut">
 						<p:ajax listener="#{assetLifecycleEvent4Controller.onItemSelect()}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
@@ -70,6 +70,18 @@
 			</p:dataTable>
 		</h:form>
 	</div>
-
+<script>
+	//<![CDATA[
+            function updateSelectAllCheckBoxPmOut() {
+            	var selectAllHeader=$("#pmTab\\:pmOrderListFormOut\\:datalist\\:selectCheckBoxHeaderPmOut_input")[0];
+                var checked=selectAllHeader.checked;
+                $('[id$="selectCheckBoxItemPmOut"] input').each(function(index,obj){
+                	if(obj.checked!=checked){
+                		$(obj).trigger("click");
+                	}
+                });
+            }
+          //]]>
+    </script>
 </ui:composition>
 </html>
