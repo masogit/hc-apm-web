@@ -48,6 +48,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -1210,13 +1211,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
+
+
         this.setSearchFilter();
         removeFilterOnField("currentStepId");
+        removeFilterOnField("currentPersonId");
         removeFilterOnField("isFinished");
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
-
+        removeFilterOnField("assetInfo.assetOwnerId");
+        removeFilterOnField("assetInfo.assetOwnerId2");
+        removeFilterOnField("assetInfo.assetOwnerId3");
         if(queryIndex==100){
             //from asset detail page
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
@@ -1319,10 +1325,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
-
         this.selected = null;
-        //     Page<V2_PmOrder> result1 =dao.findBySearchFilter(this.searchFilters,null);
+
+        List<Sort.Order> orders = new ArrayList<Sort.Order>();
+        orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
+        orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
+        Sort sort = new Sort(orders);
+
+        pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
+
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         return result;
