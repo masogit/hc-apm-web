@@ -478,9 +478,9 @@ public class AssetFileImportBaseService {
             if (!StringUtils.isEmpty(newAsset.getQrCode())) {
                 if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
                     if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
-                        //三码合一情况下，需要创建新的二维码
+                        //三码合一情况下，可以创建新的二维码或者二维码已发行
                         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), selectedOrgToImport.getUid());
-                        if (qrCodeLib != null) {
+                        if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
                             item.put("status", ImportStatus.CheckFail);
                             result.add(Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
