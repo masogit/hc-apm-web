@@ -2,19 +2,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 <ui:composition>
 	<div class="ui-g-12 card">
 		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
 		<h:form id="pmOrderListFormRemote">
 
-			<p:dataTable id="datalist" value="#{assetLifecycleEvent5Controller.lazyModel}" var="item" widgetVar="varDataList"
+			<p:dataTable id="datalist3" value="#{assetLifecycleEvent5Controller.lazyModel}" var="item" widgetVar="varDataList3"
 				selection="#{assetLifecycleEvent5Controller.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 				rowKey="#{item.id}" selectionMode="single"
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
+				<p:ajax event="filter" listener="#{assetLifecycleEvent5Controller.onFilter}" />
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}"
@@ -26,14 +27,13 @@
 						<p:ajax listener="#{assetLifecycleEvent5Controller.onItemSelect()}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
-				<p:ajax event="filter" listener="#{assetLifecycleEvent5Controller.onFilter}" />
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>
 				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.eventUid}" />
 				</p:column>
-				<p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}" filterMatchMode="LIKE">
+				<p:column headerText="更新时间" sortBy="#{item.createTime}">
 					<h:outputText value="#{item.createTime}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
 					</h:outputText>
@@ -64,10 +64,10 @@
 				</p:column>
 				<f:facet name="{Toolbar}">
 					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-						<p:dataExporter type="xlsx" target="datalist" fileName="PmOrder_export" />
+						<p:dataExporter type="xlsx" target="datalist3" fileName="PmOrder_export" />
 					</p:commandButton>
 					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
-						actionListener="#{assetLifecycleEvent5Controller.downloadSelectedReport()}" process="datalist" update=":growl">
+						actionListener="#{assetLifecycleEvent5Controller.downloadSelectedReport()}" process="datalist3" update=":growl">
 						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
 					</p:commandButton>
 				</f:facet>
@@ -78,7 +78,7 @@
 	<script>
 	//<![CDATA[
             function updateSelectAllCheckBoxPmRemote() {
-                var selectAllHeader=$("#pmTab\\:pmOrderListFormRemote\\:datalist\\:selectCheckBoxHeaderPmRemote_input")[0];
+                var selectAllHeader=$("#pmTab\\:pmOrderListFormRemote\\:datalist3\\:selectCheckBoxHeaderPmRemote_input")[0];
                 var checked=selectAllHeader.checked;
                 $('[id$="selectCheckBoxItemPmRemote"] input').each(function(index,obj){
                 	if(obj.checked!=checked){
