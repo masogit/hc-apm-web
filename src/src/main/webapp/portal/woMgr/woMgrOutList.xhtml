@@ -9,15 +9,15 @@
 
 		<h:form id="woMgrOutListForm">
 
-			<p:dataTable id="datalist" value="#{assetLifecycleEvent3Controller.lazyModel}" var="item" widgetVar="varDataList"
-				lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-				rowKey="#{item.id}" selectionMode="single"
+			<p:dataTable id="datalist" value="#{assetLifecycleEvent3Controller.lazyModel}" var="item" widgetVar="varDataList" lazy="true" paginator="true"
+				paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" selectionMode="single"
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent3Controller.selected}">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
 					<f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}" onchange="updateSelectAllCheckBoxWo();">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}"
+							onchange="updateSelectAllCheckBoxWo();">
 							<p:ajax listener="#{assetLifecycleEvent3Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
 					</f:facet>
@@ -33,7 +33,9 @@
 					<h:outputText value="#{item.eventUid}" />
 				</p:column>
 				<p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}" filterMatchMode="LIKE">
-					<h:outputText value="#{item.createTime}" />
+					<h:outputText value="#{item.createTime}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+					</h:outputText>
 				</p:column>
 				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.systemId}" />
@@ -45,7 +47,7 @@
 				<p:column headerText="状态">
 					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
 				</p:column>
-        <p:column headerText="报告下载">
+				<p:column headerText="报告下载">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
 							<h:outputText value="#{report.displayName}" />
@@ -57,7 +59,8 @@
 					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
 						<p:dataExporter type="xlsx" target="datalist" fileName="woMgr_export" />
 					</p:commandButton>
-					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false" actionListener="#{assetLifecycleEvent3Controller.downloadSelectedReport()}" process=":woTab:woMgrOutListForm:datalist" update=":growl">
+					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+						actionListener="#{assetLifecycleEvent3Controller.downloadSelectedReport()}" process=":woTab:woMgrOutListForm:datalist" update=":growl">
 						<p:fileDownload value="#{assetLifecycleEvent3Controller.exportFile}" />
 					</p:commandButton>
 				</f:facet>
@@ -68,24 +71,24 @@
 
 
 	<script>
-	//<![CDATA[
-            afterPageLoad = function () {
-                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
-                var isActive = "#{userContextService.isActive()}";
-                if(isActive == '1'){
-                    PF('ActiveDlg').show();
-                }
-            };
-            function updateSelectAllCheckBoxWo() {
-                var selectAllHeader=$("#woTab\\:woMgrOutListForm\\:datalist\\:selectCheckBoxHeaderWo_input")[0];
-                var checked=selectAllHeader.checked;
-                $('[id$="selectCheckBoxItemWo"] input').each(function(index,obj){
-                	if(obj.checked!=checked){
-                		$(obj).trigger("click");
-                	}
-                });
-            }
-          //]]>
-    </script>
+		//<![CDATA[
+		afterPageLoad = function() {
+			var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+			var isActive = "#{userContextService.isActive()}";
+			if (isActive == '1') {
+				PF('ActiveDlg').show();
+			}
+		};
+		function updateSelectAllCheckBoxWo() {
+			var selectAllHeader = $("#woTab\\:woMgrOutListForm\\:datalist\\:selectCheckBoxHeaderWo_input")[0];
+			var checked = selectAllHeader.checked;
+			$('[id$="selectCheckBoxItemWo"] input').each(function(index, obj) {
+				if (obj.checked != checked) {
+					$(obj).trigger("click");
+				}
+			});
+		}
+		//]]>
+	</script>
 </ui:composition>
 </html>
