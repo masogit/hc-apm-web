@@ -281,7 +281,7 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired? '*':''}</span></label>
                                     <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" required="#{assetInstallationController.customConfig.assetFields['warrantyDate'].arrivalRequired}" 
-                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                                requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
                                         <p:ajax event="dateSelect" process="@this" update="@this"/>
                                         <p:ajax process="@this" update="@this"/>
                                     </p:calendar>

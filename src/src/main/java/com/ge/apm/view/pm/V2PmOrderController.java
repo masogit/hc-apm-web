@@ -207,10 +207,42 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         });
         boolean result=false;
          if(orderNumList.size()>0) {
-             result = dao.getBatchPmOrderList(orderNumList).stream().allMatch(item -> item.getRuleLevel() == 2);
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
+             if(result){
+                 WebUtil.addErrorMessage("审核中的工单,无法操作");
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForApproval", true);
+                 return result;
+             }
+
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
+             if(result){
+                 WebUtil.addErrorMessage("3级保养工单不能批量完成");
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return result;
+             }
          }
          return result;
     }
+
+    public void forbidTransfer(){
+        ArrayList<String> orderNumList = new ArrayList<String>();
+        List<Map.Entry<String, Boolean>> collect =
+                sameOpHashmap.entrySet().stream().filter(item -> item.getValue()).collect(Collectors.toList());
+        collect.stream().forEach(item->{
+            orderNumList.add(item.getKey());
+        });
+        boolean result=false;
+        if(orderNumList.size()>0) {
+            result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
+            if(result){
+                WebUtil.addErrorMessage("审核中的工单,无法批量转单");
+                RequestContext.getCurrentInstance().addCallbackParam("batchForbidForTransfer", true);
+
+            }
+        }
+    }
+
+
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -1484,6 +1516,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
+
+
+
 
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
