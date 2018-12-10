@@ -1222,6 +1222,8 @@ public class NurseSiteMaintainService {
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
 					headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
+					headerColumnIndex = writeExcelSheetHeader(header, "备注", doc, headerColumnIndex, keyRow, false);
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getComment());
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
 					// "班次", doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;

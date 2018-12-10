@@ -116,16 +116,16 @@ public class WorkOrderDocxRenderService {
     private Map<String, Object> mapMyMap(Map<String, Object> source) {
         Map<String, Object> target = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
-            target.put(entry.getKey(), source.get(entry.getValue()));
-        }
-
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
 
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
-        putWorkOrderCoworker(target, (String) source.get("woId"));
+        putWorkOrderCoworker(source, (String) source.get("woId"));
+
+        for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
+            target.put(entry.getKey(), source.get(entry.getValue()));
+        }
 
         return target;
     }

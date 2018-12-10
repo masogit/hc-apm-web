@@ -71,6 +71,9 @@
                 								<label class="label">#{item}</label>
                 							</th>
                 						</p:repeat>
+                						<th>
+                							<label class="label">备注</label>
+                						</th>
                 						<!-- <th>
                 							<label class="label">查看签名</label>
                 						</th> -->
@@ -98,6 +101,9 @@
 											<!-- <td>
 												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
 											</td> -->
+											<td>
+												<h:outputText value="#{item2.comment}"/>
+											</td>
 			                    		</tr>
 									</p:repeat>
 								</table>
