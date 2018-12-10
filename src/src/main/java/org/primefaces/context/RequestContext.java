@@ -53,12 +53,14 @@ public class RequestContext{
     }
     
     public static RequestContext getCurrentInstance(FacesContext facesContext) {
-        if (facesContext != null) {
-            RequestContext context = (RequestContext) facesContext.getAttributes().get(INSTANCE_KEY);
-            return context;
+        if (facesContext == null) return null;
+
+        RequestContext context = (RequestContext) facesContext.getAttributes().get(INSTANCE_KEY);
+        if (context == null) {
+            context = new RequestContext(facesContext);
         }
 
-        return null;
+        return context;
     }
 
     public RequestContext(FacesContext context) {

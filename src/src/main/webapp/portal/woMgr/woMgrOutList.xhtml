@@ -14,18 +14,16 @@
         <h:form id="woMgrOutListForm">
 
             <p:dataTable id="datalist" value="#{assetLifecycleEventController.lazyModel}" var="item"
-                         widgetVar="varDataList"
-                         selectionMode="single" selection="#{assetLifecycleEventController.selected}"
+                         widgetVar="varDataList" selection="#{assetLifecycleEventController.selecteItems}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-
+                         <p:column selectionMode="multiple" style="width:32px;text-align:center" />
                 <p:ajax event="rowSelect" listener="#{assetLifecycleEventController.onSelectAssetLifecycleEvent}"/>
                 <p:ajax event="filter" listener="#{assetLifecycleEventController.onFilter}"/>
-
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
                           filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetName}"/>
@@ -37,7 +35,9 @@
                 </p:column>
                 <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
                           filterMatchMode="LIKE">
-                    <h:outputText value="#{item.createTime}"/>
+                    <h:outputText value="#{item.createTime}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                    </h:outputText>
                 </p:column>
                 <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}"
                           filterMatchMode="LIKE">
@@ -50,12 +50,22 @@
                     <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
                 </p:column>
 
-                <p:column headerText="报告">
-                    <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download"
-                                     rendered="#{not empty item.reportStorageId}">
-                        <p:fileDownload value="#{assetLifecycleEventController.getAnonymousReport(item.reportStorageId)}" />
-                    </p:commandButton>
+                <p:column headerText="报告下载">
+                    <p:repeat value="#{item.reports}" var="report">
+                        <p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
+                            <h:outputText value="#{report.displayName}"/>
+                        </p:link>
+                        <br/>
+                    </p:repeat>
                 </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                        <p:dataExporter type="xlsx" target="datalist" fileName="woMgr_export"/>
+                    </p:commandButton>
+                    <p:commandButton title="报告下载" icon="ui-icon-file-download" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    	<p:fileDownload value="#{assetLifecycleEventController.downloadSelectedReport()}"/>
+                    </p:commandButton>
+                </f:facet>
             </p:dataTable>
         </h:form>
 

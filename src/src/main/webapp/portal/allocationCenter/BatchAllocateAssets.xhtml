@@ -16,7 +16,9 @@
                     <p:ajax event="tabChange" listener="#{sharedAssetBatchController.onTabChange}" update="#{sharedAssetBatchController.currentTabId}"/>
                     
                     <p:tab title="批量借入" id="batchLease">
-                        <p:messages id="batchLeaseMessages" showDetail="true" showSummary="false" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchLeaseMessages" showDetail="true" showSummary="false" closable="true">
+                            <p:autoUpdate disabled="false"/>
+                        </p:messages>
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
@@ -65,7 +67,7 @@
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
                                                          update="batchLeaseForm:datalist batchLeaseForm:confirm"
-                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Lease}"/>
+                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Lease()}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
 
@@ -123,14 +125,14 @@
                                                          process="@this"
                                                          update=":batchLeaseAssetDialog"
                                                          oncomplete="PF('batchLeaseAssetDialog').show()"
-                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableLeaseSubmitBtn() eq false)}"/>
                                         <p:commandButton id="deleteButton"
                                                          icon="ui-icon-close"
                                                          title="#{msg.Delete}"
                                                          process="@this"
                                                          update="tabView:batchLeaseForm:datalist"
                                                          actionListener="#{sharedAssetBatchController.removeLeaseReqDetail()}"
-                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableLeaseSubmitBtn() eq false)}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                                         </p:commandButton>
                                     </f:facet>
@@ -158,7 +160,9 @@
                     </p:tab>
 
                     <p:tab title="批量归还" id="batchReturn">
-                        <p:messages id="batchReturnMessages" showDetail="true" showSummary="false" closable="true" autoUpdate="true"/>
+                        <p:messages id="batchReturnMessages" showDetail="true" showSummary="false" closable="true">
+                            <p:autoUpdate disabled="false"/>
+                        </p:messages>
                         <p:fieldset legend="归还明细信息" style="margin-bottom:20px">
                             <h:form id="batchReturnForm">
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -192,7 +196,7 @@
                                                          icon="ui-icon-search"
                                                          class="btn btn-sm btn-gray"
                                                          update="batchReturnForm:datalist batchReturnForm:confirm batchReturnForm:assetDept4Return returnAssetValidator"
-                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Return}"
+                                                         actionListener="#{sharedAssetBatchController.findAndSelectAsset2Return()}"
                                                          oncomplete="openReturnAssetValidator(xhr, status, args)"/>
                                     </h:panelGroup>
                                     <h:panelGroup id="assetDept4Return">
@@ -266,14 +270,14 @@
                                                          process="@this"
                                                          update=":batchReturnAssetDialog"
                                                          oncomplete="PF('batchReturnAssetDialog').show()"
-                                                         disabled="#{empty sharedAssetBatchController.selected}"/>
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableReturnSubmitBtn() eq false)}"/>
                                         <p:commandButton id="deleteButton"
                                                          icon="ui-icon-close"
                                                          title="#{msg.Delete}"
                                                          process="@this"
                                                          update="tabView:batchReturnForm:datalist tabView:batchReturnForm:assetDept4Return tabView:batchReturnForm:confirm"
                                                          actionListener="#{sharedAssetBatchController.removeReturnReqDetail()}"
-                                                         disabled="#{empty sharedAssetBatchController.selected}">
+                                                         disabled="#{(empty sharedAssetBatchController.selected) or (sharedAssetBatchController.enableReturnSubmitBtn() eq false)}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                                         </p:commandButton>
                                     </f:facet>

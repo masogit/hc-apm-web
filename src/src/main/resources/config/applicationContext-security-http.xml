@@ -30,6 +30,11 @@
         <intercept-url pattern="/**/wechat/asset/createInfoDetail.xhtml**" access="permitAll"/>
         <intercept-url pattern="/**/wechat/**" access="permitAll"/>
 
+        <!--APM管理-->
+        <intercept-url pattern="/admin/uaa/siteInfo/List.xhtml**" access="hasAnyRole('SuperAdmin','GeOp')"/>
+        <intercept-url pattern="/admin/batchFile/batchFileList.xhtml**" access="hasAnyRole('SuperAdmin','GeOp')"/>
+        <intercept-url pattern="/portal/sr/opsreport/reportList.xhtml**" access="hasAnyRole('SuperAdmin','GeOp')"/>
+
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>
         <intercept-url pattern="/sysadmin/**" access="hasRole('SuperAdmin')"/>
