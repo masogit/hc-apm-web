@@ -437,6 +437,10 @@ public class MaintainController {
 		insertMaintain(nurseSiteMaintain);
 		addMessage("工单已创建");
 	}
+	public void onCommentClick(NurseSiteMaintainItem item){
+		boolean temp=item.isBlnEditComment();
+		item.setBlnEditComment(!temp);
+	}
 
 	public void deleteMaintain() {
 		if (event.getId() != null) {
