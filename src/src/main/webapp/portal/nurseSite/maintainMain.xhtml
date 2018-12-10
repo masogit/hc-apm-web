@@ -48,11 +48,11 @@
                         </p:schedule>
                     </h:panelGrid>
                 </h:form>
-                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="700" resizable="true" draggable="true">
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="1000" resizable="true" draggable="true">
                    	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
-                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:650px':''}">
+                   		<div class="ui-datatable ui-widget" style="overflow: auto;height:480px;">
                    			<div class="ui-datatable-tablewrapper" style="padding-left:10px;padding-right:10px;">
-                   				<table>
+                   				<p:dataTable var="dataTableItem" value="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" editable="true" editMode="cell" widgetVar="maintainDlgDataTable">
                 					<tr>
                 						<th>
                 							<label class="label">名称</label>
@@ -102,11 +102,16 @@
 												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
 											</td> -->
 											<td>
-												<h:outputText value="#{item2.comment}"/>
+												<!-- <h:outputText value="#{item2.comment}">
+												</h:outputText> -->
+												<p:cellEditor>
+								                   <f:facet name="output"><h:outputText value="#{dataTableItem.comment}" /></f:facet>
+								                   <f:facet name="input"><p:inputText value="#{dataTableItem.comment}" maxlength="200"/></f:facet>
+								               </p:cellEditor>
 											</td>
 			                    		</tr>
 									</p:repeat>
-								</table>
+								</p:dataTable>
                    			</div>
                    		</div>
 	                   	<h:panelGrid columnClasses="value" columns="1">
