@@ -61,7 +61,7 @@
                     <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                            <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}"
+                            <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}" appendTo="@(Body)"
                                             scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
                                 <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
 

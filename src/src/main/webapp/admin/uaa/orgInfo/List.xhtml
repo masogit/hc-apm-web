@@ -21,7 +21,7 @@
                                 <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
                             </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                            <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false">
+                            <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
                                 <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{orgInfoController.tenantId}">
                                     <p:ajax process="@this" event="click" update=":editForm" oncomplete="PF('varPanelSite').hide();"/>
 

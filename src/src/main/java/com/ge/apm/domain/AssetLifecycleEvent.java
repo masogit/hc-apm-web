@@ -2,10 +2,13 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by lsg on 31/1/2018.
@@ -42,6 +45,12 @@ public class AssetLifecycleEvent implements Serializable {
 
     @Column(name = "description")
     private String description;
+    
+  //Schedule Date
+    @Column(name = "schedule_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    Date scheduleDate;
 
     @Column(name = "status")
     private Integer status;
@@ -50,24 +59,10 @@ public class AssetLifecycleEvent implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
-    @JoinColumn(name = "report_object_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private V2_BlobObject srReport;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pm_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "alce_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
-    private V2_BlobObject pmReport;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "checklist_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @org.hibernate.annotations.ForeignKey(name = "none")
-    private V2_BlobObject checkListReport;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "sha_report_object_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @org.hibernate.annotations.ForeignKey(name = "none")
-    private V2_BlobObject shaReport;
+    private List<ServiceRequestReport> reports = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -149,42 +144,19 @@ public class AssetLifecycleEvent implements Serializable {
         this.assetInfo = assetInfo;
     }
 
-    public String getReportStorageId() {
-        if (srReport != null) {
-            return srReport.getObjectStorageId();
-        }
-        return "";
+    public List<ServiceRequestReport> getReports() {
+        return reports;
     }
 
-    public V2_BlobObject getSrReport() {
-        return srReport;
+    public void setReports(List<ServiceRequestReport> reports) {
+        this.reports = reports;
     }
 
-    public void setSrReport(V2_BlobObject srReport) {
-        this.srReport = srReport;
-    }
+	public Date getScheduleDate() {
+		return scheduleDate;
+	}
 
-    public V2_BlobObject getPmReport() {
-        return pmReport;
-    }
-
-    public void setPmReport(V2_BlobObject pmReport) {
-        this.pmReport = pmReport;
-    }
-
-    public V2_BlobObject getCheckListReport() {
-        return checkListReport;
-    }
-
-    public void setCheckListReport(V2_BlobObject checkListReport) {
-        this.checkListReport = checkListReport;
-    }
-
-    public V2_BlobObject getShaReport() {
-        return shaReport;
-    }
-
-    public void setShaReport(V2_BlobObject shaReport) {
-        this.shaReport = shaReport;
-    }
+	public void setScheduleDate(Date scheduleDate) {
+		this.scheduleDate = scheduleDate;
+	}
 }

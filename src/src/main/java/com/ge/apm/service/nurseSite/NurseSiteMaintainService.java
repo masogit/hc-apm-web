@@ -884,8 +884,6 @@ public class NurseSiteMaintainService {
 				for (int i = 0; i < listCheckAssets.size(); ++i) {
 					NurseSiteMaintainConfigItem obj = new NurseSiteMaintainConfigItem();
 					obj.setAssetUid(listCheckAssets.get(i).getUid());
-					obj.setCheckItems(tempConfig.getCheckItems());
-					obj.setCheckItemsDetail(tempConfig.getCheckItemsDetail());
 					obj.setCreateBy(tempConfig.getCreateBy());
 					obj.setCreateByUid(tempConfig.getCreateByUid());
 					obj.setCreateDate(tempConfig.getCreateDate());
