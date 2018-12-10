@@ -41,14 +41,7 @@ public class ServiceRequestReport {
     }
 
     public String getDisplayName() {
-        switch (type) {
-            case REPORT_TYPE_SR:
-                return "SR report";
-            case REPORT_TYPE_PM:
-                return "PM report";
-            default:
-                return "Other report";
-        }
+        return fileName;
     }
 
     public String getId() {

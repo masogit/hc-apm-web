@@ -190,6 +190,10 @@ public class UserContextService implements Serializable {
             return user.getIsSiteAdmin();
         }
 
+        if ("GeOp".equals(role)) {
+            return user.getIsGeOp();
+        }
+
         if (user.getIsLocalAdmin()) {
             return true;
         } else if ("LocalAdmin".equals(role)) {
@@ -306,7 +310,11 @@ public class UserContextService implements Serializable {
     public boolean getIsLocalAdmin() {
         return UserContextService.isLocalAdmin();
     }
-    
+
+    public boolean getIsGeOp() {
+        return UserContextService.isGeOp();
+    }
+
     public boolean getIsMVSAdmin(){
     	return UserContextService.isMVSAdmin();
     }
@@ -329,6 +337,11 @@ public class UserContextService implements Serializable {
     public static boolean isLocalAdmin() {
         UserAccount userAccount = getCurrentUserAccount();
         return userAccount.getIsLocalAdmin();
+    }
+
+    public static boolean isGeOp() {
+        UserAccount userAccount = getCurrentUserAccount();
+        return userAccount.getIsGeOp();
     }
     
     public static boolean isMVSAdmin(){
@@ -500,11 +513,7 @@ public class UserContextService implements Serializable {
         UserAccount currentUser = getLoginUser();
         int siteId= currentUser.getSiteId();
         if(siteId!=46) return false; // not in GE IB Tenant
-        return !(currentUser.getGeSso()!=null || isGeOp(currentUser));
-    }
-
-    public boolean isGeOp(UserAccount currentUser) {
-        return Boolean.TRUE.equals(currentUser.getIsGeOp());
+        return !(currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()));
     }
 
     public static boolean isOnlyLocalITAdmin() {

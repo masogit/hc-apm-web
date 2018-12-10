@@ -15,7 +15,7 @@
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
-				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
+        <p:column style="width:36px;text-align:center" id="checkBoxColumn">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmOut" class="selectCheckBoxHeader" value="#{assetLifecycleEvent4Controller.blnAllSelected}" onchange="updateSelectAllCheckBoxPmOut();">
 							<p:ajax listener="#{assetLifecycleEvent4Controller.onSelectAllItemsEvent()}"></p:ajax>

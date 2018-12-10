@@ -16,6 +16,10 @@
         </div>
         <script>
           window.onload = function () {
+            setTimeout("doWindowOnLoad()",500 );
+          }
+
+          doWindowOnLoad = function () {
             if ('localStorage' in window) {
               var token = "#{userContextService.getAccessToken()}";
               localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose

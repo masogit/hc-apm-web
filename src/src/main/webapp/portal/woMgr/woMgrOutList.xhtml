@@ -45,8 +45,7 @@
 				<p:column headerText="状态">
 					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
 				</p:column>
-
-				<p:column headerText="报告下载">
+        <p:column headerText="报告下载">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
 							<h:outputText value="#{report.displayName}" />
