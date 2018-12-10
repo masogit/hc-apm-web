@@ -136,6 +136,9 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name="sequence")
 	private Integer sequence;
 	
+	@Column(name="comment")
+	private String comment;
+	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
 	
@@ -359,6 +362,14 @@ public class NurseSiteMaintainItem implements Serializable {
 		NurseSiteMaintainData tempResult=new NurseSiteMaintainData();
 		tempResult.setCheckItem("");
 		return tempResult;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	@Override
