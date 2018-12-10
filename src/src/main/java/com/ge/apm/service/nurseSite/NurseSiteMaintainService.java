@@ -96,6 +96,19 @@ public class NurseSiteMaintainService {
 
 	@Autowired
 	private UaaService uaaService;
+	
+	private static final String STR_ASSET_NAME="设备名";
+	private static final String STR_ASSET_DEPTNUM="设备编号";
+	private static final String STR_SERIAL_NUM="制造商序列号";
+	private static final String STR_ASSET_FUNCTIONTYPE="设备型号";
+	private static final String STR_COMMENT="备注";
+	private static final String STR_SCHEDULE_DATE="计划检查时间";
+	private static final String STR_CHECK_DATE="实际检查时间";
+	private static final String STR_SEQUENCE="班次";
+	private static final String STR_MODIFIED_BY="负责人";
+	private static final String STR_SIGNATURE="签名";
+	private static final String STR_NURSESITEREPORT="护士站日常维护报表";
+	
 
 	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(Set<String> orgUids) {
 		return nurseSiteMaintainConfigRepository.findByOrgUids(orgUids);
@@ -1004,10 +1017,10 @@ public class NurseSiteMaintainService {
 				}
 				tempMap.put("名称", tempMaintain.getShowTitle());
 				if(tempMaintain.getModifyBy()!=null && tempMaintain.getModifyBy().getName()!=null){
-					tempMap.put("负责人", tempMaintain.getModifyBy().getName());
+					tempMap.put(STR_MODIFIED_BY, tempMaintain.getModifyBy().getName());
 				}
 				else{
-					tempMap.put("负责人", "");
+					tempMap.put(STR_MODIFIED_BY, "");
 				}
 				tempMap.put("计划检查日期", sdf.format(tempMaintain.getScheduleDate()));
 				if(tempMaintain.getCheckDate()!=null){
@@ -1107,16 +1120,16 @@ public class NurseSiteMaintainService {
 				if (tempListItem != null && tempListItem.size() > 0) {
 					rowIndex++;
 					columnIndex = 1;
-					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, 1, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, 1, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
-					headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, 1, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, 1, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
-					headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, 1, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, 1, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
-					headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, 1, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, 1, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
-					// "班次", doc, secondHeaderColumnIndex,2,false);
+					// STR_SEQUENCE, doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
@@ -1197,35 +1210,37 @@ public class NurseSiteMaintainService {
 			}
 		}
 		int headerColumnIndex = 1;
-		// int secondHeaderColumnIndex=1;
 		int columnIndex = 1;
 		int keyRow = 1;
-		int checkNameRow=2;
-		int scheduleDateRow=3;
-		int checkDateRow=4;
-		int sequenceRow=5;
-		int modifyByRow=6;
+		int checkNameRow=keyRow+1;
+		int scheduleDateRow=keyRow+2;
+		int checkDateRow=keyRow+3;
+		int sequenceRow=keyRow+4;
+		int modifyByRow=keyRow+5;
 		int rowIndex = 7;
-		int secondKeyRow = 2;
-		int dataColumnIndex=5;
+		int dataColumnIndex=6;
 		if (mapAssetUidMaintainItem.size() > 0) {
 			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
 			while (it.hasNext()) {
 				List<NurseSiteMaintainItem> tempListItem = it.next();
 				if (tempListItem != null && tempListItem.size() > 0) {
 					columnIndex = 1;
-					headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getName());
-					headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getDepartNum());
-					headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
-					headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow, false);
+					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
-					headerColumnIndex = writeExcelSheetHeader(header, "备注", doc, headerColumnIndex, keyRow, false);
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getComment());
+					headerColumnIndex = writeExcelSheetHeader(header, STR_COMMENT, doc, headerColumnIndex, keyRow, false);
+					String tempComment=tempListItem.get(0).getComment();
+					if(StringUtils.isEmpty(tempComment)){
+						tempComment="";
+					}
+					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempComment);
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
-					// "班次", doc, secondHeaderColumnIndex,2,false);
+					// STR_SEQUENCE, doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						mapCheckItemSequence.clear();
@@ -1279,17 +1294,17 @@ public class NurseSiteMaintainService {
 				}
 			}
 //			writeExcelSecondHeader(doc,keyRow,checkNameRow,dataColumnIndex,3,"检查项",null);
-			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,"计划检查时间",null);
-//			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,"实际检查时间",null);
-			doc.writeCellData(SHEET_Maintain, checkDateRow, 1, "实际检查时间");
-			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,"班次",0);
-			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, "负责人");
+			writeExcelSecondHeader(doc,keyRow,scheduleDateRow,dataColumnIndex,0,STR_SCHEDULE_DATE,null);
+//			writeExcelSecondHeader(doc,keyRow,checkDateRow,dataColumnIndex,1,STR_CHECK_DATE,null);
+			doc.writeCellData(SHEET_Maintain, checkDateRow, 1, STR_CHECK_DATE);
+			writeExcelSecondHeader(doc,keyRow,sequenceRow,dataColumnIndex,2,STR_SEQUENCE,0);
+			doc.writeCellData(SHEET_Maintain, modifyByRow, 1, STR_MODIFIED_BY);
 			if(setSignature.size()>0){
-				writeExcelSheetHeader(header, "签名", doc, 1, rowIndex++, false);
+				writeExcelSheetHeader(header, STR_SIGNATURE, doc, 1, rowIndex++, false);
 				writeSignatureToExcel(doc, rowIndex++,dataColumnIndex,3,12, setSignature,mapSignature);
 			}
 			doc.removeRow(SHEET_Maintain, keyRow);
-//			doc.writeCellData(SHEET_Maintain, keyRow, 1, "护士站日常维护报表");
+//			doc.writeCellData(SHEET_Maintain, keyRow, 1, STR_NURSESITEREPORT);
 			writeExcelHeader(doc,keyRow);
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1330,12 +1345,13 @@ public class NurseSiteMaintainService {
 	
 	private void writeExcelHeader(ExcelDocument doc,int keyRow){
 		List<String> header = new ArrayList<String>();
-		writeExcelSheetHeader(header, "护士站日常维护报表", doc, 1, keyRow, false);
+		writeExcelSheetHeader(header, STR_NURSESITEREPORT, doc, 1, keyRow, false);
 		int headerColumnIndex=1;
-		headerColumnIndex = writeExcelSheetHeader(header, "设备名", doc, headerColumnIndex, keyRow+1, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备编号", doc, headerColumnIndex, keyRow+1, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "制造商序列号", doc, headerColumnIndex, keyRow+1, false);
-		headerColumnIndex = writeExcelSheetHeader(header, "设备型号", doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_NAME, doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow+1, false);
+		headerColumnIndex = writeExcelSheetHeader(header, STR_COMMENT, doc, headerColumnIndex, keyRow+1, false);
 	}
 	
 	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label,Integer parentIndex){
