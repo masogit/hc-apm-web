@@ -66,6 +66,9 @@ public class AssetLifecycleEvent implements Serializable {
     
     @Transient
     private boolean blnSelected=false;
+    
+    @Transient
+    private String displayStatus;
 
     public String getId() {
         return id;
@@ -169,5 +172,13 @@ public class AssetLifecycleEvent implements Serializable {
 
 	public void setBlnSelected(boolean blnSelected) {
 		this.blnSelected = blnSelected;
+	}
+
+	public String getDisplayStatus() {
+		return displayStatus;
+	}
+
+	public void setDisplayStatus(String displayStatus) {
+		this.displayStatus = displayStatus;
 	}
 }

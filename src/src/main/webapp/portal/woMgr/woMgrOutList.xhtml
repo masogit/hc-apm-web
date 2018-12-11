@@ -14,7 +14,7 @@
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent3Controller.selected}">
-				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}"
 							onchange="updateSelectAllCheckBoxWo();">
@@ -47,7 +47,7 @@
 				<p:column headerText="状态">
 					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
 				</p:column>
-				<p:column headerText="报告下载">
+				<p:column headerText="报告下载" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
 							<h:outputText value="#{report.displayName}" />
@@ -56,8 +56,8 @@
 					</p:repeat>
 				</p:column>
 				<f:facet name="{Toolbar}">
-					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-						<p:dataExporter type="xlsx" target="datalist" fileName="woMgr_export" />
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent3Controller.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEvent3Controller.exportFile}" />
 					</p:commandButton>
 					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
 						actionListener="#{assetLifecycleEvent3Controller.downloadSelectedReport()}" process=":woTab:woMgrOutListForm:datalist" update=":growl">
