@@ -163,7 +163,7 @@
                 <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.captureDataMessage')}"/>
                 
             </p:submenu>
-			<p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin')  or userContextService.isMVSAdmin() and userContextService.versionContains('mvs')}">
+			<p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin') and userContextService.versionContains('mvs')}">
 				<p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('mvs.info')}"/>
 				<p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.versionContains('mvs.purchase')}"/>
 			</p:submenu>

@@ -16,7 +16,7 @@
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 				rowsPerPageTemplate="20,50,100,500">
 				<p:ajax event="filter" listener="#{assetLifecycleEvent5Controller.onFilter}" />
-				<p:column style="width:36px;text-align:center" id="checkBoxColumn">
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}"
 							onchange="updateSelectAllCheckBoxPmRemote();">
@@ -54,7 +54,7 @@
 					</h:outputText>
 				</p:column>
 
-				<p:column headerText="报告下载">
+				<p:column headerText="报告下载" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
 							<h:outputText value="#{report.displayName}" />
@@ -63,8 +63,8 @@
 					</p:repeat>
 				</p:column>
 				<f:facet name="{Toolbar}">
-					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-						<p:dataExporter type="xlsx" target="datalist3" fileName="PmOrder_export" />
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent5Controller.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
 					</p:commandButton>
 					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
 						actionListener="#{assetLifecycleEvent5Controller.downloadSelectedReport()}" process="datalist3" update=":growl">
