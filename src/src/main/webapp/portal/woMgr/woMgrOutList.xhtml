@@ -17,7 +17,7 @@
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}"
-							onchange="updateSelectAllCheckBoxWo();">
+							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');">
 							<p:ajax listener="#{assetLifecycleEvent3Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
 					</f:facet>
@@ -79,15 +79,6 @@
 				PF('ActiveDlg').show();
 			}
 		};
-		function updateSelectAllCheckBoxWo() {
-			var selectAllHeader = $("#woTab\\:woMgrOutListForm\\:datalist\\:selectCheckBoxHeaderWo_input")[0];
-			var checked = selectAllHeader.checked;
-			$('[id$="selectCheckBoxItemWo"] input').each(function(index, obj) {
-				if (obj.checked != checked) {
-					$(obj).trigger("click");
-				}
-			});
-		}
 		//]]>
 	</script>
 </ui:composition>
