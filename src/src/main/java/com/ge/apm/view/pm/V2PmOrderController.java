@@ -1330,15 +1330,44 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
         orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
-        Sort sort = new Sort(orders);
+        Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
+        //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
+       if(orderFor!=null) {
+           if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
+               orders = new ArrayList<Sort.Order>();
+               orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
+               orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
+           }
+       }
+      //如果选择除计划完成时间的其它列 进行排序
+        orders =  acqListSortOrder(pageRequest);
 
+        Sort sort = new Sort(orders);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
 
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+       // isSelectedCurrentPage=false;
         return result;
+    }
+
+    private  List<Sort.Order> acqListSortOrder(PageRequest pageRequest){
+        List<Sort.Order> orders = new ArrayList<Sort.Order>();
+        Sort sort1 = pageRequest.getSort();
+        String filterName = sort1.toString().substring(0,sort1.toString().indexOf(":"));
+        Sort.Order orderFor =  pageRequest.getSort().getOrderFor(filterName);
+        if(orderFor!=null) {
+            if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
+                orders = new ArrayList<Sort.Order>();
+                orders.add(new Sort.Order(Sort.Direction.ASC, filterName));
+            }else{
+                orders = new ArrayList<Sort.Order>();
+                orders.add(new Sort.Order(Sort.Direction.DESC, filterName));
+            }
+        }
+     return orders;
     }
 
     public void onSelectPmOrder() {
@@ -1448,6 +1477,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             selectedMap.put(item.getId(), this.isSelectedCurrentPage);
         }
         isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        isSelectedCurrentPage=false;
     }
 
     public void onItemSelected() {
