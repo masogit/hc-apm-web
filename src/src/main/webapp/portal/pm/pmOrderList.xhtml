@@ -30,7 +30,7 @@
                     <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataListgl"
                                  selectionMode="single" selection="#{v2PmOrderController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.planTime}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.planTime}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -76,7 +76,6 @@
                                 <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
                                     <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
-                                    <p:ajax process="@this" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}"   update="pmTab:pmOrderListForm:datalist"/>
                                 </p:autoComplete>
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
@@ -109,7 +108,7 @@
                         </p:column>
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                             </h:outputText>
                         </p:column>
 
