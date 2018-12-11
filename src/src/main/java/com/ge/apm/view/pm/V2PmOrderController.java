@@ -1328,10 +1328,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selected = null;
 
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
-        orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
-        orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
+        orders.add(new Sort.Order(Sort.Direction.ASC,"planTime"));
+        orders.add(new Sort.Order(Sort.Direction.ASC,"pmNum"));
         Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
-        //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
+        //默认是计划完成时间按降升序排,如果选择升续操作 就会加入下面的column
        if(orderFor!=null) {
            if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
                orders = new ArrayList<Sort.Order>();
