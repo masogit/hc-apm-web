@@ -19,7 +19,7 @@
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
 						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}"
-							onchange="updateSelectAllCheckBoxPmRemote();">
+							onchange="CommonUtilsJS.multipleSelect('pmTab:pmOrderListFormRemote,selectCheckBoxHeaderPmRemote,selectCheckBoxItemPmRemote');">
 							<p:ajax listener="#{assetLifecycleEvent5Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
 					</f:facet>
@@ -75,18 +75,5 @@
 		</h:form>
 
 	</div>
-	<script>
-	//<![CDATA[
-            function updateSelectAllCheckBoxPmRemote() {
-                var selectAllHeader=$("#pmTab\\:pmOrderListFormRemote\\:datalist3\\:selectCheckBoxHeaderPmRemote_input")[0];
-                var checked=selectAllHeader.checked;
-                $('[id$="selectCheckBoxItemPmRemote"] input').each(function(index,obj){
-                	if(obj.checked!=checked){
-                		$(obj).trigger("click");
-                	}
-                });
-            }
-          //]]>
-    </script>
 </ui:composition>
 </html>
