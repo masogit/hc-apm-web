@@ -17,11 +17,16 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -29,8 +34,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.ServiceRequestReport;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.wo.AssetLifecycleEventService;
+import com.ge.apm.view.nurseSite.MaintainExportController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -44,11 +53,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
  *
  */
 public class AssetLifecycleEventController extends GenericCRUDUUIDController<AssetLifecycleEvent> implements Serializable, ServerEventInterface {
-
+	protected static final Logger LOGGER = LoggerFactory.getLogger(AssetLifecycleEventController.class);
 	protected AssetLifecycleEventRepository dao;
 
 	protected UaaService uaaService;
-
+	protected AssetLifecycleEventService service;
 	protected FileDownloadService fileDownloadService;
 	protected List<AssetLifecycleEvent> listSelectedItems;
 	protected StreamedContent exportFile;
@@ -57,6 +66,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        service=WebUtil.getBean(AssetLifecycleEventService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
         blnAllSelected=false;
@@ -107,11 +117,16 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     	}
     	else{
     		this.listSelectedItems=null;
+    		this.exportFile=null;
     	}
     }
     
     public void onItemSelect(){
-    	listSelectedItems=new ArrayList<AssetLifecycleEvent>();
+    	if(listSelectedItems==null){
+    		listSelectedItems=new ArrayList<AssetLifecycleEvent>();
+    	}
+    	listSelectedItems.clear();
+    	this.exportFile=null;
     	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
@@ -122,6 +137,31 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     		}
     	}
     }
+    
+    private void addMessage(String str) {
+		FacesMessage message = new FacesMessage(str,null);
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	
+	public void exportSelected(){
+		if(listSelectedItems==null || listSelectedItems.size()==0){
+			listSelectedItems=this.lazyModel.getWrappedData();
+		}
+		downloadFile(service.parseEventToMap(listSelectedItems));
+	}
+    
+    protected void downloadFile(List<Map<String,Object>> data){
+		try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/woMgr/woMgrOutList_export.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = service.exportData(doc, data);
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "woMgr_export.xlsx");
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+	}
 
     public String getMsStatus(AssetLifecycleEvent alse) {
         String strStatus = null;
@@ -129,6 +169,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
             JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
             if (parse != null) {
                 strStatus = parse.getString("status");
+                alse.setDisplayStatus(strStatus);
             }
         } catch (Exception e) {
             logger.error("Fail to parse description for status: " + alse.getId(), e);
@@ -202,6 +243,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         } catch (Exception e) {
             WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
         }
+    	this.listSelectedItems=null;
     }
 
 	public List<AssetLifecycleEvent> getListSelectedItems() {
