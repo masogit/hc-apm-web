@@ -319,6 +319,10 @@ public class UserContextService implements Serializable {
     	return UserContextService.isMVSAdmin();
     }
 
+    public boolean getIsMVSRole(){
+        return UserContextService.isMVSRole();
+    }
+
     public static UserAccount getCurrentUserAccount() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.getLoginUser();
