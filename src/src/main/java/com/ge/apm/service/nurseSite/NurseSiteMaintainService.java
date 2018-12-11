@@ -102,6 +102,7 @@ public class NurseSiteMaintainService {
 	private static final String STR_SERIAL_NUM="制造商序列号";
 	private static final String STR_ASSET_FUNCTIONTYPE="设备型号";
 	private static final String STR_COMMENT="备注";
+	private static final String KEY_COMMENT="comment";
 	private static final String STR_SCHEDULE_DATE="计划检查时间";
 	private static final String STR_CHECK_DATE="实际检查时间";
 	private static final String STR_SEQUENCE="班次";
@@ -1233,12 +1234,6 @@ public class NurseSiteMaintainService {
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getSerialNum());
 					headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow, false);
 					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempListItem.get(0).getAssetInfo().getFunctionType());
-					headerColumnIndex = writeExcelSheetHeader(header, STR_COMMENT, doc, headerColumnIndex, keyRow, false);
-					String tempComment=tempListItem.get(0).getComment();
-					if(StringUtils.isEmpty(tempComment)){
-						tempComment="";
-					}
-					doc.writeCellData(SHEET_Maintain, rowIndex, columnIndex++, tempComment);
 					// secondHeaderColumnIndex=writeExcelSheetHeader(secondHeader,
 					// STR_SEQUENCE, doc, secondHeaderColumnIndex,2,false);
 					// secondHeaderColumnIndex=5;
@@ -1246,6 +1241,7 @@ public class NurseSiteMaintainService {
 						mapCheckItemSequence.clear();
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
 						Set<NurseSiteMaintainData> listData = tempItem.getListData();
+						String keyName="";
 						if (listData != null && listData.size() > 0) {
 							Iterator<NurseSiteMaintainData> itData = listData.iterator();
 							while (itData.hasNext()) {
@@ -1257,7 +1253,7 @@ public class NurseSiteMaintainService {
 								// tempItem.getSequenceName(), doc,
 								// secondHeaderColumnIndex,2,true);
 //								keyName = sdf.format(tempItem.getScheduleDate())+","+tempItem.getCheckDate()+","+tempItem.getSequenceName()+","+tempData.getCheckItem();
-								String keyName = "";
+								keyName = "";
 								if (tempItem.getScheduleDate() != null) {
 									keyName += sdf.format(tempItem.getScheduleDate())+",";
 								}
@@ -1288,6 +1284,23 @@ public class NurseSiteMaintainService {
 								// doc.writeCellData(SHEET_Maintain, rowIndex,
 								// columnIndex++, tempData.getStrValue());
 							}
+							String tempComment=tempItem.getComment();
+							keyName = "";
+							if (tempItem.getScheduleDate() != null) {
+								keyName += sdf.format(tempItem.getScheduleDate())+",";
+							}
+							else{
+								keyName+=",";
+							}
+							keyName+=tempItem.getConfigId()+",";
+							keyName+=tempItem.getSequenceName()+",";
+							keyName+=KEY_COMMENT+",";
+							headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
+							if(StringUtils.isEmpty(tempComment)){
+								tempComment="";
+							}
+							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName,tempComment);
+							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName,STR_COMMENT);
 						}
 					}
 					rowIndex++;
@@ -1351,7 +1364,6 @@ public class NurseSiteMaintainService {
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_DEPTNUM, doc, headerColumnIndex, keyRow+1, false);
 		headerColumnIndex = writeExcelSheetHeader(header, STR_SERIAL_NUM, doc, headerColumnIndex, keyRow+1, false);
 		headerColumnIndex = writeExcelSheetHeader(header, STR_ASSET_FUNCTIONTYPE, doc, headerColumnIndex, keyRow+1, false);
-		headerColumnIndex = writeExcelSheetHeader(header, STR_COMMENT, doc, headerColumnIndex, keyRow+1, false);
 	}
 	
 	private void writeExcelSecondHeader(ExcelDocument doc,int keyRow,int scheduleDateRow,int dataColumnIndex,int keyRowIndex,String label,Integer parentIndex){
