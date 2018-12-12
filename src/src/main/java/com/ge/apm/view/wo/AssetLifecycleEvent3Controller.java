@@ -13,7 +13,4 @@ import webapp.framework.dao.SearchFilter;
 public class AssetLifecycleEvent3Controller extends AssetLifecycleEventController {
 
 	
-    protected void addFilter(){
-    	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "3"));//3外部维修
-    }
 }
