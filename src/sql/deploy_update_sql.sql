@@ -277,3 +277,16 @@ update tenant_info set tenant_config ='{"edition":"common","menuList":["homePage
 ALTER TABLE public.nurse_site_maintain_config ALTER COLUMN check_items TYPE text;
 ALTER TABLE public.nurse_site_maintain_config_item DROP COLUMN check_items;
 ALTER TABLE public.nurse_site_maintain_config_item DROP COLUMN check_items_detail;
+
+--v12.1 bi
+CREATE TABLE dashboard_role_res_tenant (
+     role_res_tenant_id serial,
+     res_id int,
+     res_type varchar(100),
+     role_id int,
+     tenant_uid varchar(32),
+     permission varchar(20),
+     PRIMARY KEY (role_res_tenant_id)
+);
+
+insert into dashboard_role_res_tenant(res_id, res_type, role_id, permission) select res_id, res_type, role_id, permission from dashboard_role_res
