@@ -1223,6 +1223,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
         removeFilterOnField("assetInfo.assetOwnerId3");
+
         if(queryIndex==100){
             //from asset detail page
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
@@ -1536,15 +1537,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
 
-        if (!Strings.isNullOrEmpty(fileterOrgName)) {
             //先获取 filterOrgName-手术科的 uid
-            List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
-            if(!filterOrg.isEmpty())
-                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, filterOrg, "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
+          //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+           // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
+
+            if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
+            } else {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            }
 
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -1706,10 +1707,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
-
-
-
-
     }
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
