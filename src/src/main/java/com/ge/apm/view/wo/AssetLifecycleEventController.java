@@ -62,6 +62,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected List<AssetLifecycleEvent> listSelectedItems;
 	protected StreamedContent exportFile;
 	protected boolean blnAllSelected;
+	protected int tabStatus;
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
@@ -70,21 +71,18 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         this.filterBySite = false;
         this.filterByHospital = false;
         blnAllSelected=false;
-        
+        tabStatus=3;
     }
 
     @Override
     protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
         return dao;
     }
-    protected void addFilter(){
-    	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "3"));//3外部维修
-    }
     @Override
     protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
         this.selected = null;
-        addFilter();
+        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
         Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
@@ -147,7 +145,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if(listSelectedItems==null || listSelectedItems.size()==0){
 			listSelectedItems=this.lazyModel.getWrappedData();
 		}
-		downloadFile(service.parseEventToMap(listSelectedItems));
+		downloadFile(service.parseEventToMap(listSelectedItems,tabStatus));
 	}
     
     protected void downloadFile(List<Map<String,Object>> data){
