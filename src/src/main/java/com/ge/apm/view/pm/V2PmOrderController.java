@@ -1338,10 +1338,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
                orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
            }
+       }else {
+           //如果选择除计划完成时间的其它列 进行排序
+           orders = acqListSortOrder(pageRequest);
        }
-      //如果选择除计划完成时间的其它列 进行排序
-        orders =  acqListSortOrder(pageRequest);
-
         Sort sort = new Sort(orders);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
 
