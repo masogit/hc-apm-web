@@ -1230,6 +1230,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         if(queryIndex==10){
+
+            List<Sort.Order> orders = new ArrayList<Sort.Order>();
+            orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
+            orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
+            Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
+            //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
+            if(orderFor!=null) {
+                if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
+                    orders = new ArrayList<Sort.Order>();
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
+                }
+            }else{
+                //如果选择除计划完成时间的其它列 进行排序
+                orders =  acqListSortOrder(pageRequest);
+            }
+            Sort sort = new Sort(orders);
+            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
+
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
@@ -1237,8 +1256,26 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(queryIndex==-2){
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
-        if (queryIndex == -1) {
+        if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+
+            List<Sort.Order> orders = new ArrayList<Sort.Order>();
+            orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
+            orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
+            Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
+            //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
+            if(orderFor!=null) {
+                if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
+                    orders = new ArrayList<Sort.Order>();
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
+                }
+            }else{
+                //如果选择除计划完成时间的其它列 进行排序
+                orders =  acqListSortOrder(pageRequest);
+            }
+            Sort sort = new Sort(orders);
+            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
@@ -1331,16 +1368,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         orders.add(new Sort.Order(Sort.Direction.ASC,"planTime"));
         orders.add(new Sort.Order(Sort.Direction.ASC,"pmNum"));
         Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
-        //默认是计划完成时间按降升序排,如果选择升续操作 就会加入下面的column
+        //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
        if(orderFor!=null) {
            if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
                orders = new ArrayList<Sort.Order>();
                orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
                orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
            }
-       }else {
-           //如果选择除计划完成时间的其它列 进行排序
-           orders = acqListSortOrder(pageRequest);
+       }else{
+
+
+      //如果选择除计划完成时间的其它列 进行排序
+        orders =  acqListSortOrder(pageRequest);
        }
         Sort sort = new Sort(orders);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
