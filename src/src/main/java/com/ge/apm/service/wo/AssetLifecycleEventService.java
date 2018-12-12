@@ -2,6 +2,7 @@ package com.ge.apm.service.wo;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.wo.AssetLifecycleEventController;
 
 @Service
 public class AssetLifecycleEventService {
@@ -35,6 +34,7 @@ public class AssetLifecycleEventService {
 	public List<Map<String, Object>> parseEventToMap(List<AssetLifecycleEvent> listEvent,int tabStatus) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy/MM/dd");
 		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
 		if (listEvent != null && listEvent.size() > 0) {
 			for (int i = 0; i < listEvent.size(); ++i) {
@@ -50,12 +50,17 @@ public class AssetLifecycleEventService {
 				try {
 					name = tempEvent.getAssetName();
 					eventUid = tempEvent.getEventUid();
-					updateTime = sdf2.format(tempEvent.getCreateTime());
+					Date tempCreateTime=tempEvent.getCreateTime();
+					if(tempCreateTime!=null){
+						updateTime = sdf2.format(tempCreateTime);
+					}
 					systemId = tempEvent.getAssetInfo().getSystemId();
 					clinicalDeptName = tempEvent.getAssetInfo().getClinicalDeptName();
 					status = tempEvent.getDisplayStatus();
-					reportDate=sdf.format(tempEvent.getScheduleDate());
-					
+					Date scheduleDate=tempEvent.getScheduleDate();
+					if(scheduleDate!=null){
+						reportDate = sdf3.format(scheduleDate);
+					}
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
