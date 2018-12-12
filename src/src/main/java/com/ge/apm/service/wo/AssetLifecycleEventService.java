@@ -27,11 +27,12 @@ public class AssetLifecycleEventService {
 	private static final String STR_SYSTEMID = "System ID";
 	private static final String STR_CLINICALDEPT = "所属科室";
 	private static final String STR_STATUS = "状态";
+	private static final String STR_SCHEDULE_DATE = "保养计划时间";
 	private static final String SHEET_NAME = "datalist";
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
 
-	public List<Map<String, Object>> parseEventToMap(List<AssetLifecycleEvent> listEvent) {
+	public List<Map<String, Object>> parseEventToMap(List<AssetLifecycleEvent> listEvent,int tabStatus) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
@@ -45,6 +46,7 @@ public class AssetLifecycleEventService {
 				String systemId = "";
 				String clinicalDeptName = "";
 				String status = "";
+				String reportDate="";
 				try {
 					name = tempEvent.getAssetName();
 					eventUid = tempEvent.getEventUid();
@@ -52,6 +54,8 @@ public class AssetLifecycleEventService {
 					systemId = tempEvent.getAssetInfo().getSystemId();
 					clinicalDeptName = tempEvent.getAssetInfo().getClinicalDeptName();
 					status = tempEvent.getDisplayStatus();
+					reportDate=sdf.format(tempEvent.getScheduleDate());
+					
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -75,6 +79,11 @@ public class AssetLifecycleEventService {
 				}
 				if (StringUtils.isNotEmpty(status)) {
 					tempMap.put(STR_STATUS, status);
+				}
+				if(tabStatus==4 || tabStatus==5){
+					if(StringUtils.isNotEmpty(reportDate)){
+						tempMap.put(STR_SCHEDULE_DATE, reportDate);
+					}
 				}
 				listMapResult.add(tempMap);
 			}
