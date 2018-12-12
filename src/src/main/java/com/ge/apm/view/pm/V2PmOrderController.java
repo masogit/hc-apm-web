@@ -1511,12 +1511,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     //
-    public void onSelectAllOfPage() {
+    /*public void onSelectAllOfPage_bak() {
         for (V2_PmOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), this.isSelectedCurrentPage);
         }
         isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         isSelectedCurrentPage=false;
+    }*/
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (V2_PmOrder item : currentPagePmOrders) {
+            selectedMap.put(item.getId(), !isSelectedAll);
+        }
     }
 
     public void onItemSelected() {
