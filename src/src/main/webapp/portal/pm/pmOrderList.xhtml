@@ -38,16 +38,21 @@
 
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
-
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36" rendered="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31}" exportable="false">
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" class="selectCheckBox">
                                 <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                           <!-- <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
                                     <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.batch-piliangjiedan)"/>
                                 </p:selectBooleanCheckbox>
-                            </f:facet>
+                            </f:facet>-->
                         </p:column>
 
 
@@ -515,7 +520,9 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
+
             <script>
+                //<![CDATA[
                 function toRepair(xhr, status, args) {
                     handleSubmit(args, 'closePmDialog');
                     PF('createSRDialog').show()
@@ -538,7 +545,20 @@
                         PF('transferOrderDialog').show()
                     }
                 }
-
+                function updateSelectAllCheckBox() {
+                    var checkboxlist = $(".selectCheckBox");
+                    var selectAllstatus = true;
+                    checkboxlist.each(function () {
+                        selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                    });
+                    $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                    if (selectAllstatus) {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                    } else {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                    }
+                }
+                //]]>
             </script>
         </p:dialog>
 
