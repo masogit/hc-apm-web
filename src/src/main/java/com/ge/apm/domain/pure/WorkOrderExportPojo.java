@@ -120,7 +120,7 @@ public class WorkOrderExportPojo {
     //设备型号
     private String assetFunctionType;
     //距上次报修天数
-    private String nearestWorkDay;
+    private Integer nearestWorkDay;
     //停机时间
     private Date confirmedDownTime;
     //恢复时间
@@ -518,11 +518,11 @@ public class WorkOrderExportPojo {
         this.assetFunctionType = assetFunctionType;
     }
 
-    public String getNearestWorkDay() {
+    public Integer getNearestWorkDay() {
         return nearestWorkDay;
     }
 
-    public void setNearestWorkDay(String nearestWorkDay) {
+    public void setNearestWorkDay(Integer nearestWorkDay) {
         this.nearestWorkDay = nearestWorkDay;
     }
 
