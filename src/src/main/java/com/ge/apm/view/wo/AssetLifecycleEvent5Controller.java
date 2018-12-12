@@ -11,9 +11,14 @@ import javax.faces.context.FacesContext;
 
 import org.primefaces.model.DefaultStreamedContent;
 
+import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.wo.AssetLifecycleEventService;
+import com.ge.apm.view.sysutil.FileDownloadService;
 
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -23,8 +28,9 @@ import webapp.framework.dao.SearchFilter;
 public class AssetLifecycleEvent5Controller extends AssetLifecycleEventController {
 
 	
-    protected void addFilter(){
-    	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "5"));//3外部维修
+	protected void init() {
+		super.init();
+        tabStatus=5;
     }
     
     protected void downloadFile(List<Map<String,Object>> data){
