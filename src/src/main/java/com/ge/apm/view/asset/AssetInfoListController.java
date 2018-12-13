@@ -269,6 +269,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             selectSite = null;
         }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
         loadClinicalDeptList();
 
         //table header dropdown needs to clear manually, table filters cleared by clear method above.
