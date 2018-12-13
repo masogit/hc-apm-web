@@ -71,6 +71,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         this.filterBySite = false;
         this.filterByHospital = false;
         blnAllSelected=false;
+        listSelectedItems=new ArrayList<AssetLifecycleEvent>();
         tabStatus=3;
     }
 
@@ -84,7 +85,28 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         this.selected = null;
         searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
         Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        updateSelectStatus(pageResult);
         return pageResult;
+    }
+    
+    private void updateSelectStatus(Page<AssetLifecycleEvent> pageResult){
+    	boolean tempAllSelect=false;
+    	if(pageResult!=null){
+        	List<AssetLifecycleEvent> tempList=pageResult.getContent();
+        	if(tempList!=null && tempList.size()>0){
+        		tempAllSelect=true;
+        		for(int i=0;i<tempList.size();++i){
+        			AssetLifecycleEvent tempEvent=tempList.get(i);
+        			if(this.listSelectedItems.contains(tempEvent)){
+        				tempEvent.setBlnSelected(true);
+        			}
+        			else{
+        				tempAllSelect=false;
+        			}
+        		}
+        	}
+        	setBlnAllSelected(tempAllSelect);
+        }
     }
 
     @Override
@@ -111,27 +133,19 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     		}
     	}
     	if(blnAllSelected){
-    		this.listSelectedItems=new ArrayList<AssetLifecycleEvent>(listCurrentItems);
+    		this.listSelectedItems.addAll(listCurrentItems);
     	}
     	else{
-    		this.listSelectedItems=null;
-    		
+    		this.listSelectedItems.removeAll(listCurrentItems);
     	}
     }
     
-    public void onItemSelect(){
-    	if(listSelectedItems==null){
-    		listSelectedItems=new ArrayList<AssetLifecycleEvent>();
+    public void onItemSelect(AssetLifecycleEvent tempEvent){
+    	if(tempEvent.isBlnSelected()){
+    		this.listSelectedItems.add(tempEvent);
     	}
-    	listSelectedItems.clear();
-    	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
-    	if(listCurrentItems!=null && listCurrentItems.size()>0){
-    		for(int i=0;i<listCurrentItems.size();++i){
-    			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
-    			if(tempEvent.isBlnSelected()){
-    				listSelectedItems.add(tempEvent);
-    			}
-    		}
+    	else{
+    		this.listSelectedItems.remove(tempEvent);
     	}
     }
     
@@ -143,7 +157,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	public void exportSelected(){
 		this.exportFile=null;
 		if(listSelectedItems==null || listSelectedItems.size()==0){
-			downloadFile(service.parseEventToMap(this.lazyModel.getWrappedData(),tabStatus));
+			downloadFile(service.parseEventToMap(dao.findBySearchFilter(this.searchFilters),tabStatus));
 		}
 		else{
 			downloadFile(service.parseEventToMap(listSelectedItems,tabStatus));
@@ -244,7 +258,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         } catch (Exception e) {
             WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
         }
-    	this.listSelectedItems=null;
     }
 
 	public List<AssetLifecycleEvent> getListSelectedItems() {
