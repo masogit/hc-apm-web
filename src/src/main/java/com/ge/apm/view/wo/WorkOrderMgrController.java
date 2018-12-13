@@ -617,12 +617,18 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+       /* if (!Strings.isNullOrEmpty(fileterOrgName)) {
             //先获取 filterOrgName-手术科的 uid
             List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
            if(!filterOrg.isEmpty())
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, filterOrg, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+       }*/
+
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
