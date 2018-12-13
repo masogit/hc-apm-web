@@ -36,6 +36,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.GbCode;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
@@ -504,7 +505,17 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
-        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId, arrivalListItem.getArrivalList().getSiteUID());
+        String tempSiteUid=arrivalListItem.getArrivalList().getSiteUID();
+        //check to delete
+        String tempQrCode=asset.getQrCode();
+        if(StringUtils.isNotEmpty(tempQrCode)){
+        	QrCodeLib tempQrCodeLib = qrCodeService.findByQrCode(tempQrCode,tempSiteUid );
+        	if(tempQrCodeLib==null){
+        		qrCodeService.getAvailableQrcode(tempQrCode, tempSiteUid);
+        	}
+        }
+        //delete
+        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId, tempSiteUid);
     }
 
     public void onAssetOwnerNameChange() {
