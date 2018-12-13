@@ -115,7 +115,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     	}
     	else{
     		this.listSelectedItems=null;
-    		this.exportFile=null;
+    		
     	}
     }
     
@@ -124,7 +124,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     		listSelectedItems=new ArrayList<AssetLifecycleEvent>();
     	}
     	listSelectedItems.clear();
-    	this.exportFile=null;
     	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
@@ -142,10 +141,13 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	}
 	
 	public void exportSelected(){
+		this.exportFile=null;
 		if(listSelectedItems==null || listSelectedItems.size()==0){
-			listSelectedItems=this.lazyModel.getWrappedData();
+			downloadFile(service.parseEventToMap(this.lazyModel.getWrappedData(),tabStatus));
 		}
-		downloadFile(service.parseEventToMap(listSelectedItems,tabStatus));
+		else{
+			downloadFile(service.parseEventToMap(listSelectedItems,tabStatus));
+		}
 	}
     
     protected void downloadFile(List<Map<String,Object>> data){
@@ -189,6 +191,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         return null;
     }
     public void downloadSelectedReport(){
+    	this.exportFile=null;
     	if(listSelectedItems==null || listSelectedItems.size()==0){
     		WebUtil.addErrorMessage("请选择需要下载报告的工单！");
     		return;
