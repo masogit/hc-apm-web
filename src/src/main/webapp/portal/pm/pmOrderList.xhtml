@@ -45,9 +45,9 @@
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
-                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan)" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)" oncomplete="updateSelectAllCheckBox();"/>
 
-                                   <!-- 备份<p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
+                                 <!-- <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
 
                                 </p:selectBooleanCheckbox>
                             </f:facet>
