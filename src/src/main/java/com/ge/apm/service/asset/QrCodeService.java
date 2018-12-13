@@ -549,6 +549,26 @@ public class QrCodeService {
         }
 
     }
+    
+    public boolean createSpecialQrCodeWithStatus(String qrcode, String siteUid,int status) {
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
+        if (null != qrCodeLib) {
+            return false;
+        }
+        OrgInfo org = orgInfoDao.findByUid(siteUid);
+        qrCodeLib = new QrCodeLib();
+        qrCodeLib.setQrCode(qrcode);
+        qrCodeLib.setTenantUID(org.getTenantUID());
+        qrCodeLib.setInstitutionUID(org.getInstitutionUID());
+        qrCodeLib.setHospitalUID(org.getHospitalUID());
+        qrCodeLib.setSiteUID(siteUid);
+        qrCodeLib.setStatus(status);
+        qrCodeLib.setIssueDate(new Date());
+//        qrCodeLib.setSiteId(org.getSiteId());
+//        qrCodeLib.setHospitalId(org.getId());
+        qrCodeLibDao.save(qrCodeLib);
+        return true;
+    }
 
     public boolean createSpecialQrCode(String qrcode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
