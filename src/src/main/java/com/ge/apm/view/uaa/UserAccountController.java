@@ -22,6 +22,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -216,13 +217,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 if (selectedOrg.getOrgType()  == 4) {
-                    if (selectedNode.isLeaf()) {
-                        searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                    } else {
-                        List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
-                        List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-                        searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalUids, "1*2+"));
-                    }
+                    //clinical dept may include child clinical dept
+                    OrgInfoClinicalDeptService clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
+                    List<OrgInfo> allClinicals = clinicalDeptService.collectChildClinicalDept(selectedOrg);
+                    List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                    searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalUids, "1*2+"));
 
                 }
             }

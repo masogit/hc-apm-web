@@ -2,10 +2,13 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by lsg on 31/1/2018.
@@ -42,6 +45,12 @@ public class AssetLifecycleEvent implements Serializable {
 
     @Column(name = "description")
     private String description;
+    
+  //Schedule Date
+    @Column(name = "schedule_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    Date scheduleDate;
 
     @Column(name = "status")
     private Integer status;
@@ -50,9 +59,16 @@ public class AssetLifecycleEvent implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
-    @JoinColumn(name = "report_object_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private V2_BlobObject reportObject;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "alce_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    private List<ServiceRequestReport> reports = new ArrayList<>();
+    
+    @Transient
+    private boolean blnSelected=false;
+    
+    @Transient
+    private String displayStatus;
 
     public String getId() {
         return id;
@@ -134,18 +150,35 @@ public class AssetLifecycleEvent implements Serializable {
         this.assetInfo = assetInfo;
     }
 
-    public String getReportStorageId() {
-        if (reportObject != null) {
-            return reportObject.getObjectStorageId();
-        }
-        return "";
+    public List<ServiceRequestReport> getReports() {
+        return reports;
     }
 
-    public V2_BlobObject getReportObject() {
-        return reportObject;
+    public void setReports(List<ServiceRequestReport> reports) {
+        this.reports = reports;
     }
 
-    public void setReportObject(V2_BlobObject reportObject) {
-        this.reportObject = reportObject;
-    }
+	public Date getScheduleDate() {
+		return scheduleDate;
+	}
+
+	public void setScheduleDate(Date scheduleDate) {
+		this.scheduleDate = scheduleDate;
+	}
+
+	public boolean isBlnSelected() {
+		return blnSelected;
+	}
+
+	public void setBlnSelected(boolean blnSelected) {
+		this.blnSelected = blnSelected;
+	}
+
+	public String getDisplayStatus() {
+		return displayStatus;
+	}
+
+	public void setDisplayStatus(String displayStatus) {
+		this.displayStatus = displayStatus;
+	}
 }

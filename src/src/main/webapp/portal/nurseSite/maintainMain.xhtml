@@ -48,9 +48,9 @@
                         </p:schedule>
                     </h:panelGrid>
                 </h:form>
-                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="700" resizable="true" draggable="true">
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="1000" resizable="true" draggable="true">
                    	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
-                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:650px':''}">
+                   		<div class="ui-datatable ui-widget" style="overflow: auto;height:480px;">
                    			<div class="ui-datatable-tablewrapper" style="padding-left:10px;padding-right:10px;">
                    				<table>
                 					<tr>
@@ -71,6 +71,9 @@
                 								<label class="label">#{item}</label>
                 							</th>
                 						</p:repeat>
+                						<th>
+                							<label class="label">备注</label>
+                						</th>
                 						<!-- <th>
                 							<label class="label">查看签名</label>
                 						</th> -->
@@ -98,6 +101,10 @@
 											<!-- <td>
 												<p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
 											</td> -->
+											<td>
+												<h:outputText value="#{item2.comment}">
+												</h:outputText>
+											</td>
 			                    		</tr>
 									</p:repeat>
 								</table>

@@ -1,7 +1,9 @@
 package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 public class WorkOrderExportService {
 
     private static final String SHEET_WORKORDER = "WorkOrder List";
+    private static final String SHEET_PARTS = "Parts List";
     private static final String I18N_INT_EXT_TYPE = "intExtType";
     private static final String I18N_REPAIR_TYPE = "repairType";
     private static final String I18N_CURRENT_STEP_ = "woSteps";
@@ -43,8 +46,6 @@ public class WorkOrderExportService {
 
     @Autowired
     ServiceRequestRepository serviceRequestDao;
-    @Autowired
-    ServiceRequestMsgRepository serviceRequestMsgRepository;
     @Autowired
     private V2_WorkOrderRepository v2WorkOrderDao;
     @Autowired
@@ -64,7 +65,198 @@ public class WorkOrderExportService {
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
-    private BlobFileService blobService;
+    private WorkOrderReportMapper worDao;
+
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+
+        if (selectedOrg != null && selectedOrg.getOrgLevel() == 0) {
+            SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            searchFilters.add(tenantFilter);
+        }
+        if (selectedOrg != null && selectedOrg.getOrgLevel() == 1) {
+            SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            searchFilters.add(institutionFilter);
+        }
+        if (selectedOrg != null && selectedOrg.getOrgLevel() == 2) {
+            SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            searchFilters.add(hospitalFilter);
+        }
+        if (selectedOrg != null && selectedOrg.getOrgLevel() == 3) {
+            SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            searchFilters.add(siteFilter);
+        }
+
+        if (selectedOrg != null) {
+            SearchFilter siteFilter = new SearchFilter("orgUID", SearchFilter.Operator.IN, selectedOrg.getUid());
+            searchFilters.add(siteFilter);
+        }
+
+        if(clinicalDept !=null){
+            List<OrgInfo> orgSearchList = new ArrayList<>();
+            orgSearchList.add(clinicalDept);
+
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
+            List<String> clinicalDeptUIDList = new ArrayList<>();
+            for (OrgInfo oi : tempOrgSearchSet) {
+                clinicalDeptUIDList.add(oi.getUid());
+            }
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
+        }
+        if(currentOwner !=null) {
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentOwner.getId()));
+        }
+
+        ZoneId zone = ZoneId.systemDefault();
+
+        if (startTime != null) {
+            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, startTime));
+        }
+        if (endTime != null) {
+            LocalDate endDate = LocalDateTime.ofInstant(endTime.toInstant(), zone).toLocalDate();
+            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
+        }
+        if (closedStartTime != null) {
+            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.GTE, closedStartTime));
+        }
+        if (closedEndTime != null) {
+            LocalDate closeEndDate = LocalDateTime.ofInstant(closedEndTime.toInstant(), zone).toLocalDate();
+            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.LT, Date.from(closeEndDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
+        }
+        if (statusList != null && !statusList.isEmpty()) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
+        }
+
+        List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
+
+        for(WorkOrderExportPojo workOrderExportPojo : workOrderList){
+            Map<String, Object> workOrderMap = new HashedMap();
+
+            workOrderMap.put("woId", workOrderExportPojo.getId());
+            workOrderMap.put("报修单号", workOrderExportPojo.getSrNum() != null ? workOrderExportPojo.getSrNum() : "");
+            workOrderMap.put("设备编号", workOrderExportPojo.getAssetDepartNum());
+            workOrderMap.put("工单状态", workOrderExportPojo.getStatusName());
+            workOrderMap.put("资产编号", workOrderExportPojo.getAssetFinancingNum());
+            workOrderMap.put("设备序列号", workOrderExportPojo.getAssetSerialNum());
+            workOrderMap.put("设备名称", workOrderExportPojo.getAssetName());
+            workOrderMap.put("院区", workOrderExportPojo.getHospitalName());
+            workOrderMap.put("科室", workOrderExportPojo.getAssetClinicalDeptName());
+            workOrderMap.put("制造商", workOrderExportPojo.getAssetManufacture());
+            workOrderMap.put("品牌", workOrderExportPojo.getAssetMakerShortName());
+            workOrderMap.put("当前责任人", workOrderExportPojo.getCurrentPersonName());
+            workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
+            workOrderMap.put("报修人", workOrderExportPojo.getRequestorName());
+            workOrderMap.put("报修时间", formatDate(workOrderExportPojo.getRequestTime()));
+            workOrderMap.put("故障描述", workOrderExportPojo.getRequestReason());
+            workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
+            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));
+            workOrderMap.put("工单类型", workOrderExportPojo.getIntExtTypeName());
+            workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
+            workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
+            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));
+            workOrderMap.put("维修完成时间", formatDate(workOrderExportPojo.getWorkStepEndTime()));
+            workOrderMap.put("签到时间", formatDate(workOrderExportPojo.getCheckinTime()));
+            workOrderMap.put("维修工程师工时", workOrderExportPojo.getManHours());
+            workOrderMap.put("维修总工时", workOrderExportPojo.getTotalManHour());
+            workOrderMap.put("维修备件", workOrderExportPojo.getParts());
+            workOrderMap.put("备件总费用", workOrderExportPojo.getPartsTotalPrice());
+            workOrderMap.put("其他费用", workOrderExportPojo.getOtherExpense());
+            workOrderMap.put("外修费用", workOrderExportPojo.getExternalExpense());
+            workOrderMap.put("维修总费用", workOrderExportPojo.getTotalPrice());
+            workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
+            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
+            workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
+            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));
+            workOrderMap.put("协助者", workOrderExportPojo.getCoworker());
+            workOrderMap.put("协助者工时", workOrderExportPojo.getCoworkManHour());
+            workOrderMap.put("最终评价", workOrderExportPojo.getFeedbackRating());
+            workOrderMap.put("故障类型", workOrderExportPojo.getCaseTypeName());
+            workOrderMap.put("原因描述", workOrderExportPojo.getPatProblems());
+            workOrderMap.put("解决方案", workOrderExportPojo.getPatActions());
+            workOrderMap.put("交付前检测", workOrderExportPojo.getPatTests());
+            workOrderMap.put("备注", workOrderExportPojo.getComment());
+            workOrderMap.put("二维码", workOrderExportPojo.getAssetInfoQrCode());
+            workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroupName());
+            workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroupName());
+            workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68Name());
+            workOrderMap.put("设备型号", workOrderExportPojo.getAssetFunctionType());
+            workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
+            workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
+            workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
+            workOrderMap.put("联系电话", workOrderExportPojo.getTelephone());
+            workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
+            workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
+
+            this.putPartsData(workOrderExportPojo ,workOrderMap);
+            //this.putWorkOrderStep(workOrderExportPojo ,workOrderMap);
+
+            resultList.add(workOrderMap);
+        }
+
+        return resultList;
+
+    }
+
+    public List<Map<String, Object>> createPartsData(List<Map<String, Object>> workOrderList){
+
+        List<Map<String, Object>> partList = new ArrayList<>();
+        for (Map<String, Object> workOrderMap : workOrderList) {
+            if(workOrderMap.containsKey("备件信息")){
+                partList.addAll((List<Map<String, Object>>)workOrderMap.get("备件信息"));
+            }
+        }
+        return partList;
+    }
+
+    private void putPartsData(WorkOrderExportPojo workOrderPojo, Map<String, Object> workOrderMap){
+
+        List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrderPojo.getId());
+        List<Map<String, Object>> parts = new ArrayList<>();
+        for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
+            Map<String, Object> part = new HashedMap();
+            part.put("报修单号", workOrderPojo.getSrNum());
+            part.put("备件名", workOrderDetail.getParts());
+            part.put("单价", workOrderDetail.getClosedPrice());
+            part.put("数量", workOrderDetail.getApartsQuantity());
+            part.put("类型", workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
+            part.put("序列号", workOrderDetail.getSerialNum());
+            part.put("质保期", workOrderDetail.getWarrantyDate());
+            part.put("合同号", workOrderDetail.getContractNum());
+            part.put("发票号", workOrderDetail.getInvoiceNum());
+            part.put("开票日期", formatDate(workOrderDetail.getInvoiceTime()));
+            part.put("预计价格", workOrderDetail.getPartsPrice());
+            part.put("供应商", workOrderDetail.getSupplier());
+            part.put("备注", workOrderDetail.getComment());
+            if (workOrderDetail.getArrived() == null) {
+                part.put("到货", null);
+            } else {
+                String arrived = workOrderDetail.getArrived().equals(Boolean.TRUE) ? "到货" : "未到货";
+                part.put("到货", arrived);
+            }
+            parts.add(part);
+        }
+
+        workOrderMap.put("备件信息", parts);
+    }
+
+    private void putWorkOrderStep(WorkOrderExportPojo workOrderPojo, Map<String, Object> workOrderMap){
+
+        List<V2_WorkOrder_Step> steps = v2WorkOrderStepDao.findByWorkOrder(workOrderPojo.getId());
+        List<Map<String, Object>> woSteps = new ArrayList<>();
+        for (V2_WorkOrder_Step step : steps) {
+            Map<String, Object> woStep = new HashedMap();
+            woStep.put("步骤名称", step.getStepName());
+            woStep.put("责任人", step.getOwnerName());
+            woStep.put("开始时间", formatDate(step.getStartTime()));
+            woStep.put("结束时间", formatDate(step.getEndTime()));
+            woStep.put("处理描述", step.getComments());
+            woSteps.add(woStep);
+        }
+
+        workOrderMap.put("维修流程", woSteps);
+    }
 
     public List<Map<String, Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList) {
 
@@ -217,8 +409,6 @@ public class WorkOrderExportService {
                 parts.add(part);
             }
 
-            putServiceRequestMessage(workOrder, workOrderMap);
-
             workOrderMap.put("维修备件", info);
             workOrderMap.put("备件总费用", infoTotalPrice);
             workOrderMap.put("其他费用", workOrder.getOtherExpense());
@@ -324,25 +514,8 @@ public class WorkOrderExportService {
 
     private void putBlob(Map<String, Object> workOrderMap, String storageId, String key) {
         if (storageId != null) {
-            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
-                workOrderMap.put(key, IOUtils.toByteArray(stream));
-            } catch (IOException ignore) {
-                //ignore
-            }
+            workOrderMap.put(key, key);
         }
-    }
-
-    private void putServiceRequestMessage(V2_WorkOrder workOrder, Map<String, Object> workOrderMap) {
-        List<ServiceRequestMsg> serviceRequestMsgs = serviceRequestMsgRepository.findBySrIdOrderBySendTime(workOrder.getId());
-        List<Map<String, Object>> srMsgs = new ArrayList<>();
-        for (ServiceRequestMsg srMessage : serviceRequestMsgs) {
-            Map<String, Object> map = new HashedMap();
-            map.put("sendTime", formatDate(srMessage.getSendTime()));
-            map.put("senderUserName", srMessage.getSenderUserName());
-            map.put("message", srMessage.getMessage());
-            srMsgs.add(map);
-        }
-        workOrderMap.put("serviceRequestMessages", srMsgs);
     }
 
     private String formatDate(Date date) {
@@ -401,13 +574,19 @@ public class WorkOrderExportService {
         return assetStatus;
     }
 
-    public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {
+    public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> workOrderData, List<Map<String, Object>> partsData) {
 
-        Integer keyRow = 1;
-        Integer dataRow = 2;
+        Integer keyRow_workOrder = 1;
+        Integer dataRow_workOrder = 2;
 
-        for (Map<String, Object> item : data) {
-            doc.writeRowData(SHEET_WORKORDER, keyRow, dataRow++, item);
+        for (Map<String, Object> item : workOrderData) {
+            doc.writeRowData(SHEET_WORKORDER, keyRow_workOrder, dataRow_workOrder++, item);
+        }
+
+        Integer keyRow_parts = 1;
+        Integer dataRow_parts = 2;
+        for (Map<String, Object> item : partsData) {
+            doc.writeRowData(SHEET_PARTS, keyRow_parts, dataRow_parts++, item);
         }
 
         return Boolean.TRUE;

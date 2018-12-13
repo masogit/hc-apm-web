@@ -1,71 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition>
-    <div class="ui-g-12 card">
-        <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+	<div class="ui-g-12 card">
+		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
-        <h:form id="woMgrOutListForm">
+		<h:form id="woMgrOutListForm">
 
-            <p:dataTable id="datalist" value="#{assetLifecycleEventController.lazyModel}" var="item"
-                         widgetVar="varDataList"
-                         selectionMode="single" selection="#{assetLifecycleEventController.selected}"
-                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                         rowsPerPageTemplate="20,50,100,500">
+			<p:dataTable id="datalist" value="#{assetLifecycleEvent3Controller.lazyModel}" var="item" widgetVar="varDataList" lazy="true" paginator="true"
+				paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" selectionMode="single"
+				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent3Controller.selected}">
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent3Controller.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');">
+							<p:ajax listener="#{assetLifecycleEvent3Controller.onSelectAllItemsEvent()}"></p:ajax>
+						</p:selectBooleanCheckbox>
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
+						<p:ajax listener="#{assetLifecycleEvent3Controller.onItemSelect()}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</p:column>
+				<p:ajax event="filter" listener="#{assetLifecycleEvent3Controller.onFilter}" />
+				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetName}" />
+				</p:column>
+				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.eventUid}" />
+				</p:column>
+				<p:column headerText="更新时间" sortBy="#{item.createTime}">
+					<h:outputText value="#{item.createTime}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.systemId}" />
+				</p:column>
+				<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+					filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+				</p:column>
+				<p:column headerText="状态">
+					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
+				</p:column>
+				<p:column headerText="报告下载" exportable="false">
+					<p:repeat value="#{item.reports}" var="report">
+						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
+							<h:outputText value="#{report.displayName}" />
+						</p:link>
+						<br />
+					</p:repeat>
+				</p:column>
+				<f:facet name="{Toolbar}">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent3Controller.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEvent3Controller.exportFile}" />
+					</p:commandButton>
+					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+						actionListener="#{assetLifecycleEvent3Controller.downloadSelectedReport()}" process=":woTab:woMgrOutListForm:datalist" update=":growl">
+						<p:fileDownload value="#{assetLifecycleEvent3Controller.exportFile}" />
+					</p:commandButton>
+				</f:facet>
+			</p:dataTable>
+		</h:form>
 
-                <p:ajax event="rowSelect" listener="#{assetLifecycleEventController.onSelectAssetLifecycleEvent}"/>
-                <p:ajax event="filter" listener="#{assetLifecycleEventController.onFilter}"/>
-
-                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetName}"/>
-                </p:column>
-
-                <p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.eventUid}"/>
-                </p:column>
-                <p:column headerText="更新时间" sortBy="#{item.createTime}" filterBy="#{item.createTime}"
-                          filterMatchMode="LIKE">
-                    <h:outputText value="#{item.createTime}"/>
-                </p:column>
-                <p:column headerText="状态">
-                    <h:outputText value="#{assetLifecycleEventController.getMsStatus(item)}"/>
-                </p:column>
-
-                <p:column headerText="报告">
-                    <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download"
-                                     rendered="#{not empty item.reportStorageId}">
-                        <p:fileDownload value="#{assetLifecycleEventController.getAnonymousReport(item.reportStorageId)}" />
-                    </p:commandButton>
-                </p:column>
-            </p:dataTable>
-        </h:form>
-
-    </div>
+	</div>
 
 
-    <script>
-            afterPageLoad = function () {
-                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
-                var isActive = "#{userContextService.isActive()}";
-                if(isActive == '1'){
-                    PF('ActiveDlg').show();
-                }
-            }
-
-
-    </script>
-
+	<script>
+		//<![CDATA[
+		afterPageLoad = function() {
+			var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+			var isActive = "#{userContextService.isActive()}";
+			if (isActive == '1') {
+				PF('ActiveDlg').show();
+			}
+		};
+		//]]>
+	</script>
 </ui:composition>
 </html>

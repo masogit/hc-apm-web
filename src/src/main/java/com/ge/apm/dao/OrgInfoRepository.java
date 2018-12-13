@@ -15,8 +15,10 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public List<OrgInfo> getByHospitalId(int hospitalId);
 
-   // @Query(value = "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')",nativeQuery = true)
-    @Query(value = "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')",nativeQuery = true)
+
+
+    /*@Query(value = "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')",nativeQuery = true)*/
+    @Query(value = "select t.uid from org_info t where site_uid in (?1) and name =?2",nativeQuery = true)
     public List<String> getOrgBySite(List<String> orgList,String filterName);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -133,4 +135,10 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     @Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo where siteUID in ?1 ",nativeQuery = false)
     public Set<OrgInfo> findSimpleAllBySiteUid(Set<String> siteUid);
+    
+    @Query(value="select o.* from org_info o where o.hospital_uid=?1 and o.org_type=3",nativeQuery=true)
+    public List<OrgInfo> getSiteListByHospitalUid(String hospitalUid);
+    
+    @Query(value="select o.* from org_info o where o.site_uid=?1 and o.org_type=4",nativeQuery=true)
+    public List<OrgInfo> getDeptListBySiteUid(String siteUid);
 }

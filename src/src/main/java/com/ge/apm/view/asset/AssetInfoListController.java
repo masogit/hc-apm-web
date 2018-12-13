@@ -216,6 +216,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -245,6 +246,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
 
+        Optional<SearchFilter> nameFilterOptional = this.getFilterOnField("name");
+        if (nameFilterOptional.isPresent() && !nameFilterOptional.get().conditionPath.equals("1*3+")) {
+
+            SearchFilter nameFilter = nameFilterOptional.get();
+            nameFilter.conditionPath = "1*name+";
+            this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameFilter.value, nameFilter.conditionPath));
+        }
+
         if (UserContextService.isMVSRole()) {
             this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
         }
@@ -260,6 +269,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             selectSite = null;
         }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
         loadClinicalDeptList();
 
         //table header dropdown needs to clear manually, table filters cleared by clear method above.
@@ -287,6 +302,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.oneSearchStr = oneSearchStr;
         if (oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
+            this.removeFilterOnField("namePyCode");
             this.removeFilterOnField("departNum");
             this.removeFilterOnField("financingNum");
             this.removeFilterOnField("qrCode");
@@ -369,6 +385,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if (assetInfo == null) {
                 continue;
             }
+
+            if (aiMgrService.isInDispenceCenter(assetInfo)) {
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+                continue;
+            }
+
             assetInfo.setStatus(4);
             dao.save(assetInfo);
         }
@@ -440,6 +462,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
                 continue;
             }
+
+            if (aiMgrService.isInDispenceCenter(assetInfo)) {
+                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+                continue;
+            }
+
             assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
