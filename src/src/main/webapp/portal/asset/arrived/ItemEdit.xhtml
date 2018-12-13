@@ -225,8 +225,8 @@
                                         <p:ajax event="keyup" process="@this" update="@(.generateFinancingNum)"/>
                                         <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="@(.generateFinancingNum) @(.financingNum)"/>
                                     </p:inputText>
-                                    <p:commandButton  validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
-                                                      update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@(.financingNum)"/>
+                                    <p:commandButton  immediate="true" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
+                                                      update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@this"/>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
