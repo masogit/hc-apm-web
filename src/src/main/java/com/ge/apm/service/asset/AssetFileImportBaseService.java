@@ -184,9 +184,12 @@ public class AssetFileImportBaseService {
 
         String orgName = newAsset.getClinicalDeptName();
         if (StringUtils.isEmpty(orgName)) {
-            item.put("status", ImportStatus.Failure);
-            AssetRow.addErrMessage(item, "错误: 科室为空");
-            return;
+            if (StringUtils.isEmpty(newAsset.getUid())) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "错误: 科室为空");
+                return;
+            }
+
         } else {
             OrgInfo orgInfo = supportingService.findOrgOnly(selectedOrgToImport, orgName);
             if (orgInfo != null) {
@@ -401,18 +404,6 @@ public class AssetFileImportBaseService {
                 }
             }
 
-            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
-                    boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-                    if (!isAvailable) {
-                        item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
-                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
-                        continue;
-                    }
-                }
-            }
-
             if (null == newAsset.getAssetGroup()) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
@@ -428,8 +419,14 @@ public class AssetFileImportBaseService {
 
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
-                item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误: 所属科室为空");
+                //新增的时候不允许为空，更新的时候允许为空。
+                if (StringUtils.isEmpty(newAsset.getUid())) {
+                    item.put("status", ImportStatus.CheckFail);
+                    AssetRow.addErrMessage(item, "错误: 所属科室为空");
+                } else {
+                    newAsset.setClinicalDeptId(null);
+                    newAsset.setClinicalDeptUID(null);
+                }
             } else {
 
                 //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
@@ -477,8 +474,36 @@ public class AssetFileImportBaseService {
 
             }
 
+            //check QrCode
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
+                    if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                        //三码合一情况下，可以创建新的二维码或者二维码已发行
+                        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), selectedOrgToImport.getUid());
+                        if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                            continue;
+                        }
+                    } else {
+                        //非三码合一情况下，二维码需要已发行
+                        boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                        if (!isAvailable) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
+                            continue;
+                        }
+                    }
+
+                }
+            }
+
 
         }
+
+
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);

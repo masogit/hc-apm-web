@@ -41,7 +41,7 @@
         // https://stackoverflow.com/questions/40570164/how-to-customize-the-message-changes-you-made-may-not-be-saved-for-window-onb
         window.onbeforeunload = null;
     </script>
-    <h:outputStylesheet name="css/main2.css"/>
+    <h:outputStylesheet name="css/main3.css"/>
     <h:outputScript name="js/main.js"/>
     <ui:insert name="head"/>
 </h:head>
@@ -49,8 +49,10 @@
 <h:body styleClass="main-body #{guestPreferences.compact ? 'layout-compact' : null}">
     <ui:include src="./google-analytics.xhtml"/>
 
-    <p:growl id="growl" autoUpdate="true" showDetail="false" showSummary="true"
-             rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}"/>
+    <p:growl id="growl" showDetail="false" showSummary="true"
+             rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}">
+        <p:autoUpdate />
+    </p:growl>
     <div class="layout-wrapper #{guestPreferences.menuLayout}">
         <ui:include src="./menu.xhtml"/>
         <ui:include src="/authorization.xhtml"/>

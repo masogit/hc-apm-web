@@ -27,7 +27,7 @@
 
                     </h:panelGrid>
 
-                    <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataList"
+                    <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataListgl"
                                  selectionMode="single" selection="#{v2PmOrderController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.planTime}"
@@ -38,21 +38,25 @@
 
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
-
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36" rendered="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31}" exportable="false">
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" class="selectCheckBox">
-                                <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton)"/>
+                                <p:ajax process="@this"  update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton)" oncomplete="updateSelectAllCheckBox();" />
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                           <!-- <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
                                     <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.batch-piliangjiedan)"/>
                                 </p:selectBooleanCheckbox>
-                            </f:facet>
+                            </f:facet>-->
                         </p:column>
 
 
-                        <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
+                        <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
 
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
@@ -63,7 +67,7 @@
                         </p:column>
                         <p:column headerText="保养类型" sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
                             <f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.repairTypeInt}">
+                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -74,10 +78,10 @@
                         <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}"
+                                <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" />
-                                    <p:ajax process="@this" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}"   update="pmTab:pmOrderListForm:datalist" />
+                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
+                                    <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
                                 </p:autoComplete>
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
@@ -97,7 +101,7 @@
                         </p:column>
                         <p:column headerText="当前处理步骤"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                             <f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
+                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
@@ -110,7 +114,7 @@
                         </p:column>
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                             </h:outputText>
                         </p:column>
 
@@ -120,7 +124,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
                         <!--待接单 3-->
@@ -132,14 +136,14 @@
                         </p:column>
 
                         <!--待抢单tab 31-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}" exportable="false">
                             <p:commandButton  class="finishButton" value="完成" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
                             <p:commandButton  class="competeButton" disabled="#{v2PmOrderController.isChecked()}" value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,'抢单对话框')}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <!--已计划 0-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">
                             <p:commandButton value="保养" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
@@ -149,10 +153,10 @@
 
 
                         <!--待审核 8-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}" exportable="false">
                             <p:commandButton value="审核" actionListener="#{v2PmOrderController.prepareAproval(item.id)}" update="@(.pmapproveDialogCls)" oncomplete="PF('pmapproveDialog').show()"/>
                         </p:column>
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}">
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}" exportable="false">
                             <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:pmOrderListForm @(.closePmDialogClass)" oncomplete="PF('closePmDialog').show()" />
                         </p:column>
 
@@ -169,10 +173,16 @@
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="批量接单"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('transferOrderDialog').show()">
+                                <!--<p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.batchTransfer()}" oncomplete="PF('transferOrderDialog').show()">
+                                </p:commandButton>-->
+                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+                                <!--<p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+                                </p:commandButton>-->
+
+
+                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
                                 </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
@@ -201,7 +211,16 @@
     <!--批量保养完成对话框-->
     <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
         <h:form id="pmrepairCompleteDialogFormBatch" class="pmrepairCompleteDialogFormclsBatch" >
-            <h:panelGroup  id="display5" style="height:500px">
+           <!-- <h:panelGroup rendered="#{v2PmOrderController.sameType() eq false}" id="display61"  style="font-size:15px">
+
+                <h:panelGroup>
+                    <br/>
+                    <br/>
+                    <center><i class="pi pi-exclamation-triangle"></i>批量完成只能对2级保养进行操作，请不要选择3级保养工单</center>
+                </h:panelGroup>
+            </h:panelGroup>-->
+
+            <h:panelGroup rendered="#{v2PmOrderController.sameType() eq false}" id="display5" style="height:500px">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">结束保养时间*</label>
@@ -272,7 +291,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">保养类型*</label>
-                            <p:selectOneMenu  onchange="PF('varDataList').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="保养类型#{msg.ValidationRequire}">
+                            <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="保养类型#{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -414,7 +433,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate2" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar timeZone="GMT+8" id="fillDate2" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 必须输入}"></p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
@@ -501,12 +520,45 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
+
             <script>
+                //<![CDATA[
                 function toRepair(xhr, status, args) {
                     handleSubmit(args, 'closePmDialog');
                     PF('createSRDialog').show()
                 }
 
+                function forbidBatchComplete(xhr, status, args) {
+                     if(args.batchForbidForApproval){
+
+                      }
+                     else if(args.batchForbidForMaintanLevel){
+
+                     }else{
+                    PF('pmrepairCompleteDialogBatch').show()
+                     }
+                }
+                function forbidTransfer(xhr,status,args){
+                    if(args.batchForbidForTransfer){
+
+                    }else{
+                        PF('transferOrderDialog').show()
+                    }
+                }
+                function updateSelectAllCheckBox() {
+                    var checkboxlist = $(".selectCheckBox");
+                    var selectAllstatus = true;
+                    checkboxlist.each(function () {
+                        selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                    });
+                    $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                    if (selectAllstatus) {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                    } else {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                    }
+                }
+                //]]>
             </script>
         </p:dialog>
 

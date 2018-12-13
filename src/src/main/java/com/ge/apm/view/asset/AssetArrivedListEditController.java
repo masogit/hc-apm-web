@@ -17,10 +17,10 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
@@ -35,18 +35,17 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.orginfo.OrgInfoService;
+import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import lombok.Getter;
 
+import lombok.Getter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -89,6 +88,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
+    UserAccount currentUser;
 
     private List<V2_BlobObject> attachList;
 
@@ -129,6 +129,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
+        currentUser=UserContextService.getCurrentUserAccount();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -140,7 +141,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                 }
-                contractList = contractService.getContractListByTenant(selected.getTenantUID());
+                contractList = contractService.getContractListByUser(currentUser);
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -541,12 +542,33 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setContractItemId(selectedContractItem.getId());
         this.selected.setAssetName(selectedContractItem.getContractAssetName());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
+//        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
         this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
         this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
         this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
+        this.selected.setFunctionType(selectedContractItem.getPattern());
+        String manufactureUid=selectedContractItem.getManufacturer();
+        if(StringUtils.isNotEmpty(manufactureUid)){
+        	Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+            if(manufacture!=null){
+            	this.selected.setManufacture(manufacture.getName());
+            	this.selected.setManufactureId(manufacture.getId().toString());
+            	this.manufacture=manufacture;
+            }
+        }
+        this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+        this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+        String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
+        if(StringUtils.isNotEmpty(supplierUid)){
+        	Supplier supplier=aiService.getSupplierByUid(supplierUid);
+            if(supplier!=null){
+            	this.selected.setVendor(supplier.getName());
+                this.selected.setSupplierId(supplier.getId());
+                this.supplier=supplier;
+            }
+        }
         selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
     }
 

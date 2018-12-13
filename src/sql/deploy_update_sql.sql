@@ -271,4 +271,22 @@ INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(8
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保日期', 'factoryWarrantyDate', NULL);
 INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
 
+--v12.1
+ALTER TABLE public.tenant_info ALTER COLUMN tenant_config TYPE text;
+update tenant_info set tenant_config ='{"edition":"common","menuList":["homePage", "asset", "asset.info", "asset.analysis", "asset.mgt", "asset.supplierMgt", "asset.scrap", "asset.create", "asset.audit", "asset.batchImportData", "asset.inventory", "assetAdjust", "assetAdjust.borrowApply", "assetAdjust.borrowAccept", "assetAdjust.returnApply", "assetAdjust.returnAccept", "assetAdjust.batch", "assetAdjust.cost", "assetAdjust.stock", "assetAdjust.config", "assetAdjust.nameConfig", "install", "install.list", "install.store", "install.check", "repair", "repair.workbench", "repair.message", "repair.report", "repair.workSchedule", "repair.vacationMgt", "repair.reportMgt", "maintain", "maintain.workbench", "maintain.rule", "maintain.assetMgt", "maintain.electricDataImport", "maintain.reportMgt", "maintain.reportMgt", "measure", "measure.categoryConfig", "measure.info", "nurseSite", "nurseSite.maintain", "nurseSite.config", "nurseSite.report", "knowledge", "knowledge.mgt", "performance", "performance.scan", "performance.CT", "performance.config", "performance.import", "performance.BI", "config", "config.tenant", "config.org", "config.user", "config.batchImportData", "config.assetMessage", "config.qrCode", "config.qrCodeMgt", "config.repairOwner", "config.assetMark", "config.engineerGroup", "config.workFlow", "config.custom", "config.attribute", "config.repairMessage", "config.captureDataMessage", "mvs", "mvs.info", "mvs.purchase"]}' where tenant_config like '%通用版%';
+ALTER TABLE public.nurse_site_maintain_config ALTER COLUMN check_items TYPE text;
+ALTER TABLE public.nurse_site_maintain_config_item DROP COLUMN check_items;
+ALTER TABLE public.nurse_site_maintain_config_item DROP COLUMN check_items_detail;
 
+--v12.1 bi
+CREATE TABLE dashboard_role_res_tenant (
+     role_res_tenant_id serial,
+     res_id int,
+     res_type varchar(100),
+     role_id int,
+     tenant_uid varchar(32),
+     permission varchar(20),
+     PRIMARY KEY (role_res_tenant_id)
+);
+
+insert into dashboard_role_res_tenant(res_id, res_type, role_id, permission) select res_id, res_type, role_id, permission from dashboard_role_res

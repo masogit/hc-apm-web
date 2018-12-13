@@ -105,7 +105,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "active_type")
     private Integer activeType;//0 means super admin ,1 means by tenant user
     
-    @Column(name="tenant_config")
+    @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
 
     public Integer getType() {

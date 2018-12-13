@@ -37,7 +37,7 @@ public class TenantTreeController {
 	UaaService uaaService = WebUtil.getBean(UaaService.class);
 	private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 	private AssetInfoRepository assestInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-	private static TreeNode tenantOrgTree;
+	private TreeNode tenantOrgTree;
 	private TreeNode selectedTenantOrgNode;
 
 	@PostConstruct

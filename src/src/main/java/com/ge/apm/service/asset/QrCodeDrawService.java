@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,8 @@ public class QrCodeDrawService {
     private static final int WIDTH = 78;
     // LOGO高度
     private static final int HEIGHT = 78;
+    
+    private static final Pattern PATTERN_DIGITAL = Pattern.compile("[0-9]*");
     // LOGO路径
 //    private static final String LOGO_PATH = "/logo.jpg";
 //    private static final String BACKGROUND_PATH = "/background.png";
@@ -159,7 +162,7 @@ public class QrCodeDrawService {
         g.drawImage(createBitMatrixImage(prifix.concat("?").concat(code), QRCODE_SIZE), 0, 0, null);
 
         StringBuffer textSB = new StringBuffer(code);
-        if (code != null && code.length() == 16) {
+        if (code != null && code.length() == 16 && PATTERN_DIGITAL.matcher(code).matches()) {
             textSB.insert(4, "-");
             textSB.insert(9, "-");
             textSB.insert(14, "-");

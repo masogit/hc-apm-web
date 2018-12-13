@@ -546,7 +546,7 @@ public class UserAccountImportService {
 				user.setListImportUserOrgInfo(listUserOrgInfo);
 			}
 			UserOrgInfo tempUserOrgInfo=new UserOrgInfo();
-			tempUserOrgInfo.setOrgType(4);
+			tempUserOrgInfo.setOrgType(tempOrgInfo.getOrgType());
 			tempUserOrgInfo.setOrgUid(tempOrgInfo.getUid());
 			tempUserOrgInfo.setUserUid(user.getUid());
 			listUserOrgInfo.add(tempUserOrgInfo);

@@ -1,60 +1,79 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-<ui:composition >
-    <div class="ui-g clearfix">
-        <div class="ui-g-12 card">
-            <h:form id="pmOrderListFormRemote">
-                <p:dataTable id="datalist" value="#{v2PmOrderRemController.lazyModel}" var="item" widgetVar="varDataList5" selectionMode="single" selection="#{v2PmOrderRemController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.scheduleDate}" paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                             rows="20" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="20,50,100,500">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<div class="ui-g-12 card">
+		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
-                    <p:ajax event="rowSelect" listener="#{v2PmOrderRemController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm"/>
-                    <p:ajax event="filter" listener="#{v2PmOrderRemController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
+		<h:form id="pmOrderListFormRemote">
 
-                    <p:column headerText="工单编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.srNum}"/>
-                    </p:column>
-                    <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetInfo.departNum}"/>
-                    </p:column>
-                    <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetInfo.name}"/>
-                    </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
-                    </p:column>
+			<p:dataTable id="datalist3" value="#{assetLifecycleEvent5Controller.lazyModel}" var="item" widgetVar="varDataList3"
+				selection="#{assetLifecycleEvent5Controller.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+				rowKey="#{item.id}" selectionMode="single"
+				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+				rowsPerPageTemplate="20,50,100,500">
+				<p:ajax event="filter" listener="#{assetLifecycleEvent5Controller.onFilter}" />
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent5Controller.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('pmTab:pmOrderListFormRemote,selectCheckBoxHeaderPmRemote,selectCheckBoxItemPmRemote');">
+							<p:ajax listener="#{assetLifecycleEvent5Controller.onSelectAllItemsEvent()}"></p:ajax>
+						</p:selectBooleanCheckbox>
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemPmRemote">
+						<p:ajax listener="#{assetLifecycleEvent5Controller.onItemSelect()}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</p:column>
+				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetName}" />
+				</p:column>
+				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.eventUid}" />
+				</p:column>
+				<p:column headerText="更新时间" sortBy="#{item.createTime}">
+					<h:outputText value="#{item.createTime}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.systemId}" />
+				</p:column>
+				<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+					filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+				</p:column>
+				<p:column headerText="状态">
+					<h:outputText value="#{assetLifecycleEvent5Controller.getMsStatus(item)}" />
+				</p:column>
+				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
+					<h:outputText value="#{item.scheduleDate}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+					</h:outputText>
+				</p:column>
 
+				<p:column headerText="报告下载" exportable="false">
+					<p:repeat value="#{item.reports}" var="report">
+						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
+							<h:outputText value="#{report.displayName}" />
+						</p:link>
+						<br />
+					</p:repeat>
+				</p:column>
+				<f:facet name="{Toolbar}">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent5Controller.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
+					</p:commandButton>
+					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+						actionListener="#{assetLifecycleEvent5Controller.downloadSelectedReport()}" process="datalist3" update=":growl">
+						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
+					</p:commandButton>
+				</f:facet>
+			</p:dataTable>
+		</h:form>
 
-                    <p:column headerText="状态" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.status}"/>
-                    </p:column>
-                    <p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
-                        <h:outputText value="#{item.scheduleDate}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                        </h:outputText>
-                    </p:column>
-
-                    <f:facet name="{Toolbar}">
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                            <p:dataExporter type="xls" target="datalist" fileName="PmOrder_export"/>
-                        </p:commandButton>
-                    </f:facet>
-                </p:dataTable>
-            </h:form>
-            <!-- <ui:include src="pmOrderView.xhtml"/>-->
-
-        </div>
-    </div>
-
-
-
-
+	</div>
 </ui:composition>
 </html>
