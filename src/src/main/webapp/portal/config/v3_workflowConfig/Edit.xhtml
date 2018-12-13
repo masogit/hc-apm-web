@@ -279,7 +279,9 @@
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">到货安装是否需要核对入库</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}">
+                                	<p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class="label">调剂中心</label>
