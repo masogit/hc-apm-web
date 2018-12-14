@@ -30,16 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.ServiceRequestReport;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.AssetLifecycleEventService;
-import com.ge.apm.view.nurseSite.MaintainExportController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -59,7 +55,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected UaaService uaaService;
 	protected AssetLifecycleEventService service;
 	protected FileDownloadService fileDownloadService;
-	protected List<AssetLifecycleEvent> listSelectedItems;
+	protected Set<AssetLifecycleEvent> setSelectedItems;
 	protected StreamedContent exportFile;
 	protected boolean blnAllSelected;
 	protected int tabStatus;
@@ -71,7 +67,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         this.filterBySite = false;
         this.filterByHospital = false;
         blnAllSelected=false;
-        listSelectedItems=new ArrayList<AssetLifecycleEvent>();
+        setSelectedItems=new HashSet<AssetLifecycleEvent>();
         tabStatus=3;
     }
 
@@ -97,7 +93,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         		tempAllSelect=true;
         		for(int i=0;i<tempList.size();++i){
         			AssetLifecycleEvent tempEvent=tempList.get(i);
-        			if(this.listSelectedItems.contains(tempEvent)){
+        			if(this.setSelectedItems.contains(tempEvent)){
         				tempEvent.setBlnSelected(true);
         			}
         			else{
@@ -125,27 +121,31 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
 
     public void onSelectAllItemsEvent() {
+    	System.out.println("all");
     	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
     			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
+    			System.out.println(tempEvent.getId());
     			tempEvent.setBlnSelected(blnAllSelected);
     		}
     	}
     	if(blnAllSelected){
-    		this.listSelectedItems.addAll(listCurrentItems);
+    		this.setSelectedItems.addAll(listCurrentItems);
     	}
     	else{
-    		this.listSelectedItems.removeAll(listCurrentItems);
+    		this.setSelectedItems.removeAll(listCurrentItems);
     	}
     }
     
     public void onItemSelect(AssetLifecycleEvent tempEvent){
+    	System.out.println("single");
+    	System.out.println(tempEvent.getId());
     	if(tempEvent.isBlnSelected()){
-    		this.listSelectedItems.add(tempEvent);
+    		this.setSelectedItems.add(tempEvent);
     	}
     	else{
-    		this.listSelectedItems.remove(tempEvent);
+    		this.setSelectedItems.remove(tempEvent);
     	}
     }
     
@@ -156,11 +156,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	
 	public void exportSelected(){
 		this.exportFile=null;
-		if(listSelectedItems==null || listSelectedItems.size()==0){
+		if(setSelectedItems==null || setSelectedItems.size()==0){
 			downloadFile(service.parseEventToMap(dao.findBySearchFilter(this.searchFilters),tabStatus));
 		}
 		else{
-			downloadFile(service.parseEventToMap(listSelectedItems,tabStatus));
+			downloadFile(service.parseEventToMap(setSelectedItems,tabStatus));
 		}
 	}
     
@@ -196,33 +196,29 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
     public void downloadSelectedReport(){
     	this.exportFile=null;
-    	if(listSelectedItems==null || listSelectedItems.size()==0){
+    	if(setSelectedItems==null || setSelectedItems.size()==0){
     		WebUtil.addErrorMessage("请选择需要下载报告的工单！");
     		return;
     	}
     	Set<String> setReportIds=new HashSet<String>();
     	Map<String,String> mapReportName=new HashMap<String,String>();
 //    	Map<String,Integer> mapName=new HashMap<String,Integer>();
-    	for(int i=0;i<listSelectedItems.size();++i){
-			List<ServiceRequestReport> listReport=listSelectedItems.get(i).getReports();
-			if(listReport!=null && listReport.size()>0){
-				for(int j=0;j<listReport.size();++j){
-					ServiceRequestReport tempReport=listReport.get(j);
-					String reportStorageId=tempReport.getStorageId();
-					if(StringUtils.isNotEmpty(reportStorageId)){
-						setReportIds.add(reportStorageId);
-//						String tempName=tempReport.getDisplayName();
-//						if(!mapName.keySet().contains(tempName)){
-//							mapName.put(tempName, 1);
-//						}
-//						else{
-//							mapName.put(tempName, mapName.get(tempName)+1);
-//						}
-//						mapReportName.put(reportStorageId, tempName+"_"+mapName.get(tempName));
-						mapReportName.put(reportStorageId, tempReport.getFileName());
-					}
-				}
-			}
+    	for(int i=0;i<setSelectedItems.size();++i){
+    		Iterator<AssetLifecycleEvent> itEvent=setSelectedItems.iterator();
+    		while(itEvent.hasNext()){
+    			AssetLifecycleEvent tempEvent=itEvent.next();
+    			List<ServiceRequestReport> listReport=tempEvent.getReports();
+    			if(listReport!=null && listReport.size()>0){
+    				for(int j=0;j<listReport.size();++j){
+    					ServiceRequestReport tempReport=listReport.get(j);
+    					String reportStorageId=tempReport.getStorageId();
+    					if(StringUtils.isNotEmpty(reportStorageId)){
+    						setReportIds.add(reportStorageId);
+    						mapReportName.put(reportStorageId, tempReport.getFileName());
+    					}
+    				}
+    			}
+    		}
 		}
     	if(setReportIds.size()==0){
     		WebUtil.addErrorMessage("工单报告为空！");
@@ -250,12 +246,12 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         }
     }
 
-	public List<AssetLifecycleEvent> getListSelectedItems() {
-		return listSelectedItems;
+	public Set<AssetLifecycleEvent> getSetSelectedItems() {
+		return setSelectedItems;
 	}
 
-	public void setListSelectedItems(List<AssetLifecycleEvent> listSelectedItems) {
-		this.listSelectedItems = listSelectedItems;
+	public void setSetSelectedItems(Set<AssetLifecycleEvent> setSelectedItems) {
+		this.setSelectedItems = setSelectedItems;
 	}
 
 	public StreamedContent getExportFile() {
