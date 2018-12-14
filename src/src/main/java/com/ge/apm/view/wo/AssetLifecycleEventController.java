@@ -178,17 +178,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	}
 
     public String getMsStatus(AssetLifecycleEvent alse) {
-        String strStatus = null;
-        try {
-            JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
-            if (parse != null) {
-                strStatus = parse.getString("status");
-                alse.setDisplayStatus(strStatus);
-            }
-        } catch (Exception e) {
-            logger.error("Fail to parse description for status: " + alse.getId(), e);
-        }
-        return strStatus;
+        return service.getMsStatus(alse);
     }
 
     public StreamedContent getAnonymousReport(String reportStorageId) {
