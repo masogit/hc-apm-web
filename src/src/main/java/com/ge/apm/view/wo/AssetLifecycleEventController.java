@@ -121,12 +121,10 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
 
     public void onSelectAllItemsEvent() {
-    	System.out.println("all");
     	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
     	if(listCurrentItems!=null && listCurrentItems.size()>0){
     		for(int i=0;i<listCurrentItems.size();++i){
     			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
-    			System.out.println(tempEvent.getId());
     			tempEvent.setBlnSelected(blnAllSelected);
     		}
     	}
@@ -139,8 +137,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     }
     
     public void onItemSelect(AssetLifecycleEvent tempEvent){
-    	System.out.println("single");
-    	System.out.println(tempEvent.getId());
     	if(tempEvent.isBlnSelected()){
     		this.setSelectedItems.add(tempEvent);
     	}
