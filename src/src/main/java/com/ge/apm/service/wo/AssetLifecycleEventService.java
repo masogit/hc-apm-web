@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -45,7 +46,9 @@ public class AssetLifecycleEventService {
         }
         return strStatus;
     }
-	
+	public List<Map<String, Object>> parseEventToMap(Set<AssetLifecycleEvent> listEvent,int tabStatus) {
+		return parseEventToMap(new ArrayList(listEvent),tabStatus);
+	}
 	public List<Map<String, Object>> parseEventToMap(List<AssetLifecycleEvent> listEvent,int tabStatus) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
