@@ -203,22 +203,20 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     	Set<String> setReportIds=new HashSet<String>();
     	Map<String,String> mapReportName=new HashMap<String,String>();
 //    	Map<String,Integer> mapName=new HashMap<String,Integer>();
-    	for(int i=0;i<setSelectedItems.size();++i){
-    		Iterator<AssetLifecycleEvent> itEvent=setSelectedItems.iterator();
-    		while(itEvent.hasNext()){
-    			AssetLifecycleEvent tempEvent=itEvent.next();
-    			List<ServiceRequestReport> listReport=tempEvent.getReports();
-    			if(listReport!=null && listReport.size()>0){
-    				for(int j=0;j<listReport.size();++j){
-    					ServiceRequestReport tempReport=listReport.get(j);
-    					String reportStorageId=tempReport.getStorageId();
-    					if(StringUtils.isNotEmpty(reportStorageId)){
-    						setReportIds.add(reportStorageId);
-    						mapReportName.put(reportStorageId, tempReport.getFileName());
-    					}
-    				}
-    			}
-    		}
+    	Iterator<AssetLifecycleEvent> itEvent=setSelectedItems.iterator();
+		while(itEvent.hasNext()){
+			AssetLifecycleEvent tempEvent=itEvent.next();
+			List<ServiceRequestReport> listReport=tempEvent.getReports();
+			if(listReport!=null && listReport.size()>0){
+				for(int j=0;j<listReport.size();++j){
+					ServiceRequestReport tempReport=listReport.get(j);
+					String reportStorageId=tempReport.getStorageId();
+					if(StringUtils.isNotEmpty(reportStorageId)){
+						setReportIds.add(reportStorageId);
+						mapReportName.put(reportStorageId, tempReport.getFileName());
+					}
+				}
+			}
 		}
     	if(setReportIds.size()==0){
     		WebUtil.addErrorMessage("工单报告为空！");
