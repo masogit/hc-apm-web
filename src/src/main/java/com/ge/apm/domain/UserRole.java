@@ -38,6 +38,9 @@ public class UserRole implements Serializable {
     @Column(name = "role_id")
     private Integer roleId;
 
+    @Column(name = "role_type")
+    private Integer roleType;  // 0 means system role  1 means cumtom role
+
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private UserAccount userAccount;
@@ -90,6 +93,14 @@ public class UserRole implements Serializable {
 
     public void setRole(SysRole role) {
         this.role = role;
+    }
+
+    public Integer getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(Integer roleType) {
+        this.roleType = roleType;
     }
 
     @Override
