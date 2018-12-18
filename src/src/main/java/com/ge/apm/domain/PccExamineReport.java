@@ -59,14 +59,8 @@ public class PccExamineReport implements Serializable {
 	// 检测日期
 	@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
-	@Column(name = "check_date")
-	private Date checkDate;
-
-	// scheduleDate
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
-	@Column(name = "schedule_date")
-	private Date scheduleDate;
+	@Column(name = "report_date")
+	private Date reportDate;
 
 	@Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
 	private String tenantUID;
@@ -101,19 +95,6 @@ public class PccExamineReport implements Serializable {
 	
 	@Column(name = "status")
 	private Integer status;
-	
-	@Column(name="signature_id")
-	private String signatureId;
-	
-	//NULL:no signature,0:from web(file text),1:from weixin(file stream)
-	@Column(name="signature_source_type")
-	private Integer signatureSourceType=0;
-	
-	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
-    private String clinicalDeptUID;//设备使用科室
-
-    @Column(name = "clinical_dept_name")
-    private String clinicalDeptName;//使用科室
     
     @Column(name = "asset_uid")
     private String assetUid;
@@ -222,21 +203,6 @@ public class PccExamineReport implements Serializable {
 		this.modifyDate = modifyDate;
 	}
 
-	public Date getCheckDate() {
-		return checkDate;
-	}
-
-	public void setCheckDate(Date checkDate) {
-		this.checkDate = checkDate;
-	}
-
-	public Date getScheduleDate() {
-		return scheduleDate;
-	}
-
-	public void setScheduleDate(Date scheduleDate) {
-		this.scheduleDate=scheduleDate;
-	}
 
 	public String getCreateByUid() {
 		return createByUid;
@@ -286,15 +252,6 @@ public class PccExamineReport implements Serializable {
 		this.name = name;
 	}
 
-	public String getSignatureId() {
-		return signatureId;
-	}
-
-	public void setSignatureId(String signatureId) {
-		this.signatureSourceType=0;
-		this.signatureId = signatureId;
-	}
-
 	
 	public boolean isNeedGetItem() {
 		return needGetItem;
@@ -302,30 +259,6 @@ public class PccExamineReport implements Serializable {
 
 	public void setNeedGetItem(boolean needGetItem) {
 		this.needGetItem = needGetItem;
-	}
-
-	public String getClinicalDeptUID() {
-		return clinicalDeptUID;
-	}
-
-	public void setClinicalDeptUID(String clinicalDeptUID) {
-		this.clinicalDeptUID = clinicalDeptUID;
-	}
-
-	public String getClinicalDeptName() {
-		return clinicalDeptName;
-	}
-
-	public void setClinicalDeptName(String clinicalDeptName) {
-		this.clinicalDeptName = clinicalDeptName;
-	}
-
-	public Integer getSignatureSourceType() {
-		return signatureSourceType;
-	}
-
-	public void setSignatureSourceType(Integer signatureSourceType) {
-		this.signatureSourceType = signatureSourceType;
 	}
 
 	public String getAssetUid() {
@@ -470,6 +403,14 @@ public class PccExamineReport implements Serializable {
 
 	public void setOilStatus(String oilStatus) {
 		this.oilStatus = oilStatus;
+	}
+
+	public Date getReportDate() {
+		return reportDate;
+	}
+
+	public void setReportDate(Date reportDate) {
+		this.reportDate = reportDate;
 	}
 
 	@Override
