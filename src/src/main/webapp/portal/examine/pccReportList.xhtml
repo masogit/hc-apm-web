@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="PCC Tool 超声探头检测报告" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="pccReportListForm">
+					<p:dataTable id="datalist" value="#{pccExamineReportController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+						selection="#{pccExamineReportController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+						sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+						<p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+						<p:ajax event="filter" listener="#{pccExamineReportController.onFilter}" />
+
+						<p:column headerText="报告名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.name}" />
+						</p:column>
+						<p:column headerText="探头名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfo.name}" />
+						</p:column>
+						<p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+						</p:column>
+						<p:column headerText="检测日期">
+							<h:outputText value="#{item.checkDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="修改人" filterBy="#{item.modifyBy}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.modifyBy.name}" />
+						</p:column>
+						<p:column headerText="修改日期">
+							<h:outputText value="#{item.modifyDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="报告下载">
+							<h:outputText value="xxx">
+							</h:outputText>
+						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Edit}"
+								action="#{pccExamineReportController.getEditPage('','Create')}" />
+							<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}"
+								action="#{pccExamineReportController.getEditPage(pccExamineReportController.selected.id,'Edit')}"
+								disabled="#{empty pccExamineReportController.selected.id}" />
+							<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete}"
+								update=":pccReportListForm:datalist" disabled="#{empty pccExamineReportController.selected.id}">
+								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+							</p:commandButton>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

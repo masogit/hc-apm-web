@@ -18,6 +18,7 @@ public class V2_BlobObject implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
+    public static final String BO_TYPE_PCCReport="PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
