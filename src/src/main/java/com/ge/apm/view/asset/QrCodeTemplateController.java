@@ -97,6 +97,10 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     public String getEditLink() {
         return "CreateTemplate.xhtml?faces-redirect=true&action=Edit&templateId=" + selected.getId();
     }
+    
+    public String saveAsAction() {
+        return "CreateTemplate.xhtml?faces-redirect=true&action=Create".concat(selected==null?"":"&copyFrom=".concat(selected.getId()));
+    }
 
     public String getPreViewBase64() {
         return selected == null ? "" : qrCodeService.getPreViewBase64(selected.getId());
