@@ -26,8 +26,8 @@
 						<p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 						</p:column>
-						<p:column headerText="检测日期">
-							<h:outputText value="#{item.checkDate}">
+						<p:column headerText="报告生成日期">
+							<h:outputText value="#{item.reportDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>

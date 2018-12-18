@@ -2,6 +2,7 @@ package com.ge.apm.view.examine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
@@ -21,6 +22,7 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.PccExamineReportRepository;
 import com.ge.apm.domain.ApmDropDownItem;
 import com.ge.apm.domain.ApmStreamedContent;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
@@ -163,6 +165,22 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 		prepareSave();
 		service.savePccReport(this.selected, listStreamedContent);
 	}
+	
+	@Override
+	public void prepareCreate() throws InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		super.prepareCreate();
+	}
+	@Override
+    public void onBeforeNewObject(PccExamineReport object) {
+        super.onBeforeNewObject(object);
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
+        object.setCreateBy(currentUser);
+        object.setCreateDate(new Date());
+    }
 	@Override
 	public void prepareEdit() {
 		// TODO Auto-generated method stub
@@ -176,7 +194,36 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 		}
 	}
 	private void prepareSave(){
-		
+		AssetInfo tempInfo=searchController.getSelectedAssetInfo();
+		if(tempInfo!=null){
+			this.selected.setAssetInfo(tempInfo);
+			this.selected.setAssetUid(tempInfo.getUid());
+		}
+		this.selected.setLineStatus(convertDropDownListToStr(selectLineStatus));
+		this.selected.setMirrorStatus(convertDropDownListToStr(selectMirrorStatus));
+		this.selected.setShellStatus(convertDropDownListToStr(selectShellStatus));
+		this.selected.setLinkerStatus(convertDropDownListToStr(selectLinkerStatus));
+		this.selected.setOilStatus(convertDropDownListToStr(selectOilStatus));
+		this.selected.setTipStatus(convertDropDownListToStr(selectTipStatus));
+		this.selected.setElectricLeakageStatus(convertDropDownListToStr(selectElectricLeakageStatus));
+		this.selected.setFirstSeenStatus(convertDropDownListToStr(selectFirstSeenStatus));
+		this.selected.setFirstTipStatus(convertDropDownListToStr(selectFirstTipStatus));
+		this.selected.setResultStatus(convertDropDownListToStr(selectResultStatus));
+		this.selected.setRecommandStatus(convertDropDownListToStr(selectRecommandStatus));
+		this.selected.setModifyBy(currentUser);
+		this.selected.setModifyDate(new Date());
+	}
+	private String convertDropDownListToStr(List<ApmDropDownItem> listItem){
+		StringBuilder sb=new StringBuilder();
+		if(listItem!=null && listItem.size()>0){
+			for(int i=0;i<listItem.size();++i){
+				ApmDropDownItem tempItem=listItem.get(i);
+				System.out.println(tempItem.getLabel());
+				sb.append(tempItem.getKey());
+				sb.append(",");
+			}
+		}
+		return sb.toString();
 	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
