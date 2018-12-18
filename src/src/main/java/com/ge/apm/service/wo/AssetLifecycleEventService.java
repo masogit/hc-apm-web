@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -30,6 +32,19 @@ public class AssetLifecycleEventService {
 	private static final String SHEET_NAME = "datalist";
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
+	
+	public String getMsStatus(AssetLifecycleEvent alse) {
+        String strStatus = null;
+        try {
+            JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
+            if (parse != null) {
+                strStatus = parse.getString("status");
+            }
+        } catch (Exception e) {
+        	LOGGER.error("Fail to parse description for status: " + alse.getId(), e);
+        }
+        return strStatus;
+    }
 
 	public List<Map<String, Object>> parseEventToMap(List<AssetLifecycleEvent> listEvent,int tabStatus) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -56,7 +71,7 @@ public class AssetLifecycleEventService {
 					}
 					systemId = tempEvent.getAssetInfo().getSystemId();
 					clinicalDeptName = tempEvent.getAssetInfo().getClinicalDeptName();
-					status = tempEvent.getDisplayStatus();
+					status = getMsStatus(tempEvent);
 					Date scheduleDate=tempEvent.getScheduleDate();
 					if(scheduleDate!=null){
 						reportDate = sdf3.format(scheduleDate);

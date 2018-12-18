@@ -1,0 +1,367 @@
+package com.ge.apm.view.examine;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.PccExamineReportRepository;
+import com.ge.apm.domain.ApmDropDownItem;
+import com.ge.apm.domain.ApmStreamedContent;
+import com.ge.apm.domain.PccExamineReport;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.examine.PccExamineReportService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.SearchController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+
+import lombok.Getter;
+import lombok.Setter;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
+/**
+ * Created by 212605082 on 2018/5/8.
+ */
+@ManagedBean
+@ViewScoped
+public class PccExamineReportController extends GenericCRUDUUIDController<PccExamineReport> implements Serializable, ServerEventInterface {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PccExamineReportController.class);
+	public static final String STR_TENANTUID = "tenantUID";
+	public static final String STR_INSTITUTIONUID = "institutionUID";
+	public static final String STR_HOSPITALUID = "hospitalUID";
+	public static final String STR_SITEUID = "siteUID";
+	public static final String STR_DEPTUID = "clinicalDeptUID";
+	public static final String STR_ASSETTYPE = "assetType";
+	public static final String STR_ASSETGROUP = "assetGroup";
+	public static final String STR_QRCODE = "qrCode";
+	public static final String STR_DEPTNUM = "departNum";
+	public static final String STR_FINANCENUM = "financingNum";
+	@Getter@Setter
+	private List<ApmDropDownItem> selectLineStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectMirrorStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectShellStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectLinkerStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectOilStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectTipStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectElectricLeakageStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectFirstSeenStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectFirstTipStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectResultStatus;
+	@Getter@Setter
+	private List<ApmDropDownItem> selectRecommandStatus;
+
+	protected UserAccount currentUser;
+	protected I18nMessageRepository i18nDao;
+	private UploadedFile file;
+	private List<ApmStreamedContent> listStreamedContent;
+	private ApmStreamedContent tailAttach;
+	String updateViewIDs;
+	UaaService uaaService;
+	AssetInstallationService aiService;
+	String contractInfoSiteUID;
+	PccExamineReportService service;
+	PccExamineReportRepository dao;
+	SearchController searchController;
+
+	protected void init() {
+		currentUser = UserContextService.getCurrentUserAccount();
+		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+		uaaService = WebUtil.getBean(UaaService.class);
+		aiService = WebUtil.getBean(AssetInstallationService.class);
+		service = WebUtil.getBean(PccExamineReportService.class);
+		dao = WebUtil.getBean(PccExamineReportRepository.class);
+		searchController = WebUtil.getBean(SearchController.class);
+		searchController.setType(2);
+		searchController.updateData();
+		if(listStreamedContent==null){
+			listStreamedContent = new ArrayList<ApmStreamedContent>();
+		}
+		System.out.println("PccExamineReportController init");
+		String encodeStr="";
+		try {
+			encodeStr = WebUtil.getRequestParameter("str");
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
+		if(StringUtils.isNotEmpty(encodeStr)){
+			String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+			if ("Create".equalsIgnoreCase(actionName)) {
+				try {
+					prepareCreate();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					LOGGER.error(e.getMessage());
+				} 
+	        } else if ("Edit".equalsIgnoreCase(actionName)) {
+	            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+	            setSelected(selectedId);
+	            prepareEdit();
+	        }
+		}
+		
+	}
+
+	@Override
+	protected Page<PccExamineReport> loadData(PageRequest pageRequest) {
+		List<SearchFilter> searchFilters = this.searchFilters;
+		if (searchFilters == null) {
+			searchFilters = new ArrayList<>();
+		}
+		// need list or set
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+		searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID(), "1*2+"));
+		searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID(), "1*2+"));
+		searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*2+"));
+		Page<PccExamineReport> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
+		return pageResult;
+	}
+
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected GenericRepositoryUUID<PccExamineReport> getDAO() {
+		// TODO Auto-generated method stub
+		return dao;
+	}
+
+	@Override
+	public void save() {
+		// TODO Auto-generated method stub
+		prepareSave();
+		service.savePccReport(this.selected, listStreamedContent);
+	}
+	@Override
+	public void prepareEdit() {
+		// TODO Auto-generated method stub
+		super.prepareEdit();
+		parseBlobObject();
+	}
+	private void parseBlobObject(){
+		String id=this.selected.getId();
+		if(StringUtils.isNotEmpty(id)){
+			this.listStreamedContent=service.parseBlobObject(id);
+		}
+	}
+	private void prepareSave(){
+		
+	}
+	private void addMessage(String str) {
+		FacesMessage message = new FacesMessage(str, null);
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	public String getEditPage(String id, String actionName) {
+        String operation = "pccReportEdit.xhtml?actionName="+actionName+"&selectedid=" + id;
+        return UrlEncryptController.encodeUrlParam(operation);
+    }
+	public String jumpCreatePage(){
+		try {
+			super.prepareCreate();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		} 
+		return "pccReportEidt?faces-redirect=false";
+	}
+	public String jumpEditPage(){
+		super.prepareEdit();
+		return "pccReportEidt?faces-redirect=true";
+	}
+	public String jumpListPage(){
+		return "pccReportList?faces-redirect=true";
+	}
+	public void upload() {
+		System.out.println("upload");
+		if (file != null) {
+			try {
+				ApmStreamedContent e = new ApmStreamedContent(file.getInputstream(), file.getContentType(), file.getFileName());
+				if (listStreamedContent.size() > 4) {
+					listStreamedContent.remove(0);
+				}
+				listStreamedContent.add(e);
+				addMessage(file.getFileName() + " 上传成功.");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		}
+	}
+
+	public void handleFileUpload(FileUploadEvent event) {
+		System.out.println("FileUploadEvent");
+		UploadedFile tempFile = event.getFile();
+		if (tempFile != null) {
+			try {
+				System.out.println(tempFile.getContentType());
+				ApmStreamedContent e = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				if (listStreamedContent.size() > 4) {
+					listStreamedContent.remove(0);
+				}
+				listStreamedContent.add(e);
+				addMessage(tempFile.getFileName() + " 上传成功！");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		} else {
+			System.out.println("FileUploadEvent is null");
+			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+		}
+		// V2_BlobObject blobObject = service.uploadFile(event);
+		// String type = event.getComponent().getId();
+		// type = type.substring(type.indexOf("type") + 4);
+		// if (null != blobObject) {
+		// attachList.add(blobObject);
+		// blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
+		// blobObject.setBoUuid(selected.getId());
+		// blobObject.setBoSubType(type);
+		// blobService.saveBlobObject(blobObject);
+		// WebUtil.addSuccessMessage(blobObject.getObjectName() +
+		// WebUtil.getMessage("SuccessUploaded"));
+		// } else {
+		// WebUtil.addErrorMessage("fail to upload file");
+		// }
+	}
+	
+	public void handleTailUpload(FileUploadEvent event){
+		UploadedFile tempFile = event.getFile();
+		if (tempFile != null) {
+			try {
+				System.out.println(tempFile.getContentType());
+				tailAttach = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				addMessage(tempFile.getFileName() + " 上传成功！");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		} else {
+			System.out.println("FileUploadEvent is null");
+			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+		}
+	}
+	
+	private void setSelected(String id) {
+        selected = dao.findById(id);
+        setSelected(selected);
+    }
+
+	public UserAccount getCurrentUser() {
+		return currentUser;
+	}
+
+	public void setCurrentUser(UserAccount currentUser) {
+		this.currentUser = currentUser;
+	}
+
+	public I18nMessageRepository getI18nDao() {
+		return i18nDao;
+	}
+
+	public void setI18nDao(I18nMessageRepository i18nDao) {
+		this.i18nDao = i18nDao;
+	}
+
+	public String getUpdateViewIDs() {
+		return updateViewIDs;
+	}
+
+	public void setUpdateViewIDs(String updateViewIDs) {
+		this.updateViewIDs = updateViewIDs;
+	}
+
+	public UaaService getUaaService() {
+		return uaaService;
+	}
+
+	public void setUaaService(UaaService uaaService) {
+		this.uaaService = uaaService;
+	}
+
+	public UploadedFile getFile() {
+		return file;
+	}
+
+	public void setFile(UploadedFile file) {
+		this.file = file;
+	}
+
+	public List<ApmStreamedContent> getListStreamedContent() {
+		return listStreamedContent;
+	}
+
+	public void setListStreamedContent(List<ApmStreamedContent> listStreamedContent) {
+		this.listStreamedContent = listStreamedContent;
+	}
+	public List<ApmDropDownItem> fetchLineStatus(){
+		return service.fetchLineStatus();
+	}
+	public List<ApmDropDownItem> fetchMirrorStatus(){
+		return service.fetchMirrorStatus();
+	}
+	public List<ApmDropDownItem> fetchShellStatus(){
+		return service.fetchShellStatus();
+	}
+	public List<ApmDropDownItem> fetchLinkerStatus(){
+		return service.fetchLinkerStatus();
+	}
+	public List<ApmDropDownItem> fetchOilStatus(){
+		return service.fetchOilStatus();
+	}
+	public List<ApmDropDownItem> fetchTipStatus(){
+		return service.fetchTipStatus();
+	}
+	public List<ApmDropDownItem> fetchElectricLeakageStatus(){
+		return service.fetchElectricLeakageStatus();
+	}
+	public List<ApmDropDownItem> fetchFirstSeenStatus(){
+		return service.fetchFirstSeenStatus();
+	}
+	public List<ApmDropDownItem> fetchFirstTipStatus(){
+		return service.fetchFirstTipStatus();
+	}
+	public List<ApmDropDownItem> fetchResultStatus(){
+		return service.fetchResultStatus();
+	}
+	public List<ApmDropDownItem> fetchRecommandStatus(){
+		return service.fetchRecommandStatus();
+	}
+
+	public ApmStreamedContent getTailAttach() {
+		return tailAttach;
+	}
+
+	public void setTailAttach(ApmStreamedContent tailAttach) {
+		this.tailAttach = tailAttach;
+	}
+}
