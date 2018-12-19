@@ -3,12 +3,7 @@ package com.ge.apm.view.uaa;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -22,6 +17,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -45,15 +41,6 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.BiomedGroupUser;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRoleVO;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserRole;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -313,9 +300,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
 
-        assignedRoles = new ArrayList<String>();
+        assignedRoles = new ArrayList<>();
+
+        Map<Integer,String> tempCR = new HashMap<>();
+        List<CustomRole> customRoles = uaaService.getTenantCustomRoles(selected.getTenantUID());
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            customRoles.stream().forEach( role -> tempCR.put(role.getId(),role.getName()));
+        }
         for (UserRole userRole : selected.getUserRoleList()) {
-            assignedRoles.add(userRole.getRole().getRoleDesc());
+            if(userRole.getRoleType() == 0){
+                assignedRoles.add(userRole.getRole().getRoleDesc());
+            }else if(userRole.getRoleType() == 1){
+                assignedRoles.add(tempCR.get(userRole.getRoleId()));
+            }
         }
         prepareUserScope();
     }

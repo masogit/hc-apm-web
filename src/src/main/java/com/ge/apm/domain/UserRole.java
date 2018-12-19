@@ -39,7 +39,7 @@ public class UserRole implements Serializable {
     private Integer roleId;
 
     @Column(name = "role_type")
-    private Integer roleType;  // 0 means system role  1 means cumtom role
+    private Integer roleType;  // 0 means system role , 1 means cumtom role
 
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
