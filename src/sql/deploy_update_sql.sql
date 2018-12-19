@@ -299,3 +299,6 @@ insert into sys_authority(id,name,description) values (5,'巡检','patrol');
 insert into sys_authority(id,name,description) values (6,'977','977');
 insert into sys_authority(id,name,description) values (7,'派工','dispath');
 insert into sys_authority(id,name,description) values (8,'审核','approve');
+
+update user_role set role_type= 0;
+

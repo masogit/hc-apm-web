@@ -1690,6 +1690,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '8',  '审核','approve', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CustomRole', '自定义角色', 'cumtom role', NULL, '-1');
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'containsKeyRole', '自定义角色名字不能是系统角色!', 'custom role cannt be sys role !', NULL, '-1');
 
 
