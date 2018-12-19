@@ -11,6 +11,7 @@ import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.common.QrcodeConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ public class QrCodeTemplateCreateController {
     
     QrCodeTemplate thisTemplate;
     JSONObject templateJsonObject;
-    static Map<String, String> fontNameMap;
     
     UaaService uaaService;
     
@@ -91,7 +91,7 @@ public class QrCodeTemplateCreateController {
         thisTemplate.setJSONObject(templateJsonObject);
         thisTemplate.setHeight(templateJsonObject.getIntValue("Height"));
         thisTemplate.setWidth(templateJsonObject.getIntValue("Width"));
-        return qrCodeService.getPreViewBase64(thisTemplate, templateService.getElementsByTemplate(thisTemplate));
+        return qrCodeService.getPreViewBase64(thisTemplate);
     }
     
     public void onSiteChange() {
@@ -128,20 +128,11 @@ public class QrCodeTemplateCreateController {
     }
     
     public Map<String, String> getFieldsMap() {
-        return qrCodeService.getFieldsMap();
+        return QrcodeConfigConstant.getFieldsMap();
     }
     
     public Map<String, String> getFontNameMap() {
-        if (fontNameMap == null) {
-            fontNameMap = new HashMap<String, String>();
-            fontNameMap.put("TimesRoman", "TimesRoman");
-            fontNameMap.put("Courier", "Courier");
-            fontNameMap.put("Arial", "Arial");
-            fontNameMap.put("Microsoft YaHei", "Microsoft YaHei");
-            fontNameMap.put("SimHei", "SimHei");
-            fontNameMap.put("SimSun", "SimSun");
-        }
-        return fontNameMap;
+        return QrcodeConfigConstant.getFontNameMap();
     }
     
     public void removeElement(JSONObject element) {
