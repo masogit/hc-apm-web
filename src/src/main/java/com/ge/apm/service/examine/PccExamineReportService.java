@@ -108,6 +108,7 @@ public class PccExamineReportService {
     public boolean savePccReport(PccExamineReport report,List<ApmStreamedContent> listContent){
     	pccExamineReportRepository.save(report);
         String id=report.getId();
+        deleteFile(id, V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_IMG);
         if(StringUtils.isNotEmpty(id)){
             saveFile(listContent, id);
         }
@@ -133,6 +134,7 @@ public class PccExamineReportService {
                 String storageId=obj.getObjectStorageId();
                 if(StringUtils.isNotEmpty(storageId)){
                     ApmStreamedContent tempContent=new ApmStreamedContent(blobFileService.getBlobObjectByStorageId(storageId).getStream(), obj.getObjectType(), obj.getObjectName());
+                    tempContent.setId(storageId);
                     listResult.add(tempContent);
                 }
             }
@@ -199,6 +201,10 @@ public class PccExamineReportService {
         return true;
     }
 	
+	public Boolean deleteFileByStorageId(String storageId){
+		return blobFileService.deleteBlobFilesByStorageId(storageId);
+	}
+	
 	public ApmStreamedContent getTemplate(){
 		List<V2_BlobObject> listBlobObject=getFile("0", V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_DOCS);
 		if(listBlobObject!=null && listBlobObject.size()==1){
@@ -245,6 +251,7 @@ public class PccExamineReportService {
 				else{
 					fileName=template.getName();
 				}
+				pcc.setReportDate(new Date());
 				template.settBytes(renderDocx(getTemplateMap(pcc,listPicture), template.gettBytes()));
 				V2_BlobObject tempObj=blobFileService.uploadFile(template.getStream(), fileName);
 				if(tempObj!=null){
@@ -253,7 +260,6 @@ public class PccExamineReportService {
 					tempObj.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
 					blobFileService.saveBlobObject(tempObj);
 					pcc.setReportStorageId(tempObj.getObjectStorageId());
-					pcc.setReportDate(new Date());
 					pccExamineReportRepository.save(pcc);
 				}
 				template.setContentType("application/msword");

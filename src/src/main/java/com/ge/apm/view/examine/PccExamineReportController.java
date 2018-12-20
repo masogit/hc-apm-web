@@ -361,7 +361,7 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	}
 	
 	public void batchGenerateReport(){
-		if(listSelected==null && listSelected.size()==0){
+		if(listSelected==null || listSelected.size()==0){
 			addMessage("请选择需要批量生成报告的项！");
 			return;
 		}
@@ -400,6 +400,7 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
                 String reportStorageId=it.next();
                 StreamedContent file = service.getSingleFile(reportStorageId);
                 String fileName = file.getName();
+                fileName=new String(fileName.getBytes("iso-8859-1"),"utf-8");
                 int index=fileName.lastIndexOf(".");
                 fileName=fileName.substring(0,index)+"_"+(count++)+fileName.substring(index,fileName.length());
                 String contentType = file.getContentType();
