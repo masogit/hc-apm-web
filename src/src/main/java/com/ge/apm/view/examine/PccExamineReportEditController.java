@@ -81,6 +81,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	private ApmStreamedContent tailAttach;
 	private List<PccExamineReport> listSelected;
 	private PccExamineReport selected;
+	private boolean blnNewUpload=false;
 	String updateViewIDs;
 	UaaService uaaService;
 	AssetInstallationService aiService;
@@ -140,8 +141,20 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	public void save() {
 		// TODO Auto-generated method stub
 		prepareSave();
-		service.savePccReport(this.selected, listStreamedContent);
-		addMessage("PCC 探头检测报告保存成功！");
+		boolean result=false;
+		if(blnNewUpload){
+			result=service.savePccReport(this.selected, listStreamedContent);
+		}
+		else{
+			result=service.savePccReport(this.selected, null);
+		}
+		if(result){
+			blnNewUpload=false;
+			addMessage("PCC 探头检测报告保存成功！");
+		}
+		else{
+			addMessage("PCC 探头检测报告保存失败！");
+		}
 	}
 	public void delete() {
 		// TODO Auto-generated method stub
@@ -206,7 +219,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			if(this.selected.getManufactDate()==null){
 				this.selected.setManufactDate(tempInfo.getManufactDate());
 			}
-			if(this.selected.getFunctionType()==null){
+			if(StringUtils.isEmpty(this.selected.getFunctionType())){
 				this.selected.setFunctionType(tempInfo.getFunctionType());
 			}
 		}
@@ -280,7 +293,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if(tempItem!=null){
 			return tempItem.getKey();
 		}
-		return null;
+		return "";
 	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
@@ -304,6 +317,15 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	}
 	public String jumpListPage(){
 		return "pccReportList?faces-redirect=true";
+	}
+	
+	public void deleteImg(int index){
+		blnNewUpload=true;
+		String storageId=listStreamedContent.get(index).getId();
+		if(StringUtils.isNotEmpty(storageId)){
+			service.deleteFileByStorageId(storageId);
+		}
+		listStreamedContent.remove(index);
 	}
 	public void generateReport(){
 		if(StringUtils.isEmpty(this.selected.getId())){
@@ -337,15 +359,16 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 
 	public void handleFileUpload(FileUploadEvent event) {
 		System.out.println("FileUploadEvent");
+		blnNewUpload=true;
 		UploadedFile tempFile = event.getFile();
 		if (tempFile != null) {
 			try {
 				System.out.println(tempFile.getContentType());
 				ApmStreamedContent e = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
-				if (listStreamedContent.size() > 4) {
+				listStreamedContent.add(e);
+				while (listStreamedContent.size() > 4) {
 					listStreamedContent.remove(0);
 				}
-				listStreamedContent.add(e);
 				addMessage(tempFile.getFileName() + " 上传成功！");
 			} catch (Exception e) {
 				// TODO: handle exception

@@ -25,6 +25,10 @@ public class ApmDropDownConverter implements Converter {
 	public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
 		if (value != null && value.trim().length() > 0) {
 			try {
+				char c=value.charAt(0);
+				if(c>160){
+					return null;
+				}
 				ApmDropDownItem tempItem = new ApmDropDownItem();
 				tempItem.setKey(value);
 				tempItem.setLabel(value);

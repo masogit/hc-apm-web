@@ -16,9 +16,10 @@
 							<h:panelGrid columns="1" cellpadding="10">
 								<h:panelGroup>
 									<p:dataGrid id="pictureList" value="#{pccExamineReportEditController.listStreamedContent}" var="fileitem" columns="4"
-										emptyMessage="#{msg.noRecordFound}">
+										emptyMessage="#{msg.noRecordFound}" rowIndexVar="index">
 										<p:column headerText="#{fileitem.name}">
-											<p:graphicImage value="#{fileitem}" width="120" height="80" stream="false" />
+											<p:graphicImage value="#{fileitem}" width="160" height="120" stream="false" />
+											<p:commandButton ajax="true" actionListener="#{pccExamineReportEditController.deleteImg(index)}" update="@parent:pictureList" icon="ui-icon-clear" process="@this" title="删除"></p:commandButton>
 										</p:column>
 										<!-- <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link> -->
 										<!-- <p:commandButton actionListener="#{pccExamineReportEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"
@@ -108,7 +109,6 @@
 											requiredMessage="提示 #{msg.ValidationRequire}">
 											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 											<f:selectItems value="#{pccExamineReportEditController.fetchTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-
 											</f:selectItems>
 											<p:column>
 												<h:outputText value="#{t.label}" />
@@ -121,7 +121,6 @@
 											requiredMessage="探头漏电流检测结果 #{msg.ValidationRequire}">
 											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 											<f:selectItems value="#{pccExamineReportEditController.fetchElectricLeakageStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-
 											</f:selectItems>
 											<p:column>
 												<h:outputText value="#{t.label}" />
@@ -148,7 +147,6 @@
 											requiredMessage="提示 #{msg.ValidationRequire}">
 											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 											<f:selectItems value="#{pccExamineReportEditController.fetchFirstTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-
 											</f:selectItems>
 											<p:column>
 												<h:outputText value="#{t.label}" />
@@ -175,7 +173,6 @@
 											requiredMessage="建议 #{msg.ValidationRequire}">
 											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 											<f:selectItems value="#{pccExamineReportEditController.fetchRecommandStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-
 											</f:selectItems>
 											<p:column>
 												<h:outputText value="#{t.label}" />
