@@ -8,15 +8,17 @@
 			</div>
 			<div class="ui-g-12 card ">
 				<h:form id="pccReportListForm">
-					<p:dataTable id="datalist" value="#{pccExamineReportController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
-						selection="#{pccExamineReportController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
-						sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+					<p:dataTable id="datalist" value="#{pccExamineReportController.lazyModel}" var="item" widgetVar="varDataList"
+						selection="#{pccExamineReportController.listSelected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.id}"
 						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
-
+						<p:column selectionMode="multiple" style="width:32px;text-align:center" exportable="false">
+						</p:column>
 						<p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+						<p:ajax event="rowSelectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="rowUnselectCheckbox" update="createButton editButton deleteButton" />
 						<p:ajax event="filter" listener="#{pccExamineReportController.onFilter}" />
-
 						<p:column headerText="报告名称" filterBy="#{item.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.name}" />
 						</p:column>
@@ -26,22 +28,31 @@
 						<p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 						</p:column>
-						<p:column headerText="报告生成日期">
+						<p:column headerText="报告生成日期" sortBy="#{item.reportDate}">
 							<h:outputText value="#{item.reportDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="修改人" filterBy="#{item.modifyBy}" filterMatchMode="LIKE">
-							<h:outputText value="#{item.modifyBy.name}" />
-						</p:column>
-						<p:column headerText="修改日期">
+						<p:column headerText="修改日期" sortBy="#{item.modifyDate}">
 							<h:outputText value="#{item.modifyDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="报告下载">
-							<h:outputText value="xxx">
+						<p:column headerText="检测结果" filterBy="#{item.status}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{pccExamineReportController.statusFilter}">
+									<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
+									<f:selectItem itemLabel="通过" itemValue="1" />
+									<f:selectItem itemLabel="未通过" itemValue="2" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{item.status==1?'通过':'未通过'}">
 							</h:outputText>
+						</p:column>
+						<p:column headerText="报告下载" exportable="false" id="idColumnDownReport">
+							<p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}" rendered="#{not empty item.reportStorageId}">
+								<h:outputText value="点击下载" />
+							</p:link>
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Edit}"
@@ -50,8 +61,18 @@
 								action="#{pccExamineReportController.getEditPage(pccExamineReportController.selected.id,'Edit')}"
 								disabled="#{empty pccExamineReportController.selected.id}" />
 							<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete}"
-								update=":pccReportListForm:datalist" disabled="#{empty pccExamineReportController.selected.id}">
+								update=":pccReportListForm:datalist,:growl" disabled="#{empty pccExamineReportController.selected.id}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel">
+								<p:dataExporter type="xlsx" target="datalist" fileName="pccReport" selectionOnly="true" />
+							</p:commandButton>
+							<p:commandButton id="idBtnBatchGenerateReport" title="批量生成报告" icon="fa fa-fw fa-building-o" ajax="true"
+								actionListener="#{pccExamineReportController.batchGenerateReport()}" update=":growl,:pccReportListForm">
+							</p:commandButton>
+							<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+								actionListener="#{pccExamineReportController.downloadSelectedReport()}" update=":growl">
+								<p:fileDownload value="#{pccExamineReportController.exportFile}" />
 							</p:commandButton>
 						</f:facet>
 					</p:dataTable>

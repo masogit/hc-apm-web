@@ -1,23 +1,34 @@
 package com.ge.apm.view.examine;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.PccExamineReportRepository;
 import com.ge.apm.domain.ApmDropDownItem;
@@ -47,16 +58,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class PccExamineReportController extends GenericCRUDUUIDController<PccExamineReport> implements Serializable, ServerEventInterface {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PccExamineReportController.class);
-	public static final String STR_TENANTUID = "tenantUID";
-	public static final String STR_INSTITUTIONUID = "institutionUID";
-	public static final String STR_HOSPITALUID = "hospitalUID";
-	public static final String STR_SITEUID = "siteUID";
-	public static final String STR_DEPTUID = "clinicalDeptUID";
-	public static final String STR_ASSETTYPE = "assetType";
-	public static final String STR_ASSETGROUP = "assetGroup";
-	public static final String STR_QRCODE = "qrCode";
-	public static final String STR_DEPTNUM = "departNum";
-	public static final String STR_FINANCENUM = "financingNum";
+	
 	@Getter@Setter
 	private List<ApmDropDownItem> selectLineStatus;
 	@Getter@Setter
@@ -83,8 +85,11 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	protected UserAccount currentUser;
 	protected I18nMessageRepository i18nDao;
 	private UploadedFile file;
+	private ApmStreamedContent reportFile;
 	private List<ApmStreamedContent> listStreamedContent;
 	private ApmStreamedContent tailAttach;
+	private List<PccExamineReport> listSelected;
+	private DefaultStreamedContent exportFile;
 	String updateViewIDs;
 	UaaService uaaService;
 	AssetInstallationService aiService;
@@ -92,6 +97,7 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	PccExamineReportService service;
 	PccExamineReportRepository dao;
 	SearchController searchController;
+	Integer statusFilter;
 
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -106,30 +112,6 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 		if(listStreamedContent==null){
 			listStreamedContent = new ArrayList<ApmStreamedContent>();
 		}
-		System.out.println("PccExamineReportController init");
-		String encodeStr="";
-		try {
-			encodeStr = WebUtil.getRequestParameter("str");
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
-		}
-		if(StringUtils.isNotEmpty(encodeStr)){
-			String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-			if ("Create".equalsIgnoreCase(actionName)) {
-				try {
-					prepareCreate();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					LOGGER.error(e.getMessage());
-				} 
-	        } else if ("Edit".equalsIgnoreCase(actionName)) {
-	            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-	            setSelected(selectedId);
-	            prepareEdit();
-	        }
-		}
-		
 	}
 
 	@Override
@@ -163,7 +145,27 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	public void save() {
 		// TODO Auto-generated method stub
 		prepareSave();
+//		super.save();
 		service.savePccReport(this.selected, listStreamedContent);
+		addMessage("PCC 探头检测报告保存成功！");
+	}
+	
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+//		super.delete();
+		if(this.listSelected==null ||this.listSelected.size()==0){
+			addMessage("请选择需要删除的报告");
+			return;
+		}
+		if(this.listSelected!=null && this.listSelected.size()>1){
+			addMessage("请逐一删除报告");
+			return;
+		}
+		service.deletePccReport(this.listSelected.get(0));
+		addMessage("PCC 探头检测报告删除成功！");
+		this.listSelected=null;
+		this.selected=null;
 	}
 	
 	@Override
@@ -179,6 +181,7 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
         object.setCreateBy(currentUser);
+        object.setCreateByUid(currentUser.getUid());
         object.setCreateDate(new Date());
     }
 	@Override
@@ -186,11 +189,27 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseBlobObject();
+		parseObject();
+	}
+	private void parseObject(){
+		selectLineStatus=convertStrToDropDownList(this.selected.getLineStatus());
+		selectMirrorStatus=convertStrToDropDownList(this.selected.getMirrorStatus());
+		selectShellStatus=convertStrToDropDownList(this.selected.getShellStatus());
+		selectLinkerStatus=convertStrToDropDownList(this.selected.getLinkerStatus());
+		selectOilStatus=convertStrToDropDownList(this.selected.getOilStatus());
+		selectTipStatus=convertStrToDropDownList(this.selected.getTipStatus());
+		selectElectricLeakageStatus=convertStrToDropDownList(this.selected.getElectricLeakageStatus());
+		selectFirstSeenStatus=convertStrToDropDownList(this.selected.getFirstSeenStatus());
+		selectFirstTipStatus=convertStrToDropDownList(this.selected.getFirstTipStatus());
+		selectResultStatus=convertStrToDropDownList(this.selected.getResultStatus());
+		selectRecommandStatus=convertStrToDropDownList(this.selected.getRecommandStatus());
+		this.searchController.setSelectedAssetInfo(this.selected.getAssetInfo());
 	}
 	private void parseBlobObject(){
 		String id=this.selected.getId();
 		if(StringUtils.isNotEmpty(id)){
-			this.listStreamedContent=service.parseBlobObject(id);
+			this.listStreamedContent=service.parseBlobObjectImg(id);
+			this.reportFile=service.parseBlobObjectDoc(id);
 		}
 	}
 	private void prepareSave(){
@@ -211,7 +230,22 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 		this.selected.setResultStatus(convertDropDownListToStr(selectResultStatus));
 		this.selected.setRecommandStatus(convertDropDownListToStr(selectRecommandStatus));
 		this.selected.setModifyBy(currentUser);
+		this.selected.setModifyByUid(currentUser.getUid());
 		this.selected.setModifyDate(new Date());
+	}
+	private List<ApmDropDownItem> convertStrToDropDownList(String str){
+		if(StringUtils.isNotEmpty(str)){
+			List<ApmDropDownItem> listItem=new ArrayList<ApmDropDownItem>();
+			String[] arr=str.split(",");
+			for(int i=0;i<arr.length;++i){
+				ApmDropDownItem item=new ApmDropDownItem();
+				item.setKey(arr[i]);
+				item.setLabel(arr[i]);
+				listItem.add(item);
+			}
+			return listItem;
+		}
+		return null;
 	}
 	private String convertDropDownListToStr(List<ApmDropDownItem> listItem){
 		StringBuilder sb=new StringBuilder();
@@ -247,6 +281,14 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	}
 	public String jumpListPage(){
 		return "pccReportList?faces-redirect=true";
+	}
+	public void generateReport(){
+		if(StringUtils.isEmpty(this.selected.getId())){
+			addMessage("请完善报告信息！");
+			return;
+		}
+		reportFile=service.generateReport(this.selected,this.listStreamedContent);
+		addMessage("报告已生成！");
 	}
 	public void upload() {
 		System.out.println("upload");
@@ -317,6 +359,64 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
 		}
 	}
+	
+	public void batchGenerateReport(){
+		if(listSelected==null && listSelected.size()==0){
+			addMessage("请选择需要批量生成报告的项！");
+			return;
+		}
+		boolean result=service.batchGenerateReport(listSelected);
+		if(result){
+			addMessage("报告已批量生成！");
+		}
+		else{
+			addMessage("请上传报告传模板");
+		}
+	}
+	
+	public void downloadSelectedReport(){
+        this.exportFile=null;
+        if(listSelected==null || listSelected.size()==0){
+            WebUtil.addErrorMessage("请选择需要下载报告的工单！");
+            return;
+        }
+        Set<String> setReportIds=new HashSet<String>();
+//      Map<String,Integer> mapName=new HashMap<String,Integer>();
+        for(int i=0;i<listSelected.size();++i){
+        	PccExamineReport tempReport=listSelected.get(i);
+            String reportStorageId=tempReport.getReportStorageId();
+            if(StringUtils.isNotEmpty(reportStorageId)){
+                setReportIds.add(reportStorageId);
+            }
+        }
+        if(setReportIds.size()==0){
+            WebUtil.addErrorMessage("工单报告为空！");
+            return;
+        }
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)){
+            Iterator<String> it=setReportIds.iterator();
+            int count=1;
+            while(it.hasNext()){
+                String reportStorageId=it.next();
+                StreamedContent file = service.getSingleFile(reportStorageId);
+                String fileName = file.getName();
+                int index=fileName.lastIndexOf(".");
+                fileName=fileName.substring(0,index)+"_"+(count++)+fileName.substring(index,fileName.length());
+                String contentType = file.getContentType();
+                InputStream stream = file.getStream();
+                zout.putNextEntry(new ZipEntry(fileName));
+                byte[] bytes = IOUtils.toByteArray(stream);
+                if (bytes != null) {
+                    IOUtils.write(bytes, zout);
+                }
+                zout.closeEntry();
+            }
+            zout.close();
+            exportFile=new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+        }
+    }
 	
 	private void setSelected(String id) {
         selected = dao.findById(id);
@@ -411,4 +511,49 @@ public class PccExamineReportController extends GenericCRUDUUIDController<PccExa
 	public void setTailAttach(ApmStreamedContent tailAttach) {
 		this.tailAttach = tailAttach;
 	}
+
+	public ApmStreamedContent getReportFile() {
+		return reportFile;
+	}
+
+	public void setReportFile(ApmStreamedContent reportFile) {
+		this.reportFile = reportFile;
+	}
+
+	public List<PccExamineReport> getListSelected() {
+		return listSelected;
+	}
+
+	public void setListSelected(List<PccExamineReport> listSelected) {
+		System.out.println("set multiple select");
+		if(listSelected!=null){
+			System.out.println(listSelected.size());
+		}
+		
+		if(listSelected!=null && listSelected.size()==1){
+			this.selected=listSelected.get(0);
+		}
+		else{
+			this.selected=null;
+		}
+		this.listSelected = listSelected;
+	}
+
+	public DefaultStreamedContent getExportFile() {
+		return exportFile;
+	}
+
+	public void setExportFile(DefaultStreamedContent exportFile) {
+		this.exportFile = exportFile;
+	}
+
+	public Integer getStatusFilter() {
+		return statusFilter;
+	}
+
+	public void setStatusFilter(Integer statusFilter) {
+		this.statusFilter = statusFilter;
+	}
+
+	
 }

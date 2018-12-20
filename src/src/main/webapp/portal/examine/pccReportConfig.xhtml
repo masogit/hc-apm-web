@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="PCC Tool 超声探头检测报告配置" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="pccReportConfigForm">
+					<p:commandButton id="idBtnDownload" value="下载配置模板" ajax="false"
+						actionListener="#{pccExamineReportConfigController.getTemplateFile}" update=":growl">
+						<p:fileDownload value="#{pccExamineReportConfigController.exportFile}" />
+					</p:commandButton>
+					<p:fileUpload id="idTemplateUpload" fileUploadListener="#{pccExamineReportConfigController.handleFileUpload}" dragDropSupport="false" style="width:100%"
+						multiple="false" sizeLimit="100000000" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M"
+						label="上传配置模板" />
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

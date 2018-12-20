@@ -28,7 +28,7 @@ public class ApmStreamedContent implements StreamedContent {
     
     private Integer contentLenght;
     
-    private byte[] tonyBytes;
+    private byte[] tBytes;
 	
 	public ApmStreamedContent() {}
 	
@@ -72,10 +72,10 @@ public class ApmStreamedContent implements StreamedContent {
 
 	@Override
 	public InputStream getStream() {
-		if(tonyBytes==null){
+		if(tBytes==null){
 			return null;
 		}
-		return new ByteArrayInputStream(tonyBytes);
+		return new ByteArrayInputStream(tBytes);
 	}
 
 	public void setStream(InputStream stream) {
@@ -83,9 +83,9 @@ public class ApmStreamedContent implements StreamedContent {
 			return;
 		}
 		try {
-//			this.tonyBytes=IOUtils.toByteArray(stream);
+//			this.tBytes=IOUtils.toByteArray(stream);
 			this.stream=stream;
-			this.tonyBytes=DynamicContentSrcBuilder.toByteArray(stream);
+			this.tBytes=DynamicContentSrcBuilder.toByteArray(stream);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			
@@ -122,13 +122,12 @@ public class ApmStreamedContent implements StreamedContent {
 	public Integer getContentLength() {
 		return contentLenght;
 	}
-
-	public byte[] getTonyBytes() {
-		return tonyBytes;
+	public byte[] gettBytes() {
+		return tBytes;
 	}
 
-	public void setTonyBytes(byte[] tonyBytes) {
-		this.tonyBytes = tonyBytes;
+	public void settBytes(byte[] tBytes) {
+		this.tBytes = tBytes;
 	}
 
 	public String getId() {
