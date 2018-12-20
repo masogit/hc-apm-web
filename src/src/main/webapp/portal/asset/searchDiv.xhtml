@@ -4,7 +4,7 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group common-search-div">
         <h:panelGroup>
             <label class="label">所属院区</label>
             <p:inputText id="selectedOrgName" value="#{searchController.selectedOrg.name}" readonly="true" required="true"
@@ -80,5 +80,11 @@
             </p:autoComplete>
         </h:panelGroup>
     </p:panelGrid>
+    <script>
+    	$(".common-search-div").each(function(index,e){
+    		let parent=e.parentElement;
+    		$(parent).css("overflow","unset");
+    	});
+    </script>
 </ui:composition>
 </html>

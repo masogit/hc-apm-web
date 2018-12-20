@@ -83,8 +83,8 @@ public class PccExamineReport implements Serializable {
 	@Column(name="name")
 	private String name;
 	
-	@Column(name="report_file_id")
-	private String reportFileId;
+	@Column(name="report_storage_id")
+	private String reportStorageId;
 
 	@Transient
 	private UserAccount createBy;
@@ -93,6 +93,7 @@ public class PccExamineReport implements Serializable {
 	private UserAccount modifyBy;
 	
 	
+	//1:pass,2:not pass,
 	@Column(name = "status")
 	private Integer status;
     
@@ -104,7 +105,7 @@ public class PccExamineReport implements Serializable {
     private AssetInfo assetInfo;
     
     @Column(name = "function_type")
-    private Integer functionType;
+    private String functionType;
     
     @Column(name = "num")
     private String num;
@@ -237,6 +238,9 @@ public class PccExamineReport implements Serializable {
 	}
 
 	public Integer getStatus() {
+		if(status==null){
+			status=2;
+		}
 		return status;
 	}
 
@@ -277,19 +281,11 @@ public class PccExamineReport implements Serializable {
 		this.assetInfo = assetInfo;
 	}
 
-	public String getReportFileId() {
-		return reportFileId;
-	}
-
-	public void setReportFileId(String reportFileId) {
-		this.reportFileId = reportFileId;
-	}
-
-	public Integer getFunctionType() {
+	public String getFunctionType() {
 		return functionType;
 	}
 
-	public void setFunctionType(Integer functionType) {
+	public void setFunctionType(String functionType) {
 		this.functionType = functionType;
 	}
 
@@ -411,6 +407,14 @@ public class PccExamineReport implements Serializable {
 
 	public void setReportDate(Date reportDate) {
 		this.reportDate = reportDate;
+	}
+
+	public String getReportStorageId() {
+		return reportStorageId;
+	}
+
+	public void setReportStorageId(String reportStorageId) {
+		this.reportStorageId = reportStorageId;
 	}
 
 	@Override

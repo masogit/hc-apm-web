@@ -190,6 +190,36 @@ public class BlobFileService {
             return true;
         }
     }
+    
+    public Boolean deleteBlobFileByBoUuid(String boUuid){
+        List<V2_BlobObject> listBlobObject = blobDao.findByBoUuid(boUuid);
+        if(listBlobObject==null){
+            return null;
+        }
+        if(listBlobObject!=null && listBlobObject.size()>0){
+            for(int i=0;i<listBlobObject.size();++i){
+            	deleteBlobFile(listBlobObject.get(i));
+            }
+        }
+        return true;
+    }
+    
+    public Boolean deleteBlobFileByBoUuidAndType(String boUuid,String boType,String subType){
+        List<V2_BlobObject> listBlobObject = blobDao.fetchBlobObjectByUuidAndType(boUuid,boType,subType);
+        if(listBlobObject==null){
+            return null;
+        }
+        if(listBlobObject!=null && listBlobObject.size()>0){
+            for(int i=0;i<listBlobObject.size();++i){
+            	deleteBlobFile(listBlobObject.get(i));
+            }
+        }
+        return true;
+    }
+    
+    public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType,String subType){
+    	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
+    }
 
     /**
      * Need to investigate why the same object storage id occurs more than once
