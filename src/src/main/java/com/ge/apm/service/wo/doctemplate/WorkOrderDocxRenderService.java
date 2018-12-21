@@ -77,15 +77,15 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_solution", "解决方案");
         COPY_KEY_MAPPING.put("fix_validation", "交付前检测");
 
-        COPY_KEY_MAPPING.put("fix_co1", "协作者1");
+        /*COPY_KEY_MAPPING.put("fix_co1", "协作者1");
         COPY_KEY_MAPPING.put("fix_co2", "协作者2");
         COPY_KEY_MAPPING.put("fix_cohour1", "工时1");
-        COPY_KEY_MAPPING.put("fix_cohour2", "工时2");
+        COPY_KEY_MAPPING.put("fix_cohour2", "工时2");*/
 
         COPY_KEY_MAPPING.put("fix_man_hour", "维修工程师工时");
 
         COPY_KEY_MAPPING.put("part_table", "备件信息");
-        COPY_KEY_MAPPING.put("proceed_table", "维修流程");
+        //COPY_KEY_MAPPING.put("proceed_table", "维修流程");
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
@@ -121,7 +121,7 @@ public class WorkOrderDocxRenderService {
 
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
-        putWorkOrderCoworker(source, (String) source.get("woId"));
+        putWorkOrderCoworker(target, (String) source.get("woId"));
 
         for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
             target.put(entry.getKey(), source.get(entry.getValue()));
@@ -191,8 +191,8 @@ public class WorkOrderDocxRenderService {
         int i = 0;
         for (V2_WorkOrderCoworker woc : workOrderList) {
             i++;
-            workOrderMap.put("工时" + String.valueOf(i), woc.getManHours());
-            workOrderMap.put("协作者" + String.valueOf(i), woc.getCowokerUserName());
+            workOrderMap.put("fix_cohour" + String.valueOf(i), woc.getManHours());
+            workOrderMap.put("fix_co" + String.valueOf(i), woc.getCowokerUserName());
         }
     }
 
