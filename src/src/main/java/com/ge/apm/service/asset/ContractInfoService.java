@@ -10,16 +10,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.ge.apm.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.dao.ContractInfoRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderDetailRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.AssetInfo;
@@ -58,6 +53,8 @@ public class ContractInfoService {
     private V2_PmOrderRepository pmDao;
     @Autowired
     private UserAccountService userAccountService;
+    @Autowired
+    private AssetInfoRepository assetInfoDao;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -135,6 +132,13 @@ public class ContractInfoService {
 //
 //        return partsDao.findByAssetUidAndContractNum(asset.getId(), asset.getUid(), contractNum, tenantUid);
 //    }
+    public List<ContractInfo> getContractListByAssetUid(String assetUid) {
+        AssetInfo asset = assetInfoDao.findByUid(assetUid);
+
+        return getContractListByAsset(asset);
+
+    }
+
     public List<ContractInfo> getContractListByAsset(AssetInfo asset) {
         List<V2_WorkOrder> woList = woDao.findByAssetId(asset.getId());
         List<V2_PmOrder> pmList = pmDao.getByAssetUid(asset.getUid());

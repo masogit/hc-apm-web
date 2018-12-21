@@ -1,25 +1,25 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ContractInfoRepository;
-
-import java.util.Arrays;
-import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -28,12 +28,16 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     private UaaService uaaService;
     private ContractInfoService contractService;
     private ContractInfoRepository dao = null;
+    private String assetUid;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+
+        String encodeStr = WebUtil.getRequestParameter("str");
+        assetUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetUid");
     }
 
     @Override
@@ -43,10 +47,16 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 
     @Override
     protected Page<ContractInfo> loadData(PageRequest pageRequest) {
+
+        if (!StringUtils.isEmpty(assetUid)) {
+            List<ContractInfo> contractInfos = contractService.getContractListByAssetUid(assetUid);
+            PageImpl page = new PageImpl(contractInfos);
+            return page;
+        }
+
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
-
         if(!this.hasFilterOnField("contractType")){
             List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
