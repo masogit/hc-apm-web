@@ -4,7 +4,7 @@
 	<ui:define name="content">
 		<div class="ui-g clearfix">
 			<div class="ui-g-12 card cardTitle">
-				<p:outputLabel class="pageTitle" value="PCC 探头检测报告编辑" />
+				<label class="pageTitle" value="PCC 探头检测报告编辑" />
 			</div>
 			<div class="ui-g-12 card">
 				<h:form id="idFormPcc">
@@ -13,7 +13,7 @@
 							<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>
 						</p:tab>
 						<p:tab title="内容">
-							<h:panelGrid columns="1" cellpadding="10">
+							<h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 								<h:panelGroup>
 									<p:dataGrid id="pictureList" value="#{pccExamineReportEditController.listStreamedContent}" var="fileitem" columns="4"
 										emptyMessage="#{msg.noRecordFound}" rowIndexVar="index">
@@ -33,142 +33,165 @@
 										invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片" />
 								</h:panelGroup>
 							</h:panelGrid>
-							<h:panelGrid columns="4" cellpadding="10">
+							<h:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 								<h:panelGroup>
-									<p:outputLabel>报告名称</p:outputLabel>
+									<label class="label">报告名称</label>
 									<p:inputText value="#{pccExamineReportEditController.selected.name}"></p:inputText>
 								</h:panelGroup>
 								<h:panelGroup>
-									<p:outputLabel>探头型号</p:outputLabel>
+									<label class="label">探头型号</label>
 									<p:inputText value="#{pccExamineReportEditController.selected.functionType}"></p:inputText>
 								</h:panelGroup>
 								<h:panelGroup>
-									<p:outputLabel>探头序列号</p:outputLabel>
+									<label class="label">探头序列号</label>
 									<p:inputText value="#{pccExamineReportEditController.selected.num}"></p:inputText>
 								</h:panelGroup>
 								<h:panelGroup>
-									<p:outputLabel>探头生产日期</p:outputLabel>
+									<label class="label">探头生产日期</label>
 									<p:calendar timeZone="GMT+8" id="endTime" value="#{pccExamineReportEditController.selected.manufactDate}" pattern="yyyy/MM/dd" required="false"
 										requiredMessage="生产日期 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
 								</h:panelGroup>
 							</h:panelGrid>
 							<p:panel header="外观检查及漏电流测试" style="margin-bottom:20px">
-								<h:panelGrid columns="10" cellpadding="10">
-
-									<p:outputLabel>线缆</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectLineStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="线缆 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchLineStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel>透镜</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectMirrorStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="透镜 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchMirrorStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel>外壳</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectShellStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="外壳 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchShellStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel>连接器</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectLinkerStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="连接器 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchLinkerStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel>油囊</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectOilStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="油囊 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchOilStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
+								<h:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+									<h:panelGroup>
+										<label class="label">线缆</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectLineStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="线缆 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchLineStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">透镜</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectMirrorStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="透镜 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchMirrorStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">外壳</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectShellStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="外壳 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchShellStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">连接器</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectLinkerStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="连接器 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchLinkerStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">油囊</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectOilStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="油囊 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchOilStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
 								</h:panelGrid>
-								<h:panelGrid columns="4" cellpadding="10">
-									<p:outputLabel>提示</p:outputLabel>
-									<p:selectOneMenu value="#{pccExamineReportEditController.selectTipStatus}" var="t" required="false" converter="apmDropDownConverter"
-										requiredMessage="提示 #{msg.ValidationRequire}">
-										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-										<f:selectItems value="#{pccExamineReportEditController.fetchTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-										</f:selectItems>
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectOneMenu>
-									<p:outputLabel>探头漏电流检测结果</p:outputLabel>
-									<p:selectOneMenu value="#{pccExamineReportEditController.selectElectricLeakageStatus}" var="t" required="false" converter="apmDropDownConverter"
-										requiredMessage="探头漏电流检测结果 #{msg.ValidationRequire}">
-										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-										<f:selectItems value="#{pccExamineReportEditController.fetchElectricLeakageStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-										</f:selectItems>
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectOneMenu>
+								<h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+									<h:panelGroup>
+										<label class="label">提示</label>
+										<p:selectOneMenu value="#{pccExamineReportEditController.selectTipStatus}" var="t" required="false" converter="apmDropDownConverter"
+											requiredMessage="提示 #{msg.ValidationRequire}">
+											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{pccExamineReportEditController.fetchTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+											</f:selectItems>
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectOneMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">探头漏电流检测结果</label>
+										<p:selectOneMenu value="#{pccExamineReportEditController.selectElectricLeakageStatus}" var="t" required="false" converter="apmDropDownConverter"
+											requiredMessage="探头漏电流检测结果 #{msg.ValidationRequire}">
+											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{pccExamineReportEditController.fetchElectricLeakageStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+											</f:selectItems>
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectOneMenu>
+									</h:panelGroup>
 								</h:panelGrid>
 							</p:panel>
 							<p:panel header="FIRST CALL检测" style="margin-bottom:20px">
-								<h:panelGrid columns="4" cellpadding="10">
-									<p:outputLabel>所见</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectFirstSeenStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="所见 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchFirstSeenStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel for="idSelectFirstTip">提示</p:outputLabel>
-									<p:selectOneMenu id="idSelectFirstTip" value="#{pccExamineReportEditController.selectFirstTipStatus}" var="t" required="false"
-										converter="apmDropDownConverter" requiredMessage="提示 #{msg.ValidationRequire}">
-										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-										<f:selectItems value="#{pccExamineReportEditController.fetchFirstTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-										</f:selectItems>
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectOneMenu>
+								<h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+									<h:panelGroup>
+										<label class="label">所见</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectFirstSeenStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="所见 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchFirstSeenStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">提示</label>
+										<p:selectOneMenu value="#{pccExamineReportEditController.selectFirstTipStatus}" var="t" required="false" converter="apmDropDownConverter"
+											requiredMessage="提示 #{msg.ValidationRequire}">
+											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{pccExamineReportEditController.fetchFirstTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+											</f:selectItems>
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectOneMenu>
+									</h:panelGroup>
 								</h:panelGrid>
 							</p:panel>
 							<p:panel header="检测结果及建议" style="margin-bottom:20px">
-								<h:panelGrid columns="6" cellpadding="10">
-									<p:outputLabel>检测结果</p:outputLabel>
-									<p:selectManyMenu value="#{pccExamineReportEditController.selectResultStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="检测结果 #{msg.ValidationRequire}">
-										<f:selectItems value="#{pccExamineReportEditController.fetchResultStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectManyMenu>
-									<p:outputLabel>建议</p:outputLabel>
-									<p:selectOneMenu value="#{pccExamineReportEditController.selectRecommandStatus}" var="t" required="false" converter="apmDropDownConverter"
-										requiredMessage="建议 #{msg.ValidationRequire}">
-										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-										<f:selectItems value="#{pccExamineReportEditController.fetchRecommandStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
-										</f:selectItems>
-										<p:column>
-											<h:outputText value="#{t.label}" />
-										</p:column>
-									</p:selectOneMenu>
-									<p:outputLabel> 备注 </p:outputLabel>
-									<p:inputTextarea value="#{pccExamineReportEditController.selected.comment}" rows="2" cols="50"></p:inputTextarea>
+								<h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+									<h:panelGroup>
+										<label class="label">检测结果</label>
+										<p:selectManyMenu value="#{pccExamineReportEditController.selectResultStatus}" var="t" required="false" showCheckbox="true"
+											converter="apmDropDownConverter" requiredMessage="检测结果 #{msg.ValidationRequire}">
+											<f:selectItems value="#{pccExamineReportEditController.fetchResultStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectManyMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label">建议</label>
+										<p:selectOneMenu value="#{pccExamineReportEditController.selectRecommandStatus}" var="t" required="false" converter="apmDropDownConverter"
+											requiredMessage="建议 #{msg.ValidationRequire}">
+											<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{pccExamineReportEditController.fetchRecommandStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+											</f:selectItems>
+											<p:column>
+												<h:outputText value="#{t.label}" />
+											</p:column>
+										</p:selectOneMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<label class="label"> 备注 </label>
+										<p:inputTextarea value="#{pccExamineReportEditController.selected.comment}" rows="2" cols="50"></p:inputTextarea>
+									</h:panelGroup>
 								</h:panelGrid>
 							</p:panel>
 						</p:tab>
 						<!-- <p:tab title="尾页">
                     <h:form id="formPccEidtTail">
-                        <h:panelGrid columns="1" cellpadding="10">
+                        <h:panelGrid columns="1">
                             <p:graphicImage value="#{pccExamineReportEditController.tailAttach}" width="120" height="80" stream="false"
                                 rendered="#{not empty pccExamineReportEditController.tailAttach}" />
                             <p:fileUpload id="idTailUpload" fileUploadListener="#{pccExamineReportEditController.handleTailUpload}" dragDropSupport="false" style="width:100%"
