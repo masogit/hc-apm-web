@@ -1,12 +1,9 @@
 package com.ge.apm.view;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -14,7 +11,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
@@ -27,12 +23,10 @@ import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.common.SearchService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
-
 @ManagedBean
 @ViewScoped
 public class SearchController {
@@ -101,7 +95,6 @@ public class SearchController {
 		threeQrCode = "";
 		selectedOrg=null;
 		updateData();
-		System.out.println("xxx init searchController type="+type);
 	}
 	
 	private void resetStatus(){
@@ -148,10 +141,8 @@ public class SearchController {
 		orgTree.getChildren().add(subTree);
 		selectedOrg=aiService.getOrgInfoByUid(siteUid);
 	}
-
 	public void fetchSiteOrgList() {
 		if (blnAccessScope) {
-
 		} else {
 			if (searchService.isSiteUser(currentUser)) {
 				listOrgSite = new ArrayList<OrgInfo>();
@@ -164,15 +155,12 @@ public class SearchController {
 			}
 		}
 	}
-
 	public void fetchDeptOrgList(OrgInfo orgInfo) {
 		if (blnAccessScope) {
-
 		} else {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}
 	}
-
 	private void onChange() {
 		if(!generateListFilter()){
 			return;
@@ -193,28 +181,22 @@ public class SearchController {
         	onChange();
         }
     }
-
 	public void onOrgSiteChange() {
 		fetchDeptOrgList(orgSite);
 		onChange();
 	}
-
 	public void onOrgDeptChange() {
 		onChange();
 	}
-
 	public void onAssetTypeChange() {
 		onChange();
 	}
-
 	public void onAssetGroupChange() {
 		onChange();
 	}
-
 	public void onThreeQrCodeChange() {
 		onChange();
 	}
-
 	public void onAssetsTransfer(TransferEvent event) {
 		List<AssetInfo> collection = (List<AssetInfo>) event.getItems();
 		if (collection != null && collection.size() > 0) {
@@ -225,7 +207,6 @@ public class SearchController {
 			}
 		}
 	}
-
 	private void fetchOriginPickListAssetInfo() {
 		if (listSearchFilter.size() > 0) {
 			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
@@ -249,9 +230,7 @@ public class SearchController {
 			}
 		} 
 	}
-
 	public void prepareDialogCallback(ServerEventInterface callingController, int type, Object obj, String updateViewIDs) {
-		System.out.println("prepareDialogCallback:"+type);
 		this.type = type;
 		this.callingController = callingController;
 		this.updateViewIDs = updateViewIDs;
@@ -261,7 +240,6 @@ public class SearchController {
 		showDialog = true;
 		updateData();
 	}
-
 	public void confirm() {
 		showDialog = false;
 		if (callingController != null) {
@@ -271,7 +249,6 @@ public class SearchController {
 	public List<AssetInfo> completeSelectedAssetInfo(String query) {
         return autoCompleteService.completeAssetInfoList(query, listUnSelectedAssetInfo);
     }
-
 	private boolean generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
 		if(selectedOrg!=null){
@@ -305,270 +282,202 @@ public class SearchController {
 		}
 		return false;
 	}
-
 	public UserAccount getCurrentUser() {
 		return currentUser;
 	}
-
 	public void setCurrentUser(UserAccount currentUser) {
 		this.currentUser = currentUser;
 	}
-
 	public OrgInfo getOrgSite() {
 		return orgSite;
 	}
-
 	public void setOrgSite(OrgInfo orgSite) {
 		this.orgSite = orgSite;
 	}
-
 	public OrgInfo getOrgDepart() {
 		return orgDepart;
 	}
-
 	public void setOrgDepart(OrgInfo orgDepart) {
 		this.orgDepart = orgDepart;
 	}
-
 	public List<OrgInfo> getListOrgSite() {
 		return listOrgSite;
 	}
-
 	public void setListOrgSite(List<OrgInfo> listOrgSite) {
 		this.listOrgSite = listOrgSite;
 	}
-
 	public List<OrgInfo> getListOrgDept() {
 		return listOrgDept;
 	}
-
 	public void setListOrgDept(List<OrgInfo> listOrgDept) {
 		this.listOrgDept = listOrgDept;
 	}
-
 	public String getAssetType() {
 		return assetType;
 	}
-
 	public void setAssetType(String assetType) {
 		this.assetType = assetType;
 	}
-
 	public String getThreeQrCode() {
 		return threeQrCode;
 	}
-
 	public void setThreeQrCode(String threeQrCode) {
 		this.threeQrCode = threeQrCode;
 	}
-
 	public int getType() {
 		return type;
 	}
-
 	public void setType(int type) {
 		this.type = type;
 	}
-
 	public I18nMessageRepository getI18nDao() {
 		return i18nDao;
 	}
-
 	public void setI18nDao(I18nMessageRepository i18nDao) {
 		this.i18nDao = i18nDao;
 	}
-
 	public SearchService getSearchService() {
 		return searchService;
 	}
-
 	public void setSearchService(SearchService searchService) {
 		this.searchService = searchService;
 	}
-
 	public ServerEventInterface getCallingController() {
 		return callingController;
 	}
-
 	public void setCallingController(ServerEventInterface callingController) {
 		this.callingController = callingController;
 	}
-
 	public String getUpdateViewIDs() {
 		return updateViewIDs;
 	}
-
 	public void setUpdateViewIDs(String updateViewIDs) {
 		this.updateViewIDs = updateViewIDs;
 	}
-
 	public boolean isBlnSite() {
 		return blnSite;
 	}
-
 	public void setBlnSite(boolean blnSite) {
 		this.blnSite = blnSite;
 	}
-
 	public boolean isBlnDept() {
 		return blnDept;
 	}
-
 	public void setBlnDept(boolean blnDept) {
 		this.blnDept = blnDept;
 	}
-
 	public boolean isBlnAssetType() {
 		return blnAssetType;
 	}
-
 	public void setBlnAssetType(boolean blnAssetType) {
 		this.blnAssetType = blnAssetType;
 	}
-
 	public boolean isBlnThreeQrCode() {
 		return blnThreeQrCode;
 	}
-
 	public void setBlnThreeQrCode(boolean blnThreeQrCode) {
 		this.blnThreeQrCode = blnThreeQrCode;
 	}
-
 	public boolean isBlnAccessScope() {
 		return blnAccessScope;
 	}
-
 	public void setBlnAccessScope(boolean blnAccessScope) {
 		this.blnAccessScope = blnAccessScope;
 	}
-
 	public boolean isShowDialog() {
 		return showDialog;
 	}
-
 	public void setShowDialog(boolean showDialog) {
 		this.showDialog = showDialog;
 	}
-
 	public List<SearchFilter> getListSearchFilter() {
 		return listSearchFilter;
 	}
-
 	public void setListSearchFilter(List<SearchFilter> listSearchFilter) {
 		this.listSearchFilter = listSearchFilter;
 	}
-
 	public boolean isBlnAssetGroup() {
 		return blnAssetGroup;
 	}
-
 	public void setBlnAssetGroup(boolean blnAssetGroup) {
 		this.blnAssetGroup = blnAssetGroup;
 	}
-
 	public boolean isBlnFunctionType() {
 		return blnFunctionType;
 	}
-
 	public void setBlnFunctionType(boolean blnFunctionType) {
 		this.blnFunctionType = blnFunctionType;
 	}
-
 	public String getAssetGroup() {
 		return assetGroup;
 	}
-
 	public void setAssetGroup(String assetGroup) {
 		this.assetGroup = assetGroup;
 	}
-
 	public DualListModel<AssetInfo> getAvailableAssets() {
 		return availableAssets;
 	}
-
 	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
 		this.availableAssets = availableAssets;
 	}
-
 	public List<AssetInfo> getListUnSelectedAssetInfo() {
 		return listUnSelectedAssetInfo;
 	}
-
 	public void setListUnSelectedAssetInfo(List<AssetInfo> listUnSelectedAssetInfo) {
 		this.listUnSelectedAssetInfo = listUnSelectedAssetInfo;
 	}
-
 	public List<AssetInfo> getListSelectedAssetInfo() {
 		return listSelectedAssetInfo;
 	}
-
 	public void setListSelectedAssetInfo(List<AssetInfo> listSelectedAssetInfo) {
 		this.listSelectedAssetInfo = listSelectedAssetInfo;
 	}
-
 	public OrgInfo getSelectedOrg() {
 		return selectedOrg;
 	}
-
 	public void setSelectedOrg(OrgInfo selectedOrg) {
 		this.selectedOrg = selectedOrg;
 	}
-
 	public TreeNode getOrgTree() {
 		return orgTree;
 	}
-
 	public void setOrgTree(TreeNode orgTree) {
 		this.orgTree = orgTree;
 	}
-
 	public boolean isBlnOrgTree() {
 		return blnOrgTree;
 	}
-
 	public void setBlnOrgTree(boolean blnOrgTree) {
 		this.blnOrgTree = blnOrgTree;
 	}
-
 	public UaaService getUaaService() {
 		return uaaService;
 	}
-
 	public void setUaaService(UaaService uaaService) {
 		this.uaaService = uaaService;
 	}
-
 	public TreeNode getSelectedNode() {
 		return selectedNode;
 	}
-
 	public void setSelectedNode(TreeNode selectedNode) {
 		this.selectedNode = selectedNode;
 	}
-
 	public boolean isBlnPickList() {
 		return blnPickList;
 	}
-
 	public void setBlnPickList(boolean blnPickList) {
 		this.blnPickList = blnPickList;
 	}
-
 	public AssetInfo getSelectedAssetInfo() {
 		return selectedAssetInfo;
 	}
-
 	public void setSelectedAssetInfo(AssetInfo selectedAssetInfo) {
 		this.selectedAssetInfo = selectedAssetInfo;
 	}
-
 	public boolean isBlnAssetSelect() {
 		return blnAssetSelect;
 	}
-
 	public void setBlnAssetSelect(boolean blnAssetSelect) {
 		this.blnAssetSelect = blnAssetSelect;
 	}
-
-
 }
