@@ -46,19 +46,6 @@ public class AssetLifecycleEventService {
         }
         return strStatus;
     }
-
-	public String getMsStatus(AssetLifecycleEvent alse) {
-        String strStatus = null;
-        try {
-            JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
-            if (parse != null) {
-                strStatus = parse.getString("status");
-            }
-        } catch (Exception e) {
-        	LOGGER.error("Fail to parse description for status: " + alse.getId(), e);
-        }
-        return strStatus;
-    }
 	public List<Map<String, Object>> parseEventToMap(Set<AssetLifecycleEvent> listEvent,int tabStatus) {
 		return parseEventToMap(new ArrayList(listEvent),tabStatus);
 	}
