@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="CustomRoleViewDlg" widgetVar="CustomRoleViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
+            <h:form id="CustomRoleViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{customRoleController.selected != null}">
+                        <h:outputLabel value="#{msg.id}" for="id" />
+                        <h:outputText value="#{customRoleController.selected.id}"/>
+                        <h:outputLabel value="#{msg.name}" for="name" />
+                        <h:outputText value="#{customRoleController.selected.name}"/>
+                        <h:outputLabel value="#{msg.homePage}" for="homePage" />
+                        <h:outputText value="#{customRoleController.selected.homePage}"/>
+                        <h:outputLabel value="#{msg.roleDesc}" for="roleDesc" />
+                        <h:outputText value="#{customRoleController.selected.roleDesc}"/>
+                        <h:outputLabel value="#{msg.tenantUID}" for="tenantUID" />
+                        <h:outputText value="#{customRoleController.selected.tenantUID}"/>
+                        <h:outputLabel value="#{msg.institutionUID}" for="institutionUID" />
+                        <h:outputText value="#{customRoleController.selected.institutionUID}"/>
+                        <h:outputLabel value="#{msg.hospitalUID}" for="hospitalUID" />
+                        <h:outputText value="#{customRoleController.selected.hospitalUID}"/>
+                        <h:outputLabel value="#{msg.siteUID}" for="siteUID" />
+                        <h:outputText value="#{customRoleController.selected.siteUID}"/>
+                        <h:outputLabel value="#{msg.createdBy}" for="createdBy" />
+                        <h:outputText value="#{customRoleController.selected.createdBy}"/>
+                        <h:outputLabel value="#{msg.createdDate}" for="createdDate" />
+                        <h:outputText value="#{customRoleController.selected.createdDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        <h:outputLabel value="#{msg.lastModifiedBy}" for="lastModifiedBy" />
+                        <h:outputText value="#{customRoleController.selected.lastModifiedBy}"/>
+                        <h:outputLabel value="#{msg.lastModifiedDate}" for="lastModifiedDate" />
+                        <h:outputText value="#{customRoleController.selected.lastModifiedDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{customRoleController.deleteAction}" icon="ui-icon-trash" actionListener="#{customRoleController.delete}" value="#{msg.Delete}" update="display,:CustomRoleViewDlg, :CustomRoleListForm:datalist, :growl" oncomplete="handleSubmit(args, 'CustomRoleViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('CustomRoleViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

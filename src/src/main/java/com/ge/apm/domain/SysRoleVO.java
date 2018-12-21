@@ -8,6 +8,15 @@ public class SysRoleVO {
     private String name;
     private String roleDesc;
     private Boolean isDisable = false;
+    private Integer roleType;// 0 means sys role 1 means custom role
+
+    public Integer getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(Integer roleType) {
+        this.roleType = roleType;
+    }
 
     public Integer getId() {
         return id;

@@ -76,7 +76,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                    <p:column headerText="院区隔离" filterBy="#{item.insulate}" filterMatchMode="EQ">
+                    <p:column headerText="院区隔离" filterBy="#{item.isInsulate}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()">
                                 <f:converter converterId="javax.faces.Boolean" />

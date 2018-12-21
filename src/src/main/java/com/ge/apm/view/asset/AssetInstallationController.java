@@ -511,7 +511,7 @@ public class AssetInstallationController {
         if(StringUtils.isNotEmpty(tempQrCode)){
         	QrCodeLib tempQrCodeLib = qrCodeService.findByQrCode(tempQrCode,tempSiteUid );
         	if(tempQrCodeLib==null){
-        		qrCodeService.getAvailableQrcode(tempQrCode, tempSiteUid);
+        		qrCodeService.createSpecialQrCodeWithStatus(tempQrCode, tempSiteUid,5);
         	}
         }
         //delete
