@@ -1,23 +1,19 @@
 package com.ge.apm.view.examine;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.PccExamineReportRepository;
@@ -33,7 +29,6 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import lombok.Getter;
 import lombok.Setter;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -41,7 +36,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
-
 /**
  * Created by 212605082 on 2018/5/8.
  */
@@ -72,7 +66,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	private List<ApmDropDownItem> selectResultStatus;
 	@Getter@Setter
 	private ApmDropDownItem selectRecommandStatus;
-
 	protected UserAccount currentUser;
 	protected I18nMessageRepository i18nDao;
 	private UploadedFile file;
@@ -89,7 +82,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	PccExamineReportService service;
 	PccExamineReportRepository dao;
 	SearchController searchController;
-
 	@PostConstruct
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -104,11 +96,9 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if(listStreamedContent==null){
 			listStreamedContent = new ArrayList<ApmStreamedContent>();
 		}
-		System.out.println("PccExamineReportEditController init");
 		String encodeStr="";
 		try {
 			encodeStr = WebUtil.getRequestParameter("str");
-			System.out.println("encodeStr="+encodeStr);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
@@ -130,14 +120,10 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		}
 		
 	}
-
-
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 		// TODO Auto-generated method stub
-
 	}
-
 	public void save() {
 		// TODO Auto-generated method stub
 		prepareSave();
@@ -282,7 +268,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if(listItem!=null && listItem.size()>0){
 			for(int i=0;i<listItem.size();++i){
 				ApmDropDownItem tempItem=listItem.get(i);
-				System.out.println(tempItem.getLabel());
 				sb.append(tempItem.getKey());
 				sb.append(",");
 			}
@@ -341,7 +326,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		}
 	}
 	public void upload() {
-		System.out.println("upload");
 		if (file != null) {
 			try {
 				ApmStreamedContent e = new ApmStreamedContent(file.getInputstream(), file.getContentType(), file.getFileName());
@@ -356,14 +340,11 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			}
 		}
 	}
-
 	public void handleFileUpload(FileUploadEvent event) {
-		System.out.println("FileUploadEvent");
 		blnNewUpload=true;
 		UploadedFile tempFile = event.getFile();
 		if (tempFile != null) {
 			try {
-				System.out.println(tempFile.getContentType());
 				ApmStreamedContent e = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
 				listStreamedContent.add(e);
 				while (listStreamedContent.size() > 4) {
@@ -375,7 +356,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			System.out.println("FileUploadEvent is null");
 			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
 		}
 		// V2_BlobObject blobObject = service.uploadFile(event);
@@ -398,7 +378,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		UploadedFile tempFile = event.getFile();
 		if (tempFile != null) {
 			try {
-				System.out.println(tempFile.getContentType());
 				tailAttach = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
 				addMessage(tempFile.getFileName() + " 上传成功！");
 			} catch (Exception e) {
@@ -406,7 +385,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			System.out.println("FileUploadEvent is null");
 			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
 		}
 	}
@@ -414,51 +392,39 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	private void setSelected(String id) {
         selected = dao.findById(id);
     }
-
 	public UserAccount getCurrentUser() {
 		return currentUser;
 	}
-
 	public void setCurrentUser(UserAccount currentUser) {
 		this.currentUser = currentUser;
 	}
-
 	public I18nMessageRepository getI18nDao() {
 		return i18nDao;
 	}
-
 	public void setI18nDao(I18nMessageRepository i18nDao) {
 		this.i18nDao = i18nDao;
 	}
-
 	public String getUpdateViewIDs() {
 		return updateViewIDs;
 	}
-
 	public void setUpdateViewIDs(String updateViewIDs) {
 		this.updateViewIDs = updateViewIDs;
 	}
-
 	public UaaService getUaaService() {
 		return uaaService;
 	}
-
 	public void setUaaService(UaaService uaaService) {
 		this.uaaService = uaaService;
 	}
-
 	public UploadedFile getFile() {
 		return file;
 	}
-
 	public void setFile(UploadedFile file) {
 		this.file = file;
 	}
-
 	public List<ApmStreamedContent> getListStreamedContent() {
 		return listStreamedContent;
 	}
-
 	public void setListStreamedContent(List<ApmStreamedContent> listStreamedContent) {
 		this.listStreamedContent = listStreamedContent;
 	}
@@ -495,31 +461,23 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	public List<ApmDropDownItem> fetchRecommandStatus(){
 		return service.fetchRecommandStatus();
 	}
-
 	public ApmStreamedContent getTailAttach() {
 		return tailAttach;
 	}
-
 	public void setTailAttach(ApmStreamedContent tailAttach) {
 		this.tailAttach = tailAttach;
 	}
-
 	public ApmStreamedContent getReportFile() {
 		return reportFile;
 	}
-
 	public void setReportFile(ApmStreamedContent reportFile) {
 		this.reportFile = reportFile;
 	}
-
 	public List<PccExamineReport> getListSelected() {
 		return listSelected;
 	}
-
 	public void setListSelected(List<PccExamineReport> listSelected) {
-		System.out.println("set multiple select");
 		if(listSelected!=null){
-			System.out.println(listSelected.size());
 		}
 		
 		if(listSelected!=null && listSelected.size()==1){
@@ -530,13 +488,9 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		}
 		this.listSelected = listSelected;
 	}
-
-
 	public PccExamineReport getSelected() {
 		return selected;
 	}
-
-
 	public void setSelected(PccExamineReport selected) {
 		this.selected = selected;
 	}

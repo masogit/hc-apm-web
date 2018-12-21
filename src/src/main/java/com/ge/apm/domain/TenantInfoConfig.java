@@ -1,20 +1,16 @@
 package com.ge.apm.domain;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-
 public class TenantInfoConfig {
 	private String edition;
 	private List<TenantInfoConfigItem> menuList;
@@ -26,7 +22,6 @@ public class TenantInfoConfig {
 	public static final String VERSION_ULTRASOUND = "ultrasound";
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static Map<String, String> mapVersion;
-
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
@@ -42,7 +37,6 @@ public class TenantInfoConfig {
 			return "{\"edition\":\"" + edition + "\",\"menuList\":[" + result + "]}";
 		}
 	}
-
 	private TenantInfoConfig() {
 	}
 	private String readTreeNode(TreeNode root,StringBuilder sb){
@@ -65,7 +59,6 @@ public class TenantInfoConfig {
 		}
 		return tempList;
 	}
-
 	private void resetVersion() {
 		if (StringUtils.isEmpty(edition)) {
 			return;
@@ -141,23 +134,17 @@ public class TenantInfoConfig {
 	}
 	
 	
-
 	public static TenantInfoConfig build() {
 		TenantInfoConfig tempVersionInfo = new TenantInfoConfig();
 		tempVersionInfo.menuList = getListVersions();
 		tempVersionInfo.edition = VERSION_COMMON;
 		return tempVersionInfo;
 	}
-
 //	 public static void main(String[] args) {
 //	 TenantInfoConfig tempConfig = TenantInfoConfig.build();
-//	 System.out.println(tempConfig.getJSONStr());
 //	 tempConfig.setEdition(VERSION_FUNCTION);
-//	 System.out.println(tempConfig.getJSONStr());
 //	 tempConfig=TenantInfoConfig.parseStr(tempConfig.getJSONStr());
-//	 System.out.println(tempConfig.getJSONStr());
 //	 }
-
 	public static TenantInfoConfig parseStr(String str) {
 		if (StringUtils.isEmpty(str)) {
 			return build();
@@ -196,7 +183,6 @@ public class TenantInfoConfig {
 		tempVersionInfo.menuList = tempListVersionItem;
 		return tempVersionInfo;
 	}
-
 	public String getJSONStr() {
 		return toString();
 	}
@@ -215,7 +201,6 @@ public class TenantInfoConfig {
         }
     }
 	
-
 	public static List<String> getListVersionName() {
 		if (listVersionName == null) {
 			listVersionName = new ArrayList<String>();
@@ -225,7 +210,6 @@ public class TenantInfoConfig {
 		}
 		return listVersionName;
 	}
-
 	private static List<TenantInfoConfigItem> getListVersions() {
 		Map<String, String> mapKeyLabel = getMapVersionKeyLabel();
 		if (listOriginVersionInfo == null) {
@@ -239,7 +223,6 @@ public class TenantInfoConfig {
 		}
 		return listOriginVersionInfo;
 	}
-
 	private static Map<String, String> getMapVersionKeyLabel() {
 		if (mapVersion == null) {
 			mapVersion = new HashMap<String, String>();
@@ -317,27 +300,22 @@ public class TenantInfoConfig {
 		}
 		return mapVersion;
 	}
-
 	public String getEdition() {
 		return edition;
 	}
-
 	public void setEdition(String edition) {
 		if(!edition.equals(this.edition)){
 			this.edition = edition;
 			resetVersion();
 		}
 	}
-
 	public TreeNode getRoot() {
 		if(root==null){
 			buildRoot();
 		}
 		return root;
 	}
-
 	public void setRoot(TreeNode root) {
 		this.root = root;
 	}
-
 }
