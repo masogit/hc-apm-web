@@ -535,6 +535,7 @@
                                                                                     </h:panelGroup>-->
                     <!--                                                                <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                     #{commonReportController.getTemplateName(reportItem.schemaId)}
+
                     <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                     </h:outputText>
@@ -611,6 +612,7 @@
                     var d = $('#ItemEditDlgForm\\:workHours');
                     $('#ItemEditDlgForm\\:workHours_input').addClass("ui-state-error");
                 }
+
             }
         </script>
 
