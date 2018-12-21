@@ -294,9 +294,6 @@ public class TenantInfoConfig {
 			mapVersion.put("config.attribute", "属性配置");
 			mapVersion.put("config.repairMessage", "维修消息配置");
 			mapVersion.put("config.captureDataMessage", "小屏消息配置");
-			mapVersion.put("mvs", "MVS设备管理");
-			mapVersion.put("mvs.info", "基本信息");
-			mapVersion.put("mvs.purchase", "采购管理");
 		}
 		return mapVersion;
 	}
