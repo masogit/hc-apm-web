@@ -25,18 +25,14 @@
 						<p:column headerText="探头名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.name}" />
 						</p:column>
+						<p:column headerText="探头型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.functionType}" />
+						</p:column>
+						<p:column headerText="探头序列号" filterBy="#{item.num}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.num}" />
+						</p:column>
 						<p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
-						</p:column>
-						<p:column headerText="报告生成日期" sortBy="#{item.reportDate}">
-							<h:outputText value="#{item.reportDate}">
-								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-							</h:outputText>
-						</p:column>
-						<p:column headerText="修改日期" sortBy="#{item.modifyDate}">
-							<h:outputText value="#{item.modifyDate}">
-								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-							</h:outputText>
 						</p:column>
 						<p:column headerText="检测结果" filterBy="#{item.status}" filterMatchMode="EQ">
 							<f:facet name="filter">
@@ -47,6 +43,16 @@
 								</p:selectOneMenu>
 							</f:facet>
 							<h:outputText value="#{item.status==1?'通过':'未通过'}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="修改日期" sortBy="#{item.modifyDate}">
+							<h:outputText value="#{item.modifyDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="报告生成日期" sortBy="#{item.reportDate}">
+							<h:outputText value="#{item.reportDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
 						<p:column headerText="报告下载" exportable="false" id="idColumnDownReport">
@@ -65,7 +71,7 @@
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
 							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel">
-								<p:dataExporter type="xlsx" target="datalist" fileName="pccReport" selectionOnly="true" />
+								<p:dataExporter type="xlsx" target="datalist" fileName="pccReport" selectionOnly="#{empty pccExamineReportController.listSelected?false:true}" />
 							</p:commandButton>
 							<p:commandButton id="idBtnBatchGenerateReport" title="批量生成报告" icon="fa fa-fw fa-building-o" ajax="true"
 								actionListener="#{pccExamineReportController.batchGenerateReport()}" update=":growl,:pccReportListForm" >
