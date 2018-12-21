@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -12,7 +13,6 @@ import org.primefaces.model.TreeNode;
 import org.primefaces.ultima.domain.User;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -47,6 +47,9 @@ public class UaaService {
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
+
+    @Autowired
+    private CustomRoleRepository customRoleRepository;
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -134,14 +137,13 @@ public class UaaService {
     public List<SysRoleVO> getSysRoleVO(String tenantUID){
         loadSysRoles();
         TenantInfo ti = tenantInfoDao.findByuid(tenantUID);
-
         List<SysRoleVO> sysRoleList = new ArrayList<>();
         for (SysRole tempSysRole : sysRoles.values()){
             SysRoleVO srVO = new SysRoleVO();
             srVO.setId(tempSysRole.getId());
             srVO.setName(tempSysRole.getName());
             srVO.setRoleDesc(tempSysRole.getRoleDesc());
-
+            srVO.setRoleType(0);
             //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
             if(UserContextService.isOnlyLocalITAdmin()){
                 if("ITAdmin".equals(tempSysRole.getName())){
@@ -156,11 +158,25 @@ public class UaaService {
                     continue;
                 }
             }
-
             sysRoleList.add(srVO);
         }
 
+        List<CustomRole> customRoles = getTenantCustomRoles(ti.getUid());
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole: customRoles) {
+                SysRoleVO srVO = new SysRoleVO();
+                srVO.setId(customRole.getId());
+                srVO.setName(customRole.getName());
+                srVO.setRoleDesc(customRole.getName());
+                srVO.setRoleType(1);
+                sysRoleList.add(srVO);
+            }
+        }
         return sysRoleList;
+    }
+
+    public List<CustomRole> getTenantCustomRoles(String tenantUID){
+       return customRoleRepository.findByTenantUID(tenantUID);
     }
 
     @Transactional
@@ -204,13 +220,24 @@ public class UaaService {
         }
         for(String newRoleName: newRoleNames){
             SysRole role = sysRoleDao.getByRoleDesc(newRoleName);
-            if (role==null){
-                logger.warn("Assign role to user: Role not found, roleName="+newRoleName);
+            if (role == null){
+                CustomRole customRole = customRoleRepository.findByTenantUIDAndName(userAccount.getTenantUID(),newRoleName);
+                if(customRole == null){
+                    logger.warn("Assign role to user: Role not found, roleName="+newRoleName);
+                    continue;
+                }else{
+                    UserRole userRole = new UserRole();
+                    userRole.setUserId(userAccount.getId());
+                    userRole.setRoleId(customRole.getId());
+                    userRole.setRoleType(1);
+                    userRoleDao.save(userRole);
+                }
             }
             else {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userAccount.getId());
                 userRole.setRoleId(role.getId());
+                userRole.setRoleType(0);
                 userRoleDao.save(userRole);
             }
         }
