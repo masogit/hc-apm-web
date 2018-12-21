@@ -1,12 +1,9 @@
 package com.ge.apm.view;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -14,7 +11,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
@@ -22,16 +18,15 @@ import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.common.SearchService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
-
 @ManagedBean
 @ViewScoped
 public class SearchController {
@@ -46,12 +41,13 @@ public class SearchController {
 	public static final String STR_QRCODE = "qrCode";
 	public static final String STR_DEPTNUM = "departNum";
 	public static final String STR_FINANCENUM = "financingNum";
-	UserAccount currentUser;
-	I18nMessageRepository i18nDao;
+	protected UserAccount currentUser;
+	protected I18nMessageRepository i18nDao;
 	SearchService searchService;
 	OrgInfo orgSite;
 	OrgInfo orgDepart;
 	OrgInfo selectedOrg;
+	AssetInfo selectedAssetInfo;
 	TreeNode orgTree;
 	TreeNode selectedNode;
 	List<OrgInfo> listOrgSite;
@@ -61,50 +57,74 @@ public class SearchController {
 	String threeQrCode;
 	ServerEventInterface callingController;
 	String updateViewIDs;
-	int type = 0;
-	boolean blnSite = false;
-	boolean blnDept = false;
-	boolean blnAssetType = false;
-	boolean blnThreeQrCode = false;
+	protected int type = 0;
 	boolean blnAccessScope = false;
 	boolean blnOrgTree=false;
 	boolean showDialog = false;
+	boolean blnSite = false;
+	boolean blnDept = false;
+	boolean blnAssetType = false;
 	boolean blnAssetGroup = false;
 	boolean blnFunctionType = false;
+	boolean blnThreeQrCode = false;
+	boolean blnPickList=false;
+	boolean blnAssetSelect=false;
 	List<SearchFilter> listSearchFilter;
 	DualListModel<AssetInfo> availableAssets;
 	List<AssetInfo> listUnSelectedAssetInfo;
-	List<AssetInfo> listSelectedAssetInfo;
+	protected List<AssetInfo> listSelectedAssetInfo;
 	UaaService uaaService;
 	AssetInstallationService aiService;
 	ContractInfoService contractInfoService;
+	AutoCompleteService autoCompleteService;
 	String contractInfoSiteUID;
 	@PostConstruct
-	private void init() {
+	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		searchService = WebUtil.getBean(SearchService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
 		contractInfoService = WebUtil.getBean(ContractInfoService.class);
 		aiService = WebUtil.getBean(AssetInstallationService.class);
+		autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
-		
 		orgSite = null;
 		orgDepart = null;
 		assetType = "";
 		assetGroup = "";
 		threeQrCode = "";
 		selectedOrg=null;
+		updateData();
+	}
+	
+	private void resetStatus(){
+		blnAccessScope = false;
+		blnOrgTree=false;
+		blnSite = false;
+		blnDept = false;
+		blnAssetType = false;
+		blnAssetGroup = false;
+		blnFunctionType = false;
+		blnThreeQrCode = false;
+		blnPickList=false;
+		blnAssetSelect=false;
+	}
+	
+	public void updateData(){
+		resetStatus();
 		if (type == 1) {
-			blnDept = true;
-			blnAssetGroup = true;
-			blnThreeQrCode = true;
-			blnAccessScope = false;
-			blnOrgTree=true;
+			blnPickList=true;
 //			fetchSiteOrgList();
 			fetchOrgTree();
 			fetchDeptOrgList(selectedOrg);
-			fetchListOriginAssetInfo();
+			fetchOriginPickListAssetInfo();
+		}
+		else if(type==2){
+			blnAssetSelect=true;
+//			fetchSiteOrgList();
+			fetchOrgTree();
+			fetchDeptOrgList(selectedOrg);
+			fetchOriginSelectAssetInfo();
 		}
 	}
 	
@@ -121,10 +141,8 @@ public class SearchController {
 		orgTree.getChildren().add(subTree);
 		selectedOrg=aiService.getOrgInfoByUid(siteUid);
 	}
-
 	public void fetchSiteOrgList() {
 		if (blnAccessScope) {
-
 		} else {
 			if (searchService.isSiteUser(currentUser)) {
 				listOrgSite = new ArrayList<OrgInfo>();
@@ -137,21 +155,21 @@ public class SearchController {
 			}
 		}
 	}
-
 	public void fetchDeptOrgList(OrgInfo orgInfo) {
 		if (blnAccessScope) {
-
 		} else {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}
 	}
-
 	private void onChange() {
 		if(!generateListFilter()){
 			return;
 		}
-		if (type == 1) {
-			fetchListOriginAssetInfo();
+		if (blnPickList) {
+			fetchOriginPickListAssetInfo();
+		}
+		else if(blnAssetSelect){
+			fetchOriginSelectAssetInfo();
 		}
 	}
 	
@@ -163,28 +181,22 @@ public class SearchController {
         	onChange();
         }
     }
-
 	public void onOrgSiteChange() {
 		fetchDeptOrgList(orgSite);
 		onChange();
 	}
-
 	public void onOrgDeptChange() {
 		onChange();
 	}
-
 	public void onAssetTypeChange() {
 		onChange();
 	}
-
 	public void onAssetGroupChange() {
 		onChange();
 	}
-
 	public void onThreeQrCodeChange() {
 		onChange();
 	}
-
 	public void onAssetsTransfer(TransferEvent event) {
 		List<AssetInfo> collection = (List<AssetInfo>) event.getItems();
 		if (collection != null && collection.size() > 0) {
@@ -195,8 +207,7 @@ public class SearchController {
 			}
 		}
 	}
-
-	private void fetchListOriginAssetInfo() {
+	private void fetchOriginPickListAssetInfo() {
 		if (listSearchFilter.size() > 0) {
 			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
 			if (listUnSelectedAssetInfo == null) {
@@ -210,7 +221,15 @@ public class SearchController {
 			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
 		}
 	}
-
+	
+	private void fetchOriginSelectAssetInfo(){
+		if (listSearchFilter.size() > 0) {
+			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
+			if (listUnSelectedAssetInfo == null) {
+				listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+			}
+		} 
+	}
 	public void prepareDialogCallback(ServerEventInterface callingController, int type, Object obj, String updateViewIDs) {
 		this.type = type;
 		this.callingController = callingController;
@@ -219,291 +238,246 @@ public class SearchController {
 			this.contractInfoSiteUID=(String)obj;
 		}
 		showDialog = true;
-		init();
+		updateData();
 	}
-
 	public void confirm() {
 		showDialog = false;
 		if (callingController != null) {
 			callingController.onServerEvent("assetListSelected", listSelectedAssetInfo);
 		}
 	}
-
+	public List<AssetInfo> completeSelectedAssetInfo(String query) {
+        return autoCompleteService.completeAssetInfoList(query, listUnSelectedAssetInfo);
+    }
 	private boolean generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
-		if (type == 1) {
-			if(selectedOrg!=null){
-				int type=selectedOrg.getOrgType();
-				if(type==0){
-					listSearchFilter.add(new SearchFilter(STR_TENANTUID, Operator.EQ, selectedOrg.getTenantUID(), "1*"));
-				}
-				else if(type==1){
-					listSearchFilter.add(new SearchFilter(STR_INSTITUTIONUID, Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
-				}
-				else if(type==2){
-					listSearchFilter.add(new SearchFilter(STR_HOSPITALUID, Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
-				}
-				else if(type==3){
-					listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
-				}
-				if (orgDepart != null) {
-					listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, orgDepart.getUid(), "1*"));
-				}
-				if (StringUtils.isNotEmpty(assetGroup)) {
-					listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
-				}
-				if (StringUtils.isNotEmpty(threeQrCode)) {
-					listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
-					listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
-					listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
-				}
+		if(selectedOrg!=null){
+			int orgType=selectedOrg.getOrgType();
+			if(orgType==0){
+				listSearchFilter.add(new SearchFilter(STR_TENANTUID, Operator.EQ, selectedOrg.getTenantUID(), "1*"));
 			}
-			if(listSearchFilter.size()>1){
-				return true;
+			else if(orgType==1){
+				listSearchFilter.add(new SearchFilter(STR_INSTITUTIONUID, Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
 			}
+			else if(orgType==2){
+				listSearchFilter.add(new SearchFilter(STR_HOSPITALUID, Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
+			}
+			else if(orgType==3){
+				listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
+			}
+			if (orgDepart != null) {
+				listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, orgDepart.getUid(), "1*"));
+			}
+			if (StringUtils.isNotEmpty(assetGroup)) {
+				listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
+			}
+			if (StringUtils.isNotEmpty(threeQrCode)) {
+				listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
+				listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
+				listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
+			}
+		}
+		if(listSearchFilter.size()>1){
+			return true;
 		}
 		return false;
 	}
-
 	public UserAccount getCurrentUser() {
 		return currentUser;
 	}
-
 	public void setCurrentUser(UserAccount currentUser) {
 		this.currentUser = currentUser;
 	}
-
 	public OrgInfo getOrgSite() {
 		return orgSite;
 	}
-
 	public void setOrgSite(OrgInfo orgSite) {
 		this.orgSite = orgSite;
 	}
-
 	public OrgInfo getOrgDepart() {
 		return orgDepart;
 	}
-
 	public void setOrgDepart(OrgInfo orgDepart) {
 		this.orgDepart = orgDepart;
 	}
-
 	public List<OrgInfo> getListOrgSite() {
 		return listOrgSite;
 	}
-
 	public void setListOrgSite(List<OrgInfo> listOrgSite) {
 		this.listOrgSite = listOrgSite;
 	}
-
 	public List<OrgInfo> getListOrgDept() {
 		return listOrgDept;
 	}
-
 	public void setListOrgDept(List<OrgInfo> listOrgDept) {
 		this.listOrgDept = listOrgDept;
 	}
-
 	public String getAssetType() {
 		return assetType;
 	}
-
 	public void setAssetType(String assetType) {
 		this.assetType = assetType;
 	}
-
 	public String getThreeQrCode() {
 		return threeQrCode;
 	}
-
 	public void setThreeQrCode(String threeQrCode) {
 		this.threeQrCode = threeQrCode;
 	}
-
 	public int getType() {
 		return type;
 	}
-
 	public void setType(int type) {
 		this.type = type;
 	}
-
 	public I18nMessageRepository getI18nDao() {
 		return i18nDao;
 	}
-
 	public void setI18nDao(I18nMessageRepository i18nDao) {
 		this.i18nDao = i18nDao;
 	}
-
 	public SearchService getSearchService() {
 		return searchService;
 	}
-
 	public void setSearchService(SearchService searchService) {
 		this.searchService = searchService;
 	}
-
 	public ServerEventInterface getCallingController() {
 		return callingController;
 	}
-
 	public void setCallingController(ServerEventInterface callingController) {
 		this.callingController = callingController;
 	}
-
 	public String getUpdateViewIDs() {
 		return updateViewIDs;
 	}
-
 	public void setUpdateViewIDs(String updateViewIDs) {
 		this.updateViewIDs = updateViewIDs;
 	}
-
 	public boolean isBlnSite() {
 		return blnSite;
 	}
-
 	public void setBlnSite(boolean blnSite) {
 		this.blnSite = blnSite;
 	}
-
 	public boolean isBlnDept() {
 		return blnDept;
 	}
-
 	public void setBlnDept(boolean blnDept) {
 		this.blnDept = blnDept;
 	}
-
 	public boolean isBlnAssetType() {
 		return blnAssetType;
 	}
-
 	public void setBlnAssetType(boolean blnAssetType) {
 		this.blnAssetType = blnAssetType;
 	}
-
 	public boolean isBlnThreeQrCode() {
 		return blnThreeQrCode;
 	}
-
 	public void setBlnThreeQrCode(boolean blnThreeQrCode) {
 		this.blnThreeQrCode = blnThreeQrCode;
 	}
-
 	public boolean isBlnAccessScope() {
 		return blnAccessScope;
 	}
-
 	public void setBlnAccessScope(boolean blnAccessScope) {
 		this.blnAccessScope = blnAccessScope;
 	}
-
 	public boolean isShowDialog() {
 		return showDialog;
 	}
-
 	public void setShowDialog(boolean showDialog) {
 		this.showDialog = showDialog;
 	}
-
 	public List<SearchFilter> getListSearchFilter() {
 		return listSearchFilter;
 	}
-
 	public void setListSearchFilter(List<SearchFilter> listSearchFilter) {
 		this.listSearchFilter = listSearchFilter;
 	}
-
 	public boolean isBlnAssetGroup() {
 		return blnAssetGroup;
 	}
-
 	public void setBlnAssetGroup(boolean blnAssetGroup) {
 		this.blnAssetGroup = blnAssetGroup;
 	}
-
 	public boolean isBlnFunctionType() {
 		return blnFunctionType;
 	}
-
 	public void setBlnFunctionType(boolean blnFunctionType) {
 		this.blnFunctionType = blnFunctionType;
 	}
-
 	public String getAssetGroup() {
 		return assetGroup;
 	}
-
 	public void setAssetGroup(String assetGroup) {
 		this.assetGroup = assetGroup;
 	}
-
 	public DualListModel<AssetInfo> getAvailableAssets() {
 		return availableAssets;
 	}
-
 	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
 		this.availableAssets = availableAssets;
 	}
-
 	public List<AssetInfo> getListUnSelectedAssetInfo() {
 		return listUnSelectedAssetInfo;
 	}
-
 	public void setListUnSelectedAssetInfo(List<AssetInfo> listUnSelectedAssetInfo) {
 		this.listUnSelectedAssetInfo = listUnSelectedAssetInfo;
 	}
-
 	public List<AssetInfo> getListSelectedAssetInfo() {
 		return listSelectedAssetInfo;
 	}
-
 	public void setListSelectedAssetInfo(List<AssetInfo> listSelectedAssetInfo) {
 		this.listSelectedAssetInfo = listSelectedAssetInfo;
 	}
-
 	public OrgInfo getSelectedOrg() {
 		return selectedOrg;
 	}
-
 	public void setSelectedOrg(OrgInfo selectedOrg) {
 		this.selectedOrg = selectedOrg;
 	}
-
 	public TreeNode getOrgTree() {
 		return orgTree;
 	}
-
 	public void setOrgTree(TreeNode orgTree) {
 		this.orgTree = orgTree;
 	}
-
 	public boolean isBlnOrgTree() {
 		return blnOrgTree;
 	}
-
 	public void setBlnOrgTree(boolean blnOrgTree) {
 		this.blnOrgTree = blnOrgTree;
 	}
-
 	public UaaService getUaaService() {
 		return uaaService;
 	}
-
 	public void setUaaService(UaaService uaaService) {
 		this.uaaService = uaaService;
 	}
-
 	public TreeNode getSelectedNode() {
 		return selectedNode;
 	}
-
 	public void setSelectedNode(TreeNode selectedNode) {
 		this.selectedNode = selectedNode;
 	}
-
-
+	public boolean isBlnPickList() {
+		return blnPickList;
+	}
+	public void setBlnPickList(boolean blnPickList) {
+		this.blnPickList = blnPickList;
+	}
+	public AssetInfo getSelectedAssetInfo() {
+		return selectedAssetInfo;
+	}
+	public void setSelectedAssetInfo(AssetInfo selectedAssetInfo) {
+		this.selectedAssetInfo = selectedAssetInfo;
+	}
+	public boolean isBlnAssetSelect() {
+		return blnAssetSelect;
+	}
+	public void setBlnAssetSelect(boolean blnAssetSelect) {
+		this.blnAssetSelect = blnAssetSelect;
+	}
 }
