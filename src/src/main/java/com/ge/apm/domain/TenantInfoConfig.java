@@ -22,6 +22,7 @@ public class TenantInfoConfig {
 	public static final String VERSION_ULTRASOUND = "ultrasound";
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static Map<String, String> mapVersion;
+	private TreeNode[] selectedNodes;
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
@@ -30,7 +31,7 @@ public class TenantInfoConfig {
 		}
 		else{
 			StringBuilder sb=new StringBuilder();
-			String result=readTreeNode(root, sb);
+			String result=readTreeNode(root,sb);
 			if(result.length()>0){
 				result=result.substring(0, result.length()-1);
 			}
@@ -46,6 +47,16 @@ public class TenantInfoConfig {
 		}
 		for(TreeNode node:root.getChildren()){
 			readTreeNode(node, sb);
+		}
+		return sb.toString();
+	}
+	private String readTreeNode(StringBuilder sb){
+		if(selectedNodes!=null && selectedNodes.length>0){
+			for(int i=0;i<selectedNodes.length;++i){
+				TreeNode tempNode=selectedNodes[i];
+				TenantInfoConfigItem tempItem=(TenantInfoConfigItem)tempNode.getData();
+				sb.append("\""+tempItem.getKey()+"\",");
+			}
 		}
 		return sb.toString();
 	}
@@ -105,8 +116,12 @@ public class TenantInfoConfig {
 			if(!childKey.contains(".")){
 				DefaultTreeNode tempNode=new DefaultTreeNode(TREE_TYPE,tempItem,root);
 				tempNode.setExpanded(true);
+				tempNode.setSelectable(true);
 				if(tempItem.isValue()){
 					tempNode.setSelected(true);
+				}
+				else{
+					tempNode.setSelected(false);
 				}
 				headerItem.put(childKey, tempNode);
 				headers.add(childKey);
@@ -125,6 +140,9 @@ public class TenantInfoConfig {
 					DefaultTreeNode tempNode=new DefaultTreeNode(TREE_TYPE,tempItem,headerItem.get(parentKey));
 					if(tempItem.isValue()){
 						tempNode.setSelected(true);
+					}
+					else{
+						tempNode.setSelected(false);
 					}
 				}
 				tempMenuList.remove(i);
@@ -195,6 +213,9 @@ public class TenantInfoConfig {
         setTreeNodes(event.getTreeNode(), false);
 	}
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
+		if(root==null){
+			return;
+		}
         root.setSelected(isSelected);
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
@@ -295,6 +316,8 @@ public class TenantInfoConfig {
 			mapVersion.put("config.repairMessage", "维修消息配置");
 			mapVersion.put("config.captureDataMessage", "小屏消息配置");
 			mapVersion.put("examineMgt", "检测管理");
+			mapVersion.put("examineMgt.pcc", "探头检测");
+			mapVersion.put("examineMgt.pccConfig", "探头检测配置");
 		}
 		return mapVersion;
 	}
@@ -315,5 +338,11 @@ public class TenantInfoConfig {
 	}
 	public void setRoot(TreeNode root) {
 		this.root = root;
+	}
+	public TreeNode[] getSelectedNodes() {
+		return selectedNodes;
+	}
+	public void setSelectedNodes(TreeNode[] selectedNodes) {
+		this.selectedNodes = selectedNodes;
 	}
 }
