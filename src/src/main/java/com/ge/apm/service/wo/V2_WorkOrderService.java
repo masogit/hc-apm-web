@@ -362,6 +362,8 @@ public class V2_WorkOrderService {
         }
     }
 
+
+
     public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, String comments, List<V2_BlobObject> attachments) {
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
