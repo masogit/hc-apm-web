@@ -33,7 +33,7 @@ public class AssetLifecycleEventService {
 	private static final String SHEET_NAME = "datalist";
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
-
+	
 	public String getMsStatus(AssetLifecycleEvent alse) {
         String strStatus = null;
         try {

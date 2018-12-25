@@ -38,8 +38,8 @@ public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
-    public static final String MVS_ADMIN="MVSAdmin";
-    private static final String MVS_FE="MVSFE";
+//    public static final String MVS_ADMIN="MVSAdmin";
+//    private static final String MVS_FE="MVSFE";
 
     private UserAccount userAccount = null;
 
@@ -115,27 +115,12 @@ public class UserContextService implements Serializable {
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
         List<String> userRoles = user.getRoleNames();
-        Integer mvsRoleType=user.getMvsRoleType();
         String[] roles = roleList.split(",");
         for (String role : roles) {
             role = role.trim();
             boolean roleAllowed = userRoles.contains(role);
             if (roleAllowed) {
                 return true;
-            }
-            else{
-            	if(mvsRoleType!=null){
-            		if(role.equals(MVS_ADMIN)){
-                		if(mvsRoleType==1){
-                			return true;
-                		}
-                	}
-            		else if(role.equals(MVS_FE)){
-            			if(mvsRoleType==2){
-            				return true;
-            			}
-            		}
-            	}
             }
         }
         return false;

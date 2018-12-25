@@ -26,16 +26,18 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
  * Created by 212605082 on 2018/5/8.
  */
 @ManagedBean
 @ViewScoped
-public class MaintainExportController {
+public class MaintainExportController implements ServerEventInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainExportController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -50,10 +52,14 @@ public class MaintainExportController {
     private Date startDate;
     private Date endDate;
     private List<OrgInfo> checkListParentOrgInfo;
-
+    private SearchController searchController;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		searchController = WebUtil.getBean(SearchController.class);
+		searchController.setType(3);
+		searchController.updateData();
+		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
 		loadUserParentOrgInfo();
@@ -289,6 +295,25 @@ public class MaintainExportController {
 
 	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
+	}
+
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+		// TODO Auto-generated method stub
+		try {
+			if(eventObject!=null){
+				if(listCheckClinicalOrgInfo==null){
+					listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
+				}
+				else{
+					listCheckClinicalOrgInfo.clear();
+				}
+				listCheckClinicalOrgInfo.add((OrgInfo)eventObject);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
 	}
 	
 }

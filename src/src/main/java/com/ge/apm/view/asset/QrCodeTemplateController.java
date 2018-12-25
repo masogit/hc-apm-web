@@ -103,7 +103,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
 
     public String getPreViewBase64() {
-        return selected == null ? "" : qrCodeService.getPreViewBase64(selected.getId());
+        return selected == null ? "" : qrCodeService.getPreViewBase64(selected);
     }
 
     @Transactional
