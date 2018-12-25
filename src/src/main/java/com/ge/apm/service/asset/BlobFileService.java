@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,40 @@ public class BlobFileService {
         String path = "";
         try {
             path = fsService.saveUploadedFile(file);
+        } catch (Exception ex) {
+            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+            Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+        String token = UserContextService.getAccessToken();
+        if (token == null || token.isEmpty()) {
+            WebUtil.addErrorMessage("do not have premission");
+            return null;
+        }
+
+        Map<String, Object> fileObject = microService.uploadSingleFile(token, new File(path));
+        fsService.deleteUploadedFile(path);
+
+        if (null != fileObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobDao.save(blobObject);
+        } else {
+            return null;
+        }
+
+    }
+    public V2_BlobObject uploadFile(InputStream input,String fileName) {
+        
+        String path = "";
+        try {
+            path = fsService.saveUploadedFile(input,fileName);
         } catch (Exception ex) {
             WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
@@ -154,6 +189,36 @@ public class BlobFileService {
             blobDao.delete(id);
             return true;
         }
+    }
+    
+    public Boolean deleteBlobFileByBoUuid(String boUuid){
+        List<V2_BlobObject> listBlobObject = blobDao.findByBoUuid(boUuid);
+        if(listBlobObject==null){
+            return null;
+        }
+        if(listBlobObject!=null && listBlobObject.size()>0){
+            for(int i=0;i<listBlobObject.size();++i){
+            	deleteBlobFile(listBlobObject.get(i));
+            }
+        }
+        return true;
+    }
+    
+    public Boolean deleteBlobFileByBoUuidAndType(String boUuid,String boType,String subType){
+        List<V2_BlobObject> listBlobObject = blobDao.fetchBlobObjectByUuidAndType(boUuid,boType,subType);
+        if(listBlobObject==null){
+            return null;
+        }
+        if(listBlobObject!=null && listBlobObject.size()>0){
+            for(int i=0;i<listBlobObject.size();++i){
+            	deleteBlobFile(listBlobObject.get(i));
+            }
+        }
+        return true;
+    }
+    
+    public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType,String subType){
+    	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
     }
 
     /**

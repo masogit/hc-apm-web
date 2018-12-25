@@ -9,6 +9,7 @@ import com.ge.apm.domain.SysAuthority;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,24 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
     //private List<String> authIds = new ArrayList<>(10);
     private String[] authIds = new String[20];
     private UserAccount user;
+    public static List<String> keyRoles = new ArrayList<>();
+
+    static {
+        keyRoles.add("院长");
+        keyRoles.add("医学工程处主任");
+        keyRoles.add("工程师");
+        keyRoles.add("临床科室主任");
+        keyRoles.add("后台运营管理");
+        keyRoles.add("多院区管理");
+        keyRoles.add("临床科室人员");
+        keyRoles.add("仅报修权限账号");
+        keyRoles.add("设备调剂管理人员");
+        keyRoles.add("本地后台运营管理");
+        keyRoles.add("维修商医工");
+        keyRoles.add("护理人员");
+        keyRoles.add("系统激活专用");
+    }
+
 
     @Override
     protected void init() {
@@ -118,6 +137,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 
     @Transactional
     public void save(){
+        if(keyRoles.contains(selected.getName())){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
+            return;
+        }
         super.save();
         if(selected.getId() != null){
             roleAuthorityRepository.deleteByRoleId(selected.getId());
@@ -166,16 +190,16 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
     public void delete(){
         Integer roleId = selected.getId();
         roleAuthorityRepository.deleteByRoleId(roleId);
-        //deleteOldData(roleId);
         super.delete();
     }
 
-    @Transactional
-    public void deleteOldData(Integer roleId){
-        roleAuthorityRepository.deleteByRoleId(roleId);
+    public static List<String> getKeyRoles() {
+        return keyRoles;
     }
 
-
+    public static void setKeyRoles(List<String> keyRoles) {
+        CustomRoleController.keyRoles = keyRoles;
+    }
 
     /*
     @Override
