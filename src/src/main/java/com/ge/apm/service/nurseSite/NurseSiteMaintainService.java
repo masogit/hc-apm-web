@@ -961,26 +961,16 @@ public class NurseSiteMaintainService {
 	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
 		Set<String> listResult = new HashSet<String>();
 		List<UserOrgInfo> listUserOrgInfo = userOrgInfoRepository.findOrgUidListByUserUid(userUid);
-		Set<String> listOrgUid = null;
-		if (listUserOrgInfo != null) {
-			if (listUserOrgInfo.size() > 1) {
-
-			} else if (listUserOrgInfo.size() == 1) {
-				UserOrgInfo tempUserOrgInfo = listUserOrgInfo.get(0);
-				if (tempUserOrgInfo.getOrgType() == 4) {
-
-				} else {
-					listOrgUid = orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(tempUserOrgInfo.getOrgUid());
-				}
-			}
-		}
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
 				listResult.add(listUserOrgInfo.get(i).getOrgUid());
 			}
 		}
-		if (listOrgUid != null && listOrgUid.size() > 0) {
-			listResult.addAll(listOrgUid);
+		if (listResult != null && listResult.size()>0) {
+			Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+			if(tempResult!=null){
+				listResult.addAll(tempResult);
+			}
 		}
 		return listResult;
 	}
