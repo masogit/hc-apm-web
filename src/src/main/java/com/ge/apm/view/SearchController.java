@@ -104,7 +104,6 @@ public class SearchController {
 		autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
 
-		System.out.println("init type=" + type);
 		updateData();
 	}
 
@@ -147,7 +146,6 @@ public class SearchController {
 	}
 
 	public void updateData() {
-		System.out.println("updateDate type=" + type);
 		resetStatus();
 		fetchOrgTree();
 		if (type == 1) {
