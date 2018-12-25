@@ -184,7 +184,7 @@
                     <h:panelGroup id="jsonString">
                         <label class="label">#{msg.jsonString}</label>
                         <p:inputTextarea id="jsonStringText"  value="#{qrCodeTemplateCreateController.importJsonString}" cols="100" />
-                        <p:commandButton  value="保存" actionListener="#{qrCodeTemplateCreateController.onImportSave}" process="jsonString" update=":qrCodeEditForm :growl"/>
+                        <p:commandButton  value="确定" actionListener="#{qrCodeTemplateCreateController.onImportSave}" process="jsonString" update=":qrCodeEditForm :growl"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
