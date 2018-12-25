@@ -84,8 +84,7 @@
                                                 <p:commandLink id="openSignatureItem" actionListener="#{maintainController.getMaintainSignature(item2.signatureId,item2.signatureSourceType)}" value="签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();"/>
                                             </td> -->
                                             <td>
-                                                <h:outputText value="#{item2.comment}">
-                                                </h:outputText>
+                                                <p:inputText value="#{item2.comment}"></p:inputText>
                                             </td>
                                         </tr>
                                     </p:repeat>
