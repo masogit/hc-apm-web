@@ -548,6 +548,7 @@ public class NurseSiteMaintainService {
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
 		int objStatus = 0;
+		boolean hasNotChecked=false;
 		while (it.hasNext()) {
 			itemStatus = 0;
 			NurseSiteMaintainItem tempItem = it.next();
@@ -562,6 +563,7 @@ public class NurseSiteMaintainService {
 				NurseSiteMaintainData tempData = itData.next();
 				Boolean value = tempData.getCheckValue();
 				if (value == null) {
+					hasNotChecked=true;
 					if (itemStatus == 2) {
 						itemStatus = 4;
 					}
@@ -590,6 +592,9 @@ public class NurseSiteMaintainService {
 					objStatus = 4;
 				}
 			}
+		}
+		if(hasNotChecked && objStatus==2){
+			objStatus=4;
 		}
 		obj.setStatus(objStatus);
 		obj.setCheckDate(date);
