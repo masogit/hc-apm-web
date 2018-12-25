@@ -153,6 +153,10 @@ public class QrCodeTemplateCreateController {
     public void onImportSave() {
         try {
             templateJsonObject = JSONObject.parseObject(importJsonString);
+            if(!templateService.isValidJson(templateJsonObject)){
+                WebUtil.addErrorMessage("JSON不正确");
+            };
+            int s=0;
         } catch (JSONException e) {
             WebUtil.addErrorMessage("不能解析JSON");
         }
