@@ -186,7 +186,7 @@ public class QrCodeService {
         if (template == null) {
             if (null != asset && !Strings.isNullOrEmpty(asset.getSiteUID())) {
                 template = getTemplateBySiteUid(asset.getSiteUID());
-            } else if (Strings.isNullOrEmpty(siteUid)) {
+            } else if (!Strings.isNullOrEmpty(siteUid)) {
                 template = getTemplateBySiteUid(siteUid);
             } else {
                 template = templateService.getDefaultTemplate();
