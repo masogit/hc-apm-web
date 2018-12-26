@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
@@ -92,6 +93,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected I18nMessageRepository i18nDao;
+
+    @Autowired
+    MvsUtil mvsUtil;
 
     protected OrgInfo selectedOrgToImport;
 
@@ -371,6 +375,16 @@ public class AssetFileImportBaseService {
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);
         assetDepreciationService.saveAssetDerpeciation(newAsset);
+
+        if (UserContextService.isMVSRole()) {
+            if (newAsset.getMvsEquip() == null) {
+                newAsset.setMvsEquip(1);
+                assetDao.save(newAsset);
+            }
+
+            mvsUtil.copyToMvsTableIfMvsEquip(newAsset);
+
+        }
 
     }
 
