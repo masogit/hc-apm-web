@@ -23,6 +23,11 @@ public class CustomConfigConstant {
         return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate");
     }
     
+    //只读字段
+    static public List<String> getReadOnlyFields() {
+        return Arrays.asList("createdDate");
+    }
+    
     static public List<String> getSystemFields() {
         return Arrays.asList("name", "assetGroup","status","siteUID");
     }

@@ -419,6 +419,9 @@ public class CustomConfigController {
     public boolean isSystemFields(String key) {
         return CustomConfigConstant.getSystemFields().contains(key);
     }
+    public boolean isReadOnlyFields(String key) {
+        return CustomConfigConstant.getReadOnlyFields().contains(key);
+    }
 
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
