@@ -188,7 +188,9 @@ public class QrCodeService {
                 template = getTemplateBySiteUid(asset.getSiteUID());
             } else if (!Strings.isNullOrEmpty(siteUid)) {
                 template = getTemplateBySiteUid(siteUid);
-            } else {
+            }
+            
+            if (template == null) {
                 template = templateService.getDefaultTemplate();
             }
         }
@@ -200,17 +202,17 @@ public class QrCodeService {
             if (null == asset) {
                 asset = getDefaultAsset();
                 asset.setQrCode(qrCode);
-                asset.setSiteUID(Strings.isNullOrEmpty(siteUid) ? template.getSiteUID():siteUid);
+                asset.setSiteUID(Strings.isNullOrEmpty(siteUid) ? template.getSiteUID() : siteUid);
             }
         }
 
         JSONObject qrCodeObject = template.getJSONObject();
-        
+
         //XXX 迁移后删除
-        if(null == qrCodeObject){
+        if (null == qrCodeObject) {
             qrCodeObject = templateService.getJSONObjectByTemplate(template);
         }
-        
+
         BufferedImage img = null;
         try {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
@@ -333,7 +335,6 @@ public class QrCodeService {
         return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(qrCode, null, templateId, siteUid));
     }
 
-
     public StreamedContent exportQrCodeListByAssets(List<AssetInfo> assetList, String templateId) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream out = new ZipOutputStream(bout);
@@ -341,7 +342,7 @@ public class QrCodeService {
         assetList.forEach(item -> {
             if (!Strings.isNullOrEmpty(item.getQrCode())) {
                 try {
-                    BufferedImage image = getQrCodeImage(template == null ? getTemplateBySiteUid(item.getSiteUID()) : template, item, null,null);
+                    BufferedImage image = getQrCodeImage(template == null ? getTemplateBySiteUid(item.getSiteUID()) : template, item, null, null);
                     String fileName = Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg");
                     out.putNextEntry(new ZipEntry(fileName));
                     ImageIO.write(image, "JPG", out);
@@ -379,7 +380,6 @@ public class QrCodeService {
         return zipFile;
     }
 
-    
     public String getPreViewBase64(QrCodeTemplate template) {
         AssetInfo asset = getDefaultAsset();
         asset.setQrCode("0123456789123456");
