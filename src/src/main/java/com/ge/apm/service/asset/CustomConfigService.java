@@ -110,28 +110,37 @@ public class CustomConfigService {
     }
 
     public List<String> getReadAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
+            userRoles.add("ClinicalStaff");
+        }
         return config.getAssetFields().entrySet().stream()
                 .filter(item -> item.getValue().getReadRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
     public List<String> getEditAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
+            userRoles.add("ClinicalStaff");
+        }
         return config.getAssetFields().entrySet().stream()
                 .filter(item -> item.getValue().getEditRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
     public List<String> getExportAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
+            userRoles.add("ClinicalStaff");
+        }
         return config.getAssetFields().entrySet().stream()
                 .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
-        List<String> exportFields = config.getAssetFields().entrySet().stream()
-                .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
-                .map(Entry::getKey).collect(Collectors.toList());
-
+        List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
         //uuid is required to export, but not in custom config fields, so include it here.
         exportFields.add("UUID");
 
