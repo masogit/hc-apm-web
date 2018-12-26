@@ -20,7 +20,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ContractInfoItem implements Serializable {
 
     public enum ContractInfoItemType {
-        ExistAsset, Purchase, ArrivalledItem
+        ExistAsset, Purchase, ArrivalledItem,paymentRecord
     }
 
     @Id
@@ -151,6 +151,18 @@ public class ContractInfoItem implements Serializable {
     @Size(min = 0, max = 256)
     private String comments;
 
+    //付款日期
+    @Basic(optional = true)
+    @Column(name = "payment_date")
+    @Temporal(TemporalType.DATE)
+    private Date paymentDate;
+    
+    //付款金额
+    @Basic(optional = true)
+    @Column(name = "payment_price")
+    private Double paymentPrice;
+    
+    
     //excel行数
     @Transient
     private int lineNum;
@@ -362,6 +374,23 @@ public class ContractInfoItem implements Serializable {
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
     }
+
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public Double getPaymentPrice() {
+        return paymentPrice;
+    }
+
+    public void setPaymentPrice(Double paymentPrice) {
+        this.paymentPrice = paymentPrice;
+    }
+    
 
     @Override
     public int hashCode() {
