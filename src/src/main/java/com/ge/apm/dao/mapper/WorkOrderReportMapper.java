@@ -33,6 +33,9 @@ public interface WorkOrderReportMapper {
     @SelectProvider(type = WorkOrderReportProvider.class,method="statisticsByStaff")
     public List<WorkOrderReport> statisticsByStaff(@Param("tenantUID") String tenantUID, @Param("institutionUID") String institutionUID, @Param("hospitalUID") String hospitalUID, @Param("siteUID") String siteUID, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
+    @SelectProvider(type = WorkOrderReportProvider.class,method="statisticsCaseloadByDepartment")
+    public List<WorkOrderReport> statisticsCaseloadByDepartment(@Param("tenantUID") String tenantUID, @Param("institutionUID") String institutionUID, @Param("hospitalUID") String hospitalUID, @Param("siteUID") String siteUID, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
     @SelectProvider(type = WorkOrderReportProvider.class,method="workOrderExport")
     public List<WorkOrderExportPojo> workOrderExport(@Param("filters") List<SearchFilter> filters);
 }

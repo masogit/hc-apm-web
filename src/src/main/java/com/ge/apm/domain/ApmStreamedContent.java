@@ -28,6 +28,8 @@ public class ApmStreamedContent implements StreamedContent {
     
     private Integer contentLenght;
     
+    private String mark;
+    
     private byte[] tBytes;
 	
 	public ApmStreamedContent() {}
@@ -141,6 +143,14 @@ public class ApmStreamedContent implements StreamedContent {
 		this.id = id;
 	}    
 	
+	public String getMark() {
+		return mark;
+	}
+
+	public void setMark(String mark) {
+		this.mark = mark;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;

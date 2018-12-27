@@ -56,11 +56,17 @@ public class PccExamineReport implements Serializable {
 	@Column(name = "modify_date")
 	private Date modifyDate;
 
-	// 检测日期
+	// 生成报告日期
 	@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
 	@Column(name = "report_date")
 	private Date reportDate;
+
+	// 检测日期
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@Column(name = "check_date")
+	private Date checkDate;
 
 	@Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
 	private String tenantUID;
@@ -79,11 +85,11 @@ public class PccExamineReport implements Serializable {
 
 	@Column(name = "modify_by")
 	private String modifyByUid;
-	
-	@Column(name="name")
+
+	@Column(name = "name")
 	private String name;
-	
-	@Column(name="report_storage_id")
+
+	@Column(name = "report_storage_id")
 	private String reportStorageId;
 
 	@Transient
@@ -91,61 +97,85 @@ public class PccExamineReport implements Serializable {
 
 	@Transient
 	private UserAccount modifyBy;
-	
-	
-	//1:pass,2:not pass,
+
+	// 1:save,2:submit,
 	@Column(name = "status")
 	private Integer status;
-    
-    @Column(name = "asset_uid")
-    private String assetUid;
-    
-    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private AssetInfo assetInfo;
-    
-    @Column(name = "function_type")
-    private String functionType;
-    
-    @Column(name = "num")
-    private String num;
-    
-    @Column(name = "manufact_date")
-    @Temporal(TemporalType.DATE)
-    private Date manufactDate;
-    
-    @Column(name = "line_status")
-    private String lineStatus;
-    @Column(name = "mirror_status")
-    private String mirrorStatus;
-    @Column(name = "shell_status")
-    private String shellStatus;
-    @Column(name = "oil_status")
-    private String oilStatus;
-    @Column(name = "linker_status")
-    private String linkerStatus;
-    @Column(name = "tip_status")
-    private String tipStatus;
-    @Column(name = "electric_leakage_status")
-    private String electricLeakageStatus;
-    @Column(name = "first_seen_status")
-    private String firstSeenStatus;
-    @Column(name = "first_tip_status")
-    private String firstTipStatus;
-    @Column(name = "result_status")
-    private String resultStatus;
-    @Column(name = "recommand_status")
-    private String recommandStatus;
-    @Column(name = "comment")
-    private String comment;
 
+	@Column(name = "asset_uid")
+	private String assetUid;
+
+//	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+//	@ManyToOne(fetch = FetchType.EAGER)
+	@Transient
+	AssetInfo assetInfo;
 	
 	@Transient
-	private boolean needGetItem=true;
+	private String modifyByName;
 	
+	@Transient
+	private String createByName;
+	@Transient
+	private String assetInfohospitalName;
+	@Transient
+	private String assetInfoname;
+	@Transient
+	private String assetInfonamePyCode;
+	@Transient
+	private Integer assetInfofunctionGroup;
+	@Transient
+	private String assetInfofunctionType;
+	@Transient
+	private String assetInfoserialNum;
+	@Transient
+	private String assetInfodepartNum;
+	@Transient
+	private String assetInfofinancingNum;
+	@Transient
+	private String assetInfoclinicalDeptUID;
+	@Transient
+	private String assetInfoclinicalDeptName;
+	@Transient
+	private Date assetInfomanufactDate;
+	@Transient
+	private String assetInfosystemId;
+	@Transient
+	private Date assetInfoarriveDate;
+	@Transient
+	private Date assetInfoinstallDate;
+	@Transient
+	private Date assetInfowarrantyDate;
+
+	@Column(name = "line_status")
+	private String lineStatus;
+	@Column(name = "mirror_status")
+	private String mirrorStatus;
+	@Column(name = "shell_status")
+	private String shellStatus;
+	@Column(name = "oil_status")
+	private String oilStatus;
+	@Column(name = "linker_status")
+	private String linkerStatus;
+	@Column(name = "tip_status")
+	private String tipStatus;
+	@Column(name = "electric_leakage_status")
+	private String electricLeakageStatus;
+	@Column(name = "first_seen_status")
+	private String firstSeenStatus;
+	@Column(name = "first_tip_status")
+	private String firstTipStatus;
+	@Column(name = "result_status")
+	private String resultStatus;
+	@Column(name = "recommand_status")
+	private String recommandStatus;
+	@Column(name = "comment")
+	private String comment;
+
+	@Transient
+	private boolean needGetItem = true;
+
 	public PccExamineReport() {
 		super();
-		this.status=0;
 	}
 
 	public String getId() {
@@ -204,7 +234,6 @@ public class PccExamineReport implements Serializable {
 		this.modifyDate = modifyDate;
 	}
 
-
 	public String getCreateByUid() {
 		return createByUid;
 	}
@@ -238,16 +267,13 @@ public class PccExamineReport implements Serializable {
 	}
 
 	public Integer getStatus() {
-		if(status==null){
-			status=2;
-		}
 		return status;
 	}
 
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -256,7 +282,6 @@ public class PccExamineReport implements Serializable {
 		this.name = name;
 	}
 
-	
 	public boolean isNeedGetItem() {
 		return needGetItem;
 	}
@@ -272,37 +297,85 @@ public class PccExamineReport implements Serializable {
 	public void setAssetUid(String assetUid) {
 		this.assetUid = assetUid;
 	}
-
-	public AssetInfo getAssetInfo() {
-		return assetInfo;
+	public String getAssetInfoname() {
+		return assetInfoname;
 	}
 
-	public void setAssetInfo(AssetInfo assetInfo) {
-		this.assetInfo = assetInfo;
+	public void setAssetInfoname(String assetInfoname) {
+		this.assetInfoname = assetInfoname;
 	}
 
-	public String getFunctionType() {
-		return functionType;
+	public String getAssetInfonamePyCode() {
+		return assetInfonamePyCode;
 	}
 
-	public void setFunctionType(String functionType) {
-		this.functionType = functionType;
+	public void setAssetInfonamePyCode(String assetInfonamePyCode) {
+		this.assetInfonamePyCode = assetInfonamePyCode;
 	}
 
-	public String getNum() {
-		return num;
+
+	public String getAssetInfofunctionType() {
+		return assetInfofunctionType;
 	}
 
-	public void setNum(String num) {
-		this.num = num;
+	public void setAssetInfofunctionType(String assetInfofunctionType) {
+		this.assetInfofunctionType = assetInfofunctionType;
 	}
 
-	public Date getManufactDate() {
-		return manufactDate;
+	public String getAssetInfoserialNum() {
+		return assetInfoserialNum;
 	}
 
-	public void setManufactDate(Date manufactDate) {
-		this.manufactDate = manufactDate;
+	public void setAssetInfoserialNum(String assetInfoserialNum) {
+		this.assetInfoserialNum = assetInfoserialNum;
+	}
+
+	public String getAssetInfodepartNum() {
+		return assetInfodepartNum;
+	}
+
+	public void setAssetInfodepartNum(String assetInfodepartNum) {
+		this.assetInfodepartNum = assetInfodepartNum;
+	}
+
+	public String getAssetInfofinancingNum() {
+		return assetInfofinancingNum;
+	}
+
+	public void setAssetInfofinancingNum(String assetInfofinancingNum) {
+		this.assetInfofinancingNum = assetInfofinancingNum;
+	}
+
+	public String getAssetInfoclinicalDeptUID() {
+		return assetInfoclinicalDeptUID;
+	}
+
+	public void setAssetInfoclinicalDeptUID(String assetInfoclinicalDeptUID) {
+		this.assetInfoclinicalDeptUID = assetInfoclinicalDeptUID;
+	}
+
+	public String getAssetInfoclinicalDeptName() {
+		return assetInfoclinicalDeptName;
+	}
+
+	public void setAssetInfoclinicalDeptName(String assetInfoclinicalDeptName) {
+		this.assetInfoclinicalDeptName = assetInfoclinicalDeptName;
+	}
+
+	public Integer getAssetInfofunctionGroup() {
+		return assetInfofunctionGroup;
+	}
+
+	public void setAssetInfofunctionGroup(Integer assetInfofunctionGroup) {
+		this.assetInfofunctionGroup = assetInfofunctionGroup;
+	}
+
+	public Date getAssetInfomanufactDate() {
+		return assetInfomanufactDate;
+	}
+
+	public void setAssetInfomanufactDate(Date assetInfomanufactDate) {
+		this.assetInfomanufactDate = assetInfomanufactDate;
 	}
 
 	public String getLineStatus() {
@@ -415,6 +488,76 @@ public class PccExamineReport implements Serializable {
 
 	public void setReportStorageId(String reportStorageId) {
 		this.reportStorageId = reportStorageId;
+	}
+
+	public Date getCheckDate() {
+		return checkDate;
+	}
+
+	public void setCheckDate(Date checkDate) {
+		this.checkDate = checkDate;
+	}
+
+	public AssetInfo getAssetInfo() {
+		return assetInfo;
+	}
+
+	public void setAssetInfo(AssetInfo assetInfo) {
+		this.assetInfo = assetInfo;
+	}
+
+	public String getAssetInfosystemId() {
+		return assetInfosystemId;
+	}
+
+	public void setAssetInfosystemId(String assetInfosystemId) {
+		this.assetInfosystemId = assetInfosystemId;
+	}
+
+	public Date getAssetInfoarriveDate() {
+		return assetInfoarriveDate;
+	}
+
+	public void setAssetInfoarriveDate(Date assetInfoarriveDate) {
+		this.assetInfoarriveDate = assetInfoarriveDate;
+	}
+
+	public Date getAssetInfoinstallDate() {
+		return assetInfoinstallDate;
+	}
+
+	public void setAssetInfoinstallDate(Date assetInfoinstallDate) {
+		this.assetInfoinstallDate = assetInfoinstallDate;
+	}
+
+	public Date getAssetInfowarrantyDate() {
+		return assetInfowarrantyDate;
+	}
+
+	public void setAssetInfowarrantyDate(Date assetInfowarrantyDate) {
+		this.assetInfowarrantyDate = assetInfowarrantyDate;
+	}
+
+	public String getModifyByName() {
+		return modifyByName;
+	}
+
+	public void setModifyByName(String modifyByName) {
+		this.modifyByName = modifyByName;
+	}
+	public String getCreateByName() {
+		return createByName;
+	}
+
+	public void setCreateByName(String createByName) {
+		this.createByName = createByName;
+	}
+	public String getAssetInfohospitalName() {
+		return assetInfohospitalName;
+	}
+
+	public void setAssetInfohospitalName(String assetInfohospitalName) {
+		this.assetInfohospitalName = assetInfohospitalName;
 	}
 
 	@Override
