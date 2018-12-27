@@ -83,18 +83,24 @@ public class TenantInfoConfig {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("assetAdjust")) {
+				else if (key.equals("assetAdjust")) {
 					tempItem.setValue(false);
 				}
-				if (key.contains("assetAdjust.")) {
+				else if (key.contains("assetAdjust.")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("nurseSite")) {
+				else if (key.equals("nurseSite")) {
 					tempItem.setValue(false);
 				}
-				if (key.contains("nurseSite.")) {
+				else if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
 				}
+			}
+			if(key.equals("examineMgt")){
+				tempItem.setValue(false);
+			}
+			else if(key.contains("examineMgt.")){
+				tempItem.setValue(false);
 			}
 		}
 		if(root!=null){

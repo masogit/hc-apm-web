@@ -54,7 +54,7 @@ public class PccExamineReportConfigController  implements Serializable{
 		currentUser = UserContextService.getCurrentUserAccount();
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		service = WebUtil.getBean(PccExamineReportService.class);
-		
+		service.clear();
 	}
 	private List<ApmDropDownItem> convertStrToDropDownList(String str){
 		if(StringUtils.isNotEmpty(str)){
