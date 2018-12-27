@@ -47,27 +47,45 @@
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
-                                <p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId}" >
+                                <!--<p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId}" >
                                     <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener}" update="AssetsPickList"/>
+                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName2}</label>
-                                <p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId2}" >
+                                <!--<p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId2}" >
                                     <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener1}" update="AssetsPickList"/>
+                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName3}</label>
-                                <p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId3}" >
+                                <!--<p:selectOneMenu  value="#{assetOwnerSettingController.queryAsset.assetOwnerId3}" >
                                     <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener2}" update="AssetsPickList"/>
+                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                </p:autoComplete>
                             </h:panelGroup>
 
                         </p:panelGrid>
@@ -101,28 +119,46 @@
                                 <p:selectBooleanCheckbox itemLabel="#{msg.SettingOwner}#{msg.assetOwnerName}" value="#{assetOwnerSettingController.isChanegeOwner}" >
                                     <p:ajax listener="#{assetOwnerSettingController.onCheckChange}"  update="setOwnerSelecter" />
                                 </p:selectBooleanCheckbox>
-                                <p:selectOneMenu   value="#{assetOwnerSettingController.ownerId}"  rendered="#{assetOwnerSettingController.isChanegeOwner}">
+                                <!--<p:selectOneMenu   value="#{assetOwnerSettingController.ownerId}"  rendered="#{assetOwnerSettingController.isChanegeOwner}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.owner}" rendered="#{assetOwnerSettingController.isChanegeOwner}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                    <p:ajax listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup id="setOwnerSelecter2">
                                 <p:selectBooleanCheckbox itemLabel="#{msg.SettingOwner}#{msg.assetOwnerName2}" value="#{assetOwnerSettingController.isChanegeOwner2}" >
                                     <p:ajax listener="#{assetOwnerSettingController.onCheckChange}"  update="setOwnerSelecter2" />
                                 </p:selectBooleanCheckbox>
-                                <p:selectOneMenu id="setOwner2" value="#{assetOwnerSettingController.ownerId2}"  rendered="#{assetOwnerSettingController.isChanegeOwner2}">
+                                <!--<p:selectOneMenu id="setOwner2" value="#{assetOwnerSettingController.ownerId2}"  rendered="#{assetOwnerSettingController.isChanegeOwner2}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.owner2}" rendered="#{assetOwnerSettingController.isChanegeOwner2}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                    <p:ajax listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup id="setOwnerSelecter3">
                                 <p:selectBooleanCheckbox itemLabel="#{msg.SettingOwner}#{msg.assetOwnerName3}" value="#{assetOwnerSettingController.isChanegeOwner3}" >
                                     <p:ajax listener="#{assetOwnerSettingController.onCheckChange}"  update="setOwnerSelecter3" />
                                 </p:selectBooleanCheckbox>
-                                <p:selectOneMenu id="setOwner3" value="#{assetOwnerSettingController.ownerId3}"  rendered="#{assetOwnerSettingController.isChanegeOwner3}">
+                                <!--<p:selectOneMenu id="setOwner3" value="#{assetOwnerSettingController.ownerId3}"  rendered="#{assetOwnerSettingController.isChanegeOwner3}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                </p:selectOneMenu>-->
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.owner3}" rendered="#{assetOwnerSettingController.isChanegeOwner3}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                    <p:ajax listener="#{assetOwnerSettingController.onOwnerChange}" />
+                                </p:autoComplete>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >

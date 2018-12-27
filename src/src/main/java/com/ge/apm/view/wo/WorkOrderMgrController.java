@@ -72,6 +72,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private String locationName;
+    private String assigneeId;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
     private Set<String> clinicalDeptOrgUidSet;
@@ -543,7 +544,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 5) { //待验收
-            if (userContextService.hasRole("AssetStaff")) {
+            if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             } else {
@@ -576,10 +577,14 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 //            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
+            if(!userContextService.hasRole("AssetHead")){
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+}
+
         } else if (queryIndex == 11) { //全部维修单
             if(stepFileter!=null) {
                 fillterStepId = woStatus.get(stepFileter);
@@ -844,12 +849,16 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         accessoryList.forEach(item -> item.setCreatedDate(null));
         if (!attachList.isEmpty())
             picList.addAll(attachList);
-        woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
     public List<UserAccount> getWorkerList() {
         return woService.getWorkerList(selectedWorkOrder.getAssetId());
+    }
+   //待验收
+    public List<UserAccount> getAcker() {
+        return woService.getAckerList(selectedWorkOrder.getId());
     }
 
     public void ackWorkOrder() {
@@ -932,12 +941,13 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
-        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
     public void cancelWorkOrder() {
-
+//tbc: cancelReason assetStatus
+        assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
         woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason, assetStatus);
 
         cancelReason = null;
@@ -1599,6 +1609,14 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             itemDetail.setSupplier(supplierName);
         else
             itemDetail.setSupplier(supplier.getName());
+    }
+
+    public String getAssigneeId() {
+        return assigneeId;
+    }
+
+    public void setAssigneeId(String assigneeId) {
+        this.assigneeId = assigneeId;
     }
 
     public String getManHourShow() {

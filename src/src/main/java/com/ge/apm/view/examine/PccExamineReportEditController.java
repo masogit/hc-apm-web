@@ -20,6 +20,7 @@ import com.ge.apm.dao.PccExamineReportRepository;
 import com.ge.apm.domain.ApmDropDownItem;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
@@ -71,7 +72,11 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	private UploadedFile file;
 	private ApmStreamedContent reportFile;
 	private List<ApmStreamedContent> listStreamedContent;
-	private ApmStreamedContent tailAttach;
+	private ApmStreamedContent picture1;
+	private ApmStreamedContent picture2;
+	private ApmStreamedContent picture3;
+	private ApmStreamedContent picture4;
+	private ApmStreamedContent pictureTail;
 	private List<PccExamineReport> listSelected;
 	private PccExamineReport selected;
 	private boolean blnNewUpload=false;
@@ -81,7 +86,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	String contractInfoSiteUID;
 	PccExamineReportService service;
 	PccExamineReportRepository dao;
-	SearchController searchController;
 	@PostConstruct
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -89,10 +93,8 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		uaaService = WebUtil.getBean(UaaService.class);
 		aiService = WebUtil.getBean(AssetInstallationService.class);
 		service = WebUtil.getBean(PccExamineReportService.class);
+		service.clear();
 		dao = WebUtil.getBean(PccExamineReportRepository.class);
-		searchController = WebUtil.getBean(SearchController.class);
-		searchController.setType(2);
-		searchController.updateData();
 		if(listStreamedContent==null){
 			listStreamedContent = new ArrayList<ApmStreamedContent>();
 		}
@@ -108,6 +110,9 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			if ("Create".equalsIgnoreCase(actionName)) {
 				try {
 					prepareCreate();
+					String assetuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+					this.selected.setAssetUid(assetuid);
+					this.selected.setAssetInfo(service.getAssetInfo(assetuid));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					LOGGER.error(e.getMessage());
@@ -115,20 +120,46 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	        } else if ("Edit".equalsIgnoreCase(actionName)) {
 	            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
 	            setSelected(selectedId);
+	            this.selected.setAssetInfo(service.getAssetInfo(this.selected.getAssetUid()));
 	            prepareEdit();
+	            
 	        }
+			this.selected.setStatus(1);
 		}
-		
 	}
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 		// TODO Auto-generated method stub
+		try {
+			if(eventObject!=null){
+				
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
 	}
 	public void save() {
 		// TODO Auto-generated method stub
 		prepareSave();
 		boolean result=false;
 		if(blnNewUpload){
+			listStreamedContent.clear();
+			if(picture1!=null){
+				listStreamedContent.add(picture1);
+			}
+			if(picture2!=null){
+				listStreamedContent.add(picture2);
+			}
+			if(picture3!=null){
+				listStreamedContent.add(picture3);
+			}
+			if(picture4!=null){
+				listStreamedContent.add(picture4);
+			}
+			if(pictureTail!=null){
+				listStreamedContent.add(pictureTail);
+			}
 			result=service.savePccReport(this.selected, listStreamedContent);
 		}
 		else{
@@ -141,6 +172,15 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		else{
 			addMessage("PCC 探头检测报告保存失败！");
 		}
+	}
+	
+	public void submit(){
+		if(picture1==null || picture2==null || picture3==null || picture4==null || pictureTail ==null){
+			addMessage("图片缺失，请上传！");
+			return;
+		}
+		this.selected.setStatus(2);
+		save();
 	}
 	public void delete() {
 		// TODO Auto-generated method stub
@@ -185,30 +225,36 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		selectFirstTipStatus=convertStrToDropDown(this.selected.getFirstTipStatus());
 		selectResultStatus=convertStrToDropDownList(this.selected.getResultStatus());
 		selectRecommandStatus=convertStrToDropDown(this.selected.getRecommandStatus());
-		this.searchController.setSelectedAssetInfo(this.selected.getAssetInfo());
 	}
 	private void parseBlobObject(){
 		String id=this.selected.getId();
 		if(StringUtils.isNotEmpty(id)){
 			this.listStreamedContent=service.parseBlobObjectImg(id);
+			if(listStreamedContent!=null && listStreamedContent.size()>0){
+				for(int i=0;i<listStreamedContent.size();++i){
+					ApmStreamedContent tempContent=listStreamedContent.get(i);
+					if(tempContent.getMark().equals("picture1")){
+						picture1=tempContent;
+					}
+					else if(tempContent.getMark().equals("picture2")){
+						picture2=tempContent;
+					}
+					else if(tempContent.getMark().equals("picture3")){
+						picture3=tempContent;
+					}
+					else if(tempContent.getMark().equals("picture4")){
+						picture4=tempContent;
+					}
+					else if(tempContent.getMark().equals("pictureTail")){
+						pictureTail=tempContent;
+					}
+				}
+			}
 			this.reportFile=service.parseBlobObjectDoc(id);
 		}
 	}
 	private void prepareSave(){
-		AssetInfo tempInfo=searchController.getSelectedAssetInfo();
-		if(tempInfo!=null){
-			this.selected.setAssetInfo(tempInfo);
-			this.selected.setAssetUid(tempInfo.getUid());
-			if(StringUtils.isEmpty(this.selected.getNum())){
-				this.selected.setNum(tempInfo.getDepartNum());
-			}
-			if(this.selected.getManufactDate()==null){
-				this.selected.setManufactDate(tempInfo.getManufactDate());
-			}
-			if(StringUtils.isEmpty(this.selected.getFunctionType())){
-				this.selected.setFunctionType(tempInfo.getFunctionType());
-			}
-		}
+//		this.selected.setAssetUid(tempInfo.getUid());
 		this.selected.setLineStatus(convertDropDownListToStr(selectLineStatus));
 		this.selected.setMirrorStatus(convertDropDownListToStr(selectMirrorStatus));
 		this.selected.setShellStatus(convertDropDownListToStr(selectShellStatus));
@@ -220,18 +266,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		this.selected.setFirstTipStatus(convertDropDownToStr(selectFirstTipStatus));
 		this.selected.setResultStatus(convertDropDownListToStr(selectResultStatus));
 		this.selected.setRecommandStatus(convertDropDownToStr(selectRecommandStatus));
-		String strStatus=this.selected.getRecommandStatus();
-		if(StringUtils.isNotEmpty(strStatus)){
-			if(strStatus.contains("2")){
-				this.selected.setStatus(2);
-			}
-			else{
-				this.selected.setStatus(1);
-			}
-		}
-		else{
-			this.selected.setStatus(2);
-		}
 		this.selected.setModifyBy(currentUser);
 		this.selected.setModifyByUid(currentUser.getUid());
 		this.selected.setModifyDate(new Date());
@@ -317,7 +351,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			addMessage("请完善报告信息！");
 			return;
 		}
-		reportFile=service.generateReport(this.selected,this.listStreamedContent);
+		reportFile=service.generateReport_bak(this.selected,this.listStreamedContent);
 		if(reportFile==null){
 			addMessage("请上传报告传模板");
 		}
@@ -329,10 +363,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if (file != null) {
 			try {
 				ApmStreamedContent e = new ApmStreamedContent(file.getInputstream(), file.getContentType(), file.getFileName());
-				if (listStreamedContent.size() > 4) {
-					listStreamedContent.remove(0);
-				}
-				listStreamedContent.add(e);
 				addMessage(file.getFileName() + " 上传成功.");
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -340,16 +370,14 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			}
 		}
 	}
-	public void handleFileUpload(FileUploadEvent event) {
+	public void handleFileUpload1(FileUploadEvent event) {
 		blnNewUpload=true;
+		picture1=null;
 		UploadedFile tempFile = event.getFile();
 		if (tempFile != null) {
 			try {
-				ApmStreamedContent e = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
-				listStreamedContent.add(e);
-				while (listStreamedContent.size() > 4) {
-					listStreamedContent.remove(0);
-				}
+				picture1 = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				picture1.setMark("picture1");
 				addMessage(tempFile.getFileName() + " 上传成功！");
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -358,27 +386,67 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		} else {
 			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
 		}
-		// V2_BlobObject blobObject = service.uploadFile(event);
-		// String type = event.getComponent().getId();
-		// type = type.substring(type.indexOf("type") + 4);
-		// if (null != blobObject) {
-		// attachList.add(blobObject);
-		// blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
-		// blobObject.setBoUuid(selected.getId());
-		// blobObject.setBoSubType(type);
-		// blobService.saveBlobObject(blobObject);
-		// WebUtil.addSuccessMessage(blobObject.getObjectName() +
-		// WebUtil.getMessage("SuccessUploaded"));
-		// } else {
-		// WebUtil.addErrorMessage("fail to upload file");
-		// }
 	}
-	
-	public void handleTailUpload(FileUploadEvent event){
+	public void handleFileUpload2(FileUploadEvent event) {
+		blnNewUpload=true;
+		picture2=null;
 		UploadedFile tempFile = event.getFile();
 		if (tempFile != null) {
 			try {
-				tailAttach = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				picture2 = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				picture2.setMark("picture2");
+				addMessage(tempFile.getFileName() + " 上传成功！");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		} else {
+			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+		}
+	}
+	public void handleFileUpload3(FileUploadEvent event) {
+		blnNewUpload=true;
+		picture3=null;
+		UploadedFile tempFile = event.getFile();
+		if (tempFile != null) {
+			try {
+				picture3 = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				picture3.setMark("picture3");
+				addMessage(tempFile.getFileName() + " 上传成功！");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		} else {
+			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+		}
+	}
+	public void handleFileUpload4(FileUploadEvent event) {
+		blnNewUpload=true;
+		picture4=null;
+		UploadedFile tempFile = event.getFile();
+		if (tempFile != null) {
+			try {
+				picture4 = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				picture4.setMark("picture4");
+				addMessage(tempFile.getFileName() + " 上传成功！");
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error(e.getMessage());
+			}
+		} else {
+			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+		}
+	}
+	
+	public void handleTailUpload(FileUploadEvent event){
+		blnNewUpload=true;
+		pictureTail=null;
+		UploadedFile tempFile = event.getFile();
+		if (tempFile != null) {
+			try {
+				pictureTail = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
+				pictureTail.setMark("pictureTail");
 				addMessage(tempFile.getFileName() + " 上传成功！");
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -461,12 +529,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	public List<ApmDropDownItem> fetchRecommandStatus(){
 		return service.fetchRecommandStatus();
 	}
-	public ApmStreamedContent getTailAttach() {
-		return tailAttach;
-	}
-	public void setTailAttach(ApmStreamedContent tailAttach) {
-		this.tailAttach = tailAttach;
-	}
+	
 	public ApmStreamedContent getReportFile() {
 		return reportFile;
 	}
@@ -493,5 +556,35 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	}
 	public void setSelected(PccExamineReport selected) {
 		this.selected = selected;
+	}
+	public ApmStreamedContent getPicture1() {
+		return picture1;
+	}
+	public void setPicture1(ApmStreamedContent picture1) {
+		this.picture1 = picture1;
+	}
+	public ApmStreamedContent getPicture2() {
+		return picture2;
+	}
+	public void setPicture2(ApmStreamedContent picture2) {
+		this.picture2 = picture2;
+	}
+	public ApmStreamedContent getPicture3() {
+		return picture3;
+	}
+	public void setPicture3(ApmStreamedContent picture3) {
+		this.picture3 = picture3;
+	}
+	public ApmStreamedContent getPicture4() {
+		return picture4;
+	}
+	public void setPicture4(ApmStreamedContent picture4) {
+		this.picture4 = picture4;
+	}
+	public ApmStreamedContent getPictureTail() {
+		return pictureTail;
+	}
+	public void setPictureTail(ApmStreamedContent pictureTail) {
+		this.pictureTail = pictureTail;
 	}
 }
