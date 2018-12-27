@@ -339,18 +339,24 @@ public class SearchController {
 
 	private boolean generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
+		int filterCount=0;
 		if (selectedOrg != null) {
 			int orgTypeTemp = selectedOrg.getOrgType();
 			if (orgTypeTemp == 0) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_TENANTUID, Operator.EQ, selectedOrg.getTenantUID(), "1*"));
 			} else if (orgTypeTemp == 1) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_INSTITUTIONUID, Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
 			} else if (orgTypeTemp == 2) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_HOSPITALUID, Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
 			} else if (orgTypeTemp == 3) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
 			}
 			if (selectedOrgDepart != null) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, selectedOrgDepart.getUid(), "1*"));
 			}
 			if (blnFilterStatus) {
@@ -363,22 +369,26 @@ public class SearchController {
 				listSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
 			}
 			if (StringUtils.isNotEmpty(assetName)) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_ASSETNAME, Operator.LIKE, assetName, "1*3+"));
 				listSearchFilter.add(new SearchFilter(STR_ASSETNAME_PY, Operator.LIKE, assetName, "1*3+"));
 			}
 			if (StringUtils.isNotEmpty(assetGroup)) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
 			}
 			if (StringUtils.isNotEmpty(functionType)) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_FUNCTIONTYPE, Operator.LIKE, functionType, "1*"));
 			}
 			if (StringUtils.isNotEmpty(threeQrCode)) {
+				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
 				listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
 				listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
 			}
 		}
-		if (listSearchFilter.size() > 1) {
+		if (filterCount > 1) {
 			return true;
 		}
 		return false;
