@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.pm;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
@@ -1106,6 +1107,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void submitAppvalPmOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="报价审核";
+        }
+
         //先保存检查项
         saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
