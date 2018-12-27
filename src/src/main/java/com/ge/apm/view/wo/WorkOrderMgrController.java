@@ -1220,6 +1220,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
     public void submitWorkOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="报价审核";
+        }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> {
             item.setCreatedDate(null);
