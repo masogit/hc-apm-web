@@ -33,9 +33,9 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.ApmDropDownItem;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.bo.render.ListPictureRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
@@ -81,9 +81,8 @@ public class PccExamineReportService {
     private static List<ApmDropDownItem> firstTipStatus;
     private static List<ApmDropDownItem> resultStatus;
     private static List<ApmDropDownItem> recommandStatus;
-
-    
-    
+    private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
+    private Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
     public List<PccExamineReport> fetchPccExamineReportBySite(String siteUid){
         return pccExamineReportRepository.fetchPccExamineReportBySiteUid(siteUid);
     }
@@ -92,11 +91,18 @@ public class PccExamineReportService {
         return blobFileService.uploadFile(event.getFile());
     }
     
-    public boolean saveFile(List<ApmStreamedContent> list,String boUuid){
+    public void clear(){
+    	mapOrgInfo.clear();
+    	mapAssetInfo.clear();
+    }
+    
+    public boolean saveFile(List<ApmStreamedContent> list,String boUuid,String boType){
         boolean result=false;
         if(list!=null && list.size()>0){
             for(int i=0;i<list.size();++i){
-                result=saveImage(list.get(i),boUuid);
+            	ApmStreamedContent tempContent=list.get(i);
+            	deleteFile(boUuid, boType, tempContent.getMark());
+                result=saveFile(tempContent,boUuid,V2_BlobObject.BO_TYPE_PCCReport,tempContent.getMark());
                 if(!result){
                     return result;
                 }
@@ -108,9 +114,8 @@ public class PccExamineReportService {
     public boolean savePccReport(PccExamineReport report,List<ApmStreamedContent> listContent){
     	pccExamineReportRepository.save(report);
         String id=report.getId();
-        deleteFile(id, V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_IMG);
         if(StringUtils.isNotEmpty(id)){
-            saveFile(listContent, id);
+            saveFile(listContent, id,V2_BlobObject.BO_TYPE_PCCReport);
         }
         return true;
     }
@@ -126,7 +131,7 @@ public class PccExamineReportService {
     
     
     public List<ApmStreamedContent> parseBlobObjectImg(String boUuid){
-        List<V2_BlobObject> listObj=getFile(boUuid,V2_BlobObject.BO_TYPE_PCCReport,V2_BlobObject.BO_SUB_TYPE_IMG);
+        List<V2_BlobObject> listObj=getFile(boUuid,V2_BlobObject.BO_TYPE_PCCReport);
         List<ApmStreamedContent> listResult=new ArrayList<ApmStreamedContent>();
         if(listObj!=null&& listObj.size()>0){
             for(int i=0;i<listObj.size();++i){
@@ -135,6 +140,7 @@ public class PccExamineReportService {
                 if(StringUtils.isNotEmpty(storageId)){
                     ApmStreamedContent tempContent=new ApmStreamedContent(blobFileService.getBlobObjectByStorageId(storageId).getStream(), obj.getObjectType(), obj.getObjectName());
                     tempContent.setId(storageId);
+                    tempContent.setMark(obj.getBoSubType());
                     listResult.add(tempContent);
                 }
             }
@@ -155,17 +161,6 @@ public class PccExamineReportService {
             }
         }
         return null;
-    }
-    @Transactional
-    public boolean saveImage(ApmStreamedContent content,String boUuid){
-        if(content!=null){
-            V2_BlobObject blobObj=blobFileService.uploadFile(content.getStream(), content.getName());
-            blobObj.setBoType(V2_BlobObject.BO_TYPE_PCCReport);
-            blobObj.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-            blobObj.setBoUuid(boUuid);
-            blobFileService.saveBlobObject(blobObj);
-        }
-        return true;
     }
     
     @Transactional
@@ -188,8 +183,12 @@ public class PccExamineReportService {
         return msService.downloadSingleFile(storageId);
     }
     
+    public List<V2_BlobObject> getFile(String boUuid,String boType){
+    	return blobFileService.fetchBlobObject(boUuid, boType);
+    }
+    
     public List<V2_BlobObject> getFile(String boUuid,String boType,String boSubType){
-    	return blobFileService.fetchBlobObject(boUuid, boType, boSubType);
+    	return blobFileService.fetchBlobObject(boUuid, boType,boSubType);
     }
     
 	public Boolean deleteFile(String boUuid,String boType,String boSubType){
@@ -203,6 +202,28 @@ public class PccExamineReportService {
 	
 	public Boolean deleteFileByStorageId(String storageId){
 		return blobFileService.deleteBlobFilesByStorageId(storageId);
+	}
+	
+	private OrgInfo getOrgInfo(String orgUid){
+		OrgInfo orgInfo=mapOrgInfo.get(orgUid);
+		if(orgInfo==null){
+			orgInfo=orgInfoRepository.findByUid(orgUid);
+			if(orgInfo!=null){
+				mapOrgInfo.put(orgUid, orgInfo);
+			}
+		}
+		return orgInfo;
+	}
+	
+	public AssetInfo getAssetInfo(String assetUid){
+		AssetInfo assetInfo=mapAssetInfo.get(assetUid);
+		if(assetInfo==null){
+			assetInfo=assetInfoRepository.findByUid(assetUid);
+			if(assetInfo!=null){
+				mapAssetInfo.put(assetUid, assetInfo);
+			}
+		}
+		return assetInfo;
 	}
 	
 	public ApmStreamedContent getTemplate(){
@@ -224,11 +245,11 @@ public class PccExamineReportService {
 	public ApmStreamedContent getOriginTemplate(){
 		return new ApmStreamedContent(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/examine/pccExamineReportTemplate.docx"), "application/octet-stream", "pccExamineReportTemplate.docx");
 	}
-	public boolean batchGenerateReport(List<PccExamineReport> listPcc){
+	public boolean batchGenerateReport_bak(List<PccExamineReport> listPcc){
 		boolean result=true;
 		for(int i=0;i<listPcc.size();++i){
 			PccExamineReport tempPcc=listPcc.get(i);
-			ApmStreamedContent tempResult=generateReport(tempPcc, null);
+			ApmStreamedContent tempResult=generateReport(tempPcc);
 			if(tempResult==null){
 				return false;
 			}
@@ -236,8 +257,45 @@ public class PccExamineReportService {
 		return result;
 	}
 	
+	public List<ApmStreamedContent> batchGenerateReport(List<PccExamineReport> listPcc){
+		List<ApmStreamedContent> list=new ArrayList<ApmStreamedContent>();
+		for(int i=0;i<listPcc.size();++i){
+			PccExamineReport tempPcc=listPcc.get(i);
+			ApmStreamedContent tempResult=generateReport(tempPcc);
+			if(tempResult!=null){
+				list.add(tempResult);
+			}
+		}
+		return list;
+	}
+	
 	@Transactional
-	public ApmStreamedContent generateReport(PccExamineReport pcc,List<ApmStreamedContent> listPicture){
+	public ApmStreamedContent generateReport(PccExamineReport pcc){
+//		deleteFile(pcc.getId(), V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_DOCS);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+		Date date=new Date();
+		List<ApmStreamedContent> listPicture=parseBlobObjectImg(pcc.getId());
+		ApmStreamedContent template=getTemplate();
+		if(template!=null){
+			try {
+				String fileName=sdf.format(date);
+				String tempFileName=template.getName();
+				int index=tempFileName.lastIndexOf(".");
+				fileName=fileName+tempFileName.substring(index,tempFileName.length());
+				pcc.setReportDate(new Date());
+				template.settBytes(renderDocx(getTemplateMap(pcc,listPicture), template.gettBytes()));
+				template.setContentType("application/msword");
+				template.setName(fileName);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				LOGGER.error(e.getMessage());
+			}
+		}
+		return template;
+	}
+	
+	@Transactional
+	public ApmStreamedContent generateReport_bak(PccExamineReport pcc,List<ApmStreamedContent> listPicture){
 		deleteFile(pcc.getId(), V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_DOCS);
 		ApmStreamedContent template=getTemplate();
 		if(template!=null){
@@ -274,46 +332,64 @@ public class PccExamineReportService {
 	private Map<String, Object> getTemplateMap(PccExamineReport pcc,List<ApmStreamedContent> listPicture){
 		Map<String, Object> data=new HashMap<String, Object>();
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-		data.put("lineStatus", convertKeyToLable(pcc.getLineStatus(),lineStatus));
-		data.put("mirrorStatus", convertKeyToLable(pcc.getMirrorStatus(),mirrorStatus));
-		data.put("shellStatus", convertKeyToLable(pcc.getShellStatus(),shellStatus));
-		data.put("linkerStatus", convertKeyToLable(pcc.getLinkerStatus(),linkerStatus));
-		data.put("oilStatus", convertKeyToLable(pcc.getOilStatus(),oilStatus));
-		data.put("tipStatus", convertKeyToLable(pcc.getTipStatus(),tipStatus));
-		data.put("electricLeakageStatus", convertKeyToLable(pcc.getElectricLeakageStatus(),electricLeakageStatus));
-		data.put("firstSeenStatus", convertKeyToLable(pcc.getFirstSeenStatus(),firstSeenStatus));
-		data.put("firstTipStatus", convertKeyToLable(pcc.getFirstTipStatus(),firstTipStatus));
-		data.put("resultStatus", convertKeyToLable(pcc.getResultStatus(),resultStatus));
-		data.put("recommandStatus", convertKeyToLable(pcc.getRecommandStatus(),recommandStatus));
+		data.put("lineStatus", convertKeyToLable(pcc.getLineStatus(),fetchLineStatus()));
+		data.put("mirrorStatus", convertKeyToLable(pcc.getMirrorStatus(),fetchMirrorStatus()));
+		data.put("shellStatus", convertKeyToLable(pcc.getShellStatus(),fetchShellStatus()));
+		data.put("linkerStatus", convertKeyToLable(pcc.getLinkerStatus(),fetchLinkerStatus()));
+		data.put("oilStatus", convertKeyToLable(pcc.getOilStatus(),fetchOilStatus()));
+		data.put("tipStatus", convertKeyToLable(pcc.getTipStatus(),fetchTipStatus()));
+		data.put("electricLeakageStatus", convertKeyToLable(pcc.getElectricLeakageStatus(),fetchElectricLeakageStatus()));
+		data.put("firstSeenStatus", convertKeyToLable(pcc.getFirstSeenStatus(),fetchFirstSeenStatus()));
+		data.put("firstTipStatus", convertKeyToLable(pcc.getFirstTipStatus(),fetchFirstTipStatus()));
+		data.put("resultStatus", convertKeyToLable(pcc.getResultStatus(),fetchResultStatus()));
+		data.put("recommandStatus", convertKeyToLable(pcc.getRecommandStatus(),fetchRecommandStatus()));
 		data.put("comment", pcc.getComment());
-		data.put("functionType", pcc.getFunctionType());
-		data.put("num", pcc.getNum());
+		
 		AssetInfo tempInfo=pcc.getAssetInfo();
+		if(tempInfo==null){
+			tempInfo=getAssetInfo(pcc.getAssetUid());
+			pcc.setAssetInfo(tempInfo);
+		}
 		if(tempInfo!=null){
 			data.put("hospitalName", tempInfo.getHospital().getName());
 			data.put("clinicalName",tempInfo.getClinicalDeptName());
+			data.put("functionType",tempInfo.getFunctionType());
+			data.put("num", tempInfo.getDepartNum());
+			Date tempDate=tempInfo.getManufactDate();
+			if(tempDate!=null){
+				data.put("manufactDate", sdf.format(tempDate));
+			}
 		}
 		Date tempDate=pcc.getReportDate();
 		if(tempDate!=null){
 			data.put("reportDate", sdf.format(tempDate));
 		}
-		tempDate=pcc.getManufactDate();
-		if(tempDate!=null){
-			data.put("manufactDate", sdf.format(tempDate));
-		}
 		if(listPicture==null){
 			listPicture=parseBlobObjectImg(pcc.getId());
 		}
-		List<PictureRenderData> listTempPicture=null;
 		if(listPicture!=null && listPicture.size()>0){
-			listTempPicture=new ArrayList<PictureRenderData>();
 			for(int i=0;i<listPicture.size();++i){
 				ApmStreamedContent tempContent=listPicture.get(i);
 				PictureRenderData tempPic=new PictureRenderData(200, 160, tempContent.getName(), tempContent.gettBytes());
-				listTempPicture.add(tempPic);
+				if(tempContent.getMark().equals("picture1")){
+					data.put("picture1", tempPic);
+				}
+				else if(tempContent.getMark().equals("picture2")){
+					data.put("picture2", tempPic);
+				}
+				else if(tempContent.getMark().equals("picture3")){
+					data.put("picture3", tempPic);
+				}
+				else if(tempContent.getMark().equals("picture4")){
+					data.put("picture4", tempPic);
+				}
+				else if(tempContent.getMark().equals("pictureTail")){
+					tempPic.setWidth(600);
+					tempPic.setHeight(800);
+					data.put("pictureTail", tempPic);
+				}
 			}
 		}
-		data.put("picture", listTempPicture);
 		return data;
 	}
 	
@@ -341,9 +417,6 @@ public class PccExamineReportService {
 		XWPFTemplate template = null;
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream(); InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
 			template = XWPFTemplate.compile(inputStream);
-			if(datas.get("picture")!=null){
-				template.registerPolicy("picture", new ListPictureRenderPolicy());
-			}
 			template.render(datas);
 			template.write(out);
 			bytes = out.toByteArray();

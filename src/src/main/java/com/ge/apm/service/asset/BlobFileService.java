@@ -220,6 +220,10 @@ public class BlobFileService {
     public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType,String subType){
     	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
     }
+    
+    public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType){
+    	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType);
+    }
 
     /**
      * Need to investigate why the same object storage id occurs more than once

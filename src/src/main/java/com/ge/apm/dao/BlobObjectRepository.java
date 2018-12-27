@@ -23,6 +23,9 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     @Query(value="select o.* from v2_blob_object o where o.bo_uuid=?1 and o.bo_type=?2 and o.bo_sub_type=?3",nativeQuery=true)
     public List<V2_BlobObject> fetchBlobObjectByUuidAndType(String boUuid,String boType,String boSubType);
     
+    @Query(value="select o.* from v2_blob_object o where o.bo_uuid=?1 and o.bo_type=?2",nativeQuery=true)
+    public List<V2_BlobObject> fetchBlobObjectByUuidAndType(String boUuid,String boType);
+    
     public List<V2_BlobObject> findAllByObjectStorageId(Set<String> objectIds);
 
     @Query(value="select o from V2_BlobObject o,AssetInfo a where o.boUuid=a.uid and o.boType='AssetInfo' and  (a.siteUID in ?1 or a.clinicalDeptUID in ?1"
