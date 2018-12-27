@@ -188,6 +188,13 @@
 
                         </p:panelGrid>
 
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
+                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
