@@ -118,6 +118,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
             exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("所属课题项目", "subjectProject");
+            exportFields.put("创建日期", "createdDate");
 
             exportFields.put("UUID", "UUID");
 
