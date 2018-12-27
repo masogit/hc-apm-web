@@ -48,7 +48,7 @@
 						   <label class ="label">#{msg.clinicalDeptName}</label>
 						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
 										   forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
-										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" disabled="#{generatePmOrdersController.level == null}">
+										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
 							   <!--<p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
 							   <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>-->
 						   </p:autoComplete>
@@ -56,14 +56,14 @@
 
 						  <h:panelGroup >
 							 <label class ="label">#{msg.assetName}</label>
-							 <p:inputText  value="#{generatePmOrdersController.queryAsset.name}"  disabled="#{generatePmOrdersController.level == null}">
+							 <p:inputText  value="#{generatePmOrdersController.queryAsset.name}">
 									<!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />-->
 							 </p:inputText>
 						 </h:panelGroup>
 
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
-		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}" disabled="#{generatePmOrdersController.level == null}" >
+		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}">
 		                             <!-- <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -82,14 +82,14 @@
 
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>
-		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}"  disabled="#{generatePmOrdersController.level == null}">
+		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}">
 	                                    <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 	                          </p:inputText>
 		                 </h:panelGroup>
 
 						   <h:panelGroup >
 							   <label class ="label">#{msg.brand}</label>
-							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}"  disabled="#{generatePmOrdersController.level == null}">
+							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}">
 								   <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />-->
 							   </p:inputText>
 						   </h:panelGroup>
@@ -146,7 +146,7 @@
                     <br/> <br/>
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
-						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="生成" icon="ui-icon-check" update=":growl GeneratePmOrderForm" />
+						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="生成" icon="ui-icon-check" update=":growl" />
 						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
