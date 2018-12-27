@@ -762,6 +762,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         confirmedDownTime = null;
         needConfirmTime = false;
         selectedApproverUid = null;
+       // comments="工作需要";
     }
 
     public void prepareNewWorkOrder(String woid) {
@@ -1077,6 +1078,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
     public void reassignWorkOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="工作需要";
+        }
         woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
