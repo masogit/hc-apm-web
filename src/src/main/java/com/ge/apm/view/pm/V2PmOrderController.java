@@ -5,7 +5,6 @@
  */
 package com.ge.apm.view.pm;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
@@ -39,7 +38,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.context.RequestContext;
@@ -830,11 +829,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void reassignWorkOrder() {
-
-        if(StringUtils.isEmpty(comments)){
-            comments ="工作需要";
-        }
-
         if (isChecked() == false) {//非批量
             pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
         } else {//批量派工
