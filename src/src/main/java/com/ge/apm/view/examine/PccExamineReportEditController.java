@@ -8,6 +8,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -174,6 +176,63 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	}
 	
 	public void submit(){
+		boolean passValid=true;
+		if(StringUtils.isEmpty(this.selected.getLineStatus())){
+		    WebUtil.addErrorMessage("线缆" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("lineStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getMirrorStatus())){
+		    WebUtil.addErrorMessage("透镜" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("mirrorStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getShellStatus())){
+		    WebUtil.addErrorMessage("外壳" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("shellStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getOilStatus())){
+		    WebUtil.addErrorMessage("油囊" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("oilStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getLinkerStatus())){
+		    WebUtil.addErrorMessage("连接器" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("linkerStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getTipStatus())){
+		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("tipStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getElectricLeakageStatus())){
+		    WebUtil.addErrorMessage("探头漏电流检测结果" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("electricLeakageStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getFirstSeenStatus())){
+		    WebUtil.addErrorMessage("所见" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("firstSeenStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getFirstTipStatus())){
+		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("firstTipStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getResultStatus())){
+		    WebUtil.addErrorMessage("检测结果" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("resultStatus", true);
+		    passValid=false;
+		}
+		else if(StringUtils.isEmpty(this.selected.getRecommandStatus())){
+		    WebUtil.addErrorMessage("建议" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("recommandStatus", true);
+		    passValid=false;
+		}
+        
 		if(picture1==null){
 			addMessage("图片1缺失，请上传！");
 			return;
@@ -192,6 +251,9 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		}
 		else if(pictureTail ==null){
 			addMessage("尾页图片缺失，请上传！");
+			return;
+		}
+		if(!passValid){
 			return;
 		}
 		this.selected.setStatus(2);
