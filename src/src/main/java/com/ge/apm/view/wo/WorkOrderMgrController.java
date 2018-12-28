@@ -762,7 +762,22 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         confirmedDownTime = null;
         needConfirmTime = false;
         selectedApproverUid = null;
-       // comments="工作需要";
+        Long time = System.currentTimeMillis();
+        time += 120*1000*60;
+        esTime = new Date(time);
+    }
+
+    public boolean isStep(V2_WorkOrder workOrder){
+        if(workOrder==null){
+            return false;
+        }
+        //2-待派工/3-已派工
+        if(workOrder.getCurrentStepId()==2 ||workOrder.getCurrentStepId()==3 ||workOrder.getCurrentStepId()==4 ){
+            return false;
+        }else{
+            return true;
+        }
+
     }
 
     public void prepareNewWorkOrder(String woid) {
@@ -1070,9 +1085,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
         }
     }
-
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
+
         woService.acceptWorkOrder(selectedWorkOrder, esTime, repairType, comments);
         cancel();
     }

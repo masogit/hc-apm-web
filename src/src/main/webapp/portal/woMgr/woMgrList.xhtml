@@ -169,8 +169,8 @@
                     <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
-                    <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" disabled="#{!userContextService.hasRole('AssetHead')}" oncomplete="PF('ackDialog').show()"/>
-                    <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
+                    <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm"  oncomplete="PF('ackDialog').show()"/>
+                    <p:commandButton value="修改" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
 
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
@@ -184,6 +184,11 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
+                </p:column>
+
+                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==0}">
+   <!--待派工 待接单 待维修-->
+                    <p:commandButton  value="取消" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
 
                 <f:facet name="{Toolbar}">
