@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -105,14 +106,15 @@ public class PccExamineReport implements Serializable {
 	@Column(name = "asset_uid")
 	private String assetUid;
 
-//	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
-//	@ManyToOne(fetch = FetchType.EAGER)
+	// @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable
+	// = false, updatable = false)
+	// @ManyToOne(fetch = FetchType.EAGER)
 	@Transient
 	AssetInfo assetInfo;
-	
+
 	@Transient
 	private String modifyByName;
-	
+
 	@Transient
 	private String createByName;
 	@Transient
@@ -179,6 +181,9 @@ public class PccExamineReport implements Serializable {
 	}
 
 	public String getId() {
+		if (id == null) {
+			id = UUID.randomUUID().toString().replace("-", "");
+		}
 		return id;
 	}
 
@@ -297,6 +302,7 @@ public class PccExamineReport implements Serializable {
 	public void setAssetUid(String assetUid) {
 		this.assetUid = assetUid;
 	}
+
 	public String getAssetInfoname() {
 		return assetInfoname;
 	}
@@ -312,7 +318,6 @@ public class PccExamineReport implements Serializable {
 	public void setAssetInfonamePyCode(String assetInfonamePyCode) {
 		this.assetInfonamePyCode = assetInfonamePyCode;
 	}
-
 
 	public String getAssetInfofunctionType() {
 		return assetInfofunctionType;
@@ -545,6 +550,7 @@ public class PccExamineReport implements Serializable {
 	public void setModifyByName(String modifyByName) {
 		this.modifyByName = modifyByName;
 	}
+
 	public String getCreateByName() {
 		return createByName;
 	}
@@ -552,6 +558,7 @@ public class PccExamineReport implements Serializable {
 	public void setCreateByName(String createByName) {
 		this.createByName = createByName;
 	}
+
 	public String getAssetInfohospitalName() {
 		return assetInfohospitalName;
 	}
