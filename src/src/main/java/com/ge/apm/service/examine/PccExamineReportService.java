@@ -356,15 +356,15 @@ public class PccExamineReportService {
 			data.put("hospitalName", tempInfo.getHospital().getName());
 			data.put("clinicalName",tempInfo.getClinicalDeptName());
 			data.put("functionType",tempInfo.getFunctionType());
-			data.put("num", tempInfo.getDepartNum());
+			data.put("serialNum", tempInfo.getSerialNum());
 			Date tempDate=tempInfo.getManufactDate();
 			if(tempDate!=null){
 				data.put("manufactDate", sdf.format(tempDate));
 			}
 		}
-		Date tempDate=pcc.getReportDate();
+		Date tempDate=pcc.getCheckDate();
 		if(tempDate!=null){
-			data.put("reportDate", sdf.format(tempDate));
+			data.put("checkDate", sdf.format(tempDate));
 		}
 		if(listPicture==null){
 			listPicture=parseBlobObjectImg(pcc.getId());
