@@ -113,6 +113,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 					String assetuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
 					this.selected.setAssetUid(assetuid);
 					this.selected.setAssetInfo(service.getAssetInfo(assetuid));
+					this.selected.setStatus(1);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					LOGGER.error(e.getMessage());
@@ -122,9 +123,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	            setSelected(selectedId);
 	            this.selected.setAssetInfo(service.getAssetInfo(this.selected.getAssetUid()));
 	            prepareEdit();
-	            
 	        }
-			this.selected.setStatus(1);
 		}
 	}
 	@Override
@@ -175,8 +174,24 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 	}
 	
 	public void submit(){
-		if(picture1==null || picture2==null || picture3==null || picture4==null || pictureTail ==null){
-			addMessage("图片缺失，请上传！");
+		if(picture1==null){
+			addMessage("图片1缺失，请上传！");
+			return;
+		}
+		else if(picture2==null ){
+			addMessage("图片2缺失，请上传！");
+			return;
+		}
+		else if(picture3==null){
+			addMessage("图片3缺失，请上传！");
+			return;
+		}
+		else if(picture4==null){
+			addMessage("图片4缺失，请上传！");
+			return;
+		}
+		else if(pictureTail ==null){
+			addMessage("尾页图片缺失，请上传！");
 			return;
 		}
 		this.selected.setStatus(2);
