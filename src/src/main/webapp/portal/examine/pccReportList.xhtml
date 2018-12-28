@@ -24,7 +24,7 @@
 								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}" disabled="#{!pccExamineReportController.blnEditable}" />
 							<p:commandButton id="editButton" icon="fa fa-fw fa-edit" title="#{msg.Edit}" action="#{pccExamineReportController.getEditPage(item.id,'Edit')}"
 								disabled="#{empty item.id or !pccExamineReportController.blnEditable}" />
-							<p:commandButton id="deleteButton" process="@this" icon="fa fa-fw fa-remove" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete}"
+							<p:commandButton id="deleteButton" process="@this" icon="fa fa-fw fa-remove" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete(item)}"
 								update=":pccReportListForm:datalist,:growl" disabled="#{empty item.id or !pccExamineReportController.blnEditable}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
