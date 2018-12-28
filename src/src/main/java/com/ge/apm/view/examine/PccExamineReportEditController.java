@@ -179,57 +179,57 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		boolean passValid=true;
 		if(StringUtils.isEmpty(this.selected.getLineStatus())){
 		    WebUtil.addErrorMessage("线缆" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("lineStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectLineStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getMirrorStatus())){
 		    WebUtil.addErrorMessage("透镜" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("mirrorStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectMirrorStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getShellStatus())){
 		    WebUtil.addErrorMessage("外壳" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("shellStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectShellStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getOilStatus())){
 		    WebUtil.addErrorMessage("油囊" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("oilStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectOilStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getLinkerStatus())){
 		    WebUtil.addErrorMessage("连接器" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("linkerStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectLinkerStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getTipStatus())){
 		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("tipStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectTipStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getElectricLeakageStatus())){
 		    WebUtil.addErrorMessage("探头漏电流检测结果" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("electricLeakageStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectElectricLeakageStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getFirstSeenStatus())){
 		    WebUtil.addErrorMessage("所见" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("firstSeenStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectFirstSeenStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getFirstTipStatus())){
 		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("firstTipStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectFirstTipStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getResultStatus())){
 		    WebUtil.addErrorMessage("检测结果" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("resultStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectResultStatus", true);
 		    passValid=false;
 		}
 		else if(StringUtils.isEmpty(this.selected.getRecommandStatus())){
 		    WebUtil.addErrorMessage("建议" + WebUtil.getMessage("ValidationRequire"));
-		    RequestContext.getCurrentInstance().addCallbackParam("recommandStatus", true);
+		    RequestContext.getCurrentInstance().addCallbackParam("selectRecommandStatus", true);
 		    passValid=false;
 		}
         
