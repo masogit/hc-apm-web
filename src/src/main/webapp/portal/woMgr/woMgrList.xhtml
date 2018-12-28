@@ -169,7 +169,7 @@
                     <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
-                    <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
+                    <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" disabled="#{!userContextService.hasRole('AssetHead')}" oncomplete="PF('ackDialog').show()"/>
                     <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
 
                 </p:column>
