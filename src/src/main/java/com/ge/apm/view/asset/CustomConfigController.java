@@ -438,29 +438,24 @@ public class CustomConfigController {
     }
 
     //for 10.1 update
-    public void updateCustomFieldForArrivalRequired() {
-        com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
-        List<CustomConfig> allConfigList = customConfigDao.find();
-
-//       allConfigList.stream().forEach(item->{
-//           CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
-//           configObject.getAssetFields().entrySet().stream().filter(fielditem-> fielditem.getValue().isRequired()).forEach(fielditem-> {fielditem.getValue().setArrivalRequired(true);});
-//           item.setConfig(JSONObject.toJSONString(configObject));
-//       });
-        allConfigList.stream().forEach(item -> {
-            CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
-
-            CustomConfigConstant.getSystemFields().forEach(fielditem -> {
-                configObject.getAssetFields().get(fielditem).setRequired(true);
-                configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
-            });
-            CustomConfigConstant.getInstallRequiredFields().forEach(fielditem -> {
-                configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
-            });
-            item.setConfig(JSONObject.toJSONString(configObject));
-        });
-        customConfigDao.save(allConfigList);
-        WebUtil.addSuccessMessage("updated all config:" + allConfigList.size());
-    }
+//    public void updateCustomFieldForArrivalRequired() {
+//        com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
+//        List<CustomConfig> allConfigList = customConfigDao.find();
+//
+//        allConfigList.stream().forEach(item -> {
+//            CustomConfigObject configObject = JSONObject.parseObject(item.getConfig(), CustomConfigObject.class);
+//
+//            CustomConfigConstant.getSystemFields().forEach(fielditem -> {
+//                configObject.getAssetFields().get(fielditem).setRequired(true);
+//                configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
+//            });
+//            CustomConfigConstant.getInstallRequiredFields().forEach(fielditem -> {
+//                configObject.getAssetFields().get(fielditem).setArrivalRequired(true);
+//            });
+//            item.setConfig(JSONObject.toJSONString(configObject));
+//        });
+//        customConfigDao.save(allConfigList);
+//        WebUtil.addSuccessMessage("updated all config:" + allConfigList.size());
+//    }
 
 }
