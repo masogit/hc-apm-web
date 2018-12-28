@@ -133,7 +133,7 @@ public class CustomConfigService {
     
     private List<String> getConfigurantionRules(List<String> userRoles){
         List<String> resRule = new ArrayList();
-        resRule.addAll(resRule);
+        resRule.addAll(userRoles);
         if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
             (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
             resRule.add("ClinicalStaff");
