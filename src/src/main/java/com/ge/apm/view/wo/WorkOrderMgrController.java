@@ -544,7 +544,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 5) { //待验收
-            if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
+            if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             } else {
@@ -1131,16 +1131,38 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
     public boolean allowChanged(){
         //is closed
+        if(selectedWorkOrder==null){
+            return true;
+        }
         if( selectedWorkOrder.getStatus()==2) {//关单后
           if(userContextService.hasAnyRole("AssetHead")){
+              return true;
+          }else{
               return false;
           }
         }else{
             if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
-                return false;
+                return true;
             }
         }
-        return true;
+       return true;
+    }
+
+    public boolean allowChangedForDisable(){
+        if(selected.getStatus()==2) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }else{
+                return true;
+            }
+        }
+
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
