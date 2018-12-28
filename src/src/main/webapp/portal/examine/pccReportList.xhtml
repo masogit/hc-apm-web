@@ -21,15 +21,15 @@
 						<p:ajax event="filter" listener="#{pccExamineReportController.onFilter}" />
 						<p:column exportable="false">
 							<p:commandButton id="createButton" icon="fa fa-plus" class="btn btn-sm btn-gray" title="#{msg.Edit}"
-								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}"  disabled="#{!pccExamineReportController.blnEditable}"/>
+								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}" disabled="#{!pccExamineReportController.blnEditable}" />
 							<p:commandButton id="editButton" icon="fa fa-fw fa-edit" title="#{msg.Edit}" action="#{pccExamineReportController.getEditPage(item.id,'Edit')}"
 								disabled="#{empty item.id or !pccExamineReportController.blnEditable}" />
 							<p:commandButton id="deleteButton" process="@this" icon="fa fa-fw fa-remove" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete}"
 								update=":pccReportListForm:datalist,:growl" disabled="#{empty item.id or !pccExamineReportController.blnEditable}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
-							<p:commandButton id="downloadButtonId" validateClient="false" icon="fa fa-fw fa-download" update=":growl" ajax="false" actionListener="#{pccExamineReportController.generateReport(item)}"
-								disabled="#{item.status!=2}">
+							<p:commandButton id="downloadButtonId" validateClient="false" icon="fa fa-fw fa-download" update=":growl" ajax="false"
+								actionListener="#{pccExamineReportController.generateReport(item)}" disabled="#{item.status!=2}">
 								<p:fileDownload value="#{pccExamineReportController.reportFile}" />
 							</p:commandButton>
 						</p:column>
@@ -51,27 +51,42 @@
 						<p:column headerText="探头S/N" filterBy="#{item.assetInfoserialNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfoserialNum}" />
 						</p:column>
-						<p:column headerText="探头生产日期" sortBy="#{item.assetInfomanufactDate}">
+						<p:column headerText="探头生产日期" sortBy="#{item.assetInfomanufactDate}" filterBy="#{item.assetInfomanufactDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfomanufactDate" widgetVar="varFilterassetInfomanufactDate" />
+							</f:facet>
 							<h:outputText value="#{item.assetInfomanufactDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="探头安装日期" sortBy="#{item.assetInfoarriveDate}">
+						<p:column headerText="探头安装日期" sortBy="#{item.assetInfoarriveDate}" filterBy="#{item.assetInfoarriveDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfoarriveDate" widgetVar="varFilterassetInfoarriveDate" />
+							</f:facet>
 							<h:outputText value="#{item.assetInfoarriveDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="探头合同开始日期" sortBy="#{item.assetInfoinstallDate}">
+						<p:column headerText="探头合同开始日期" sortBy="#{item.assetInfoinstallDate}" filterBy="#{item.assetInfoinstallDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfoinstallDate" widgetVar="varFilterassetInfoinstallDate" />
+							</f:facet>
 							<h:outputText value="#{item.assetInfoinstallDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="探头合同截至日期" sortBy="#{item.assetInfowarrantyDate}">
+						<p:column headerText="探头合同截至日期" sortBy="#{item.assetInfowarrantyDate}" filterBy="#{item.assetInfowarrantyDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfowarrantyDate" widgetVar="varFilterassetInfowarrantyDate" />
+							</f:facet>
 							<h:outputText value="#{item.assetInfowarrantyDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="检测日期" sortBy="#{item.checkDate}">
+						<p:column headerText="检测日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filtercheckDate" widgetVar="varFiltercheckDate" />
+							</f:facet>
 							<h:outputText value="#{item.checkDate}">
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
@@ -101,8 +116,8 @@
 							<h:outputText value="#{empty item.status?'':item.status==1?'未提交':'已提交'}">
 							</h:outputText>
 						</p:column>
-						
-						
+
+
 						<!-- <p:column headerText="报告下载" exportable="false" id="idColumnDownReport">
 							<p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}" rendered="#{not empty item.reportStorageId}">
 								<h:outputText value="点击下载" />
@@ -122,6 +137,84 @@
 						</f:facet>
 					</p:dataTable>
 				</h:form>
+				<p:overlayPanel widgetVar="panelFilterassetInfomanufactDate"
+					for=":pccReportListForm:datalist:filterassetInfomanufactDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfomanufactDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfomanufactDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfomanufactDate','varStartTimeFrom_assetInfomanufactDate','varStartTimeTo_assetInfomanufactDate'); PF('panelFilterassetInfomanufactDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfomanufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfoarriveDate" for=":pccReportListForm:datalist:filterassetInfoarriveDate"
+					dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfoarriveDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfoarriveDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfoarriveDate','varStartTimeFrom_assetInfoarriveDate','varStartTimeTo_assetInfoarriveDate'); PF('panelFilterassetInfoarriveDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfoarriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfoinstallDate"
+					for=":pccReportListForm:datalist:filterassetInfoinstallDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfoinstallDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfoinstallDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfoinstallDate','varStartTimeFrom_assetInfoinstallDate','varStartTimeTo_assetInfoinstallDate'); PF('panelFilterassetInfoinstallDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfoinstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfowarrantyDate"
+					for=":pccReportListForm:datalist:filterassetInfowarrantyDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfowarrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfowarrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfowarrantyDate','varStartTimeFrom_assetInfowarrantyDate','varStartTimeTo_assetInfowarrantyDate'); PF('panelFilterassetInfowarrantyDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfowarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFiltercheckDate" for=":pccReportListForm:datalist:filtercheckDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_checkDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_checkDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFiltercheckDate','varStartTimeFrom_checkDate','varStartTimeTo_checkDate'); PF('panelFiltercheckDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFiltercheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
 			</div>
 		</div>
 	</ui:define>
