@@ -487,7 +487,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         removeFilterOnField("assetInfo.uid");
         Integer  fillterStepId;
         if (queryIndex == 1) {//已报修 可取消
-            if (userContextService.hasRole("AssetStaff")) {
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
             }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -576,12 +576,12 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
 //            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
-        } else if (queryIndex == 10) { //审批
+        } else if (queryIndex == 10) { //待审批
 
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
-            if(!userContextService.hasRole("AssetHead")||!userContextService.hasRole("DeptHead")){
+            if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
 }
 
@@ -765,7 +765,13 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         Long time = System.currentTimeMillis();
         time += 120*1000*60;
         esTime = new Date(time);
+
+
     }
+
+   /* public void prepareRepair(String woid){
+        selectedWorkOrder = dao.findById(woid);
+    }*/
 
     public boolean isStep(V2_WorkOrder workOrder){
         if(workOrder==null){
