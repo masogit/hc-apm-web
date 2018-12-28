@@ -23,6 +23,7 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Strings;
+import org.primefaces.context.RequestContext;
 import webapp.framework.web.WebUtil;
 
 @ManagedBean
@@ -155,10 +156,13 @@ public class QrCodeTemplateCreateController {
             templateJsonObject = JSONObject.parseObject(importJsonString);
             if(!templateService.isValidJson(templateJsonObject)){
                 WebUtil.addErrorMessage("JSON不正确");
+                RequestContext.getCurrentInstance().addCallbackParam("JsonValid", false);
+                return;
             };
-            int s=0;
+            RequestContext.getCurrentInstance().addCallbackParam("JsonValid", true);
         } catch (JSONException e) {
             WebUtil.addErrorMessage("不能解析JSON");
+            RequestContext.getCurrentInstance().addCallbackParam("JsonValid", false);
         }
     }
 
