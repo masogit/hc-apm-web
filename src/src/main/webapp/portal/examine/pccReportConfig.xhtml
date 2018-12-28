@@ -14,7 +14,7 @@
 					</p:commandButton>
 					<p:fileUpload id="idTemplateUpload" fileUploadListener="#{pccExamineReportConfigController.handleFileUpload}" dragDropSupport="false" style="width:100%"
 						multiple="false" sizeLimit="100000000" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M"
-						label="上传配置模板" />
+						label="上传配置模板" allowTypes="/(\.|\/)(doc|docx)$/"/>
 				</h:form>
 			</div>
 		</div>
