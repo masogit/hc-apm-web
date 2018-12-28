@@ -170,7 +170,7 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
                     <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" disabled="#{!userContextService.hasRole('AssetHead')}" oncomplete="PF('ackDialog').show()"/>
-                    <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
+                    <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
 
                 </p:column>
                 <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
@@ -207,7 +207,22 @@
 
 
     </div>
-
+<p:dialog id="ackEditDialog" widgetVar="ackEditDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="修改维修结果">
+    <h:form id="ackEditForm" >
+        <h:panelGroup>
+            <label class="label">维修结果*</label>
+            <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="维修结果 #{msg.ValidationRequire}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+<br/>
+        <h:panelGroup>
+            <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveEditedWorkOrder}" value="#{msg.save}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args,'ackEditDialog');"/>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('ackEditDialog').hide()"/>
+        </h:panelGroup>
+    </h:form>
+</p:dialog>
 
     <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
         <h:form id="dispatchDialogForm" >
