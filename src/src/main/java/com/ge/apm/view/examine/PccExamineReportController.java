@@ -169,6 +169,13 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		this.selected=null;
 	}
 	
+	public void delete(PccExamineReport pcc){
+		service.deletePccReport(pcc);
+		addMessage("PCC 探头检测报告删除成功！");
+		this.listSelected=null;
+		this.selected=null;
+	}
+	
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
