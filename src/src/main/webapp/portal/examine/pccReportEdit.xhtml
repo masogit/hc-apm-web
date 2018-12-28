@@ -1,7 +1,11 @@
-
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 	<ui:define name="content">
+		<style>
+            td {
+                text-align: left;
+            }
+        </style>
 		<div class="ui-g clearfix">
 			<div class="ui-g-12 card cardTitle">
 				<label class="pageTitle" value="PCC 探头检测报告编辑" />
@@ -171,7 +175,7 @@
 								<h:panelGroup>
 									<label class="label">所见</label>
 									<p:selectManyMenu value="#{pccExamineReportEditController.selectFirstSeenStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="所见 #{msg.ValidationRequire}" style="width:50%">
+										converter="apmDropDownConverter" requiredMessage="所见 #{msg.ValidationRequire}" style="width:100%">
 										<f:selectItems value="#{pccExamineReportEditController.fetchFirstSeenStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
 										<p:column>
 											<h:outputText value="#{t.label}" />
@@ -197,7 +201,7 @@
 								<h:panelGroup>
 									<label class="label">检测结果</label>
 									<p:selectManyMenu value="#{pccExamineReportEditController.selectResultStatus}" var="t" required="false" showCheckbox="true"
-										converter="apmDropDownConverter" requiredMessage="检测结果 #{msg.ValidationRequire}" style="height:200px;width:50%">
+										converter="apmDropDownConverter" requiredMessage="检测结果 #{msg.ValidationRequire}" style="height:200px;width:100%">
 										<f:selectItems value="#{pccExamineReportEditController.fetchResultStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
 										<p:column>
 											<h:outputText value="#{t.label}" />
