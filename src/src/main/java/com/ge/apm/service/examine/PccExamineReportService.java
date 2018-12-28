@@ -272,6 +272,11 @@ public class PccExamineReportService {
 	@Transactional
 	public ApmStreamedContent generateReport(PccExamineReport pcc){
 //		deleteFile(pcc.getId(), V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_DOCS);
+		AssetInfo tempInfo=pcc.getAssetInfo();
+		if(tempInfo==null){
+			tempInfo=getAssetInfo(pcc.getAssetUid());
+			pcc.setAssetInfo(tempInfo);
+		}
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
 		Date date=new Date();
 		List<ApmStreamedContent> listPicture=parseBlobObjectImg(pcc.getId());
@@ -282,6 +287,7 @@ public class PccExamineReportService {
 				String tempFileName=template.getName();
 				int index=tempFileName.lastIndexOf(".");
 				fileName=fileName+tempFileName.substring(index,tempFileName.length());
+				fileName=tempInfo.getName()+"_"+fileName;
 				pcc.setReportDate(new Date());
 				template.settBytes(renderDocx(getTemplateMap(pcc,listPicture), template.gettBytes()));
 				template.setContentType("application/msword");
@@ -346,10 +352,6 @@ public class PccExamineReportService {
 		data.put("comment", pcc.getComment());
 		
 		AssetInfo tempInfo=pcc.getAssetInfo();
-		if(tempInfo==null){
-			tempInfo=getAssetInfo(pcc.getAssetUid());
-			pcc.setAssetInfo(tempInfo);
-		}
 		if(tempInfo!=null){
 			data.put("hospitalName", tempInfo.getHospital().getName());
 			data.put("clinicalName",tempInfo.getClinicalDeptName());
@@ -385,7 +387,7 @@ public class PccExamineReportService {
 				}
 				else if(tempContent.getMark().equals("pictureTail")){
 					tempPic.setWidth(600);
-					tempPic.setHeight(800);
+					tempPic.setHeight(600);
 					data.put("pictureTail", tempPic);
 				}
 			}
