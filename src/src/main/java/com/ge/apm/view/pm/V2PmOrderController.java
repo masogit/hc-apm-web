@@ -185,6 +185,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setClosedTime(null);
         }
     }
+    public boolean allowChanged(){
+        //is closed
+        if( selected.isFinished()) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return false;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void arrivalTimeSet() {
         if (itemDetail == null) return;
         if (itemDetail.getArrived() == true)

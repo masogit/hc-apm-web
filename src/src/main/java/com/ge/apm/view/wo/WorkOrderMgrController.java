@@ -581,7 +581,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
-            if(!userContextService.hasRole("AssetHead")){
+            if(!userContextService.hasRole("AssetHead")||!userContextService.hasRole("DeptHead")){
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
 }
 
@@ -1120,6 +1120,21 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
+    }
+
+
+    public boolean allowChanged(){
+        //is closed
+        if( selectedWorkOrder.getStatus()==2) {//关单后
+          if(userContextService.hasAnyRole("AssetHead")){
+              return false;
+          }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }
+        }
+        return true;
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
