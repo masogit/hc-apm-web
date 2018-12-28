@@ -110,7 +110,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		if(listStreamedContent==null){
 			listStreamedContent = new ArrayList<ApmStreamedContent>();
 		}
-		if(userRoleNames.contains(ApmConstant.MVS_ROLE_NAME_FE) || currentUser.getIsSuperAdmin()){
+		if(userRoleNames.contains("AssetStaff") || currentUser.getIsSuperAdmin()){
 			blnEditable=true;
 		}
 	}
@@ -123,7 +123,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 //		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
 //		searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID(), "1*2+"));
 //		searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID(), "1*2+"));
-		if(userRoleNames.contains(ApmConstant.MVS_ROLE_NAME_ADMIN)||userRoleNames.contains(ApmConstant.MVS_ROLE_NAME_FE)){
+		if(userRoleNames.contains("AssetHead")||userRoleNames.contains("AssetStaff")){
 			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
 		}
 		else{
