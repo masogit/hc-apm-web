@@ -969,7 +969,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
     public void cancelWorkOrder() {
 //tbc: cancelReason assetStatus
-        assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
+      //  assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
         woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason, assetStatus);
 
         cancelReason = null;
