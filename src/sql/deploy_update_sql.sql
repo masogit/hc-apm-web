@@ -302,3 +302,5 @@ insert into sys_authority(id,name,description) values (8,'审核','approve');
 
 update user_role set role_type= 0;
 
+
+update message_subscriber set meter_hit =false where meter_hit is null
