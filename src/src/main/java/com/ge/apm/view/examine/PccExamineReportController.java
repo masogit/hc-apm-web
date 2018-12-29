@@ -253,6 +253,10 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
         String operation = "pccReportEdit.xhtml?actionName="+actionName+"&selectedid=" + id;
         return UrlEncryptController.encodeUrlParam(operation);
     }
+	public String getEditPage(String id, String assetuid,String actionName) {
+        String operation = "pccReportEdit.xhtml?actionName="+actionName+"&selectedid=" + id+"&assetuid="+assetuid;
+        return UrlEncryptController.encodeUrlParam(operation);
+    }
 	public String jumpCreatePage(){
 		try {
 			super.prepareCreate();
