@@ -2,10 +2,14 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 	<ui:define name="content">
 		<style>
-            td {
-                text-align: left;
-            }
-        </style>
+			td {
+				text-align: left;
+			}
+			
+			tr.ui-selectlistbox-item td:first-child {
+				width: 20px !important;
+			}
+		</style>
 		<div class="ui-g clearfix">
 			<div class="ui-g-12 card cardTitle">
 				<label class="pageTitle" value="PCC 探头检测报告编辑" />
@@ -70,25 +74,25 @@
 								</p:graphicImage>
 								<p:fileUpload id="idPictureUpload" fileUploadListener="#{pccExamineReportEditController.handleFileUpload1}" dragDropSupport="false" style="width:100%"
 									multiple="false" sizeLimit="100000000" update="@parent:idPicture1" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
-									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片1" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/"/>
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片1" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
 							</h:panelGroup>
 							<h:panelGroup>
 								<p:graphicImage id="idPicture2" value="#{pccExamineReportEditController.picture2}" width="160" height="120" stream="false" />
 								<p:fileUpload id="idPictureUpload2" fileUploadListener="#{pccExamineReportEditController.handleFileUpload2}" dragDropSupport="false" style="width:100%"
 									multiple="false" sizeLimit="100000000" update="@parent:idPicture2" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
-									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片2" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/"/>
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片2" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
 							</h:panelGroup>
 							<h:panelGroup>
 								<p:graphicImage id="idPicture3" value="#{pccExamineReportEditController.picture3}" width="160" height="120" stream="false" />
 								<p:fileUpload id="idPictureUpload3" fileUploadListener="#{pccExamineReportEditController.handleFileUpload3}" dragDropSupport="false" style="width:100%"
 									multiple="false" sizeLimit="100000000" update="@parent:idPicture3" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
-									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片3" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/"/>
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片3" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
 							</h:panelGroup>
 							<h:panelGroup>
 								<p:graphicImage id="idPicture4" value="#{pccExamineReportEditController.picture4}" width="160" height="120" stream="false" />
 								<p:fileUpload id="idPictureUpload4" fileUploadListener="#{pccExamineReportEditController.handleFileUpload4}" dragDropSupport="false" style="width:100%"
 									multiple="false" sizeLimit="100000000" update="@parent:idPicture4" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
-									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片4" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/"/>
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片4" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
 							</h:panelGroup>
 						</p:panelGrid>
 						<p:panel header="外观检查及漏电流测试" style="margin-bottom:20px">
@@ -234,14 +238,14 @@
 								<p:graphicImage id="idPictureTail" value="#{pccExamineReportEditController.pictureTail}" width="160" height="120" stream="false" />
 								<p:fileUpload id="idTailUpload" fileUploadListener="#{pccExamineReportEditController.handleTailUpload}" dragDropSupport="false" style="width:100%"
 									multiple="false" sizeLimit="100000000" update="@parent:idPictureTail" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
-									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/"/>
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
 							</h:panelGroup>
 						</p:panelGrid>
 					</p:fieldset>
-					<p:commandButton id="saveButtonId" validateClient="false" partialSubmit=":idFormPcc" value="暂存" process="@parent" update=":growl" icon="ui-icon-check"
-						actionListener="#{pccExamineReportEditController.save}" disabled="#{pccExamineReportEditController.selected.status==2}"/>
-					<p:commandButton id="submitButtonId" validateClient="true" partialSubmit=":idFormPcc" value="提交" process="@parent" update=":growl,saveButtonId" icon="ui-icon-check"
-						actionListener="#{pccExamineReportEditController.submit}" />
+					<p:commandButton id="saveButtonId" validateClient="true" immediate="false" partialSubmit="true" value="暂存" process="@parent" update=":growl" icon="ui-icon-check"
+						actionListener="#{pccExamineReportEditController.save}" disabled="#{pccExamineReportEditController.selected.status==2}" />
+					<p:commandButton id="submitButtonId" validateClient="true" immediate="false" partialSubmit="true" value="提交" process="@parent" update=":growl,saveButtonId,submitButtonId"
+						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.submit}" disabled="#{pccExamineReportEditController.selected.status==2}"/>
 					<!-- <p:commandButton id="generateButtonId" validateClient="true" partialSubmit=":idFormPcc" value="生成报告" process="@parent" update=":growl,downloadButtonId"
 						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.generateReport}" disabled="#{empty pccExamineReportEditController.selected.id}" /> -->
 					<!-- <p:commandButton id="downloadButtonId" validateClient="true" value="下载报告" update=":growl" icon="ui-icon-check" ajax="false"
