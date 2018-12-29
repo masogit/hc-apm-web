@@ -278,12 +278,15 @@ public class PccExamineReportService {
 			pcc.setAssetInfo(tempInfo);
 		}
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
-		Date date=new Date();
+		Date date=pcc.getCheckDate();
 		List<ApmStreamedContent> listPicture=parseBlobObjectImg(pcc.getId());
 		ApmStreamedContent template=getTemplate();
 		if(template!=null){
 			try {
-				String fileName=sdf.format(date);
+				String fileName="";
+				if(date!=null){
+					fileName=sdf.format(date);
+				}
 				String tempFileName=template.getName();
 				int index=tempFileName.lastIndexOf(".");
 				fileName=fileName+tempFileName.substring(index,tempFileName.length());
