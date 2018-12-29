@@ -114,7 +114,6 @@ public class PccExamineReportService {
     public boolean savePccReport(PccExamineReport report,List<ApmStreamedContent> listContent){
     	pccExamineReportRepository.save(report);
         String id=report.getId();
-        System.out.println("xxx="+id);
         if(StringUtils.isNotEmpty(id)){
             saveFile(listContent, id,V2_BlobObject.BO_TYPE_PCCReport);
         }
