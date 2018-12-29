@@ -40,8 +40,6 @@ public class PccExamineReport implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(generator = "uuid")
-	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(columnDefinition = "CHAR(32)")
 	private String id;
 
