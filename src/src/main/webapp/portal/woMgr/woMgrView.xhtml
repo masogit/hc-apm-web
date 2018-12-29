@@ -180,8 +180,8 @@
                                     <p:outputLabel value="#{woItem.externalExpense}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">#{msg.currentPersonName}</label>
-                                    <p:outputLabel value="#{woItem.currentPersonName}"/>
+                                    <label class="label">#{msg.currentPersonName}---</label>gaolei
+                                    <p:outputLabel value="#{woItem.currentStepId ==5 ? woItem.ackName:woItem.currentPersonName}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.feedbackRating}</label>

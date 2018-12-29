@@ -130,7 +130,7 @@
 							<!-- <p:commandButton id="idBtnBatchGenerateReport" title="批量生成报告" icon="fa fa-fw fa-building-o" ajax="true"
 								actionListener="#{pccExamineReportController.batchGenerateReport()}" update=":growl,:pccReportListForm" >
 							</p:commandButton> -->
-							<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+							<p:commandButton id="downloadAllId" title="报告下载(仅当前页)" icon="ui-icon-file-download" ajax="false"
 								actionListener="#{pccExamineReportController.downloadSelectedReport()}" update=":growl">
 								<p:fileDownload value="#{pccExamineReportController.exportFile}" />
 							</p:commandButton>
