@@ -113,6 +113,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				try {
 					prepareCreate();
 					String assetuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+//					this.selected.setId(selectId);
 					this.selected.setAssetUid(assetuid);
 					this.selected.setAssetInfo(service.getAssetInfo(assetuid));
 					this.selected.setStatus(1);
@@ -167,7 +168,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			result=service.savePccReport(this.selected, null);
 		}
 		if(result){
-			blnNewUpload=false;
 			addMessage("PCC 探头检测报告保存成功！");
 		}
 		else{
@@ -175,59 +175,70 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		}
 	}
 	
+	public void onValueChange(){
+		
+	}
+	
 	public void submit(){
 		boolean passValid=true;
-		if(StringUtils.isEmpty(this.selected.getLineStatus())){
+		
+		if(this.selected.getCheckDate()==null){
+			WebUtil.addErrorMessage("检测日期" + WebUtil.getMessage("ValidationRequire"));
+		    RequestContext.getCurrentInstance().addCallbackParam("checkDate", true);
+		    passValid=false;
+		}
+		
+		if(this.selectLineStatus==null || this.selectLineStatus.size()==0){
 		    WebUtil.addErrorMessage("线缆" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectLineStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getMirrorStatus())){
+		else if(this.selectMirrorStatus==null|| this.selectMirrorStatus.size()==0){
 		    WebUtil.addErrorMessage("透镜" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectMirrorStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getShellStatus())){
+		else if(selectShellStatus==null || this.selectShellStatus.size()==0){
 		    WebUtil.addErrorMessage("外壳" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectShellStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getOilStatus())){
+		else if(selectOilStatus==null || this.selectOilStatus.size()==0){
 		    WebUtil.addErrorMessage("油囊" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectOilStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getLinkerStatus())){
+		else if(selectLinkerStatus==null || this.selectLinkerStatus.size()==0){
 		    WebUtil.addErrorMessage("连接器" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectLinkerStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getTipStatus())){
+		else if(selectTipStatus==null ){
 		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectTipStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getElectricLeakageStatus())){
+		else if(selectElectricLeakageStatus==null){
 		    WebUtil.addErrorMessage("探头漏电流检测结果" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectElectricLeakageStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getFirstSeenStatus())){
+		else if(selectFirstSeenStatus==null || this.selectFirstSeenStatus.size()==0){
 		    WebUtil.addErrorMessage("所见" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectFirstSeenStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getFirstTipStatus())){
+		else if(selectFirstTipStatus==null ){
 		    WebUtil.addErrorMessage("提示" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectFirstTipStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getResultStatus())){
+		else if(selectResultStatus==null || this.selectResultStatus.size()==0){
 		    WebUtil.addErrorMessage("检测结果" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectResultStatus", true);
 		    passValid=false;
 		}
-		else if(StringUtils.isEmpty(this.selected.getRecommandStatus())){
+		else if(selectRecommandStatus==null){
 		    WebUtil.addErrorMessage("建议" + WebUtil.getMessage("ValidationRequire"));
 		    RequestContext.getCurrentInstance().addCallbackParam("selectRecommandStatus", true);
 		    passValid=false;

@@ -144,7 +144,9 @@
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
-                            <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{workOrderMgrController.allowChanged() or detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+                                <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetHead')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
+
+                                <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{workOrderMgrController.allowChanged() or detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>
 
                                 <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmmoreAccDialogViewDlg)" oncomplete="PF('pmmoreAccDialogViewDlg').show()"/>
 
