@@ -177,6 +177,51 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
+
+
+    public boolean allowChanged(){
+        //is closed
+        if(selected==null){
+            return true;
+        }
+        if( selected.isFinished()) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return true;
+            }
+        }
+        return true;
+    }
+    public boolean allowChangedForDisable(){
+        if(selected.isFinished()) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+    }
+    public void partsPriceUpdate(){
+        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+        }
+    }
+    public void closePrcieUpdate(){
+        itemDetail.setClosedPrice(itemDetail.getClosedPrice());
+    }
+
     public void orderSet() {
         if (itemDetail == null) return;
         if (itemDetail.getClosed() == true)
@@ -185,19 +230,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setClosedTime(null);
         }
     }
-    public boolean allowChanged(){
-        //is closed
-        if( selected.isFinished()) {//关单后
-            if(userContextService.hasAnyRole("AssetHead")){
-                return false;
-            }
-        }else{
-            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
-                return false;
-            }
-        }
-        return true;
-    }
+
 
     public void arrivalTimeSet() {
         if (itemDetail == null) return;

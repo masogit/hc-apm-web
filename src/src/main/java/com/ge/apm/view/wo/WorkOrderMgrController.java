@@ -182,14 +182,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
 ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
-
-
-
     }
 
-    ///////////////////////////////////////////start
+public void partsPriceUpdate(){
+        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+        }
+}
 
-
+    public void closePrcieUpdate(){
+            itemDetail.setClosedPrice(itemDetail.getClosedPrice());
+    }
     public String getStepImg(V2_WorkOrder v2_workOrder){
         Integer stepId =v2_workOrder.getCurrentStepId();
         int mode =v2_workOrder.getDispatchMode();
@@ -547,7 +550,8 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 5) { //待验收
-            if (userContextService.hasRole("AssetStaff")) {
+            /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             } else {
@@ -555,7 +559,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             }
         } else if (queryIndex == 6) { //待评价
-            if (userContextService.hasRole("AssetStaff")) {
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
             }
             searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
