@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition><!--备件对话框-->
-        <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="850"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
+        <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
             <h:form class="pmmoreAccDialogFormCls"  id="pmmoreAccDialogForm" >
                 <h:panelGroup id="display42">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -25,7 +25,10 @@
                         <h:panelGroup>
                             <label class="label">预估单价(元)*</label>
                             <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
+                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="pmTab:pmmoreAccDialogForm" >
+                                </p:ajax>
                                 <f:convertNumber pattern="0" type="number"/>
+
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -60,6 +63,8 @@
                         <h:panelGroup>
                             <label class="label">合同价格(元)</label>
                             <p:inputNumber  decimalPlaces="0" maxValue="999999" id="closedPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}">
+                                <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}" update="pmTab:pmmoreAccDialogForm">
+                                </p:ajax>
                                 <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>

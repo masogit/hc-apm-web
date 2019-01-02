@@ -147,7 +147,7 @@
                             </h:panelGrid>
                             <p:panelGrid id="idInstrumentDataBind" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             	<h:panelGroup>
-                            		<p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" style="width:auto;">
+                            		<p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" style="width:auto;" escape="false">
 	                                    <f:facet name="sourceCaption">待绑定键值对</f:facet>
 	                                    <f:facet name="targetCaption">已绑定键值对</f:facet>
 										                  <p:column style="float: left;width:100%;text-align:left;">

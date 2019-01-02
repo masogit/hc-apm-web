@@ -1,20 +1,16 @@
 package com.ge.apm.domain;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-
 public class TenantInfoConfig {
 	private String edition;
 	private List<TenantInfoConfigItem> menuList;
@@ -26,7 +22,7 @@ public class TenantInfoConfig {
 	public static final String VERSION_ULTRASOUND = "ultrasound";
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static Map<String, String> mapVersion;
-
+	private TreeNode[] selectedNodes;
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
@@ -35,14 +31,13 @@ public class TenantInfoConfig {
 		}
 		else{
 			StringBuilder sb=new StringBuilder();
-			String result=readTreeNode(root, sb);
+			String result=readTreeNode(root,sb);
 			if(result.length()>0){
 				result=result.substring(0, result.length()-1);
 			}
 			return "{\"edition\":\"" + edition + "\",\"menuList\":[" + result + "]}";
 		}
 	}
-
 	private TenantInfoConfig() {
 	}
 	private String readTreeNode(TreeNode root,StringBuilder sb){
@@ -52,6 +47,16 @@ public class TenantInfoConfig {
 		}
 		for(TreeNode node:root.getChildren()){
 			readTreeNode(node, sb);
+		}
+		return sb.toString();
+	}
+	private String readTreeNode(StringBuilder sb){
+		if(selectedNodes!=null && selectedNodes.length>0){
+			for(int i=0;i<selectedNodes.length;++i){
+				TreeNode tempNode=selectedNodes[i];
+				TenantInfoConfigItem tempItem=(TenantInfoConfigItem)tempNode.getData();
+				sb.append("\""+tempItem.getKey()+"\",");
+			}
 		}
 		return sb.toString();
 	}
@@ -65,7 +70,6 @@ public class TenantInfoConfig {
 		}
 		return tempList;
 	}
-
 	private void resetVersion() {
 		if (StringUtils.isEmpty(edition)) {
 			return;
@@ -79,18 +83,24 @@ public class TenantInfoConfig {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("assetAdjust")) {
+				else if (key.equals("assetAdjust")) {
 					tempItem.setValue(false);
 				}
-				if (key.contains("assetAdjust.")) {
+				else if (key.contains("assetAdjust.")) {
 					tempItem.setValue(false);
 				}
-				if (key.equals("nurseSite")) {
+				else if (key.equals("nurseSite")) {
 					tempItem.setValue(false);
 				}
-				if (key.contains("nurseSite.")) {
+				else if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
 				}
+			}
+			if(key.equals("examineMgt")){
+				tempItem.setValue(false);
+			}
+			else if(key.contains("examineMgt.")){
+				tempItem.setValue(false);
 			}
 		}
 		if(root!=null){
@@ -112,8 +122,12 @@ public class TenantInfoConfig {
 			if(!childKey.contains(".")){
 				DefaultTreeNode tempNode=new DefaultTreeNode(TREE_TYPE,tempItem,root);
 				tempNode.setExpanded(true);
+				tempNode.setSelectable(true);
 				if(tempItem.isValue()){
 					tempNode.setSelected(true);
+				}
+				else{
+					tempNode.setSelected(false);
 				}
 				headerItem.put(childKey, tempNode);
 				headers.add(childKey);
@@ -133,6 +147,9 @@ public class TenantInfoConfig {
 					if(tempItem.isValue()){
 						tempNode.setSelected(true);
 					}
+					else{
+						tempNode.setSelected(false);
+					}
 				}
 				tempMenuList.remove(i);
 				--i;
@@ -141,23 +158,17 @@ public class TenantInfoConfig {
 	}
 	
 	
-
 	public static TenantInfoConfig build() {
 		TenantInfoConfig tempVersionInfo = new TenantInfoConfig();
 		tempVersionInfo.menuList = getListVersions();
 		tempVersionInfo.edition = VERSION_COMMON;
 		return tempVersionInfo;
 	}
-
 //	 public static void main(String[] args) {
 //	 TenantInfoConfig tempConfig = TenantInfoConfig.build();
-//	 System.out.println(tempConfig.getJSONStr());
 //	 tempConfig.setEdition(VERSION_FUNCTION);
-//	 System.out.println(tempConfig.getJSONStr());
 //	 tempConfig=TenantInfoConfig.parseStr(tempConfig.getJSONStr());
-//	 System.out.println(tempConfig.getJSONStr());
 //	 }
-
 	public static TenantInfoConfig parseStr(String str) {
 		if (StringUtils.isEmpty(str)) {
 			return build();
@@ -196,7 +207,6 @@ public class TenantInfoConfig {
 		tempVersionInfo.menuList = tempListVersionItem;
 		return tempVersionInfo;
 	}
-
 	public String getJSONStr() {
 		return toString();
 	}
@@ -209,13 +219,15 @@ public class TenantInfoConfig {
         setTreeNodes(event.getTreeNode(), false);
 	}
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
+		if(root==null){
+			return;
+		}
         root.setSelected(isSelected);
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
     }
 	
-
 	public static List<String> getListVersionName() {
 		if (listVersionName == null) {
 			listVersionName = new ArrayList<String>();
@@ -225,7 +237,6 @@ public class TenantInfoConfig {
 		}
 		return listVersionName;
 	}
-
 	private static List<TenantInfoConfigItem> getListVersions() {
 		Map<String, String> mapKeyLabel = getMapVersionKeyLabel();
 		if (listOriginVersionInfo == null) {
@@ -239,7 +250,6 @@ public class TenantInfoConfig {
 		}
 		return listOriginVersionInfo;
 	}
-
 	private static Map<String, String> getMapVersionKeyLabel() {
 		if (mapVersion == null) {
 			mapVersion = new HashMap<String, String>();
@@ -311,33 +321,34 @@ public class TenantInfoConfig {
 			mapVersion.put("config.attribute", "属性配置");
 			mapVersion.put("config.repairMessage", "维修消息配置");
 			mapVersion.put("config.captureDataMessage", "小屏消息配置");
-			mapVersion.put("mvs", "MVS设备管理");
-			mapVersion.put("mvs.info", "基本信息");
-			mapVersion.put("mvs.purchase", "采购管理");
+			mapVersion.put("examineMgt", "检测管理");
+			mapVersion.put("examineMgt.pcc", "探头检测");
+			mapVersion.put("examineMgt.pccConfig", "探头检测配置");
 		}
 		return mapVersion;
 	}
-
 	public String getEdition() {
 		return edition;
 	}
-
 	public void setEdition(String edition) {
 		if(!edition.equals(this.edition)){
 			this.edition = edition;
 			resetVersion();
 		}
 	}
-
 	public TreeNode getRoot() {
 		if(root==null){
 			buildRoot();
 		}
 		return root;
 	}
-
 	public void setRoot(TreeNode root) {
 		this.root = root;
 	}
-
+	public TreeNode[] getSelectedNodes() {
+		return selectedNodes;
+	}
+	public void setSelectedNodes(TreeNode[] selectedNodes) {
+		this.selectedNodes = selectedNodes;
+	}
 }

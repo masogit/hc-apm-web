@@ -7,7 +7,8 @@
 
     <ui:define name="content">
         <h:form>
-            <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{customConfigController.updateCustomFieldForArrivalRequired()}" value="添加自定义配置字段  到货安装是否必填"/>
+            <!--<p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{customConfigController.updateCustomFieldForArrivalRequired()}" value="添加自定义配置字段  到货安装是否必填"/>-->
+            <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{qrCodeTemplateController.updateAllTemplatesJsonField()}" value="二维码模板使用JSON"/>
         </h:form>
     </ui:define>
 

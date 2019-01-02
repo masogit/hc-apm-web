@@ -188,6 +188,13 @@
 
                         </p:panelGrid>
 
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
+                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
@@ -210,7 +217,7 @@
 
                         <h:panelGroup>
                             <label class="label">申请审核原因</label>
-                            <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+                            <p:inputTextarea placeholder="报价审核" value="#{workOrderMgrController.comments}" maxlength="256" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">审核人*</label>

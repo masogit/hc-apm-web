@@ -51,6 +51,7 @@
                     <f:selectItem itemLabel="按设备名称" itemValue="assetName" />
                     <f:selectItem itemLabel="按故障类别" itemValue="faultType" />
                     <f:selectItem itemLabel="按维修工程师" itemValue="staff" />
+                    <f:selectItem itemLabel="按科室统计工作量" itemValue="caseload" />
                 </p:selectOneRadio>
             </h:panelGrid>
         </p:fieldset>
@@ -71,7 +72,7 @@
             <p:column headerText="资产名称" rendered="#{workOrderStatisticsController.statisticsType == 'assetName'}">
                 <h:outputText value="#{item.assetName}" />
             </p:column>
-            <p:column headerText="#{msg.clinicalDeptName}" rendered="#{workOrderStatisticsController.statisticsType == 'depart' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
+            <p:column headerText="#{msg.clinicalDeptName}" rendered="#{workOrderStatisticsController.statisticsType == 'depart' || workOrderStatisticsController.statisticsType == 'departAndassetType' || workOrderStatisticsController.statisticsType == 'caseload'}">
                 <h:outputText value="#{workOrderStatisticsController.getAllorgName(item.clinicalDeptID)}" />
             </p:column>
             <p:column headerText="资产类型" rendered="#{workOrderStatisticsController.statisticsType == 'assetType' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
@@ -86,8 +87,8 @@
             <p:column headerText="平均耗时" rendered="#{workOrderStatisticsController.statisticsType == 'staff'}">
                 <h:outputText value="#{workOrderStatisticsController.calculateAVGDate(item.totalSpendTime, item.closeCount)}" />
             </p:column>
-            <p:column headerText="总工时" rendered="#{workOrderStatisticsController.statisticsType == 'staff'}">
-                <h:outputText value="#{item.totalManhour}" />
+            <p:column headerText="工作量" rendered="#{workOrderStatisticsController.statisticsType == 'staff' || workOrderStatisticsController.statisticsType == 'caseload'}">
+                <h:outputText value="#{item.totalManHour}" />
             </p:column>
             <!--<p:column headerText="总报修次数">
                 <h:outputText value="#{item.totalCount}" />
@@ -95,14 +96,17 @@
             <p:column headerText="未完成报修次数">
                 <h:outputText value="#{item.openCount}" />
             </p:column>-->
-            <p:column headerText="已完成报修次数">
+            <p:column headerText="已完成报修次数" rendered="#{workOrderStatisticsController.statisticsType != 'caseload'}">
                 <h:outputText value="#{item.closeCount}" />
             </p:column>
             <!--<p:column headerText="已取消报修次数">
                 <h:outputText value="#{item.cleanCount}" />
             </p:column>-->
-            <p:column headerText="比例">
+            <p:column headerText="比例" rendered="#{workOrderStatisticsController.statisticsType != 'caseload'}">
                 <h:outputText value="#{workOrderStatisticsController.calculateRate(item.closeCount)}" />
+            </p:column>
+            <p:column headerText="比例" rendered="#{workOrderStatisticsController.statisticsType == 'caseload'}">
+                <h:outputText value="#{workOrderStatisticsController.calculateCaseloadRate(item.totalManHour)}" />
             </p:column>
 
             <f:facet name="{Toolbar}">

@@ -6,10 +6,8 @@
 package com.ge.apm.domain.pure;
 
 import com.ge.apm.service.common.CustomConfigConstant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -44,9 +42,11 @@ public class CustomConfigObject {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
             });
-            CustomConfigConstant.getInstallRequiredFields().forEach(item -> {
-                assetFields.get(item).setArrivalRequired(true);
-            });
+            CustomConfigConstant.getInstallRequiredFields().stream()
+                    .filter(item -> assetFields.containsKey(item))
+                    .forEach(item -> {
+                        assetFields.get(item).setArrivalRequired(true);
+                    });
         }
         return assetFields;
     }
@@ -175,7 +175,7 @@ public class CustomConfigObject {
     public void setAssetsMobilepageDetailFields(List<String> assetsMobilepageDetailFields) {
         this.assetsMobilepageDetailFields = assetsMobilepageDetailFields;
     }
-    
+
     public List<String> getAssetsMobilepageHeaderFields() {
         if (assetsMobilepageHeaderFields == null) {
             assetsMobilepageHeaderFields = CustomConfigConstant.getAssetsMobilepageHeaderFields();

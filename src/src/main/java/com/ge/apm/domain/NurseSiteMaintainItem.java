@@ -142,6 +142,9 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
 	
+	@Transient
+	private boolean blnEditComment=false;
+	
 	public NurseSiteMaintainItem() {
 		super();
 		this.status=0;
@@ -370,6 +373,14 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public boolean isBlnEditComment() {
+		return blnEditComment;
+	}
+
+	public void setBlnEditComment(boolean blnEditComment) {
+		this.blnEditComment = blnEditComment;
 	}
 
 	@Override

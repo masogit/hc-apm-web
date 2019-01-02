@@ -33,6 +33,7 @@ import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -84,10 +85,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private boolean isSaveDisable=true;
   	private List<Integer> listAssetGroup;
   	private boolean isCreate=false;
-  	
+  	private SearchController searchController;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        searchController = WebUtil.getBean(SearchController.class);
+		searchController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
@@ -119,7 +122,15 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-
+    	if(eventObject!=null){
+    		try {
+    			listCheckAssets=(List<AssetInfo>)eventObject;
+    			checkSaveDisable();
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error("onServerEvent"+e.getMessage());
+			}
+    	}
     }
 
     @Override
@@ -163,9 +174,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		super.prepareCreate();
+		searchController.setType(4);
+		searchController.updateData();
 		isCreate=true;
 		initValues();
 		loadMaintainConfig(this.selected);
+		
 	}
 	
 	@Override
@@ -420,10 +434,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	
 	private void checkSaveDisable(){
 		try {
-			if(listCheckAssets.size()==0){
-				isSaveDisable=true;
-			}
-			else if(listPairCheckItems.size()<2){
+//			if(listCheckAssets.size()==0){
+//				isSaveDisable=true;
+//			}
+			if(listPairCheckItems.size()<2){
 				isSaveDisable=true;
 			}
 			else{
@@ -432,7 +446,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		} catch (Exception e) {
 			// TODO: handle exception
 			isSaveDisable=true;
-			LOGGER.error(e.getMessage());
+			LOGGER.error("checkSaveDisable"+e.getMessage());
 		}
 	}
 	

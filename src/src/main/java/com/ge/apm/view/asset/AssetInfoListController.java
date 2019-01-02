@@ -109,6 +109,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterAssetStatus = null;
     private String filterWarrantyDate = null;
     private Integer assetId;
+    
+    private Map<String, Object> selectedObject;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -135,6 +137,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
+        this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
 
@@ -269,6 +272,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             selectSite = null;
         }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
         loadClinicalDeptList();
 
         //table header dropdown needs to clear manually, table filters cleared by clear method above.
@@ -760,4 +769,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setAssetId(Integer assetId) {
         this.assetId = assetId;
     }
+
+    public Map<String, Object> getSelectedObject() {
+        return selectedObject;
+    }
+
+    public void setSelectedObject(Map<String, Object> selectedObject) {
+        this.selectedObject = selectedObject;
+    }
+    
+    
 }

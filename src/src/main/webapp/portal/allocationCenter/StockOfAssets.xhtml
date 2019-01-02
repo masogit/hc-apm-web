@@ -46,11 +46,11 @@
                         <p:ajax event="rowSelect" listener="#{sharedAssetStockController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{sharedAssetStockController.onFilter}"/>
 
-                        <p:column headerText="借据ID" sortBy="#{voucher_num}" filterBy="#{asset.voucher_num}" filterMatchMode="LIKE">
+                        <p:column headerText="借据ID" sortBy="#{asset.voucher_num}" filterBy="#{asset.voucher_num}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.sharedAssetReqDetail.voucherNum}"/>
                         </p:column>
 
-                        <p:column headerText="借用科室" sortBy="#{lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
+                        <p:column headerText="借用科室" sortBy="#{asset.lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -60,39 +60,39 @@
                             <h:outputText value="#{asset.assetDeptOrg.name}"/>
                         </p:column>
 
-                        <p:column headerText="设备名称" sortBy="#{asset_name}" filterBy="#{asset.asset_name}" filterMatchMode="LIKE">
+                        <p:column headerText="设备名称" sortBy="#{asset.asset_name}" filterBy="#{asset.asset_name}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.name}"/>
                         </p:column>
 
-                        <p:column headerText="设备编号" sortBy="#{asset_num}" filterBy="#{asset.asset_num}" filterMatchMode="LIKE">
+                        <p:column headerText="设备编号" sortBy="#{asset.asset_num}" filterBy="#{asset.asset_num}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.departNum}"/>
                         </p:column>
 
-                        <p:column headerText="设备型号" sortBy="#{asset_function_type}" filterBy="#{asset.asset_function_type}" filterMatchMode="LIKE">
+                        <p:column headerText="设备型号" sortBy="#{asset.asset_function_type}" filterBy="#{asset.asset_function_type}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.functionType}"/>
                         </p:column>
 
-                        <p:column headerText="调剂设备名称" sortBy="#{swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
+                        <p:column headerText="调剂设备名称" sortBy="#{asset.swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                         </p:column>
 
-                        <p:column headerText="计费开始时间" sortBy="#{charging_begin_time}">
+                        <p:column headerText="计费开始时间" sortBy="#{asset.charging_begin_time}">
                             <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="计费结束时间" sortBy="#{charging_end_time}">
+                        <p:column headerText="计费结束时间" sortBy="#{asset.charging_end_time}">
                             <h:outputText value="#{asset.sharedAssetReqDetail.chargingEndTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="单价" sortBy="#{req_unit_price}">
+                        <p:column headerText="单价" sortBy="#{asset.req_unit_price}">
                             <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                         </p:column>
 
-                        <p:column headerText="计价方式" sortBy="#{req_charging_type}" filterBy="#{asset.req_charging_type}" filterMatchMode="EQ">
+                        <p:column headerText="计价方式" sortBy="#{asset.req_charging_type}" filterBy="#{asset.req_charging_type}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -151,6 +151,7 @@
                         e.preventDefault();
                     }
                 });
+                $('#ui-datepicker-div').css({"height":"400px"});
             }
 
             var newWin;
