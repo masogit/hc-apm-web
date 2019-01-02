@@ -57,6 +57,20 @@ public class MvsUtil {
 
     }
 
+    public void copyToMvsTableIfMvsEquip(AssetInfo assetInfo) {
+
+        if (assetInfo == null) return;
+
+        if (assetInfo.getMvsEquip() == null || assetInfo.getMvsEquip() != 1) return;
+
+        MvsAssetInfo foundExisting = mvsAssetInfoDao.findById(assetInfo.getUid());
+
+        if (foundExisting == null) {
+            createNewMvsAssetInfo(assetInfo);
+        }
+
+    }
+
     private void createNewMvsAssetInfo(AssetInfo assetInfo) {
         //below is 17 fields copied
         MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();

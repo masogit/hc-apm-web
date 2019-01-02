@@ -164,6 +164,14 @@
                                 <label class="label">#{msg.accountingCategory}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('accountingCategory', assetInstallationController.arrivalListItem.accountingCategory)}"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.isAssetPMed}</label>
+                                <h:outputText  value="#{assetInstallationController.arrivalListItem.isPm?msg.True2Yes:msg.False2No}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.isAssetChecked}</label>
+                                <h:outputText  value="#{assetInstallationController.arrivalListItem.isChecked?msg.True2Yes:msg.False2No}"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -225,8 +233,8 @@
                                         <p:ajax event="keyup" process="@this" update="@(.generateFinancingNum)"/>
                                         <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="@(.generateFinancingNum) @(.financingNum)"/>
                                     </p:inputText>
-                                    <p:commandButton  validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
-                                                      update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@(.financingNum)"/>
+                                    <p:commandButton id="generateFinancingNum" immediate="true" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
+                                                      update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum generateFinancingNum" process="@this"/>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['qrCode']}">
@@ -373,28 +381,6 @@
                                                  requiredMessage="#{msg.locationName} #{msg.ValidationRequire}">
                                         <p:ajax process="@this" update="@this"/>
                                     </p:inputText>
-                                </h:panelGroup>
-                            </c:if>
-                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['isPm']}">
-                                <h:panelGroup >
-                                    <label class="label">#{msg.isAssetPMed}<span style="color:red">#{assetInstallationController.customConfig.assetFields['isPm'].arrivalRequired? '*':''}</span></label>
-                                    <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isPm}" required="#{assetInstallationController.customConfig.assetFields['isPm'].arrivalRequired}" 
-                                                      requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}">
-                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                                        <p:ajax process="@this" update="@this"/>
-                                    </p:selectOneRadio>
-                                </h:panelGroup>
-                            </c:if>
-                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['isChecked']}">
-                                <h:panelGroup >
-                                    <label class="label">#{msg.isAssetChecked}<span style="color:red">#{assetInstallationController.customConfig.assetFields['isChecked'].arrivalRequired? '*':''}</span></label>
-                                    <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.isChecked}" required="#{assetInstallationController.customConfig.assetFields['isChecked'].arrivalRequired}" 
-                                                      requiredMessage="#{msg.isAssetChecked} #{msg.ValidationRequire}">
-                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                                        <p:ajax process="@this" update="@this"/>
-                                    </p:selectOneRadio>
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['comments']}">

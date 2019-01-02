@@ -182,7 +182,7 @@ public class WorkOrderExportService {
             workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroupName());
             workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68Name());
             workOrderMap.put("设备型号", workOrderExportPojo.getAssetFunctionType());
-            workOrderMap.put("距上次报修天数", workOrderExportPojo.getNearestWorkDay());
+            workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
             workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
             workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
             workOrderMap.put("联系电话", workOrderExportPojo.getTelephone());

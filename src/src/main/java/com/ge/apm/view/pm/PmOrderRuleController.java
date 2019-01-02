@@ -524,6 +524,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected = null;
         selected = dao.findById(newId);
         selected.setPeriod(null);
+        selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
 
@@ -552,6 +553,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             this.checkItemLists = null;
             super.prepareCreate();
             initCheckItemLists();
+            selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -563,6 +565,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         Integer newId = selected.getId();
         selected = null;
         selected = dao.findById(newId);
+        selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
 

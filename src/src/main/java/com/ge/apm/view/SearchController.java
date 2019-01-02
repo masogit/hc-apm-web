@@ -2,11 +2,9 @@ package com.ge.apm.view;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -14,7 +12,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
@@ -22,11 +19,11 @@ import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.common.SearchService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
@@ -42,127 +39,219 @@ public class SearchController {
 	public static final String STR_SITEUID = "siteUID";
 	public static final String STR_DEPTUID = "clinicalDeptUID";
 	public static final String STR_ASSETTYPE = "assetType";
+	public static final String STR_ASSETNAME = "name";
+	public static final String STR_ASSETNAME_PY = "namePyCode";
 	public static final String STR_ASSETGROUP = "assetGroup";
+	public static final String STR_FUNCTIONTYPE = "functionType";
 	public static final String STR_QRCODE = "qrCode";
 	public static final String STR_DEPTNUM = "departNum";
 	public static final String STR_FINANCENUM = "financingNum";
-	UserAccount currentUser;
-	I18nMessageRepository i18nDao;
+	protected UserAccount currentUser;
+	protected I18nMessageRepository i18nDao;
 	SearchService searchService;
 	OrgInfo orgSite;
-	OrgInfo orgDepart;
+	OrgInfo selectedOrgDepart;
 	OrgInfo selectedOrg;
+	AssetInfo selectedAssetInfo;
 	TreeNode orgTree;
 	TreeNode selectedNode;
 	List<OrgInfo> listOrgSite;
 	List<OrgInfo> listOrgDept;
+	String assetName;
 	String assetType;
+	String functionType;
 	String assetGroup;
 	String threeQrCode;
 	ServerEventInterface callingController;
 	String updateViewIDs;
-	int type = 0;
+
+	// 1:contractedit,2:pcc,3:nursesite
+	protected int type = 0;
+	boolean blnAccessScope = false;
+	boolean blnOrgTree = false;
+	boolean showDialog = false;
 	boolean blnSite = false;
 	boolean blnDept = false;
+	boolean blnAssetName = false;
 	boolean blnAssetType = false;
-	boolean blnThreeQrCode = false;
-	boolean blnAccessScope = false;
-	boolean blnOrgTree=false;
-	boolean showDialog = false;
 	boolean blnAssetGroup = false;
 	boolean blnFunctionType = false;
+	boolean blnThreeQrCode = false;
+	boolean blnPickList = false;
+	boolean blnAssetSelect = false;
+	boolean blnChangeEvent = false;
+	boolean blnFilterStatus = true;
+	boolean blnFilterValied = true;
+	boolean blnFilterDelete = true;
 	List<SearchFilter> listSearchFilter;
 	DualListModel<AssetInfo> availableAssets;
 	List<AssetInfo> listUnSelectedAssetInfo;
-	List<AssetInfo> listSelectedAssetInfo;
+	protected List<AssetInfo> listSelectedAssetInfo;
 	UaaService uaaService;
 	AssetInstallationService aiService;
 	ContractInfoService contractInfoService;
-	String contractInfoSiteUID;
+	AutoCompleteService autoCompleteService;
+	String otherSiteUID;
+
 	@PostConstruct
-	private void init() {
+	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		searchService = WebUtil.getBean(SearchService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
 		contractInfoService = WebUtil.getBean(ContractInfoService.class);
 		aiService = WebUtil.getBean(AssetInstallationService.class);
+		autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
-		
+
+		updateData();
+	}
+
+	private void resetStatus() {
 		orgSite = null;
-		orgDepart = null;
+		selectedOrgDepart = null;
+		selectedOrg = null;
+		selectedAssetInfo = null;
+		if (listUnSelectedAssetInfo == null) {
+			listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+		} else {
+			listUnSelectedAssetInfo.clear();
+		}
+		if (listSelectedAssetInfo == null) {
+			listSelectedAssetInfo = new ArrayList<AssetInfo>();
+		} else {
+			listSelectedAssetInfo.clear();
+		}
+		if (availableAssets == null) {
+			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
+		}
+		assetName = "";
 		assetType = "";
 		assetGroup = "";
+		functionType = "";
 		threeQrCode = "";
-		selectedOrg=null;
+
+		blnAccessScope = false;
+		blnOrgTree = false;
+		blnSite = false;
+		blnDept = false;
+		blnAssetName = false;
+		blnAssetType = false;
+		blnAssetGroup = false;
+		blnFunctionType = false;
+		blnThreeQrCode = false;
+		blnPickList = false;
+		blnAssetSelect = false;
+		blnChangeEvent = false;
+	}
+
+	public void updateData() {
+		resetStatus();
+		fetchOrgTree();
 		if (type == 1) {
-			blnDept = true;
+			blnPickList = true;
 			blnAssetGroup = true;
 			blnThreeQrCode = true;
-			blnAccessScope = false;
-			blnOrgTree=true;
-//			fetchSiteOrgList();
-			fetchOrgTree();
+			// fetchSiteOrgList();
 			fetchDeptOrgList(selectedOrg);
-			fetchListOriginAssetInfo();
+//			fetchOriginPickListAssetInfo();
+		} else if (type == 2) {
+			blnAssetSelect = true;
+			// fetchSiteOrgList();
+			fetchDeptOrgList(selectedOrg);
+			fetchOriginSelectAssetInfo();
+		} else if (type == 3) {
+			blnChangeEvent = true;
+			blnAccessScope = true;
+			// fetchSiteOrgList();
+			fetchDeptOrgList(selectedOrg);
+//			fetchOriginSelectAssetInfo();
+		} else if (type == 4) {
+			blnPickList = true;
+			blnAssetName = true;
+			blnAssetGroup = true;
+			blnFunctionType = true;
+			blnChangeEvent = true;
+			blnAccessScope = true;
+			// fetchSiteOrgList();
+			fetchDeptOrgList(selectedOrg);
+//			fetchOriginPickListAssetInfo();
 		}
 	}
-	
-	private void fetchOrgTree(){
-		String siteUid=currentUser.getSiteUID();
-		String uid=currentUser.getUid();
-		if(type==1){
-			if(StringUtils.isNotEmpty(contractInfoSiteUID)){
-				siteUid=contractInfoSiteUID;
+
+	private void fetchOrgTree() {
+		String siteUid = currentUser.getSiteUID();
+		String uid = currentUser.getUid();
+		if (type == 1) {
+			if (StringUtils.isNotEmpty(otherSiteUID)) {
+				siteUid = otherSiteUID;
 			}
 		}
-		TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid);
+		TreeNode subTree = null;
+		if (blnAccessScope) {
+			subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid, uid);
+		} else {
+			subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid);
+		}
 		orgTree = new DefaultTreeNode("org", null, null);
 		orgTree.getChildren().add(subTree);
-		selectedOrg=aiService.getOrgInfoByUid(siteUid);
+		selectedOrg = aiService.getOrgInfoByUid(siteUid);
 	}
 
 	public void fetchSiteOrgList() {
-		if (blnAccessScope) {
-
-		} else {
-			if (searchService.isSiteUser(currentUser)) {
-				listOrgSite = new ArrayList<OrgInfo>();
-				OrgInfo tempOrg = searchService.getOrgInfoByUid(currentUser.getSiteUID());
-				if (tempOrg != null) {
-					listOrgSite.add(tempOrg);
-				}
-			} else {
-				listOrgSite = searchService.getSiteListByHospitalUid(currentUser.getHospitalUID());
+		if (searchService.isSiteUser(currentUser)) {
+			listOrgSite = new ArrayList<OrgInfo>();
+			OrgInfo tempOrg = searchService.getOrgInfoByUid(currentUser.getSiteUID());
+			if (tempOrg != null) {
+				listOrgSite.add(tempOrg);
 			}
+		} else {
+			listOrgSite = searchService.getSiteListByHospitalUid(currentUser.getHospitalUID());
 		}
 	}
 
 	public void fetchDeptOrgList(OrgInfo orgInfo) {
 		if (blnAccessScope) {
-
+			listOrgDept = searchService.fetchAccessOrgInfo(orgInfo.getSiteUID(), currentUser.getUid());
 		} else {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}
 	}
 
 	private void onChange() {
-		if(!generateListFilter()){
+		if (!generateListFilter()) {
 			return;
 		}
-		if (type == 1) {
-			fetchListOriginAssetInfo();
+		if (blnPickList) {
+			fetchOriginPickListAssetInfo();
+		} else if (blnAssetSelect) {
+			fetchOriginSelectAssetInfo();
+		}
+		if (blnChangeEvent) {
+			if (callingController != null) {
+				if (type == 2) {
+					callingController.onServerEvent("change", selectedAssetInfo);
+				} else if (type == 3) {
+					if (selectedOrgDepart != null) {
+						callingController.onServerEvent("change", selectedOrgDepart);
+					} else {
+						callingController.onServerEvent("change", selectedOrg);
+					}
+				} else if (type == 4) {
+					callingController.onServerEvent("change", listSelectedAssetInfo);
+				}
+			}
 		}
 	}
-	
+
 	public void onSelectOrgFromTree(NodeSelectEvent event) {
-        TreeNode node = event.getTreeNode();
-        selectedOrg = (OrgInfo) node.getData();
-        if (null != selectedOrg) {
-        	fetchDeptOrgList(selectedOrg);
-        	onChange();
-        }
-    }
+		TreeNode node = event.getTreeNode();
+		selectedOrg = (OrgInfo) node.getData();
+		if (null != selectedOrg) {
+			fetchDeptOrgList(selectedOrg);
+			onChange();
+		}
+	}
 
 	public void onOrgSiteChange() {
 		fetchDeptOrgList(orgSite);
@@ -173,11 +262,19 @@ public class SearchController {
 		onChange();
 	}
 
+	public void onAssetNameChange() {
+		onChange();
+	}
+
 	public void onAssetTypeChange() {
 		onChange();
 	}
 
 	public void onAssetGroupChange() {
+		onChange();
+	}
+
+	public void onFunctionTypeChange() {
 		onChange();
 	}
 
@@ -196,7 +293,7 @@ public class SearchController {
 		}
 	}
 
-	private void fetchListOriginAssetInfo() {
+	private void fetchOriginPickListAssetInfo() {
 		if (listSearchFilter.size() > 0) {
 			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
 			if (listUnSelectedAssetInfo == null) {
@@ -204,10 +301,15 @@ public class SearchController {
 			}
 			listSelectedAssetInfo = new ArrayList<AssetInfo>();
 			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
-		} else {
-			listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
-			listSelectedAssetInfo = new ArrayList<AssetInfo>();
-			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
+		}
+	}
+
+	private void fetchOriginSelectAssetInfo() {
+		if (listSearchFilter.size() > 0) {
+			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
+			if (listUnSelectedAssetInfo == null) {
+				listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+			}
 		}
 	}
 
@@ -215,52 +317,79 @@ public class SearchController {
 		this.type = type;
 		this.callingController = callingController;
 		this.updateViewIDs = updateViewIDs;
-		if(type==1){
-			this.contractInfoSiteUID=(String)obj;
+		if (type == 1) {
+			this.otherSiteUID = (String) obj;
 		}
 		showDialog = true;
-		init();
+		updateData();
 	}
 
 	public void confirm() {
 		showDialog = false;
 		if (callingController != null) {
-			callingController.onServerEvent("assetListSelected", listSelectedAssetInfo);
+			if (type == 1) {
+				callingController.onServerEvent("assetListSelected", listSelectedAssetInfo);
+			}
 		}
+	}
+
+	public List<AssetInfo> completeSelectedAssetInfo(String query) {
+		return autoCompleteService.completeAssetInfoList(query, listUnSelectedAssetInfo);
 	}
 
 	private boolean generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
-		if (type == 1) {
-			if(selectedOrg!=null){
-				int type=selectedOrg.getOrgType();
-				if(type==0){
-					listSearchFilter.add(new SearchFilter(STR_TENANTUID, Operator.EQ, selectedOrg.getTenantUID(), "1*"));
-				}
-				else if(type==1){
-					listSearchFilter.add(new SearchFilter(STR_INSTITUTIONUID, Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
-				}
-				else if(type==2){
-					listSearchFilter.add(new SearchFilter(STR_HOSPITALUID, Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
-				}
-				else if(type==3){
-					listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
-				}
-				if (orgDepart != null) {
-					listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, orgDepart.getUid(), "1*"));
-				}
-				if (StringUtils.isNotEmpty(assetGroup)) {
-					listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
-				}
-				if (StringUtils.isNotEmpty(threeQrCode)) {
-					listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
-					listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
-					listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
-				}
+		int filterCount=0;
+		if (selectedOrg != null) {
+			int orgTypeTemp = selectedOrg.getOrgType();
+			if (orgTypeTemp == 0) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_TENANTUID, Operator.EQ, selectedOrg.getTenantUID(), "1*"));
+			} else if (orgTypeTemp == 1) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_INSTITUTIONUID, Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
+			} else if (orgTypeTemp == 2) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_HOSPITALUID, Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
+			} else if (orgTypeTemp == 3) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_SITEUID, Operator.EQ, selectedOrg.getSiteUID(), "1*"));
 			}
-			if(listSearchFilter.size()>1){
-				return true;
+			if (selectedOrgDepart != null) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, selectedOrgDepart.getUid(), "1*"));
 			}
+			if (blnFilterStatus) {
+				listSearchFilter.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
+			}
+			if (blnFilterValied) {
+				listSearchFilter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
+			}
+			if (blnFilterDelete) {
+				listSearchFilter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+			}
+			if (StringUtils.isNotEmpty(assetName)) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_ASSETNAME, Operator.LIKE, assetName, "1*3+"));
+				listSearchFilter.add(new SearchFilter(STR_ASSETNAME_PY, Operator.LIKE, assetName, "1*3+"));
+			}
+			if (StringUtils.isNotEmpty(assetGroup)) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_ASSETGROUP, Operator.EQ, assetGroup, "1*"));
+			}
+			if (StringUtils.isNotEmpty(functionType)) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_FUNCTIONTYPE, Operator.LIKE, functionType, "1*"));
+			}
+			if (StringUtils.isNotEmpty(threeQrCode)) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter(STR_QRCODE, Operator.LIKE, threeQrCode, "1*2+"));
+				listSearchFilter.add(new SearchFilter(STR_DEPTNUM, Operator.LIKE, threeQrCode, "1*2+"));
+				listSearchFilter.add(new SearchFilter(STR_FINANCENUM, Operator.LIKE, threeQrCode, "1*2+"));
+			}
+		}
+		if (filterCount > 1) {
+			return true;
 		}
 		return false;
 	}
@@ -281,12 +410,12 @@ public class SearchController {
 		this.orgSite = orgSite;
 	}
 
-	public OrgInfo getOrgDepart() {
-		return orgDepart;
+	public OrgInfo getSelectedOrgDepart() {
+		return selectedOrgDepart;
 	}
 
-	public void setOrgDepart(OrgInfo orgDepart) {
-		this.orgDepart = orgDepart;
+	public void setSelectedOrgDepart(OrgInfo selectedOrgDepart) {
+		this.selectedOrgDepart = selectedOrgDepart;
 	}
 
 	public List<OrgInfo> getListOrgSite() {
@@ -474,6 +603,9 @@ public class SearchController {
 	}
 
 	public TreeNode getOrgTree() {
+		if (orgTree == null) {
+			fetchOrgTree();
+		}
 		return orgTree;
 	}
 
@@ -505,5 +637,67 @@ public class SearchController {
 		this.selectedNode = selectedNode;
 	}
 
+	public boolean isBlnPickList() {
+		return blnPickList;
+	}
 
+	public void setBlnPickList(boolean blnPickList) {
+		this.blnPickList = blnPickList;
+	}
+
+	public AssetInfo getSelectedAssetInfo() {
+		return selectedAssetInfo;
+	}
+
+	public void setSelectedAssetInfo(AssetInfo selectedAssetInfo) {
+		this.selectedAssetInfo = selectedAssetInfo;
+	}
+
+	public boolean isBlnAssetSelect() {
+		return blnAssetSelect;
+	}
+
+	public void setBlnAssetSelect(boolean blnAssetSelect) {
+		this.blnAssetSelect = blnAssetSelect;
+	}
+
+	public String getAssetName() {
+		return assetName;
+	}
+
+	public void setAssetName(String assetName) {
+		this.assetName = assetName;
+	}
+
+	public String getFunctionType() {
+		return functionType;
+	}
+
+	public void setFunctionType(String functionType) {
+		this.functionType = functionType;
+	}
+
+	public boolean isBlnAssetName() {
+		return blnAssetName;
+	}
+
+	public void setBlnAssetName(boolean blnAssetName) {
+		this.blnAssetName = blnAssetName;
+	}
+
+	public boolean isBlnChangeEvent() {
+		return blnChangeEvent;
+	}
+
+	public void setBlnChangeEvent(boolean blnChangeEvent) {
+		this.blnChangeEvent = blnChangeEvent;
+	}
+
+	public String getOtherSiteUID() {
+		return otherSiteUID;
+	}
+
+	public void setOtherSiteUID(String otherSiteUID) {
+		this.otherSiteUID = otherSiteUID;
+	}
 }

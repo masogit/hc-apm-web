@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
+    <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
         <h:form id="moreAccDialogForm" >
             <h:panelGroup id="display42" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -20,7 +20,12 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">预估单价(元)*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" />
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
+                       <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="woTab:moreAccDialogForm" >
+                        </p:ajax>
+
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备件类别</label>
@@ -50,7 +55,11 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">合同价格(元)</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}"/>
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice" class="xx1"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+
+                            <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}" update="woTab:moreAccDialogForm">
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">申请时间</label>

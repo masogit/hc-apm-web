@@ -4,11 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,16 +34,18 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
+import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
  * Created by 212605082 on 2018/5/8.
  */
 @ManagedBean
 @ViewScoped
-public class MaintainController {
+public class MaintainController implements ServerEventInterface {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -81,10 +81,16 @@ public class MaintainController {
     private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
+    private SearchController searchController;
 
-	@PostConstruct
+    @PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		searchController = WebUtil.getBean(SearchController.class);
+		searchController.setType(3);
+		searchController.setUpdateViewIDs(":maintainForm:maintain");
+		searchController.updateData();
+		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -436,6 +442,10 @@ public class MaintainController {
 //		lazyEventModel.addEvent(event);
 		insertMaintain(nurseSiteMaintain);
 		addMessage("工单已创建");
+	}
+	public void onCommentClick(NurseSiteMaintainItem item){
+		boolean temp=item.isBlnEditComment();
+		item.setBlnEditComment(!temp);
 	}
 
 	public void deleteMaintain() {
@@ -806,6 +816,22 @@ public class MaintainController {
 
 	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
+	}
+
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+		// TODO Auto-generated method stub
+		OrgInfo tempOrg=(OrgInfo)eventObject;
+		if(tempOrg!=null){
+			if(listCheckClinicalOrgInfo!=null){
+				listCheckClinicalOrgInfo.clear();
+			}
+			else{
+				listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
+			}
+			listCheckClinicalOrgInfo.add(tempOrg);
+			onClinicalOrgInfoChange();
+		}
 	}
 	
 }
