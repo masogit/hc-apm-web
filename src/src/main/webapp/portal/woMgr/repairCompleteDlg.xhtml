@@ -22,7 +22,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}*</label>
                             <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                               <!-- <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>

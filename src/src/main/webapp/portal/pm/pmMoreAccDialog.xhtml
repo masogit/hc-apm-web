@@ -25,7 +25,7 @@
                         <h:panelGroup>
                             <label class="label">预估单价(元)*</label>
                             <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
-                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="pmTab:pmmoreAccDialogForm" >
+                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                                 </p:ajax>
                                 <f:convertNumber pattern="0" type="number"/>
 
@@ -62,8 +62,8 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">合同价格(元)</label>
-                            <p:inputNumber  decimalPlaces="0" maxValue="999999" id="closedPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}">
-                                <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}" update="pmTab:pmmoreAccDialogForm">
+                            <p:inputNumber  decimalPlaces="0" maxValue="999999" class="hetongjia" id="closedPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}">
+                                <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}">
                                 </p:ajax>
                                 <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>

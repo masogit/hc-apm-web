@@ -22,7 +22,7 @@
                         <label class="label">预估单价(元)*</label>
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
                        <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
-                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="woTab:moreAccDialogForm" >
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)" >
                         </p:ajax>
 
                         </p:inputNumber>
@@ -57,7 +57,7 @@
                         <label class="label">合同价格(元)</label>
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice" class="xx1"  value="#{workOrderMgrController.itemDetail.closedPrice}">
 
-                            <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}" update="woTab:moreAccDialogForm">
+                            <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
                         </p:inputNumber>
                     </h:panelGroup>
