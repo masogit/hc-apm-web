@@ -30,7 +30,8 @@
                         <h:panelGroup>
                             <label class="label">维修结果*</label>
                             <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="维修结果 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0)"/>
+                                <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -38,7 +39,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup id="assetstatus">
                             <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                            <p:selectOneRadio class="x0" id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
@@ -185,7 +186,6 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
-
                         </p:panelGrid>
 
                         <h:panelGroup>
