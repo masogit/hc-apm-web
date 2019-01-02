@@ -190,6 +190,18 @@ public void partsPriceUpdate(){
         }
 }
 
+public void repairResultSet(){
+    if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
+    currentStatus =1;
+}
+    else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
+        currentStatus =3;
+    } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
+    currentStatus =4;
+    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ currentStatus =1;
+    }
+}
+
     public void closePrcieUpdate(){
             itemDetail.setClosedPrice(itemDetail.getClosedPrice());
     }
@@ -844,6 +856,25 @@ public void partsPriceUpdate(){
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+       String result = selectedWorkOrder.getRepairResult();
+if(result.equalsIgnoreCase("2")){
+    currentStatus=3;
+
+}
+        if(result.equalsIgnoreCase("3")){
+            currentStatus=4;
+
+        }
+
+        if(result.equalsIgnoreCase("4")){
+            currentStatus=1;
+
+        }
+        if(result.equalsIgnoreCase("1")){
+            currentStatus=1;
+
+        }
+
         //获取当前工单的所属流程配置
 
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
@@ -854,7 +885,7 @@ public void partsPriceUpdate(){
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
+      //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
