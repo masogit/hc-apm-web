@@ -857,23 +857,25 @@ public void repairResultSet(){
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
        String result = selectedWorkOrder.getRepairResult();
-if(result.equalsIgnoreCase("2")){
-    currentStatus=3;
+       if(result!=null) {
+           if (result.equalsIgnoreCase("2")) {
+               currentStatus = 3;
 
-}
-        if(result.equalsIgnoreCase("3")){
-            currentStatus=4;
+           }
+           if (result.equalsIgnoreCase("3")) {
+               currentStatus = 4;
 
-        }
+           }
 
-        if(result.equalsIgnoreCase("4")){
-            currentStatus=1;
+           if (result.equalsIgnoreCase("4")) {
+               currentStatus = 1;
 
-        }
-        if(result.equalsIgnoreCase("1")){
-            currentStatus=1;
+           }
+           if (result.equalsIgnoreCase("1")) {
+               currentStatus = 1;
 
-        }
+           }
+       }
 
         //获取当前工单的所属流程配置
 
