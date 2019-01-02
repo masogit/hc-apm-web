@@ -527,7 +527,7 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@JsonIgnore
 	public List<String> getRoleNames() {
-//		if (userRoleNames == null) {
+		if (userRoleNames == null) {
 			userRoleNames = new ArrayList<>();
 			for (UserRole userRole : userRoleList) {
 				userRoleNames.add(userRole.getRole().getName());
@@ -553,7 +553,7 @@ public class UserAccount implements ChineseName, Serializable {
 				logger.info("No mvs role found: {}", this.loginName);
 
 			}
-//		}
+		}
 
 		return userRoleNames;
 	}
