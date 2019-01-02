@@ -539,7 +539,7 @@ public class UserAccount implements ChineseName, Serializable {
 				userRoleNames.add("SiteAdmin");
 			if (this.isLocalAdmin)
 				userRoleNames.add("LocalAdmin");
-            if (this.isGeOp!=null && this.isGeOp)
+            if (this.isGeOp!=null && this.isGeOp.booleanValue())
                 userRoleNames.add("GeOp");
 
 			//add mvs role
