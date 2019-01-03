@@ -1,25 +1,50 @@
 package com.ge.apm.service.uaa;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-import org.primefaces.ultima.domain.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.CustomRoleRepository;
+import com.ge.apm.dao.InspectionChecklistRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SysRoleRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.dao.UserRoleRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.CustomRole;
+import com.ge.apm.domain.InspectionChecklist;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.SysRoleVO;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.UserRole;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.SearchFilter;
-
 import webapp.framework.web.WebUtil;
 
 /**
@@ -50,6 +75,7 @@ public class UaaService {
 
     @Autowired
     private CustomRoleRepository customRoleRepository;
+    
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -1127,4 +1153,41 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 
     }
 
+    public Set<String> findAccessClinicalUidListByUserUid(String userUid) {
+		Set<String> listResult = new HashSet<String>();
+		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+				listResult.add(listUserOrgInfo.get(i).getOrgUid());
+			}
+		}
+		if (listResult != null && listResult.size()>0) {
+			Set<String> tempResult=orgInfoDao.findClinicalDeptOrgUidListByOrgUid(listResult);
+			if(tempResult!=null){
+				listResult.addAll(tempResult);
+			}
+		}
+		return listResult;
+	}
+    
+    public Map<Integer,Set<String>> findAccessOrgUidListByUserUid(String userUid) {
+		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		Map<Integer,Set<String>> mapResult=new HashMap<Integer,Set<String>>();
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for(int j=0;j<5;++j){
+				Set<String> setResult=new HashSet<String>();
+				mapResult.put(j, setResult);
+				for (int i = 0; i>-1 && i < listUserOrgInfo.size(); ++i) {
+					UserOrgInfo tempOrg=listUserOrgInfo.get(i);
+					Integer type=tempOrg.getOrgType();
+					if(type.equals(j)){
+						setResult.add(tempOrg.getOrgUid());
+						listUserOrgInfo.remove(i);
+						--i;
+					}
+				}
+			}
+		}
+		return mapResult;
+	}
 }
