@@ -21,15 +21,15 @@
 						<p:ajax event="filter" listener="#{pccExamineReportController.onFilter}" />
 						<p:column exportable="false">
 							<p:commandButton id="createButton" icon="fa fa-plus" class="btn btn-sm btn-gray" title="#{msg.Edit}"
-								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}" disabled="#{!pccExamineReportController.blnEditable}" />
+								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}" disabled="#{!pccExamineReportController.blnEditable}" style="zoom:0.7;"/>
 							<p:commandButton id="editButton" icon="fa fa-fw fa-edit" title="#{msg.Edit}" action="#{pccExamineReportController.getEditPage(item.id,'Edit')}"
-								disabled="#{empty item.status or !pccExamineReportController.blnEditable or item.status==2}" />
+								disabled="#{empty item.status or !pccExamineReportController.blnEditable or item.status==2}"  style="zoom:0.7;"/>
 							<p:commandButton id="deleteButton" process="@this" icon="fa fa-fw fa-remove" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete(item)}"
-								update=":pccReportListForm:datalist,:growl" disabled="#{empty item.status or !pccExamineReportController.blnEditable}">
+								update=":pccReportListForm:datalist,:growl" disabled="#{empty item.status or !pccExamineReportController.blnEditable}" style="zoom:0.7;">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
 							<p:commandButton id="downloadButtonId" validateClient="false" icon="fa fa-fw fa-download" update=":growl" ajax="false"
-								actionListener="#{pccExamineReportController.generateReport(item)}" disabled="#{item.status!=2}">
+								actionListener="#{pccExamineReportController.generateReport(item)}" disabled="#{item.status!=2}" style="zoom:0.7;">
 								<p:fileDownload value="#{pccExamineReportController.reportFile}" />
 							</p:commandButton>
 						</p:column>
