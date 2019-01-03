@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -57,305 +58,316 @@ import webapp.framework.web.WebUtil;
 
 public class LoginService implements Serializable, ApplicationEventPublisherAware {
 
-	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
-	public static final int PASSWORD_ERROR_TIME_LIMIT = 6;
-	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
-	private SessionAuthenticationStrategy sessionAuthenticationStrategy;
-	private SecurityContextRepository securityContextRepository;
-	private MessageUtil messageUtil;
-	private UserAccountRepository userAccountDao;
-	private ApplicationEventPublisher applicationEventPublisher;
-	private MicroServiceUtil msUtil;
-	static {
-		IdFuzzyResolver.registerResolver();
-		// Global setting: change default timezone to UTC+0
-		// TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
-	}
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
+    public static final int PASSWORD_ERROR_TIME_LIMIT = 6;
+    private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+    private SessionAuthenticationStrategy sessionAuthenticationStrategy;
+    private SecurityContextRepository securityContextRepository;
+    private MessageUtil messageUtil;
+    private UserAccountRepository userAccountDao;
+    private ApplicationEventPublisher applicationEventPublisher;
+    private MicroServiceUtil msUtil;
+    private GeSsoService geSsoService;
 
-	@PostConstruct
-	private void init() {
-		userAccountDao = WebUtil.getBean(UserAccountRepository.class);
-		WebApplicationContext ctx = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
-		usernamePasswordAuthenticationFilter = ctx.getBean(UsernamePasswordAuthenticationFilter.class);
-		sessionAuthenticationStrategy = ctx.getBean(SessionAuthenticationStrategy.class);
-		securityContextRepository = ctx.getBean(SecurityContextRepository.class);
-		messageUtil = ctx.getBean(MessageUtil.class);
-		msUtil = ctx.getBean(MicroServiceUtil.class);
-	}
+    static {
+        IdFuzzyResolver.registerResolver();
+        // Global setting: change default timezone to UTC+0
+        // TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
+    }
 
-	public void setSessionExpired(String value) {
-		messageUtil.error("session_expired");
-	}
+    @PostConstruct
+    private void init() {
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        geSsoService = WebUtil.getBean(GeSsoService.class);
+        WebApplicationContext ctx = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
+        usernamePasswordAuthenticationFilter = ctx.getBean(UsernamePasswordAuthenticationFilter.class);
+        sessionAuthenticationStrategy = ctx.getBean(SessionAuthenticationStrategy.class);
+        securityContextRepository = ctx.getBean(SecurityContextRepository.class);
+        messageUtil = ctx.getBean(MessageUtil.class);
+        msUtil = ctx.getBean(MicroServiceUtil.class);
+    }
 
-	public String getSessionExpired() {
-		return null;
-	}
+    public void setSessionExpired(String value) {
+        messageUtil.error("session_expired");
+    }
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-		this.applicationEventPublisher = applicationEventPublisher;
-	}
+    public String getSessionExpired() {
+        return null;
+    }
 
-	public void forgetPassword() {
-		ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-		HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
-		String loginName = request.getParameter("j_username");
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
-		FacesMessage msg = new FacesMessage();
-		msg.setSummary("Password reset");
-		msg.setDetail("Password reset");
-		FacesContext.getCurrentInstance().addMessage("forgetPassword", msg);
-	}
+    public void forgetPassword() {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        String loginName = request.getParameter("j_username");
 
-	public String onPasswordEncrypted(String loginName, String plainPassword) {
-		return plainPassword;
-	}
+        FacesMessage msg = new FacesMessage();
+        msg.setSummary("Password reset");
+        msg.setDetail("Password reset");
+        FacesContext.getCurrentInstance().addMessage("forgetPassword", msg);
+    }
 
-	protected void afterLogin(String userName,String password) {
+    public String onPasswordEncrypted(String loginName, String plainPassword) {
+        return plainPassword;
+    }
 
-	}
+    protected void afterLogin(String userName, String password) {
 
-	protected void setCookieForUser(HttpServletResponse res, String userName, String password) throws Exception {
-		String body = "{\"loginName\": \"" + userName + "\",\"password\": \"" + password + "\"}";
-		Properties pro = new Properties();
-		pro.load(PropertyUtils.class.getResourceAsStream("/url.properties"));
-		String authenticateBasic = pro.getProperty("authenticateBasic").trim();
+    }
 
-		String jsonStr = requestPost(authenticateBasic, body);
-		JSONObject obj = new JSONObject(jsonStr);
-		if (obj == null)
-			return;
-		JSONObject data = obj.getJSONObject("data");
-		if (data == null)
-			return;
-		Cookie cookie = new Cookie("Authorization", data.getString("id_token"));
-		res.addCookie(cookie);
-	}
+    protected void setCookieForUser(HttpServletResponse res, String userName, String password) throws Exception {
+        String body = "{\"loginName\": \"" + userName + "\",\"password\": \"" + password + "\"}";
+        Properties pro = new Properties();
+        pro.load(PropertyUtils.class.getResourceAsStream("/url.properties"));
+        String authenticateBasic = pro.getProperty("authenticateBasic").trim();
 
-	public String requestPost(String url, String body) {
-		CloseableHttpClient httpclient = null;
-		HttpPost httppost = null;
-		try {
-			httpclient = HttpClientBuilder.create().build();
-			httppost = new HttpPost(url);
-			httppost.setEntity(new StringEntity(body));
-			httppost.setHeader("Content-Type", "application/json");
+        String jsonStr = requestPost(authenticateBasic, body);
+        JSONObject obj = new JSONObject(jsonStr);
+        if (obj == null)
+            return;
+        JSONObject data = obj.getJSONObject("data");
+        if (data == null)
+            return;
+        Cookie cookie = new Cookie("Authorization", data.getString("id_token"));
+        res.addCookie(cookie);
+    }
 
-			CloseableHttpResponse response = httpclient.execute(httppost);
+    public String requestPost(String url, String body) {
+        CloseableHttpClient httpclient = null;
+        HttpPost httppost = null;
+        try {
+            httpclient = HttpClientBuilder.create().build();
+            httppost = new HttpPost(url);
+            httppost.setEntity(new StringEntity(body));
+            httppost.setHeader("Content-Type", "application/json");
 
-			HttpEntity entity = response.getEntity();
-			return EntityUtils.toString(entity, "utf-8");
-		} catch (Exception e) {
-			messageUtil.error("security_cookie_error");
-		} finally {
-			try {
-				if (httppost != null) {
-					httppost.releaseConnection();
-				}
-				if (httpclient != null) {
-					httpclient.close();
-				}
-			} catch (IOException e) {
-				messageUtil.error("security_cookie_error");
-			}
-		}
-		return "";
-	}
+            CloseableHttpResponse response = httpclient.execute(httppost);
 
-	public Authentication authenticate(HttpServletRequest request,HttpServletResponse response){
-		String userName = request.getParameter("j_username");
-		if(userName == null ){
-			logger.error("userName can't be null !");
-			return null;
-		}
-		try {
-			Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
-			if (authResult == null) {
-				updateLoginStatus(userName, false);
-				messageUtil.error("security_error");
-			}
-			return authResult;
-		} catch (UsernameNotFoundException e) {
-			messageUtil.error("security_username_not_found");
-		} catch (DisabledException e) {
-			messageUtil.error("security_account_disabled");
-		} catch (LockedException e) {
-			messageUtil.error("AccountLocked");
-		} catch (AccountExpiredException e) {
-			messageUtil.error("security_account_expired");
-		} catch (CredentialsExpiredException e) {
-			messageUtil.error("security_account_credentials_expired");
-		} catch (AccountStatusException e) {
-			messageUtil.error("security_account_status_invalid");
-		} catch (BadCredentialsException e) {
-			updateLoginStatus(userName, false);
-			//messageUtil.error("security_bad_credentials");
-		} catch (AuthenticationException e) {
+            HttpEntity entity = response.getEntity();
+            return EntityUtils.toString(entity, "utf-8");
+        } catch (Exception e) {
+            messageUtil.error("security_cookie_error");
+        } finally {
+            try {
+                if (httppost != null) {
+                    httppost.releaseConnection();
+                }
+                if (httpclient != null) {
+                    httpclient.close();
+                }
+            } catch (IOException e) {
+                messageUtil.error("security_cookie_error");
+            }
+        }
+        return "";
+    }
+
+    public Authentication authenticate(HttpServletRequest request, HttpServletResponse response) {
+        String userName = request.getParameter("j_username");
+        if (userName == null) {
+            logger.error("userName can't be null !");
+            return null;
+        }
+        try {
+            Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
+            if (authResult == null) {
+                updateLoginStatus(userName, false);
+                messageUtil.error("security_error");
+            }
+            return authResult;
+        } catch (UsernameNotFoundException e) {
+            messageUtil.error("security_username_not_found");
+        } catch (DisabledException e) {
+            messageUtil.error("security_account_disabled");
+        } catch (LockedException e) {
+            messageUtil.error("AccountLocked");
+        } catch (AccountExpiredException e) {
+            messageUtil.error("security_account_expired");
+        } catch (CredentialsExpiredException e) {
+            messageUtil.error("security_account_credentials_expired");
+        } catch (AccountStatusException e) {
+            messageUtil.error("security_account_status_invalid");
+        } catch (BadCredentialsException e) {
+            updateLoginStatus(userName, false);
+            //messageUtil.error("security_bad_credentials");
+        } catch (AuthenticationException e) {
             updateLoginStatus(userName, false);
             //messageUtil.error("security_error");
         }
         return null;
-	}
+    }
 
-	public void saveToContext(HttpServletRequest request,HttpServletResponse response,Authentication authResult){
-		HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
-		SecurityContextRepository securityContextRepository = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance()).getBean(SecurityContextRepository.class);
-		SecurityContext securityContext = securityContextRepository.loadContext(holder);
-		SecurityContextHolder.setContext(securityContext);
-		String userName = request.getParameter("j_username");
-		String originPwd = request.getParameter("j_password");
-		try{
-			sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
-		}
-		catch(Exception ex){
-			logger.error(ex.getMessage());
-		}
-		securityContext.setAuthentication(authResult);
-		securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
-		usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
-		if (applicationEventPublisher != null) {
-			applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
-		}
-	}
+    public void saveToContext(HttpServletRequest request, HttpServletResponse response, Authentication authResult) {
+        HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
+        SecurityContextRepository securityContextRepository = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance()).getBean(SecurityContextRepository.class);
+        SecurityContext securityContext = securityContextRepository.loadContext(holder);
+        SecurityContextHolder.setContext(securityContext);
+        String userName = request.getParameter("j_username");
+        String originPwd = request.getParameter("j_password");
+        try {
+            sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
+        securityContext.setAuthentication(authResult);
+        securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
+        usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
+        if (applicationEventPublisher != null) {
+            applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
+        }
+    }
 
-	public void doLogin() {
-		ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-		HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
-		HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
-		HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
-		SecurityContext securityContext = securityContextRepository.loadContext(holder);
-		SecurityContextHolder.setContext(securityContext);
-		String userName = "";
-		String password = "";
-		try {
-			Map<String, String[]> extraParams = new TreeMap<String, String[]>();
-			userName = request.getParameter("j_username");
-			password = request.getParameter("j_password");
-			String originPwd = password;
+    public void doLogin() {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+        HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
+        SecurityContext securityContext = securityContextRepository.loadContext(holder);
+        SecurityContextHolder.setContext(securityContext);
+        String userName = "";
+        String password;
+        try {
+            Map<String, String[]> extraParams = new TreeMap<>();
+            userName = request.getParameter("j_username");
+            password = request.getParameter("j_password");
+            String originPwd = password;
+            String originUserName = userName;
 
-			if ("".equals(userName) || userName == null) {
-				userName = request.getParameter("input_j_username");
-				password = request.getParameter("input_j_password");
-				extraParams.put("j_username", new String[] { userName });
-				extraParams.put("j_password", new String[] { password });
-				HttpServletRequest wrappedRequest = new WrappedRequest(request, extraParams);
-				request = wrappedRequest;
-			}
-			if (password == null)
-				password = "";
+            if ("".equals(userName) || userName == null) {
+                userName = request.getParameter("input_j_username");
+                password = request.getParameter("input_j_password");
+                extraParams.put("j_username", new String[]{userName});
+                extraParams.put("j_password", new String[]{password});
+                request = new WrappedRequest(request, extraParams);
+            }
+            if (password == null)
+                password = "";
 
-			password = onPasswordEncrypted(userName, password);
-			extraParams.put("j_username", new String[] { userName });
-			extraParams.put("j_password", new String[] { password });
-			HttpServletRequest wrappedRequest = new WrappedRequest(request, extraParams);
-			request = wrappedRequest;
+            password = onPasswordEncrypted(userName, password);
 
-			Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
-			if (authResult == null) {
-				updateLoginStatus(userName, false);
-				messageUtil.error("security_error");
-				return;
-			}
-			try{
-				sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
-			}
-			catch(Exception ex){
+            UserAccount user = userAccountDao.getByLoginName(userName);
+            if (user == null) {
+                String geLoginName = "ge" + userName;
+                UserAccount geUser = userAccountDao.getByLoginName(geLoginName);
+                if (geUser != null) {
+                    boolean geSsoAuthPass = geSsoService.authenticate(userName, password);
+                    if (geSsoAuthPass) {
+                        userName = geLoginName;
+                        password = geUser.getPassword();
+                    }
+                }
+            }
 
-			}
-			// below : do the same thing as in
-			// AbstractAuthenticationProcessingFilter.successfulAuthentication(),
-			// except for the redirection to the login success URL that is
-			// managed by JSF
-			securityContext.setAuthentication(authResult);
-			usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
-			if (applicationEventPublisher != null) {
-				applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
-			}
+            extraParams.put("j_username", new String[]{userName});
+            extraParams.put("j_password", new String[]{password});
+            request = new WrappedRequest(request, extraParams);
+
+            Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
+            if (authResult == null) {
+                updateLoginStatus(userName, false);
+                messageUtil.error("security_error");
+                return;
+            }
+            try {
+                sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+            } catch (Exception ex) {
+
+            }
+            // below : do the same thing as in
+            // AbstractAuthenticationProcessingFilter.successfulAuthentication(),
+            // except for the redirection to the login success URL that is
+            // managed by JSF
+            securityContext.setAuthentication(authResult);
+            usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
+            if (applicationEventPublisher != null) {
+                applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
+            }
 //			try {
 //				setCookieForUser(response, userName, originPwd);
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-			afterLogin(userName,originPwd);
-			updateLoginStatus(userName, true);
+            afterLogin(originUserName, originPwd);
+            updateLoginStatus(userName, true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
-			// redirects to the home page
-			/*
-			 * FacesContext context = FacesContext.getCurrentInstance();
-			 * ConfigurableNavigationHandler handler =
-			 * (ConfigurableNavigationHandler)
-			 * context.getApplication().getNavigationHandler();
-			 * handler.performNavigation("/home.xhtml?faces-redirect=true");
-			 */
-		} catch (UsernameNotFoundException e) {
-			messageUtil.error("security_username_not_found");
-		} catch (DisabledException e) {
-			messageUtil.error("security_account_disabled");
-		} catch (LockedException e) {
-			messageUtil.error("AccountLocked");
-		} catch (AccountExpiredException e) {
-			messageUtil.error("security_account_expired");
-		} catch (CredentialsExpiredException e) {
-			messageUtil.error("security_account_credentials_expired");
-		} catch (AccountStatusException e) {
-			messageUtil.error("security_account_status_invalid");
-		} catch (BadCredentialsException e) {
-			updateLoginStatus(userName, false);
-			//messageUtil.error("security_bad_credentials");
-		} catch (AuthenticationException e) {
-			updateLoginStatus(userName, false);
-			//messageUtil.error("security_error");
-		} finally {
-			securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
-		}
-	}
+            // redirects to the home page
+            /*
+             * FacesContext context = FacesContext.getCurrentInstance();
+             * ConfigurableNavigationHandler handler =
+             * (ConfigurableNavigationHandler)
+             * context.getApplication().getNavigationHandler();
+             * handler.performNavigation("/home.xhtml?faces-redirect=true");
+             */
+        } catch (UsernameNotFoundException e) {
+            messageUtil.error("security_username_not_found");
+        } catch (DisabledException e) {
+            messageUtil.error("security_account_disabled");
+        } catch (LockedException e) {
+            messageUtil.error("AccountLocked");
+        } catch (AccountExpiredException e) {
+            messageUtil.error("security_account_expired");
+        } catch (CredentialsExpiredException e) {
+            messageUtil.error("security_account_credentials_expired");
+        } catch (AccountStatusException e) {
+            messageUtil.error("security_account_status_invalid");
+        } catch (AuthenticationException e) {
+            updateLoginStatus(userName, false);
+            //messageUtil.error("security_error");
+        } finally {
+            securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
+        }
+    }
 
-	public void updateLoginStatus(String userName, boolean loginStatus) {
-		if(userName ==  null || StringUtils.isEmpty(userName)){
-			logger.error("loginName:{} invalid !", userName);
-			messageUtil.error("security_bad_credentials");
-			return;
-		}
-		UserAccount user = userAccountDao.getByLoginName(userName);
-		if (user == null) {
-			messageUtil.error("security_bad_credentials");
-			logger.error("can't find user by loginName:{}", userName);
-			return;
-		}
+    public void updateLoginStatus(String userName, boolean loginStatus) {
+        if (userName == null || StringUtils.isEmpty(userName)) {
+            logger.error("loginName:{} invalid !", userName);
+            messageUtil.error("security_bad_credentials");
+            return;
+        }
+        UserAccount user = userAccountDao.getByLoginName(userName);
+        if (user == null) {
+            messageUtil.error("security_bad_credentials");
+            logger.error("can't find user by loginName:{}", userName);
+            return;
+        }
 /*		if(!user.getIsActive()){
 			messageUtil.error("AccountNotActivated");
 			return;
 		}*/
-		if(user.getIsLocked()!=null && user.getIsLocked().booleanValue()==true){
-			messageUtil.error("AccountLocked");
-			return;
-		}
-		if (loginStatus) {
-			user.setLastLoginTime(new Date());
-			user.setPasswordErrorCount(0);
-			user.setIsLocked(false);
-			userAccountDao.save(user);
-		} else {
-			Integer errorTimes = user.getPasswordErrorCount();
-			if (errorTimes == null) {
-				errorTimes = 0;
-			}
-			AtomicInteger ai = new AtomicInteger(errorTimes);
-			ai.getAndAdd(1);
-			errorTimes = ai.get();
-			if (errorTimes >= PASSWORD_ERROR_TIME_LIMIT) {
-				user.setIsLocked(true);
-				user.setLockTime(new Date());
-				userAccountDao.save(user);
-				logger.error("user:{} is locked because of password error times reach the limit !", userName);
-				messageUtil.error("AccountLocked");
-				return;
-			}
-			user.setPasswordErrorCount(errorTimes);
-			userAccountDao.save(user);
-			messageUtil.error("security_bad_credentials");
-		}
-	}
+        if (user.getIsLocked() != null && user.getIsLocked()) {
+            messageUtil.error("AccountLocked");
+            return;
+        }
+        if (loginStatus) {
+            user.setLastLoginTime(new Date());
+            user.setPasswordErrorCount(0);
+            user.setIsLocked(false);
+            userAccountDao.save(user);
+        } else {
+            Integer errorTimes = user.getPasswordErrorCount();
+            if (errorTimes == null) {
+                errorTimes = 0;
+            }
+            AtomicInteger ai = new AtomicInteger(errorTimes);
+            ai.getAndAdd(1);
+            errorTimes = ai.get();
+            if (errorTimes >= PASSWORD_ERROR_TIME_LIMIT) {
+                user.setIsLocked(true);
+                user.setLockTime(new Date());
+                userAccountDao.save(user);
+                logger.error("user:{} is locked because of password error times reach the limit !", userName);
+                messageUtil.error("AccountLocked");
+                return;
+            }
+            user.setPasswordErrorCount(errorTimes);
+            userAccountDao.save(user);
+            messageUtil.error("security_bad_credentials");
+        }
+    }
 }

@@ -60,6 +60,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserAccount account = obtainAccount(login);
 
         if (account == null) {
+            account = obtainAccount("ge" + login);
+            if (account != null) {
+                log.info("Account ge" + login + " is found");
+            }
+        }
+
+        if (account == null) {
             if (log.isInfoEnabled()) {
                 log.info("Account " + login + " could not be found");
             }
@@ -75,7 +82,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             else
                 throw new LockedException("account locked");
         }
-        
+
         Collection<GrantedAuthority> grantedAuthorities = obtainGrantedAuthorities(login);
 
         if (grantedAuthorities == null) {
