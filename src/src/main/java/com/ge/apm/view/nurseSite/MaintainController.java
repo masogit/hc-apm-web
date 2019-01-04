@@ -383,7 +383,7 @@ public class MaintainController implements ServerEventInterface {
 		}
 		try {
 			if(listItem!=null && listItem.size()>0){
-				Set<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
+				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
 				if(listTempData!=null){
 					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
 					while(it.hasNext()){
@@ -405,7 +405,7 @@ public class MaintainController implements ServerEventInterface {
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
-			Set<NurseSiteMaintainData> listData=tempItem.getListData();
+			List<NurseSiteMaintainData> listData=tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
