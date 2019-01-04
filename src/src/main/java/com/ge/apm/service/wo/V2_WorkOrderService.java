@@ -341,6 +341,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(4);
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
+        formData.setAssetStatus(assetStatus.toString());
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
@@ -355,6 +356,7 @@ public class V2_WorkOrderService {
         if(null!=assetStatus){
             formData.setAssetStatus(assetStatus.toString());
         }
+
         formData.setStepDetail(accDetails);
         formData.setStepCoworker(coDetails);
         formData.setManHours(selectedWorkOrder.getManHours());

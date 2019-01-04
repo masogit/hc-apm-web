@@ -94,6 +94,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private List<AssetInfo> listSelectedAssetInfo = new ArrayList<AssetInfo>();
 
     private ContractInfoItem paymentInfo;
+    
+    private Boolean canBeEdit;
 
     @Override
     protected void init() {
@@ -379,17 +381,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public void remomveContractItem(AssetInfo assetInfo) {
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         listSelectedAssetInfo.remove(assetInfo);
-        for (int i = 0; i > -1 && i < allItemList.size(); ++i) {
-            ContractInfoItem tempItem = allItemList.get(i);
-            if (tempItem.getAssetInfo().equals(assetInfo)) {
-                allItemList.remove(i);
-                if (StringUtils.isNotEmpty(tempItem.getId())) {
-                    removedItemList.add(tempItem);
-                }
-                --i;
-                return;
-            }
-        }
+        List<ContractInfoItem> removeList =allItemList.stream().filter(item-> Objects.equals(item.getAssetUid(),assetInfo.getUid())).collect(Collectors.toList());
+        allItemList.removeAll(removeList);
+        removedItemList.addAll(removeList.stream().filter(item-> StringUtils.isNotEmpty(item.getId())).collect(Collectors.toList()));
+        
     }
 
     public void remomveContractItem(ContractInfoItem item) {
@@ -476,7 +471,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public List<ContractInfoItem> getContractItemsList() {
-        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType()) 
+        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())
                 || ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
@@ -538,6 +533,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
     }
 
+    public Boolean getCanBeEdit() {
+        if(null == canBeEdit){
+            canBeEdit = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream()
+                .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
+                        Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
+                        Objects.equals(item, selected.getSiteUID()));
+        }
+        return canBeEdit;
+    }
+    
 //    public void remomvePaymentInfo(ContractInfoItem item) {
 //        allItemList.remove(item);
 //        if (!Strings.isNullOrEmpty(item.getId())) {
@@ -545,7 +550,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 //            removedItemList.add(item);
 //        }
 //    }
-
     // public String getPartsInvoiceNum(ContractInfoItem assetItem){
     // V2_WorkOrder_Detail part = parts.stream().filter(item ->
     // Objects.equals(assetItem.getAssetUid(),

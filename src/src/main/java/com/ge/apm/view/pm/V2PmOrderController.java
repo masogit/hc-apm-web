@@ -1549,7 +1549,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(woid);
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
-        
+        if (pmCheckItemList != null){
         pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
                 .forEach(item -> {
                     UnstructuredData unData = new UnstructuredData();
@@ -1558,7 +1558,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     hmCheck.put(item.getUid(), unData);
                 });
         
-        
+        }
         
 //        if (pmCheckItemList != null) {
 //            if (hmCheck.isEmpty()) {

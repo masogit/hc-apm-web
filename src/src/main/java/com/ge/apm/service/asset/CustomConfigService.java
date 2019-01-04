@@ -16,6 +16,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +138,10 @@ public class CustomConfigService {
         if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
             (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
             resRule.add("ClinicalStaff");
+        }
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains(ApmConstant.MVS_ROLE_NAME_ADMIN) || userRoles.contains(ApmConstant.MVS_ROLE_NAME_FE))) {
+            resRule.add("AssetStaff");
         }
         return resRule;
     }

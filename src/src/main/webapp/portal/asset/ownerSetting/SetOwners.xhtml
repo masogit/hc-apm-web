@@ -56,7 +56,7 @@
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
                                     <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener}" update="AssetsPickList"/>
-                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                    <p:ajax listener="#{assetOwnerSettingController.handleSelectOwener}" update="AssetsPickList"/>
                                 </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
@@ -66,11 +66,11 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>-->
-                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch}"
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch2}"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
-                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener1}" update="AssetsPickList"/>
-                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener2}" update="AssetsPickList"/>
+                                    <p:ajax listener="#{assetOwnerSettingController.handleSelectOwener2}" update="AssetsPickList"/>
                                 </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
@@ -80,11 +80,11 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetOwnerSettingController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>-->
-                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch}"
+                                <p:autoComplete dropdown="true" value="#{assetOwnerSettingController.ownerSearch3}"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteOwner}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
-                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener2}" update="AssetsPickList"/>
-                                    <!--<p:ajax listener="#{assetOwnerSettingController.handleSelectSearch}" />-->
+                                    <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectOwener3}" update="AssetsPickList"/>
+                                    <p:ajax listener="#{assetOwnerSettingController.handleSelectOwener3}" update="AssetsPickList"/>
                                 </p:autoComplete>
                             </h:panelGroup>
 
