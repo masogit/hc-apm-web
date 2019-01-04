@@ -188,13 +188,24 @@
                             </h:panelGroup>
                         </p:panelGrid>
 
-                        <h:panelGroup>
+                      <!--  <h:panelGroup>
                             <label class="label">验收人*</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
-                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{workOrderMgrController.acker}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:autoComplete id="ackerName" converter="userAccountConverter" value="#{workOrderMgrController.ua1}" dropdown="true" forceSelection="true" requiredMessage="验收人#{msg.ValidationRequire}"  var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{workOrderMgrController.completeAckList}">
+                               <!-- <p:ajax event="itemSelect" listener="#{workOrderMgrController.test}" process="@this" />
+                                <p:ajax listener="#{workOrderMgrController.test}" process="@this" />-->
+                                <p:column>
+                                    <h:outputText value="#{t.name}"/>
+                                </p:column>
+
+                            </p:autoComplete>
+                        </h:panelGroup>
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
