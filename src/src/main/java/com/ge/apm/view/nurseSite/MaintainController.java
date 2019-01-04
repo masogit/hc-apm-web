@@ -390,7 +390,7 @@ public class MaintainController implements ServerEventInterface {
 						NurseSiteMaintainData tempData=it.next();
 						showLables.add(tempData.getCheckItem());
 					}
-					showLables.sort(new StringComparator());
+//					showLables.sort(new StringComparator());
 				}
 			}
 			nurseSiteMaintain.setShowLables(showLables);
