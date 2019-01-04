@@ -112,10 +112,6 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
-
-
-
-
     public String invokeWorkOrderAction(String token, WorkOrderActionForm formData, String actionName, String woId) {
         HttpEntity<WorkOrderActionForm> requestEntity = new HttpEntity<WorkOrderActionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.WORK_ORDER_ACTION);

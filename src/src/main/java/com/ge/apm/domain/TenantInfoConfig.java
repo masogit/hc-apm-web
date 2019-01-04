@@ -161,7 +161,7 @@ public class TenantInfoConfig {
 	public static TenantInfoConfig build() {
 		TenantInfoConfig tempVersionInfo = new TenantInfoConfig();
 		tempVersionInfo.menuList = getListVersions();
-		tempVersionInfo.edition = VERSION_COMMON;
+		tempVersionInfo.setEdition(VERSION_COMMON);
 		return tempVersionInfo;
 	}
 //	 public static void main(String[] args) {

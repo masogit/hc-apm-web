@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.faces.context.FacesContext;
 
@@ -256,6 +257,9 @@ public class PccExamineReportService {
 		}
 		return result;
 	}
+	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
+		return uaaService.findAccessClinicalUidListByUserUid(userUid);
+	}
 	
 	public List<ApmStreamedContent> batchGenerateReport(List<PccExamineReport> listPcc){
 		List<ApmStreamedContent> list=new ArrayList<ApmStreamedContent>();
@@ -473,7 +477,7 @@ public class PccExamineReportService {
     }
     public static List<ApmDropDownItem> fetchTipStatus(){
         if(tipStatus==null){
-            String str="[{\"key\":\"1\",\"label\":\"外观良好,通过测试\"},{\"key\":\"2\",\"label\":\"外观存在问题,未通过测试\"}]";
+            String str="[{\"key\":\"1\",\"label\":\"外观良好，通过测试\"},{\"key\":\"2\",\"label\":\"外观存在问题，未通过测试\"}]";
             tipStatus=(List<ApmDropDownItem>)JSONObject.parseArray(str, ApmDropDownItem.class);
         }
         return tipStatus;
@@ -494,7 +498,7 @@ public class PccExamineReportService {
     }
     public static List<ApmDropDownItem> fetchFirstTipStatus(){
         if(firstTipStatus==null){
-            String str="[{\"key\":\"1\",\"label\":\"未执行FIRSTCALL检测，建议测试其他环节综合判断\"},{\"key\":\"2\",\"label\":\"测试值良好，无功能故障\"},{\"key\":\"3\",\"label\":\"探头功能故障,未通过测试\"}]";
+            String str="[{\"key\":\"1\",\"label\":\"未执行FIRSTCALL检测，建议测试其他环节综合判断\"},{\"key\":\"2\",\"label\":\"测试值良好，无功能故障\"},{\"key\":\"3\",\"label\":\"探头功能故障，未通过测试\"}]";
             firstTipStatus=(List<ApmDropDownItem>)JSONObject.parseArray(str, ApmDropDownItem.class);
         }
         return firstTipStatus;

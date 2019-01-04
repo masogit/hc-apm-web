@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import com.google.common.base.Strings;
 import org.primefaces.event.SelectEvent;
@@ -52,7 +53,10 @@ public class AssetOwnerSettingController {
 
     private AssetInfo queryAsset;
 
+    List<UserAccount> userAccountList;
     private UserAccount ownerSearch;
+    private UserAccount ownerSearch2;
+    private UserAccount ownerSearch3;
     private Integer ownerId;
     private UserAccount owner;
     private Integer ownerId2;
@@ -88,6 +92,8 @@ public class AssetOwnerSettingController {
         }else {
             hasAssetGroupSecondary = Boolean.FALSE;
         }
+
+        userAccountList = userCommonService.getWorkerList(null,"");
         //not display data initially
 //        getQueryAssetsList();
 
@@ -139,7 +145,7 @@ public class AssetOwnerSettingController {
 
     public List<UserAccount> autoCompleteOwner(String query) {
 
-        List<UserAccount> userAccountList = userCommonService.getWorkerList(null,"");
+        //List<UserAccount> userAccountList = userCommonService.getWorkerList(null,"");
         if (userAccountList == null) {
             return Collections.emptyList();
         }
@@ -149,26 +155,50 @@ public class AssetOwnerSettingController {
         return res;
     }
 
-    public void handleSelectOwener(SelectEvent event) {
-        Object item = event.getObject();
-        if(item != null){
-            queryAsset.setAssetOwnerId(((UserAccount) item).getId());
-            this.getQueryAssetsList();
+    public void handleSelectOwener(AjaxBehaviorEvent event) {
+        Object filterOwner;
+        Integer filterOwnerId = null;
+        if (event instanceof SelectEvent) {
+            filterOwner = ((SelectEvent) event).getObject();
+            filterOwnerId = ((UserAccount) filterOwner).getId();
         }
+
+        if (ownerSearch != null && !userAccountList.stream().anyMatch(item -> ownerSearch.getId().equals(item.getId()))) {
+            ownerSearch = null;
+        }
+
+        queryAsset.setAssetOwnerId(filterOwnerId);
+        this.getQueryAssetsList();
     }
-    public void handleSelectOwener1(SelectEvent event) {
-        Object item = event.getObject();
-        if(item != null){
-            queryAsset.setAssetOwnerId2(((UserAccount) item).getId());
-            this.getQueryAssetsList();
+    public void handleSelectOwener2(AjaxBehaviorEvent event) {
+        Object filterOwner;
+        Integer filterOwnerId = null;
+        if (event instanceof SelectEvent) {
+            filterOwner = ((SelectEvent) event).getObject();
+            filterOwnerId = ((UserAccount) filterOwner).getId();
         }
+
+        if (ownerSearch2 != null && !userAccountList.stream().anyMatch(item -> ownerSearch2.getId().equals(item.getId()))) {
+            ownerSearch2 = null;
+        }
+
+        queryAsset.setAssetOwnerId2(filterOwnerId);
+        this.getQueryAssetsList();
     }
-    public void handleSelectOwener2(SelectEvent event) {
-        Object item = event.getObject();
-        if(item != null){
-            queryAsset.setAssetOwnerId3(((UserAccount) item).getId());
-            this.getQueryAssetsList();
+    public void handleSelectOwener3(AjaxBehaviorEvent event) {
+        Object filterOwner;
+        Integer filterOwnerId = null;
+        if (event instanceof SelectEvent) {
+            filterOwner = ((SelectEvent) event).getObject();
+            filterOwnerId = ((UserAccount) filterOwner).getId();
         }
+
+        if (ownerSearch3 != null && !userAccountList.stream().anyMatch(item -> ownerSearch3.getId().equals(item.getId()))) {
+            ownerSearch3 = null;
+        }
+
+        queryAsset.setAssetOwnerId3(filterOwnerId);
+        this.getQueryAssetsList();
     }
 
     public void onOwnerChange(SelectEvent event){
@@ -307,5 +337,21 @@ public class AssetOwnerSettingController {
 
     public void setOwner3(UserAccount owner3) {
         this.owner3 = owner3;
+    }
+
+    public UserAccount getOwnerSearch2() {
+        return ownerSearch2;
+    }
+
+    public void setOwnerSearch2(UserAccount ownerSearch2) {
+        this.ownerSearch2 = ownerSearch2;
+    }
+
+    public UserAccount getOwnerSearch3() {
+        return ownerSearch3;
+    }
+
+    public void setOwnerSearch3(UserAccount ownerSearch3) {
+        this.ownerSearch3 = ownerSearch3;
     }
 }
