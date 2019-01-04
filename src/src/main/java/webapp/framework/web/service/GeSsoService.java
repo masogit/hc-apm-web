@@ -32,10 +32,6 @@ public class GeSsoService {
     public boolean authenticate(String username, String password) {
         LOGGER.info("User {} is trying SSO login.", username);
 
-        if ("212688574".equals(username)) {
-            return true;
-        }
-
         try {
             HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
             HttpPost request = new HttpPost(URL);
