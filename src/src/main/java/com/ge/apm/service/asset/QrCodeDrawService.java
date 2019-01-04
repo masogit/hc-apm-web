@@ -119,7 +119,6 @@ public class QrCodeDrawService {
         return image;
     }
 
-
     public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate) throws Exception {
         Integer width = qrcodeTemplate.getInteger("Width");
         Integer height = qrcodeTemplate.getInteger("Height");
@@ -129,9 +128,9 @@ public class QrCodeDrawService {
         g.fillRect(0, 0, width, height);
 
         JSONObject qrcodeElement = qrcodeTemplate.getJSONObject("QrCodeElements");
+        BufferedImage imageQrcode = drawQrcodeWithText(suscribeLink, qrcodeElement.getString("TextValue"), qrcodeElement.getInteger("FontSize"), qrcodeElement.getInteger("FontPositionX"), qrcodeElement.getString("FontName"));
         g.drawImage(
-                drawQrcodeWithText(suscribeLink, qrcodeElement.getString("TextValue"), qrcodeElement.getInteger("FontSize"), qrcodeElement.getInteger("FontPositionX"), qrcodeElement.getString("FontName"))
-                        .getScaledInstance(qrcodeElement.getInteger("Size"), image.getHeight() * qrcodeElement.getInteger("Size") / QRCODE_SIZE, Image.SCALE_SMOOTH),
+                imageQrcode.getScaledInstance(qrcodeElement.getInteger("Size"), imageQrcode.getHeight()*qrcodeElement.getInteger("Size") / QRCODE_SIZE, Image.SCALE_SMOOTH),
                 qrcodeElement.getInteger("PositionX"),
                 qrcodeElement.getInteger("PositionY"), null
         );
