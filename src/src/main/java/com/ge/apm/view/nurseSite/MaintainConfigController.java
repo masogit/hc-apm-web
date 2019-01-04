@@ -219,7 +219,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	private void initObjPairCheckItem(){
 		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
-		objPairCheckItem.setKey(new Date().getTime()+"");
+		objPairCheckItem.setKey(new Date().getTime());
 	}
 	private void loadParentOrgInfo(){
 		checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(setOrgUid);
