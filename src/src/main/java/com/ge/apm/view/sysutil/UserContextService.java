@@ -115,6 +115,11 @@ public class UserContextService implements Serializable {
     //add MVSAdmin,MVSFE
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
+        
+        if(user.getIsSiteAdmin()){
+            return roleList.contains("SiteAdmin");
+        }
+        
         List<String> userRoles = user.getRoleNames();
         String[] roles = roleList.split(",");
         for (String role : roles) {
