@@ -868,7 +868,7 @@ public void repairResultSet(){
            }
 
            if (result.equalsIgnoreCase("4")) {
-               currentStatus = 1;
+               currentStatus = 3;
 
            }
            if (result.equalsIgnoreCase("1")) {
