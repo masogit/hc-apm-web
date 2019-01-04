@@ -117,6 +117,10 @@ public class V2_WorkOrder implements Serializable {
 
     @Column(name="ack_name")
     private String ackName;
+
+    @Column(name="ack_id")
+    private Integer ackId;
+
     //	    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.LAZY,targetEntity=V2_BlobObject.class) 
 //	    @Where(clause="bo_uuid=id")
 //	    private List<V2_BlobObject> attachments ;
@@ -632,5 +636,11 @@ public class V2_WorkOrder implements Serializable {
         return true;
     }
 
+    public Integer getAckId() {
+        return ackId;
+    }
 
+    public void setAckId(Integer ackId) {
+        this.ackId = ackId;
+    }
 }
