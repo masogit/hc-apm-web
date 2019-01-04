@@ -198,7 +198,7 @@ public void repairResultSet(){
         currentStatus =3;
     } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
     currentStatus =4;
-    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ currentStatus =1;
+    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ currentStatus =3;
     }
 }
 
@@ -868,7 +868,7 @@ public void repairResultSet(){
            }
 
            if (result.equalsIgnoreCase("4")) {
-               currentStatus = 1;
+               currentStatus = 3;
 
            }
            if (result.equalsIgnoreCase("1")) {
