@@ -250,17 +250,21 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 
             password = onPasswordEncrypted(userName, password);
 
-            UserAccount user = userAccountDao.getByLoginName(userName);
-            if (user == null) {
-                String geLoginName = "ge" + userName;
-                UserAccount geUser = userAccountDao.getByLoginName(geLoginName);
-                if (geUser != null) {
-                    boolean geSsoAuthPass = geSsoService.authenticate(userName, password);
-                    if (geSsoAuthPass) {
-                        userName = geLoginName;
-                        password = geUser.getPassword();
+            try {
+                UserAccount user = userAccountDao.getByLoginName(userName);
+                if (user == null) {
+                    String geLoginName = "ge" + userName;
+                    UserAccount geUser = userAccountDao.getByLoginName(geLoginName);
+                    if (geUser != null) {
+                        boolean geSsoAuthPass = geSsoService.authenticate(userName, password);
+                        if (geSsoAuthPass) {
+                            userName = geLoginName;
+                            password = geUser.getPassword();
+                        }
                     }
                 }
+            } catch (Exception e) {
+                logger.warn("Fail to valid by ge sso " + e.getMessage());
             }
 
             extraParams.put("j_username", new String[]{userName});
