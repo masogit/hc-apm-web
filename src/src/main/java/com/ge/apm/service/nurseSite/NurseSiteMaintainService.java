@@ -30,6 +30,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
@@ -359,18 +361,22 @@ public class NurseSiteMaintainService {
 
 	public Set<NurseSiteMaintainItem> loadConfigCheckItems(NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets) {
 		Set<NurseSiteMaintainItem> listMaintainItem = new HashSet<NurseSiteMaintainItem>();
-		String strCheckItems = nurseSiteMaintainConfig.getCheckItems();
-		if (StringUtils.isNotEmpty(strCheckItems) && listCheckAssets != null) {
-			String arr2[] = strCheckItems.split(",");
+//		String strCheckItems = nurseSiteMaintainConfig.getCheckItems();
+		String strCheckDetail=nurseSiteMaintainConfig.getCheckItemsDetail();
+		if (StringUtils.isNotEmpty(strCheckDetail) && listCheckAssets != null) {
+//			String arr2[] = strCheckItems.split(",");
+			JSONArray jsonArray=JSONArray.parseArray(strCheckDetail);
 			for (int i = 0; i < listCheckAssets.size(); ++i) {
 				NurseSiteMaintainItem item = new NurseSiteMaintainItem();
 				item.setAssetInfo(listCheckAssets.get(i));
 				item.setAssetUid(listCheckAssets.get(i).getUid());
-				Set<NurseSiteMaintainData> listData = new HashSet<NurseSiteMaintainData>();
+				List<NurseSiteMaintainData> listData = new ArrayList<NurseSiteMaintainData>();
 				item.setListData(listData);
-				for (int j = 0; j < arr2.length; ++j) {
+				for (int j = 0; j < jsonArray.size(); ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
-					p.setCheckItem(arr2[j]);
+					JSONObject obj=jsonArray.getJSONObject(j);
+					p.setCheckItem(obj.getString("name"));
+					p.setIndex(obj.getLong("key"));
 					// p.setCheckValue(false);
 					p.setItem(item);
 					listData.add(p);
@@ -392,7 +398,7 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
 			tempItem.setModifyDate(date);
-			Set<NurseSiteMaintainData> listData = tempItem.getListData();
+			List<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			tempItem.setStatus(2);
 			while (itData.hasNext()) {
@@ -407,73 +413,122 @@ public class NurseSiteMaintainService {
 		obj.setModifyDate(date);
 	}
 	
-	private void supplementMaintainItem(Set<NurseSiteMaintainItem> listItem){
-		Set<String> setModifyByUids=new HashSet<String>();
-		Set<String> setAssetInfoUids=new HashSet<String>();
-		Set<String> setItemIds=new HashSet<String>();
-		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
-		Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
-		Map<String,Set<NurseSiteMaintainData>> mapData=new HashMap<String,Set<NurseSiteMaintainData>>();
-		List<UserAccount> listModify=null;
-		List<AssetInfo> listAssetInfo=null;
-		List<NurseSiteMaintainData> listData=null;
-		if(listItem!=null && listItem.size()>0){
-			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
-			while(itItem.hasNext()){
-				NurseSiteMaintainItem tempItem=itItem.next();
-				setModifyByUids.add(tempItem.getModifyByUid());
-				setAssetInfoUids.add(tempItem.getAssetUid());
-				setItemIds.add(tempItem.getId());
+	private void supplementMaintainItem(Set<NurseSiteMaintainItem> listItem) {
+        Set<String> setModifyByUids = new HashSet<String>();
+        Set<String> setAssetInfoUids = new HashSet<String>();
+        Set<String> setItemIds = new HashSet<String>();
+        Set<String> setConfigId=new HashSet<String>();
+        Map<String, UserAccount> mapModifyBy = new HashMap<String, UserAccount>();
+        Map<String, AssetInfo> mapAssetInfo = new HashMap<String, AssetInfo>();
+        Map<String, List<NurseSiteMaintainData>> mapData = new HashMap<String, List<NurseSiteMaintainData>>();
+        Map<String,NurseSiteMaintainConfig> mapConfig=new HashMap<String,NurseSiteMaintainConfig>();
+        List<UserAccount> listModify = null;
+        List<AssetInfo> listAssetInfo = null;
+        List<NurseSiteMaintainData> listData = null;
+        List<NurseSiteMaintainConfig> listConfig=null;
+        
+        if (listItem != null && listItem.size() > 0) {
+            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+            while (itItem.hasNext()) {
+                NurseSiteMaintainItem tempItem = itItem.next();
+                if (tempItem.isNeedGetItem()) {
+                    setModifyByUids.add(tempItem.getModifyByUid());
+                    setAssetInfoUids.add(tempItem.getAssetUid());
+                    setItemIds.add(tempItem.getId());
+                    tempItem.setNeedGetItem(false);
+                    String configId=tempItem.getConfigId();
+                    if(!setConfigId.contains(configId)){
+                        setConfigId.add(configId);
+                    }
+                }
+            }
+        }
+        if (setModifyByUids.size() > 0) {
+            listModify = userAccountRepository.getSimpleByUids(setModifyByUids);
+        }
+        if (setAssetInfoUids.size() > 0) {
+            listAssetInfo = assetInfoRepository.getSimpleDataByUids(setAssetInfoUids);
+        }
+        if (setItemIds.size() > 0) {
+            listData = nurseSiteMaintainDataRepository.findListMaintainDataByParentIds(setItemIds);
+        }
+        if(setConfigId.size()>0){
+            listConfig=nurseSiteMaintainConfigRepository.fetchListByIds(setConfigId);
+        }
+        if (listModify != null) {
+            for (int i = 0; i < listModify.size(); ++i) {
+                UserAccount tempUser = listModify.get(i);
+                mapModifyBy.put(tempUser.getUid(), tempUser);
+            }
+        }
+        if (listAssetInfo != null) {
+            for (int i = 0; i < listAssetInfo.size(); ++i) {
+                AssetInfo tempAsset = listAssetInfo.get(i);
+                mapAssetInfo.put(tempAsset.getUid(), tempAsset);
+            }
+        }
+        if (listData != null) {
+            for (int i = 0; i < listData.size(); ++i) {
+                NurseSiteMaintainData tempData = listData.get(i);
+                String parentId = tempData.getParentId();
+                if (mapData.containsKey(parentId)) {
+                    mapData.get(parentId).add(tempData);
+                } else {
+                    List<NurseSiteMaintainData> tempSetData = new ArrayList<NurseSiteMaintainData>();
+                    tempSetData.add(tempData);
+                    mapData.put(parentId, tempSetData);
+                }
+            }
+        }
+        if (listItem != null && listItem.size() > 0) {
+            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+            while (itItem.hasNext()) {
+                NurseSiteMaintainItem tempItem = itItem.next();
+                if (StringUtils.isNotEmpty(tempItem.getAssetUid())) {
+                    tempItem.setAssetInfo(mapAssetInfo.get(tempItem.getAssetUid()));
+                }
+                if (StringUtils.isNotEmpty(tempItem.getModifyByUid())) {
+                    tempItem.setModifyBy(mapModifyBy.get(tempItem.getModifyByUid()));
+                }
+                tempItem.setListData(mapData.get(tempItem.getId()));
+            }
+        }
+        //order data
+        if(listConfig!=null){
+            for(int i=0;i<listConfig.size();++i){
+                NurseSiteMaintainConfig tempConfig=listConfig.get(i);
+                mapConfig.put(tempConfig.getId(), tempConfig);
+            }
+        }
+        if(listItem!=null && listItem.size()>0){
+            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+            while (itItem.hasNext()) {
+                NurseSiteMaintainItem tempItem = itItem.next();
+                List<NurseSiteMaintainData> listTempData=tempItem.getListData();
+                if(listTempData!=null && listTempData.size()>0){
+                    NurseSiteMaintainConfig tempConfig=mapConfig.get(tempItem.getConfigId());
+                    JSONArray jsonArray=JSONArray.parseArray(tempConfig.getCheckItemsDetail());
+                    List<NurseSiteMaintainData> listNewData=new ArrayList<NurseSiteMaintainData>();
+                    for(int i=0;i<jsonArray.size();++i){
+                        JSONObject obj=jsonArray.getJSONObject(i);
+                        String name=obj.getString("name");
+                        NurseSiteMaintainData tempData=findObjInList(listTempData, name);
+                        listNewData.add(tempData);
+                    }
+                    tempItem.setListData(listNewData);
+                }
+            }
+        }
+    }
+	private NurseSiteMaintainData findObjInList(List<NurseSiteMaintainData> list,String name){
+		for(int i=0;i<list.size();++i){
+			NurseSiteMaintainData tempDate=list.get(i);
+			String tempName=list.get(i).getCheckItem();
+			if(tempName.equals(name)){
+				return list.remove(i);
 			}
 		}
-		if (setModifyByUids.size() > 0) {
-			listModify=userAccountRepository.getSimpleByUids(setModifyByUids);
-		}
-		if (setAssetInfoUids.size() > 0) {
-			listAssetInfo=assetInfoRepository.getSimpleDataByUids(setAssetInfoUids);
-		}
-		if (setItemIds.size() > 0) {
-			listData=nurseSiteMaintainDataRepository.findListMaintainDataByParentIds(setItemIds);
-		}
-		if(listModify!=null){
-			for(int i=0;i<listModify.size();++i){
-				UserAccount tempUser=listModify.get(i);
-				mapModifyBy.put(tempUser.getUid(), tempUser);
-			}
-		}
-		if(listAssetInfo!=null){
-			for(int i=0;i<listAssetInfo.size();++i){
-				AssetInfo tempAsset=listAssetInfo.get(i);
-				mapAssetInfo.put(tempAsset.getUid(), tempAsset);
-			}
-		}
-		if(listData!=null){
-			for(int i=0;i<listData.size();++i){
-				NurseSiteMaintainData tempData=listData.get(i);
-				String parentId=tempData.getParentId();
-				if(mapData.containsKey(parentId)){
-					mapData.get(parentId).add(tempData);
-				}
-				else{
-					Set<NurseSiteMaintainData> tempSetData=new HashSet<NurseSiteMaintainData>();
-					tempSetData.add(tempData);
-					mapData.put(parentId, tempSetData);
-				}
-			}
-		}
-		if(listItem!=null && listItem.size()>0){
-			Iterator<NurseSiteMaintainItem> itItem=listItem.iterator();
-			while(itItem.hasNext()){
-				NurseSiteMaintainItem tempItem=itItem.next();
-				if(StringUtils.isNotEmpty(tempItem.getAssetUid())){
-					tempItem.setAssetInfo(mapAssetInfo.get(tempItem.getAssetUid()));
-				}
-				if(StringUtils.isNotEmpty(tempItem.getModifyByUid())){
-					tempItem.setModifyBy(mapModifyBy.get(tempItem.getModifyByUid()));
-				}
-				tempItem.setListData(mapData.get(tempItem.getId()));
-			}
-		}
+		return null;
 	}
 	
 	public void supplementMaintain(NurseSiteMaintain tempMaintain){
@@ -556,7 +611,7 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyBy(user);
 			tempItem.setModifyByUid(user.getUid());
 			tempItem.setModifyDate(date);
-			Set<NurseSiteMaintainData> listData = tempItem.getListData();
+			List<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
 			// single,0:未检查，2：已通过，3：有问题，4：进行中
 			while (itData.hasNext()) {
@@ -1129,7 +1184,7 @@ public class NurseSiteMaintainService {
 					// secondHeaderColumnIndex=5;
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
-						Set<NurseSiteMaintainData> listData = tempItem.getListData();
+						List<NurseSiteMaintainData> listData = tempItem.getListData();
 						if (listData != null && listData.size() > 0) {
 							Iterator<NurseSiteMaintainData> itData = listData.iterator();
 							while (itData.hasNext()) {
@@ -1235,7 +1290,7 @@ public class NurseSiteMaintainService {
 					for (int i = 0; i < tempListItem.size(); ++i) {
 						mapCheckItemSequence.clear();
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
-						Set<NurseSiteMaintainData> listData = tempItem.getListData();
+						List<NurseSiteMaintainData> listData = tempItem.getListData();
 						String keyName="";
 						if (listData != null && listData.size() > 0) {
 							Iterator<NurseSiteMaintainData> itData = listData.iterator();

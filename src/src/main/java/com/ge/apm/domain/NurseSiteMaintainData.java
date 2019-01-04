@@ -43,6 +43,9 @@ public class NurseSiteMaintainData {
 	@Column(name="check_value")
 	private Boolean checkValue;
 	
+	@Column(name="index")
+	private Long index;
+	
 	@JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JsonIgnore
@@ -82,6 +85,14 @@ public class NurseSiteMaintainData {
 
 	public void setCheckValue(Boolean checkValue) {
 		this.checkValue = checkValue;
+	}
+
+	public Long getIndex() {
+		return index;
+	}
+
+	public void setIndex(Long index) {
+		this.index = index;
 	}
 
 	public NurseSiteMaintainItem getItem() {
