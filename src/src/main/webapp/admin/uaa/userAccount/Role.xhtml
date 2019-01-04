@@ -29,7 +29,7 @@
                         </p:tab>
                         <p:tab title="访问权限" class="ui-g-12" >
                             <p:scrollPanel style="height: 300px; border: 0;" mode="native">
-                                <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="true"  cache="false" selectionMode="checkbox" highlight="true">
+                                <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
                                         <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
                                         <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
                                     <p:treeNode type="org">

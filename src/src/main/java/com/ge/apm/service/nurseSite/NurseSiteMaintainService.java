@@ -548,6 +548,7 @@ public class NurseSiteMaintainService {
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
 		int objStatus = 0;
+		boolean hasNotChecked=false;
 		while (it.hasNext()) {
 			itemStatus = 0;
 			NurseSiteMaintainItem tempItem = it.next();
@@ -562,6 +563,7 @@ public class NurseSiteMaintainService {
 				NurseSiteMaintainData tempData = itData.next();
 				Boolean value = tempData.getCheckValue();
 				if (value == null) {
+					hasNotChecked=true;
 					if (itemStatus == 2) {
 						itemStatus = 4;
 					}
@@ -590,6 +592,9 @@ public class NurseSiteMaintainService {
 					objStatus = 4;
 				}
 			}
+		}
+		if(hasNotChecked && objStatus==2){
+			objStatus=4;
 		}
 		obj.setStatus(objStatus);
 		obj.setCheckDate(date);
@@ -956,26 +961,16 @@ public class NurseSiteMaintainService {
 	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
 		Set<String> listResult = new HashSet<String>();
 		List<UserOrgInfo> listUserOrgInfo = userOrgInfoRepository.findOrgUidListByUserUid(userUid);
-		Set<String> listOrgUid = null;
-		if (listUserOrgInfo != null) {
-			if (listUserOrgInfo.size() > 1) {
-
-			} else if (listUserOrgInfo.size() == 1) {
-				UserOrgInfo tempUserOrgInfo = listUserOrgInfo.get(0);
-				if (tempUserOrgInfo.getOrgType() == 4) {
-
-				} else {
-					listOrgUid = orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(tempUserOrgInfo.getOrgUid());
-				}
-			}
-		}
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
 				listResult.add(listUserOrgInfo.get(i).getOrgUid());
 			}
 		}
-		if (listOrgUid != null && listOrgUid.size() > 0) {
-			listResult.addAll(listOrgUid);
+		if (listResult != null && listResult.size()>0) {
+			Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+			if(tempResult!=null){
+				listResult.addAll(tempResult);
+			}
 		}
 		return listResult;
 	}
