@@ -123,7 +123,7 @@
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
-            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin')  and userContextService.versionContains('config')}">
+            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')  and userContextService.versionContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.org')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.user')}"/>
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.versionContains('config.assetMessage')}"/>
