@@ -2,7 +2,6 @@ package com.ge.apm.view.sysutil;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
+import java.util.Objects;
 
 import javaslang.control.Option;
 import webapp.framework.dao.SearchFilter;
@@ -104,7 +104,7 @@ public class UserContextService implements Serializable {
     public static List<String> getRoles() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
-
+        
         return user.getRoleNames();
     }
 
@@ -130,7 +130,7 @@ public class UserContextService implements Serializable {
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
     }
-
+    
     public boolean versionContains(String menuNameList){
     	UserAccount user = getLoginUser();
     	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
@@ -200,7 +200,7 @@ public class UserContextService implements Serializable {
             if (userName == null) {
                 return null; // user is not logined
             }
-
+            
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
         }
@@ -218,23 +218,31 @@ public class UserContextService implements Serializable {
 
         return userAccount;
     }
-
+    
     private Boolean flagIsAgentTenant = null;
     public boolean isAgentTenant() {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
-
+            
         UserAccount user = getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        if(tenant.getType() != null && tenant.getType() == 1) {
-                flagIsAgentTenant = true;
-        }
-        else
-            flagIsAgentTenant = false;
-
+        flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
+        
         return flagIsAgentTenant;
     }
 
+    private Boolean flagIsUltraSoundTenant = null;
+    public boolean isUltraSoundTenant() {
+        if(flagIsUltraSoundTenant!=null) return flagIsUltraSoundTenant;
+            
+        UserAccount user = getLoginUser();
+        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
+        
+        return flagIsUltraSoundTenant;
+    }
+    
     WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
 
     private Boolean flagIsHospitalUser = null;
@@ -249,7 +257,7 @@ public class UserContextService implements Serializable {
         } else {
             flagIsHospitalUser = Boolean.FALSE;
         }
-
+        
         return flagIsHospitalUser;
     }
 
@@ -333,7 +341,7 @@ public class UserContextService implements Serializable {
         UserAccount userAccount = getCurrentUserAccount();
         return userAccount.getIsGeOp();
     }
-
+    
     public static boolean isMVSAdmin(){
     	UserAccount userAccount=getCurrentUserAccount();
     	Integer mvsRoleType=userAccount.getMvsRoleType();
@@ -388,9 +396,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
-            if(isIBCustomer())
+            if(isIBorUltraSoundIBEndUser())
                 return "portal/woMgr/workOrderList.xhtml";
-
+            
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
         }
@@ -418,9 +426,9 @@ public class UserContextService implements Serializable {
     private Boolean isPmDispatcher = null;
 
     private Boolean isAssetApprover = null;
-
+    
     private Boolean needAssetApproval = null;
-
+    
     private Boolean needInstorageCheck = null;
 
     public Boolean needInstorageCheck(){
@@ -429,7 +437,7 @@ public class UserContextService implements Serializable {
         }
         return needInstorageCheck;
     }
-
+    
     public Boolean needAssetApproval(){
         if (needAssetApproval == null) {
             getUserPrivilege();
@@ -469,12 +477,12 @@ public class UserContextService implements Serializable {
                 || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
-
+        
         needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
-
+        
         needInstorageCheck = wcList.stream().anyMatch(item -> null!=item.getNeedInstorageCheck() && item.getNeedInstorageCheck());
     }
-
+    
     private List<WorkflowConfig> getSiteConfigurations(){
         UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -497,22 +505,65 @@ public class UserContextService implements Serializable {
         }
     }
 
-    public boolean isNotIBCustomer(){
-        return !isIBCustomer();
+    /* 
+     Full access for SuperAdmin, GE user(has GE SSO number), GE Ops.
+     SiteAdmin: only External WorkOrder and SR Report submission
+     Hopital end user's access to modules by different Versions:
+        Account Version: Full function except for External Work Order
+        Dealer version:  AssetInfo + WorkOrder ( Internal & External )
+        UltraSound IB versoin: AssetInfo + External WorkOrder
+        IB version: Only External WorkOrder
+    */
+    public boolean isFEorOpsUser(){
+        UserAccount currentUser = getLoginUser();
+        return currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp());
     }
 
-    public boolean isIBCustomer(){
+    public boolean isFEorOpsOrSiteAdminUser(){
+        UserAccount currentUser = getLoginUser();
+        return currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()) || currentUser.getIsSiteAdmin();
+    }
+
+    public boolean isIBEndUser(){
+        if(isFEorOpsOrSiteAdminUser()) return false;
+        
         UserAccount currentUser = getLoginUser();
         int siteId= currentUser.getSiteId();
-        if(siteId!=46) return false; // not in GE IB Tenant
-        return !(currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()));
+        return siteId==46;
+    }
+    
+    public boolean isUltraSoundIBEndUser(){
+        if(isFEorOpsOrSiteAdminUser()) return false;
+        
+        return isUltraSoundTenant();
     }
 
+    public boolean isIBorUltraSoundIBEndUser(){
+        return isIBEndUser() || isUltraSoundIBEndUser();
+    }
+
+    public boolean isDealerEndUser(){
+        if(isFEorOpsOrSiteAdminUser()) return false;
+        
+        return isAgentTenant();
+    }
+
+    public boolean isIBorUltraSoundIBorDealerEndUser(){
+        return isIBEndUser() || isUltraSoundIBEndUser() || isDealerEndUser();
+    }
+    
+    public boolean isAccountEndUser(){
+        if(isFEorOpsOrSiteAdminUser()) return false;
+        if(isDealerEndUser()) return false;
+        if(isIBEndUser()) return false;
+        return !isUltraSoundIBEndUser();
+    }
+    
     public static boolean isOnlyLocalITAdmin() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
         List<String> userRoles = user.getRoleNames();
-
+        
         if(userRoles.contains("LocalITAdmin")){
             if(userRoles.contains("ITAdmin") || isSuperAdmin()){
                 return false;
