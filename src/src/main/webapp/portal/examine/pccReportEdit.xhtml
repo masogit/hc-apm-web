@@ -1,0 +1,278 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<ui:define name="content">
+		<style>
+			td {
+				text-align: left;
+			}
+			
+			tr.ui-selectlistbox-item td:first-child {
+				width: 20px !important;
+			}
+		</style>
+		<div class="ui-g clearfix">
+			<div class="ui-g-12 card cardTitle">
+				<label class="pageTitle" value="PCC 探头检测报告编辑" />
+			</div>
+			<div class="ui-g-12 card">
+				<h:form id="idFormPcc">
+					<p:fieldset legend="首页">
+						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+							<h:panelGroup>
+								<label class="label">医院</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.hospital.name}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">科室</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.clinicalDeptName}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">主机SystemID</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.systemId}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头安装日期</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.arriveDate}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头合同开始日期</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.installDate}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头合同截至日期</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.warrantyDate}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">检测日期*</label>
+								<p:calendar timeZone="GMT+8" id="checkDate" value="#{pccExamineReportEditController.selected.checkDate}" pattern="yyyy/MM/dd" required="false"
+									requiredMessage="检测日期 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+							</h:panelGroup>
+						</p:panelGrid>
+					</p:fieldset>
+					<p:fieldset legend="内容">
+						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+							<h:panelGroup>
+								<label class="label">探头名称</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.name}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头型号</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.functionType}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头序列号</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.serialNum}"></h:outputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<label class="label">探头生产日期</label>
+								<h:outputText value="#{pccExamineReportEditController.selected.assetInfo.manufactDate}"></h:outputText>
+							</h:panelGroup>
+						</p:panelGrid>
+						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+							<h:panelGroup>
+								<p:graphicImage id="idPicture1" value="#{pccExamineReportEditController.picture1}" width="160" height="120" stream="false">
+								</p:graphicImage>
+								<p:fileUpload id="idPictureUpload" fileUploadListener="#{pccExamineReportEditController.handleFileUpload1}" dragDropSupport="false" style="width:100%"
+									multiple="false" sizeLimit="100000000" update="@parent:idPicture1" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片1" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:graphicImage id="idPicture2" value="#{pccExamineReportEditController.picture2}" width="160" height="120" stream="false" />
+								<p:fileUpload id="idPictureUpload2" fileUploadListener="#{pccExamineReportEditController.handleFileUpload2}" dragDropSupport="false" style="width:100%"
+									multiple="false" sizeLimit="100000000" update="@parent:idPicture2" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片2" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:graphicImage id="idPicture3" value="#{pccExamineReportEditController.picture3}" width="160" height="120" stream="false" />
+								<p:fileUpload id="idPictureUpload3" fileUploadListener="#{pccExamineReportEditController.handleFileUpload3}" dragDropSupport="false" style="width:100%"
+									multiple="false" sizeLimit="100000000" update="@parent:idPicture3" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片3" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:graphicImage id="idPicture4" value="#{pccExamineReportEditController.picture4}" width="160" height="120" stream="false" />
+								<p:fileUpload id="idPictureUpload4" fileUploadListener="#{pccExamineReportEditController.handleFileUpload4}" dragDropSupport="false" style="width:100%"
+									multiple="false" sizeLimit="100000000" update="@parent:idPicture4" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片4" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
+							</h:panelGroup>
+						</p:panelGrid>
+						<p:panel header="外观检查及漏电流测试" style="margin-bottom:20px">
+							<p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<label class="label">线缆*</label>
+									<p:selectManyMenu id="selectLineStatus" value="#{pccExamineReportEditController.selectLineStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="线缆 #{msg.ValidationRequire}" style="height:80px" class="noscroll">
+										<f:selectItems value="#{pccExamineReportEditController.fetchLineStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">透镜*</label>
+									<p:selectManyMenu id="selectMirrorStatus" value="#{pccExamineReportEditController.selectMirrorStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="透镜 #{msg.ValidationRequire}" style="height:80px" class="noscroll">
+										<f:selectItems value="#{pccExamineReportEditController.fetchMirrorStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">外壳*</label>
+									<p:selectManyMenu id="selectShellStatus" value="#{pccExamineReportEditController.selectShellStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="外壳 #{msg.ValidationRequire}" style="height:80px" class="noscroll">
+										<f:selectItems value="#{pccExamineReportEditController.fetchShellStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">连接器*</label>
+									<p:selectManyMenu id="selectLinkerStatus" value="#{pccExamineReportEditController.selectLinkerStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="连接器 #{msg.ValidationRequire}" style="height:80px" class="noscroll">
+										<f:selectItems value="#{pccExamineReportEditController.fetchLinkerStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">油囊*</label>
+									<p:selectManyMenu id="selectOilStatus" value="#{pccExamineReportEditController.selectOilStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="油囊 #{msg.ValidationRequire}" style="height:80px;" class="noscroll">
+										<f:selectItems value="#{pccExamineReportEditController.fetchOilStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+							</p:panelGrid>
+							<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<label class="label">提示*</label>
+									<p:selectOneMenu id="selectTipStatus" value="#{pccExamineReportEditController.selectTipStatus}" var="t" required="false" converter="apmDropDownConverter"
+										requiredMessage="提示 #{msg.ValidationRequire}">
+										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{pccExamineReportEditController.fetchTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+										</f:selectItems>
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectOneMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">探头漏电流检测结果*</label>
+									<p:selectOneMenu id="selectElectricLeakageStatus" value="#{pccExamineReportEditController.selectElectricLeakageStatus}" var="t" required="false" converter="apmDropDownConverter"
+										requiredMessage="探头漏电流检测结果 #{msg.ValidationRequire}">
+										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{pccExamineReportEditController.fetchElectricLeakageStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+										</f:selectItems>
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectOneMenu>
+								</h:panelGroup>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel header="FIRST CALL检测" style="margin-bottom:20px">
+							<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<label class="label">所见*</label>
+									<p:selectManyMenu id="selectFirstSeenStatus" value="#{pccExamineReportEditController.selectFirstSeenStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="所见 #{msg.ValidationRequire}" style="width:100%">
+										<f:selectItems value="#{pccExamineReportEditController.fetchFirstSeenStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">提示*</label>
+									<p:selectOneMenu id="selectFirstTipStatus" value="#{pccExamineReportEditController.selectFirstTipStatus}" var="t" required="false" converter="apmDropDownConverter"
+										requiredMessage="提示 #{msg.ValidationRequire}">
+										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{pccExamineReportEditController.fetchFirstTipStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+										</f:selectItems>
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectOneMenu>
+								</h:panelGroup>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel header="检测结果及建议" style="margin-bottom:20px">
+							<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<label class="label">检测结果*</label>
+									<p:selectManyMenu id="selectResultStatus" value="#{pccExamineReportEditController.selectResultStatus}" var="t" required="false" showCheckbox="true"
+										converter="apmDropDownConverter" requiredMessage="检测结果 #{msg.ValidationRequire}" style="height:200px;width:100%">
+										<f:selectItems value="#{pccExamineReportEditController.fetchResultStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}" />
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectManyMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">建议*</label>
+									<p:selectOneMenu id="selectRecommandStatus" value="#{pccExamineReportEditController.selectRecommandStatus}" var="t" required="false" converter="apmDropDownConverter"
+										requiredMessage="建议 #{msg.ValidationRequire}">
+										<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{pccExamineReportEditController.fetchRecommandStatus()}" var="item" itemLabel="#{item.label}" itemValue="#{item}">
+										</f:selectItems>
+										<p:column>
+											<h:outputText value="#{t.label}" />
+										</p:column>
+									</p:selectOneMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<label class="label">备注</label>
+									<p:inputTextarea value="#{pccExamineReportEditController.selected.comment}" rows="2" cols="50" style="width:75%" maxlength="200"></p:inputTextarea>
+								</h:panelGroup>
+							</p:panelGrid>
+						</p:panel>
+					</p:fieldset>
+					<p:fieldset legend="尾页">
+						<p:panelGrid columns="1">
+							<h:panelGroup>
+								<p:graphicImage id="idPictureTail" value="#{pccExamineReportEditController.pictureTail}" width="160" height="120" stream="false" />
+								<p:fileUpload id="idTailUpload" fileUploadListener="#{pccExamineReportEditController.handleTailUpload}" dragDropSupport="false" style="width:100%"
+									multiple="false" sizeLimit="100000000" update="@parent:idPictureTail" auto="true" invalidFileMessage="仅支持文件类型:jpg,png"
+									invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="上传图片" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" />
+							</h:panelGroup>
+						</p:panelGrid>
+					</p:fieldset>
+					<p:commandButton id="saveButtonId" validateClient="true" immediate="false" partialSubmit="true" value="暂存" process="@parent" update=":growl" icon="ui-icon-check"
+						actionListener="#{pccExamineReportEditController.save}" disabled="#{pccExamineReportEditController.selected.status==2}" />
+					<p:commandButton id="submitButtonId" validateClient="true" immediate="false" partialSubmit="true" value="提交" process="@parent" update=":growl,saveButtonId,submitButtonId"
+						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.submit}" disabled="#{pccExamineReportEditController.selected.status==2}" oncomplete="validFields(xhr, status, args)" />
+					<!-- <p:commandButton id="generateButtonId" validateClient="true" partialSubmit=":idFormPcc" value="生成报告" process="@parent" update=":growl,downloadButtonId"
+						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.generateReport}" disabled="#{empty pccExamineReportEditController.selected.id}" /> -->
+					<!-- <p:commandButton id="downloadButtonId" validateClient="true" value="下载报告" update=":growl" icon="ui-icon-check" ajax="false"
+						disabled="#{empty pccExamineReportEditController.selected.reportStorageId}">
+						<p:fileDownload value="#{pccExamineReportEditController.reportFile}" />
+					</p:commandButton> -->
+					<p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-cancel" action="pccReportList.xhtml?faces-redirect=true" />
+				</h:form>
+			</div>
+		</div>
+		<script>
+		$('.noscroll .ui-selectlistbox-listcontainer').each(function(index, e) {
+			$(e).css("overflow", "unset");
+		});
+		function validFields(xhr, status, args){
+			if(args){
+				for(obj in args){
+					if(args[obj]){
+						$('#idFormPcc\\:'+obj).addClass("ui-state-error");
+					}	
+					else{
+						$('#idFormPcc\\:'+obj).removeClass("ui-state-error");
+					}
+				}
+			}
+		}
+	</script>
+	</ui:define>
+
+</ui:composition>

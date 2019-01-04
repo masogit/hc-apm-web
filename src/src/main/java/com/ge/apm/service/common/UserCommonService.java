@@ -65,6 +65,24 @@ public class UserCommonService {
         }
         return null;
     }
+
+    public List<UserAccount> getAckerList(String woOrderId, String orgUid) {
+        Map<String, Object> res = srApi.getAcker(UserContextService.getAccessToken(), woOrderId, orgUid);
+        if (null != res) {
+            List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
+            List<UserAccount> userList = mapList.stream().map(item -> {
+                UserAccount u = new UserAccount();
+                u.setId(Integer.parseInt(item.get("id").toString()));
+                u.setUid(item.get("uid").toString());
+                u.setName(item.get("name").toString());
+                u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
+                return u;
+            }).collect(Collectors.toList());
+
+            return userList;
+        }
+        return null;
+    }
     
     public List<UserAccount> getExternalWorkerList(String tenantUID) {
         return userDao.findByTenantUIDAndRoleName(tenantUID,"ExternalStaff");

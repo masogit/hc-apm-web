@@ -1,0 +1,221 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="PCC Tool 超声探头检测报告" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="pccReportListForm">
+					<p:dataTable id="datalist" value="#{pccExamineReportController.lazyModel}" var="item" widgetVar="varDataList"
+						selection="#{pccExamineReportController.listSelected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.assetUid}"
+						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+						<p:column selectionMode="multiple" style="width:32px;text-align:center" exportable="false">
+						</p:column>
+						<p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+						<p:ajax event="rowSelectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="rowUnselectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="filter" listener="#{pccExamineReportController.onFilter}" />
+						<p:column exportable="false">
+							<p:commandButton id="createButton" icon="fa fa-plus" class="btn btn-sm btn-gray" title="#{msg.Edit}"
+								action="#{pccExamineReportController.getEditPage(item.assetUid,'Create')}" disabled="#{!pccExamineReportController.blnEditable}" style="zoom:0.7;"/>
+							<p:commandButton id="editButton" icon="fa fa-fw fa-edit" title="#{msg.Edit}" action="#{pccExamineReportController.getEditPage(item.id,'Edit')}"
+								disabled="#{empty item.status or !pccExamineReportController.blnEditable or item.status==2}"  style="zoom:0.7;"/>
+							<p:commandButton id="deleteButton" process="@this" icon="fa fa-fw fa-remove" title="#{msg.Delete}" actionListener="#{pccExamineReportController.delete(item)}"
+								update=":pccReportListForm:datalist,:growl" disabled="#{empty item.status or !pccExamineReportController.blnEditable}" style="zoom:0.7;">
+								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:commandButton id="downloadButtonId" validateClient="false" icon="fa fa-fw fa-download" update=":growl" ajax="false"
+								actionListener="#{pccExamineReportController.generateReport(item)}" disabled="#{item.status!=2}" style="zoom:0.7;">
+								<p:fileDownload value="#{pccExamineReportController.reportFile}" />
+							</p:commandButton>
+						</p:column>
+						<p:column headerText="医院" filterBy="#{item.assetInfohospitalName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfohospitalName}" />
+						</p:column>
+						<p:column headerText="科室" filterBy="#{item.assetInfoclinicalDeptName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoclinicalDeptName}" />
+						</p:column>
+						<p:column headerText="主机SystemID" filterBy="#{item.assetInfosystemId}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfosystemId}" />
+						</p:column>
+						<p:column headerText="探头名称" filterBy="#{item.assetInfoname}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoname}" />
+						</p:column>
+						<p:column headerText="探头型号" filterBy="#{item.assetInfofunctionType}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfofunctionType}" />
+						</p:column>
+						<p:column headerText="探头S/N" filterBy="#{item.assetInfoserialNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoserialNum}" />
+						</p:column>
+						<p:column headerText="探头生产日期" sortBy="#{item.assetInfomanufactDate}" filterBy="#{item.assetInfomanufactDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfomanufactDate" widgetVar="varFilterassetInfomanufactDate" />
+							</f:facet>
+							<h:outputText value="#{item.assetInfomanufactDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="探头安装日期" sortBy="#{item.assetInfoarriveDate}" filterBy="#{item.assetInfoarriveDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfoarriveDate" widgetVar="varFilterassetInfoarriveDate" />
+							</f:facet>
+							<h:outputText value="#{item.assetInfoarriveDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="探头合同开始日期" sortBy="#{item.assetInfoinstallDate}" filterBy="#{item.assetInfoinstallDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfoinstallDate" widgetVar="varFilterassetInfoinstallDate" />
+							</f:facet>
+							<h:outputText value="#{item.assetInfoinstallDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="探头合同截至日期" sortBy="#{item.assetInfowarrantyDate}" filterBy="#{item.assetInfowarrantyDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterassetInfowarrantyDate" widgetVar="varFilterassetInfowarrantyDate" />
+							</f:facet>
+							<h:outputText value="#{item.assetInfowarrantyDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="检测日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filtercheckDate" widgetVar="varFiltercheckDate" />
+							</f:facet>
+							<h:outputText value="#{item.checkDate}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="创建人" filterBy="#{item.createByName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.createByName}" />
+						</p:column>
+						<p:column headerText="探头好/坏" filterBy="#{item.recommandStatus}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{pccExamineReportController.recommandStatusFilter}">
+									<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
+									<f:selectItem itemLabel="好" itemValue="1" />
+									<f:selectItem itemLabel="坏" itemValue="2" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{empty item.recommandStatus?'':item.recommandStatus==1?'好':'坏'}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="报告状态" filterBy="#{item.status}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{pccExamineReportController.statusFilter}">
+									<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
+									<f:selectItem itemLabel="未提交" itemValue="1" />
+									<f:selectItem itemLabel="已提交" itemValue="2" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{empty item.status?'':item.status==1?'未提交':'已提交'}">
+							</h:outputText>
+						</p:column>
+
+
+						<!-- <p:column headerText="报告下载" exportable="false" id="idColumnDownReport">
+							<p:link href="#{fileDownloadService.getFileUrl(item.reportStorageId)}" rendered="#{not empty item.reportStorageId}">
+								<h:outputText value="点击下载" />
+							</p:link>
+						</p:column> -->
+						<f:facet name="{Toolbar}">
+							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel">
+								<p:dataExporter type="xlsx" target="datalist" fileName="pccReport" selectionOnly="#{empty pccExamineReportController.listSelected?false:true}" />
+							</p:commandButton>
+							<!-- <p:commandButton id="idBtnBatchGenerateReport" title="批量生成报告" icon="fa fa-fw fa-building-o" ajax="true"
+								actionListener="#{pccExamineReportController.batchGenerateReport()}" update=":growl,:pccReportListForm" >
+							</p:commandButton> -->
+							<p:commandButton id="downloadAllId" title="报告下载(仅当前页)" icon="ui-icon-file-download" ajax="false"
+								actionListener="#{pccExamineReportController.downloadSelectedReport()}" update=":growl">
+								<p:fileDownload value="#{pccExamineReportController.exportFile}" />
+							</p:commandButton>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+				<p:overlayPanel widgetVar="panelFilterassetInfomanufactDate"
+					for=":pccReportListForm:datalist:filterassetInfomanufactDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfomanufactDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfomanufactDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfomanufactDate','varStartTimeFrom_assetInfomanufactDate','varStartTimeTo_assetInfomanufactDate'); PF('panelFilterassetInfomanufactDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfomanufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfoarriveDate" for=":pccReportListForm:datalist:filterassetInfoarriveDate"
+					dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfoarriveDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfoarriveDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfoarriveDate','varStartTimeFrom_assetInfoarriveDate','varStartTimeTo_assetInfoarriveDate'); PF('panelFilterassetInfoarriveDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfoarriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfoinstallDate"
+					for=":pccReportListForm:datalist:filterassetInfoinstallDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfoinstallDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfoinstallDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfoinstallDate','varStartTimeFrom_assetInfoinstallDate','varStartTimeTo_assetInfoinstallDate'); PF('panelFilterassetInfoinstallDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfoinstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterassetInfowarrantyDate"
+					for=":pccReportListForm:datalist:filterassetInfowarrantyDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_assetInfowarrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_assetInfowarrantyDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+							navigator="true" mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterassetInfowarrantyDate','varStartTimeFrom_assetInfowarrantyDate','varStartTimeTo_assetInfowarrantyDate'); PF('panelFilterassetInfowarrantyDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterassetInfowarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+						style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFiltercheckDate" for=":pccReportListForm:datalist:filtercheckDate" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_checkDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_checkDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFiltercheckDate','varStartTimeFrom_checkDate','varStartTimeTo_checkDate'); PF('panelFiltercheckDate').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFiltercheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -5,7 +5,7 @@
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{userContextService.isNotIBCustomer() and userContextService.versionContains('homePage')}"/>
 
             
-            <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('asset')}">
+            <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,NursingStaff') and userContextService.versionContains('asset')}">
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
                 <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('asset.info')}"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml"/>
@@ -21,11 +21,11 @@
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.create')}"/>
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.hasAnyRole('AssetHead') or userContextService.isAssetApprover()) and userContextService.versionContains('asset.audit')}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.batchImportData')}"/>
-        <p:menuitem id="um088" value="盘点工单" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.inventory')}"/>
+        <p:menuitem id="um088" value="盘点工单" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,NursingStaff') and userContextService.versionContains('asset.inventory')}"/>
 
             </p:submenu>
 
-            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.isHospitalUser() and userContextService.versionContains('assetAdjust')}">
+            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt')  and userContextService.isHospitalUser() and userContextService.versionContains('assetAdjust')}">
                 <!--<p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
                 <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.versionContains('assetAdjust.borrowApply')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.versionContains('assetAdjust.borrowAccept')}"/>
@@ -55,13 +55,13 @@
 
             <!--</p:submenu>-->
 
-            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('install')}">
+            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,AssetHead')  and userContextService.versionContains('install')}">
                 <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.versionContains('install.list')}"/>
                 <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.versionContains('install.store')}"/>
                 <p:menuitem value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.needInstorageCheck() and userContextService.versionContains('install.check')}"/>
                 <!--<p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>-->
             </p:submenu>
-            <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('repair')}">
+            <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')  and userContextService.versionContains('repair')}">
                 <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
                 <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" rendered="false"/>
                 <p:menuitem id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="false"/> 
@@ -76,10 +76,10 @@
                 <p:menuitem id="um202" value="休假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetHead,AssetStaff') and userContextService.versionContains('repair.vacationMgt')}"/>
                 <p:menuitem id="um220" value="报表模版管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin') and userContextService.versionContains('repair.reportMgt')}"/>
             </p:submenu>
-            <p:submenu id="um60" label="预防维护" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('ClinicalStaff, DeptHead,HospitalHead') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and !userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead') and userContextService.versionContains('maintain')}" icon="fa fa-check-square-o">
+            <p:submenu id="um60" label="预防维护" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('ClinicalStaff, DeptHead,HospitalHead')  and !userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead') and userContextService.versionContains('maintain')}" icon="fa fa-check-square-o">
                 <p:menuitem id="um601" value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.versionContains('maintain.workbench')}"/>
             </p:submenu>
-            <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('maintain')}">
+            <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.versionContains('maintain')}">
                 <p:menuitem value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.versionContains('maintain.workbench')}"/>
 <!--                <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>-->
@@ -100,16 +100,16 @@
         <p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
-            <p:submenu id="um5024" label="#{msg.计量管理}" icon="fa fa-check-square-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('measure')}">
+            <p:submenu id="um5024" label="#{msg.计量管理}" icon="fa fa-check-square-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.versionContains('measure')}">
                 <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.versionContains('measure.categoryConfig')}"/>
                 <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml" rendered="#{userContextService.versionContains('measure.info')}"/>
             </p:submenu>
-            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('nurseSite')}">
+            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,NursingStaff')  and userContextService.versionContains('nurseSite')}">
                        <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.maintain')}"/>
                        <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.config')}"/>
                        <p:menuitem id="um703" value="日常维护报表" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.report')}"/>
             </p:submenu>
-            <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('knowledge')}">
+            <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')  and userContextService.versionContains('knowledge')}">
                 <p:menuitem id="um32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.versionContains('knowledge.mgt')}"/>
                 <p:menuitem id="um33" value="#{msg.AssetKMMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um34" value="#{msg.DeviceMgmtForum}" rendered="false" style="color: orange;" outcome="/empty"/>
@@ -117,7 +117,7 @@
                 <p:menuitem id="um36" value="#{msg.DeviceUpgradMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um37" value="#{msg.AdvancedDeviceInfoTracking}" rendered="false" style="color: orange;" outcome="/empty"/>
             </p:submenu>
-            <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('performance')}">
+            <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead')  and userContextService.versionContains('performance')}">
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') and userContextService.versionContains('performance.scan')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>
                 <p:menuitem id="um171" value="#{msg.FailureAnalysis}" url="/portal/analysis/reports.xhtml#/FailureAnalysis" rendered="false"/>
@@ -138,7 +138,7 @@
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
-            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin') and userContextService.hasNotAnyRole('MVSAdmin,MVSFE') and userContextService.versionContains('config')}">
+            <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.isNotIBCustomer() and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin')  and userContextService.versionContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.org')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.user')}"/>
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.versionContains('config.assetMessage')}"/>
@@ -161,13 +161,17 @@
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.qrCode')}"/>
                 <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.captureDataMessage')}"/>
+                <!--<p:menuitem id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.versionContains('config.user')}"/>-->
                 
             </p:submenu>
-			<p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin') and userContextService.versionContains('mvs')}">
-				<p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('mvs.info')}"/>
-				<p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.versionContains('mvs.purchase')}"/>
+			<p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
+				<p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
+				<p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
 			</p:submenu>
-
+			<p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SuperAdmin') or userContextService.versionContains('examineMgt')}">
+				<p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
+				<p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.versionContains('examineMgt.pccConfig') and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')}"/>
+			</p:submenu>
             <!--Super admin and GE OP only-->
             <p:submenu id="um4000" label="APM平台管理" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp') }"/>

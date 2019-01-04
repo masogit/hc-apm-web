@@ -311,6 +311,14 @@ public class TenantInfo implements Serializable {
         isInsulate = insulate;
     }
 
+    public Boolean getIsInsulate() {
+        return isInsulate;
+    }
+
+    public void setIsInsulate(Boolean insulate) {
+        isInsulate = insulate;
+    }
+    
     public String getTenantConfig() {
 		return tenantConfig;
 	}

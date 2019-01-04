@@ -97,5 +97,41 @@ public class FileScanService {
     public void deleteUploadedFile(String path) {
         FileUtils.deleteFolder(path.substring(0, path.lastIndexOf(File.separator)));
     }
+    
+    public String saveUploadedFile(InputStream input,String fileName) throws Exception {
+        String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
+        return saveFile(input, folderName, fileName);
+    }
+
+    public String saveFile(InputStream inputStream, String folderName, String saveFilename) throws Exception {
+
+        FileUtils.createFolder(folderName, true);
+        String fileName = folderName.concat(File.separator).concat(saveFilename);
+
+        try (FileOutputStream out = new FileOutputStream(fileName)) {
+            int count = 0;
+            long starttime = new Date().getTime();
+            long endtime;
+            while (count == 0) {
+                count = inputStream.available();
+                endtime = new Date().getTime();
+                if (endtime - starttime >= TIME_OUT) {
+                    throw new Exception("Save file[" + fileName + "] timeout !");
+                }
+            }
+            byte[] buff = new byte[count];
+            int bytesRead;
+
+            while (-1 != (bytesRead = inputStream.read(buff))) {
+                out.write(buff, 0, bytesRead);
+            }
+            out.flush();
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return fileName;
+    }
 
 }

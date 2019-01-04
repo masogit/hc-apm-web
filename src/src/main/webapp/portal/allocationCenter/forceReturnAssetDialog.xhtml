@@ -7,13 +7,16 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="forceReturnAssetDialog" widgetVar="forceReturnAssetDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="强制归还">
+    <p:dialog id="forceReturnAssetDialog" widgetVar="forceReturnAssetDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="强制归还">
         <h:form id="forceReturnAssetDialogForm" >
             <h:panelGroup id="display1">
-                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">借据ID: </label>
                         <h:outputText value="#{sharedAssetStockController.selected.sharedAssetReqDetail.voucherNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">借用科室: </label><h:outputText value="#{sharedAssetStockController.selected.assetDeptOrg.name}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class='label'>请求类型*</label>
@@ -25,10 +28,7 @@
                             <f:selectItem itemLabel="维修" itemValue="1" />
                         </p:selectOneRadio>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">借用科室: </label>
-                        <h:outputText value="#{sharedAssetStockController.selected.assetDeptOrg.name}"/>
-                    </h:panelGroup>
+                    <h:panelGroup></h:panelGroup>
                     <h:panelGroup>
                         <label class="label">计费开始时间*</label>
                         <p:calendar timeZone="GMT+8"

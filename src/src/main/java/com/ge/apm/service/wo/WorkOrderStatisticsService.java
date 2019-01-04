@@ -16,12 +16,13 @@ import java.util.List;
 @Service
 public class WorkOrderStatisticsService {
 
-    private static final String STATISTICS_TYPE_DEPART = "depart";              //按使用科室
-    private static final String STATISTICS_TYPE_ASSETTYPE = "assetType";    //按设备类型
-    private static final String STATISTICS_TYPE_DEPART_AND_ASSETTYPE = "departAndassetType";    //按使用科室和设备类型
-    private static final String STATISTICS_TYPE_ASSETNAME = "assetName";    //按设备名称
-    private static final String STATISTICS_TYPE_FAULTTYPE = "faultType";    //按故障类型
-    private static final String STATISTICS_TYPE_STAFF = "staff";            //按维修工程师
+    public static final String STATISTICS_TYPE_DEPART = "depart";              //按使用科室
+    public static final String STATISTICS_TYPE_ASSETTYPE = "assetType";    //按设备类型
+    public static final String STATISTICS_TYPE_DEPART_AND_ASSETTYPE = "departAndassetType";    //按使用科室和设备类型
+    public static final String STATISTICS_TYPE_ASSETNAME = "assetName";    //按设备名称
+    public static final String STATISTICS_TYPE_FAULTTYPE = "faultType";    //按故障类型
+    public static final String STATISTICS_TYPE_STAFF = "staff";            //按维修工程师
+    public static final String STATISTICS_TYPE_CASELOAD = "caseload";            //按科室统计工作量
 
     @Autowired
     private WorkOrderReportMapper worDao;
@@ -67,6 +68,8 @@ public class WorkOrderStatisticsService {
             woReportList = worDao.statisticsByCaseType(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
         }else if(STATISTICS_TYPE_STAFF.equals(statisticsType)){
             woReportList = worDao.statisticsByStaff(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+        }else if(STATISTICS_TYPE_CASELOAD.equals(statisticsType)){
+            woReportList = worDao.statisticsCaseloadByDepartment(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
         }
 
         return woReportList;

@@ -72,6 +72,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private String locationName;
+    private String assigneeId;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
     private Set<String> clinicalDeptOrgUidSet;
@@ -137,6 +138,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
+
+    public String faultReason;
+
     protected void init() {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
@@ -178,14 +182,29 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
 ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
-
-
-
     }
 
-    ///////////////////////////////////////////start
+public void partsPriceUpdate(){
+        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+        }
+}
 
+public void repairResultSet(){
+    if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
+    currentStatus =1;
+}
+    else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
+        currentStatus =3;
+    } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
+    currentStatus =4;
+    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ currentStatus =1;
+    }
+}
 
+    public void closePrcieUpdate(){
+            itemDetail.setClosedPrice(itemDetail.getClosedPrice());
+    }
     public String getStepImg(V2_WorkOrder v2_workOrder){
         Integer stepId =v2_workOrder.getCurrentStepId();
         int mode =v2_workOrder.getDispatchMode();
@@ -486,7 +505,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         removeFilterOnField("assetInfo.uid");
         Integer  fillterStepId;
         if (queryIndex == 1) {//已报修 可取消
-            if (userContextService.hasRole("AssetStaff")) {
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
             }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -543,7 +562,8 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 5) { //待验收
-            if (userContextService.hasRole("AssetStaff")) {
+            /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             } else {
@@ -551,7 +571,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             }
         } else if (queryIndex == 6) { //待评价
-            if (userContextService.hasRole("AssetStaff")) {
+            if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
             }
             searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
@@ -575,11 +595,15 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
 //            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
-        } else if (queryIndex == 10) { //审批
+        } else if (queryIndex == 10) { //待审批
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
+            if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+}
+
         } else if (queryIndex == 11) { //全部维修单
             if(stepFileter!=null) {
                 fillterStepId = woStatus.get(stepFileter);
@@ -757,6 +781,28 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         confirmedDownTime = null;
         needConfirmTime = false;
         selectedApproverUid = null;
+        Long time = System.currentTimeMillis();
+        time += 120*1000*60;
+        esTime = new Date(time);
+
+
+    }
+
+   /* public void prepareRepair(String woid){
+        selectedWorkOrder = dao.findById(woid);
+    }*/
+
+    public boolean isStep(V2_WorkOrder workOrder){
+        if(workOrder==null){
+            return false;
+        }
+        //2-待派工/3-已派工
+        if(workOrder.getCurrentStepId()==2 ||workOrder.getCurrentStepId()==3 ||workOrder.getCurrentStepId()==4 ){
+            return false;
+        }else{
+            return true;
+        }
+
     }
 
     public void prepareNewWorkOrder(String woid) {
@@ -810,6 +856,27 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+       String result = selectedWorkOrder.getRepairResult();
+       if(result!=null) {
+           if (result.equalsIgnoreCase("2")) {
+               currentStatus = 3;
+
+           }
+           if (result.equalsIgnoreCase("3")) {
+               currentStatus = 4;
+
+           }
+
+           if (result.equalsIgnoreCase("4")) {
+               currentStatus = 1;
+
+           }
+           if (result.equalsIgnoreCase("1")) {
+               currentStatus = 1;
+
+           }
+       }
+
         //获取当前工单的所属流程配置
 
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
@@ -820,7 +887,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
+      //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -844,12 +911,16 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         accessoryList.forEach(item -> item.setCreatedDate(null));
         if (!attachList.isEmpty())
             picList.addAll(attachList);
-        woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
     public List<UserAccount> getWorkerList() {
         return woService.getWorkerList(selectedWorkOrder.getAssetId());
+    }
+   //待验收
+    public List<UserAccount> getAcker() {
+        return woService.getAckerList(selectedWorkOrder.getId());
     }
 
     public void ackWorkOrder() {
@@ -932,12 +1003,13 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
-        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
     public void cancelWorkOrder() {
-
+//tbc: cancelReason assetStatus
+      //  assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
         woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason, assetStatus);
 
         cancelReason = null;
@@ -973,7 +1045,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
     public void createServiceRequest() {
+
         cancel();
+
         if (!Strings.isNullOrEmpty(requestAssetUid)) {
             selectedAsset = assetDao.findByUid(requestAssetUid);
             onSelectedAsset(selectedAsset);
@@ -989,9 +1063,16 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        faultReason="设备故障";
     }
 
     public void saveServiceRequest() {
+        if(StringUtils.isEmpty(faultReason)){
+            newServiceRequest.setRequestReason("设备故障");
+        }else{
+            newServiceRequest.setRequestReason(faultReason);
+        }
+
         if (null == selectedAsset) {
             WebUtil.addErrorMessage("没有选择设备,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -1059,14 +1140,17 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
         }
     }
-
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
+
         woService.acceptWorkOrder(selectedWorkOrder, esTime, repairType, comments);
         cancel();
     }
 
     public void reassignWorkOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="工作需要";
+        }
         woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
@@ -1090,6 +1174,43 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
 
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+
+    }
+
+
+    public boolean allowChanged(){
+        //is closed
+        if(selectedWorkOrder==null){
+            return true;
+        }
+        if( selectedWorkOrder.getStatus()==2) {//关单后
+          if(userContextService.hasAnyRole("AssetHead")){
+              return true;
+          }else{
+              return false;
+          }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return true;
+            }
+        }
+       return true;
+    }
+
+    public boolean allowChangedForDisable(){
+        if(selected.getStatus()==2) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }else{
+                return true;
+            }
+        }
 
     }
 
@@ -1206,6 +1327,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
     public void submitWorkOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="报价审核";
+        }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> {
             item.setCreatedDate(null);
@@ -1601,12 +1725,28 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
             itemDetail.setSupplier(supplier.getName());
     }
 
+    public String getAssigneeId() {
+        return assigneeId;
+    }
+
+    public void setAssigneeId(String assigneeId) {
+        this.assigneeId = assigneeId;
+    }
+
     public String getManHourShow() {
         if (hourRequired) {
             return "工时(小时)*";
         } else {
             return "工时(小时)";
         }
+    }
+
+    public String getFaultReason() {
+        return faultReason;
+    }
+
+    public void setFaultReason(String faultReason) {
+        this.faultReason = faultReason;
     }
 }
 
