@@ -102,7 +102,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.LAZY)
-    private Set<NurseSiteMaintainData> listData;
+    private List<NurseSiteMaintainData> listData;
 	
 	@Transient
 	private List<NurseSiteMaintainData> listCopyData;
@@ -261,11 +261,11 @@ public class NurseSiteMaintainItem implements Serializable {
 		this.scheduleDate = scheduleDate;
 	}
 
-	public Set<NurseSiteMaintainData> getListData() {
+	public List<NurseSiteMaintainData> getListData() {
 		return listData;
 	}
 
-	public void setListData(Set<NurseSiteMaintainData> listData) {
+	public void setListData(List<NurseSiteMaintainData> listData) {
 		this.listData = listData;
 	}
 	
