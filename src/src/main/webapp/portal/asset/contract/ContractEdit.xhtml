@@ -47,15 +47,21 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetContractName}*</label>
-                                <p:inputText value="#{contractInfoEditController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{contractInfoEditController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}">
+                                    <p:ajax process="@this" />
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.contractNum}</label>
-                                <p:inputText value="#{contractInfoEditController.selected.contractNum}"/>
+                                <p:inputText value="#{contractInfoEditController.selected.contractNum}">
+                                    <p:ajax process="@this" />
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.foreignTradeNum}</label>
-                                <p:inputText value="#{contractInfoEditController.selected.foreignTradeNum}" />
+                                <p:inputText value="#{contractInfoEditController.selected.foreignTradeNum}" >
+                                    <p:ajax process="@this" />
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.vendor}</label>
@@ -67,7 +73,9 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetContractAmount}</label>
-                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{contractInfoEditController.selected.amount}"/>
+                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{contractInfoEditController.selected.amount}">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.startTime}#{contractInfoEditController.selected.contractType ne 'Equipment'?'*':''}</label>
@@ -92,7 +100,9 @@
                             <h:panelGroup id="invoiceNum">
                                 <h:panelGroup  rendered="#{contractInfoEditController.selected.contractType ne 'Parts' and ( contractInfoEditController.selected.contractType ne 'Equipment')}">
                                     <label class="label" >#{msg.invoiceNum}</label>
-                                    <p:inputText value="#{contractInfoEditController.selected.invoiceNum}" class="invoiceNum"/>
+                                    <p:inputText value="#{contractInfoEditController.selected.invoiceNum}" class="invoiceNum">
+                                        <p:ajax process="@this" />
+                                    </p:inputText>
                                 </h:panelGroup>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -104,7 +114,7 @@
                                         <h:outputText value="文件名称" class="ui-g-3"/>
                                         <h:outputText value="上传时间" class="ui-g-3" />
                                         <h:outputText value="上传人" class="ui-g-2" />
-                                        <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-2"/>
+                                        <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-2" rendered="#{contractInfoEditController.canBeEdit}"/>
                                     </div>
                                 </f:facet>
 
@@ -115,14 +125,50 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                     </h:outputText>
                                     <h:outputText value="#{contractInfoEditController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
-                                    <p:commandLink value="#{msg.Delete}" class="ui-g-2" update="AttachList " actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this">
+                                    <p:commandLink value="#{msg.Delete}" class="ui-g-2" update="AttachList " actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandLink>
                                 </div>
                             </p:dataList>
 
                         </h:panelGroup>
+                        <p:fieldset legend="付款信息">
 
+                            <h:panelGroup >
+                                <p:dataTable id="paymentList"  value="#{contractInfoEditController.getPaymentList()}" var="item" 
+                                             rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                             paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="20,50,100,500"  rows="20" emptyMessage="#{msg.noRecordFound}">
+                                    <p:ajax event="rowSelect" />
+                                    <p:column headerText="付款金额">
+                                        <h:outputText value="#{item.paymentPrice}"/>
+                                    </p:column>
+                                    <p:column headerText="付款时间">
+                                        <h:outputText value="#{item.paymentDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.comments}">
+                                        <h:outputText value="#{item.comments}"/>
+                                    </p:column>
+                                    <p:column width="140" rendered="#{contractInfoEditController.canBeEdit}">
+                                        <f:facet name="header" >
+                                            <h:outputText value="操作" />
+                                        </f:facet>
+                                        <p:commandLink process="@this" actionListener="#{contractInfoEditController.prepareEditPaymentInfo(item)}" update=":addPaymentForm" oncomplete="PF('addPaymentDlg').show()" value="#{msg.Edit}" style="padding:10px" />
+                                        <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="paymentList" />
+                                    </p:column>
+
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandLink value="添加付款信息" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPaymentInfo()}" process="@this" rendered="#{contractInfoEditController.canBeEdit}"
+                                                       update=":addPaymentForm" oncomplete="PF('addPaymentDlg').show()" />
+                                    </f:facet>
+
+                                </p:dataTable>
+
+                            </h:panelGroup>
+
+                        </p:fieldset>
                     </p:fieldset>
                     <p:fieldset legend="详细信息一" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Equipment'}">
                         <!-- <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -290,7 +336,7 @@
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item.assetInfo)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
-                            <f:facet name="{Toolbar}">
+                            <f:facet name="{Toolbar}" rendered="#{contractInfoEditController.canBeEdit}">
                                 <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1,contractInfoEditController.selected.siteUID, ':AssetContractEditForm:itemList')}" 
                                                 process="@this" update=":searchDlg" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
@@ -322,7 +368,7 @@
                             <p:column headerText="数量" >
                                 <h:outputText value="#{item[1].apartsQuantity}" />
                             </p:column>
-                            <p:column width="140" >
+                            <p:column width="140" rendered="#{contractInfoEditController.canBeEdit}">
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
@@ -331,8 +377,8 @@
 
                         </p:dataTable>
                     </p:fieldset>
-                    <h:panelGroup>
-                        <p:commandButton validateClient="true"  actionListener="#{contractInfoEditController.saveContract}" value="#{msg.Save}" update=":AssetContractEditForm :growl" icon="ui-icon-check"/>
+                    <h:panelGroup rendered="#{contractInfoEditController.canBeEdit}">
+                        <p:commandButton validateClient="true"  actionListener="#{contractInfoEditController.saveContract}" value="#{msg.Save}" update=":AssetContractEditForm :growl" icon="ui-icon-check" />
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="ContractList?faces-redirect=true" immediate="true" />
                     </h:panelGroup>
                 </h:form>
@@ -348,32 +394,32 @@
                             <label class="label">#{msg.contractAssetName}</label>
                             <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.contractAssetName}"/>
                         </h:panelGroup>
-                       <!--  <h:panelGroup>
-                            <label class="label">#{msg.applyDept}</label>
-                            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true" appendTo="@this"
-                                            completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                                <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
-                                <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
-                            </p:autoComplete>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.estimatedPrice}</label>
-                            <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
-                                <p:ajax listener="#{contractInfoEditController.onEstimatedPriceChange}" process="@this" update="priceType" />
-                            </p:inputNumber>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.priceType}</label>
-                            <p:selectOneMenu id="priceType" value="#{contractInfoEditController.selectedContractItem.priceType}" disabled="true">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractPriceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">#{msg.contractAssetPrice}</label>
-                            <p:inputNumber  decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
-                        </h:panelGroup> -->
+                        <!--  <h:panelGroup>
+                             <label class="label">#{msg.applyDept}</label>
+                             <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true" appendTo="@this"
+                                             completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                                 <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
+                                 <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
+                             </p:autoComplete>
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.estimatedPrice}</label>
+                             <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
+                                 <p:ajax listener="#{contractInfoEditController.onEstimatedPriceChange}" process="@this" update="priceType" />
+                             </p:inputNumber>
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.priceType}</label>
+                             <p:selectOneMenu id="priceType" value="#{contractInfoEditController.selectedContractItem.priceType}" disabled="true">
+                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                 <f:selectItems value="#{fieldMsg.getFieldValueList('contractPriceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                             </p:selectOneMenu>
+                         </h:panelGroup>
+ 
+                         <h:panelGroup>
+                             <label class="label">#{msg.contractAssetPrice}</label>
+                             <p:inputNumber  decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
+                         </h:panelGroup> -->
                         <h:panelGroup>
                             <label class="label">#{msg.contractAssetQuantity}*</label>
                             <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.contractAssetQuantity}" required="true" requiredMessage="#{msg.contractAssetQuantity} #{msg.ValidationRequire}" />
@@ -390,36 +436,36 @@
                             <label class="label">#{msg.pattern}</label>
                             <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.pattern}"/>
                         </h:panelGroup>
-                       <!--  <h:panelGroup>
-                            <label class="label">#{msg.deliveryDays}</label>
-                            <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.deliveryDays}">
-                                <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
-                            </p:inputNumber>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.noticeDate}</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.noticeDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
-                                <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
-                            </p:calendar>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.plannedArriveDate}</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" class="plannedArriveDate" value="#{contractInfoEditController.selectedContractItem.plannedArriveDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.downPaymentDate}</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.applyPaymentDate}</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.tailPaymentDate}</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                        </h:panelGroup> -->
+                        <!--  <h:panelGroup>
+                             <label class="label">#{msg.deliveryDays}</label>
+                             <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.deliveryDays}">
+                                 <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
+                             </p:inputNumber>
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.noticeDate}</label>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.noticeDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                                 <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
+                             </p:calendar>
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.plannedArriveDate}</label>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" class="plannedArriveDate" value="#{contractInfoEditController.selectedContractItem.plannedArriveDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.downPaymentDate}</label>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+ 
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.applyPaymentDate}</label>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+ 
+                         </h:panelGroup>
+                         <h:panelGroup>
+                             <label class="label">#{msg.tailPaymentDate}</label>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                         </h:panelGroup> -->
                         <h:panelGroup>
                             <label class="label">#{msg.comments}</label>
                             <p:inputText  value="#{contractInfoEditController.selectedContractItem.comments}"/>
@@ -434,6 +480,35 @@
             </h:form>
         </p:dialog>
 
+        <p:dialog id="addPaymentDlg" widgetVar="addPaymentDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="添加付款信息">
+            <h:form id="addPaymentForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">付款金额*</label>
+                            <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.paymentInfo.paymentPrice}" required="true" requiredMessage="付款金额#{msg.ValidationRequire}" >
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">付款时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.paymentInfo.paymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                            </p:calendar>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.comments}</label>
+                            <p:inputText  value="#{contractInfoEditController.paymentInfo.comments}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{contractInfoEditController.savePaymentItem()}" value="#{msg.Confirm}" 
+                                         update=":AssetContractEditForm:paymentList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'addPaymentDlg');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('addPaymentDlg').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+
+        </p:dialog>
         <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传文件">
             <h:form id="uploadDialogForm" >
                 <h:panelGroup id="display" >

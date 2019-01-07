@@ -549,6 +549,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
         }
         dao.save(selected);
+        WebUtil.addSuccessMessage("重置成功");
     }
 
     public void lockAccount() {

@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import com.ge.apm.service.common.CustomConfigConstant;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author 212579464
  */
 public class CustomConfigAssetField {
+
     String key;
     Double widthInListPage;
     List<String> exportRoles = Collections.EMPTY_LIST;
@@ -21,17 +23,18 @@ public class CustomConfigAssetField {
     boolean required = false;
     boolean arrivalRequired = false;
 
-
-    public CustomConfigAssetField(String key,List<String> roles) {
+    public CustomConfigAssetField(String key, List<String> roles) {
         this.key = key;
         this.exportRoles = roles;
         this.readRoles = roles;
-        this.editRoles = roles;
+        if (!CustomConfigConstant.getReadOnlyFields().contains(key)) {
+            this.editRoles = roles;
+        }
     }
-    
+
     public CustomConfigAssetField() {
     }
-    
+
     public String getKey() {
         return key;
     }

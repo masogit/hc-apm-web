@@ -90,17 +90,34 @@ public class WorkOrderStatisticsController {
     public String calculateRate(Long sourceCount){
         DecimalFormat df = new DecimalFormat("######0");
         Long allCloseCount = 0l;
+        String rateStr = " ";
 
         for (WorkOrderReport wor: worList) {
             allCloseCount += wor.getCloseCount();
         }
 
         if(allCloseCount != 0){
-            return df.format((sourceCount.doubleValue()/allCloseCount) * 100) + "%";
-        }else{
-            return " ";
+            rateStr = df.format((sourceCount.doubleValue()/allCloseCount) * 100) + "%";
         }
 
+        return rateStr;
+    }
+
+    public String calculateCaseloadRate(Long sourceCaseload){
+
+        DecimalFormat df = new DecimalFormat("######0");
+        Long allTotalManHour = 0l;
+        String rateCaseloadStr = " ";
+
+        for (WorkOrderReport wor: worList) {
+            allTotalManHour += wor.getTotalManHour();
+        }
+
+        if(allTotalManHour != 0){
+            rateCaseloadStr = df.format((sourceCaseload.doubleValue()/allTotalManHour) * 100) + "%";
+        }
+
+        return rateCaseloadStr;
     }
 
     public String calculateAVGDate(Long spendTime, Long closeCount){

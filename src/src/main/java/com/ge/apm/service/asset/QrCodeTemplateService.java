@@ -211,4 +211,13 @@ public class QrCodeTemplateService {
 //        }).collect(Collectors.toList()));
         return elementList;
     }
+
+    public boolean isValidJson(JSONObject jsonObject) {
+        
+        if(jsonObject.getJSONObject("QrCodeElements") ==null){
+            return false;
+        }
+        
+        return true;
+    }
 }

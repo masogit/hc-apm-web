@@ -22,7 +22,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}*</label>
                             <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                               <!-- <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -30,7 +30,8 @@
                         <h:panelGroup>
                             <label class="label">维修结果*</label>
                             <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="维修结果 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0)"/>
+                                <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -38,7 +39,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup id="assetstatus">
                             <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                            <p:selectOneRadio class="x0" id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
@@ -185,8 +186,14 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
-
                         </p:panelGrid>
+
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
+                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
@@ -210,7 +217,7 @@
 
                         <h:panelGroup>
                             <label class="label">申请审核原因</label>
-                            <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+                            <p:inputTextarea placeholder="报价审核" value="#{workOrderMgrController.comments}" maxlength="256" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">审核人*</label>

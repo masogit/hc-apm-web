@@ -7,20 +7,25 @@ package com.ge.apm.view.sysutil;
 
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ImportFilesRepository;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ImportFiles;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.FileScanService;
 import com.google.common.base.Strings;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import webapp.framework.web.WebUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +33,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 /**
- *
  * @author 212579464
  */
 @ManagedBean
@@ -44,6 +48,8 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private String fileType;
 
+    private List<I18nMessage> batchFileType;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
@@ -54,6 +60,9 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         this.filterByHospital = false;
         fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
 
+        FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
+        batchFileType = fieldMsg.getFieldValueList("batchFileType");
+        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
     @Override
@@ -71,7 +80,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     }
 
     public void uploadDataFile(FileUploadEvent event) {
-        if(StringUtils.equalsIgnoreCase(fileType, ImportFiles.ImportFileType.SrReportPdf.toString())){
+        if (StringUtils.equalsIgnoreCase(fileType, ImportFiles.ImportFileType.SrReportPdf.toString())) {
             WebUtil.addErrorMessage("不支持服务报告类型文件上传，保存失败!");
             return;
         }
@@ -100,9 +109,9 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         fileList.add(new Tuple2<>(itemFile, event.getFile()));
     }
 
-    public void removeFailedFile(String id){
+    public void removeFailedFile(String id) {
         ImportFiles file = dao.findById(id);
-        if(null != file && Strings.isNullOrEmpty(file.getFilePath())){
+        if (null != file && Strings.isNullOrEmpty(file.getFilePath())) {
             dao.delete(file);
         }
     }
@@ -114,7 +123,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public String getUserName(String userUid) {
         UserAccount user = userService.getUserByUid(userUid);
-        return null==user?"":user.getName();
+        return null == user ? "" : user.getName();
     }
 
     public void saveFiles() throws Exception {
@@ -144,6 +153,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         }
         this.fileList.clear();
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
+    }
+
+    public List<I18nMessage> getBatchFileType() {
+        return batchFileType;
     }
 
     public List<Tuple2<ImportFiles, UploadedFile>> getFileList() {
