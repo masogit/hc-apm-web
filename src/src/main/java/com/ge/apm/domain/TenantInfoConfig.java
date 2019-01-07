@@ -31,7 +31,8 @@ public class TenantInfoConfig {
 		}
 		else{
 			StringBuilder sb=new StringBuilder();
-			String result=readTreeNode(root,sb);
+			readTreeNode(root,sb);
+			String result=sb.toString();
 			if(result.length()>0){
 				result=result.substring(0, result.length()-1);
 			}
@@ -40,7 +41,7 @@ public class TenantInfoConfig {
 	}
 	private TenantInfoConfig() {
 	}
-	private String readTreeNode(TreeNode root,StringBuilder sb){
+	private void readTreeNode(TreeNode root,StringBuilder sb){
 		if(root.isSelected()){
 			TenantInfoConfigItem tempItem=(TenantInfoConfigItem)root.getData();
 			sb.append("\""+tempItem.getKey()+"\",");
@@ -48,7 +49,6 @@ public class TenantInfoConfig {
 		for(TreeNode node:root.getChildren()){
 			readTreeNode(node, sb);
 		}
-		return sb.toString();
 	}
 	private String readTreeNode(StringBuilder sb){
 		if(selectedNodes!=null && selectedNodes.length>0){
@@ -226,6 +226,7 @@ public class TenantInfoConfig {
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
+        setTreeNodes(root.getParent(),isSelected);
     }
 	
 	public static List<String> getListVersionName() {
