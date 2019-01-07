@@ -241,11 +241,21 @@ public class TenantInfoConfig {
 	}
 	
 	public void onSelectTenantConfig(NodeSelectEvent event){
-		setTreeNodes(event.getTreeNode(), true);
+		TreeNode tempNode=event.getTreeNode();
+		setTreeNodes(tempNode, true);
+		TreeNode parentNode=tempNode.getParent();
+        if(parentNode!=null){
+        	parentNode.setSelected(true);
+        }
 	}
 	
 	public void onUnSelectTenantConfig(NodeUnselectEvent event){
-        setTreeNodes(event.getTreeNode(), false);
+		TreeNode tempNode=event.getTreeNode();
+        setTreeNodes(tempNode, false);
+        TreeNode parentNode=tempNode.getParent();
+        if(parentNode!=null){
+        	parentNode.setSelected(false);
+        }
 	}
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
 		if(root==null){
@@ -255,7 +265,6 @@ public class TenantInfoConfig {
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
-        setTreeNodes(root.getParent(),isSelected);
     }
 	
 	public static List<String> getListVersionName() {
