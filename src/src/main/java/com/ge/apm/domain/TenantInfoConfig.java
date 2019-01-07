@@ -79,7 +79,7 @@ public class TenantInfoConfig {
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
-			} else if (edition.equals(VERSION_ULTRASOUND) || edition.equals(VERSION_FUNCTION)) {
+			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				}
@@ -93,6 +93,29 @@ public class TenantInfoConfig {
 					tempItem.setValue(false);
 				}
 				else if (key.contains("nurseSite.")) {
+					tempItem.setValue(false);
+				}
+			}
+			else if (edition.equals(VERSION_FUNCTION)) {
+				if (key.equals("repair.workSchedule")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("assetAdjust")) {
+					tempItem.setValue(false);
+				}
+				else if (key.contains("assetAdjust.")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("nurseSite")) {
+					tempItem.setValue(false);
+				}
+				else if (key.contains("nurseSite.")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("repair.vacationMgt")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("maintain.electricDataImport")) {
 					tempItem.setValue(false);
 				}
 			}
@@ -321,7 +344,6 @@ public class TenantInfoConfig {
 			mapVersion.put("config.custom", "自定义配置");
 			mapVersion.put("config.attribute", "属性配置");
 			mapVersion.put("config.repairMessage", "维修消息配置");
-			mapVersion.put("config.captureDataMessage", "小屏消息配置");
 			mapVersion.put("examineMgt", "检测管理");
 			mapVersion.put("examineMgt.pcc", "探头检测");
 			mapVersion.put("examineMgt.pccConfig", "探头检测配置");
