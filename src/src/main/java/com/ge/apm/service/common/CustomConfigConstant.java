@@ -20,7 +20,12 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate");
+    }
+    
+    //只读字段
+    static public List<String> getReadOnlyFields() {
+        return Arrays.asList("createdDate");
     }
     
     static public List<String> getSystemFields() {
@@ -113,6 +118,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
             exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("所属课题项目", "subjectProject");
+            exportFields.put("创建日期", "createdDate");
 
             exportFields.put("UUID", "UUID");
 
@@ -201,6 +207,7 @@ public class CustomConfigConstant {
             allFields.put("acceptDate", WebUtil.getMessage("acceptDate"));
             allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
             allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
+            allFields.put("createdDate", WebUtil.getMessage("createdDate"));
         }
         return allFields;
     }

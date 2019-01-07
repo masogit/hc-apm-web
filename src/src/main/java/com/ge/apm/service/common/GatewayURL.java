@@ -20,6 +20,9 @@ public enum GatewayURL {
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
 
+    //ACKER
+    GET_ACKER_BY_OrderId("/hcapmassetservice/api/apm/asset/{workOrderId}/acker"),
+
     GET_WORKFLOW_CONFIG("/hcapmassetservice/api/apm/asset/workflowConfig/{assetId}"),
 
     // Send Message to Wechat

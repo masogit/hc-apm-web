@@ -15,7 +15,7 @@ public class WorkOrderReport {
     private Integer staffId;
     private String staffName;
     private Long totalSpendTime;
-    private Long totalManhour;
+    private Long totalManHour;
 
     private Long totalCount;
     private Long openCount;
@@ -135,19 +135,19 @@ public class WorkOrderReport {
         this.totalSpendTime = totalSpendTime;
     }
 
-    public Long getTotalManhour() {
-        return totalManhour;
-    }
-
-    public void setTotalManhour(Long totalManhour) {
-        this.totalManhour = totalManhour;
-    }
-
     public Long getAllCount() {
         return allCount;
     }
 
     public void setAllCount(Long allCount) {
         this.allCount = allCount;
+    }
+
+    public Long getTotalManHour() {
+        return totalManHour;
+    }
+
+    public void setTotalManHour(Long totalManHour) {
+        this.totalManHour = totalManHour;
     }
 }

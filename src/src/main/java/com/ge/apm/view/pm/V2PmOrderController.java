@@ -38,6 +38,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.context.RequestContext;
@@ -176,6 +177,51 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
+
+
+    public boolean allowChanged(){
+        //is closed
+        if(selected==null){
+            return true;
+        }
+        if( selected.isFinished()) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return true;
+            }
+        }
+        return true;
+    }
+    public boolean allowChangedForDisable(){
+        if(selected.isFinished()) {//关单后
+            if(userContextService.hasAnyRole("AssetHead")){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+    }
+    public void partsPriceUpdate(){
+        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+        }
+    }
+    public void closePrcieUpdate(){
+        itemDetail.setClosedPrice(itemDetail.getClosedPrice());
+    }
+
     public void orderSet() {
         if (itemDetail == null) return;
         if (itemDetail.getClosed() == true)
@@ -184,6 +230,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setClosedTime(null);
         }
     }
+
+
     public void arrivalTimeSet() {
         if (itemDetail == null) return;
         if (itemDetail.getArrived() == true)
@@ -1100,6 +1148,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void submitAppvalPmOrder() {
+        if(StringUtils.isEmpty(comments)){
+            comments="报价审核";
+        }
+
         //先保存检查项
         saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1497,16 +1549,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(woid);
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
-        if (pmCheckItemList != null) {
-            if (hmCheck.isEmpty()) {
-                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
+        if (pmCheckItemList != null){
+        pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
+                .forEach(item -> {
                     UnstructuredData unData = new UnstructuredData();
                     unData.setValue("pass");
-                    unData.setKey(pmList.getUid());
-                    hmCheck.put(pmList.getUid(), unData);
-                }
-            }
+                    unData.setKey(item.getUid());
+                    hmCheck.put(item.getUid(), unData);
+                });
+        
         }
+        
+//        if (pmCheckItemList != null) {
+//            if (hmCheck.isEmpty()) {
+//                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
+//                    UnstructuredData unData = new UnstructuredData();
+//                    unData.setValue("pass");
+//                    unData.setKey(pmList.getUid());
+//                    hmCheck.put(pmList.getUid(), unData);
+//                }
+//            }
+//        }
         picList = new ArrayList<V2_BlobObject>();
         picListForRP = new ArrayList<V2_BlobObject>();
     }
