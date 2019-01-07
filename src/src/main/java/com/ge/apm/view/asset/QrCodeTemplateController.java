@@ -20,6 +20,7 @@ import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -173,6 +174,15 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
             siteUID = selected.getSiteUID();
         }
         return accessibleOrgInfoList.contains(siteUID);
+    }
+    
+    public void updateAllTemplatesJsonField(){
+        List<QrCodeTemplate> alltemplates = Lists.newArrayList(dao.findAll());
+        alltemplates.stream().filter(item-> item.getJSONObject()==null).forEach(item -> {
+            item.setJSONObject(templateService.getJSONObjectByTemplate(item));
+        });
+        dao.save(alltemplates);
+        WebUtil.addSuccessMessage("更新完成");
     }
 
     public String getHospitalName(String orgUid) {

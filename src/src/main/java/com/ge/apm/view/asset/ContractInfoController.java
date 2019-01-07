@@ -72,6 +72,40 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
+
+    protected long countValidContracts(ContractInfo contractInfo) {
+
+        List<SearchFilter> localSearchFilters = new ArrayList<>();
+        List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
+        localSearchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
+
+        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+        localSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        localSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        localSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        localSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+        localSearchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, contractInfo.getId(), "1*"));
+
+        Page<ContractInfo> contractInfoPage = dao.findBySearchFilter(localSearchFilters, new PageRequest(0, 1));
+
+        return contractInfoPage.getTotalElements();
+    }
+
+    public boolean isEditable(ContractInfo contractInfo) {
+        if (contractInfo == null || StringUtils.isEmpty(assetUid)) {
+            return true;
+        }
+
+        long result = countValidContracts(contractInfo);
+
+        if (result > 0) {
+            return true;
+        }
+
+        return false;
+
+    }
     
     
     public void deleteContract(){

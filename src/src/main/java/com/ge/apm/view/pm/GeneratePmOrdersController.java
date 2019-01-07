@@ -111,10 +111,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void initOrgTree() {
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
-//        orgTree = new DefaultTreeNode("root",null,null);
-//        orgTree.getChildren().add(treeNode);
-//        orgTree.setExpanded(true);
-
 		OrgInfo rootOrg = new OrgInfo();
 		rootOrg.setId(-1);
 		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -130,7 +126,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
-        addFilter();
+        //addFilter();
     }
 
     private void initTree(String tenantUid) {
@@ -164,10 +160,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
             return null;
         }
         String name = org.getName();
-/*        while (org.getParentOrg() != null) {
-            org = org.getParentOrg();
-            name = org.getName() + "/" + name;
-        }*/
         return name;
     }
 
@@ -203,22 +195,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
-        if (clinicalOrgInfo != null){//StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())
+        if (clinicalOrgInfo != null){
             Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
             List<String> results = new ArrayList<>(clinicalUids);
             if(CollectionUtils.isNotEmpty(results)){
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
             }
         }
-/*        if (null != queryAsset.getClinicalDeptId()) {
-            OrgInfo selectedOrg = orgInfoRepository.findById(queryAsset.getClinicalDeptId());
-            if(selectedOrg != null){
-                Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(selectedOrg.getUid());
-                if(CollectionUtils.isNotEmpty(clinicalUids)){
-                    assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,clinicalUids ));
-                }
-            }
-        }*/
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
 		}
@@ -278,7 +261,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
     public List<OrgInfo> getClinicalDeptList(String name){
-        //UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();
         filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
 		if(selectedUserOrg != null){
@@ -402,16 +384,16 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		long start = System.currentTimeMillis();
 		try{
 			pmOrderRequestApiService.createPmOrdersByBatch(token, request);
+			long end = System.currentTimeMillis();
+			LOGGER.info("批量生成保养工单结束，耗时 : {} 秒 !",(end - start)/1000);
+			WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 			//WebUtil.addSuccessMessage("工单生成成功！");
 		} catch(Exception e){
 			//WebUtil.addErrorMessage("工单生成失败！");
 			e.printStackTrace();
 			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
-
 		}
-		long end = System.currentTimeMillis();
-		LOGGER.info("批量生成保养工单结束，耗时 : {} 秒 !",(end - start)/1000);
-		WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
+
 	}
 
 	public String getStrDate(Date lastPmDate) {
@@ -425,21 +407,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public List<String> getSupplier(String name) {
 		return supplierService.getSupplier(name);
 	}
-/*	public List<Supplier> getSupplier(){
-		List<Supplier> suppliers = supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
-		suppliers.sort(new Comparator<Supplier>() {
-			@Override
-			public int compare(Supplier o1, Supplier o2) {
-				try{
-					return PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE).compareTo(
-							PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE));
-				}catch(Exception e){
-					return 0;
-				}
-			}
-		});
-		return suppliers;
-	}*/
 
 	public OrgInfo getClinicalOrgInfo() {
 		return clinicalOrgInfo;
