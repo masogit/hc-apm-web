@@ -1,13 +1,17 @@
 package com.ge.apm.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
@@ -202,7 +206,7 @@ public class TenantInfoConfig {
 		JSONArray arr = jsonObj.getJSONArray("menuList");
 		List<TenantInfoConfigItem> tempListVersionItem = new ArrayList<TenantInfoConfigItem>();
 		Map<String, String> mapKeyLabel = getMapVersionKeyLabel();
-		List<String> listItemKey = new ArrayList<String>();
+		Set<String> setItemKey = new HashSet<String>();
 		try {
 			for (int i = 0; i < arr.size(); ++i) {
 				String key = arr.getString(i);
@@ -210,16 +214,18 @@ public class TenantInfoConfig {
 				if (StringUtils.isEmpty(label)) {
 					continue;
 				}
-				listItemKey.add(key);
-				TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, true);
-				tempListVersionItem.add(tempItem);
+				setItemKey.add(key);
 			}
 			Iterator<String> it = mapKeyLabel.keySet().iterator();
 			while (it.hasNext()) {
 				String key = it.next();
 				String label = mapKeyLabel.get(key);
-				if (!listItemKey.contains(key)) {
+				if (!setItemKey.contains(key)) {
 					TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, false);
+					tempListVersionItem.add(tempItem);
+				}
+				else{
+					TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, true);
 					tempListVersionItem.add(tempItem);
 				}
 			}
