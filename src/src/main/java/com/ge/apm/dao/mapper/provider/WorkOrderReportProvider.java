@@ -270,7 +270,7 @@ public class WorkOrderReportProvider {
             "(select ua.telephone from user_account ua where ua.id = sr.requestor_id) as telephone," +
             "(select aft.fault_name from asset_fault_type aft where aft.id=wo.case_type) as caseTypeName, " +
             "(select im.value_zh from i18n_message im where concat(ai.status,'') = im.msg_key and im.msg_type='assetStatus') as assetStatusName," +
-            "wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment " +
+            "wo.signature as signature,wo.ack_signature as ackSignature,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment " +
             "from v2_work_order wo, v2_service_request sr, asset_info ai " +
             "where wo.sr_id = sr.id and ai.id = wo.asset_id "
         );

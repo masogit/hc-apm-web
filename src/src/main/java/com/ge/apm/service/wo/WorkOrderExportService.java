@@ -189,6 +189,9 @@ public class WorkOrderExportService {
             workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
             workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
 
+            workOrderMap.put("signature", workOrderExportPojo.getSignature());
+            workOrderMap.put("ack_signature", workOrderExportPojo.getAckSignature());
+
             this.putPartsData(workOrderExportPojo ,workOrderMap);
             //this.putWorkOrderStep(workOrderExportPojo ,workOrderMap);
 
