@@ -153,7 +153,7 @@
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
             </p:submenu>
-            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SuperAdmin') and (userContextService.versionContains('examineMgt') and userContextService.isUltraSoundIBEndUser())}">
+            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('examineMgt') and userContextService.isUltraSoundIBEndUser()}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
                     <p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.versionContains('examineMgt.pccConfig') and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')}"/>
             </p:submenu>
