@@ -48,7 +48,9 @@ public class TenantInfoConfig {
 	private void readTreeNode(TreeNode root,StringBuilder sb){
 		if(root.isSelected()){
 			TenantInfoConfigItem tempItem=(TenantInfoConfigItem)root.getData();
-			sb.append("\""+tempItem.getKey()+"\",");
+			if(tempItem!=null){
+				sb.append("\""+tempItem.getKey()+"\",");
+			}
 		}
 		for(TreeNode node:root.getChildren()){
 			readTreeNode(node, sb);
@@ -240,22 +242,30 @@ public class TenantInfoConfig {
 		return toString();
 	}
 	
+	private void updateParentNode(TreeNode parentNode){
+		if(parentNode==null){
+			return;
+		}
+		boolean result=false;
+		for(TreeNode item:parentNode.getChildren()){
+			result=item.isSelected();
+			if(result){
+				break;
+			}
+		}
+		parentNode.setSelected(result);
+	}
+	
 	public void onSelectTenantConfig(NodeSelectEvent event){
 		TreeNode tempNode=event.getTreeNode();
 		setTreeNodes(tempNode, true);
-		TreeNode parentNode=tempNode.getParent();
-        if(parentNode!=null){
-        	parentNode.setSelected(true);
-        }
+		updateParentNode(tempNode.getParent());
 	}
 	
 	public void onUnSelectTenantConfig(NodeUnselectEvent event){
 		TreeNode tempNode=event.getTreeNode();
         setTreeNodes(tempNode, false);
-        TreeNode parentNode=tempNode.getParent();
-        if(parentNode!=null){
-        	parentNode.setSelected(false);
-        }
+        updateParentNode(tempNode.getParent());
 	}
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
 		if(root==null){
