@@ -103,7 +103,7 @@
                 <p:menuitem id="um37" value="#{msg.AdvancedDeviceInfoTracking}" rendered="false" style="color: orange;" outcome="/empty"/>
             </p:submenu>
             <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead')  and userContextService.versionContains('performance')}">
-                <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') and userContextService.versionContains('performance.scan')}"/>
+                <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.scan')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>
                 <p:menuitem id="um171" value="#{msg.FailureAnalysis}" url="/portal/analysis/reports.xhtml#/FailureAnalysis" rendered="false"/>
                 <p:menuitem id="um172" value="#{msg.StaffPerformance}" url="/portal/analysis/reports.xhtml#/StaffPerf" rendered="false"/>
@@ -134,7 +134,7 @@
                 <p:menuitem id="um493" value="#{msg.SysCodeConfig}" rendered="false" outcome="/portal/config/FieldCodeTypeConfig.xhtml"/>
                 <!--  <p:menuitem id="um494" value="#{msg.WorkFlowConfig}" outcome="/portal/config/workFlowConfig/Edit.xhtml"/> -->
                 <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.qrCode')}"/>
-                <p:menuitem id="um488" value="#{msg.QRCodeTemplateMgmt}" outcome="/portal/asset/qrCode/qrCodeTemplate.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin') and userContextService.versionContains('config.qrCodeMgt')}"/>
+                <p:menuitem id="um488" value="#{msg.QRCodeTemplateMgmt}" outcome="/portal/asset/qrCode/qrCodeTemplate.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin') and userContextService.versionContains('config.qrCodeMgt')}"/>
                 <p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/SetOwners.xhtml" rendered="#{userContextService.versionContains('config.repairOwner')}"/>
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.versionContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.versionContains('config.engineerGroup')}"/>
@@ -144,7 +144,7 @@
                 <p:menuitem id="um506" value="维修消息配置" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.versionContains('config.repairMessage')}"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
-                <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.qrCode')}"/>
+                <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasAnyRole('ITAdmin,LocalITAdmin,SuperAdmin') and userContextService.versionContains('config.qrCode')}"/>
                 <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
                 <!--<p:menuitem id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.versionContains('config.user')}"/>-->
                 
@@ -153,7 +153,7 @@
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
             </p:submenu>
-            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SuperAdmin') or (userContextService.versionContains('examineMgt') and userContextService.isUltraSoundIBEndUser())}">
+            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SuperAdmin') and (userContextService.versionContains('examineMgt') and userContextService.isUltraSoundIBEndUser())}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
                     <p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.versionContains('examineMgt.pccConfig') and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')}"/>
             </p:submenu>
