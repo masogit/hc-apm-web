@@ -16,7 +16,9 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
@@ -110,28 +112,42 @@ public class CustomConfigService {
     }
 
     public List<String> getReadAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        List<String> configurationRule = getConfigurantionRules(userRoles);
         return config.getAssetFields().entrySet().stream()
-                .filter(item -> item.getValue().getReadRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+                .filter(item -> item.getValue().getReadRoles().stream().anyMatch(itemRole -> configurationRule.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
     public List<String> getEditAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        List<String> configurationRule = getConfigurantionRules(userRoles);
         return config.getAssetFields().entrySet().stream()
-                .filter(item -> item.getValue().getEditRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+                .filter(item -> item.getValue().getEditRoles().stream().anyMatch(itemRole -> configurationRule.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
     public List<String> getExportAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        List<String> configurationRule = getConfigurantionRules(userRoles);
         return config.getAssetFields().entrySet().stream()
-                .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+                .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> configurationRule.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
+    }
+    
+    private List<String> getConfigurantionRules(List<String> userRoles){
+        List<String> resRule = new ArrayList();
+        resRule.addAll(userRoles);
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
+            resRule.add("ClinicalStaff");
+        }
+        if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
+            (userRoles.contains(ApmConstant.MVS_ROLE_NAME_ADMIN) || userRoles.contains(ApmConstant.MVS_ROLE_NAME_FE))) {
+            resRule.add("AssetStaff");
+        }
+        return resRule;
     }
 
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
-        List<String> exportFields = config.getAssetFields().entrySet().stream()
-                .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
-                .map(Entry::getKey).collect(Collectors.toList());
-
+        List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
         //uuid is required to export, but not in custom config fields, so include it here.
         exportFields.add("UUID");
 

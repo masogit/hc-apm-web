@@ -115,6 +115,8 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "checkin")
     private Integer checkin;
 
+    @Column(name="ack_name")
+    private String ackName;
     //	    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.LAZY,targetEntity=V2_BlobObject.class) 
 //	    @Where(clause="bo_uuid=id")
 //	    private List<V2_BlobObject> attachments ;
@@ -603,7 +605,13 @@ public class V2_WorkOrder implements Serializable {
 	public void setFEOwner(UserAccount fEOwner) {
 		FEOwner = fEOwner;
 	}
+    public String getAckName() {
+        return ackName;
+    }
 
+    public void setAckName(String ackName) {
+        this.ackName = ackName;
+    }
 	@Override
     public int hashCode() {
         Integer hash = 0;
@@ -623,5 +631,6 @@ public class V2_WorkOrder implements Serializable {
         }
         return true;
     }
+
 
 }

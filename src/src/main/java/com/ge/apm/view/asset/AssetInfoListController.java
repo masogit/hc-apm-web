@@ -109,6 +109,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterAssetStatus = null;
     private String filterWarrantyDate = null;
     private Integer assetId;
+    
+    private Map<String, Object> selectedObject;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -135,6 +137,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
+        this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
 
@@ -766,4 +769,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setAssetId(Integer assetId) {
         this.assetId = assetId;
     }
+
+    public Map<String, Object> getSelectedObject() {
+        return selectedObject;
+    }
+
+    public void setSelectedObject(Map<String, Object> selectedObject) {
+        this.selectedObject = selectedObject;
+    }
+    
+    
 }

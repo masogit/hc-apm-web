@@ -189,7 +189,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">可修改角色</label>
-                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" >
+                                    <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" disabled="#{customConfigController.isReadOnlyFields(customConfigController.currentEditField.key)}">
                                         <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
                                     </p:selectManyCheckbox>
                                 </h:panelGroup>
