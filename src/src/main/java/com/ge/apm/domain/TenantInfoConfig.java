@@ -1,13 +1,17 @@
 package com.ge.apm.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
@@ -31,7 +35,8 @@ public class TenantInfoConfig {
 		}
 		else{
 			StringBuilder sb=new StringBuilder();
-			String result=readTreeNode(root,sb);
+			readTreeNode(root,sb);
+			String result=sb.toString();
 			if(result.length()>0){
 				result=result.substring(0, result.length()-1);
 			}
@@ -40,7 +45,7 @@ public class TenantInfoConfig {
 	}
 	private TenantInfoConfig() {
 	}
-	private String readTreeNode(TreeNode root,StringBuilder sb){
+	private void readTreeNode(TreeNode root,StringBuilder sb){
 		if(root.isSelected()){
 			TenantInfoConfigItem tempItem=(TenantInfoConfigItem)root.getData();
 			sb.append("\""+tempItem.getKey()+"\",");
@@ -48,7 +53,6 @@ public class TenantInfoConfig {
 		for(TreeNode node:root.getChildren()){
 			readTreeNode(node, sb);
 		}
-		return sb.toString();
 	}
 	private String readTreeNode(StringBuilder sb){
 		if(selectedNodes!=null && selectedNodes.length>0){
@@ -79,7 +83,7 @@ public class TenantInfoConfig {
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
-			} else if (edition.equals(VERSION_ULTRASOUND) || edition.equals(VERSION_FUNCTION)) {
+			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				}
@@ -93,6 +97,29 @@ public class TenantInfoConfig {
 					tempItem.setValue(false);
 				}
 				else if (key.contains("nurseSite.")) {
+					tempItem.setValue(false);
+				}
+			}
+			else if (edition.equals(VERSION_FUNCTION)) {
+				if (key.equals("repair.workSchedule")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("assetAdjust")) {
+					tempItem.setValue(false);
+				}
+				else if (key.contains("assetAdjust.")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("nurseSite")) {
+					tempItem.setValue(false);
+				}
+				else if (key.contains("nurseSite.")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("repair.vacationMgt")) {
+					tempItem.setValue(false);
+				}
+				else if (key.equals("maintain.electricDataImport")) {
 					tempItem.setValue(false);
 				}
 			}
@@ -179,7 +206,7 @@ public class TenantInfoConfig {
 		JSONArray arr = jsonObj.getJSONArray("menuList");
 		List<TenantInfoConfigItem> tempListVersionItem = new ArrayList<TenantInfoConfigItem>();
 		Map<String, String> mapKeyLabel = getMapVersionKeyLabel();
-		List<String> listItemKey = new ArrayList<String>();
+		Set<String> setItemKey = new HashSet<String>();
 		try {
 			for (int i = 0; i < arr.size(); ++i) {
 				String key = arr.getString(i);
@@ -187,16 +214,18 @@ public class TenantInfoConfig {
 				if (StringUtils.isEmpty(label)) {
 					continue;
 				}
-				listItemKey.add(key);
-				TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, true);
-				tempListVersionItem.add(tempItem);
+				setItemKey.add(key);
 			}
 			Iterator<String> it = mapKeyLabel.keySet().iterator();
 			while (it.hasNext()) {
 				String key = it.next();
 				String label = mapKeyLabel.get(key);
-				if (!listItemKey.contains(key)) {
+				if (!setItemKey.contains(key)) {
 					TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, false);
+					tempListVersionItem.add(tempItem);
+				}
+				else{
+					TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, true);
 					tempListVersionItem.add(tempItem);
 				}
 			}
@@ -212,11 +241,21 @@ public class TenantInfoConfig {
 	}
 	
 	public void onSelectTenantConfig(NodeSelectEvent event){
-		setTreeNodes(event.getTreeNode(), true);
+		TreeNode tempNode=event.getTreeNode();
+		setTreeNodes(tempNode, true);
+		TreeNode parentNode=tempNode.getParent();
+        if(parentNode!=null){
+        	parentNode.setSelected(true);
+        }
 	}
 	
 	public void onUnSelectTenantConfig(NodeUnselectEvent event){
-        setTreeNodes(event.getTreeNode(), false);
+		TreeNode tempNode=event.getTreeNode();
+        setTreeNodes(tempNode, false);
+        TreeNode parentNode=tempNode.getParent();
+        if(parentNode!=null){
+        	parentNode.setSelected(false);
+        }
 	}
 	private void setTreeNodes(TreeNode root, Boolean isSelected) {
 		if(root==null){
@@ -320,7 +359,6 @@ public class TenantInfoConfig {
 			mapVersion.put("config.custom", "自定义配置");
 			mapVersion.put("config.attribute", "属性配置");
 			mapVersion.put("config.repairMessage", "维修消息配置");
-			mapVersion.put("config.captureDataMessage", "小屏消息配置");
 			mapVersion.put("examineMgt", "检测管理");
 			mapVersion.put("examineMgt.pcc", "探头检测");
 			mapVersion.put("examineMgt.pccConfig", "探头检测配置");
