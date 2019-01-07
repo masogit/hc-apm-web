@@ -19,9 +19,9 @@
 				</h:panelGroup>
 			</p:panelGrid>
 			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
-				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfig.root}" var="item" dynamic="true" cache="false" selectionMode="checkbox" highlight="true">
-					<p:ajax event="select" listener="#{tenantInfoController.tenantConfig.onSelectTenantConfig}" />
-                    <p:ajax event="unselect" listener="#{tenantInfoController.tenantConfig.onUnSelectTenantConfig}" />
+				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfig.root}" selection="#{tenantInfoController.tenantConfig.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
+					<p:ajax event="select" listener="#{tenantInfoController.tenantConfig.onSelectTenantConfig}" process="@this"/>
+                    <p:ajax event="unselect" listener="#{tenantInfoController.tenantConfig.onUnSelectTenantConfig}" process="@this"/>
 					<p:treeNode type="tenantConfigTree">
                         <h:outputText value="#{item.label}"/>
                     </p:treeNode>

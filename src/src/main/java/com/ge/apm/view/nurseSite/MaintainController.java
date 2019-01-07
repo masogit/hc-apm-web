@@ -4,11 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,16 +34,18 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
+import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
  * Created by 212605082 on 2018/5/8.
  */
 @ManagedBean
 @ViewScoped
-public class MaintainController {
+public class MaintainController implements ServerEventInterface {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -81,10 +81,16 @@ public class MaintainController {
     private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
+    private SearchController searchController;
 
-	@PostConstruct
+    @PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		searchController = WebUtil.getBean(SearchController.class);
+		searchController.setType(3);
+		searchController.setUpdateViewIDs(":maintainForm:maintain");
+		searchController.updateData();
+		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
@@ -377,14 +383,14 @@ public class MaintainController {
 		}
 		try {
 			if(listItem!=null && listItem.size()>0){
-				Set<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
+				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
 				if(listTempData!=null){
 					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
 					while(it.hasNext()){
 						NurseSiteMaintainData tempData=it.next();
 						showLables.add(tempData.getCheckItem());
 					}
-					showLables.sort(new StringComparator());
+//					showLables.sort(new StringComparator());
 				}
 			}
 			nurseSiteMaintain.setShowLables(showLables);
@@ -399,7 +405,7 @@ public class MaintainController {
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
-			Set<NurseSiteMaintainData> listData=tempItem.getListData();
+			List<NurseSiteMaintainData> listData=tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
@@ -810,6 +816,22 @@ public class MaintainController {
 
 	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
+	}
+
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+		// TODO Auto-generated method stub
+		OrgInfo tempOrg=(OrgInfo)eventObject;
+		if(tempOrg!=null){
+			if(listCheckClinicalOrgInfo!=null){
+				listCheckClinicalOrgInfo.clear();
+			}
+			else{
+				listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
+			}
+			listCheckClinicalOrgInfo.add(tempOrg);
+			onClinicalOrgInfoChange();
+		}
 	}
 	
 }

@@ -194,7 +194,8 @@
 
                 <p:panel  header="设备相关合同">
                     <f:facet name="actions">
-                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}" 
+                                       disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
                     <p:dataTable var="item" value="#{assetInfoDetailController.getContractList()}" emptyMessage="#{msg.noRecordFound}">
@@ -224,7 +225,7 @@
                         </p:column>
                         <p:column   >
                             <!--<p:commandLink action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" value="查看" />-->
-                            <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}">查看</p:link>
+                            <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}">查看</p:link>
                         </p:column>
                     </p:dataTable>
                 </p:panel>

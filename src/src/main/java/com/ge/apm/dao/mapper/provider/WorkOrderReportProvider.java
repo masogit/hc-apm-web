@@ -233,6 +233,44 @@ public class WorkOrderReportProvider {
 
     }
 
+    public String statisticsCaseloadByDepartment(Map<String,String> param){
+
+        String tenantUID = param.get("tenantUID");
+        String institutionUID = param.get("institutionUID");
+        String hospitalUID = param.get("hospitalUID");
+        String siteUID = param.get("siteUID");
+        String startDate = param.get("startDate");
+        String endDate = param.get("endDate");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("select ai.clinical_dept_id as clinicalDeptId,oi.name as clinicalDeptName,sum(wo.total_man_hour) as totalManHour from v2_work_order wo,asset_info ai,org_info oi where wo.asset_id=ai.id and ai.clinical_dept_id=oi.id");
+
+        if(tenantUID != null){
+            sb.append(" and wo.tenant_uid='"+tenantUID+"'");
+        }
+        if(institutionUID != null){
+            sb.append(" and wo.institution_uid='"+institutionUID+"'");
+        }
+        if(hospitalUID != null){
+            sb.append(" and wo.hospital_uid='"+hospitalUID+"'");
+        }
+        if(siteUID != null){
+            sb.append(" and wo.site_uid='"+siteUID+"'");
+        }
+        if(startDate != null){
+            sb.append(" and wo.created_date>='"+startDate+"'");
+        }
+        if(endDate != null){
+            sb.append(" and wo.created_date<='"+endDate+"'");
+        }
+
+        sb.append(" group by ai.clinical_dept_id, oi.name");
+        sb.append(" order by totalManHour desc");
+
+        return sb.toString();
+    }
+
     public String workOrderExport(Map<String,Object> param){
 
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
@@ -277,6 +315,7 @@ public class WorkOrderReportProvider {
 
         String filter = buildFilter(searchFilterList);
         sb.append(filter);
+        sb.append(" order by wo.created_date desc ");
 
         return sb.toString();
 

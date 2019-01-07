@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.JSONObject;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -12,7 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 /**
  *
@@ -61,6 +64,18 @@ public class QrCodeTemplate  implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "json_text")
+    @Type(type = "text")
+    private String jsonText;
+    
+    public JSONObject getJSONObject(){
+        return Strings.isEmpty(jsonText)? null: JSONObject.parseObject(jsonText);
+    }
+    
+    public void setJSONObject(JSONObject object){
+        this.jsonText = JSONObject.toJSONString(object);
+    }
+    
     public String getTenantUID() {
         return tenantUID;
     }
@@ -148,6 +163,14 @@ public class QrCodeTemplate  implements Serializable {
         this.usingDate = usingDate;
     }
 
+    public String getJsonText() {
+        return jsonText;
+    }
+
+    public void setJsonText(String jsonText) {
+        this.jsonText = jsonText;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -170,7 +193,7 @@ public class QrCodeTemplate  implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.QrCodeLib[ id=" + id + " ]";
+        return "com.ge.apm.domain.QrCodeTemplate[ id=" + id + " ]";
     }
     
 }
