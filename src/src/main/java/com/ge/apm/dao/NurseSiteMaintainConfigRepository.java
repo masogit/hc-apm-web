@@ -18,5 +18,6 @@ public interface NurseSiteMaintainConfigRepository extends GenericRepositoryUUID
 	@Query(value="select o.* from nurse_site_maintain_config o where o.id=?1",nativeQuery=true)
 	public NurseSiteMaintainConfig findById(String id);
 	
-	
+	@Query(value="select o.* from nurse_site_maintain_config o where o.id in ?1",nativeQuery=true)
+	public List<NurseSiteMaintainConfig> fetchListByIds(Set<String> ids);
 }

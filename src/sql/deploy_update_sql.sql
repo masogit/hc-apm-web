@@ -290,3 +290,17 @@ CREATE TABLE dashboard_role_res_tenant (
 );
 
 insert into dashboard_role_res_tenant(res_id, res_type, role_id, permission) select res_id, res_type, role_id, permission from dashboard_role_res
+
+insert into sys_authority(id,name,description) values (1,'编辑','edit');
+insert into sys_authority(id,name,description) values (2,'排班','schedule');
+insert into sys_authority(id,name,description) values (3,'调剂','adjust');
+insert into sys_authority(id,name,description) values (4,'盘点','check');
+insert into sys_authority(id,name,description) values (5,'巡检','patrol');
+insert into sys_authority(id,name,description) values (6,'977','977');
+insert into sys_authority(id,name,description) values (7,'派工','dispath');
+insert into sys_authority(id,name,description) values (8,'审核','approve');
+
+update user_role set role_type= 0;
+
+
+update message_subscriber set meter_hit =false where meter_hit is null

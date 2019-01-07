@@ -22,10 +22,11 @@
 						</p:selectBooleanCheckbox>
 					</f:facet>
 					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
-						<p:ajax listener="#{assetLifecycleEvent3Controller.onItemSelect()}"></p:ajax>
+						<p:ajax listener="#{assetLifecycleEvent3Controller.onItemSelect(item)}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
-				<p:ajax event="filter" listener="#{assetLifecycleEvent3Controller.onFilter}" />
+				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');"></p:ajax>
+				<p:ajax event="filter" listener="#{assetLifecycleEvent3Controller.onFilter}"/>
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>

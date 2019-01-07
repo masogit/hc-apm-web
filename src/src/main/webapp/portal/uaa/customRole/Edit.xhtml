@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
+            <h:form id="CustomRoleEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{customRoleController.selected != null}">
+                        
+                        <h:panelGroup>
+                            <label class ="label">#{msg.name}*</label>
+                            <p:inputText id="name" value="#{customRoleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class ="label">角色描述</label>
+                            <p:inputText id="roleDesc" value="#{customRoleController.selected.roleDesc}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    &nbsp;&nbsp;
+
+                    <h3>权限列表</h3>
+                    <p:selectManyCheckbox id="grid2" value="#{customRoleController.authIds}" layout="responsive" columns="3" >
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('sysAuthority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                    </p:selectManyCheckbox>
+
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{customRoleController.save}" value="#{msg.Save}" update="display,:CustomRoleEditDlg, :CustomRoleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'CustomRoleEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('CustomRoleEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

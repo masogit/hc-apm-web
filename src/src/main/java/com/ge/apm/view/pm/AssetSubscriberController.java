@@ -372,7 +372,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			/* 如果加上合同等消息推送 替换成这个if
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
-				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false){
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false && selected.getMeterHit()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				msgsubList = new ArrayList<MessageSubscriber>();
@@ -438,7 +438,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			/* 如果加上合同等消息推送 替换成这个if
 			* if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false)*/
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getMeterHit()==false){
 				WebUtil.addErrorMessage("消息设置不可为空");
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;

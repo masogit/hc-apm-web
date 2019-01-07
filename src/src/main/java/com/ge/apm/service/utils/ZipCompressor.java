@@ -1,5 +1,4 @@
 package com.ge.apm.service.utils;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,7 +7,6 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 public class ZipCompressor {
 static final int BUFFER = 8192;     
     
@@ -52,10 +50,8 @@ static final int BUFFER = 8192;
     private void compress(File file, ZipOutputStream out, String basedir) {     
         /* 判断是目录还是文件 */    
         if (file.isDirectory()) {     
-//            System.out.println("压缩：" + basedir + file.getName());     
             this.compressDirectory(file, out, basedir);     
         } else {     
-//            System.out.println("压缩：" + basedir + file.getName());     
             this.compressFile(file, out, basedir);     
         }     
     }     

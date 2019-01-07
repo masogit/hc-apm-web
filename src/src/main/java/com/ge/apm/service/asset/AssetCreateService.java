@@ -255,7 +255,9 @@ public class AssetCreateService {
         UserAccount user = userDao.getByUid(userUid);
         List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        List<String> collect = siteUidList.stream().distinct().collect(Collectors.toList());
+        collect.removeIf(Objects::isNull);
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
     

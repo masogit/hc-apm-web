@@ -26,12 +26,12 @@
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">#{msg.mvsDeviceType}</label>
-            <p:inputText id="mvsDeviceType_readonly" value="#{assetInfoDetailController.mvsAssetInfo.deviceType}" readonly="true"/>
+            <p:inputText id="mvsDeviceType_readonly" value="#{assetInfoEditController.mvsAssetInfo.deviceType}" readonly="true"/>
         </h:panelGroup>
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">#{msg.mvsAssetGroup}</label>
-            <p:inputText id="mvsAssetGroup_readonly" value="#{assetInfoDetailController.mvsAssetInfo.mvsType}" readonly="true"/>
+            <p:inputText id="mvsAssetGroup_readonly" value="#{assetInfoEditController.mvsAssetInfo.mvsType}" readonly="true"/>
         </h:panelGroup>
 
         <h:panelGroup>
@@ -108,14 +108,14 @@
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">#{msg.factoryWarrantyDate}</label>
-            <p:inputText id="mvs_factoryWarrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.factoryWarrantyDate}" readonly="true">
+            <p:inputText id="mvs_factoryWarrantyDate_readonly" value="#{assetInfoEditController.mvsAssetInfo.factoryWarrantyDate}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
             </p:inputText>
         </h:panelGroup>
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">#{msg.warrantyDate}</label>
-            <p:inputText id="mvs_warrantyDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.warrantyDate}" readonly="true">
+            <p:inputText id="mvs_warrantyDate_readonly" value="#{assetInfoEditController.mvsAssetInfo.warrantyDate}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
             </p:inputText>
         </h:panelGroup>
@@ -144,14 +144,14 @@
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">合同开始日期</label>
-            <p:inputText id="mvs_contractStartDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.contractStartDate}" readonly="true">
+            <p:inputText id="mvs_contractStartDate_readonly" value="#{assetInfoEditController.mvsAssetInfo.contractStartDate}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
             </p:inputText>
         </h:panelGroup>
 
         <h:panelGroup rendered="#{!userContextService.isMVSAdmin()}">
             <label class="label">合同结束日期</label>
-            <p:inputText id="mvs_contractEndDate_readonly" value="#{assetInfoDetailController.mvsAssetInfo.contractEndDate}" readonly="true">
+            <p:inputText id="mvs_contractEndDate_readonly" value="#{assetInfoEditController.mvsAssetInfo.contractEndDate}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
             </p:inputText>
         </h:panelGroup>

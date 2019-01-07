@@ -825,6 +825,7 @@ public class AssetInfoFormatter {
         map.put("所属课题项目", assetInfo.getSubjectProject());
         map.put("质保时间（月）", assetInfo.getWarrantyMonth());
         map.put("验收日期", assetInfo.getAcceptDate());
+        map.put("创建日期", assetInfo.getCreatedDate());
 
         map.put("UUID", this.getUid());
 
