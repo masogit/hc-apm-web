@@ -17,6 +17,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,14 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BiomedGroupUserRepository;
-import com.ge.apm.dao.JsonTemplateRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -67,7 +60,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
-    public static final int ACTIVATION_ROLE = 10;
+    //public static final int ACTIVATION_ROLE = 10;
+    public static final String ACTIVATION_ROLE = "ActivationPerson";
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -104,6 +98,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfoTreeService orgInfoTreeService;
 
+    private SysRoleRepository sysRoleRepository;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -124,6 +120,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -764,18 +761,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
         List<UserRole> roles = loginUser.getUserRoleList();
-        roles = roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(roles)){
-            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-            tenant.setIsEnabled(true);
-            tenant.setActiveTime(new Date());
-            tenant.setActiveUserId(loginUser.getId());
-            tenant.setActiveType(1);
-            tenantInfoRepository.save(tenant);
-            dao.updateMembersStatus(loginUser.getTenantUID());
+        SysRole sysRole = sysRoleRepository.getByName(ACTIVATION_ROLE);
+        if(sysRole != null){
+            roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(roles)){
+                TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+                tenant.setIsEnabled(true);
+                tenant.setActiveTime(new Date());
+                tenant.setActiveUserId(loginUser.getId());
+                tenant.setActiveType(1);
+                tenantInfoRepository.save(tenant);
+                dao.updateMembersStatus(loginUser.getTenantUID());
+            }
+            WebUtil.addSuccessMessage("激活成功！");
+        }else{
+            logger.info("not active person !");
         }
 
-        WebUtil.addSuccessMessage("激活成功！");
     }
 
     @Transactional
