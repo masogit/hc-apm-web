@@ -254,13 +254,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">维保提醒提前天数</label>
+                                <label class = "label">维保/质保提醒提前天数</label>
                                 <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">维保提醒次数</label>
+                                <label class = "label">维保/质保提醒次数</label>
                                 <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />  
                                 </p:inputNumber>
