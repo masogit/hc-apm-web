@@ -87,7 +87,7 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"  
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
