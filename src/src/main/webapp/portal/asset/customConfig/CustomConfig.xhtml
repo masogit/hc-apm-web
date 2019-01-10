@@ -150,6 +150,99 @@
                                 </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
+                        <p:tab title="微信端报修页面">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fieldset legend="资产信息显示字段组">
+                                    <p:orderList id="MobileWorkOrderFieldsList" value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="报修信息填写">
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="priorityGroup">
+                                        <h:panelGroup >
+                                            <label class="label">启用紧急程度</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.priority.enable}" >
+                                                <p:ajax update="priorityGroup"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.priority.enable}">
+                                            <label class="label">必填</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.priority.required}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.priority.enable}">
+                                            <label class="label">默认值</label>
+                                            <p:selectOneMenu value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.priority.defaultValue}" >
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
+                                                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="assetStatusGroup">
+                                        <h:panelGroup >
+                                            <label class="label">启用资产状态更新</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetStatus.enable}" >
+                                                <p:ajax update="assetStatusGroup"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetStatus.enable}">
+                                            <label class="label">必填</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetStatus.required}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetStatus.enable}">
+                                            <label class="label">默认值</label>
+                                            <p:selectOneMenu value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.assetStatus.defaultValue}" >
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="attachmentsGroup">
+                                        <h:panelGroup >
+                                            <label class="label">启用上传图片</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.attachments.enable}" >
+                                            <p:ajax update="attachmentsGroup"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.attachments.enable}">
+                                            <label class="label">必填</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.attachments.required}" />
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="voiceAttachmentGroup">
+                                        <h:panelGroup >
+                                            <label class="label">启用上传语音</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.voiceAttachment.enable}" >
+                                            <p:ajax update="voiceAttachmentGroup"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.voiceAttachment.enable}">
+                                            <label class="label">必填</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.voiceAttachment.required}" />
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="requestReasonGroup">
+                                        <h:panelGroup >
+                                            <label class="label">启用文字描述</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.requestReason.enable}" >
+                                            <p:ajax update="requestReasonGroup"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.requestReason.enable}">
+                                            <label class="label">必填</label>
+                                            <p:selectBooleanCheckbox value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.requestReason.required}" />
+                                        </h:panelGroup>
+                                         <h:panelGroup rendered="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.requestReason.enable}">
+                                            <label class="label">默认值</label>
+                                            <p:inputText value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.requestReason.defaultValue}" />
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+
+                                </p:fieldset>
+                            </p:panelGrid>
+                        </p:tab>
                     </p:tabView>
 
                     <h:panelGroup >
