@@ -1409,6 +1409,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'SrReportPdf', '服务报告', '服务报告', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'SrResetReport', '服务报告重置', '服务报告重置', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'SrExcel', '服务请求报表', '服务请求报表', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetCustomerExcel', '院方人员列表', 'Customer List', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetFeExcel', 'FE列表', 'FE List', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetOLEExcel', 'OLE列表', 'OLE List', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'UserAssetSalesExcel', 'Sales列表', 'Sales List', NULL, '-1');
