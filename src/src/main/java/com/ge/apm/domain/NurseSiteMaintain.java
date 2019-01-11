@@ -97,7 +97,7 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
-    private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
+    private List<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
 	//0：未检查,1:已检查，2:通过，3有问题,4进行中
 	@Column(name = "status")
@@ -124,9 +124,6 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Transient
 	private List<String> showLables;
-	
-	@Transient
-	private List<NurseSiteMaintainItem> showListNurseSiteMaintainItem;
 	
 	@Transient
 	private boolean needGetItem=true;
@@ -256,11 +253,11 @@ public class NurseSiteMaintain implements Serializable {
 		this.name = name;
 	}
 
-	public Set<NurseSiteMaintainItem> getListNurseSiteMaintainItem() {
+	public List<NurseSiteMaintainItem> getListNurseSiteMaintainItem() {
 		return listNurseSiteMaintainItem;
 	}
 
-	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
+	public void setListNurseSiteMaintainItem(List<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
 		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
 	}
 
@@ -332,27 +329,27 @@ public class NurseSiteMaintain implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
-		if(showListNurseSiteMaintainItem==null){
-			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
-		}
-		else{
-			showListNurseSiteMaintainItem.clear();
-		}
-		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
-		return showListNurseSiteMaintainItem;
-	}
-
-	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
-		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
-		if(listNurseSiteMaintainItem==null){
-			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		else{
-			listNurseSiteMaintainItem.clear();
-		}
-		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
-	}
+//	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
+//		if(showListNurseSiteMaintainItem==null){
+//			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
+//		}
+//		else{
+//			showListNurseSiteMaintainItem.clear();
+//		}
+//		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
+//		return showListNurseSiteMaintainItem;
+//	}
+//
+//	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
+//		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
+//		if(listNurseSiteMaintainItem==null){
+//			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+//		}
+//		else{
+//			listNurseSiteMaintainItem.clear();
+//		}
+//		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
+//	}
 	
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
