@@ -14,5 +14,6 @@ public interface SysRoleRepository extends GenericRepository<SysRole> {
     public SysRole getByRoleDesc(String name);
     
     public List<SysRole> getByNameIn(List<String> names);
-    
+
+
 }

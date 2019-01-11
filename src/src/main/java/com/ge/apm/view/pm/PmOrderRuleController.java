@@ -77,6 +77,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private AssetInfoRepository assetInfoRepository;
     private RelRuleAssetRepository relRuleAssetRepository;
     private SupplierService supplierService;
+    private List<String> deletedCheckListIds = new ArrayList<>();
 
     @Override
     protected void init() {
@@ -277,10 +278,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 
 
-    @Override
     @Transactional
-    public void onBeforeSave(PmOrderRule por) {
-        pmOrderRuleCheckListRepository.deleteExistsRecord(por.getUid());
+    public void onBeforeSave(String ruleId,List<String> deletedCheckListIds) {
+        if(CollectionUtils.isNotEmpty(deletedCheckListIds)){
+            pmOrderRuleCheckListRepository.updateStatus(deletedCheckListIds);
+        }
+        pmOrderRuleCheckListRepository.deleteExistsRecord(ruleId);
     }
 
     public List<UserAccount> getApproveUserList() {
@@ -339,7 +342,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         {
             selected.setPeriod(getPeriod());
             if (selected.getId() != null) {
-                onBeforeSave(selected);
+                onBeforeSave(selected.getUid(),deletedCheckListIds);
             }
             getName();
             if(selectedUserOrg != null){
@@ -578,12 +581,16 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmRuleCheckItem.setInstitutionUID(selectedUserOrg.getInstitutionUID());
             pmRuleCheckItem.setHospitalUID(selectedUserOrg.getHospitalUID());
             pmRuleCheckItem.setSiteUID(selectedUserOrg.getSiteUID());
+            pmRuleCheckItem.setStatus(1);
         } else {
             pmRuleCheckItem = checkItemLists.stream().filter(item -> item.getUid().equals(itemId)).findAny().get();
         }
     }
 
     public void deleteItemDetail(String itemId) {
+        if(!deletedCheckListIds.contains(itemId)){
+            deletedCheckListIds.add(itemId);
+        }
         checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals(itemId)).collect(Collectors.toList()));
     }
 
@@ -692,6 +699,19 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     }
 
+
+    public boolean notApproved(){
+        if(selected == null){
+            return true;
+        }
+        boolean isAssetHead = UserContextService.checkRole("AssetHead");
+        if(isAssetHead){
+            return true;
+        }else{
+            return selected.getStatus() == 1 ? true : false;
+        }
+    }
+
     public Integer getManufactureId() {
         return manufactureId;
     }
@@ -734,6 +754,14 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
      */
     public void setReportTemplateFile(StreamedContent reportTemplateFile) {
         this.reportTemplateFile = reportTemplateFile;
+    }
+
+    public List<String> getDeletedCheckListIds() {
+        return deletedCheckListIds;
+    }
+
+    public void setDeletedCheckListIds(List<String> deletedCheckListIds) {
+        this.deletedCheckListIds = deletedCheckListIds;
     }
 
     public Boolean getInsulate() {
