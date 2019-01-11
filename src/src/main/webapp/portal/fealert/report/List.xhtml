@@ -43,6 +43,9 @@
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.systemId}"/>
                         </p:column>
+                        <p:column headerText="设备类型" sortBy="#{item.deviceType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('alertConfigDeviceType',item.deviceType)}"/>
+                        </p:column>
                         <p:column headerText="报警项目" sortBy="#{item.label}" filterBy="#{item.label}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.label}"/>
