@@ -62,7 +62,7 @@ public interface UserAccountMapper {
 	@Update("update user_account set site_id=#{siteId},hospital_id=#{hospitalId},tenant_uid=#{tenantUID},institution_uid=#{institutionUID},hospital_uid=#{hospitalUID},site_uid=#{siteUID},telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked},last_modified_by=#{lastModifiedBy},last_modified_date=#{lastModifiedDate},password_error_count=#{passwordErrorCount},active_time=#{activeTime},name_py_code=#{namePyCode} where uid=#{uid}")
 	public void updateUserAccount(UserAccount user);
 
-	@Insert("insert into user_role(user_id,role_id) values (#{userId},#{roleId})")
+	@Insert("insert into user_role(user_id,role_id,role_type) values (#{userId},#{roleId},#{roleType})")
 	public void saveUserRole(UserRole userRole);
 	
 	@Delete("delete from user_role where user_id =#{userId}")
