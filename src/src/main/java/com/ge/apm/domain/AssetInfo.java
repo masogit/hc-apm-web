@@ -7,23 +7,12 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -348,6 +337,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
     private Brand brand;//品牌
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action= NotFoundAction.IGNORE)
+    @JoinColumn(insertable = false, nullable = true,updatable = false,name = "uid")
+    private MvsAssetInfo mvsAssetInfo;
 
     @Column(name = "hospital_id")
     @Basic(optional = false)
@@ -1747,5 +1742,13 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
         reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
         return reqDetail;
+    }
+
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
     }
 }
