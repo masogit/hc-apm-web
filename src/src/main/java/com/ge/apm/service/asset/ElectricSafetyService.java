@@ -59,6 +59,7 @@ public class ElectricSafetyService {
     private final String INSERT="INSERT";
     private UserAccount user;
     private Pattern p=Pattern.compile("([+-\\.0-9]+).*");
+    private final String STR_MA="mA";
     
     @Autowired
     AssetInfoRepository assetInfoRepository;
@@ -811,13 +812,17 @@ public class ElectricSafetyService {
 	
 	private double parseDouble(Object obj){
 		String str=obj.toString();
+		double result=0;
 		if(StringUtils.isNotEmpty(str)){
 			Matcher m=p.matcher(str);
 			if(m.find()){
-				return Double.parseDouble(m.group(1));
+				result=Double.parseDouble(m.group(1));
+				if(str.endsWith(STR_MA)){
+					result=result*1000;
+				}
 			}
 		}
-		return 0;
+		return result;
 	}
 	
 	private void setCheckType(String str,ElectricSafetyData data){
