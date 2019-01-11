@@ -18,6 +18,9 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
+    public static final String DEFAULT_MOBILE_PAGE_JSON = "{\"mobilePage\":{\"pageWorkOrder\":{\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"siteUID\",\"clinicalDeptName\",\"factoryWarrantyDate\",\"installDate\"],\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":true},\"requestReason\":{\"defaultValue\":\"设备故障\",\"enable\":true,\"required\":true},\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":false},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":false}}}}";
+
+    
     //默认不使用的字段
     static public List<String> getExtFields() {
         return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate");

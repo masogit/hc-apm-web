@@ -133,6 +133,10 @@ public class WorkOrderExportPojo {
     private Integer assetStatus;
     //报修状态名称
     private String assetStatusName;
+    //
+    private String signature;
+    //
+    private String ackSignature;
 
     public String getId() {
         return Id;
@@ -636,5 +640,21 @@ public class WorkOrderExportPojo {
 
     public void setAssetStatusName(String assetStatusName) {
         this.assetStatusName = assetStatusName;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getAckSignature() {
+        return ackSignature;
+    }
+
+    public void setAckSignature(String ackSignature) {
+        this.ackSignature = ackSignature;
     }
 }
