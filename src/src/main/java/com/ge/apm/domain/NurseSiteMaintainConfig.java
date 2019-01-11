@@ -80,9 +80,6 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	@JsonBackReference
 	private UserAccount modifyBy;
 	
-	@Column(name="check_items",columnDefinition="text")
-	private String checkItems;
-	
 	@Column(name="check_items_detail",columnDefinition="text")
 	private String checkItemsDetail;
 	
@@ -191,14 +188,6 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 
 	public void setModifyBy(UserAccount modifyBy) {
 		this.modifyBy = modifyBy;
-	}
-
-	public String getCheckItems() {
-		return checkItems;
-	}
-
-	public void setCheckItems(String checkItems) {
-		this.checkItems = checkItems;
 	}
 
 	public Integer getType() {

@@ -26,7 +26,7 @@
 					</p:selectBooleanCheckbox>
 				</p:column>
 				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');"></p:ajax>
-				<p:ajax event="filter" listener="#{assetLifecycleEvent3Controller.onFilter}"/>
+				<p:ajax event="filter" listener="#{assetLifecycleEvent3Controller.onFilter}" />
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>
@@ -45,7 +45,13 @@
 					filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 				</p:column>
-				<p:column headerText="状态">
+				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetLifecycleEvent3Controller.descriptionStatusFilter}">
+							<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
+							<f:selectItems value="#{fieldMsg.getFieldValueList('assetLifecycleEventStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+						</p:selectOneMenu>
+					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
 				</p:column>
 				<p:column headerText="报告下载" exportable="false">
@@ -57,7 +63,8 @@
 					</p:repeat>
 				</p:column>
 				<f:facet name="{Toolbar}">
-					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent3Controller.exportSelected}" update=":growl" ajax="false">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
+						actionListener="#{assetLifecycleEvent3Controller.exportSelected}" update=":growl" ajax="false">
 						<p:fileDownload value="#{assetLifecycleEvent3Controller.exportFile}" />
 					</p:commandButton>
 					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"

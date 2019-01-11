@@ -158,9 +158,15 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
-    	nurseSiteMaintainService.deleteMaintainConfig(this.selected);
+    	boolean result=nurseSiteMaintainService.deleteMaintainConfig(this.selected);
+    	if(result){
+    		WebUtil.addSuccessMessage("删除成功！");
+    	}
+    	else{
+    		WebUtil.addSuccessMessage("不允许删除！");
+    	}
     	this.selected=null;
-    	WebUtil.addSuccessMessage("删除成功");
+    	
     }
 
 	
@@ -403,21 +409,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			}
 		}
 		nurseSiteMaintainConfig.setTypeValue(typeValue);
-		String tempResult="";
 		JSONArray jsonArray=new JSONArray();
 		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
 			for(int i=0;i<listPairCheckItems.size();++i){
 				JSONObject jsonObject=new JSONObject();
 				NurseSiteMaintainConfigCheckItem p=listPairCheckItems.get(i);
 				if(StringUtils.isNotEmpty(p.getName())){
-					tempResult+=p.getName()+",";
 					jsonObject=(JSONObject) jsonObject.toJSON(p);
 					jsonArray.add(jsonObject);
 				}
 			}
 			nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		}
-		nurseSiteMaintainConfig.setCheckItems(tempResult);
 		if(isSave){
 			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
 		}
@@ -477,18 +480,19 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.checkListHours = checkListHours;
 	}
 	
-	public void addCheckListItem(){
-		listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
-		initObjPairCheckItem();
+	public void saveCheckListItem(){
+		if(listPairCheckItems.contains(objPairCheckItem)){
+			
+		}
+		else{
+			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
+			initObjPairCheckItem();
+		}
 		checkSaveDisable();
 	}
-	public void deleteItemDetail(String str){
-		for(int i=0;i<listPairCheckItems.size();++i){
-			NurseSiteMaintainConfigCheckItem p=listPairCheckItems.get(i);
-			if(p.getName()!=null &&p.getName().equals(str)){
-				listPairCheckItems.remove(i);
-				--i;
-			}
+	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
+		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
+			listPairCheckItems.remove(item);
 		}
 		checkSaveDisable();
 	}
