@@ -55,5 +55,8 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain where id in ?1", nativeQuery = true)
 	void deleteMaintain(Set<String> ids);
+	
+	@Query(value="select count(o.id) from nurse_site_maintain o where o.config_id = ?1",nativeQuery=true)
+	public Integer fetchCountByConfigId(String configId);
 }
 

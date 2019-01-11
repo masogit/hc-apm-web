@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -21,6 +23,7 @@ import javax.faces.context.FacesContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -38,7 +41,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.examine.PccExamineReportService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -97,6 +99,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<ApmStreamedContent> listStreamedContent;
 	private ApmStreamedContent tailAttach;
 	private List<PccExamineReport> listSelected;
+	private Map<Integer,List<PccExamineReport>> mapListSelected;
 	private DefaultStreamedContent exportFile;
 	private boolean blnEditable = false;
 	String updateViewIDs;
@@ -111,6 +114,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<PccExamineReport> listDetail;
 	private List<String> userRoleNames;
 	private Set<String> setUserUids;
+	private int currentPage;
 
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -128,12 +132,17 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			blnEditable = true;
 		}
 		setUserUids = service.findAccessOrgUidListByUserUid(currentUser.getUid());
+		mapListSelected=new HashMap<Integer,List<PccExamineReport>>();
 	}
 
 	@Override
 	protected List<PccExamineReport> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<SearchFilter>();
+		}
+		currentPage=pageRequest.getCurrent();
+		if(mapListSelected.containsKey(currentPage)){
+			listSelected=mapListSelected.get(currentPage);
 		}
 		// need list or set
 		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
@@ -282,6 +291,12 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		String operation = "pccReportEdit.xhtml?actionName=" + actionName + "&selectedid=" + id;
 		return UrlEncryptController.encodeUrlParam(operation);
 	}
+	
+	public void onPageSelect(PageEvent event){
+		if(listSelected!=null && listSelected.size()>0){
+			mapListSelected.put(currentPage, listSelected);
+		}
+	}
 
 	public String getEditPage(String id, String assetuid, String actionName) {
 		String operation = "pccReportEdit.xhtml?actionName=" + actionName + "&selectedid=" + id + "&assetuid=" + assetuid;
@@ -404,14 +419,19 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 
 	public void downloadSelectedReport() {
 		this.exportFile = null;
-		if (listSelected == null || listSelected.size() == 0) {
+		onPageSelect(null);
+		List<PccExamineReport> listTotalReport=new ArrayList<PccExamineReport>();
+		if (mapListSelected == null || mapListSelected.size() == 0) {
 			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
 			return;
 		}
+		for(List<PccExamineReport> listTemp:mapListSelected.values()){
+			listTotalReport.addAll(listTemp);
+		}
 		Set<PccExamineReport> setReportIds = new HashSet<PccExamineReport>();
 		// Map<String,Integer> mapName=new HashMap<String,Integer>();
-		for (int i = 0; i < listSelected.size(); ++i) {
-			PccExamineReport tempPcc = listSelected.get(i);
+		for (int i = 0; i < listTotalReport.size(); ++i) {
+			PccExamineReport tempPcc = listTotalReport.get(i);
 			String tempBoId = tempPcc.getId();
 			Integer status = tempPcc.getStatus();
 			if (status != null && status == 2) {

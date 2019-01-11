@@ -34,8 +34,6 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private String name;
 	private String description;
 
-	
-
 	public Long getKey() {
 		return key;
 	}
@@ -60,4 +58,29 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 		this.description = description;
 	}
 
+	@Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (key != null ? key.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the key fields are
+        // not set
+        if (!(object instanceof NurseSiteMaintainConfigCheckItem)) {
+            return false;
+        }
+        NurseSiteMaintainConfigCheckItem other = (NurseSiteMaintainConfigCheckItem) object;
+        if ((this.key == null && other.key != null) || (this.key != null && !this.key.equals(other.key))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "NurseSiteMaintainConfigCheckItem [ key=" + key + " ]";
+    }
 }

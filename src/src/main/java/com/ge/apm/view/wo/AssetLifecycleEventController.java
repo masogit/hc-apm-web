@@ -59,6 +59,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected StreamedContent exportFile;
 	protected boolean blnAllSelected;
 	protected int tabStatus;
+	protected String descriptionStatusFilter;
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
@@ -270,4 +271,12 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		// TODO Auto-generated method stub
 		
 	}
+	public String getDescriptionStatusFilter() {
+		return descriptionStatusFilter;
+	}
+
+	public void setDescriptionStatusFilter(String descriptionStatusFilter) {
+		this.descriptionStatusFilter = descriptionStatusFilter;
+	}
+	
 }

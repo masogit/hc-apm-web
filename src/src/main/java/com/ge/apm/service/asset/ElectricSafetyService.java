@@ -58,6 +58,7 @@ public class ElectricSafetyService {
     private final String UPDATE="UPDATE";
     private final String INSERT="INSERT";
     private UserAccount user;
+    private Pattern p=Pattern.compile("([+-\\.0-9]+).*");
     
     @Autowired
     AssetInfoRepository assetInfoRepository;
@@ -811,16 +812,9 @@ public class ElectricSafetyService {
 	private double parseDouble(Object obj){
 		String str=obj.toString();
 		if(StringUtils.isNotEmpty(str)){
-			int length=str.length();
-			while(length>0){
-				try {
-					return Double.parseDouble(str);
-				} catch (Exception e) {
-					// TODO: handle exception
-					LOGGER.error(e.getMessage());
-				}
-				str=str.substring(1, str.length());
-				length=str.length();
+			Matcher m=p.matcher(str);
+			if(m.find()){
+				return Double.parseDouble(m.group(1));
 			}
 		}
 		return 0;
