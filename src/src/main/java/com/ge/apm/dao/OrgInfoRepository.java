@@ -42,6 +42,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=4 and t.siteUID=?2")
     public List<OrgInfo> getDepartmentByName(Set<String> name,String siteUID);
+    
+    @Query(value="select o.* from org_info o where o.parent_uid=?1",nativeQuery=true)
+    public List<OrgInfo> fetchOrgByParentUid(String parentUid);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     @Query("select t from OrgInfo t where t.siteId=?1 order by t.orgLevel, t.parentOrg")
