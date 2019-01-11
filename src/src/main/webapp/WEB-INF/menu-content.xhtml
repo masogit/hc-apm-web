@@ -40,7 +40,7 @@
                 <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.versionContains('assetAdjust.config')}"/>
                 <p:menuitem id="um909" value="调剂名称设置" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.versionContains('assetAdjust.nameConfig')}"/>
             </p:submenu>
-            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,AssetHead')  and userContextService.versionContains('install')}">
+            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')  and userContextService.versionContains('install')}">
                 <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.versionContains('install.list')}"/>
                 <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.versionContains('install.store')}"/>
                 <p:menuitem value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.needInstorageCheck() and userContextService.versionContains('install.check')}"/>
@@ -153,7 +153,7 @@
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
             </p:submenu>
-            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('examineMgt') and userContextService.isUltraSoundIBEndUser()}">
+            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('examineMgt') and (userContextService.isUltraSoundIBEndUser() or userContextService.hasAnyRole('SuperAdmin'))}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
                     <p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.versionContains('examineMgt.pccConfig') and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')}"/>
             </p:submenu>

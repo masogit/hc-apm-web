@@ -47,7 +47,13 @@
 					filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 				</p:column>
-				<p:column headerText="状态">
+				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetLifecycleEvent4Controller.descriptionStatusFilter}">
+							<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
+							<f:selectItems value="#{fieldMsg.getFieldValueList('assetLifecycleEventStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+						</p:selectOneMenu>
+					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent4Controller.getMsStatus(item)}" />
 				</p:column>
 				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
