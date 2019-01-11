@@ -545,13 +545,31 @@ public class UserAccountImportService {
 				listUserOrgInfo=new ArrayList<UserOrgInfo>();
 				user.setListImportUserOrgInfo(listUserOrgInfo);
 			}
+			Integer orgType=tempOrgInfo.getOrgType();
 			UserOrgInfo tempUserOrgInfo=new UserOrgInfo();
-			tempUserOrgInfo.setOrgType(tempOrgInfo.getOrgType());
+			tempUserOrgInfo.setOrgType(orgType);
 			tempUserOrgInfo.setOrgUid(tempOrgInfo.getUid());
 			tempUserOrgInfo.setUserUid(user.getUid());
 			listUserOrgInfo.add(tempUserOrgInfo);
+			if(orgType==4){
+				addClinicalUserOrg(listUserOrgInfo,tempOrgInfo,user.getUid());
+			}
 		}
 		return true;
+	}
+	
+	private void addClinicalUserOrg(List<UserOrgInfo> listUserOrgInfo,OrgInfo tempOrgInfo,String userUid){
+		List<OrgInfo> listOrgInfo=orgInfoRepository.fetchOrgByParentUid(tempOrgInfo.getUid());
+		if(listOrgInfo!=null){
+			for(int i=0;i<listOrgInfo.size();++i){
+				OrgInfo tempOrg=listOrgInfo.get(i);
+				UserOrgInfo tempUserOrgInfo=new UserOrgInfo();
+				tempUserOrgInfo.setOrgType(tempOrg.getOrgType());
+				tempUserOrgInfo.setOrgUid(tempOrg.getUid());
+				tempUserOrgInfo.setUserUid(userUid);
+				listUserOrgInfo.add(tempUserOrgInfo);
+			}
+		}
 	}
 	
 	private boolean supplementAccessScope(UserAccount user){

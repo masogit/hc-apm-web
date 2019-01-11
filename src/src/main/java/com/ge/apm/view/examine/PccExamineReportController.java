@@ -462,7 +462,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			zout.close();
 			exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
 		} catch (Exception e) {
-			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+			LOGGER.error(e.getMessage());
+			WebUtil.addErrorMessage("下载报告失败！");
 		}
 	}
 
@@ -507,7 +508,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			zout.close();
 			exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
 		} catch (Exception e) {
-			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+			LOGGER.error(e.getMessage());
+			WebUtil.addErrorMessage("下载报告失败！");
 		}
 	}
 
