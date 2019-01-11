@@ -18,6 +18,18 @@
                             <label class="label">#{msg.assetName}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.assetName}" />
                         </h:panelGroup>
+
+
+                        <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                            <label class="label">MVS合同起始日</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractStartDate}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                            <label class="label">MVS合同截止日</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractEndDate}" />
+                        </h:panelGroup>
+
+
                         <h:panelGroup>
                             <label class="label">#{msg.departNum}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.departNum}" />
