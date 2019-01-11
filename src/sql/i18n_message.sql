@@ -1681,6 +1681,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'business', '业务版', 'Business Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'ultrasound', '超声科室版', 'Ultrasound Dept', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Open', 'Open', 'Open', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Assigned', 'Assigned', 'Assigned', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Equipment Up', 'Equipment Up', 'Equipment Up', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Closed', 'Closed', 'Closed', NULL, '-1');
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '1',  '编辑','edit', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '2',  '排班','schedule', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '3',  '调剂','adjust', NULL, '-1');
