@@ -164,12 +164,14 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageHeaderFields());
                 break;
             case "MobileWorkOrderFieldsList":
+                List<String> assetFields = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields").toJavaList(String.class);
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields").contains(item))
-                        .collect(Collectors.toList()));
+                        .filter(item -> !assetFields.contains(item)).collect(Collectors.toList()));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
-                addFieldsList.addAll(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields").toJavaList(String.class));
+                addFieldsList.addAll(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields").toJavaList(String.class));
                 break;
             
         }
@@ -329,18 +331,28 @@ public class CustomConfigController {
                 customConfigObject.getAssetsEditpageFinicialFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
             case "MobileWorkOrderFieldsList":
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder")
-                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields")));
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields")
+                
+                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
+                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")));
+                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
+                        .getJSONArray("assetInfoFields")
                         .addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                        && !customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields").contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
+                        && !customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(groupitem-> Objects.equals("assetInfo",groupitem.getString("type"))).findAny().get().getJSONArray("assetInfoFields").contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder")
-                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields")));
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields")
+                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
+                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")));
+                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")
                         .removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                        && customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("assetInfoFields").contains(item.getKey()))
+                        && customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
+                        .filter(groupitem-> Objects.equals("assetInfo",groupitem.getString("type"))).findAny().get().getJSONArray("assetInfoFields").contains(item.getKey()))
                                 .map(Entry::getKey).collect(Collectors.toList()));
                 break;
         }
