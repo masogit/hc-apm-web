@@ -17,10 +17,10 @@ import webapp.framework.dao.GenericRepositoryUUID;
 public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<NurseSiteMaintainItem> {
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1",nativeQuery=true)
-	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId);
+	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId);
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
-	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(Set<String> parentIds);
+	public List<NurseSiteMaintainItem> findMaintainItemByParentId(Set<String> parentIds);
 	
 	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
 	public Set<String> findIdsByParentId(Set<String> parentIds);

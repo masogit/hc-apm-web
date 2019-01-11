@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.CustomConfigConstant;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    
+    JSONObject mobilePage; 
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -187,4 +190,16 @@ public class CustomConfigObject {
         this.assetsMobilepageHeaderFields = assetsMobilepageHeaderFields;
     }
 
+    public JSONObject getMobilePage() {
+        if (mobilePage == null) {
+            mobilePage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+        }
+        return mobilePage;
+    }
+
+    public void setMobilePage(JSONObject mobilePage) {
+        this.mobilePage = mobilePage;
+    }
+
+    
 }
