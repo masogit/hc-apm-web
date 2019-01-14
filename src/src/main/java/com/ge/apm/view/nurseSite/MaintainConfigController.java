@@ -42,9 +42,6 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-/**
- * Created by 212605082 on 2017/10/11.
- */
 @ManagedBean
 @ViewScoped
 public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface {

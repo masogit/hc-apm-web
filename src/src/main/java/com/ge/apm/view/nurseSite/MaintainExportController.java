@@ -32,9 +32,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-/**
- * Created by 212605082 on 2018/5/8.
- */
 @ManagedBean
 @ViewScoped
 public class MaintainExportController implements ServerEventInterface{

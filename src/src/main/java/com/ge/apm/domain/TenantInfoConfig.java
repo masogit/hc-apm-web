@@ -397,6 +397,8 @@ public class TenantInfoConfig {
 				listLabel.add("日常维护设置");
 				listKey.add("nurseSite.report");
 				listLabel.add("日常维护报表");
+				listKey.add("nurseSite.optRecord");
+				listLabel.add("开关机检查");
 				listKey.add("knowledge");
 				listLabel.add("知识文档");
 				listKey.add("knowledge.mgt");
