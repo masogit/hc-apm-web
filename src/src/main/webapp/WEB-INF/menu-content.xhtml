@@ -93,6 +93,7 @@
                        <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.maintain')}"/>
                        <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.config')}"/>
                        <p:menuitem id="um703" value="日常维护报表" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.report')}"/>
+                       <p:menuitem id="um704" value="开关机检查" outcome="/portal/nurseSite/assetOptRecordList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,NursingStaff') and userContextService.versionContains('nurseSite.optRecord')}"/>
             </p:submenu>
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')  and userContextService.versionContains('knowledge')}">
                 <p:menuitem id="um32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.versionContains('knowledge.mgt')}"/>
