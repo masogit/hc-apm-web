@@ -92,7 +92,7 @@ public class AssetOptRecord implements Serializable {
 	private UserAccount modifyBy;
 	
 	@Transient
-	@JsonFormat(pattern = "dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
 	private Date costTime;
 
 	// 0：进行中，1：完成
