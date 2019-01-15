@@ -378,6 +378,17 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('assetFunctionGrade',item.functionGrade)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'proprietaryClass'}">
+                                <p:column headerText="#{msg.proprietaryClass}" sortBy="#{item.proprietaryClass}" filterBy="#{item.proprietaryClass}" filterMatchMode="EQ" >
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('proprietaryClass',item.proprietaryClass)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'maitanance'}">
                                 <p:column headerText="#{msg.maitanance}" >
                                     <h:outputText value="#{item.maitanance}"/>

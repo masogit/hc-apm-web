@@ -482,6 +482,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringStatus', '计量状态', 'Measuring Status', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'accountingCategory', '核算类别', 'Accounting Category', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'maintenanceValue', '维修价值', 'Maintenance Value', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'proprietaryClass', '专有分类', 'Proprietary Classification', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'creatorUID', '创建人', 'Creator', NULL, '-1');
@@ -714,6 +715,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '5', '借用', 'OrderType5', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListProcessType', 'Normal', '正常', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListProcessType', 'Easy', '简易', 'Easy', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('proprietaryClass', '1', '一般设备', '一般设备', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('proprietaryClass', '2', '仪器仪表及量具', '仪器仪表及量具', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('proprietaryClass', '3', '专用设备', '专用设备', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('inventoryStatus', '0', '未盘点', NULL, NULL, '-1');

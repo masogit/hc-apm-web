@@ -466,6 +466,10 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "ib_status")
     private Integer ibStatus;
+    
+    //专有分类 YHAAO-3890 一般设备、仪器仪表及量具、专用设备 3类
+    @Column(name = "proprietary_class")
+    private String proprietaryClass;
 
     @Column(name = "ge_device_type")
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
@@ -1667,6 +1671,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSubjectProject(String subjectProject) {
         this.subjectProject = subjectProject;
+    }
+
+    public String getProprietaryClass() {
+        return proprietaryClass;
+    }
+
+    public void setProprietaryClass(String proprietaryClass) {
+        this.proprietaryClass = proprietaryClass;
     }
     
     @Override

@@ -24,7 +24,7 @@ public class CustomConfigConstant {
     
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass");
     }
     
     //只读字段
@@ -123,6 +123,7 @@ public class CustomConfigConstant {
             exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("所属课题项目", "subjectProject");
             exportFields.put("创建日期", "createdDate");
+            exportFields.put("专有分类", "proprietaryClass");
 
             exportFields.put("UUID", "UUID");
 
@@ -212,6 +213,7 @@ public class CustomConfigConstant {
             allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
             allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
             allFields.put("createdDate", WebUtil.getMessage("createdDate"));
+            allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
         }
         return allFields;
     }
