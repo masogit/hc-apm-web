@@ -33,7 +33,7 @@ public class AssetAlertConfig implements Serializable {
     @Column(name = "asset_uid")
     private String assetUid;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), insertable = false, updatable = false)
     private AssetInfo assetInfo;
 
