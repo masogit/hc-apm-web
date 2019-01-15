@@ -14,10 +14,7 @@
             <div class="ui-g-12 card">
                 <h:form >
                     <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
-                    &#160;
-                    <!--                    <p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
-                                                         title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
-                                                         oncomplete="PF('generateQrCodesDialog').show()"/>-->
+                    <p:commandButton id="importQrcode" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
                 </h:form>
 
                 <h:form id="qrCodeLibListForm">

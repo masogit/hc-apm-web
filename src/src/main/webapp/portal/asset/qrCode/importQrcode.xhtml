@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.Import}二维码"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="importForm">
+
+                    <h:panelGroup >
+                        <p:commandButton value="上传文件"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
+                        <h:outputText value="#{qrCodeImportController.file.fileName}" />
+                        <!--<p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>-->
+                    </h:panelGroup>
+                    
+                    <p:dataTable id="importTable" widgetVar="varDataList" value="#{qrCodeImportController.importQrCodeMap.values()}" var="item" rows="20" paginator="true" 
+                                 selection="#{compareImportController.selectedItem}" rowKey="#{item['RowIndex']}"  selectionMode="single" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+                        
+                        <!--<p:ajax event="rowSelect" listener="#{compareImportController.onSelectedChange}" update=":ItemViewForm"/>-->
+                        <p:column headerText="#{msg.assetName}" >
+                            <h:outputText value="#{item['QrcodeItem']}"/>
+                        </p:column>
+                        <p:column headerText="使用院区" >
+                            <h:outputText value="#{item['org']}"/>
+                        </p:column>
+                        <p:column headerText="状态" >
+                            <f:facet name="filter">
+<!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem value="成功" itemLabel="成功" itemValue="成功"/>
+                                    <f:selectItem value="失败" itemLabel="失败" itemValue="失败"/>
+                                </p:selectOneMenu>-->
+                            </f:facet>
+                            <h:outputText value="#{item['status']}"/>
+                        </p:column>
+                        <p:column headerText="结果" >
+                            <h:outputText value="#{item['res']}"/>
+                        </p:column>
+                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="importButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Import}" actionListener="#{qrCodeImportController.importAllCode}" update=":importForm importTable :growl" 
+                                             disabled="#{empty qrCodeImportController.importQrCodeMap}"/>
+                         </f:facet>
+                    </p:dataTable>
+
+
+                </h:form>
+            </div>
+        </div>
+
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传数据文件">
+            <h:form id="uploadDialogForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.hospitalId}</label>
+                            <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeImportController.selectedSiteUID}"  autoWidth="false" style="max-width: 150px;" >
+                                <p:ajax  listener="#{qrCodeImportController.onSiteChange}" update=":importForm"/>
+                                <f:selectItems value="#{qrCodeImportController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <h:outputText   value="#{qrCodeImportController.file.fileName}"  rendered="#{not empty qrCodeImportController.file}"/>
+                            <p:fileUpload  fileUploadListener="#{qrCodeImportController.uploadDataFile}" value="#{qrCodeImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty qrCodeImportController.file}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>1. <a href="QRCodeImportTemplate.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>
+                            <p>1. 文件中填入要导入的二维码</p>
+                            <p>2. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton immediate="false" validateClient="true" actionListener="#{qrCodeImportController.finishUpload()}" disabled="#{empty qrCodeImportController.file}" value="#{msg.Confirm}" update=":uploadDialogForm :importForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{qrCodeImportController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('rateDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>
+
