@@ -7,6 +7,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -19,7 +20,6 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -164,14 +164,11 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageHeaderFields());
                 break;
             case "MobileWorkOrderFieldsList":
-                List<String> assetFields = customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields").toJavaList(String.class);
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !assetFields.contains(item)).collect(Collectors.toList()));
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",item)).collect(Collectors.toList()));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
-                addFieldsList.addAll(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields").toJavaList(String.class));
+                addFieldsList.addAll(((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
             
         }
@@ -331,29 +328,14 @@ public class CustomConfigController {
                 customConfigObject.getAssetsEditpageFinicialFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
             case "MobileWorkOrderFieldsList":
-                
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
-                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")));
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
-                        .getJSONArray("assetInfoFields")
-                        .addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                        && !customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(groupitem-> Objects.equals("assetInfo",groupitem.getString("type"))).findAny().get().getJSONArray("assetInfoFields").contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
+                JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                                .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get()
-                        .put("assetInfoFields", new JSONArray(customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")));
-                customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(item-> Objects.equals("assetInfo",item.getString("type"))).findAny().get().getJSONArray("assetInfoFields")
-                        .removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                        && customConfigObject.getMobilePage().getJSONObject("pageWorkOrder").getJSONArray("group").toJavaList(JSONObject.class).stream()
-                        .filter(groupitem-> Objects.equals("assetInfo",groupitem.getString("type"))).findAny().get().getJSONArray("assetInfoFields").contains(item.getKey()))
-                                .map(Entry::getKey).collect(Collectors.toList()));
+                JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                                .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
         }
         cancelAddFields();
@@ -457,6 +439,19 @@ public class CustomConfigController {
     
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
+    }
+    
+    public void moveItem(JSONObject groupItem, String oper){
+        JSONArray groups = ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group"));
+        int index = groups.indexOf(groupItem);
+        if ("up".equals(oper) && index >= 1) {
+            groups.set(index, groups.get(index - 1));
+            groups.set(index - 1, groupItem);
+        }
+        if ("down".equals(oper) && index < groups.size() - 1) {
+            groups.set(index, groups.get(index + 1));
+            groups.set(index + 1, groupItem);
+        }
     }
 
     //for 10.1 update
