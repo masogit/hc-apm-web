@@ -99,12 +99,12 @@ public class AssetOptRecord implements Serializable {
 	@Column(name = "status")
 	private Integer status = 0;
 
-	@Column(name = "signature_id")
-	private String signatureId;
-
-	// NULL:no signature,0:from web(file text),1:from weixin(file stream)
-	@Column(name = "signature_source_type")
-	private Integer signatureSourceType;
+//	@Column(name = "signature_id")
+//	private String signatureId;
+//
+//	// NULL:no signature,0:from web(file text),1:from weixin(file stream)
+//	@Column(name = "signature_source_type")
+//	private Integer signatureSourceType;
 
 	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
 	private String clinicalDeptUID;// 设备使用科室
@@ -226,16 +226,16 @@ public class AssetOptRecord implements Serializable {
 		this.status = status;
 	}
 
-	public String getSignatureId() {
-		return signatureId;
-	}
-
-	public void setSignatureId(String signatureId) {
-		if (StringUtils.isNotEmpty(signatureId)) {
-			this.signatureSourceType = 1;
-		}
-		this.signatureId = signatureId;
-	}
+//	public String getSignatureId() {
+//		return signatureId;
+//	}
+//
+//	public void setSignatureId(String signatureId) {
+//		if (StringUtils.isNotEmpty(signatureId)) {
+//			this.signatureSourceType = 1;
+//		}
+//		this.signatureId = signatureId;
+//	}
 
 	public String getClinicalDeptUID() {
 		return clinicalDeptUID;
@@ -253,13 +253,13 @@ public class AssetOptRecord implements Serializable {
 		this.clinicalDeptName = clinicalDeptName;
 	}
 
-	public Integer getSignatureSourceType() {
-		return signatureSourceType;
-	}
-
-	public void setSignatureSourceType(Integer signatureSourceType) {
-		this.signatureSourceType = signatureSourceType;
-	}
+//	public Integer getSignatureSourceType() {
+//		return signatureSourceType;
+//	}
+//
+//	public void setSignatureSourceType(Integer signatureSourceType) {
+//		this.signatureSourceType = signatureSourceType;
+//	}
 
 	public Date getStartDate() {
 		return startDate;
