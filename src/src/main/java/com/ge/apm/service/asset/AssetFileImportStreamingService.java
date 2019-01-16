@@ -191,6 +191,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue("二维码", "setQrCode");
 //                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
+                assetRow.setFieldDropdownValueAsString("专有分类", "setProprietaryClass", proprietaryClassList, map, null);
+
                 supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
 
                 map.put("asset", asset);
