@@ -307,3 +307,4 @@ update message_subscriber set meter_hit =false where meter_hit is null
 
 --2019-v1.2
 ALTER TABLE public.nurse_site_maintain_config DROP COLUMN check_items;
+update pm_order_rule_check_list set status = 1 where status is null;
