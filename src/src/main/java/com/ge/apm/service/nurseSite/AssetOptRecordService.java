@@ -16,11 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetOptRecordRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetOptRecord;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
+import com.ibm.icu.util.Calendar;
 
 
 @Service
@@ -34,6 +37,8 @@ public class AssetOptRecordService {
 	@Autowired
 	AssetInfoRepository assetInfoRepository;
 	@Autowired
+	OrgInfoRepository orgInfoRepository;
+	@Autowired
 	UaaService uaaService;
 	public AssetOptRecordRepository getAssetOptRecordRepository(){
 		return assetOptRecordRepository;
@@ -41,6 +46,33 @@ public class AssetOptRecordService {
 	
 	public Set<String> findAccessClinicalUidListByUserUid(String userUid){
 		return uaaService.findAccessClinicalUidListByUserUid(userUid);
+	}
+	private String generateCostTime(Date start,Date end){
+		Calendar ca1=Calendar.getInstance();
+		ca1.setTime(start);
+		Calendar ca2=Calendar.getInstance();
+		ca2.setTime(end);
+		int year=ca1.fieldDifference(end, Calendar.YEAR);
+		int day=ca1.fieldDifference(end, Calendar.DAY_OF_YEAR);
+		int hour=ca1.fieldDifference(end, Calendar.HOUR_OF_DAY);
+		int minute=ca1.fieldDifference(end, Calendar.MINUTE);
+		StringBuilder sb=new StringBuilder();
+		if(year>0){
+			sb.append(year+"年");
+		}
+		if(day>0){
+			sb.append(day+"天");
+		}
+		if(hour>0){
+			sb.append(hour+"时");
+		}
+		if(minute>0){
+			sb.append(minute+"分");
+		}
+		return sb.toString();
+	}
+	public OrgInfo fetchOrgInfoByUid(String uid){
+		return orgInfoRepository.findByUid(uid);
 	}
 	public void supplementCostTime(List<AssetOptRecord> listRecord){
 		if(listRecord!=null && listRecord.size()>0){
@@ -50,10 +82,7 @@ public class AssetOptRecordService {
 				Date startDate=tempRecord.getStartDate();
 				Date endDate=tempRecord.getEndDate();
 				if(startDate!=null && endDate!=null){
-					long costTime=endDate.getTime()-startDate.getTime();
-					Date costDate=new Date();
-					costDate.setTime(costTime);
-					tempRecord.setCostTime(costDate);
+					tempRecord.setCostTime(generateCostTime(startDate, endDate));
 				}
 			}
 		}
@@ -107,10 +136,7 @@ public class AssetOptRecordService {
 				Date startDate=tempRecord.getStartDate();
 				Date endDate=tempRecord.getEndDate();
 				if(startDate!=null && endDate!=null){
-					long costTime=endDate.getTime()-startDate.getTime();
-					Date costDate=new Date();
-					costDate.setTime(costTime);
-					tempRecord.setCostTime(costDate);
+					tempRecord.setCostTime(generateCostTime(startDate, endDate));
 				}
 			}
 		}

@@ -27,7 +27,7 @@
 					</p:scrollPanel>
 				</p:overlayPanel>
 			</h:panelGroup>
-			<h:panelGroup>
+			<h:panelGroup rendered="#{searchController.blnDepartOrg}">
 				<label class="label">所属科室</label>
 				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoConverter">
 					<p:autoUpdate></p:autoUpdate>
