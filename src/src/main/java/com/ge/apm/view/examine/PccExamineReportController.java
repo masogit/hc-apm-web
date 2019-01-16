@@ -2,6 +2,7 @@ package com.ge.apm.view.examine;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.examine.PccExamineReportService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -415,6 +417,31 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		} else {
 			addMessage("请上传报告传模板");
 		}
+	}
+	public void exportSelectedExcel(){
+		this.exportFile = null;
+		onPageSelect(null);
+		List<PccExamineReport> listTotalReport=new ArrayList<PccExamineReport>();
+		if (mapListSelected == null || mapListSelected.size() == 0) {
+			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
+			return;
+		}
+		for(List<PccExamineReport> listTemp:mapListSelected.values()){
+			listTotalReport.addAll(listTemp);
+		}
+		downloadFile(service.parseMaintainToMap(listTotalReport));
+	}
+	private void downloadFile(List<Map<String,Object>> data){
+		try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/examine/pccExamineReportTemplate.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = service.exportData(doc, data);
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "pccExamineReport.xlsx");
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
 	}
 
 	public void downloadSelectedReport() {

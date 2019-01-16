@@ -55,19 +55,26 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 	private Set<String> setOrgUid;
 	private List<String> listOrgUid;
 	private String assetGroupFilter;
+	private SearchController searchController;
+	private OrgInfo selectOrgInfo;
 
 	@Override
 	protected void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		service = WebUtil.getBean(AssetOptRecordService.class);
+		searchController=WebUtil.getBean(SearchController.class);
+		searchController.setCallingController(this);
+		searchController.setUpdateViewIDs(":optRecordListForm");
+		searchController.setType(5);
+		searchController.updateData();
 		dao = service.getAssetOptRecordRepository();
 		setOrgUid = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
 		if (setOrgUid != null) {
 			listOrgUid = new ArrayList<String>();
 			listOrgUid.addAll(setOrgUid);
 		}
-
+		this.selectOrgInfo=service.fetchOrgInfoByUid(currentUser.getSiteUID());
 		// test
 	}
 
@@ -84,8 +91,12 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 		}
 		// need list or set
 		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
+		searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+		searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+		searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
 		List<SearchFilter> listNewSearchFilter=new ArrayList<SearchFilter>();
-		int count=2;
+		int count=3;
 		for (SearchFilter tempFilter : searchFilters) {
 			if (tempFilter.fieldName.equals("assetInfo.name")) {
 				tempFilter.conditionPath="1*"+count+"+";
@@ -120,8 +131,15 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
+		try {
+			OrgInfo orgInfo=(OrgInfo)eventObject;
+			if(orgInfo!=null){
+				selectOrgInfo=orgInfo;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
-
 	@Override
 	public void onBeforeNewObject(AssetOptRecord object) {
 		super.onBeforeNewObject(object);
@@ -186,6 +204,14 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
+	public OrgInfo getSelectOrgInfo() {
+		return selectOrgInfo;
+	}
+
+	public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
+		this.selectOrgInfo = selectOrgInfo;
 	}
 
 }
