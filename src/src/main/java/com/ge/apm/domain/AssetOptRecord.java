@@ -92,8 +92,7 @@ public class AssetOptRecord implements Serializable {
 	private UserAccount modifyBy;
 	
 	@Transient
-	@JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
-	private Date costTime;
+	private String costTime;
 
 	// 0：进行中，1：完成
 	@Column(name = "status")
@@ -309,11 +308,11 @@ public class AssetOptRecord implements Serializable {
 		this.assetInfo = assetInfo;
 	}
 
-	public Date getCostTime() {
+	public String getCostTime() {
 		return costTime;
 	}
 
-	public void setCostTime(Date costTime) {
+	public void setCostTime(String costTime) {
 		this.costTime = costTime;
 	}
 
