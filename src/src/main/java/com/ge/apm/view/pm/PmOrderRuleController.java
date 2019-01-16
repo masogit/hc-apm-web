@@ -700,13 +700,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
 
-    public boolean notApproved(){
+    public boolean isDisable(){
         if(selected == null){
-            return true;
+            return false;
         }
         boolean isAssetHead = UserContextService.checkRole("AssetHead");
         if(isAssetHead){
-            return true;
+            return false;
         }else{
             return selected.getStatus() == 1 ? true : false;
         }
