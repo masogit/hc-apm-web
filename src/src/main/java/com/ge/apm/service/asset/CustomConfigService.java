@@ -5,7 +5,9 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.CustomConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SysRoleRepository;
@@ -204,6 +206,10 @@ public class CustomConfigService {
         }
         if (customConfigObject.getAssetsMobilepageHeaderFields().contains(key)) {
             customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
+        }
+        if (JSONPath.containsValue(customConfigObject.getMobilePage(), "$.pageWorkOrder.group[type='assetInfo'].assetInfoFields",key)) {
+            JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).fluentRemove(key));
         }
     }
 
