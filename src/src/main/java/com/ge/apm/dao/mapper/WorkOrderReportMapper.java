@@ -1,6 +1,7 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.dao.mapper.provider.WorkOrderReportProvider;
+import com.ge.apm.domain.pure.AssetWorkOrder;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.domain.pure.WorkOrderReport;
 import org.apache.ibatis.annotations.Param;
@@ -38,4 +39,7 @@ public interface WorkOrderReportMapper {
 
     @SelectProvider(type = WorkOrderReportProvider.class,method="workOrderExport")
     public List<WorkOrderExportPojo> workOrderExport(@Param("filters") List<SearchFilter> filters);
+
+    @SelectProvider(type = WorkOrderReportProvider.class,method="statisticsAssetWorkOrder")
+    public List<AssetWorkOrder> statisticsAssetWorkOrder(@Param("filters") List<SearchFilter> filters);
 }
