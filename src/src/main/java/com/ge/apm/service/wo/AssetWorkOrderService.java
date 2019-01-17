@@ -1,13 +1,9 @@
 package com.ge.apm.service.wo;
 
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.ge.apm.dao.mapper.AssetWorkOrderMapper;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetWorkOrder;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
