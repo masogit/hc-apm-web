@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,13 +40,13 @@ public class QrCodeImportController {
     private String selectedSiteUID;
 
     private UaaService uaaService;
-    
+
     private QrCodeService qrcodeService;
-    
+
     private List<OrgInfo> orgInfoList;
-    
+
     private Map<String, Map<String, Object>> importQrCodeMap;
-    
+
     @PostConstruct
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
@@ -54,10 +55,31 @@ public class QrCodeImportController {
 
     public void cancelUpload() {
         this.file = null;
+        importQrCodeMap=new HashMap();
     }
 
     public void finishUpload() {
-        ExcelDocument doc = null;
+    }
+
+    public void onSiteChange() {
+
+    }
+
+    public List<OrgInfo> getHospitalFileterList() {
+        if (null == orgInfoList) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
+        }
+        return orgInfoList;
+    }
+
+    public void importAllCode() {
+        importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap, orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().get());
+    }
+
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc=null;
+        this.file = event.getFile();
         try {
             InputStream in = new ByteArrayInputStream(file.getContents());
             doc = new ExcelDocument(in, ExcelDocument.parseTypeByFileName(file.getFileName()));
@@ -73,27 +95,6 @@ public class QrCodeImportController {
                 doc.release();
             }
         }
-    }
-
-    public void onSiteChange() {
-
-    }
-
-    public List<OrgInfo> getHospitalFileterList() {
-        if(null == orgInfoList) {
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
-        }
-        return orgInfoList;
-    }
-    
-    
-    public void importAllCode(){
-        importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap,orgInfoList.stream().filter(item-> Objects.equals(item.getUid(),selectedSiteUID)).findAny().get());
-    }
-
-    public void uploadDataFile(FileUploadEvent event) {
-        this.file = event.getFile();
     }
 
     public UploadedFile getFile() {
@@ -119,6 +120,5 @@ public class QrCodeImportController {
     public void setImportQrCodeMap(Map<String, Map<String, Object>> importQrCodeMap) {
         this.importQrCodeMap = importQrCodeMap;
     }
-    
 
 }

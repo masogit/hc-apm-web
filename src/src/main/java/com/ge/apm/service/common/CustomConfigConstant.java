@@ -18,7 +18,7 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
-    public static final String DEFAULT_MOBILE_PAGE_JSON = "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"siteUID\",\"clinicalDeptName\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"requestReason\":{\"defaultValue\":\"设备故障\",\"enable\":true,\"required\":true}}]}}";
+    public static final String DEFAULT_MOBILE_PAGE_JSON = "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"siteUID\",\"clinicalDeptName\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"设备故障\",\"enable\":true,\"required\":true}}]}}";
 
     
     //默认不使用的字段
