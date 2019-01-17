@@ -513,7 +513,9 @@ public class NurseSiteMaintainService {
                         JSONObject obj=jsonArray.getJSONObject(i);
                         String name=obj.getString("name");
                         NurseSiteMaintainData tempData=findObjInList(listTempData, name);
-                        listNewData.add(tempData);
+                        if(tempData!=null){
+                        	listNewData.add(tempData);
+                        }
                     }
                     tempItem.setListData(listNewData);
                 }
