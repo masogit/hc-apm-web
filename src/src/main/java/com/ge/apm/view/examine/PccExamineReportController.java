@@ -295,9 +295,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	}
 	
 	public void onPageSelect(PageEvent event){
-		if(listSelected!=null && listSelected.size()>0){
-			mapListSelected.put(currentPage, listSelected);
-		}
+		mapListSelected.put(currentPage, listSelected);
 	}
 
 	public String getEditPage(String id, String assetuid, String actionName) {
@@ -427,7 +425,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			return;
 		}
 		for(List<PccExamineReport> listTemp:mapListSelected.values()){
-			listTotalReport.addAll(listTemp);
+			if(listTemp!=null){
+				listTotalReport.addAll(listTemp);
+			}
 		}
 		downloadFile(service.parseMaintainToMap(listTotalReport));
 	}
@@ -453,7 +453,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			return;
 		}
 		for(List<PccExamineReport> listTemp:mapListSelected.values()){
-			listTotalReport.addAll(listTemp);
+			if(listTemp!=null){
+				listTotalReport.addAll(listTemp);
+			}
 		}
 		Set<PccExamineReport> setReportIds = new HashSet<PccExamineReport>();
 		// Map<String,Integer> mapName=new HashMap<String,Integer>();

@@ -69,7 +69,9 @@ public class SearchController {
 	protected int type = 0;
 	boolean blnAccessScope = false;
 	boolean blnDepartOrg=false;
+	boolean blnDepartOrgUpdate=false;
 	boolean blnOrgTree = false;
+	boolean blnOrgTreeUpdate=false;
 	boolean showDialog = false;
 	boolean blnAssetName = false;
 	boolean blnAssetType = false;
@@ -82,6 +84,7 @@ public class SearchController {
 	boolean blnFilterStatus = true;
 	boolean blnFilterValied = true;
 	boolean blnFilterDelete = true;
+	boolean blnUpdate=false;
 	List<SearchFilter> listSearchFilter;
 	DualListModel<AssetInfo> availableAssets;
 	List<AssetInfo> listUnSelectedAssetInfo;
@@ -129,9 +132,10 @@ public class SearchController {
 		assetGroup = "";
 		functionType = "";
 		threeQrCode = "";
-
+		blnUpdate=false;
 		blnAccessScope = false;
 		blnOrgTree = false;
+		blnOrgTreeUpdate=false;
 		blnAssetName = false;
 		blnAssetType = false;
 		blnAssetGroup = false;
@@ -141,6 +145,7 @@ public class SearchController {
 		blnAssetSelect = false;
 		blnChangeEvent = false;
 		blnDepartOrg=false;
+		blnDepartOrgUpdate=false;
 	}
 
 	public void updateData() {
@@ -162,6 +167,7 @@ public class SearchController {
 			fetchOriginSelectAssetInfo();
 		} else if (type == 3) {
 			blnDepartOrg=true;
+			blnDepartOrgUpdate=true;
 			blnChangeEvent = true;
 			blnAccessScope = true;
 			// fetchSiteOrgList();
@@ -179,6 +185,9 @@ public class SearchController {
 			fetchDeptOrgList(selectedOrg);
 			// fetchOriginPickListAssetInfo();
 		} else if (type == 5) {
+			blnChangeEvent = true;
+			blnAccessScope = true;
+			blnOrgTreeUpdate=true;
 		}
 	}
 
@@ -222,7 +231,8 @@ public class SearchController {
 	}
 
 	private void onChange() {
-		if (!generateListFilter()) {
+		generateListFilter();
+		if (!blnUpdate) {
 			return;
 		}
 		if (blnPickList) {
@@ -343,7 +353,7 @@ public class SearchController {
 		return autoCompleteService.completeAssetInfoList(query, listUnSelectedAssetInfo);
 	}
 
-	private boolean generateListFilter() {
+	private void generateListFilter() {
 		listSearchFilter = new ArrayList<SearchFilter>();
 		int filterCount = 0;
 		if (selectedOrg != null) {
@@ -395,9 +405,14 @@ public class SearchController {
 			}
 		}
 		if (filterCount > 1) {
-			return true;
+			blnUpdate=true;
 		}
-		return false;
+		else{
+			blnUpdate=false;
+		}
+		if(type==5){
+			blnUpdate=true;
+		}
 	}
 
 	public UserAccount getCurrentUser() {
@@ -696,5 +711,29 @@ public class SearchController {
 
 	public void setOtherSiteUID(String otherSiteUID) {
 		this.otherSiteUID = otherSiteUID;
+	}
+
+	public boolean isBlnDepartOrgUpdate() {
+		return blnDepartOrgUpdate;
+	}
+
+	public void setBlnDepartOrgUpdate(boolean blnDepartOrgUpdate) {
+		this.blnDepartOrgUpdate = blnDepartOrgUpdate;
+	}
+
+	public boolean isBlnOrgTreeUpdate() {
+		return blnOrgTreeUpdate;
+	}
+
+	public void setBlnOrgTreeUpdate(boolean blnOrgTreeUpdate) {
+		this.blnOrgTreeUpdate = blnOrgTreeUpdate;
+	}
+
+	public boolean isBlnUpdate() {
+		return blnUpdate;
+	}
+
+	public void setBlnUpdate(boolean blnUpdate) {
+		this.blnUpdate = blnUpdate;
 	}
 }
