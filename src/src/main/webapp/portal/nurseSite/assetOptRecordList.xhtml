@@ -7,8 +7,8 @@
 				<p:outputLabel class="pageTitle" value="设备开关机记录" />
 			</div>
 			<div class="ui-g-12 card ">
-				<ui:include src="/portal/asset/searchDiv.xhtml"/>
-				<h:form id="optRecordListForm">
+				<h:form id="optRecordListForm" rendered="#{not empty assetOptRecordController}">
+					<ui:include src="/portal/asset/searchDiv.xhtml"/>
 					<p:dataTable id="datalist" value="#{assetOptRecordController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{assetOptRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
 						sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -66,6 +66,10 @@
 						</p:column>
 						<p:column headerText="使用时长">
 							<h:outputText value="#{item.costTime}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="备注">
+							<h:outputText value="#{item.comment}">
 							</h:outputText>
 						</p:column>
 						<f:facet name="{Toolbar}">

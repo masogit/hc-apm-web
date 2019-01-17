@@ -48,8 +48,11 @@
 				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
 					<f:facet name="filter">
 						<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetLifecycleEvent3Controller.descriptionStatusFilter}">
-							<f:selectItem itemLabel="#{msg.All}" itemValue="#{null}" />
-							<f:selectItems value="#{fieldMsg.getFieldValueList('assetLifecycleEventStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItem itemLabel="Open" itemValue="Open" />
+							<f:selectItem itemLabel="Assigned" itemValue="Assigned" />
+							<f:selectItem itemLabel="Equipment Up" itemValue="Equipment Up" />
+							<f:selectItem itemLabel="Closed" itemValue="Closed" />
 						</p:selectOneMenu>
 					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent3Controller.getMsStatus(item)}" />
