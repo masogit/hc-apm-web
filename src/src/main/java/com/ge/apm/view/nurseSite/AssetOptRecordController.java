@@ -65,7 +65,7 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 		service = WebUtil.getBean(AssetOptRecordService.class);
 		searchController=WebUtil.getBean(SearchController.class);
 		searchController.setCallingController(this);
-		searchController.setUpdateViewIDs(":optRecordListForm");
+		searchController.setUpdateViewIDs(":optRecordListForm:datalist");
 		searchController.setType(5);
 		searchController.updateData();
 		dao = service.getAssetOptRecordRepository();

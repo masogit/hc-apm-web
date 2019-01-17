@@ -16,7 +16,7 @@
 					<p:scrollPanel style="height:300px;border: 0" mode="native">
 						<p:tree id="idCSTreeUser" class="tree" style="width:98%;border:0;" value="#{searchController.orgTree}" selection="#{searchController.selectedNode}"
 							var="node" selectionMode="single">
-							<p:ajax process="@this" event="select" update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo"
+							<p:ajax process="@this" event="select" update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo,#{searchController.blnOrgTreeUpdate?searchController.updateViewIDs:''}"
 								listener="#{searchController.onSelectOrgFromTree}" oncomplete="PF('varCSPanelOrg').hide();" />
 							<p:ajax process="@this" event="expand" />
 							<p:ajax process="@this" event="collapse" />
@@ -30,8 +30,7 @@
 			<h:panelGroup rendered="#{searchController.blnDepartOrg}">
 				<label class="label">所属科室</label>
 				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoConverter">
-					<p:autoUpdate></p:autoUpdate>
-					<p:ajax listener="#{searchController.onOrgDeptChange()}" update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.updateViewIDs}" />
+					<p:ajax listener="#{searchController.onOrgDeptChange()}" update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 				</p:selectOneMenu>
