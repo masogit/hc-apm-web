@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -673,6 +674,9 @@ public class QrCodeService {
                 item.getValue().put("status", "失败");
             } else if (newQrcode.length() < 4) {
                 item.getValue().put("res", "二维码不能少于4位");
+                item.getValue().put("status", "失败");
+            } else if(newQrcodeList.stream().anyMatch(saveditem-> Objects.equals(saveditem.getQrCode(),newQrcode))){
+                item.getValue().put("res", "文件中重复的二维码");
                 item.getValue().put("status", "失败");
             } else {
                 QrCodeLib qrcodeItem = this.findByQrCode(newQrcode, site.getUid());
