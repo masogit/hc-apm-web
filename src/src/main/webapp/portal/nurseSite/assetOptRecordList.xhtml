@@ -36,8 +36,8 @@
 							</f:facet>
 							<h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetInfo.assetGroup)}" />
 						</p:column>
-						<p:column headerText="所属院区" filterBy="#{assetOptRecordController.selectOrgInfo.name}" visible="false" exportable="true">
-							<h:outputText value="#{assetOptRecordController.selectOrgInfo.name}" />
+						<p:column headerText="所属院区" visible="false" exportable="true">
+							<h:outputText value="#{item.siteOrgInfo.name}" />
 						</p:column>
 						<p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.clinicalDeptName}" />

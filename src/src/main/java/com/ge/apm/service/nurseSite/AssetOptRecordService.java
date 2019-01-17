@@ -87,6 +87,37 @@ public class AssetOptRecordService {
 			}
 		}
 	}
+	public void supplementOrgInfo(List<AssetOptRecord> listRecord){
+		if(listRecord!=null && listRecord.size()>0){
+			Set<String> setSiteOrgUids=new HashSet<String>();
+			for(int i=0;i<listRecord.size();++i){
+				AssetOptRecord tempRecord=listRecord.get(i);
+				setSiteOrgUids.add(tempRecord.getSiteUID());
+			}
+			List<OrgInfo> listOrgInfo=null;
+			Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
+	        if (setSiteOrgUids.size() > 0) {
+	        	listOrgInfo = orgInfoRepository.findByUids(setSiteOrgUids);
+	        }
+	        if (listOrgInfo != null) {
+	            for (int i = 0; i < listOrgInfo.size(); ++i) {
+	            	OrgInfo tempOrgInfo = listOrgInfo.get(i);
+	            	mapOrgInfo.put(tempOrgInfo.getUid(), tempOrgInfo);
+	            }
+	        }
+	        for(int i=0;i<listRecord.size();++i){
+				AssetOptRecord tempRecord=listRecord.get(i);
+				String siteUid=tempRecord.getSiteUID();
+				tempRecord.setSiteOrgInfo(mapOrgInfo.get(siteUid));
+				//add
+				Date startDate=tempRecord.getStartDate();
+				Date endDate=tempRecord.getEndDate();
+				if(startDate!=null && endDate!=null){
+					tempRecord.setCostTime(generateCostTime(startDate, endDate));
+				}
+			}
+		}
+	}
 	public void supplementRecord(List<AssetOptRecord> listRecord){
 		if(listRecord!=null && listRecord.size()>0){
 			Set<String> setAssetUid=new HashSet<String>();
