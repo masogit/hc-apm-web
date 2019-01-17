@@ -121,6 +121,9 @@ public class AssetOptRecord implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER)
 //	@Transient
 	private AssetInfo assetInfo;
+	
+	@Transient
+	private OrgInfo siteOrgInfo;
 
 	@Transient
 	private boolean needGetItem = true;
@@ -306,6 +309,14 @@ public class AssetOptRecord implements Serializable {
 
 	public void setAssetInfo(AssetInfo assetInfo) {
 		this.assetInfo = assetInfo;
+	}
+
+	public OrgInfo getSiteOrgInfo() {
+		return siteOrgInfo;
+	}
+
+	public void setSiteOrgInfo(OrgInfo siteOrgInfo) {
+		this.siteOrgInfo = siteOrgInfo;
 	}
 
 	public String getCostTime() {

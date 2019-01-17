@@ -125,7 +125,7 @@ public class AssetOptRecordController extends GenericCRUDUUIDController<AssetOpt
 		}
 		Page<AssetOptRecord> pageResult = dao.findBySearchFilter(searchFilters, pageRequest);
 		List<AssetOptRecord> listResult = pageResult.getContent();
-		service.supplementCostTime(listResult);
+		service.supplementOrgInfo(listResult);
 		return pageResult;
 	}
 
