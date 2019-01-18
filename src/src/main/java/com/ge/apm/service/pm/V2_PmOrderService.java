@@ -180,7 +180,33 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void saveReport(UnstructuredDataCollection report){
     	reportDao.save(report);
     }
-    
+
+
+    public void invokePmOerCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        //如果是工单是周期性的
+        if(selectedPmOrder.getPmType()==1){ //周期性
+             if(cancelInt.equalsIgnoreCase("1")){
+                 formData.setQualityChecking("2");
+             }else{
+                 formData.setQualityChecking("1");
+             }
+        }else{//一次性或重测
+            formData.setQualityChecking("2");
+        }
+
+        formData.setDesc(desc);
+
+        String res = srApi.invokePmOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("取消提交成功");
+        }
+
+    }
+
     public void saveReport(List<UnstructuredDataCollection> listReport){
     	reportDao.save(listReport);
     }

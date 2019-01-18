@@ -81,7 +81,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private static final String EMPTY_SIGNATURE_HOLDER = "";
     private String fileterOrgName;
     private String fileterAssetDeptOrgName;
-
+private  String cancelInt;
     private String supplierName;
     private AutoCompleteService autoCompleteService;
     private AssetInfoMgrService aimService;
@@ -177,7 +177,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
     }
+    public void prepareCancel(String itemId){
+        cancelReason=null;
+          selected = dao.findById(itemId);
+        int type = selected.getPmType();
+        if(type == 1){
+            cancelInt="2";
+        }
+        if(type ==2 ){
+            cancelInt="1";
+        }
+        if(type ==3 ){
+            cancelInt="1";
+        }
+    }
 
+    public void cancelPMorder(){
+        if(selectedPmOrder.getPmType()==1){//周期性
+            pmOrderService.invokePmOerCancel(cancelReason,selected,cancelInt);
+        }
+
+
+    }
 
     public boolean allowChanged(){
         //is closed
@@ -806,12 +827,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
 
-    /*public void prepareAproval(String woid) {
-        prepareAct(woid);
-        approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
-        approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
-    }*/
-
 
     public void prepareAproval(String woid) {
         prepareAct(woid);
@@ -1275,6 +1290,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
         removeFilterOnField("assetInfo.assetOwnerId3");
+
+        if(queryIndex == 20){
+            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已取消"));
+        }
 
         if(queryIndex==100){
             //from asset detail page
@@ -2491,5 +2510,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setFileterOrgName(String fileterOrgName) {
         this.fileterOrgName = fileterOrgName;
+    }
+
+    public String getCancelInt() {
+        return cancelInt;
+    }
+
+    public void setCancelInt(String cancelInt) {
+        this.cancelInt = cancelInt;
     }
 }

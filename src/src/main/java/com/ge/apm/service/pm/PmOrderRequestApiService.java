@@ -77,6 +77,22 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }
     }
 
+    //CANCEL_PM_ORDER
+public String invokePmOrderCancel(String token, PmOrderActionForm formData, String actionName, String pmOrderId){
+    HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
+    String gatewayURL = getGatewayURL(GatewayURL.CANCEL_PM_ORDER);
+    String url = gatewayURL.replace("{pmOrderId}", pmOrderId);
+
+    ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
+    if (isOkay(response)) {
+        LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+        logger.info("Invoke PmOrderCancel "+actionName+" has finished "+responseMap.get("data"));
+        return (String) responseMap.get("bizStatusCode");
+    } else {
+        return null;
+    }
+}
+
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.PM_ORDER_ACTION);
