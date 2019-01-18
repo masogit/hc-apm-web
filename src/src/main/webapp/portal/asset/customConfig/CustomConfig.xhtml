@@ -253,14 +253,16 @@
                                             </h:panelGroup>
                                             <h:panelGroup >
                                                 <label class="label">默认值</label>
-                                                <p:inputText value="#{groupItem.requestReason.defaultValue}" />
+                                                <p:inputText value="#{groupItem.requestReason.defaultValue}" maxlength="200" >
+                                                    <p:ajax />
+                                                </p:inputText>
                                             </h:panelGroup>
                                         </p:panelGrid>
                                         <br/>
                                         
                                         <h:panelGroup >
                                             <label class="label">语音文字必填一项</label>
-                                            <p:selectBooleanCheckbox value="#{groupItem.voiceOrReasonRequired}" >
+                                            <p:selectBooleanCheckbox value="#{groupItem.voiceOrReasonRequired}" disabled="#{!groupItem.requestReason.enable or !groupItem.voiceAttachment.enable}" >
                                                 <p:ajax listener="#{customConfigController.onCheckConfig('voiceOrReasonRequired')}" update="descriptionsSet"/>
                                             </p:selectBooleanCheckbox>
                                         </h:panelGroup>
@@ -268,7 +270,9 @@
                                         <h:panelGroup style="float:right;padding-left: 5px">
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="上移"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}" />
                                             <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="下移"  update=":customConfigForm "  disabled="#{groupIndex.index eq 2}"/>
-                                            <p:selectBooleanCheckbox style="padding-left: 5px"  label="报修页面显示" value="#{groupItem.show}" />
+                                            <p:selectBooleanCheckbox style="padding-left: 5px"  label="报修页面显示" value="#{groupItem.show}" >
+                                                <p:ajax />
+                                            </p:selectBooleanCheckbox>
                                         </h:panelGroup>
                                     </p:fieldset>
                                 </p:dataList>
