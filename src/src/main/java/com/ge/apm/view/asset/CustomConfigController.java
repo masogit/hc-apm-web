@@ -464,11 +464,13 @@ public class CustomConfigController {
             case "voiceAttachment.enable":
                 if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.enable", Boolean.FALSE)) {
                     JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
                 }
                 break;
             case "requestReason.enable":
                 if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.enable", Boolean.FALSE)) {
                     JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
                 }
                 break;
             case "voiceAttachment.required":
