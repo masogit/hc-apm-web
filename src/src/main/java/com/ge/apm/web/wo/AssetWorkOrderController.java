@@ -48,6 +48,8 @@ public class AssetWorkOrderController implements Serializable {
     private OrgInfo filterDeptOrg;
     private List<OrgInfo> clinicalDeptList;
     private String searchStr;
+    private Date startDate;
+    private Date endDate;
 
     @PostConstruct
     protected void init() {
@@ -62,7 +64,7 @@ public class AssetWorkOrderController implements Serializable {
 
     public void loadData() {
         List<SearchFilter> searchFilters = new ArrayList<>();
-        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList);
+        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate);
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -173,5 +175,21 @@ public class AssetWorkOrderController implements Serializable {
 
     public void setSearchStr(String searchStr) {
         this.searchStr = searchStr;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
