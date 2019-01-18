@@ -517,6 +517,9 @@ public class NurseSiteMaintainService {
                         	listNewData.add(tempData);
                         }
                     }
+                    if(listTempData!=null && listTempData.size()>0){
+						listNewData.addAll(listTempData);
+					}
                     tempItem.setListData(listNewData);
                 }
             }
