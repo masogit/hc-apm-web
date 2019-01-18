@@ -410,8 +410,11 @@ public class WorkOrderReportProvider {
                 sb.append(" and ai.asset_group = " + value);
             }else if(tempColumn.equals("searchStr")){
                 sb.append(" and (ai.name like '%" + value + "%' or ai.serial_num like '%" + value + "%' or ai.financing_num like '%" + value + "%' or ai.function_type like '%" + value + "%') ");
+            }else if(tempColumn.equals("createdDateStart")){
+                sb.append(" and wo.created_date>='" + value + "' ");
+            }else if(tempColumn.equals("createdDateEnd")){
+                sb.append(" and wo.created_date<'" + value + "' ");
             }
-
         }
 
         return sb.toString();
