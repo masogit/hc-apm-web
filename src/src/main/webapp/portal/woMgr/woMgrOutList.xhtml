@@ -9,7 +9,7 @@
 
 		<h:form id="woMgrOutListForm">
 
-			<p:dataTable id="datalist" value="#{assetLifecycleEvent3Controller.lazyModel}" var="item" widgetVar="varDataList" lazy="true" paginator="true"
+			<p:dataTable id="datalist" value="#{assetLifecycleEvent3Controller.lazyModel}" var="item" widgetVar="varWoMgrOutDataList" lazy="true" paginator="true"
 				paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" selectionMode="single"
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -47,7 +47,7 @@
 				</p:column>
 				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
 					<f:facet name="filter">
-						<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetLifecycleEvent3Controller.descriptionStatusFilter}">
+						<p:selectOneMenu onchange="PF('varWoMgrOutDataList').filter()">
 							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 							<f:selectItem itemLabel="Open" itemValue="Open" />
 							<f:selectItem itemLabel="Assigned" itemValue="Assigned" />

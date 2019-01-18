@@ -80,7 +80,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
         this.selected = null;
-        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
+        if (!this.hasFilterOnField("eventType")) {
+        	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
+        }
         Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         updateSelectStatus(pageResult);
         return pageResult;
