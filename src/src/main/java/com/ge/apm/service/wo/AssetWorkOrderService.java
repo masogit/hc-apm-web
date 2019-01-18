@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class AssetWorkOrderService {
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
 
-    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList){
+    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate){
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 
@@ -61,6 +62,16 @@ public class AssetWorkOrderService {
 
         if(searchStr != null && searchStr.trim().length() > 0){
             SearchFilter searchStrFilter = new SearchFilter("searchStr", SearchFilter.Operator.IN, searchStr);
+            searchFilters.add(searchStrFilter);
+        }
+
+        if(starDate != null){
+            SearchFilter searchStrFilter = new SearchFilter("createdDateStart", SearchFilter.Operator.GTE, starDate);
+            searchFilters.add(searchStrFilter);
+        }
+
+        if(endDate != null){
+            SearchFilter searchStrFilter = new SearchFilter("createdDateEnd", SearchFilter.Operator.LT, endDate);
             searchFilters.add(searchStrFilter);
         }
 
