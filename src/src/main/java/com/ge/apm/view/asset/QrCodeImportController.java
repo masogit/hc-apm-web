@@ -59,6 +59,8 @@ public class QrCodeImportController {
     }
 
     public void finishUpload() {
+        importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap, orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().get());
+
     }
 
     public void onSiteChange() {
@@ -71,10 +73,6 @@ public class QrCodeImportController {
             orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
         }
         return orgInfoList;
-    }
-
-    public void importAllCode() {
-        importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap, orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().get());
     }
 
     public void uploadDataFile(FileUploadEvent event) {

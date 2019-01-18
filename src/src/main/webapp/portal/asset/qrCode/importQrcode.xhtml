@@ -19,7 +19,7 @@
                     <h:panelGroup >
                         <p:commandButton value="上传文件"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
                         <h:outputText value="#{qrCodeImportController.file.fileName}" />
-                        <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>
+                        <!--<p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>-->
                     </h:panelGroup>
 
                     <p:dataTable id="importTable" widgetVar="varDataList" value="#{qrCodeImportController.importQrCodeMap.values()}" var="item" rows="20" paginator="true" 
@@ -48,8 +48,8 @@
                             <h:outputText value="#{item['res']}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="importButton" value="导入" icon="ui-icon-check"  class="btn btn-sm btn-gray" title="#{msg.Import}" actionListener="#{qrCodeImportController.importAllCode}" update=":importForm importTable :growl" 
-                                             disabled="#{empty qrCodeImportController.importQrCodeMap}"/>
+<!--                            <p:commandButton id="importButton" value="导入" icon="ui-icon-check"  class="btn btn-sm btn-gray" title="#{msg.Import}" actionListener="#{qrCodeImportController.importAllCode}" update=":importForm importTable :growl" 
+                                             disabled="#{empty qrCodeImportController.importQrCodeMap}"/>-->
                         </f:facet>
                     </p:dataTable>
 
