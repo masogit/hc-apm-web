@@ -19,16 +19,16 @@
                     <h:panelGroup >
                         <p:commandButton value="上传文件"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
                         <h:outputText value="#{qrCodeImportController.file.fileName}" />
-                        <!--<p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>-->
+                        <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>
                     </h:panelGroup>
-                    
+
                     <p:dataTable id="importTable" widgetVar="varDataList" value="#{qrCodeImportController.importQrCodeMap.values()}" var="item" rows="20" paginator="true" 
                                  selection="#{compareImportController.selectedItem}" rowKey="#{item['RowIndex']}"  selectionMode="single" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  rowsPerPageTemplate="20,50,100,500" >
-                        
-                        <!--<p:ajax event="rowSelect" listener="#{compareImportController.onSelectedChange}" update=":ItemViewForm"/>-->
-                        <p:column headerText="#{msg.assetName}" >
+
+<!--<p:ajax event="rowSelect" listener="#{compareImportController.onSelectedChange}" update=":ItemViewForm"/>-->
+                        <p:column headerText="#{msg.qrcode}" >
                             <h:outputText value="#{item['QrcodeItem']}"/>
                         </p:column>
                         <p:column headerText="使用院区" >
@@ -36,24 +36,26 @@
                         </p:column>
                         <p:column headerText="状态" >
                             <f:facet name="filter">
-<!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItem value="成功" itemLabel="成功" itemValue="成功"/>
-                                    <f:selectItem value="失败" itemLabel="失败" itemValue="失败"/>
-                                </p:selectOneMenu>-->
+                                <!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                                                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                                    <f:selectItem value="成功" itemLabel="成功" itemValue="成功"/>
+                                                                    <f:selectItem value="失败" itemLabel="失败" itemValue="失败"/>
+                                                                </p:selectOneMenu>-->
                             </f:facet>
                             <h:outputText value="#{item['status']}"/>
                         </p:column>
-                        <p:column headerText="结果" >
+                        <p:column headerText="警告信息" >
                             <h:outputText value="#{item['res']}"/>
                         </p:column>
-                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="importButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Import}" actionListener="#{qrCodeImportController.importAllCode}" update=":importForm importTable :growl" 
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="importButton" value="导入" icon="ui-icon-check"  class="btn btn-sm btn-gray" title="#{msg.Import}" actionListener="#{qrCodeImportController.importAllCode}" update=":importForm importTable :growl" 
                                              disabled="#{empty qrCodeImportController.importQrCodeMap}"/>
-                         </f:facet>
+                        </f:facet>
                     </p:dataTable>
 
-
+                    <h:panelGroup >
+                        <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="qrCodeLibList?faces-redirect=true" update=":growl"/>
+                    </h:panelGroup>
                 </h:form>
             </div>
         </div>
