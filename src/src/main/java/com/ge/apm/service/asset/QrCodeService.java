@@ -694,7 +694,7 @@ public class QrCodeService {
                     qrcodeItem.setIssueDate(new Date());
                     newQrcodeList.add(qrcodeItem);
                     item.getValue().put("res", "导入");
-                    item.getValue().put("status", "成功");
+                    item.getValue().put("status", "导入成功");
                 }
             }
             

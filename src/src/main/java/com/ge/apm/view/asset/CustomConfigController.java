@@ -42,11 +42,11 @@ import webapp.framework.web.WebUtil;
 @ManagedBean
 @ViewScoped
 public class CustomConfigController {
-    
+
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
-    
+
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -57,9 +57,9 @@ public class CustomConfigController {
     private List<String> addFieldsList;
     private String addFieldsType;
     private Map<String, String> configInfo = new HashMap();
-    
+
     private PinYinComparator pinYinComparator;
-    
+
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -72,7 +72,7 @@ public class CustomConfigController {
         pinYinComparator = new PinYinComparator();
         loadConfigForSite(selectSite.getUid());
     }
-    
+
     private void loadConfigForSite(String siteUid) {
         customConfig = ccService.getCustomConfigBySite(siteUid);
         if (null == customConfig) {
@@ -82,7 +82,7 @@ public class CustomConfigController {
         }
         updateConfigInfo();
     }
-    
+
     public void prepareAddAssetField(String type) {
         addFieldsType = type;
         if (null == addFieldsList) {
@@ -165,20 +165,20 @@ public class CustomConfigController {
                 break;
             case "MobileWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",item)).collect(Collectors.toList()));
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
-                addFieldsList.addAll(((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
+                addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
-            
+
         }
-        
+
         addFieldsList.sort((String o1, String o2) -> {
             return pinYinComparator.compare(CustomConfigConstant.getAllFields().get(o1), CustomConfigConstant.getAllFields().get(o2));
         });
-        
+
     }
-    
+
     public String getAddFieldsUpdateString() {
         switch (addFieldsType) {
             case "BasicFields":
@@ -225,7 +225,7 @@ public class CustomConfigController {
                 return "";
         }
     }
-    
+
     public void addAssetFields() {
         switch (addFieldsType) {
             case "BasicFields":
@@ -329,18 +329,18 @@ public class CustomConfigController {
                         && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
             case "MobileWorkOrderFieldsList":
                 JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
-                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
                 JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
-                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
         }
         cancelAddFields();
     }
-    
+
     public void cancelAddFields() {
         addFieldsType = "";
         addFieldsList.clear();
@@ -362,11 +362,11 @@ public class CustomConfigController {
         roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
         return res.toString();
     }
-    
+
     public void removeAssetField(String key) {
         ccService.removeAssetField(customConfigObject, key);
     }
-    
+
     public String getCustomConfigInfomation() {
         if (customConfig == null) {
             return "当前院区无配置,保存后创建";
@@ -382,7 +382,7 @@ public class CustomConfigController {
         }
         return res.toString();
     }
-    
+
     private void updateConfigInfo() {
         if (null != customConfig) {
             configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
@@ -391,7 +391,7 @@ public class CustomConfigController {
             configInfo.put("LastModifiedDate", customConfig.getLastModifiedDate() == null ? "" : DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
     }
-    
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         if (null != event) {
             if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
@@ -402,47 +402,47 @@ public class CustomConfigController {
             loadConfigForSite(selectSite.getUid());
         }
     }
-    
+
     public void onListPageFieldsReorder(ReorderEvent event) {
     }
-    
+
     public void saveChange() {
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
         updateConfigInfo();
     }
-    
+
     public void deleteConfig() {
         ccService.removeConfig(selectSite);
         loadConfigForSite(selectSite.getUid());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
     }
-    
+
     public boolean isSystemFields(String key) {
         return CustomConfigConstant.getSystemFields().contains(key);
     }
-    
+
     public boolean isReadOnlyFields(String key) {
         return CustomConfigConstant.getReadOnlyFields().contains(key);
     }
-    
+
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
         }
     }
-    
+
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
-    
+
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
     }
-    
-    public void moveItem(JSONObject groupItem, String oper){
-        JSONArray groups = ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group"));
+
+    public void moveItem(JSONObject groupItem, String oper) {
+        JSONArray groups = ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group"));
         int index = groups.indexOf(groupItem);
         if ("up".equals(oper) && index >= 1) {
             groups.set(index, groups.get(index - 1));
@@ -451,6 +451,39 @@ public class CustomConfigController {
         if ("down".equals(oper) && index < groups.size() - 1) {
             groups.set(index, groups.get(index + 1));
             groups.set(index + 1, groupItem);
+        }
+    }
+
+    public void onCheckConfig(String opt) {
+        switch (opt) {
+            case "attachments.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].attachments.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].attachments.required", Boolean.FALSE);
+                }
+                break;
+            case "voiceAttachment.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.FALSE);
+                }
+                break;
+            case "requestReason.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.FALSE);
+                }
+                break;
+            case "voiceAttachment.required":
+            case "requestReason.required":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.TRUE)
+                        || JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.TRUE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
+                }
+                break;
+            case "voiceOrReasonRequired" :
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.TRUE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.FALSE);
+                }
+            default:
         }
     }
 
@@ -477,51 +510,51 @@ public class CustomConfigController {
     public Map<String, Boolean> getSelectedAddFields() {
         return selectedAddFields;
     }
-    
+
     public void setSelectedAddFields(Map<String, Boolean> selectedAddFields) {
         this.selectedAddFields = selectedAddFields;
     }
-    
+
     public CustomConfigObject getCustomConfigObject() {
         return customConfigObject;
     }
-    
+
     public void setCustomConfigObject(CustomConfigObject customConfigObject) {
         this.customConfigObject = customConfigObject;
     }
-    
+
     public CustomConfigAssetField getCurrentEditField() {
         return currentEditField;
     }
-    
+
     public void setCurrentEditField(CustomConfigAssetField currentEditField) {
         this.currentEditField = currentEditField;
     }
-    
+
     public CustomConfig getCustomConfig() {
         return customConfig;
     }
-    
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
-    
+
     public Map<String, String> getConfigInfo() {
         return configInfo;
     }
-    
+
     public LinkedHashMap<String, String> getAllFields() {
         return allFields;
     }
-    
+
     public Map<String, String> getConfigRoles() {
         return configRoles;
     }
-    
+
     public List<String> getAddFieldsList() {
         return addFieldsList;
     }
-    
+
     public String getAddFieldsType() {
         return addFieldsType;
     }
