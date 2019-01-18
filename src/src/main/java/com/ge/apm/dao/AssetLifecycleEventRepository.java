@@ -1,11 +1,12 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.ExternalWorkOrder;
-import org.springframework.data.jpa.repository.Query;
-import webapp.framework.dao.GenericRepositoryUUID;
-
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+
+import com.ge.apm.domain.AssetLifecycleEvent;
+
+import webapp.framework.dao.GenericRepositoryUUID;
 
 public interface AssetLifecycleEventRepository extends GenericRepositoryUUID<AssetLifecycleEvent> {
 
