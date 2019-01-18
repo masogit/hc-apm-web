@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,11 +86,13 @@ public class AssetOptRecord implements Serializable {
 //	@Transient
 	@JoinColumn(name = "create_by", referencedColumnName = "uid", insertable = false, updatable = false)
 	@ManyToOne(fetch = FetchType.EAGER)
+	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount createBy;
 
 //	@Transient
 	@JoinColumn(name = "modify_by", referencedColumnName = "uid", insertable = false, updatable = false)
 	@ManyToOne(fetch = FetchType.EAGER)
+	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount modifyBy;
 	
 	@Transient
@@ -118,12 +122,24 @@ public class AssetOptRecord implements Serializable {
 	private String comment;
 
 	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+	@NotFound(action= NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.EAGER)
 //	@Transient
 	private AssetInfo assetInfo;
 	
 	@Transient
 	private OrgInfo siteOrgInfo;
+	
+	@Transient
+	private String assetInfoname;
+	@Transient
+	private String assetInfodepartNum;
+	@Transient
+	private String assetInfofunctionType;
+	@Transient
+	private String assetInfoSiteName;
+	@Transient
+	private String assetInfoclinicalDeptName;
 
 	@Transient
 	private boolean needGetItem = true;
@@ -325,6 +341,46 @@ public class AssetOptRecord implements Serializable {
 
 	public void setCostTime(String costTime) {
 		this.costTime = costTime;
+	}
+
+	public String getAssetInfoname() {
+		return assetInfoname;
+	}
+
+	public void setAssetInfoname(String assetInfoname) {
+		this.assetInfoname = assetInfoname;
+	}
+
+	public String getAssetInfodepartNum() {
+		return assetInfodepartNum;
+	}
+
+	public void setAssetInfodepartNum(String assetInfodepartNum) {
+		this.assetInfodepartNum = assetInfodepartNum;
+	}
+
+	public String getAssetInfofunctionType() {
+		return assetInfofunctionType;
+	}
+
+	public void setAssetInfofunctionType(String assetInfofunctionType) {
+		this.assetInfofunctionType = assetInfofunctionType;
+	}
+
+	public String getAssetInfoSiteName() {
+		return assetInfoSiteName;
+	}
+
+	public void setAssetInfoSiteName(String assetInfoSiteName) {
+		this.assetInfoSiteName = assetInfoSiteName;
+	}
+
+	public String getAssetInfoclinicalDeptName() {
+		return assetInfoclinicalDeptName;
+	}
+
+	public void setAssetInfoclinicalDeptName(String assetInfoclinicalDeptName) {
+		this.assetInfoclinicalDeptName = assetInfoclinicalDeptName;
 	}
 
 	@Override
