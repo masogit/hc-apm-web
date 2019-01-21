@@ -7,6 +7,7 @@ package com.ge.apm.domain.pure;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.CustomConfigConstant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class CustomConfigObject {
 
         if (null == assetFields) {
             assetFields = CustomConfigConstant.getAllFields().entrySet().stream().filter(item -> !CustomConfigConstant.getExtFields().contains(item.getKey()))
-                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
+                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(),CustomConfigConstant.getConfigRolesName(), CustomConfigConstant.getConfigEditRolesName())));
             CustomConfigConstant.getSystemFields().forEach(item -> {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
