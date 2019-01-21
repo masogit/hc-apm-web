@@ -83,7 +83,7 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
     String gatewayURL = getGatewayURL(GatewayURL.CANCEL_PM_ORDER);
     String url = gatewayURL.replace("{pmOrderId}", pmOrderId);
 
-    ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
+    ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.DELETE,requestEntity,LinkedHashMap.class);
     if (isOkay(response)) {
         LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
         logger.info("Invoke PmOrderCancel "+actionName+" has finished "+responseMap.get("data"));
