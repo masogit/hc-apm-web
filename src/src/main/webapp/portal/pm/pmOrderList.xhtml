@@ -287,7 +287,7 @@
     </h:panelGroup>
             <br></br>
     <h:panelGroup>
-        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.cancelPMorder()}" value="确认" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmCancelDialog');"/>
+        <p:commandButton validateClient="true" update="pmTab:pmOrderListForm:datalist :growl" actionListener="#{v2PmOrderController.cancelPMorder()}" value="确认" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmCancelDialog');"/>
         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('pmCancelDialog').hide()"/>
     </h:panelGroup>
         </h:form>
