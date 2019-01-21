@@ -4,7 +4,7 @@ package com.ge.apm.service.common;
 public enum GatewayURL {
 
 
-    CANCEL_PM_ORDER("/api/apm/pmOrders/{pmOrderId}/cancel"),
+    CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
     // Security
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
