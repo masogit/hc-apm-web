@@ -383,12 +383,8 @@ public class OrgInfoService {
             List<OrgInfo> list = findOrgByParent(orgInfo.getUid(), orgInfoList);
             if (list.size() > 0) {
                 exportOrgByParent(orgInfo.getUid(), orgInfoList, orgInfoMap, resultList);
-
-            } else {
-                exportOrg(orgInfo, resultList, orgInfoMap);
-
             }
-
+            exportOrg(orgInfo, resultList, orgInfoMap);
         }
     }
     
