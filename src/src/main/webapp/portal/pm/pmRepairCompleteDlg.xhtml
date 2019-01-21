@@ -36,19 +36,23 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="uiTransparent accessCls" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList2" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.accessory}">
+                                    <p:column headerText="名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
 
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
-                                    <p:column headerText="预估单价">
+                                    <p:column headerText="预估单价(元)">
                                         <h:outputText value="#{item.partsPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <h:column>
+                                        <label class="label">合同价格(元)*</label>
+                                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" readonly="true" />
+                                    </h:column>
+                                    <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
                                     <p:column headerText="序列号">
@@ -175,7 +179,10 @@
                             </c:forEach>
                         </p:fieldset>
                     </p:fieldset>
-
+                    <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
+                        <p:ajax process="console"  update="@(.rpb) @(.rpt) @(.x3) @(.buttonG)"></p:ajax>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qualityChecking')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                    </p:selectOneRadio>
 
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup class="buttonG">
@@ -214,6 +221,8 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+
+
 
             <script>
                 function handleToRepair(xhr, status, args) {

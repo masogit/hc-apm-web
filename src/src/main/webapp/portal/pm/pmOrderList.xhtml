@@ -62,6 +62,9 @@
                         <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
 
+                        <p:column headerText="制造商序列" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
@@ -128,19 +131,24 @@
                         </p:column>
 
 
-                        <p:column headerText="操作" rendered="#{(v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 )and userContextService.hasRole('AssetStaff')}" exportable="false">
+                       <!-- <p:column headerText="操作" rendered="#{(v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 )and userContextService.hasRole('AssetStaff')}" exportable="false">
+                            <p:commandButton value="取消"  update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>
+
+                            &lt;!&ndash;医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色&ndash;&gt;
+                            <p:commandButton value="取消" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                             <p:commandButton value="取消" update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>
+                        </p:column>-->
+                       <!-- <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
+
                         </p:column>
-                        <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
-                            <!--医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色-->
+
+                        <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.hasRole('AssetHead')}" exportable="false">
+
+                        </p:column>-->
+                        <!--待办 -1-->
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
                             <p:commandButton value="取消" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                         </p:column>
-                             <!--医工主任：待派工界面加-->
-                        <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.hasRole('AssetHead')}" exportable="false">
-                            <p:commandButton value="取消" update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>
-                        </p:column>
-
-
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
@@ -150,6 +158,14 @@
                             <p:commandButton  class="completeButton" value="完成" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
    <!--v2PmOrderController.isChecked()加了后 一选中了checkbox 接单按钮就会灰掉 保证不能即批量又单个接单-->
                             <p:commandButton class="takeOrderbutton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" value="接单" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,'接单对话框')}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
+
+                           <!-- <p:commandButton value="取消"  update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>-->
+
+                            <!--医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色-->
+                            <p:commandButton value="取消" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
+                            <!--<p:commandButton value="取消" update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>-->
+
+
                         </p:column>
 
                         <!--待抢单tab 31-->

@@ -193,10 +193,8 @@ private  String cancelInt;
     }
 
     public void cancelPMorder(){
-        if(selectedPmOrder.getPmType()==1){//周期性
-            pmOrderService.invokePmOerCancel(cancelReason,selected,cancelInt);
-        }
 
+            pmOrderService.invokePmOerCancel(cancelReason,selected,cancelInt);
 
     }
 
@@ -1045,6 +1043,15 @@ private  String cancelInt;
     }
 
     public void saveServiceRequest() {
+        System.out.println(currentStatus);
+        if(currentStatus!=2 && currentStatus!=3){
+            WebUtil.addErrorMessage("必须选择当前状态");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            RequestContext.getCurrentInstance().addCallbackParam("status", true);
+        }
+        if(newServiceRequest.getRequestReason()==null){
+            newServiceRequest.setRequestReason("设备故障");
+        }
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -1487,6 +1494,7 @@ private  String cancelInt;
         // 获取picList
         picList = blobDao.findByBoUuid(selected.getId());
         reportList = pmOrderService.getReportList(selected.getId());
+
         loadHmCheck(selected);
     }
 
@@ -1719,12 +1727,12 @@ private  String cancelInt;
             return;
         }
         saveCheckItemData();
-        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+       /* tmp: accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);*/
         //保养合格的话 去关单
         //cancel();
     }
@@ -1875,7 +1883,12 @@ private  String cancelInt;
         if (pmOrderRule == null) {
             return null;
         }
-        return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+        return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
+
+        /*if(v2PmOrder.isFinished())
+            return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
+        else
+            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());*/
     }
 
     List<UnstructuredDataCollection> unDataCollection;
@@ -1884,12 +1897,12 @@ private  String cancelInt;
     UnstructuredDataCollectionRepository reportDao;
     List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
 
-    public List<CheckItem> loadHmCheck(V2_PmOrder v2PmOrder) {
+    public void loadHmCheck(V2_PmOrder v2PmOrder) {
         hmCheck = new HashMap<String, UnstructuredData>();
         pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
-        List<CheckItem> CheckItemList = new ArrayList<CheckItem>();
-        if (pmCheckItemList == null) return null;
+        List<CheckItem> checkItemList = new ArrayList<CheckItem>();
+        if (pmCheckItemList == null) return ;
         for (int i = 0; i < pmCheckItemList.size(); i++) {
             pmCheckItem = (PmOrderRuleCheckList) pmCheckItemList.get(i);
             if (unDataCollection != null && !unDataCollection.isEmpty()) { //
@@ -1899,14 +1912,14 @@ private  String cancelInt;
                     for (int k = 0; k < dataList.size(); k++) {
                         UnstructuredData unsData = (UnstructuredData) dataList.get(k);
                         if (unsData.getKey().equalsIgnoreCase(pmCheckItem.getUid())) {
-                            CheckItemList.add(new CheckItem(pmCheckItem.getUid(), unsData));
+                            checkItemList.add(new CheckItem(pmCheckItem.getUid(), unsData));
                             hmCheck.put(pmCheckItem.getUid(), unsData);
                         }
                     }
                 }
             }
         }
-        return CheckItemList;
+       // return checkItemList;
     }
 
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
