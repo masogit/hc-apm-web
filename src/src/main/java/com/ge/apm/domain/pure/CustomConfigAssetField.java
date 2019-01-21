@@ -23,12 +23,12 @@ public class CustomConfigAssetField {
     boolean required = false;
     boolean arrivalRequired = false;
 
-    public CustomConfigAssetField(String key, List<String> roles) {
+    public CustomConfigAssetField(String key, List<String> readRoles,List<String> editRoles) {
         this.key = key;
-        this.exportRoles = roles;
-        this.readRoles = roles;
+        this.exportRoles = readRoles;
+        this.readRoles = readRoles;
         if (!CustomConfigConstant.getReadOnlyFields().contains(key)) {
-            this.editRoles = roles;
+            this.editRoles = editRoles;
         }
     }
 
