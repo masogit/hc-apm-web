@@ -91,7 +91,7 @@
                         <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
                         <label class="label">使用的备件</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="#{msg.accessory}">
+                            <p:column headerText="名称">
                                 <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
 
@@ -106,7 +106,7 @@
                             <p:column headerText="审核状态">
                                 <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
                             </p:column>
-                            <p:column headerText="类型">
+                            <p:column headerText="备件类别">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                             </p:column>
                             <p:column headerText="发票号">
