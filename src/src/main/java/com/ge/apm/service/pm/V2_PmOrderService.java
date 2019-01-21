@@ -186,11 +186,12 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         //如果是工单是周期性的
+        /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
         if(selectedPmOrder.getPmType()==1){ //周期性
              if(cancelInt.equalsIgnoreCase("1")){
-                 formData.setQualityChecking("2");
-             }else{
                  formData.setQualityChecking("1");
+             }else{
+                 formData.setQualityChecking("2");
              }
         }else{//一次性或重测
             formData.setQualityChecking("2");
