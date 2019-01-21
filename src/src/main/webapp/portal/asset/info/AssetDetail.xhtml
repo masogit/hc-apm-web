@@ -132,15 +132,15 @@
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
-                        <p:dataTable var="item" value="#{assetInfoDetailController.getPmScheduleData('epm')}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList('5')}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="保养编号" >
-                                <h:outputText value="#{item.assetNum}"/>
+                                <h:outputText value="#{item.eventUid}"/>
                             </p:column>
-                            <p:column headerText="关单日期" >
-                                <h:outputText value="#{item.closeDate}"/>
+                            <p:column headerText="更新日期" >
+                                <h:outputText value="#{item.createTime}"/>
                             </p:column>
-                            <p:column headerText="当前处理步骤" >
-                                <h:outputText value="#{item.scheduleDate}"/>
+                            <p:column headerText="状态" >
+                                <h:outputText value="#{item.descriptionObject.status}"/>
                             </p:column>
                         </p:dataTable>
                     </p:panel>
@@ -152,11 +152,11 @@
                             <p:column headerText="编号" >
                                 <h:outputText value="#{item.eventUid}"/>
                             </p:column>
-                            <p:column headerText="日期" >
+                            <p:column headerText="更新日期" >
                                 <h:outputText value="#{item.createTime}"/>
                             </p:column>
                             <p:column headerText="状态" >
-                                <h:outputText value="#{item.status}"/>
+                                <h:outputText value="#{item.descriptionObject.status}"/>
                             </p:column>
                         </p:dataTable>
                     </p:panel>
@@ -165,14 +165,14 @@
                             <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
                         </f:facet>
                         <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList(4)}" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="保养编号" >
+                            <p:column headerText="编号" >
                                 <h:outputText value="#{item.eventUid}"/>
                             </p:column>
-                            <p:column headerText="关单日期" >
+                            <p:column headerText="更新日期" >
                                 <h:outputText value="#{item.createTime}"/>
                             </p:column>
-                            <p:column headerText="当前处理步骤" >
-                                <h:outputText value="#{item.status}"/>
+                            <p:column headerText="状态" >
+                                <h:outputText value="#{item.descriptionObject.status}"/>
                             </p:column>
                         </p:dataTable>
                     </p:panel>
