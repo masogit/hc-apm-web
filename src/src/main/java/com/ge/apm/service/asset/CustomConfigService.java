@@ -70,9 +70,9 @@ public class CustomConfigService {
             return getDefalutCustomConfigObject();
         }
         CustomConfig config = configList.stream().filter(item -> org.getSiteUID().equals(item.getSiteUID())).findAny()
-                .orElse(configList.stream().filter(item -> org.getHospitalUID().equals(item.getHospitalUID())).findAny()
-                        .orElse(configList.stream().filter(item -> org.getInstitutionUID().equals(item.getInstitutionUID())).findAny()
-                                .orElse(configList.stream().filter(item -> org.getTenantUID().equals(item.getTenantUID())).findAny().orElse(null))));
+                .orElse(configList.stream().filter(item -> org.getHospitalUID().equals(item.getSiteUID())).findAny()
+                        .orElse(configList.stream().filter(item -> org.getInstitutionUID().equals(item.getSiteUID())).findAny()
+                                .orElse(configList.stream().filter(item -> org.getTenantUID().equals(item.getSiteUID())).findAny().orElse(null))));
         return config == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
 
     }
