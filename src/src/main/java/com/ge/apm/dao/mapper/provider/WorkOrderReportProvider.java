@@ -411,12 +411,12 @@ public class WorkOrderReportProvider {
             }else if(tempColumn.equals("searchStr")){
                 if(value != null){
                     String tempValue = value.toString().toLowerCase();
-                    sb.append(" and (lower(ai.name) like '%" + tempValue + "%' or lower(ai.serial_num) like '%" + tempValue + "%' or lower(ai.financing_num) like '%" + tempValue + "%' or lower(ai.function_type) like '%" + tempValue + "%' or ai.qr_code like '%" + tempValue + "%') ");
+                    sb.append(" and (lower(ai.name) like '%" + tempValue + "%' or lower(ai.function_type) like '%" + tempValue + "%' or lower(ai.serial_num) like '%" + tempValue + "%' or lower(ai.financing_num) like '%" + tempValue + "%' or lower(ai.function_type) like '%" + tempValue + "%' or ai.qr_code like '%" + tempValue + "%') ");
                 }
             }else if(tempColumn.equals("createdDateStart")){
                 sb.append(" and wo.created_date>='" + value + "' ");
             }else if(tempColumn.equals("createdDateEnd")){
-                sb.append(" and wo.created_date<='" + value + "' ");
+                sb.append(" and wo.created_date<'" + value + "' ");
             }
         }
 

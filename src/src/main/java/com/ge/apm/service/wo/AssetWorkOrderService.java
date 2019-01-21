@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +37,7 @@ public class AssetWorkOrderService {
     public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate){
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        ZoneId zone = ZoneId.systemDefault();
 
         if(selectedOrg != null){
             SearchFilter orgFilter = new SearchFilter("orgUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
@@ -71,7 +76,8 @@ public class AssetWorkOrderService {
         }
 
         if(endDate != null){
-            SearchFilter searchStrFilter = new SearchFilter("createdDateEnd", SearchFilter.Operator.LT, endDate);
+            LocalDate endLocalDate = LocalDateTime.ofInstant(endDate.toInstant(), zone).toLocalDate();
+            SearchFilter searchStrFilter = new SearchFilter("createdDateEnd", SearchFilter.Operator.LT, Date.from(endLocalDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant()));
             searchFilters.add(searchStrFilter);
         }
 
