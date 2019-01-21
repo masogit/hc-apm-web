@@ -1117,7 +1117,7 @@ private  String cancelInt;
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         this.selectedMap = new HashMap();
-//如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
+        //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -1141,9 +1141,6 @@ private  String cancelInt;
                 searchList(queryIndex);
             }
         }
-
-
-
         /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
             String query = WebUtil.getRequestParameter("query");
             if (Strings.isNullOrEmpty(query)) {
@@ -1173,7 +1170,6 @@ private  String cancelInt;
         if(StringUtils.isEmpty(comments)){
             comments="报价审核";
         }
-
         //先保存检查项
         saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1875,6 +1871,16 @@ private  String cancelInt;
         List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
+    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder){
+        /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
+        * key就是检查项uid*/
+        UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
+        List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
+        List<String> strList=new ArrayList<String>();
+        byCollectionId.stream().forEach(item->strList.add(item.getKey()));
+        List<PmOrderRuleCheckList> pmcl = pmckLstDao.findPMCL(strList);
+        return pmcl;
+    }
 
     public List<PmOrderRuleCheckList> acPmOrderUleCheckList(V2_PmOrder v2PmOrder) {
         if (v2PmOrder == null)
@@ -1883,12 +1889,14 @@ private  String cancelInt;
         if (pmOrderRule == null) {
             return null;
         }
-        return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
+       // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
 
-        /*if(v2PmOrder.isFinished())
-            return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
-        else
-            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());*/
+        if(v2PmOrder.isFinished()) {
+         return getPmRuleCLclosed(v2PmOrder);
+        }
+        else {
+            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+        }
     }
 
     List<UnstructuredDataCollection> unDataCollection;
