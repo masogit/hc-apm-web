@@ -640,6 +640,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     //apdDao.save(applySwapType);
                                     
                                     applySwapType.setActualQty(applySwapType.getActualQty() + 1);
+                                    System.out.println("Context: " + context.getCallbackParams().get("isValidReqDetail"));
                                     WebUtil.addSuccessMessage("录入成功！");
                                     return;
                                 }else{
