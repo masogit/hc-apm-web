@@ -434,14 +434,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	
 	private void checkSaveDisable(){
 		try {
-//			if(listCheckAssets.size()==0){
-//				isSaveDisable=true;
-//			}
-			if(listPairCheckItems.size()<2){
+			isSaveDisable=false;
+			if(listCheckAssets.size()==0){
 				isSaveDisable=true;
 			}
-			else{
-				isSaveDisable=false;
+			else if(listPairCheckItems.size()<2){
+				isSaveDisable=true;
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
