@@ -7,9 +7,9 @@ import java.util.Set;
 import webapp.framework.dao.SearchFilter;
 
 public class AssetOptRecordProvider {
-	private static final String selectStr = "select a.id as id,a.create_date as createDate,a.modify_date as modifyDate,a.report_date as reportDate,a.check_date as checkDate,a.tenant_uid as tenantUID,a.institution_uid as institutionUID,a.hospital_uid as hospitalUID,a.site_uid as siteUID,a.create_by as createByUid,a.modify_by as modifyByUid,a.name as name,a.report_storage_id as reportStorageId,a.status as status,b.uid as assetUid,a.line_status as lineStatus,a.mirror_status as mirrorStatus,a.shell_status as shellStatus,a.oil_status as oilStatus,a.linker_status as linkerStatus,a.tip_status as tipStatus,a.electric_leakage_status as electricLeakageStatus,a.first_seen_status as firstSeenStatus,a.first_tip_status as firstTipStatus,a.result_status as resultStatus,a.recommand_status as recommandStatus,a.comment as comment,b.name as assetInfoname,b.name_py_code as assetInfonamePyCode,b.function_group as assetInfofunctionGroup,b.function_type as assetInfofunctionType,b.serial_num as assetInfoserialNum,b.depart_num as assetInfodepartNum,b.financing_num as assetInfofinancingNum,b.clinical_dept_uid as assetInfoclinicalDeptUID,b.clinical_dept_name as assetInfoclinicalDeptName,b.manufact_date as assetInfomanufactDate,b.system_id as assetInfosystemId,b.arrive_date as assetInfoarriveDate,b.install_date as assetInfoinstallDate,b.warranty_date as assetInfowarrantyDate,c.name as createByName, d.name as assetInfohospitalName";
-	private static final String tableStr = " from ((asset_info b left join pcc_examine_report a on a.asset_uid=b.uid) left join user_account c on c.uid=a.create_by left join org_info d on d.id=b.hospital_id) where b.is_deleted='f' and b.is_valid='t' and b.status!=4";
-
+	private static final String selectStr = "select a.id as id,a.create_date as createDate,a.modify_date as modifyDate,a.start_date as startDate,a.end_date as endDate,a.tenant_uid as tenantUID,a.institution_uid as institutionUID,a.hospital_uid as hospitalUID,a.site_uid as siteUID,a.create_by as createByUid,a.modify_by as modifyByUid,a.status as status,a.clinical_dept_uid as clinicalDeptUID,a.clinical_dept_name as clinicalDeptName,a.asset_uid as assetUid,a.comment as comment,b.name as assetInfoname,b.depart_num as assetInfodepartNum,b.function_type as assetInfofunctionType,b.clinical_dept_name as assetInfoclinicalDeptName,b.asset_group as assetInfoassetGroup,c.name as assetInfoSiteName,d.name as createByName,e.name as modifyByName";
+	private static final String tableStr = " from ((((asset_opt_record a join asset_info b on a.asset_uid= b.uid and b.is_deleted='f' and b.is_valid='t' and b.status!=4) join org_info c on b.site_uid=c.uid) join user_account d on a.create_by=d.uid) join user_account e on a.modify_by=e.uid) where 1=1";
+	private boolean lastAndOr=true;
 	public String getAll(Map<String, Object> param) {
 		StringBuilder sb = new StringBuilder();
 		@SuppressWarnings("unchecked")
@@ -25,9 +25,9 @@ public class AssetOptRecordProvider {
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
 				addDefaultFilter(sb, searchFilter);
-//				addFilter(sb, searchFilter);
+				// addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			sb.append(" 1=1 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -35,7 +35,7 @@ public class AssetOptRecordProvider {
 			Iterator<SearchFilter> it = columns.iterator();
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
-//				addDefaultFilter(sb, searchFilter);
+				// addDefaultFilter(sb, searchFilter);
 				addFilter(sb, searchFilter);
 			}
 			sb.append(" 1=1 ");
@@ -58,9 +58,9 @@ public class AssetOptRecordProvider {
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
 				addDefaultFilter(sb, searchFilter);
-//				addFilter(sb, searchFilter);
+				// addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			sb.append(" 1=1 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -68,7 +68,7 @@ public class AssetOptRecordProvider {
 			Iterator<SearchFilter> it = columns.iterator();
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
-//				addDefaultFilter(sb, searchFilter);
+				// addDefaultFilter(sb, searchFilter);
 				addFilter(sb, searchFilter);
 			}
 			sb.append(" 1=1 ");
@@ -95,42 +95,36 @@ public class AssetOptRecordProvider {
 		String tempColumn = searchFilter.fieldName;
 		Object value = searchFilter.value;
 		SearchFilter.Operator op = searchFilter.operator;
-		if(op.equals(SearchFilter.Operator.IN)){
-			String strValue=getSetValue(value);
-			if (tempColumn.equals("assetInfo.siteUID")) {
-				sb.append("b.site_uid in " + strValue + " or ");
-			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
-				sb.append("b.hospital_uid in " + strValue + " or ");
-			} else if (tempColumn.equals("assetInfo.institutionUID")) {
-				sb.append("b.institution_uid in " + strValue + " or ");
-			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid in " + strValue + " or ");
-			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid in " + strValue + " or ");
+		if (op.equals(SearchFilter.Operator.IN)) {
+			String strValue = getSetValue(value);
+			if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
+				sb.append("b.clinical_dept_uid in " + strValue + " and ");
+				lastAndOr=true;
 			}
-		}
-		else{
+		} else {
 			if (tempColumn.equals("assetInfo.siteUID")) {
 				sb.append("b.site_uid='" + value + "' and ");
+				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
 				sb.append("b.hospital_uid='" + value + "' and ");
+				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
 				sb.append("b.institution_uid='" + value + "' and ");
+				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.tenantUID")) {
 				sb.append("b.tenant_uid='" + value + "' and ");
-			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid='" + value + "' and ");
+				lastAndOr=false;
 			}
 		}
 	}
-	
-	private String getSetValue(Object value){
-		StringBuilder sb=new StringBuilder();
-		Set<String> set=(Set<String>)value;
-		if(set!=null){
-			Iterator<String> it=set.iterator();
+
+	private String getSetValue(Object value) {
+		StringBuilder sb = new StringBuilder();
+		Set<String> set = (Set<String>) value;
+		if (set != null) {
+			Iterator<String> it = set.iterator();
 			sb.append("(");
-			while(it.hasNext()){
+			while (it.hasNext()) {
 				sb.append("'");
 				sb.append(it.next());
 				sb.append("'");
@@ -147,23 +141,44 @@ public class AssetOptRecordProvider {
 		String tempColumn = searchFilter.fieldName;
 		Object value = searchFilter.value;
 		SearchFilter.Operator op = searchFilter.operator;
-		if (tempColumn.equals("reportDate")) {
+		// obj
+		if (tempColumn.equals("createDate")) {
 			if (op.equals(SearchFilter.Operator.GTE)) {
-				sb.append("a.report_date>='" + value + "' and ");
+				sb.append("a.create_date>='" + value + "' and ");
 			} else if (op.equals(SearchFilter.Operator.LTE)) {
-				sb.append("a.report_date<='" + value + "' and ");
+				sb.append("a.create_date<='" + value + "' and ");
 			}
-		} else if (tempColumn.equals("checkDate")) {
+		} else if (tempColumn.equals("modifyDate")) {
 			if (op.equals(SearchFilter.Operator.GTE)) {
-				sb.append("a.check_date>='" + value + "' and ");
+				sb.append("a.modify_date>='" + value + "' and ");
 			} else if (op.equals(SearchFilter.Operator.LTE)) {
-				sb.append("a.check_date<='" + value + "' and ");
+				sb.append("a.modify_date<='" + value + "' and ");
 			}
-		} else if (tempColumn.equals("status")) {
-			sb.append("a.status='" + value + "' and ");
-		} else if (tempColumn.equals("recommandStatus")) {
-			sb.append("a.recommand_status='" + value + "' and ");
-		} else if (tempColumn.equals("assetInfoname")) {
+		} else if (tempColumn.equals("startDate")) {
+			if (op.equals(SearchFilter.Operator.GTE)) {
+				sb.append("a.start_date>='" + value + "' and ");
+			} else if (op.equals(SearchFilter.Operator.LTE)) {
+				sb.append("a.start_date<='" + value + "' and ");
+			}
+		} else if (tempColumn.equals("endDate")) {
+			if (op.equals(SearchFilter.Operator.GTE)) {
+				sb.append("a.end_date>='" + value + "' and ");
+			} else if (op.equals(SearchFilter.Operator.LTE)) {
+				sb.append("a.end_date<='" + value + "' and ");
+			}
+		}
+		// userAccount
+		else if (tempColumn.equals("createByName")) {
+			sb.append("(d.name like '%" + value + "%' or ");
+			sb.append("d.name_py_code like '%" + value + "%') and ");
+		} else if (tempColumn.equals("modifyByName")) {
+			sb.append("(e.name like '%" + value + "%' or ");
+			sb.append("e.name_py_code like '%" + value + "%') and ");
+		}
+		// orgInfo
+		
+		// assetInfo
+		else if (tempColumn.equals("assetInfoname")) {
 			sb.append("(b.name like '%" + value + "%' or ");
 			sb.append("b.name_py_code like '%" + value + "%') and ");
 		} else if (tempColumn.equals("assetInfonamePyCode")) {
@@ -212,12 +227,6 @@ public class AssetOptRecordProvider {
 			} else if (op.equals(SearchFilter.Operator.LTE)) {
 				sb.append("b.warranty_date<='" + value + "' and ");
 			}
-		} else if (tempColumn.equals("createByName")) {
-			sb.append("(c.name like '%" + value + "%' or ");
-			sb.append("c.name_py_code like '%" + value + "%') and ");
-		} else if (tempColumn.equals("assetInfohospitalName")) {
-			sb.append("(d.name like '%" + value + "%' or ");
-			sb.append("d.name_py_code like '%" + value + "%') and ");
 		}
 	}
 }

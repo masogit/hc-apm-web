@@ -85,13 +85,13 @@ public class AssetOptRecord implements Serializable {
 
 //	@Transient
 	@JoinColumn(name = "create_by", referencedColumnName = "uid", insertable = false, updatable = false)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount createBy;
 
 //	@Transient
 	@JoinColumn(name = "modify_by", referencedColumnName = "uid", insertable = false, updatable = false)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount modifyBy;
 	
@@ -123,7 +123,7 @@ public class AssetOptRecord implements Serializable {
 
 	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
 	@NotFound(action= NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 //	@Transient
 	private AssetInfo assetInfo;
 	
@@ -140,6 +140,12 @@ public class AssetOptRecord implements Serializable {
 	private String assetInfoSiteName;
 	@Transient
 	private String assetInfoclinicalDeptName;
+	@Transient
+	private Integer assetInfoassetGroup;
+	@Transient
+	private String createByName;
+	@Transient
+	private String modifyByName;
 
 	@Transient
 	private boolean needGetItem = true;
@@ -381,6 +387,30 @@ public class AssetOptRecord implements Serializable {
 
 	public void setAssetInfoclinicalDeptName(String assetInfoclinicalDeptName) {
 		this.assetInfoclinicalDeptName = assetInfoclinicalDeptName;
+	}
+
+	public String getCreateByName() {
+		return createByName;
+	}
+
+	public void setCreateByName(String createByName) {
+		this.createByName = createByName;
+	}
+
+	public String getModifyByName() {
+		return modifyByName;
+	}
+
+	public void setModifyByName(String modifyByName) {
+		this.modifyByName = modifyByName;
+	}
+
+	public Integer getAssetInfoassetGroup() {
+		return assetInfoassetGroup;
+	}
+
+	public void setAssetInfoassetGroup(Integer assetInfoassetGroup) {
+		this.assetInfoassetGroup = assetInfoassetGroup;
 	}
 
 	@Override
