@@ -128,8 +128,8 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <h:column>
-                                        <label class="label">合同价格(元)*</label>
+                                    <h:column headerText="合同价格(元)">
+
                                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}" readonly="true" />
                                     </h:column>
                                     <p:column headerText="备件类别">
