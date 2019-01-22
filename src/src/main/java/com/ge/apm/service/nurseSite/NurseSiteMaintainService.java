@@ -213,9 +213,9 @@ public class NurseSiteMaintainService {
 		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId);
 	}
 
-	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId) {
-		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
-	}
+//	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId) {
+//		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
+//	}
 
 	public List<String> findUserUidListByOrgUids(List<String> orgUids) {
 		return userAccountRepository.findUserUidListByOrgUids(orgUids);
@@ -494,36 +494,36 @@ public class NurseSiteMaintainService {
             }
         }
         //order data
-        if(listConfig!=null){
-            for(int i=0;i<listConfig.size();++i){
-                NurseSiteMaintainConfig tempConfig=listConfig.get(i);
-                mapConfig.put(tempConfig.getId(), tempConfig);
-            }
-        }
-        if(listItem!=null && listItem.size()>0){
-            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
-            while (itItem.hasNext()) {
-                NurseSiteMaintainItem tempItem = itItem.next();
-                List<NurseSiteMaintainData> listTempData=tempItem.getListData();
-                if(listTempData!=null && listTempData.size()>0){
-                    NurseSiteMaintainConfig tempConfig=mapConfig.get(tempItem.getConfigId());
-                    JSONArray jsonArray=JSONArray.parseArray(tempConfig.getCheckItemsDetail());
-                    List<NurseSiteMaintainData> listNewData=new ArrayList<NurseSiteMaintainData>();
-                    for(int i=0;i<jsonArray.size();++i){
-                        JSONObject obj=jsonArray.getJSONObject(i);
-                        String name=obj.getString("name");
-                        NurseSiteMaintainData tempData=findObjInList(listTempData, name);
-                        if(tempData!=null){
-                        	listNewData.add(tempData);
-                        }
-                    }
-                    if(listTempData!=null && listTempData.size()>0){
-						listNewData.addAll(listTempData);
-					}
-                    tempItem.setListData(listNewData);
-                }
-            }
-        }
+//        if(listConfig!=null){
+//            for(int i=0;i<listConfig.size();++i){
+//                NurseSiteMaintainConfig tempConfig=listConfig.get(i);
+//                mapConfig.put(tempConfig.getId(), tempConfig);
+//            }
+//        }
+//        if(listItem!=null && listItem.size()>0){
+//            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+//            while (itItem.hasNext()) {
+//                NurseSiteMaintainItem tempItem = itItem.next();
+//                List<NurseSiteMaintainData> listTempData=tempItem.getListData();
+//                if(listTempData!=null && listTempData.size()>0){
+//                    NurseSiteMaintainConfig tempConfig=mapConfig.get(tempItem.getConfigId());
+//                    JSONArray jsonArray=JSONArray.parseArray(tempConfig.getCheckItemsDetail());
+//                    List<NurseSiteMaintainData> listNewData=new ArrayList<NurseSiteMaintainData>();
+//                    for(int i=0;i<jsonArray.size();++i){
+//                        JSONObject obj=jsonArray.getJSONObject(i);
+//                        String name=obj.getString("name");
+//                        NurseSiteMaintainData tempData=findObjInList(listTempData, name);
+//                        if(tempData!=null){
+//                        	listNewData.add(tempData);
+//                        }
+//                    }
+//                    if(listTempData!=null && listTempData.size()>0){
+//						listNewData.addAll(listTempData);
+//					}
+//                    tempItem.setListData(listNewData);
+//                }
+//            }
+//        }
     }
 	private NurseSiteMaintainData findObjInList(List<NurseSiteMaintainData> list,String name){
 		for(int i=0;i<list.size();++i){
