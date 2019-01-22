@@ -59,6 +59,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setCallingController(this);
 		searchController.setUpdateViewIDs(":optRecordListForm:datalist");
+		searchController.setBlnOrgTreeUpdate(true);
 		searchController.setType(5);
 		searchController.updateData();
 		dao = WebUtil.getBean(AssetOptRecordMapper.class);

@@ -68,10 +68,11 @@ public class SearchController {
 	// 1:contractedit,2:pcc,3:nursesite
 	protected int type = 0;
 	boolean blnAccessScope = false;
-	boolean blnDepartOrg=false;
-	boolean blnDepartOrgUpdate=false;
+	boolean blnDepartOrg = false;
 	boolean blnOrgTree = false;
-	boolean blnOrgTreeUpdate=false;
+	boolean blnDepartOrgUpdate = false;
+	boolean blnOrgTreeUpdate = false;
+	boolean blnAssetUpdate = false;
 	boolean showDialog = false;
 	boolean blnAssetName = false;
 	boolean blnAssetType = false;
@@ -84,7 +85,7 @@ public class SearchController {
 	boolean blnFilterStatus = true;
 	boolean blnFilterValied = true;
 	boolean blnFilterDelete = true;
-	boolean blnUpdate=false;
+	boolean blnUpdate = false;
 	List<SearchFilter> listSearchFilter;
 	DualListModel<AssetInfo> availableAssets;
 	List<AssetInfo> listUnSelectedAssetInfo;
@@ -105,7 +106,9 @@ public class SearchController {
 		aiService = WebUtil.getBean(AssetInstallationService.class);
 		autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
 		listSearchFilter = new ArrayList<SearchFilter>();
-
+		blnDepartOrgUpdate = false;
+		blnOrgTreeUpdate = false;
+		blnAssetUpdate = false;
 		updateData();
 	}
 
@@ -132,10 +135,9 @@ public class SearchController {
 		assetGroup = "";
 		functionType = "";
 		threeQrCode = "";
-		blnUpdate=false;
+		blnUpdate = false;
 		blnAccessScope = false;
 		blnOrgTree = false;
-		blnOrgTreeUpdate=false;
 		blnAssetName = false;
 		blnAssetType = false;
 		blnAssetGroup = false;
@@ -144,15 +146,14 @@ public class SearchController {
 		blnPickList = false;
 		blnAssetSelect = false;
 		blnChangeEvent = false;
-		blnDepartOrg=false;
-		blnDepartOrgUpdate=false;
+		blnDepartOrg = false;
 	}
 
 	public void updateData() {
 		resetStatus();
 		fetchOrgTree();
 		if (type == 1) {
-			blnDepartOrg=true;
+			blnDepartOrg = true;
 			blnPickList = true;
 			blnAssetGroup = true;
 			blnThreeQrCode = true;
@@ -160,21 +161,20 @@ public class SearchController {
 			fetchDeptOrgList(selectedOrg);
 			// fetchOriginPickListAssetInfo();
 		} else if (type == 2) {
-			blnDepartOrg=true;
+			blnDepartOrg = true;
 			blnAssetSelect = true;
 			// fetchSiteOrgList();
 			fetchDeptOrgList(selectedOrg);
 			fetchOriginSelectAssetInfo();
 		} else if (type == 3) {
-			blnDepartOrg=true;
-			blnDepartOrgUpdate=true;
+			blnDepartOrg = true;
 			blnChangeEvent = true;
 			blnAccessScope = true;
 			// fetchSiteOrgList();
 			fetchDeptOrgList(selectedOrg);
 			// fetchOriginSelectAssetInfo();
 		} else if (type == 4) {
-			blnDepartOrg=true;
+			blnDepartOrg = true;
 			blnPickList = true;
 			blnAssetName = true;
 			blnAssetGroup = true;
@@ -187,7 +187,6 @@ public class SearchController {
 		} else if (type == 5) {
 			blnChangeEvent = true;
 			blnAccessScope = true;
-			blnOrgTreeUpdate=true;
 		}
 	}
 
@@ -230,6 +229,24 @@ public class SearchController {
 		}
 	}
 
+	private void triggerEvent() {
+		if (callingController != null) {
+			if (type == 2) {
+				callingController.onServerEvent("change", selectedAssetInfo);
+			} else if (type == 3) {
+				if (selectedOrgDepart != null) {
+					callingController.onServerEvent("change", selectedOrgDepart);
+				} else {
+					callingController.onServerEvent("change", selectedOrg);
+				}
+			} else if (type == 4) {
+				callingController.onServerEvent("change", listSelectedAssetInfo);
+			} else if (type == 5) {
+				callingController.onServerEvent("change", selectedOrg);
+			}
+		}
+	}
+
 	private void onChange() {
 		generateListFilter();
 		if (!blnUpdate) {
@@ -241,22 +258,7 @@ public class SearchController {
 			fetchOriginSelectAssetInfo();
 		}
 		if (blnChangeEvent) {
-			if (callingController != null) {
-				if (type == 2) {
-					callingController.onServerEvent("change", selectedAssetInfo);
-				} else if (type == 3) {
-					if (selectedOrgDepart != null) {
-						callingController.onServerEvent("change", selectedOrgDepart);
-					} else {
-						callingController.onServerEvent("change", selectedOrg);
-					}
-				} else if (type == 4) {
-					callingController.onServerEvent("change", listSelectedAssetInfo);
-				}
-				else if (type ==5) {
-					callingController.onServerEvent("change", selectedOrg);
-				}
-			}
+			triggerEvent();
 		}
 	}
 
@@ -307,6 +309,7 @@ public class SearchController {
 				listSelectedAssetInfo.removeAll(collection);
 			}
 		}
+		triggerEvent();
 	}
 
 	private void fetchOriginPickListAssetInfo() {
@@ -405,13 +408,12 @@ public class SearchController {
 			}
 		}
 		if (filterCount > 1) {
-			blnUpdate=true;
+			blnUpdate = true;
+		} else {
+			blnUpdate = false;
 		}
-		else{
-			blnUpdate=false;
-		}
-		if(type==5){
-			blnUpdate=true;
+		if (type == 5) {
+			blnUpdate = true;
 		}
 	}
 
@@ -510,6 +512,7 @@ public class SearchController {
 	public void setUpdateViewIDs(String updateViewIDs) {
 		this.updateViewIDs = updateViewIDs;
 	}
+
 	public boolean isBlnAssetType() {
 		return blnAssetType;
 	}
@@ -736,4 +739,13 @@ public class SearchController {
 	public void setBlnUpdate(boolean blnUpdate) {
 		this.blnUpdate = blnUpdate;
 	}
+
+	public boolean isBlnAssetUpdate() {
+		return blnAssetUpdate;
+	}
+
+	public void setBlnAssetUpdate(boolean blnAssetUpdate) {
+		this.blnAssetUpdate = blnAssetUpdate;
+	}
+
 }

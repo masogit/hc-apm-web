@@ -85,6 +85,7 @@ public class MaintainController implements ServerEventInterface {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
+		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
 		searchController.updateData();
 		searchController.setCallingController(this);
