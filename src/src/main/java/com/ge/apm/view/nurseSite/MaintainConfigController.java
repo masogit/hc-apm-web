@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -196,7 +197,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		setDefaultValueForAssetList();
 	}
 	private void initValues(){
-		this.listCheckAssets=new ArrayList<AssetInfo>();
+		this.listCheckAssets=new LinkedList<AssetInfo>();
 		this.listCheckDate=new ArrayList<String>();
 		this.listMonthDay=new ArrayList<String>();
 		this.listWeekDay=new ArrayList<String>();
@@ -210,7 +211,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			listOrgInfo.clear();
 		}
 		if(checkListAssets==null){
-			checkListAssets=new ArrayList<AssetInfo>();
+			checkListAssets=new LinkedList<AssetInfo>();
 		}
 		else{
 			checkListAssets.clear();
@@ -263,10 +264,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
 			}
 			if(checkListAssets==null){
-				checkListAssets=new ArrayList<AssetInfo>();
+				checkListAssets=new LinkedList<AssetInfo>();
 			}
 			if(listCheckAssets==null){
-				listCheckAssets=new ArrayList<AssetInfo>();
+				listCheckAssets=new LinkedList<AssetInfo>();
 			}
 			availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 		}
@@ -341,16 +342,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			checkListAssets=nurseSiteMaintainService.getListAssetInfoBySearchFilter(listSearchFilter,sort);
 		}
 		else{
-			checkListAssets=new ArrayList<AssetInfo>();
+			checkListAssets=new LinkedList<AssetInfo>();
 		}
 		if(checkListAssets!=null && listCheckAssets!=null){
 			checkListAssets.removeAll(listCheckAssets);
 		}
 		if(checkListAssets==null){
-			checkListAssets=new ArrayList<AssetInfo>();
+			checkListAssets=new LinkedList<AssetInfo>();
 		}
 		if(listCheckAssets==null){
-			listCheckAssets=new ArrayList<AssetInfo>();
+			listCheckAssets=new LinkedList<AssetInfo>();
 		}
 		availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 	}
