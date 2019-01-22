@@ -18,7 +18,7 @@
                                 </p:selectBooleanCheckbox>
                                 <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
                                 <f:facet name="header"  >
-                                    <p:selectBooleanCheckbox itemLabel="勾选审批" id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
+                                    <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
                                         <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@this @(.selectCheckBox)"/>
                                     </p:selectBooleanCheckbox>
                                     <!--<h:outputText value="勾选审批" />-->
@@ -59,9 +59,9 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="到货">
+                            <!--<p:column headerText="到货">
                                 <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
-                            </p:column>
+                            </p:column>-->
 
                         </p:dataTable>
 
