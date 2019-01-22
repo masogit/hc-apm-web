@@ -566,13 +566,16 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
+            V2_PmOrder v2 = woDao.findById(item.getKey());
+
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("accept");
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
-            if(type==1)
+            formData.setStepId(v2.getCurrentStepId());
+       /*     if(type==1)
                 formData.setStepId("Accept");//抢单Assign和接单都是Accept
             if(type==2)
-                formData.setStepId("Assign");//抢单Assign和接单都是Accept
+                formData.setStepId("Assign");//抢单Assign和接单都是Accept*/
             formData.setPmOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原
