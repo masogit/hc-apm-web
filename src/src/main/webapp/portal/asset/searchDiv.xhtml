@@ -78,7 +78,7 @@
 					requiredMessage="已选设备 #{msg.ValidationRequire}" style="width:850px">
 					<f:facet name="sourceCaption">待选设备</f:facet>
 					<f:facet name="targetCaption">已选设备</f:facet>
-					<p:ajax event="transfer" listener="#{searchController.onAssetsTransfer}"/>
+					<p:ajax event="transfer" listener="#{searchController.onAssetsTransfer}" update="#{searchController.blnAssetUpdate?searchController.updateViewIDs:''}"/>
 					<p:column style="float: left;width:25%;text-align:left;">
 						<h:outputText value="#{item.name}" />
 					</p:column>

@@ -55,6 +55,7 @@ public class MaintainExportController implements ServerEventInterface{
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
+		searchController.setBlnDepartOrgUpdate(true);
 		searchController.updateData();
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
