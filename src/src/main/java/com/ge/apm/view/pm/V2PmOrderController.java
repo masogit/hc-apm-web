@@ -81,6 +81,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private static final String EMPTY_SIGNATURE_HOLDER = "";
     private String fileterOrgName;
     private String fileterAssetDeptOrgName;
+    private Integer casePriority;
 private  String cancelInt;
     private String supplierName;
     private AutoCompleteService autoCompleteService;
@@ -176,6 +177,10 @@ private  String cancelInt;
     if(!accessoryList.isEmpty())
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
+    }
+
+    public void x3(){
+        System.out.println(casePriority);
     }
     public void prepareCancel(String itemId){
         cancelReason=null;
@@ -1043,11 +1048,11 @@ private  String cancelInt;
     }
 
     public void saveServiceRequest() {
-        System.out.println(currentStatus);
+
         if(currentStatus!=2 && currentStatus!=3){
             WebUtil.addErrorMessage("必须选择当前状态");
             RequestContext requestContext = RequestContext.getCurrentInstance();
-            RequestContext.getCurrentInstance().addCallbackParam("status", true);
+            requestContext.addCallbackParam("status", true);
         }
         if(newServiceRequest.getRequestReason()==null){
             newServiceRequest.setRequestReason("设备故障");
@@ -1065,6 +1070,10 @@ private  String cancelInt;
             newServiceRequest.setSrRepairType("1");
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(dptName);
+
+            if(casePriority ==null) {
+                newServiceRequest.setCasePriority(1);
+            }
             woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
@@ -1451,8 +1460,6 @@ private  String cancelInt;
                orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
            }
        }else{
-
-
       //如果选择除计划完成时间的其它列 进行排序
         orders =  acqListSortOrder(pageRequest);
        }
@@ -2539,5 +2546,13 @@ private  String cancelInt;
 
     public void setCancelInt(String cancelInt) {
         this.cancelInt = cancelInt;
+    }
+
+    public Integer getCasePriority() {
+        return casePriority;
+    }
+
+    public void setCasePriority(Integer casePriority) {
+        this.casePriority = casePriority;
     }
 }
