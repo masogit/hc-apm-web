@@ -49,10 +49,8 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(value="select pm.* from v2_pm_order pm where id in ?1",nativeQuery = true)
 	public  List<V2_PmOrder> getBatchPmOrderList(List<String> idList);
 
+	public V2_PmOrder findById(String Id);
 
-
-
-
-        public List<V2_PmOrder> getByAssetUid(String asset_uid);
+	public List<V2_PmOrder> getByAssetUid(String asset_uid);
         
 }

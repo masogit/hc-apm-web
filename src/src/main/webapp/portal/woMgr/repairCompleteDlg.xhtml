@@ -115,7 +115,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="accessList" value="#{workOrderMgrController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="名称">
+                                    <p:column headerText="备件名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
 
@@ -128,10 +128,12 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <h:column>
-                                        <label class="label">合同价格(元)*</label>
-                                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}" readonly="true" />
-                                    </h:column>
+                                    <p:column headerText="合同价格(元)">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+
+                                    </p:column>
                                     <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
