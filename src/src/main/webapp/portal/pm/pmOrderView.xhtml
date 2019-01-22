@@ -91,7 +91,7 @@
                         <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
                         <label class="label">使用的备件</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="名称">
+                            <p:column headerText="备件名称">
                                 <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
 
@@ -102,6 +102,12 @@
                                 <h:outputText value="#{detailItem.partsPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
+                            </p:column>
+                            <p:column headerText="合同价格(元)">
+                                <h:outputText value="#{item.closedPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+
                             </p:column>
                             <p:column headerText="审核状态">
                                 <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
@@ -137,11 +143,6 @@
                             </p:column>
                             <p:column headerText="到货">
                                 <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" rendered="#{detailItem.id ne '000'}"/>
-                            </p:column>
-                            <p:column headerText="合同价格(元)">
-                                <h:outputText value="#{detailItem.closedPrice}">
-                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
-                                </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
                                <!-- <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetHead')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>-->

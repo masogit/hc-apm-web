@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -118,12 +119,12 @@ public class SearchController {
 		selectedOrg = null;
 		selectedAssetInfo = null;
 		if (listUnSelectedAssetInfo == null) {
-			listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+			listUnSelectedAssetInfo = new LinkedList<AssetInfo>();
 		} else {
 			listUnSelectedAssetInfo.clear();
 		}
 		if (listSelectedAssetInfo == null) {
-			listSelectedAssetInfo = new ArrayList<AssetInfo>();
+			listSelectedAssetInfo = new LinkedList<AssetInfo>();
 		} else {
 			listSelectedAssetInfo.clear();
 		}
@@ -316,9 +317,9 @@ public class SearchController {
 		if (listSearchFilter.size() > 0) {
 			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
 			if (listUnSelectedAssetInfo == null) {
-				listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+				listUnSelectedAssetInfo = new LinkedList<AssetInfo>();
 			}
-			listSelectedAssetInfo = new ArrayList<AssetInfo>();
+			listSelectedAssetInfo = new LinkedList<AssetInfo>();
 			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
 		}
 	}
@@ -327,7 +328,7 @@ public class SearchController {
 		if (listSearchFilter.size() > 0) {
 			listUnSelectedAssetInfo = searchService.getListAssetInfo(listSearchFilter);
 			if (listUnSelectedAssetInfo == null) {
-				listUnSelectedAssetInfo = new ArrayList<AssetInfo>();
+				listUnSelectedAssetInfo = new LinkedList<AssetInfo>();
 			}
 		}
 	}

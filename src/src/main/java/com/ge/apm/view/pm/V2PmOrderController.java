@@ -1240,7 +1240,7 @@ private  String cancelInt;
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
         return dao;
     }
-
+        //type =1 是接单 ,type =2 是抢单
     public void acceptWorkOrder(int type) {
         if (isChecked() == false) //如果是false说明不是批量的操作
         {
