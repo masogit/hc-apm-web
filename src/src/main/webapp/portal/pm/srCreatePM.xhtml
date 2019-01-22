@@ -32,7 +32,8 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.casePriority}*</label>
-                            <p:selectOneMenu value="#{v2PmOrderController.newServiceRequest.casePriority}" >
+                            <p:selectOneMenu value="#{v2PmOrderController.casePriority}" >
+                                <p:ajax listener="#{v2PmOrderController.x3()}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>

@@ -97,6 +97,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         if (null != newServiceRequest.getConfirmedDownTime()) {
             formData.setConfirmedDownTime(TimeUtils.getStrDate(newServiceRequest.getConfirmedDownTime(), "yyyy-MM-dd HH:mm:ss"));
         }
+
         formData.setPriority(newServiceRequest.getCasePriority());
         formData.setRequestReason(newServiceRequest.getRequestReason());
         formData.setAttachments(picList);
