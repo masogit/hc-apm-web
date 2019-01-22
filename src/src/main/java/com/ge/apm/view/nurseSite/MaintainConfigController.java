@@ -87,7 +87,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         searchController = WebUtil.getBean(SearchController.class);
-		searchController.setCallingController(this);
+        searchController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
@@ -178,11 +178,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		// TODO Auto-generated method stub
 		super.prepareCreate();
 		searchController.setType(4);
+		searchController.setUpdateViewIDs(":maintainConfigCreateForm:saveButtonId");
+		searchController.setBlnAssetUpdate(true);
 		searchController.updateData();
 		isCreate=true;
 		initValues();
 		loadMaintainConfig(this.selected);
-		
 	}
 	
 	@Override
