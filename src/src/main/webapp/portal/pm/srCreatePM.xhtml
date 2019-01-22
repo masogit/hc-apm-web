@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修---" >
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" >
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" >
@@ -47,7 +47,7 @@
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.requestReason}*--</label>
+                            <label class="label">#{msg.requestReason}*</label>
                             <p:inputTextarea id="devfaultId" placeholder="设备故障" required="false" value="#{v2PmOrderController.newServiceRequest.requestReason}" />
                             <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestReason}" />
                         </h:panelGroup>

@@ -46,9 +46,15 @@
                             <p:column headerText="备件类别">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                             </p:column>
+
+
                             <p:column headerText="序列号">
                                 <h:outputText value="#{item.serialNum}" />
                             </p:column>
+                            <p:column headerText="发票号">
+                                <h:outputText value="#{item.invoiceNum}" />
+                            </p:column>
+
                             <p:column headerText="质保期">
                                 <h:outputText value="#{item.warrantyDate}">
                                     <f:convertDateTime pattern="yyyy-MM-dd"/>
