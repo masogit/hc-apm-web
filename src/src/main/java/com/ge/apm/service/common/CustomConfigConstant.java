@@ -45,7 +45,7 @@ public class CustomConfigConstant {
     
     //默认可修改角色
     static public List<String> getConfigEditRolesName() {
-        return Arrays.asList("AssetHead", "DeptHead", "AssetStaff");
+        return Arrays.asList("AssetHead", "AssetStaff");
     }
 
     public static Map<String, String> getExportFields() {
