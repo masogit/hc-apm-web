@@ -1881,11 +1881,15 @@ private  String cancelInt;
     public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
+        List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
         UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
+        if(unsD==null){
+            return pmcl;
+        }
         List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
         List<String> strList=new ArrayList<String>();
         byCollectionId.stream().forEach(item->strList.add(item.getKey()));
-        List<PmOrderRuleCheckList> pmcl = pmckLstDao.findPMCL(strList);
+         pmcl = pmckLstDao.findPMCL(strList);
         return pmcl;
     }
 
