@@ -169,7 +169,8 @@ public class PccExamineReportService {
     @Transactional
     public boolean saveFile(ApmStreamedContent content,String boUuid,String boType,String boSubType){
         if(content!=null){
-            V2_BlobObject blobObj=blobFileService.uploadFile(content.getStream(), content.getName());
+        	String name=content.getName();
+            V2_BlobObject blobObj=blobFileService.uploadFile(content.getStream(), name.toLowerCase());
             blobObj.setBoType(boType);
             blobObj.setBoSubType(boSubType);
             blobObj.setBoUuid(boUuid);
