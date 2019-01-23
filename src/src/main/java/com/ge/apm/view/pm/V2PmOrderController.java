@@ -1444,6 +1444,7 @@ private  String cancelInt;
                 searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             }
+            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已关单"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
         this.selected = null;
