@@ -53,7 +53,7 @@
 								<p:inputText id="filterstartDate" widgetVar="varFilterstartDate" />
 							</f:facet>
 							<h:outputText value="#{item.startDate}">
-								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								<f:convertDateTime timeZone="GMT+8" pattern="MM/dd/yyyy HH:mm:ss" />
 							</h:outputText>
 						</p:column>
 						<p:column headerText="关机时间" sortBy="#{item.endDate}" filterBy="#{item.endDate}" filterMatchMode="GTE">
@@ -61,7 +61,7 @@
 								<p:inputText id="filterendDate" widgetVar="varFilterendDate" />
 							</f:facet>
 							<h:outputText value="#{item.endDate}">
-								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								<f:convertDateTime timeZone="GMT+8" pattern="MM/dd/yyyy HH:mm:ss" />
 							</h:outputText>
 						</p:column>
 						<p:column headerText="使用时长">
@@ -95,10 +95,10 @@
 		<p:overlayPanel widgetVar="panelFilterstartDate" for="optRecordListForm:datalist:filterstartDate" dismissable="false">
 			<h:panelGrid columns="2">
 				<p:outputLabel value="#{msg.From}" />
-				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_startDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_startDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true"
 					mask="true" size="12" locale="zh" />
 				<p:outputLabel value="#{msg.To}" />
-				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_startDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_startDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
 					size="12" locale="zh" />
 			</h:panelGrid>
 			<p:commandButton
@@ -109,10 +109,10 @@
 		<p:overlayPanel widgetVar="panelFilterendDate" for="optRecordListForm:datalist:filterendDate" dismissable="false">
 			<h:panelGrid columns="2">
 				<p:outputLabel value="#{msg.From}" />
-				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
 					size="12" locale="zh" />
 				<p:outputLabel value="#{msg.To}" />
-				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_endDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_endDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
 					size="12" locale="zh" />
 			</h:panelGrid>
 			<p:commandButton

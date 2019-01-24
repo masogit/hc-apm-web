@@ -166,6 +166,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		// updateFilter();
 		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
 		listDetail = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
+		service.supplementRecord(listDetail);
 		this.pageRequest = pageRequest;
 		this.sortField = sortField;
 		this.isAscending = isAscending;
