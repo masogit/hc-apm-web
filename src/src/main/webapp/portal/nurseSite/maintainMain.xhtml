@@ -15,7 +15,7 @@
             </div>
             <div class="ui-g-12 card">
                 <p:growl widgetVar="messages" id="messages" showDetail="true" />
-                <h:form id="maintainHeaderForm">
+                <h:form id="maintainHeaderForm" rendered="#{not empty maintainController}">
                     <p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     <br/>
@@ -60,7 +60,7 @@
                                             <label class="label">查看签名</label>
                                         </th> -->
                                     </tr>
-                                    <p:repeat value="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item2">
+                                    <p:repeat value="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item2">
                                         <tr>
                                             <td>
                                                 <h:outputText value="#{item2.assetInfo.name}"/>

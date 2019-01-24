@@ -1,6 +1,8 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.common.base.Strings;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
@@ -132,6 +134,10 @@ public class AssetLifecycleEvent implements Serializable {
         this.description = description;
     }
 
+    public JSONObject getDescriptionObject(){
+        return Strings.isNullOrEmpty(description)?null:JSONObject.parseObject(description);
+    }    
+    
     public Integer getStatus() {
         return status;
     }

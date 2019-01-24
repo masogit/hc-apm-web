@@ -60,6 +60,17 @@ public class PmOrderRuleCheckList {
 	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
 	private String siteUID;
 
+	@Column(name = "status")
+	private Integer status;// 0、已删除 1、使用中
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 	public String getTenantUID() {
 		return tenantUID;
 	}

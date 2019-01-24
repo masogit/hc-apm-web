@@ -40,9 +40,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-/**
- * Created by 212605082 on 2018/5/8.
- */
 @ManagedBean
 @ViewScoped
 public class MaintainController implements ServerEventInterface {
@@ -88,6 +85,7 @@ public class MaintainController implements ServerEventInterface {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
+		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
 		searchController.updateData();
 		searchController.setCallingController(this);
@@ -374,7 +372,7 @@ public class MaintainController implements ServerEventInterface {
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
 		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
-		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(showLables==null){
 			showLables=new ArrayList<String>();
 		}
@@ -401,7 +399,7 @@ public class MaintainController implements ServerEventInterface {
 	}
 	
 	public void checkRightAll(){
-		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
@@ -593,6 +591,36 @@ public class MaintainController implements ServerEventInterface {
 						}
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+				}
+			}
+			else if(type==3){
+				//month day,1-31
+				while(startCalendar.getTimeInMillis()<endCalendar.getTimeInMillis()){
+					int currentDay=startCalendar.get(Calendar.DAY_OF_MONTH);
+					int currentMonth=startCalendar.get(Calendar.MONTH);
+					int currentValue = 1;
+					for(int i=0;i<arr.length;++i){
+						try {
+							currentValue=Integer.parseInt(arr[i]);
+							if(currentDay==currentValue){
+								startCalendar.set(Calendar.HOUR_OF_DAY,currentCalendar.get(Calendar.HOUR_OF_DAY));
+								batchCreateMaintainData(startCalendar.getTime(), listMaintainData,null);
+							}
+						} catch (Exception e) {
+							// TODO: handle exception
+							LOGGER.error(e.getMessage());
+						}
+					}
+					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					int nextMonth=startCalendar.get(Calendar.MONTH);
+					if(nextMonth!=currentMonth){
+						if(currentDay<currentValue){
+							startCalendar.add(Calendar.DAY_OF_YEAR, -1);
+							startCalendar.set(Calendar.HOUR_OF_DAY,currentCalendar.get(Calendar.HOUR_OF_DAY));
+							batchCreateMaintainData(startCalendar.getTime(), listMaintainData,null);
+							startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+						}
+					}
 				}
 			}
 		}

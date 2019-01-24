@@ -707,6 +707,18 @@ public class AssetInfoFormatter {
         return value;
     }
 
+    public String getProprietaryClassAsString() {
+
+        if (assetInfo.getProprietaryClass() == null) return null;
+
+        int proprietaryClass = Integer.parseInt(assetInfo.getProprietaryClass());
+
+        String value = findMatchValue(proprietaryClass, importService.proprietaryClassList);
+
+        return value;
+
+    }
+
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
 
         String msgKey = String.valueOf(item);
@@ -826,6 +838,8 @@ public class AssetInfoFormatter {
         map.put("质保时间（月）", assetInfo.getWarrantyMonth());
         map.put("验收日期", assetInfo.getAcceptDate());
         map.put("创建日期", assetInfo.getCreatedDate());
+
+        map.put("专有分类", this.getProprietaryClassAsString());
 
         map.put("UUID", this.getUid());
 

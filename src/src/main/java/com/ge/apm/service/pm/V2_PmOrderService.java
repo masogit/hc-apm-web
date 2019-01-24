@@ -180,7 +180,34 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void saveReport(UnstructuredDataCollection report){
     	reportDao.save(report);
     }
-    
+
+
+    public void invokePmOerCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        //如果是工单是周期性的
+        /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
+        if(selectedPmOrder.getPmType()==1){ //周期性
+             if(cancelInt.equalsIgnoreCase("1")){
+                 formData.setQualityChecking("1");
+             }else{
+                 formData.setQualityChecking("2");
+             }
+        }else{//一次性或重测
+            formData.setQualityChecking("2");
+        }
+
+        formData.setDesc(desc);
+
+        String res = srApi.invokePmOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("取消提交成功");
+        }
+
+    }
+
     public void saveReport(List<UnstructuredDataCollection> listReport){
     	reportDao.save(listReport);
     }
@@ -539,13 +566,16 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
+            V2_PmOrder v2 = woDao.findById(item.getKey());
+
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("accept");
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
-            if(type==1)
+            formData.setStepId(v2.getCurrentStepId());
+       /*     if(type==1)
                 formData.setStepId("Accept");//抢单Assign和接单都是Accept
             if(type==2)
-                formData.setStepId("Assign");//抢单Assign和接单都是Accept
+                formData.setStepId("Assign");//抢单Assign和接单都是Accept*/
             formData.setPmOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原

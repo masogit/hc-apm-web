@@ -209,13 +209,13 @@ public class NurseSiteMaintainService {
 		return nurseSiteMaintainConfigItemRepository.findByParentId(parentId);
 	}
 
-	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId) {
+	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId) {
 		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId);
 	}
 
-	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId) {
-		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
-	}
+//	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId) {
+//		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
+//	}
 
 	public List<String> findUserUidListByOrgUids(List<String> orgUids) {
 		return userAccountRepository.findUserUidListByOrgUids(orgUids);
@@ -359,8 +359,8 @@ public class NurseSiteMaintainService {
 		this.assetInfoRepository = assetInfoRepository;
 	}
 
-	public Set<NurseSiteMaintainItem> loadConfigCheckItems(NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets) {
-		Set<NurseSiteMaintainItem> listMaintainItem = new HashSet<NurseSiteMaintainItem>();
+	public List<NurseSiteMaintainItem> loadConfigCheckItems(NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets) {
+		List<NurseSiteMaintainItem> listMaintainItem = new ArrayList<NurseSiteMaintainItem>();
 //		String strCheckItems = nurseSiteMaintainConfig.getCheckItems();
 		String strCheckDetail=nurseSiteMaintainConfig.getCheckItemsDetail();
 		if (StringUtils.isNotEmpty(strCheckDetail) && listCheckAssets != null) {
@@ -388,7 +388,7 @@ public class NurseSiteMaintainService {
 	}
 	
 	private void updateMaintainDataAllRight(NurseSiteMaintain obj, Date date,UserAccount user){
-		Set<NurseSiteMaintainItem> listItem = null;
+		List<NurseSiteMaintainItem> listItem = null;
 		supplementMaintain(obj);
 		listItem = obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
@@ -413,7 +413,7 @@ public class NurseSiteMaintainService {
 		obj.setModifyDate(date);
 	}
 	
-	private void supplementMaintainItem(Set<NurseSiteMaintainItem> listItem) {
+	private void supplementMaintainItem(List<NurseSiteMaintainItem> listItem) {
         Set<String> setModifyByUids = new HashSet<String>();
         Set<String> setAssetInfoUids = new HashSet<String>();
         Set<String> setItemIds = new HashSet<String>();
@@ -494,31 +494,36 @@ public class NurseSiteMaintainService {
             }
         }
         //order data
-        if(listConfig!=null){
-            for(int i=0;i<listConfig.size();++i){
-                NurseSiteMaintainConfig tempConfig=listConfig.get(i);
-                mapConfig.put(tempConfig.getId(), tempConfig);
-            }
-        }
-        if(listItem!=null && listItem.size()>0){
-            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
-            while (itItem.hasNext()) {
-                NurseSiteMaintainItem tempItem = itItem.next();
-                List<NurseSiteMaintainData> listTempData=tempItem.getListData();
-                if(listTempData!=null && listTempData.size()>0){
-                    NurseSiteMaintainConfig tempConfig=mapConfig.get(tempItem.getConfigId());
-                    JSONArray jsonArray=JSONArray.parseArray(tempConfig.getCheckItemsDetail());
-                    List<NurseSiteMaintainData> listNewData=new ArrayList<NurseSiteMaintainData>();
-                    for(int i=0;i<jsonArray.size();++i){
-                        JSONObject obj=jsonArray.getJSONObject(i);
-                        String name=obj.getString("name");
-                        NurseSiteMaintainData tempData=findObjInList(listTempData, name);
-                        listNewData.add(tempData);
-                    }
-                    tempItem.setListData(listNewData);
-                }
-            }
-        }
+//        if(listConfig!=null){
+//            for(int i=0;i<listConfig.size();++i){
+//                NurseSiteMaintainConfig tempConfig=listConfig.get(i);
+//                mapConfig.put(tempConfig.getId(), tempConfig);
+//            }
+//        }
+//        if(listItem!=null && listItem.size()>0){
+//            Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
+//            while (itItem.hasNext()) {
+//                NurseSiteMaintainItem tempItem = itItem.next();
+//                List<NurseSiteMaintainData> listTempData=tempItem.getListData();
+//                if(listTempData!=null && listTempData.size()>0){
+//                    NurseSiteMaintainConfig tempConfig=mapConfig.get(tempItem.getConfigId());
+//                    JSONArray jsonArray=JSONArray.parseArray(tempConfig.getCheckItemsDetail());
+//                    List<NurseSiteMaintainData> listNewData=new ArrayList<NurseSiteMaintainData>();
+//                    for(int i=0;i<jsonArray.size();++i){
+//                        JSONObject obj=jsonArray.getJSONObject(i);
+//                        String name=obj.getString("name");
+//                        NurseSiteMaintainData tempData=findObjInList(listTempData, name);
+//                        if(tempData!=null){
+//                        	listNewData.add(tempData);
+//                        }
+//                    }
+//                    if(listTempData!=null && listTempData.size()>0){
+//						listNewData.addAll(listTempData);
+//					}
+//                    tempItem.setListData(listNewData);
+//                }
+//            }
+//        }
     }
 	private NurseSiteMaintainData findObjInList(List<NurseSiteMaintainData> list,String name){
 		for(int i=0;i<list.size();++i){
@@ -538,7 +543,7 @@ public class NurseSiteMaintainService {
 		Set<String> setModifyByUids=new HashSet<String>();
 		Map<String,UserAccount> mapModifyBy=new HashMap<String,UserAccount>();
 		List<UserAccount> listModify=null;
-		Set<NurseSiteMaintainItem> listItem = findMaintainItemByParentId(tempMaintain.getId());
+		List<NurseSiteMaintainItem> listItem = findMaintainItemByParentId(tempMaintain.getId());
 		setModifyByUids.add(tempMaintain.getCreateByUid());
 		setModifyByUids.add(tempMaintain.getModifyByUid());
 		if (setModifyByUids.size() > 0) {
@@ -597,7 +602,7 @@ public class NurseSiteMaintainService {
 	}
 
 	public void updateMaintainData(NurseSiteMaintain obj,Date date,UserAccount user) {
-		Set<NurseSiteMaintainItem> listItem = null;
+		List<NurseSiteMaintainItem> listItem = null;
 		supplementMaintain(obj);
 		listItem=obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
@@ -663,7 +668,7 @@ public class NurseSiteMaintainService {
 	private void completeMaintainData(List<NurseSiteMaintain> listMaintain){
 		Set<String> setParentIds=new HashSet<String>();
 		Set<String> setModifyByUids=new HashSet<String>();
-		Set<NurseSiteMaintainItem> listMaintainItem=null;
+		List<NurseSiteMaintainItem> listMaintainItem=null;
 		List<UserAccount> listModifyBy=null;
 		Map<String,Set<NurseSiteMaintainItem>> mapItem=new HashMap<String,Set<NurseSiteMaintainItem>>();
 		Map<String,UserAccount> mapUser=new HashMap<String,UserAccount>();
@@ -792,10 +797,10 @@ public class NurseSiteMaintainService {
 
 	public NurseSiteMaintain createMaintain(Date date, UserAccount currentUser, NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets,
 			Integer sequence) {
-		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() == 2) {
-			sequence = null;
+		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() !=1) {
+			sequence = 0;
 		}
-		Set<NurseSiteMaintainItem> listItem = loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
+		List<NurseSiteMaintainItem> listItem = loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);
 		NurseSiteMaintain tempNurseSiteMaintain = new NurseSiteMaintain();
 		Date currentDate = new Date();
 		tempNurseSiteMaintain.setTenantUID(currentUser.getTenantUID());
@@ -985,8 +990,14 @@ public class NurseSiteMaintainService {
 
 	@Transactional
 	public boolean deleteMaintainConfig(NurseSiteMaintainConfig tempConfig) {
-		deleteConfigChildren(tempConfig.getId());
-		delete(tempConfig);
+		Integer count=nurseSiteMaintainRepository.fetchCountByConfigId(tempConfig.getId());
+		if(count!=null && count>0){
+			return false;
+		}
+		else{
+			deleteConfigChildren(tempConfig.getId());
+			delete(tempConfig);
+		}
 		return true;
 	}
 
@@ -1141,7 +1152,7 @@ public class NurseSiteMaintainService {
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
 			supplementMaintain(tempMaintain);
-			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
+			List<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
 				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
 				while (itItem.hasNext()) {
@@ -1239,7 +1250,7 @@ public class NurseSiteMaintainService {
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
 			supplementMaintain(tempMaintain);
-			Set<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
+			List<NurseSiteMaintainItem> listItem = tempMaintain.getListNurseSiteMaintainItem();
 			if (listItem != null && listItem.size() > 0) {
 				Iterator<NurseSiteMaintainItem> itItem = listItem.iterator();
 				while (itItem.hasNext()) {

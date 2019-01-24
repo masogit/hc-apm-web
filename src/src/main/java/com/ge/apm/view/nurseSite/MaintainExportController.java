@@ -32,9 +32,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-/**
- * Created by 212605082 on 2018/5/8.
- */
 @ManagedBean
 @ViewScoped
 public class MaintainExportController implements ServerEventInterface{
@@ -58,6 +55,7 @@ public class MaintainExportController implements ServerEventInterface{
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
+		searchController.setBlnDepartOrgUpdate(true);
 		searchController.updateData();
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();

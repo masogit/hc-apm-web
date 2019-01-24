@@ -184,12 +184,35 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         loadClinicalDeptList();
     }
 
+
 public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
 }
 
+private UserAccount ua1;
+
+    public UserAccount getUa1() {
+        return ua1;
+    }
+
+    public void setUa1(UserAccount ua1) {
+        this.ua1 = ua1;
+    }
+
+    private List<UserAccount> acker;
+    public List<UserAccount> completeAckList(String query) {
+       //return woService.getAckerList(selectedWorkOrder.getId());
+        if (acker == null) {
+            return Collections.emptyList();
+        }
+
+        List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+//        res.sort(new PinYinComparatorByName());
+        return res;
+    }
 public void repairResultSet(){
     if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
     currentStatus =1;
@@ -856,7 +879,19 @@ public void repairResultSet(){
     private Boolean hourRequired;
 
     public void prepareCompleteOrder(String woid) {
+
         selectedWorkOrder = dao.findById(woid);
+        acker=woService.getAckerList(selectedWorkOrder.getId());
+        Integer userId = selectedWorkOrder.getAckId();
+       if( userId!=null){
+          ua1 = userDao.getById(userId);
+       }else{
+           ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
+
+       }
+
+
+
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
            if (result.equalsIgnoreCase("2")) {
@@ -895,6 +930,7 @@ public void repairResultSet(){
     }
 
     public void saveRepairWorkOrder() {
+        assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
@@ -996,6 +1032,7 @@ public void repairResultSet(){
         if (!valid) {
             return;
         }
+        assigneeId =ua1.getId().toString();
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1747,6 +1784,10 @@ public void repairResultSet(){
 
     public void setFaultReason(String faultReason) {
         this.faultReason = faultReason;
+    }
+
+    public void setAcker(List<UserAccount> acker) {
+        this.acker = acker;
     }
 }
 

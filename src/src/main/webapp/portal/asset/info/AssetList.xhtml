@@ -87,7 +87,7 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"  
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -376,6 +376,17 @@
                             <c:if test="#{columnItem eq 'functionGrade'}">
                                 <p:column headerText="#{msg.functionGrade}" >
                                     <h:outputText value="#{fieldMsg.fieldValue('assetFunctionGrade',item.functionGrade)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'proprietaryClass'}">
+                                <p:column headerText="#{msg.proprietaryClass}" sortBy="#{item.proprietaryClass}" filterBy="#{item.proprietaryClass}" filterMatchMode="EQ" >
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('proprietaryClass',item.proprietaryClass)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'maitanance'}">

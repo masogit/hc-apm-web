@@ -366,4 +366,60 @@ public class WorkOrderReportProvider {
         return sb.toString();
 
     }
+
+    public String statisticsAssetWorkOrder(Map<String,Object> param){
+
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("SELECT ai.id as id,ai.uid as uid,ai.name as name,ai.serial_num as serialNum,ai.financing_num as financingNum, " +
+                "ai.function_type as functionType,ai.clinical_dept_uid as clinicalDeptUID,ai.asset_group as assetGroup,ai.qr_code as qrCode, " +
+                "count(wo.id) as workOrderCount, " +
+                "(SELECT im.value_zh FROM i18n_message im WHERE concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
+                "(SELECT oi.name FROM org_info oi WHERE ai.clinical_dept_uid = oi.uid) as clinicalDeptName " +
+                "FROM asset_info ai, v2_work_order wo " +
+                "WHERE ai.id=wo.asset_id ");
+
+        sb.append(buildFilter_AssetWorkOrder(searchFilterList));
+        sb.append(" GROUP BY ai.id ");
+        sb.append(" HAVING count(wo.id) > 0 ");
+        sb.append(" ORDER BY workOrderCount DESC ");
+
+        return sb.toString();
+
+    }
+
+    public String buildFilter_AssetWorkOrder(List<SearchFilter> searchFilterList){
+        StringBuilder sb = new StringBuilder();
+        for (SearchFilter searchFilter : searchFilterList) {
+            String tempColumn = searchFilter.fieldName;
+            Object value = searchFilter.value;
+            SearchFilter.Operator op = searchFilter.operator;
+
+            if(tempColumn.equals("orgUID")){
+                sb.append(" and (ai.tenant_uid='" + value + "' or ai.institution_uid='" + value + "' or ai.hospital_uid='" + value + "' or ai.site_uid='" + value + "') ");
+            }else if(tempColumn.equals("clinicalDeptUID")){
+                String str = "";
+                for (Object obj : (List<Object>)value) {
+                    str += "'" + obj + "',";
+                }
+                str = str.substring(0, str.length() - 1);
+                sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
+            }else if(tempColumn.equals("assetGroup")){
+                sb.append(" and ai.asset_group = " + value);
+            }else if(tempColumn.equals("searchStr")){
+                if(value != null){
+                    String tempValue = value.toString().toLowerCase();
+                    sb.append(" and (lower(ai.name) like '%" + tempValue + "%' or lower(ai.function_type) like '%" + tempValue + "%' or lower(ai.serial_num) like '%" + tempValue + "%' or lower(ai.financing_num) like '%" + tempValue + "%' or lower(ai.function_type) like '%" + tempValue + "%' or ai.qr_code like '%" + tempValue + "%') ");
+                }
+            }else if(tempColumn.equals("createdDateStart")){
+                sb.append(" and wo.created_date>='" + value + "' ");
+            }else if(tempColumn.equals("createdDateEnd")){
+                sb.append(" and wo.created_date<'" + value + "' ");
+            }
+        }
+
+        return sb.toString();
+    }
 }
