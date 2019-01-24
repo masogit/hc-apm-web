@@ -101,7 +101,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<ApmStreamedContent> listStreamedContent;
 	private ApmStreamedContent tailAttach;
 	private List<PccExamineReport> listSelected;
-	private Map<Integer,List<PccExamineReport>> mapListSelected;
+	private Map<Integer, List<PccExamineReport>> mapListSelected;
 	private DefaultStreamedContent exportFile;
 	private boolean blnEditable = false;
 	String updateViewIDs;
@@ -117,6 +117,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<String> userRoleNames;
 	private Set<String> setUserUids;
 	private int currentPage;
+	private String sortField;
+	private boolean isAscending;
+	private Pagination pageRequest;
 
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -134,7 +137,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			blnEditable = true;
 		}
 		setUserUids = service.findAccessOrgUidListByUserUid(currentUser.getUid());
-		mapListSelected=new HashMap<Integer,List<PccExamineReport>>();
+		mapListSelected = new HashMap<Integer, List<PccExamineReport>>();
 	}
 
 	@Override
@@ -142,9 +145,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<SearchFilter>();
 		}
-		currentPage=pageRequest.getCurrent();
-		if(mapListSelected.containsKey(currentPage)){
-			listSelected=mapListSelected.get(currentPage);
+		currentPage = pageRequest.getCurrent();
+		if (mapListSelected.containsKey(currentPage)) {
+			listSelected = mapListSelected.get(currentPage);
 		}
 		// need list or set
 		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
@@ -163,6 +166,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		// updateFilter();
 		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
 		listDetail = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
+		this.pageRequest = pageRequest;
+		this.sortField = sortField;
+		this.isAscending = isAscending;
 		return listDetail;
 	}
 
@@ -293,8 +299,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		String operation = "pccReportEdit.xhtml?actionName=" + actionName + "&selectedid=" + id;
 		return UrlEncryptController.encodeUrlParam(operation);
 	}
-	
-	public void onPageSelect(PageEvent event){
+
+	public void onPageSelect(PageEvent event) {
 		mapListSelected.put(currentPage, listSelected);
 	}
 
@@ -416,44 +422,52 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			addMessage("请上传报告传模板");
 		}
 	}
-	public void exportSelectedExcel(){
+
+	public void exportSelectedExcel() {
 		this.exportFile = null;
 		onPageSelect(null);
-		List<PccExamineReport> listTotalReport=new ArrayList<PccExamineReport>();
-		if (mapListSelected == null || mapListSelected.size() == 0) {
-			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
-			return;
-		}
-		for(List<PccExamineReport> listTemp:mapListSelected.values()){
-			if(listTemp!=null){
-				listTotalReport.addAll(listTemp);
+		List<PccExamineReport> listTotalReport = new ArrayList<PccExamineReport>();
+		if (mapListSelected != null && mapListSelected.size() >= 0) {
+			for (List<PccExamineReport> listTemp : mapListSelected.values()) {
+				if (listTemp != null) {
+					listTotalReport.addAll(listTemp);
+				}
 			}
+		} 
+		if(listTotalReport.size()==0){
+			listTotalReport = dao.getAll(searchFilters, sortField, isAscending, Integer.MAX_VALUE, 0);
 		}
-		downloadFile(service.parseMaintainToMap(listTotalReport));
+		if(listTotalReport!=null && listTotalReport.size()>0){
+			downloadFile(service.parseMaintainToMap(listTotalReport));
+		}
+		else{
+			WebUtil.addErrorMessage("没有数据！");
+		}
 	}
-	private void downloadFile(List<Map<String,Object>> data){
+
+	private void downloadFile(List<Map<String, Object>> data) {
 		try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/examine/pccExamineReportTemplate.xlsx");
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = service.exportData(doc, data);
-            if (exportFlag) {
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "pccExamineReport.xlsx");
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }
+			InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/examine/pccExamineReportTemplate.xlsx");
+			ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+			Boolean exportFlag = service.exportData(doc, data);
+			if (exportFlag) {
+				exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "pccExamineReport.xlsx");
+			}
+		} catch (IOException ex) {
+			LOGGER.error(ex.getMessage());
+		}
 	}
 
 	public void downloadSelectedReport() {
 		this.exportFile = null;
 		onPageSelect(null);
-		List<PccExamineReport> listTotalReport=new ArrayList<PccExamineReport>();
+		List<PccExamineReport> listTotalReport = new ArrayList<PccExamineReport>();
 		if (mapListSelected == null || mapListSelected.size() == 0) {
 			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
 			return;
 		}
-		for(List<PccExamineReport> listTemp:mapListSelected.values()){
-			if(listTemp!=null){
+		for (List<PccExamineReport> listTemp : mapListSelected.values()) {
+			if (listTemp != null) {
 				listTotalReport.addAll(listTemp);
 			}
 		}
