@@ -45,25 +45,25 @@ public class PccExamineReport implements Serializable {
 
 	// 创建日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "create_date")
 	private Date createDate;
 
 	// 修改日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "modify_date")
 	private Date modifyDate;
 
 	// 生成报告日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "report_date")
 	private Date reportDate;
 
 	// 检测日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "check_date")
 	private Date checkDate;
 

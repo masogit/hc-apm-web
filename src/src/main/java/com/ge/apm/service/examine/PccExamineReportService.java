@@ -98,7 +98,20 @@ public class PccExamineReportService {
     	mapOrgInfo.clear();
     	mapAssetInfo.clear();
     }
-    
+    public void supplementRecord(List<PccExamineReport> list){
+    	if(list!=null && list.size()>0){
+    		for(int i=0;i<list.size();++i){
+    			PccExamineReport pcc=list.get(i);
+    			String id=pcc.getId();
+    			if(StringUtils.isEmpty(id)){
+    				AssetInfo asset=pcc.getAssetInfo();
+    				if(asset!=null){
+    					pcc.setId(asset.getUid());
+    				}
+    			}
+    		}
+    	}
+    }
     public boolean saveFile(List<ApmStreamedContent> list,String boUuid,String boType){
         boolean result=false;
         if(list!=null && list.size()>0){
@@ -284,7 +297,7 @@ public class PccExamineReportService {
 			tempInfo=getAssetInfo(pcc.getAssetUid());
 			pcc.setAssetInfo(tempInfo);
 		}
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdf=new SimpleDateFormat("MM/dd/yyyy");
 		Date date=pcc.getCheckDate();
 		List<ApmStreamedContent> listPicture=parseBlobObjectImg(pcc.getId());
 		ApmStreamedContent template=getTemplate();
@@ -347,7 +360,7 @@ public class PccExamineReportService {
 	
 	private Map<String, Object> getTemplateMap(PccExamineReport pcc,List<ApmStreamedContent> listPicture){
 		Map<String, Object> data=new HashMap<String, Object>();
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf=new SimpleDateFormat("MM/dd/yyyy");
 		data.put("lineStatus", convertKeyToLable(pcc.getLineStatus(),fetchLineStatus()));
 		data.put("mirrorStatus", convertKeyToLable(pcc.getMirrorStatus(),fetchMirrorStatus()));
 		data.put("shellStatus", convertKeyToLable(pcc.getShellStatus(),fetchShellStatus()));
@@ -455,8 +468,8 @@ public class PccExamineReportService {
 		return Boolean.TRUE;
 	}
 	public List<Map<String, Object>> parseMaintainToMap(List<PccExamineReport> listPcc) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
 		if (listPcc != null && listPcc.size() > 0) {
 			for (int i = 0; i < listPcc.size(); ++i) {
