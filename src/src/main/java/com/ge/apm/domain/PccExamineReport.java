@@ -170,6 +170,8 @@ public class PccExamineReport implements Serializable {
 	private String recommandStatus;
 	@Column(name = "comment")
 	private String comment;
+	
+	private boolean blnHasId=true;
 
 	@Transient
 	private boolean needGetItem = true;
@@ -179,9 +181,6 @@ public class PccExamineReport implements Serializable {
 	}
 
 	public String getId() {
-		if (id == null) {
-			id = UUID.randomUUID().toString().replace("-", "");
-		}
 		return id;
 	}
 
@@ -563,6 +562,13 @@ public class PccExamineReport implements Serializable {
 
 	public void setAssetInfohospitalName(String assetInfohospitalName) {
 		this.assetInfohospitalName = assetInfohospitalName;
+	}
+	public boolean isBlnHasId() {
+		return blnHasId;
+	}
+
+	public void setBlnHasId(boolean blnHasId) {
+		this.blnHasId = blnHasId;
 	}
 
 	@Override
