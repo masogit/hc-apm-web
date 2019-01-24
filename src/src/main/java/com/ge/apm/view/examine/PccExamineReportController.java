@@ -433,7 +433,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 					listTotalReport.addAll(listTemp);
 				}
 			}
-		} else {
+		} 
+		if(listTotalReport.size()==0){
 			listTotalReport = dao.getAll(searchFilters, sortField, isAscending, Integer.MAX_VALUE, 0);
 		}
 		if(listTotalReport!=null && listTotalReport.size()>0){
