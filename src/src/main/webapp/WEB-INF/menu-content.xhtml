@@ -153,7 +153,7 @@
             </p:submenu>
             <p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
-                <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml"/>
+                <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.hasNotAnyRole('MVSFE')}"/>
             </p:submenu>
             <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('examineMgt') and (userContextService.isUltraSoundIBEndUser() or userContextService.hasAnyRole('SuperAdmin'))}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
