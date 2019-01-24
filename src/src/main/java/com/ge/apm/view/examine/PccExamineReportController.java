@@ -221,6 +221,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		super.prepareCreate();
+		if(!this.selected.isBlnHasId()){
+			this.selected.setId(null);
+		}
 	}
 
 	@Override
@@ -239,6 +242,9 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	public void prepareEdit() {
 		// TODO Auto-generated method stub
 		super.prepareEdit();
+		if(!this.selected.isBlnHasId()){
+			this.selected.setId(null);
+		}
 	}
 
 	private void updateFilter() {
