@@ -34,11 +34,13 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.ApmDropDownItem;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceUtil;
 
 /**
@@ -47,7 +49,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 @Service
 public class PccExamineReportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PccExamineReportService.class);
-    private static final String SHEET_Maintain = "Maintain List";
+    private static final String SHEET_Maintain = "datalist";
     @Autowired
     AssetInfoRepository assetInfoRepository;
 
@@ -167,7 +169,8 @@ public class PccExamineReportService {
     @Transactional
     public boolean saveFile(ApmStreamedContent content,String boUuid,String boType,String boSubType){
         if(content!=null){
-            V2_BlobObject blobObj=blobFileService.uploadFile(content.getStream(), content.getName());
+        	String name=content.getName();
+            V2_BlobObject blobObj=blobFileService.uploadFile(content.getStream(), name.toLowerCase());
             blobObj.setBoType(boType);
             blobObj.setBoSubType(boSubType);
             blobObj.setBoUuid(boUuid);
@@ -439,6 +442,100 @@ public class PccExamineReportService {
 			}
 		}
 		return bytes;
+	}
+	public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {
+
+		Integer keyRow = 1;
+		Integer dataRow = 2;
+
+		for (Map<String, Object> item : data) {
+			doc.writeRowData(SHEET_Maintain, keyRow, dataRow++, item);
+		}
+
+		return Boolean.TRUE;
+	}
+	public List<Map<String, Object>> parseMaintainToMap(List<PccExamineReport> listPcc) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		List<Map<String, Object>> listMapResult = new ArrayList<Map<String, Object>>();
+		if (listPcc != null && listPcc.size() > 0) {
+			for (int i = 0; i < listPcc.size(); ++i) {
+				PccExamineReport temp = listPcc.get(i);
+				Map<String, Object> tempMap = new HashMap<String, Object>();
+				String hospitalName=temp.getAssetInfohospitalName();
+				String clinicalName=temp.getAssetInfoclinicalDeptName();
+				String systemId=temp.getAssetInfosystemId();
+				String name=temp.getAssetInfoname();
+				String functionType=temp.getAssetInfofunctionType();
+				String sn=temp.getAssetInfoserialNum();
+				Date manufactureDate=temp.getAssetInfomanufactDate();
+				Date installDate=temp.getAssetInfoarriveDate();
+				Date startDate=temp.getAssetInfoinstallDate();
+				Date endDate=temp.getAssetInfowarrantyDate();
+				Date checkDate=temp.getCheckDate();
+				String createByName=temp.getCreateByName();
+				String rStatus = temp.getRecommandStatus();
+				String rStatusStr = "";
+				Integer status=temp.getStatus();
+				String statusStr="";
+				if (rStatus == null) {
+				} else if (rStatus.equals("1")) {
+					rStatusStr = "好";
+				} else if (rStatus.equals("2")) {
+					rStatusStr = "坏";
+				}
+				if (status == null) {
+				} else if (status==1) {
+					statusStr = "未提交";
+				} else if (status==2) {
+					statusStr = "已提交";
+				}
+				if(StringUtils.isNotEmpty(hospitalName)){
+					tempMap.put("医院", hospitalName);
+				}
+				if(StringUtils.isNotEmpty(clinicalName)){
+					tempMap.put("科室", clinicalName);
+				}
+				if(StringUtils.isNotEmpty(systemId)){
+					tempMap.put("主机SystemID", systemId);
+				}
+				if(StringUtils.isNotEmpty(name)){
+					tempMap.put("探头名称", name);
+				}
+				if(StringUtils.isNotEmpty(functionType)){
+					tempMap.put("探头型号", functionType);
+				}
+				if(StringUtils.isNotEmpty(sn)){
+					tempMap.put("探头S/N", sn);
+				}
+				if(StringUtils.isNotEmpty(createByName)){
+					tempMap.put("创建人", createByName);
+				}
+				if(StringUtils.isNotEmpty(rStatusStr)){
+					tempMap.put("探头好/坏", rStatusStr);
+				}
+				if(StringUtils.isNotEmpty(statusStr)){
+					tempMap.put("报告状态", statusStr);
+				}
+				if(manufactureDate!=null){
+					tempMap.put("探头生产日期", sdf.format(manufactureDate));
+				}
+				if(installDate!=null){
+					tempMap.put("探头安装日期", sdf.format(installDate));
+				}
+				if(startDate!=null){
+					tempMap.put("探头合同开始日期", sdf.format(startDate));
+				}
+				if(endDate!=null){
+					tempMap.put("探头合同截至日期", sdf.format(endDate));
+				}
+				if(checkDate!=null){
+					tempMap.put("检测日期", sdf2.format(checkDate));
+				}
+				listMapResult.add(tempMap);
+			}
+		}
+		return listMapResult;
 	}
     public static List<ApmDropDownItem> fetchLineStatus(){
         if(lineStatus==null){

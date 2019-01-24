@@ -5,7 +5,9 @@
  */
 package com.ge.apm.domain.pure;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.CustomConfigConstant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,12 +34,14 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    
+    JSONObject mobilePage; 
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
         if (null == assetFields) {
             assetFields = CustomConfigConstant.getAllFields().entrySet().stream().filter(item -> !CustomConfigConstant.getExtFields().contains(item.getKey()))
-                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
+                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(),CustomConfigConstant.getConfigRolesName(), CustomConfigConstant.getConfigEditRolesName())));
             CustomConfigConstant.getSystemFields().forEach(item -> {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
@@ -187,4 +191,16 @@ public class CustomConfigObject {
         this.assetsMobilepageHeaderFields = assetsMobilepageHeaderFields;
     }
 
+    public JSONObject getMobilePage() {
+        if (mobilePage == null) {
+            mobilePage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+        }
+        return mobilePage;
+    }
+
+    public void setMobilePage(JSONObject mobilePage) {
+        this.mobilePage = mobilePage;
+    }
+
+    
 }

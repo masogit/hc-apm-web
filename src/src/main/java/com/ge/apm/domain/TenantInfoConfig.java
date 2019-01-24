@@ -359,6 +359,8 @@ public class TenantInfoConfig {
 				listLabel.add("维修流程");
 				listKey.add("repair.workbench");
 				listLabel.add("维修工作台");
+				listKey.add("repair.count");
+				listLabel.add("设备维修统计");
 				listKey.add("repair.message");
 				listLabel.add("设备消息订阅");
 				listKey.add("repair.report");
@@ -397,6 +399,8 @@ public class TenantInfoConfig {
 				listLabel.add("日常维护设置");
 				listKey.add("nurseSite.report");
 				listLabel.add("日常维护报表");
+				listKey.add("nurseSite.optRecord");
+				listLabel.add("开关机检查");
 				listKey.add("knowledge");
 				listLabel.add("知识文档");
 				listKey.add("knowledge.mgt");

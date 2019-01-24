@@ -115,9 +115,10 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="accessList" value="#{workOrderMgrController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.accessory}">
+                                    <p:column headerText="备件名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
+
 
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
@@ -127,7 +128,13 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <p:column headerText="合同价格(元)">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+
+                                    </p:column>
+                                    <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
                                     <p:column headerText="序列号">
@@ -188,13 +195,24 @@
                             </h:panelGroup>
                         </p:panelGrid>
 
-                        <h:panelGroup>
+                      <!--  <h:panelGroup>
                             <label class="label">验收人*</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
-                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{workOrderMgrController.acker}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:autoComplete id="ackerName" converter="userAccountConverter" value="#{workOrderMgrController.ua1}" dropdown="true" forceSelection="true" requiredMessage="验收人#{msg.ValidationRequire}"  var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{workOrderMgrController.completeAckList}">
+                               <!-- <p:ajax event="itemSelect" listener="#{workOrderMgrController.test}" process="@this" />
+                                <p:ajax listener="#{workOrderMgrController.test}" process="@this" />-->
+                                <p:column>
+                                    <h:outputText value="#{t.name}"/>
+                                </p:column>
+
+                            </p:autoComplete>
+                        </h:panelGroup>
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>

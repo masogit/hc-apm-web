@@ -232,6 +232,12 @@
             <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoDetailController.selected.functionGrade)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'proprietaryClass')}">
+        <h:panelGroup >
+            <label class="label">#{msg.proprietaryClass}</label>
+            <p:inputText id="proprietaryClass" value="#{fieldMsg.fieldValue('proprietaryClass', assetInfoDetailController.selected.proprietaryClass)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'repairForm')}">
         <h:panelGroup >
             <label class="label">#{msg.repairForm}</label>

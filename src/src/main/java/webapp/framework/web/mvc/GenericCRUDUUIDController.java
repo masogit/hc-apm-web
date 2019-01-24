@@ -92,9 +92,17 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
     }
         
     public Class<E> getBeanClass() {
-        return (Class<E>)
-               ((ParameterizedType)(getClass().getGenericSuperclass()))
-               .getActualTypeArguments()[0];
+    	Class<E> result=null;
+    	Class<?> tempClass=this.getClass();
+    	while(result==null){
+    		try {
+        		result=(Class<E>)(((ParameterizedType) (tempClass.getGenericSuperclass())).getActualTypeArguments()[0]);
+    		} catch (Exception e) {
+    			// TODO: handle exception
+    			tempClass=tempClass.getSuperclass();
+    		}
+    	}
+    	return result;
     }        
 
     private Map<String, Boolean> dateTimeFields = null;

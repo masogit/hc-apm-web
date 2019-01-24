@@ -150,9 +150,9 @@
                                     <h:outputText value="#{item.remark}"  style="word-wrap: break-word;"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Actions}">
-                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{pmOrderRuleController.prepareEditItemDetail('new')}" update=":PmOrderRuleItemEditDlg" oncomplete="PF('PmOrderRuleItemEditDlg').show()" rendered="#{item.uid eq '000'}"/>
-                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{pmOrderRuleController.prepareEditItemDetail(item.uid)}" update="@(.PmOrderRuleItemEditDlg)" oncomplete="PF('PmOrderRuleItemEditDlg').show()" rendered="#{item.uid ne '000'}" />
-                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{pmOrderRuleController.deleteItemDetail(item.uid)}" update="@(.addCheckList)" rendered="#{item.uid ne '000'}">
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" rendered="#{item.uid eq '000'}" disabled="#{pmOrderRuleController.isDisable()}" actionListener="#{pmOrderRuleController.prepareEditItemDetail('new')}" update=":PmOrderRuleItemEditDlg" oncomplete="PF('PmOrderRuleItemEditDlg').show()" />
+                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" rendered="#{item.uid ne '000'}"  disabled="#{pmOrderRuleController.isDisable()}" actionListener="#{pmOrderRuleController.prepareEditItemDetail(item.uid)}" update="@(.PmOrderRuleItemEditDlg)" oncomplete="PF('PmOrderRuleItemEditDlg').show()" />
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" rendered="#{item.uid ne '000'}" disabled="#{pmOrderRuleController.isDisable()}" actionListener="#{pmOrderRuleController.deleteItemDetail(item.uid)}" update="@(.addCheckList)" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </p:column>

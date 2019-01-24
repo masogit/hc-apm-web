@@ -416,6 +416,16 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'proprietaryClass')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.proprietaryClass}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['proprietaryClass'].required? '*':''}</span></label>
+            <p:selectOneMenu id="proprietaryClass" value="#{assetInfoEditController.selected.proprietaryClass}" required="#{assetInfoEditController.customConfig.assetFields['proprietaryClass'].required}" 
+                         requiredMessage="#{msg.proprietaryClass} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('proprietaryClass')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'repairForm')}" >
         <h:panelGroup>
             <label class="label">#{msg.repairForm}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['repairForm'].required? '*':''}</span></label>

@@ -18,6 +18,7 @@ import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -28,7 +29,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -189,7 +193,7 @@ public class QrCodeService {
             } else if (!Strings.isNullOrEmpty(siteUid)) {
                 template = getTemplateBySiteUid(siteUid);
             }
-            
+
             if (template == null) {
                 template = templateService.getDefaultTemplate();
             }
@@ -629,5 +633,76 @@ public class QrCodeService {
 
     public QrCodeLib findByQrCode(String qrCode, String siteUid) {
         return qrCodeLibDao.findByQrCode(qrCode, siteUid);
+    }
+
+    //for import Qrcode
+    public Map<String, Map<String, Object>> getQrCodeMapFromTemplate(ExcelDocument doc) throws Exception {
+        Map<String, Map<String, Object>> result = new LinkedHashMap();
+        int keyRow = 1;
+        int dataRow = 2;
+        String sheetName = doc.getWorkBook().getSheetAt(0).getSheetName();
+
+        for (Map< String, String> rowMap = doc.getStringDataRowMap(sheetName, keyRow, dataRow); rowMap != null; rowMap = doc.getStringDataRowMap(sheetName, keyRow, ++dataRow)) {
+
+            String qrcodeItem = Optional.ofNullable(rowMap.get("二维码")).orElse("").toString();
+            if (StringUtils.isEmpty(qrcodeItem)) {
+                break; //return if go beyond the valid cell range
+            }
+            Map< String, Object> dataMap = new LinkedHashMap();
+            dataMap.put("RowIndex", String.valueOf(dataRow));
+            dataMap.put("QrcodeItem", qrcodeItem);
+            result.put(String.valueOf(dataRow), dataMap);
+        }
+
+        return result;
+    }
+
+    public Map<String, Map<String, Object>> importQrCode(Map<String, Map<String, Object>> importQrCodeMap, OrgInfo site) {
+        if (null == site) {
+            WebUtil.addErrorMessage("所选院区无效");
+            return importQrCodeMap;
+        }
+
+        List<QrCodeLib> newQrcodeList = new ArrayList();
+        importQrCodeMap.entrySet().stream().forEach(item -> {
+            String newQrcode = ((String) (item.getValue().get("QrcodeItem"))).trim();
+            if (Strings.isNullOrEmpty(newQrcode)) {
+                item.getValue().put("res", "二维码不能为空");
+                item.getValue().put("status", "失败");
+            } else if (newQrcode.length() > 16) {
+                item.getValue().put("res", "二维码超长");
+                item.getValue().put("status", "失败");
+            } else if (newQrcode.length() < 4) {
+                item.getValue().put("res", "二维码不能少于4位");
+                item.getValue().put("status", "失败");
+            } else if(newQrcodeList.stream().anyMatch(saveditem-> Objects.equals(saveditem.getQrCode(),newQrcode))){
+                item.getValue().put("res", "文件中重复的二维码");
+                item.getValue().put("status", "失败");
+            } else {
+                QrCodeLib qrcodeItem = this.findByQrCode(newQrcode, site.getUid());
+                if (null != qrcodeItem) {
+                    item.getValue().put("res", "已经存在二维码，状态：" + WebUtil.getFieldValueMessage("qrCodeLibStatus", String.valueOf(qrcodeItem.getStatus())));
+                    item.getValue().put("status", "失败");
+                } else {
+                    qrcodeItem = new QrCodeLib();
+                    qrcodeItem.setQrCode(newQrcode);
+                    qrcodeItem.setTenantUID(site.getTenantUID());
+                    qrcodeItem.setInstitutionUID(site.getInstitutionUID());
+                    qrcodeItem.setHospitalUID(site.getHospitalUID());
+                    qrcodeItem.setSiteUID(site.getSiteUID());
+                    qrcodeItem.setStatus(1);
+                    qrcodeItem.setIssueDate(new Date());
+                    newQrcodeList.add(qrcodeItem);
+                    item.getValue().put("res", "导入");
+                    item.getValue().put("status", "导入成功");
+                }
+            }
+            
+            item.getValue().put("org", site.getName());
+
+        });
+
+        qrCodeLibDao.save(newQrcodeList);
+        return importQrCodeMap;
     }
 }

@@ -196,6 +196,13 @@ public class V2_PmOrder  implements Serializable {
     private String qualityChecking; //默认是合格
     @Column(name="approval_status")
     private String approvalStatus;
+
+    @Column(name = "cancel_person")
+    private String cancelPerson;
+
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
@@ -613,5 +620,21 @@ public class V2_PmOrder  implements Serializable {
 
     public void setIntExtType(Integer intExtType) {
         this.intExtType = intExtType;
+    }
+
+    public String getCancelPerson() {
+        return cancelPerson;
+    }
+
+    public void setCancelPerson(String cancelPerson) {
+        this.cancelPerson = cancelPerson;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 }

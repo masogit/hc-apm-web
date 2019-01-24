@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="preRenderView"/>
+
+    <ui:define name="head">
+        <h:outputStylesheet name="css/wo_steps.css"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="消息报警设置 #{msg.List}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <p:messages autoUpdate="true" closable="true" showDetail="false"/>
+
+                <h:form id="dispatchListForm">
+                    <p:dataTable id="datalist" value="#{feAlertReportController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{feAlertReportController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{feAlertReportController.onFilter}"/>
+
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}"
+                                  filterBy="#{item.assetInfo.name}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}"
+                                  filterBy="#{item.assetInfo.systemId}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.systemId}"/>
+                        </p:column>
+                        <p:column headerText="设备类型" sortBy="#{item.deviceType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('alertConfigDeviceType',item.deviceType)}"/>
+                        </p:column>
+                        <p:column headerText="报警项目" sortBy="#{item.label}" filterBy="#{item.label}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.label}"/>
+                        </p:column>
+                        <p:column headerText="上限" sortBy="#{item.upperLimit}">
+                            <h:outputText value="#{item.upperLimit}"/>
+                        </p:column>
+                        <p:column headerText="下限" sortBy="#{item.lowerLimit}">
+                            <h:outputText value="#{item.lowerLimit}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="alert_config_report"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

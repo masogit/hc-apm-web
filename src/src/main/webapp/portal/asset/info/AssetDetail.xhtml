@@ -58,7 +58,7 @@
             <h:form>
                 <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
 
-                    <p:panel  header="#{msg.MaintainanceRecord}">
+                    <p:panel  header="#{msg.MaintainanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
@@ -82,7 +82,7 @@
                         </p:dataTable>
                     </p:panel>
 
-                    <p:panel  header="#{msg.MetrologyMonitor}">
+                    <p:panel  header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/measuring/measuringResultMain?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                             <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
@@ -109,7 +109,7 @@
                         </p:dataTable>
                     </p:panel>
                     <!--test-->
-                    <p:panel  header="内部保养记录">
+                    <p:panel  header="内部保养记录" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
@@ -128,19 +128,51 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
-                    <p:panel  header="远程保养记录">
+                    <p:panel  header="远程保养记录" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
-                        <p:dataTable var="item" value="#{assetInfoDetailController.getPmScheduleData('epm')}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList('5')}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="保养编号" >
-                                <h:outputText value="#{item.assetNum}"/>
+                                <h:outputText value="#{item.eventUid}"/>
                             </p:column>
-                            <p:column headerText="关单日期" >
-                                <h:outputText value="#{item.closeDate}"/>
+                            <p:column headerText="更新日期" >
+                                <h:outputText value="#{item.createTime}"/>
                             </p:column>
-                            <p:column headerText="当前处理步骤" >
-                                <h:outputText value="#{item.scheduleDate}"/>
+                            <p:column headerText="状态" >
+                                <h:outputText value="#{item.descriptionObject.status}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel  header="外修记录" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                        <f:facet name="actions">
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
+                        </f:facet>
+                        <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList(3)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="编号" >
+                                <h:outputText value="#{item.eventUid}"/>
+                            </p:column>
+                            <p:column headerText="更新日期" >
+                                <h:outputText value="#{item.createTime}"/>
+                            </p:column>
+                            <p:column headerText="状态" >
+                                <h:outputText value="#{item.descriptionObject.status}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel  header="外部保养记录" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                        <f:facet name="actions">
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
+                        </f:facet>
+                        <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList(4)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="编号" >
+                                <h:outputText value="#{item.eventUid}"/>
+                            </p:column>
+                            <p:column headerText="更新日期" >
+                                <h:outputText value="#{item.createTime}"/>
+                            </p:column>
+                            <p:column headerText="状态" >
+                                <h:outputText value="#{item.descriptionObject.status}"/>
                             </p:column>
                         </p:dataTable>
                     </p:panel>
