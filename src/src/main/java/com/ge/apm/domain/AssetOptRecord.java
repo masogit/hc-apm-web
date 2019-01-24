@@ -43,25 +43,25 @@ public class AssetOptRecord implements Serializable {
 
 	// 创建日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "create_date")
 	private Date createDate;
 
 	// 修改日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "modify_date")
 	private Date modifyDate;
 
 	// 开机时间
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "start_date")
 	private Date startDate;
 
 	// 关机时间
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "end_date")
 	private Date endDate;
 
