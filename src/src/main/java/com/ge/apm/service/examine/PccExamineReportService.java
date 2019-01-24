@@ -311,7 +311,7 @@ public class PccExamineReportService {
 			tempInfo = getAssetInfo(pcc.getAssetUid());
 			pcc.setAssetInfo(tempInfo);
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
 		Date date = pcc.getCheckDate();
 		List<ApmStreamedContent> listPicture = parseBlobObjectImg(pcc.getId());
 		ApmStreamedContent template = getTemplate();
@@ -400,7 +400,7 @@ public class PccExamineReportService {
 		}
 		Date tempDate = pcc.getCheckDate();
 		if (tempDate != null) {
-			data.put("checkDate", tempDate);
+			data.put("checkDate", sdf.format(tempDate));
 		}
 		if (listPicture == null) {
 			listPicture = parseBlobObjectImg(pcc.getId());
