@@ -319,7 +319,6 @@ public class SearchController {
 			if (listUnSelectedAssetInfo == null) {
 				listUnSelectedAssetInfo = new LinkedList<AssetInfo>();
 			}
-			listSelectedAssetInfo = new LinkedList<AssetInfo>();
 			availableAssets = new DualListModel<>(listUnSelectedAssetInfo, listSelectedAssetInfo);
 		}
 	}

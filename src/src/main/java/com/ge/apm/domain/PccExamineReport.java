@@ -170,7 +170,7 @@ public class PccExamineReport implements Serializable {
 	private String recommandStatus;
 	@Column(name = "comment")
 	private String comment;
-	
+	@Transient
 	private boolean blnHasId=true;
 
 	@Transient

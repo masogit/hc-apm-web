@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -221,9 +222,6 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		super.prepareCreate();
-		if(!this.selected.isBlnHasId()){
-			this.selected.setId(null);
-		}
 	}
 
 	@Override
@@ -242,9 +240,6 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	public void prepareEdit() {
 		// TODO Auto-generated method stub
 		super.prepareEdit();
-		if(!this.selected.isBlnHasId()){
-			this.selected.setId(null);
-		}
 	}
 
 	private void updateFilter() {
