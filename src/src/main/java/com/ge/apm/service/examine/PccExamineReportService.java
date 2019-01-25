@@ -311,7 +311,7 @@ public class PccExamineReportService {
 			tempInfo = getAssetInfo(pcc.getAssetUid());
 			pcc.setAssetInfo(tempInfo);
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = pcc.getCheckDate();
 		List<ApmStreamedContent> listPicture = parseBlobObjectImg(pcc.getId());
 		ApmStreamedContent template = getTemplate();
@@ -373,7 +373,7 @@ public class PccExamineReportService {
 
 	private Map<String, Object> getTemplateMap(PccExamineReport pcc, List<ApmStreamedContent> listPicture) {
 		Map<String, Object> data = new HashMap<String, Object>();
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		data.put("lineStatus", convertKeyToLable(pcc.getLineStatus(), fetchLineStatus()));
 		data.put("mirrorStatus", convertKeyToLable(pcc.getMirrorStatus(), fetchMirrorStatus()));
 		data.put("shellStatus", convertKeyToLable(pcc.getShellStatus(), fetchShellStatus()));
@@ -395,7 +395,7 @@ public class PccExamineReportService {
 			data.put("serialNum", tempInfo.getSerialNum());
 			Date tempDate = tempInfo.getManufactDate();
 			if (tempDate != null) {
-				data.put("manufactDate", tempDate);
+				data.put("manufactDate", sdf.format(tempDate));
 			}
 		}
 		Date tempDate = pcc.getCheckDate();
