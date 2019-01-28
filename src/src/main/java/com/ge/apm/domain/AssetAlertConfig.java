@@ -35,6 +35,7 @@ public class AssetAlertConfig implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), insertable = false, updatable = false)
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private AssetInfo assetInfo;
 
     @Column(name = "device_type")
