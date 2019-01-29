@@ -309,6 +309,10 @@ public class AssetFileImportSupportingService {
 
             cleanRelatedFieldsWhenUpdating(asset);
         }
+
+        if (StringUtils.isEmpty(asset.getName())) {
+            asset.setName(AssetRow.DELETE_MARK);
+        }
     }
 
     /**
