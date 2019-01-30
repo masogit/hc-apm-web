@@ -9,6 +9,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.pure.ServiceRequestProjection;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
@@ -36,10 +37,10 @@ public class InspectionServiceController {
         return res.subList(0, Math.min(limit, res.size()));
     }
     
-    public List<V2_ServiceRequest> getWorkOrderList(Integer assetId,Integer limit){
+    public List<ServiceRequestProjection> getWorkOrderList(Integer assetId, Integer limit){
         Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
         PageRequest pr =  new PageRequest(0, limit, sort);
-        return srDao.findByAssetId(assetId, pr).getContent();
+        return srDao.findProjectionByAssetId(assetId, pr).getContent();
     }
     
     public List<V2_PmOrder> getPmOrderList(String assetUid,Integer limit){
