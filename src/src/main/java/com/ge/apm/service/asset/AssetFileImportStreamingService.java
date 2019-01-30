@@ -101,20 +101,19 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 }
 
                 AssetRow assetRow = new AssetRow(asset, rowMap);
-                assetRow.setFieldStringValue("设备名称", "setName");
-                assetRow.setFieldStringValue("设备编号", "setDepartNum");
-                assetRow.setFieldStringValue("资产编号", "setFinancingNum");
-                assetRow.setFieldStringValue("设备别名", "setAliasName");
-                assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
-                assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
-                assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
-                assetRow.setFieldStringValue("保养负责人", "setPmOwnerName");
-                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName");
-                assetRow.setFieldStringValue("制造商", "setManufacture");
-                assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
-                assetRow.setFieldStringValue("设备标准名称", "setDeviceName");
-                assetRow.setFieldStringValue("注册证号", "setRegistrationNo");
-                assetRow.setFieldStringValue("供应商", "setVendor");
+                assetRow.setFieldStringValue("设备名称", "setName", false);
+                assetRow.setFieldStringValue("设备编号", "setDepartNum", true);
+                assetRow.setFieldStringValue("资产编号", "setFinancingNum", true);
+                assetRow.setFieldStringValue("设备别名", "setAliasName", true);
+                assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName", true);
+                assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2", true);
+                assetRow.setFieldStringValue("保养负责人", "setPmOwnerName", true);
+                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName", true);
+                assetRow.setFieldStringValue("制造商", "setManufacture", true);
+                assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName", true);
+                assetRow.setFieldStringValue("设备标准名称", "setDeviceName", true);
+                assetRow.setFieldStringValue("注册证号", "setRegistrationNo", true);
+                assetRow.setFieldStringValue("供应商", "setVendor", true);
 
                 assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map, null);
                 if (asset.getFunctionGroup() != null) {
@@ -136,12 +135,12 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
                 assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
-                assetRow.setFieldStringValue("设备型号", "setFunctionType");
-                assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
-                assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
-                assetRow.setFieldStringValue("条码", "setBarcode");
-                assetRow.setFieldStringValue("2010国家编码", "setNationalStandardCode");
-                assetRow.setFieldStringValue("IT系统编号", "setModalityId");
+                assetRow.setFieldStringValue("设备型号", "setFunctionType", true);
+                assetRow.setFieldStringValue("制造商序列号", "setSerialNum", true);
+                assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId", true);
+                assetRow.setFieldStringValue("条码", "setBarcode", true);
+                assetRow.setFieldStringValue("2010国家编码", "setNationalStandardCode", true);
+                assetRow.setFieldStringValue("IT系统编号", "setModalityId", true);
                 assetRow.setFieldDoubleValue("采购价格", "setPurchasePrice");
                 assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
                 assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
@@ -159,12 +158,12 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
                 assetRow.setFieldDateValue("上次巡检日期", "setLastQaDate");
 
-                assetRow.setFieldStringValue("维修商", "setMaitanance");
-                assetRow.setFieldStringValue("维修商电话", "setMaitananceTel");
-                assetRow.setFieldStringValue("安装位置编码", "setLocationCode");
-                assetRow.setFieldStringValue("安装位置", "setLocationName");
-                assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
-                assetRow.setFieldStringValue("备注", "setComments");
+                assetRow.setFieldStringValue("维修商", "setMaitanance", true);
+                assetRow.setFieldStringValue("维修商电话", "setMaitananceTel", true);
+                assetRow.setFieldStringValue("安装位置编码", "setLocationCode", true);
+                assetRow.setFieldStringValue("安装位置", "setLocationName", true);
+                assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName", true);
+                assetRow.setFieldStringValue("备注", "setComments", true);
 
                 assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map, null);
                 assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map, null);
@@ -184,11 +183,11 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue("资金来源2", "setCapitalSource2", capitalSource2List, map, null);
                 assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", true);
 
-                assetRow.setFieldStringValue("所属课题项目", "setSubjectProject");
+                assetRow.setFieldStringValue("所属课题项目", "setSubjectProject", true);
                 assetRow.setFieldDateValue("验收日期", "setAcceptDate");
                 assetRow.setFieldIntegerValue("质保时间（月）", "setWarrantyMonth");
 
-                assetRow.setFieldStringValue("二维码", "setQrCode");
+                assetRow.setFieldStringValue("二维码", "setQrCode", true);
 //                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
                 assetRow.setFieldDropdownValueAsString("专有分类", "setProprietaryClass", proprietaryClassList, map, null);
