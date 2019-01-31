@@ -1890,6 +1890,9 @@ private  String cancelInt;
         List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
         List<String> strList=new ArrayList<String>();
         byCollectionId.stream().forEach(item->strList.add(item.getKey()));
+        if(strList.isEmpty()){
+            strList.add("");
+        }
          pmcl = pmckLstDao.findPMCL(strList);
         return pmcl;
     }
