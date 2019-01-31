@@ -539,6 +539,14 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
+    public void fieldKeyChange(){
+        String newKey = editTableItem.getKey();
+        if(!newKey.matches("^[A-Za-z0-9_]+$")){
+            editTableItem.setKey("");
+            WebUtil.addErrorMessage("只能包含,英文,数字,下划线");
+        }
+    }
+    
     public String saveSelectedInstrumentData() {
         String result = "";
 
