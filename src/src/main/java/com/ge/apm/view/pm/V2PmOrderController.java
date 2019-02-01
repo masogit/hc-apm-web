@@ -383,7 +383,12 @@ private  String cancelInt;
                         try {
                             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
                             InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
-                            rawTemplate = pmOrderReportTemplateService.generateReportTemplateByRule(activeTemplateStream, rule);
+                            
+                            String safetySchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-safety-report"))
+                                    .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
+                            String performanceSchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-performance-report"))
+                                    .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
+                            rawTemplate = pmOrderReportTemplateService.generateReportTemplateBySchemaId(activeTemplateStream, safetySchema,performanceSchema);
                         } catch (IOException e) {
                             throw new BusinessException("自动模版生成失败");
                         }
@@ -392,7 +397,7 @@ private  String cancelInt;
                     if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
                     Map<String, Object> datas = populateReportContent(selected);
-
+                    
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
                     // render policy for accessory information.
@@ -585,7 +590,6 @@ private  String cancelInt;
 
         // update select box option values
         Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
-
         final String emptyStr = "";
         final String prefix = component.toString();
         for(TableGroup group : table.getGroups()) {
