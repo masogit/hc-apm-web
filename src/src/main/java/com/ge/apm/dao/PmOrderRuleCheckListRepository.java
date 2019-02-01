@@ -32,8 +32,8 @@ public interface PmOrderRuleCheckListRepository extends GenericRepository<PmOrde
 	@Transactional
 	void updateStatus(List<String> deletedCheckListIds);
 
-	@Query(value="select o from PmOrderRuleCheckList o where uid in ?1")
+	@Query(value="select o from PmOrderRuleCheckList o where uid in ?1 and ruleUID =?2")
 	@Transactional
-	public List<PmOrderRuleCheckList> findPMCL(List<String> stringList);
+	public List<PmOrderRuleCheckList> findPMCL(List<String> stringList,String ruleUid);
 
 }
