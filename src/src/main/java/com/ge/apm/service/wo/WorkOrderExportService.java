@@ -224,8 +224,10 @@ public class WorkOrderExportService {
         for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
             Map<String, Object> part = new HashedMap();
             part.put("报修单号", workOrderPojo.getSrNum());
+            part.put("资产名称", workOrderPojo.getAssetName());
+            part.put("设备编号", workOrderPojo.getAssetDepartNum());
             part.put("备件名", workOrderDetail.getParts());
-            part.put("单价", workOrderDetail.getClosedPrice());
+            part.put("合同价格", workOrderDetail.getClosedPrice());
             part.put("数量", workOrderDetail.getApartsQuantity());
             part.put("类型", workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
             part.put("序列号", workOrderDetail.getSerialNum());
