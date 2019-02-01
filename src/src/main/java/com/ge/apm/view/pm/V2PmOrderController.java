@@ -383,7 +383,7 @@ private  String cancelInt;
                         try {
                             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
                             InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
-                            
+
                             String safetySchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-safety-report"))
                                     .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
                             String performanceSchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-performance-report"))
@@ -397,7 +397,7 @@ private  String cancelInt;
                     if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
                     Map<String, Object> datas = populateReportContent(selected);
-                    
+
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
                     // render policy for accessory information.
@@ -1881,7 +1881,7 @@ private  String cancelInt;
         List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder){
+    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
@@ -1895,7 +1895,7 @@ private  String cancelInt;
         if(strList.isEmpty()){
             strList.add("");
         }
-         pmcl = pmckLstDao.findPMCL(strList);
+         pmcl = pmckLstDao.findPMCL(strList,ruleUid);
         return pmcl;
     }
 
@@ -1909,7 +1909,7 @@ private  String cancelInt;
        // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
 
         if(v2PmOrder.isFinished()) {
-         return getPmRuleCLclosed(v2PmOrder);
+         return getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
         }
         else {
             return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
