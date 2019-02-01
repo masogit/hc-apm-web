@@ -1877,7 +1877,7 @@ private  String cancelInt;
         List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder){
+    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
@@ -1888,7 +1888,7 @@ private  String cancelInt;
         List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
         List<String> strList=new ArrayList<String>();
         byCollectionId.stream().forEach(item->strList.add(item.getKey()));
-         pmcl = pmckLstDao.findPMCL(strList);
+         pmcl = pmckLstDao.findPMCL(strList,ruleUid);
         return pmcl;
     }
 
@@ -1902,7 +1902,7 @@ private  String cancelInt;
        // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
 
         if(v2PmOrder.isFinished()) {
-         return getPmRuleCLclosed(v2PmOrder);
+         return getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
         }
         else {
             return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
