@@ -1,5 +1,6 @@
 package com.ge.apm.service.wo;
 
+import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -112,7 +113,7 @@ public class PmOrderReportTemplateService {
      * Generate PmOrder report template by rule.
      *
      * @param stream {@link InputStream} object
-     * @param rule   {@link PmOrderRule} object
+     * @param rule {@link PmOrderRule} object
      * @return {@link InputStream} object
      * @throws IOException
      */
@@ -131,6 +132,30 @@ public class PmOrderReportTemplateService {
             }
         }
 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+        template.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public InputStream generateReportTemplateBySchemaId(InputStream stream, String fReportId, String pReportId) throws IOException {
+        MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
+        // add dynamic table.
+        TableSchema schema;
+        if (fReportId != null) {
+            TableDefinition td = templateDao.findById(fReportId);
+            schema = JSONObject.parseObject(td.getSchema(), TableSchema.class);
+            if (schema != null) {
+                builder.safetyReport(schema);
+            }
+        }
+        if (pReportId != null) {
+            TableDefinition td = templateDao.findById(pReportId);
+            schema = JSONObject.parseObject(td.getSchema(), TableSchema.class);
+            if (schema != null) {
+                builder.performanceReport(schema);
+            }
+        }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
         template.write(out);
