@@ -1,7 +1,6 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
-import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.ArrivalListItem;
 import org.apache.commons.collections.map.HashedMap;
