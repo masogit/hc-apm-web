@@ -590,6 +590,7 @@ private  String cancelInt;
 
         // update select box option values
         Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
+
         final String emptyStr = "";
         final String prefix = component.toString();
         for(TableGroup group : table.getGroups()) {
