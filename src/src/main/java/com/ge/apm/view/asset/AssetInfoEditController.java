@@ -457,6 +457,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             selected.setNationalStandardCode(selectedGb.getCode());
         }
+
+        //when mvs user create a new record, mark this asset as mvs asset
+        if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
+            this.selected.setMvsEquip(1);
+        }
+
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
 
