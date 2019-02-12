@@ -466,10 +466,10 @@ public class AssetFileImportBaseService {
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
             if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
-                if (newAsset.getDepartNum().length() > 16) {
+                if (newAsset.getDepartNum().length() > 64) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 设备编号不能超过16位");
+                    AssetRow.addErrMessage(item, "错误: 设备编号不能超过64位");
                     continue;
                 }
 
