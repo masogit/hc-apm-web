@@ -1710,3 +1710,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('alertConfigDeviceType', '5', 'Pet CT', 'Pet CT', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('alertConfigDeviceType', '6', 'NM CT', 'NM CT', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'AssetsIsBlank', '设备列表不能为空！', 'assets list cannot be blank!', NULL, '-1');
