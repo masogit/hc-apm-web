@@ -642,11 +642,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                             break;
                         default:
                     }
-                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
-                        qrCode = num.substring(0, 16);
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 64) {
+                        qrCode = num.substring(0, 64);
                         selected.setFinancingNum(qrCode);
                         selected.setDepartNum(qrCode);
-                        WebUtil.addErrorMessage("二维码超长,最大16位");
+                        WebUtil.addErrorMessage("二维码超长,最大64位");
                     } else {
                         qrCode = num;
                         selected.setFinancingNum(num);
