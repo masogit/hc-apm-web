@@ -1216,6 +1216,7 @@ public void repairResultSet(){
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         nochange = true;
     }
 

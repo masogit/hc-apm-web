@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="备件1">
+    <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
         <h:form id="moreAccDialogForm" >
             <h:panelGroup id="display42" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -35,9 +35,9 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                    <label class="label">发票号</label>
-                    <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
-                </h:panelGroup>
+                     <label class="label">发票号</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">开票时间</label>
                         <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
