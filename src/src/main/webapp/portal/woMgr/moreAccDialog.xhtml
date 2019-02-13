@@ -93,7 +93,7 @@
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList woTab:woMgrDetailForm:x3 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>
