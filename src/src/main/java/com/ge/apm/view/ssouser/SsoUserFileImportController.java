@@ -1,10 +1,15 @@
 package com.ge.apm.view.ssouser;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SysRoleRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.ssouser.SsoUserFileImportStreamingService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -52,14 +57,18 @@ public class SsoUserFileImportController {
 
     private boolean displayErrorsOnly = true;
 
+    private SysRoleRepository sysRoleRepository;
+
     @PostConstruct
     protected void init() {
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         streamingService = WebUtil.getBean(SsoUserFileImportStreamingService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
     }
 
     public void uploadDataFile(FileUploadEvent event) {
+
 
         this.file = event.getFile();
 
@@ -70,7 +79,17 @@ public class SsoUserFileImportController {
                 return;
             }
 
-            importUserMap = streamingService.getUserMapFromTemplate(uploadDocument);
+            OrgInfo orgInfo = getOrgInfo();
+            Integer roleId = getRoleId("AssetStaff", 3);
+            if (orgInfo == null) {
+                WebUtil.addErrorMessage("获取用户租户信息失败，请重新导入！");
+                return;
+            }
+            if (roleId == null) {
+                WebUtil.addErrorMessage("获取用户角色信息失败，请重新导入！");
+                return;
+            }
+            importUserMap = streamingService.getUserMapFromTemplate(uploadDocument, orgInfo, roleId);
 
             if (importUserMap.size() > 5000) {
                 WebUtil.addErrorMessage("导入Excel中行数最多5000条，请分批导入！");
@@ -87,6 +106,12 @@ public class SsoUserFileImportController {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--" + e.getMessage(), null);
             logger.error(e.getMessage(), e);
         }
+    }
+
+    private OrgInfo getOrgInfo() {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String tenantUID = user.getTenantUID();
+        return orgDao.getByUid(tenantUID);
     }
 
     public void exportExcelTemplate() throws IOException {
@@ -137,6 +162,11 @@ public class SsoUserFileImportController {
         } else {
             return importUserMap;
         }
+    }
+
+    private Integer getRoleId(String roleName, int defaultValue) {
+        SysRole sysRole = sysRoleRepository.getByName(roleName);
+        return sysRole != null ? sysRole.getId() : defaultValue;
     }
 
     public List<Map<String, Object>> getImportedUsers() {

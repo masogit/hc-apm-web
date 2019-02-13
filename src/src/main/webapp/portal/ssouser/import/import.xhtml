@@ -55,7 +55,7 @@
                 <h:form id="importDataForm">
                     <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
                     </p:messages>
-                    <h:panelGroup>总行数<h:outputText value="#{ssoUserFileImportController.importUserMap.size}"/>, 导入行数<h:outputText value="#{ssoUserFileImportController.importedUsers.size}"/> </h:panelGroup>
+                    <h:panelGroup>总行数<h:outputText value="#{ssoUserFileImportController.importUserMap.size()}"/>, 导入行数<h:outputText value="#{ssoUserFileImportController.importedUsers.size()}, 未导入数据:"/> </h:panelGroup>
                     <h:panelGroup>
                         <p:dataTable id="userTable" value="#{ssoUserFileImportController.displayUsers}" var="item"
                                      rows="20" paginator="true"
