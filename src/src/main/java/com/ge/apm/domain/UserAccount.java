@@ -205,6 +205,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Transient
 	private Integer orgType;
 
+	@Transient
+	private int lineNum;
+
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
 	private List<UserRole> userRoleList;
@@ -1041,6 +1044,12 @@ public class UserAccount implements ChineseName, Serializable {
     public void setGeSso(String geSso) {
         this.geSso = geSso;
     }
-        
-        
+
+	public int getLineNum() {
+		return lineNum;
+	}
+
+	public void setLineNum(int lineNum) {
+		this.lineNum = lineNum;
+	}
 }
