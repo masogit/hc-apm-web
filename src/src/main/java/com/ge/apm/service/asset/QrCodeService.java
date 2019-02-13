@@ -436,7 +436,7 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "Normal";
         }
-        if (qrcode.length() > 16) {
+        if (qrcode.length() > 64) {
             return "TooLong";
         }
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
