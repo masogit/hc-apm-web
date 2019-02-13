@@ -1,7 +1,12 @@
 package com.ge.apm.service.ssouser;
 
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.dao.UserRoleRepository;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import org.slf4j.Logger;
@@ -32,10 +37,14 @@ public class SsoUserFileImportStreamingService {
 
     @Autowired
     UserAccountRepository repository;
+    @Autowired
+    UserOrgInfoRepository userOrgInfoRepository;
+    @Autowired
+    UserRoleRepository userRoleRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(SsoUserFileImportStreamingService.class);
 
-    public List<Map<String, Object>> getUserMapFromTemplate(ExcelDocumentStreamingReader doc) throws Exception {
+    public List<Map<String, Object>> getUserMapFromTemplate(ExcelDocumentStreamingReader doc, OrgInfo orgInfo, Integer roleId) throws Exception {
 
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -78,7 +87,27 @@ public class SsoUserFileImportStreamingService {
                     userAccount.setPlainPassword(getRandomPwd());
                     userAccount.entryptPassword();
                     userAccount.setPlainPassword(null);
+                    userAccount.setOrgInfoId(orgInfo.getId());
+                    userAccount.setOrgInfoUID(orgInfo.getInstitutionUID());
+                    userAccount.setHospitalId(orgInfo.getHospitalId());
+                    userAccount.setSiteId(orgInfo.getSiteId());
+                    userAccount.setTenantUID(orgInfo.getTenantUID());
+                    userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
+                    userAccount.setHospitalUID(orgInfo.getHospitalUID());
+                    userAccount.setSiteUID(orgInfo.getSiteUID());
+                    userAccount.setIsActive(true);
+                    userAccount.setOrgLevel(orgInfo.getOrgLevel());
                     repository.save(userAccount);
+                    UserOrgInfo userOrgInfo = new UserOrgInfo();
+                    userOrgInfo.setOrgType(orgInfo.getOrgType());
+                    userOrgInfo.setUserUid(userAccount.getUid());
+                    userOrgInfo.setOrgUid(userAccount.getOrgInfoUID());
+                    userOrgInfoRepository.save(userOrgInfo);
+                    UserRole userRole = new UserRole();
+                    userRole.setUserId(userAccount.getId());
+                    userRole.setRoleId(roleId);
+                    userRole.setRoleType(0);
+                    userRoleRepository.save(userRole);
                 }
                 userAccount.setLineNum(dataRow);
                 map.put("user", userAccount);
@@ -107,7 +136,7 @@ public class SsoUserFileImportStreamingService {
         return EXCEL_SSO_USER_TEMPLATE_VERSION.equalsIgnoreCase(doc.getVersion());
     }
 
-    String getRandomPwd() {
+    private String getRandomPwd() {
         return UUID.randomUUID().toString().substring(20);
     }
 }
