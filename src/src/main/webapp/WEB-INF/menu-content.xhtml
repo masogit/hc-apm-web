@@ -158,6 +158,7 @@
             <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('examineMgt') and (userContextService.isUltraSoundIBEndUser() or userContextService.hasAnyRole('SuperAdmin'))}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.versionContains('examineMgt.pcc')}"/>
                     <p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.versionContains('examineMgt.pccConfig') and userContextService.hasAnyRole('SuperAdmin,AssetStaff,AssetHead')}"/>
+                    <p:menuitem id="um5003" value="SSO用户导入" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')  and userContextService.versionContains('examineMgt.ssoImp')}"/>
             </p:submenu>
             <!--Super admin and GE OP only-->
             <p:submenu id="um4000" label="APM平台管理" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">

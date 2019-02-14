@@ -31,6 +31,7 @@ import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -1217,6 +1218,7 @@ public void repairResultSet(){
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        supplierName=itemDetail.getSupplier();
         nochange = true;
     }
 
@@ -1291,12 +1293,15 @@ public void repairResultSet(){
         coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
-
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
-            accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
 
-            // detailDao.delete(itemId);
+           /* itemDetail =accessoryList.get(0);
+            detailDao.delete(itemDetail);*/
+
+            accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+       //     detailDao.deleteById(itemId);
+
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
