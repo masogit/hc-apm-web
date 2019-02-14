@@ -80,6 +80,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private Date varWarrantyDateTo = null;
     private String warrantyFormatTime = null;
+    private String manufactDateFormatTime = null;
     private Boolean needShowAssetApproval;
 
     private StreamedContent excelFile;
@@ -111,6 +112,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Integer assetId;
     
     private Map<String, Object> selectedObject;
+
+
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -777,6 +780,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObject(Map<String, Object> selectedObject) {
         this.selectedObject = selectedObject;
     }
-    
-    
+
+    public String getManufactDateFormatTime() {
+        return manufactDateFormatTime;
+    }
+
+    public void setManufactDateFormatTime(String manufactDateFormatTime) {
+        this.manufactDateFormatTime = manufactDateFormatTime;
+    }
 }
