@@ -5,7 +5,7 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-<ui:composition>
+<ui:composition><!--备件对话框 修改-->
     <p:dialog id="moreAccDialogPriceDlg" class="moreAccDialogPriceDlg" widgetVar="moreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
         <h:form id="moreAccDialogFormX" >
             <h:panelGroup id="display42">
@@ -40,7 +40,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">开票时间</label>
-                        <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar timeZone="GMT+8" label="开票时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">供应商</label>
@@ -96,7 +96,7 @@
     </p:dialog>
     
     <p:dialog id="moreAccDialogViewDlg" class="moreAccDialogViewDlg" widgetVar="moreAccDialogViewDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件查看">
-        <h:form id="moreAccDialogViewForm" >
+        <h:form id="moreAccDialogViewForm" ><!--备件对话框 查看-->
             <h:panelGroup>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
@@ -110,9 +110,7 @@
                     <h:panelGroup>
                         <label class="label">预估单价(元)*</label>
                         <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPriceView"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
-                            <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
-                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)" >
-                            </p:ajax>
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>

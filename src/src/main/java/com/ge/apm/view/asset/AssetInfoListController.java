@@ -79,7 +79,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private boolean terminate = false;
 
     private Date varWarrantyDateTo = null;
+
     private String warrantyFormatTime = null;
+    private String manufactDateFormatTime = null;
+    private String installDateFormatTime = null;
+    private String arriveDateFormatTime = null;
+    private String factoryWarrantyDateFormatTime = null;
+
     private Boolean needShowAssetApproval;
 
     private StreamedContent excelFile;
@@ -111,6 +117,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Integer assetId;
     
     private Map<String, Object> selectedObject;
+
+
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -777,6 +785,36 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObject(Map<String, Object> selectedObject) {
         this.selectedObject = selectedObject;
     }
-    
-    
+
+    public String getManufactDateFormatTime() {
+        return manufactDateFormatTime;
+    }
+
+    public void setManufactDateFormatTime(String manufactDateFormatTime) {
+        this.manufactDateFormatTime = manufactDateFormatTime;
+    }
+
+    public String getInstallDateFormatTime() {
+        return installDateFormatTime;
+    }
+
+    public void setInstallDateFormatTime(String installDateFormatTime) {
+        this.installDateFormatTime = installDateFormatTime;
+    }
+
+    public String getArriveDateFormatTime() {
+        return arriveDateFormatTime;
+    }
+
+    public void setArriveDateFormatTime(String arriveDateFormatTime) {
+        this.arriveDateFormatTime = arriveDateFormatTime;
+    }
+
+    public String getFactoryWarrantyDateFormatTime() {
+        return factoryWarrantyDateFormatTime;
+    }
+
+    public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
+        this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
 }
