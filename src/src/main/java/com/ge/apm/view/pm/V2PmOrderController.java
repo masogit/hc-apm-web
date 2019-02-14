@@ -177,6 +177,9 @@ private  String cancelInt;
     if(!accessoryList.isEmpty())
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
+
     }
 
     public void x3(){

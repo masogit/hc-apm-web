@@ -402,8 +402,8 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "";
         }
-        if (qrcode.length() > 16) {
-            WebUtil.addErrorMessage("二维码不能超过最大长度16位");
+        if (qrcode.length() > 64) {
+            WebUtil.addErrorMessage("二维码不能超过最大长度64位");
             return "";
         }
 
@@ -669,7 +669,7 @@ public class QrCodeService {
             if (Strings.isNullOrEmpty(newQrcode)) {
                 item.getValue().put("res", "二维码不能为空");
                 item.getValue().put("status", "失败");
-            } else if (newQrcode.length() > 16) {
+            } else if (newQrcode.length() > 64) {
                 item.getValue().put("res", "二维码超长");
                 item.getValue().put("status", "失败");
             } else if (newQrcode.length() < 4) {
