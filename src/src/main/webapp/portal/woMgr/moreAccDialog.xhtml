@@ -20,7 +20,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">预估单价(元)*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
+                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
                        <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)" >
                         </p:ajax>
@@ -35,7 +35,7 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">发票号</label>
+                     <label class="label">发票号</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -63,7 +63,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">申请时间</label>
-                        <p:calendar timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">预计到达时间</label>
@@ -93,7 +93,7 @@
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>

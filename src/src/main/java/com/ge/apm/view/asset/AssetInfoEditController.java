@@ -457,6 +457,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             selected.setNationalStandardCode(selectedGb.getCode());
         }
+
+        //when mvs user create a new record, mark this asset as mvs asset
+        if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
+            this.selected.setMvsEquip(1);
+        }
+
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
 
@@ -636,11 +642,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                             break;
                         default:
                     }
-                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
-                        qrCode = num.substring(0, 16);
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 64) {
+                        qrCode = num.substring(0, 64);
                         selected.setFinancingNum(qrCode);
                         selected.setDepartNum(qrCode);
-                        WebUtil.addErrorMessage("二维码超长,最大16位");
+                        WebUtil.addErrorMessage("二维码超长,最大64位");
                     } else {
                         qrCode = num;
                         selected.setFinancingNum(num);

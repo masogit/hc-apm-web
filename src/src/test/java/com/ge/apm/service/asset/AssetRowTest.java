@@ -47,7 +47,7 @@ public class AssetRowTest {
         rowMap.put("是否PM", "否");
 
         AssetRow assetRow = new AssetRow(assetInfo, rowMap);
-        assetRow.setFieldStringValue("设备别名", "setAliasName");
+        assetRow.setFieldStringValue("设备别名", "setAliasName", true);
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
@@ -91,7 +91,7 @@ public class AssetRowTest {
         rowMap.put("是否PM", "#");
 
         AssetRow assetRow = new AssetRow(assetInfo, rowMap);
-        assetRow.setFieldStringValue("设备别名", "setAliasName");
+        assetRow.setFieldStringValue("设备别名", "setAliasName", true);
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
@@ -127,7 +127,7 @@ public class AssetRowTest {
         rowMap.put("是否PM", "否");
 
         AssetRow assetRow = new AssetRow(assetInfo, rowMap);
-        assetRow.setFieldStringValue("设备别名", "setAliasName");
+        assetRow.setFieldStringValue("设备别名", "setAliasName", true);
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
@@ -159,7 +159,7 @@ public class AssetRowTest {
 //        rowMap.put("设备别名", "");
 
         AssetRow assetRow = new AssetRow(assetInfo, rowMap);
-        assetRow.setFieldStringValue("设备别名", "setAliasName");
+        assetRow.setFieldStringValue("设备别名", "setAliasName", true);
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");

@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +55,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
-
-    V2_WorkOrderRepository dao;
+    @Setter@Getter
+    private Boolean nochange=false;
+    private UserAccount ua1;
+    private V2_WorkOrderRepository dao;
     private String supplierName;
     private String fileterOrgName;
     private String fileterAssetDeptOrgName;
@@ -191,7 +195,7 @@ public void partsPriceUpdate(){
         }
 }
 
-private UserAccount ua1;
+
 
     public UserAccount getUa1() {
         return ua1;
@@ -1205,13 +1209,15 @@ public void repairResultSet(){
             supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        nochange=false;
     }
+
 
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        nochange = true;
     }
 
 
@@ -1760,6 +1766,14 @@ public void repairResultSet(){
             itemDetail.setSupplier(supplierName);
         else
             itemDetail.setSupplier(supplier.getName());
+    }
+
+    public Boolean getNochange() {
+        return nochange;
+    }
+
+    public void setNochange(Boolean nochange) {
+        this.nochange = nochange;
     }
 
     public String getAssigneeId() {

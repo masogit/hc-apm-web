@@ -279,8 +279,9 @@ public class WorkOrderReportProvider {
 
         sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
             "(select im.value_zh from i18n_message im where concat(wo.status,'') = im.msg_key and im.msg_type='status') as statusName, " +
-            "sr.hospital_name as hospitalName,ai.clinical_dept_name as assetClinicalDeptName,ai.manufacture as assetManufacture, " +
+            "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
             "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
+            "(select oi.short_name from org_info oi where ai.clinical_dept_uid = oi.uid) as assetClinicalDeptName, " +
             "(select im.value_zh from i18n_message im where concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
             "(select im.value_zh from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType') as assetFunctionGroupName, " +
             "(select im.value_zh from i18n_message im where concat(ai.asset_code68,'') = im.msg_key and im.msg_type=(select im.msg_key from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType')) as assetCode68Name, " +
@@ -295,7 +296,7 @@ public class WorkOrderReportProvider {
             "(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepStartTime, " +
             "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1) as workStepEndTime, " +
             "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
-            "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',单价:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
+            "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
             "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as partsTotalPrice, " +
             "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
             "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepOwnerName, " +
