@@ -23,22 +23,27 @@ public class AssetRow {
         this.rowMap = rowMap;
     }
 
-    public void setFieldStringValue(String fieldName, String methodName) {
+    public void setFieldStringValue(String fieldName, String methodName, boolean allowEmpty) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Method method = AssetInfo.class.getMethod(methodName, String.class);
 
             if (StringUtils.isEmpty(assetInfo.getUid())) {
-                if (DELETE_MARK.equals(fieldValueOfString)) {
-                    fieldValueOfString = null;
-                }
+                //only new record allow # for its content
+
+//                if (DELETE_MARK.equals(fieldValueOfString)) {
+//                    fieldValueOfString = null;
+//                }
                 method.invoke(assetInfo, fieldValueOfString);
             } else {
                 //if empty, keep the old value, so there is no else clause
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     String emptyString = null;
                     if (DELETE_MARK.equals(fieldValueOfString)) {
-                        method.invoke(assetInfo, emptyString);
+                        if (allowEmpty) {
+                            method.invoke(assetInfo, emptyString);
+                        }
+
                     } else {
                         method.invoke(assetInfo, fieldValueOfString);
                     }

@@ -490,6 +490,9 @@ public class AssetInstallationController {
             this.arrivalListItem.setFinancingNum(financingNum);
         }
         onDepartNumChange("financingNum");
+        
+        //save
+        updateItem();
     }
 
     public String getQrCodeImageForAsset() {
