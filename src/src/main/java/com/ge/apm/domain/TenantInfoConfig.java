@@ -449,6 +449,8 @@ public class TenantInfoConfig {
 				listLabel.add("探头检测");
 				listKey.add("examineMgt.pccConfig");
 				listLabel.add("探头检测配置");
+				listKey.add("examineMgt.ssoImp");
+				listLabel.add("SSO用户导入");
 			}
 		}
 	}
