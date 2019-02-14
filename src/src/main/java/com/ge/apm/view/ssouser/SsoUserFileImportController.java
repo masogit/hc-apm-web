@@ -6,7 +6,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.ssouser.SsoUserFileImportStreamingService;
-import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -43,17 +42,11 @@ public class SsoUserFileImportController {
 
     private SsoUserFileImportStreamingService streamingService;
 
-    private UaaService uaaService;
-
     private OrgInfoRepository orgDao;
-
-    private Boolean isImported = false;
-    private Boolean hasExportData = false;
 
     private StreamedContent templateFile;
 
     private TreeNode orgTree;
-    private TreeNode selectedNode;
 
     private boolean displayErrorsOnly = true;
 
@@ -63,7 +56,6 @@ public class SsoUserFileImportController {
     protected void init() {
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         streamingService = WebUtil.getBean(SsoUserFileImportStreamingService.class);
-        uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
     }
 
@@ -181,14 +173,6 @@ public class SsoUserFileImportController {
         return importUserMap;
     }
 
-    public Boolean getIsImported() {
-        return isImported;
-    }
-
-    public Boolean getHasExportData() {
-        return hasExportData;
-    }
-
     public UploadedFile getFile() {
         return file;
     }
@@ -203,14 +187,6 @@ public class SsoUserFileImportController {
 
     public void setOrgTree(TreeNode orgTree) {
         this.orgTree = orgTree;
-    }
-
-    public TreeNode getSelectedNode() {
-        return selectedNode;
-    }
-
-    public void setSelectedNode(TreeNode selectedNode) {
-        this.selectedNode = selectedNode;
     }
 
     public boolean isDisplayErrorsOnly() {
