@@ -36,6 +36,7 @@ public class CustomConfigObject {
     List<String> assetsMobilepageDetailFields;
     
     JSONObject mobilePage; 
+    
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
