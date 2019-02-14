@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.Import}SSO#{msg.UserAccount}"/>
+            </div>
+            <div class="ui-g-12 card">
+
+                <h:form id="importForm">
+                    <p:fieldset legend="#{msg.ImportSsoUserDataFile}" id="uploaderContainer">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.choseFileToUpload}</label>
+                                <h:outputText value="#{ssoUserFileImportController.file.fileName}"
+                                              rendered="#{not empty ssoUserFileImportController.file}"/>
+                                <p:fileUpload id="fileUpload"
+                                              fileUploadListener="#{ssoUserFileImportController.uploadDataFile}"
+                                              value="#{ssoUserFileImportController.file}" mode="advanced"
+                                              dragDropSupport="false" style="width:100%" process="@this"
+                                              multiple="false" sizeLimit="10000000"
+                                              update="uploaderContainer :importDataForm" auto="true"
+                                              invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                              allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"
+                                              rendered="#{empty ssoUserFileImportController.file}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p>说明</p>
+                                <p>
+                                    1.
+                                    <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}"
+                                                     icon="ui-icon-arrowstop-1-s" class="btn btn-sm"
+                                                     actionListener="#{ssoUserFileImportController.exportExcelTemplate}"
+                                                     update=":growl"
+                                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
+                                                     style="background-color: #5180ce;">
+                                        <p:fileDownload value="#{ssoUserFileImportController.templateFile}"/>
+                                    </p:commandButton>
+                                </p>
+                                <p>2. 文件中填入要导入的SSO用户数据</p>
+                                <p>3. 上传文件进行导入</p>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="importDataForm">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
+                    </p:messages>
+                    <h:panelGroup>总行数<h:outputText value="#{ssoUserFileImportController.importUserMap.size()}"/>, 导入行数<h:outputText value="#{ssoUserFileImportController.importedUsers.size()}, 未导入数据:"/> </h:panelGroup>
+                    <h:panelGroup>
+                        <p:dataTable id="userTable" value="#{ssoUserFileImportController.displayUsers}" var="item"
+                                     rows="20" paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="20,50,100,500">
+                            <p:column headerText="Excel行数">
+                                <h:outputText value="#{item.get('user').lineNum}"/>
+                            </p:column>
+                            <p:column headerText="SSO">
+                                <h:outputText value="#{item.get('user').geSso}"/>
+                            </p:column>
+                            <p:column headerText="姓名">
+                                <h:outputText value="#{item.get('user').name}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+
+        <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false"
+                  closable="false" resizable="false" showHeader="false">
+            <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"/>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>
