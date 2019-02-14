@@ -602,11 +602,11 @@ public class AssetInstallationController {
                         default:
                     }
 
-                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
-                        num = num.substring(0, 16);
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 64) {
+                        num = num.substring(0, 64);
                         if (null != arrivalListItem.getQrCode()) {
                             arrivalListItem.setQrCode(num);
-                            WebUtil.addErrorMessage("二维码超长,最大16位");
+                            WebUtil.addErrorMessage("二维码超长,最大64位");
                         }
                     }
                     arrivalListItem.setFinancingNum(num);
