@@ -126,7 +126,6 @@ public class SsoUserFileImportController {
     }
 
     public void filterErrorRecords() {
-
         if (!displayErrorsOnly) return;
 
         if (importUserMap == null) return;
@@ -135,6 +134,7 @@ public class SsoUserFileImportController {
         displayUsers.addAll(getUsersByStatus(SsoUserFileImportStreamingService.ImportStatus.Failure));
 
         importedUsers = getUsersByStatus(SsoUserFileImportStreamingService.ImportStatus.New);
+        importedUsers.addAll(getUsersByStatus(SsoUserFileImportStreamingService.ImportStatus.Exist));
     }
 
     private List<Map<String, Object>> getUsersByStatus(SsoUserFileImportStreamingService.ImportStatus status) {
