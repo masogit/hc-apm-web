@@ -402,8 +402,8 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "";
         }
-        if (qrcode.length() > 16) {
-            WebUtil.addErrorMessage("二维码不能超过最大长度16位");
+        if (qrcode.length() > 64) {
+            WebUtil.addErrorMessage("二维码不能超过最大长度64位");
             return "";
         }
 
