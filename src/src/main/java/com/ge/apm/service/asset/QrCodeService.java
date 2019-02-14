@@ -669,7 +669,7 @@ public class QrCodeService {
             if (Strings.isNullOrEmpty(newQrcode)) {
                 item.getValue().put("res", "二维码不能为空");
                 item.getValue().put("status", "失败");
-            } else if (newQrcode.length() > 16) {
+            } else if (newQrcode.length() > 64) {
                 item.getValue().put("res", "二维码超长");
                 item.getValue().put("status", "失败");
             } else if (newQrcode.length() < 4) {
