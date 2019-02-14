@@ -50,30 +50,47 @@
                         </p:panelGrid>
                     </p:fieldset>
                 </h:form>
-            </div>
-            <div class="ui-g-12 card ">
+
                 <h:form id="importDataForm">
-                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
-                    </p:messages>
-                    <h:panelGroup>总行数<h:outputText value="#{ssoUserFileImportController.importUserMap.size()}"/>, 导入行数<h:outputText value="#{ssoUserFileImportController.importedUsers.size()}, 未导入数据:"/> </h:panelGroup>
-                    <h:panelGroup>
-                        <p:dataTable id="userTable" value="#{ssoUserFileImportController.displayUsers}" var="item"
-                                     rows="20" paginator="true"
-                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500">
-                            <p:column headerText="Excel行数">
-                                <h:outputText value="#{item.get('user').lineNum}"/>
-                            </p:column>
-                            <p:column headerText="SSO">
-                                <h:outputText value="#{item.get('user').geSso}"/>
-                            </p:column>
-                            <p:column headerText="姓名">
-                                <h:outputText value="#{item.get('user').name}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </h:panelGroup>
+                    <p:fieldset legend="导入结果" id="uploaderResult"
+                                rendered="#{not empty ssoUserFileImportController.file}">
+
+                        <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
+                        </p:messages>
+                        <h:panelGroup>
+                            <p>总行数
+                                <h:outputText value="#{ssoUserFileImportController.importUserMap.size()}"/>
+                                , 成功导入行数
+                                <h:outputText value="#{ssoUserFileImportController.importedUsers.size()}"/>
+                            </p>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{ssoUserFileImportController.displayUsers.size() > 0}">
+                            <p>有问题的行数
+                                <h:outputText value="#{ssoUserFileImportController.displayUsers.size()}"/>
+                                ，数据如下:
+                            </p>
+                            <p:dataTable id="userTable" value="#{ssoUserFileImportController.displayUsers}" var="item"
+                                         title="123"
+                                         rows="20" paginator="true"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="20,50,100,500">
+                                <p:column headerText="Excel行数">
+                                    <h:outputText value="#{item.get('user').lineNum}"/>
+                                </p:column>
+                                <p:column headerText="SSO">
+                                    <h:outputText value="#{item.get('user').geSso}"/>
+                                </p:column>
+                                <p:column headerText="姓名">
+                                    <h:outputText value="#{item.get('user').name}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
+
+
+                    </p:fieldset>
                 </h:form>
             </div>
+
         </div>
 
         <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false"
