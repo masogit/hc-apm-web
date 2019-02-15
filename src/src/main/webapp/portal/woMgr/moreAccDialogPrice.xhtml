@@ -81,7 +81,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:column headerText="结单">
-                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
+                            <p:selectBooleanButton  disabled="#{workOrderMgrController.selected.currentStepId==5 or workOrderMgrController.selected.currentStepId==6 or workOrderMgrController.selected.currentStepId==7}" value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
                                 <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>
                             </p:selectBooleanButton>
                             <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
