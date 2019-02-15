@@ -329,7 +329,7 @@
         <h:panelGroup>
             <label class="label">#{msg.financingNum}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['financingNum'].required? '*':''}</span></label>
             <p:inputText value="#{assetInfoEditController.selected.financingNum}" class="financingNumChange" required="#{assetInfoEditController.customConfig.assetFields['financingNum'].required}" 
-                         requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('financingNum')}" >
+                         requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('financingNum')}" maxlength="64">
                 <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                 <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
             </p:inputText>
@@ -341,7 +341,7 @@
         <h:panelGroup>
             <label class="label">#{msg.departNum}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['departNum'].required? '*':''}</span></label>
             <p:inputText id="departNum" value="#{assetInfoEditController.selected.departNum}" required="#{assetInfoEditController.customConfig.assetFields['departNum'].required}" 
-                         requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('departNum')}" class="financingNumChange">
+                         requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('departNum')}" class="financingNumChange" maxlength="64">
                 <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('departNum')}" update="@(.financingNumChange)"/>
             </p:inputText>
         </h:panelGroup>
@@ -371,7 +371,7 @@
         <h:panelGroup>
             <label class="label">#{msg.QRCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</span></label>
             <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange financingNumChange"
-                         requiredMessage="#{msg.QRCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}">
+                         requiredMessage="#{msg.QRCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}" maxlength="64">
                 <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>
             </p:inputText>
             <p:commandButton id="qrCodeButton" actionListener="#{assetInfoEditController.renewQrcode()}" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" 

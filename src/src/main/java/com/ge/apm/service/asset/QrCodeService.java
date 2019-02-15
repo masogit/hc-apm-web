@@ -305,6 +305,9 @@ public class QrCodeService {
                     case "systemId":
                         itemObject.put("TextShowValue", textValue.concat(asset.getSystemId() == null ? "" : asset.getSystemId()));
                         break;
+                    case "qrCode":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getQrCode() == null ? "" : asset.getQrCode()));
+                        break;
                     case "installDate":
                         itemObject.put("TextShowValue", textValue.concat(asset.getInstallDate() == null ? "" : TimeUtils.getStrDate(asset.getInstallDate(), "yyyy-MM-dd")));
                         break;

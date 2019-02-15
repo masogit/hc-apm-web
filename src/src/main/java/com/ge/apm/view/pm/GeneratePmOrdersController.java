@@ -79,6 +79,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
     private List<AssetInfo> assetInfoList = new ArrayList<>();
+    private Integer total = 0;
 
 
     @Override
@@ -265,6 +266,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void addFilter(){
 		assetInfoList.clear();
 		assetInfoList = getAssetList();
+		total = assetInfoList.size();
 	}
 
     public List<OrgInfo> getClinicalDeptList(String name){
@@ -408,19 +410,23 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public String getName(AssetInfo assetInfo){
-		return StringUtils.isEmpty(assetInfo.getName()) ? "未配置" : assetInfo.getName();
+		return StringUtils.isEmpty(assetInfo.getName()) ? "  " : assetInfo.getName();
 	}
 
 	public String getDepartNum(AssetInfo assetInfo){
-		return StringUtils.isEmpty(assetInfo.getDepartNum()) ? "未配置" : assetInfo.getDepartNum();
+		return StringUtils.isEmpty(assetInfo.getDepartNum()) ? "  " : assetInfo.getDepartNum();
 	}
 
 	public String getClinicalDeptName(AssetInfo assetInfo){
-		return StringUtils.isEmpty(assetInfo.getClinicalDeptName()) ? "未配置" : assetInfo.getClinicalDeptName();
+		return StringUtils.isEmpty(assetInfo.getClinicalDeptName()) ? "  " : assetInfo.getClinicalDeptName();
 	}
 
 	public String getFunctionType(AssetInfo assetInfo) {
-		return StringUtils.isEmpty(assetInfo.getFunctionType()) ? "未配置" : assetInfo.getFunctionType();
+		return StringUtils.isEmpty(assetInfo.getFunctionType()) ? "  " : assetInfo.getFunctionType();
+	}
+
+	public String getSeriaNum(AssetInfo assetInfo) {
+		return StringUtils.isEmpty(assetInfo.getSerialNum()) ? "  " : assetInfo.getSerialNum();
 	}
 
 	public String getStrDate(Date lastPmDate) {
@@ -549,5 +555,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public void setAssetInfoList(List<AssetInfo> assetInfoList) {
 		this.assetInfoList = assetInfoList;
+	}
+
+	public Integer getTotal() {
+		return total;
+	}
+
+	public void setTotal(Integer total) {
+		this.total = total;
 	}
 }
