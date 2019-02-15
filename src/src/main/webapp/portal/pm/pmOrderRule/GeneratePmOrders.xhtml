@@ -107,17 +107,20 @@
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
 
+
 			<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300">
 				<f:facet name="header">
-					下拉查看更多
+					总计#{generatePmOrdersController.total}条，下拉查看更多
 				</f:facet>
-
-				<h:panelGrid columns="5" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
+				<h:panelGrid columns="6" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
 					<h:outputText value="#{generatePmOrdersController.getName(item)}" />
 					<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
 					<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
 					<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
-					<p:commandButton icon="ui-icon-close" actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update="dataScroller"/>
+					<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
+					<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}"  update="dataScroller" icon="ui-icon-close" style="width: 30px; height: 30px;"/>
+						<!--<p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
+
 				</h:panelGrid>
 			</p:dataScroller>
 
