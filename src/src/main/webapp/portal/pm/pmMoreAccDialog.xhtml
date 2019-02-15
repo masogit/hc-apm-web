@@ -24,7 +24,7 @@
 
                         <h:panelGroup>
                             <label class="label">预估单价(元)*</label>
-                            <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
+                            <p:inputNumber  disabled="#{v2PmOrderController.nochange}" decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
                                 <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                                 </p:ajax>
                                 <f:convertNumber pattern="0" type="number"/>
@@ -87,7 +87,7 @@
 
                         <h:panelGroup>
                             <label class="label">申请时间</label>
-                            <p:calendar timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                         <p:column headerText="到货">
