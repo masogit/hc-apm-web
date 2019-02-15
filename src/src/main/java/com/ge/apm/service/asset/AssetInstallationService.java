@@ -197,7 +197,6 @@ public class AssetInstallationService {
             if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
                 qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 5);
             }
-            WebUtil.addSuccessMessage("修改成功");
             return true;
         } catch (ObjectOptimisticLockingFailureException e) {
             WebUtil.addErrorMessage("保存失败,数据已经被修改!");

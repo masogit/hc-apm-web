@@ -371,12 +371,19 @@ public class AssetInstallationController {
     }
 
     public void updateItem() {
+        if(saveItem()){
+            WebUtil.addSuccessMessage("修改成功");
+        }
+    }
+    
+    
+    private boolean saveItem(){
         Boolean valid = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
-                return;
+                return false;
             }
             if (null != gbCodeName) {
                 arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
@@ -388,14 +395,16 @@ public class AssetInstallationController {
             arrivalListItem.setQrCode(null);
         }
         if (!valid) {
-            return;
+            return false;
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            aiService.saveOrUpdateItem(arrivalListItem);
+            boolean res = aiService.saveOrUpdateItem(arrivalListItem);
             arrivalListItem = itemDao.findById(arrivalListItem.getId());
+            return res;
         } else {
             WebUtil.addErrorMessage("不可修改");
+            return false;
         }
     }
 
@@ -492,7 +501,7 @@ public class AssetInstallationController {
         onDepartNumChange("financingNum");
         
         //save
-        updateItem();
+        saveItem();
     }
 
     public String getQrCodeImageForAsset() {
