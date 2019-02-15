@@ -446,6 +446,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
+        if(exportList.size()>5000){
+            WebUtil.addErrorMessage("超出下载数量限制5000");
+            return;
+        }
         zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()), exportQrCodeTemplateId);
     }
 
