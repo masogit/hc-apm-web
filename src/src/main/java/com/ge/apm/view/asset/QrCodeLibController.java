@@ -222,6 +222,10 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void exportQrCode() throws Exception {
         List<QrCodeLib> exportList = dao.findBySearchFilter(searchFilters);
+        if(exportList.size()>5000){
+            WebUtil.addErrorMessage("超出下载数量限制5000");
+            return;
+        }
         zipFile = qrCodeService.exportQrCodeList(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()));
     }
 
