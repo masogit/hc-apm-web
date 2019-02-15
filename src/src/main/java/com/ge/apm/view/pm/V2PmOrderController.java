@@ -37,6 +37,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
@@ -75,7 +77,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
-
+    @Setter@Getter
+    private Boolean nochange=false;
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
@@ -179,6 +182,8 @@ private  String cancelInt;
 
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
 
+        supplierName=itemDetail.getSupplier();
+        nochange = true;
 
     }
 
@@ -1844,7 +1849,7 @@ private  String cancelInt;
         }
 
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
-
+        nochange=false;
     }
 
     public void removeWoDetail(String itemId, Integer index) {
