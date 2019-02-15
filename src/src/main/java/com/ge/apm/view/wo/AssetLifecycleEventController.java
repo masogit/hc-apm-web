@@ -20,6 +20,8 @@ import java.util.zip.ZipOutputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.google.common.base.Strings;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +62,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected boolean blnAllSelected;
 	protected int tabStatus;
 	protected String descriptionStatusFilter;
+
+	protected String queryAssetUid;
+
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
@@ -70,6 +75,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         blnAllSelected=false;
         setSelectedItems=new HashSet<AssetLifecycleEvent>();
         tabStatus=3;
+
+		String enCodeParameters = WebUtil.getRequestParameter("str");
+		if (!Strings.isNullOrEmpty(enCodeParameters)) {
+			queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+		}
     }
 
     @Override
@@ -121,6 +131,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+
+        if (StringUtils.isNotEmpty(queryAssetUid)) {
+			searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+
+		}
     }
 
     public void onSelectAllItemsEvent() {

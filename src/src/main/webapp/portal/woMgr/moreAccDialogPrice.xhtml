@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition><!--备件对话框 修改-->
-    <p:dialog id="moreAccDialogPriceDlg" class="moreAccDialogPriceDlg" widgetVar="moreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
+    <p:dialog id="moreAccDialogPriceDlg" class="moreAccDialogPriceDlg" widgetVar="moreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件更新"><!--维修工单备件更新-->
         <h:form id="moreAccDialogFormX" >
             <h:panelGroup id="display42">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -70,13 +70,7 @@
                         <label class="label">序列号</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <p:column headerText="结单">
-                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
-                                <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
-                            </p:selectBooleanButton>
-                        </p:column>
-                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">合同号</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
@@ -84,6 +78,16 @@
                     <h:panelGroup>
                         <label class="label">备注</label>
                         <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:column headerText="结单">
+                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
+                                <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
+                            <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                                <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
+                        </p:column>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
@@ -142,7 +146,6 @@
                     <h:panelGroup>
                         <label class="label">合同价格(元)</label>
                         <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPriceView" class="xx1"  value="#{workOrderMgrController.itemDetail.closedPrice}">
-
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
                         </p:inputNumber>
@@ -164,18 +167,19 @@
                         <label class="label">序列号</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea id="areaView" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
                     <p:column headerText="到货">
                         <p:selectBooleanButton  disabled="true" value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
-                           <!-- <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>-->
+                            <!-- <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>-->
                         </p:selectBooleanButton>
                         <p:selectBooleanButton disabled="true"  value="#{workOrderMgrController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
                             <!--<p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>-->
                         </p:selectBooleanButton>
                     </p:column>
-                    <h:panelGroup>
-                        <label class="label">备注</label>
-                        <p:inputTextarea id="areaView" value="#{workOrderMgrController.itemDetail.comment}"/>
-                    </h:panelGroup>
 
 
 

@@ -14,7 +14,7 @@
             </div>
 
             <div class="ui-g-12 ">
-                <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false">
+                <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false" activeIndex="#{workOrderTabController.queryTab}">
                    <!-- <p:ajax event="tabChange"/>-->
                     <p:tab class="ui-g-12" title="内部工单" id="inWorkOrder" rendered="#{not userContextService.isIBorUltraSoundIBEndUser()}">
                         <ui:include src="woMgrList.xhtml"/>
