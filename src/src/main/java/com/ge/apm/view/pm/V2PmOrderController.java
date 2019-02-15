@@ -181,6 +181,8 @@ private  String cancelInt;
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
+        supplierName=itemDetail.getSupplier();
         nochange = true;
 
     }
