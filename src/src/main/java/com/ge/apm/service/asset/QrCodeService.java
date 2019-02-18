@@ -385,8 +385,7 @@ public class QrCodeService {
                     fileName = Optional.ofNullable(orgNamesMap.get(asset.getSiteUID())).orElse("").concat("_")
                             .concat(Optional.ofNullable(asset.getClinicalDeptName()).orElse("")).concat("_").concat(asset.getName()).concat("_").concat(asset.getQrCode()).concat(".jpg");
                 }
-                fileName = fileName.replaceAll("/", "").replaceAll("?", "").replaceAll("*", "").replaceAll("\\", "")
-                        .replaceAll("<", "").replaceAll(">", "").replaceAll("|", "").replaceAll("\"", "").replaceAll(":", "");
+                fileName = fileName.replaceAll("[?:/<>*\"\\\\|]", "");
                 out.putNextEntry(new ZipEntry(fileName.concat(".jpg")));
                 ImageIO.write(image, "JPG", out);
                 out.closeEntry();
