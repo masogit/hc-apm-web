@@ -247,6 +247,7 @@ public class UserContextService implements Serializable {
         UserAccount user = getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        System.err.println("**************** getTenantConfig="+tenant.getTenantConfig());
         flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
         
         return flagIsUltraSoundTenant;
@@ -523,18 +524,23 @@ public class UserContextService implements Serializable {
         UltraSound IB versoin: AssetInfo + External WorkOrder
         IB version: Only External WorkOrder
     */
-    public boolean isFEorOpsUser(){
+    public boolean isGeSsoUser(){
         UserAccount currentUser = getLoginUser();
-        return currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp());
+        return currentUser.getGeSso()!=null;
     }
 
-    public boolean isFEorOpsOrSiteAdminUser(){
+    public boolean isGeOpsUser(){
         UserAccount currentUser = getLoginUser();
-        return currentUser.getGeSso()!=null || Boolean.TRUE.equals(currentUser.getIsGeOp()) || currentUser.getIsSiteAdmin();
+        return Boolean.TRUE.equals(currentUser.getIsGeOp());
+    }
+
+    public boolean isOpsOrSiteAdminUser(){
+        UserAccount currentUser = getLoginUser();
+        return Boolean.TRUE.equals(currentUser.getIsGeOp()) || currentUser.getIsSiteAdmin();
     }
 
     public boolean isIBEndUser(){
-        if(isFEorOpsOrSiteAdminUser()) return false;
+        if(isOpsOrSiteAdminUser()) return false;
         
         UserAccount currentUser = getLoginUser();
         int siteId= currentUser.getSiteId();
@@ -542,7 +548,7 @@ public class UserContextService implements Serializable {
     }
     
     public boolean isUltraSoundIBEndUser(){
-        if(isFEorOpsOrSiteAdminUser()) return false;
+        if(isOpsOrSiteAdminUser()) return false;
         
         return isUltraSoundTenant();
     }
@@ -552,7 +558,7 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isDealerEndUser(){
-        if(isFEorOpsOrSiteAdminUser()) return false;
+        if(isOpsOrSiteAdminUser()) return false;
         
         return isAgentTenant();
     }
@@ -562,7 +568,7 @@ public class UserContextService implements Serializable {
     }
     
     public boolean isAccountEndUser(){
-        if(isFEorOpsOrSiteAdminUser()) return false;
+        if(isOpsOrSiteAdminUser()) return false;
         if(isDealerEndUser()) return false;
         if(isIBEndUser()) return false;
         return !isUltraSoundIBEndUser();
