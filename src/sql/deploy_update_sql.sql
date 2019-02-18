@@ -313,3 +313,17 @@ update pm_order_rule_check_list set status = 1 where status is null;
 alter table public.asset_info alter column qr_code type varchar(64) using qr_code::varchar(64);
 alter table public.qr_code_lib alter column qr_code type varchar(64) using qr_code::varchar(64);
 
+-- bi
+create table dashboard_role_res_tenant_revoke
+(
+  id serial,
+  role_id            integer,
+  res_type           varchar(100),
+  res_id             integer,
+  tenant_uid         varchar(32),
+  PRIMARY KEY (id)
+);
+
+
+
+
