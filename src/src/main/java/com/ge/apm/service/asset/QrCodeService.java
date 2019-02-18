@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.joda.time.DateTime;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
@@ -366,25 +368,30 @@ public class QrCodeService {
         return zipFile;
     }
 
-    public StreamedContent exportQrCodeList(List<QrCodeLib> exportList) throws IOException {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream out = new ZipOutputStream(bout);
+    public void writeZipOutputStream(List<Object> exportList, ZipOutputStream out, String templateId,Map<String,String> orgNamesMap) throws Exception {
 
+        QrCodeTemplate template = Strings.isNullOrEmpty(templateId) ? null : templateDao.findById(templateId);
         exportList.forEach(item -> {
             try {
-                BufferedImage image = getQrCodeImage(item);
-                out.putNextEntry(new ZipEntry(item.getQrCode().concat(".jpg")));
+                String fileName = "";
+                BufferedImage image = null;
+                if (item instanceof QrCodeLib) {
+                    QrCodeLib codeItem = (QrCodeLib) item;
+                    image = getQrCodeImage(codeItem);
+                    fileName = Optional.ofNullable(orgNamesMap.get(codeItem.getSiteUID())).orElse("").concat("_").concat(codeItem.getQrCode());
+                } else if (item instanceof AssetInfo) {
+                    AssetInfo asset = (AssetInfo) item;
+                    image = getQrCodeImage(template == null ? getTemplateBySiteUid(asset.getSiteUID()) : template, asset, null, null);
+                    fileName = Optional.ofNullable(orgNamesMap.get(asset.getSiteUID())).orElse("").concat("_")
+                            .concat(Optional.ofNullable(asset.getClinicalDeptName()).orElse("")).concat("_").concat(asset.getName()).concat("_").concat(asset.getQrCode()).concat(".jpg");
+                }
+                out.putNextEntry(new ZipEntry(fileName.concat(".jpg")));
                 ImageIO.write(image, "JPG", out);
                 out.closeEntry();
             } catch (Exception e) {
-                WebUtil.addErrorMessage(item.getQrCode() + "export fail;");
+                WebUtil.addErrorMessage("export fail;");
             }
         });
-        out.close();
-
-        DefaultStreamedContent zipFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()));
-        zipFile.setName("qrCodes.zip");
-        return zipFile;
     }
 
     public String getPreViewBase64(QrCodeTemplate template) {
@@ -678,7 +685,7 @@ public class QrCodeService {
             } else if (newQrcode.length() < 4) {
                 item.getValue().put("res", "二维码不能少于4位");
                 item.getValue().put("status", "失败");
-            } else if(newQrcodeList.stream().anyMatch(saveditem-> Objects.equals(saveditem.getQrCode(),newQrcode))){
+            } else if (newQrcodeList.stream().anyMatch(saveditem -> Objects.equals(saveditem.getQrCode(), newQrcode))) {
                 item.getValue().put("res", "文件中重复的二维码");
                 item.getValue().put("status", "失败");
             } else {
@@ -700,7 +707,7 @@ public class QrCodeService {
                     item.getValue().put("status", "导入成功");
                 }
             }
-            
+
             item.getValue().put("org", site.getName());
 
         });
