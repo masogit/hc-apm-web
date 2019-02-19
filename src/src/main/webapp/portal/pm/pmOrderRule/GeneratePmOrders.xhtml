@@ -102,15 +102,45 @@
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
-                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update="dataScroller"/>
+                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update=":GeneratePmOrderForm:dataTable"/>
 				   </p:panelGrid>
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
+			<p:fieldset id="dataTable" legend="共有#{generatePmOrdersController.total}个资产，下拉查看更多" >
+				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
+					<p:column headerText="资产名称">
+						<h:outputText value="#{generatePmOrdersController.getName(item)}" />
+					</p:column>
+					<p:column headerText="设备编号" >
+						<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
+					</p:column>
+					<p:column headerText="所属科室" >
+						<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
+					</p:column>
+					<p:column headerText="设备型号" >
+						<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
+					</p:column>
+					<p:column headerText="制造商序列号" >
+						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
+					</p:column>
+					<p:column headerText="操作" >
+						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
+										 icon="ui-icon-close" style="zoom: 0.7"/>
+					</p:column>
 
+				</p:dataTable>
+			</p:fieldset>
 
-			<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300">
+			<!--<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300" rows="#{generatePmOrdersController.total}">
+
 				<f:facet name="header">
-					总计#{generatePmOrdersController.total}条，下拉查看更多
+					<h:panelGrid columns="5" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
+						<h:outputText value="资产名称" />
+						<h:outputText value="设备编号" />
+						<h:outputText value="使用科室" />
+						<h:outputText value="设备类型" />
+						<h:outputText value="资产编号" />
+					</h:panelGrid>
 				</f:facet>
 				<h:panelGrid columns="6" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
 					<h:outputText value="#{generatePmOrdersController.getName(item)}" />
@@ -119,10 +149,8 @@
 					<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
 					<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
 					<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}"  update="dataScroller" icon="ui-icon-close" style="width: 30px; height: 30px;"/>
-						<!--<p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
-
 				</h:panelGrid>
-			</p:dataScroller>
+			</p:dataScroller>-->
 
 
 
