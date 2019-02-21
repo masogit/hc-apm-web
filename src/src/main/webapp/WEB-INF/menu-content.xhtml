@@ -117,7 +117,7 @@
                <p:menuitem id="um151" value="CT球管预测" rendered="#{userContextService.isAgentTenant() and userContextService.versionContains('performance.CT')}" outcome="/portal/config/tubeData/List.xhtml"/>
                 <p:menuitem id="um50" value="设备绩效配置" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.config')}"/>
                 <p:menuitem id="um51" value="设备绩效导入" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.import')}"/>
-                <p:menuitem id="um52" value="设备绩效报表" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="false"/>
+                <p:menuitem id="um52" value="设备绩效报表" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/>
                 <p:menuitem id="um39" value="#{msg.DeviceROIAnalysis}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf" rendered="false"/>
                 <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf" rendered="false"/>
