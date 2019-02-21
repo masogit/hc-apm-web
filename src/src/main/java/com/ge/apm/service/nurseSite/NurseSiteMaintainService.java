@@ -237,33 +237,6 @@ public class NurseSiteMaintainService {
 		nurseSiteMaintainConfigItemRepository.save(obj);
 	}
 
-	public void saveMaintainWithThread(List<NurseSiteMaintain> obj) {
-		if(obj!=null && obj.size()>0){
-			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
-			for(int i=0;i<obj.size();++i){
-				splitList.add(obj.get(i));
-				if(i%50==0 || i+1>=obj.size()){
-					nurseSiteMaintainRepository.save(splitList);
-					splitList.clear();
-				}
-			}
-		}
-	}
-	
-	public void deleteMaintainWithThread(List<NurseSiteMaintain> obj) {
-		if(obj!=null && obj.size()>0){
-			List<NurseSiteMaintain> splitList=new ArrayList<NurseSiteMaintain>();
-			for(int i=0;i<obj.size();++i){
-				splitList.add(obj.get(i));
-				if(i%500==0 || i+1>=obj.size()){
-//					nurseSiteMaintainRepository.delete(splitList);
-					nativeDeleteMaintain(splitList);
-					splitList.clear();
-				}
-			}
-		}
-	}
-
 	@Transactional
 	public boolean deleteMaintain(NurseSiteMaintain maintain) {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
@@ -292,7 +265,9 @@ public class NurseSiteMaintainService {
 				blobFileService.deleteBlobFilesByStorageId(setSignatureId);
 			}
 			// nurseSiteMaintainItemRepository.delete(listItem);
-			deleteMaintainWithThread(listMaintain);
+			if(listMaintain!=null && listMaintain.size()>0){
+				nativeDeleteMaintain(listMaintain);
+			}
 		}
 		return true;
 	}
@@ -300,7 +275,7 @@ public class NurseSiteMaintainService {
 	@Transactional
 	public void saveAndDelete(List<NurseSiteMaintain> obj, List<NurseSiteMaintain> obj2) {
 		if (obj != null && obj.size() > 0) {
-			saveMaintainWithThread(obj);
+			nurseSiteMaintainRepository.save(obj);
 		}
 		if (obj2 != null && obj2.size() > 0) {
 			deleteMaintain(obj2);
@@ -1020,7 +995,9 @@ public class NurseSiteMaintainService {
 				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
 			}
 		}
-		saveMaintainWithThread(listNewMaintain);
+		if(listNewMaintain.size()>0){
+			nurseSiteMaintainRepository.save(listNewMaintain);
+		}
 		deleteMaintain(listMaintain);
 	}
 
