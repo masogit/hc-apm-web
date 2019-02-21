@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.utils;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MvsAssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -52,7 +53,7 @@ public class MvsUtil {
             }
 
         } else {
-            createNewMvsAssetInfo(assetInfo);
+            createNewMvsAssetInfo(assetInfo, updatedMvsAssetInfo);
         }
 
     }
@@ -66,40 +67,51 @@ public class MvsUtil {
         MvsAssetInfo foundExisting = mvsAssetInfoDao.findById(assetInfo.getUid());
 
         if (foundExisting == null) {
-            createNewMvsAssetInfo(assetInfo);
+            createNewMvsAssetInfo(assetInfo, null);
         }
 
     }
 
-    private void createNewMvsAssetInfo(AssetInfo assetInfo) {
+    private void createNewMvsAssetInfo(AssetInfo assetInfo, MvsAssetInfo mvsAssetInfo) {
         //below is 17 fields copied
-        MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+        if (mvsAssetInfo == null) {
+            mvsAssetInfo = new MvsAssetInfo();
+        }
 
-        mvsAssetInfo.setName(assetInfo.getName());
-        mvsAssetInfo.setAliasName(assetInfo.getAliasName());
+        if (StringUtils.isEmpty(mvsAssetInfo.getName())) {
+            mvsAssetInfo.setName(assetInfo.getName());
+        }
+
+        if (StringUtils.isEmpty(mvsAssetInfo.getAliasName())) {
+            mvsAssetInfo.setAliasName(assetInfo.getAliasName());
+        }
 
         //site org
-        OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
-        if (siteOrg == null) {
-            logger.error("site org not found using site uid, {}", assetInfo.getSiteUID());
-        } else {
-            mvsAssetInfo.setSiteName(siteOrg.getName());
+        if (StringUtils.isEmpty(mvsAssetInfo.getSiteName()) && !StringUtils.isEmpty(assetInfo.getSiteUID())) {
+            OrgInfo siteOrg = orgInfoDao.findByUid(assetInfo.getSiteUID());
+            if (siteOrg != null) {
+                mvsAssetInfo.setSiteName(siteOrg.getName());
+            }
         }
-
 
         //asset dept org
-        OrgInfo clinicalDeptOrg = orgInfoDao.findByUid(assetInfo.getClinicalDeptUID());
-        if (clinicalDeptOrg == null) {
-            logger.error("clinical dept org not found using clnical dept uid, {}", assetInfo.getClinicalDeptUID());
-        } else {
-            mvsAssetInfo.setClinicalDeptName(clinicalDeptOrg.getName());
+        if (StringUtils.isEmpty(mvsAssetInfo.getClinicalDeptName()) && !StringUtils.isEmpty(assetInfo.getClinicalDeptUID())) {
+            OrgInfo clinicalDeptOrg = orgInfoDao.findByUid(assetInfo.getClinicalDeptUID());
+            if (clinicalDeptOrg != null) {
+                mvsAssetInfo.setClinicalDeptName(clinicalDeptOrg.getName());
+            }
         }
 
-        mvsAssetInfo.setManufacture(assetInfo.getManufacture());
-        mvsAssetInfo.setMakerShortName(assetInfo.getMakerShortName());
+        if (StringUtils.isEmpty(mvsAssetInfo.getManufacture())) {
+            mvsAssetInfo.setManufacture(assetInfo.getManufacture());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getMakerShortName())) {
+            mvsAssetInfo.setMakerShortName(assetInfo.getMakerShortName());
+        }
 
         I18nMessage foundMsg;
-        if (assetInfo.getAssetGroup() != null) {
+
+        if (StringUtils.isEmpty(mvsAssetInfo.getAssetGroup()) && assetInfo.getAssetGroup() != null) {
             foundMsg = i18nMessageService.getByMsgTypeAndMsgKey("assetGroup", String.valueOf(assetInfo.getAssetGroup()));
 
             if (foundMsg != null) {
@@ -107,7 +119,7 @@ public class MvsUtil {
             }
         }
 
-        if (assetInfo.getRepairForm() != null) {
+        if (StringUtils.isEmpty(mvsAssetInfo.getRepairForm()) && assetInfo.getRepairForm() != null) {
             foundMsg = i18nMessageService.getByMsgTypeAndMsgKey("repairForm", String.valueOf(assetInfo.getRepairForm()));
 
             if (foundMsg != null) {
@@ -115,15 +127,34 @@ public class MvsUtil {
             }
         }
 
-        mvsAssetInfo.setFunctionType(assetInfo.getFunctionType());
-        mvsAssetInfo.setSerialNum(assetInfo.getSerialNum());
-        mvsAssetInfo.setSystemId(assetInfo.getSystemId());
-        mvsAssetInfo.setFinancingNum(assetInfo.getFinancingNum());
-        mvsAssetInfo.setFactoryWarrantyDate(assetInfo.getFactoryWarrantyDate());
-        mvsAssetInfo.setWarrantyDate(assetInfo.getWarrantyDate());
-        mvsAssetInfo.setQrCode(assetInfo.getQrCode());
-        mvsAssetInfo.setComments(assetInfo.getComments());
-        mvsAssetInfo.setId(assetInfo.getUid());
+        if (StringUtils.isEmpty(mvsAssetInfo.getFunctionType())) {
+            mvsAssetInfo.setFunctionType(assetInfo.getFunctionType());
+        }
+
+        if (StringUtils.isEmpty(mvsAssetInfo.getSerialNum())) {
+            mvsAssetInfo.setSerialNum(assetInfo.getSerialNum());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getSystemId())) {
+            mvsAssetInfo.setSystemId(assetInfo.getSystemId());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getFinancingNum())) {
+            mvsAssetInfo.setFinancingNum(assetInfo.getFinancingNum());
+        }
+        if (mvsAssetInfo.getFactoryWarrantyDate() == null) {
+            mvsAssetInfo.setFactoryWarrantyDate(assetInfo.getFactoryWarrantyDate());
+        }
+        if (mvsAssetInfo.getWarrantyDate() == null) {
+            mvsAssetInfo.setWarrantyDate(assetInfo.getWarrantyDate());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getQrCode())) {
+            mvsAssetInfo.setQrCode(assetInfo.getQrCode());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getComments())) {
+            mvsAssetInfo.setComments(assetInfo.getComments());
+        }
+        if (StringUtils.isEmpty(mvsAssetInfo.getId())) {
+            mvsAssetInfo.setId(assetInfo.getUid());
+        }
 
         mvsAssetInfoDao.save(mvsAssetInfo);
     }

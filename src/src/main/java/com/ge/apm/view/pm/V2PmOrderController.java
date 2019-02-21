@@ -37,6 +37,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
@@ -75,7 +77,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
-
+    @Setter@Getter
+    private Boolean nochange=false;
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
@@ -176,6 +179,11 @@ private  String cancelInt;
         accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
     if(!accessoryList.isEmpty())
         itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
+        supplierName=itemDetail.getSupplier();
+        nochange = true;
 
     }
 
@@ -383,7 +391,6 @@ private  String cancelInt;
                         try {
                             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
                             InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
-                            
                             String safetySchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-safety-report"))
                                     .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
                             String performanceSchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-performance-report"))
@@ -1294,8 +1301,6 @@ private  String cancelInt;
 
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
-
-
         this.setSearchFilter();
         removeFilterOnField("currentStepId");
         removeFilterOnField("currentPersonId");
@@ -1842,7 +1847,7 @@ private  String cancelInt;
         }
 
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
-
+        nochange=false;
     }
 
     public void removeWoDetail(String itemId, Integer index) {
@@ -1883,7 +1888,7 @@ private  String cancelInt;
         List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder){
+    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
@@ -1897,7 +1902,7 @@ private  String cancelInt;
         if(strList.isEmpty()){
             strList.add("");
         }
-         pmcl = pmckLstDao.findPMCL(strList);
+        pmcl = pmckLstDao.findPMCL(strList,ruleUid);
         return pmcl;
     }
 
@@ -1911,7 +1916,7 @@ private  String cancelInt;
        // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
 
         if(v2PmOrder.isFinished()) {
-         return getPmRuleCLclosed(v2PmOrder);
+         return getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
         }
         else {
             return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
