@@ -45,6 +45,7 @@ public class AssetInstallationReportService {
 
     public Map<String, Object> createReportData(ArrivalListItem arrivalListItem){
 
+
         Map<String, Object> reportData = new HashedMap();
 
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
@@ -52,6 +53,12 @@ public class AssetInstallationReportService {
         reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
+
+        reportData.put("contract_num", arrivalListItem.getArrivalList().getContractNum());//合同号
+        reportData.put("invoice_num", arrivalListItem.getArrivalList().getInvoiceNum());//发票号
+        reportData.put("contract_price", arrivalListItem.getArrivalList().getContractPrice());//合同价格
+        reportData.put("contract_qua", arrivalListItem.getArrivalList().getQuantity());//数量
+        reportData.put("manufacture", arrivalListItem.getArrivalList().getManufacture());//生产厂家
 
         //技术验收
         reportData.put("technical_third_party_name", "");//第三方检查单位

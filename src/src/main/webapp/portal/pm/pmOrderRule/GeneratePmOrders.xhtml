@@ -7,6 +7,12 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
+		<style>
+			.cellAlignLeft {
+				text-align: left;
+				width: 25%;
+			}
+		</style>
        <div class="ui-g clearfix">
        <div class="ui-g-12 card cardTitle">
            <p:outputLabel class="pageTitle" value="批量生成保养工单"/>
@@ -96,10 +102,59 @@
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
-                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update="AssetsPickList"/>
+                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update=":GeneratePmOrderForm:dataTable"/>
 				   </p:panelGrid>
 				</p:fieldset>
-                <p:fieldset id="assets" legend="筛选资产">
+				<h:panelGroup id = "AssetsPickList"/>
+			<p:fieldset id="dataTable" legend="共有#{generatePmOrdersController.total}个资产，下拉查看更多" >
+				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
+					<p:column headerText="资产名称">
+						<h:outputText value="#{generatePmOrdersController.getName(item)}" />
+					</p:column>
+					<p:column headerText="设备编号" >
+						<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
+					</p:column>
+					<p:column headerText="所属科室" >
+						<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
+					</p:column>
+					<p:column headerText="设备型号" >
+						<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
+					</p:column>
+					<p:column headerText="制造商序列号" >
+						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
+					</p:column>
+					<p:column headerText="操作" >
+						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
+										 icon="ui-icon-close" style="zoom: 0.7"/>
+					</p:column>
+
+				</p:dataTable>
+			</p:fieldset>
+
+			<!--<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300" rows="#{generatePmOrdersController.total}">
+
+				<f:facet name="header">
+					<h:panelGrid columns="5" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
+						<h:outputText value="资产名称" />
+						<h:outputText value="设备编号" />
+						<h:outputText value="使用科室" />
+						<h:outputText value="设备类型" />
+						<h:outputText value="资产编号" />
+					</h:panelGrid>
+				</f:facet>
+				<h:panelGrid columns="6" style="width:100%" columnClasses="cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft,cellAlignLeft">
+					<h:outputText value="#{generatePmOrdersController.getName(item)}" />
+					<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
+					<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
+					<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
+					<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
+					<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}"  update="dataScroller" icon="ui-icon-close" style="width: 30px; height: 30px;"/>
+				</h:panelGrid>
+			</p:dataScroller>-->
+
+
+
+<!--                <p:fieldset id="assets" legend="筛选资产">
                     <p:pickList id="AssetsPickList" value="#{generatePmOrdersController.availableAssets}" var="item"
                                 itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
@@ -113,9 +168,9 @@
                         <p:column style="float: left;width:30%;">
                             <h:outputText value="#{item.departNum}" />
                         </p:column>
-<!--                        <p:column style="float: left;width:20%;">
+&lt;!&ndash;                        <p:column style="float: left;width:20%;">
                             <h:outputText value="#{generatePmOrdersController.getOrgName(item.siteUID)}" />
-                        </p:column>-->
+                        </p:column>&ndash;&gt;
                          <p:column style="float: left;width:25%;">
                             <h:outputText value="#{item.clinicalDeptName}" />
                         </p:column>
@@ -124,7 +179,7 @@
 						</p:column>
                     </p:pickList>
 
-                </p:fieldset>
+                </p:fieldset>-->
                     <br/> <br/>
 
                     <p:fieldset id="config" legend="配置工单">

@@ -63,7 +63,8 @@ import webapp.framework.web.WebUtil;
 @ViewScoped
 public class AssetInstallationController {
 
-    @Getter@Setter
+    @Getter
+    @Setter
     private ArrivalListItem arrivalListItem;
     private ArrivalListItemRepository itemDao;
     private AssetInstallationService aiService;
@@ -76,33 +77,42 @@ public class AssetInstallationController {
 
     private List<V2_BlobObject> attachList;
 
-    @Getter@Setter
+    @Getter
+    @Setter
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
-    
-    
-    @Getter@Setter
+
+    @Getter
+    @Setter
     private TreeNode selectedNode;
-    @Getter@Setter
+    @Getter
+    @Setter
     private TreeNode selectedGbNode;
-    
-    @Getter@Setter
+
+    @Getter
+    @Setter
     private String gbCodeName;
-    
-    @Getter@Setter
+
+    @Getter
+    @Setter
     private GbCode selectedGb;
-    @Getter@Setter
+    @Getter
+    @Setter
     private TreeNode gbTree;
     private String src = "";
-    @Getter@Setter
+    @Getter
+    @Setter
     private UserAccount owner1;
-    @Getter@Setter
+    @Getter
+    @Setter
     private UserAccount owner2;
-    @Getter@Setter
+    @Getter
+    @Setter
     private UserAccount owner3;
-    @Getter@Setter
+    @Getter
+    @Setter
     private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
 //    private String currentQrCode;
@@ -113,10 +123,12 @@ public class AssetInstallationController {
 
     private StreamedContent exportFile;
 
-    @Getter@Setter
+    @Getter
+    @Setter
     private String exportQrCodeTemplateId;
 
-    @Getter@Setter
+    @Getter
+    @Setter
     private String deptName;
     private List<UserAccount> ownerList;
     private List<UserAccount> clinicalOwnerList;
@@ -125,12 +137,13 @@ public class AssetInstallationController {
     private WorkflowConfig config;
     private boolean needInstorageCheck;
     private List<AssetInfo> parentAssetList;
-    
-    @Getter@Setter
+
+    @Getter
+    @Setter
     private AssetInfo parentAssetInfo;
-    
+
     private String oldQrCode;
-    
+
     @Getter
     private CustomConfigObject customConfig;
 
@@ -182,8 +195,8 @@ public class AssetInstallationController {
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         needInstorageCheck = userContextService.needInstorageCheck();
-        if(arrivalListItem.getParentAssetId()!=null){
-        	parentAssetInfo=assetDao.findById(arrivalListItem.getParentAssetId());
+        if (arrivalListItem.getParentAssetId() != null) {
+            parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
     }
@@ -371,12 +384,18 @@ public class AssetInstallationController {
     }
 
     public void updateItem() {
+        if (saveItem()) {
+            WebUtil.addSuccessMessage("修改成功");
+        }
+    }
+
+    private boolean saveItem() {
         Boolean valid = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
-                return;
+                return false;
             }
             if (null != gbCodeName) {
                 arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
@@ -388,14 +407,16 @@ public class AssetInstallationController {
             arrivalListItem.setQrCode(null);
         }
         if (!valid) {
-            return;
+            return false;
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            aiService.saveOrUpdateItem(arrivalListItem);
+            boolean res = aiService.saveOrUpdateItem(arrivalListItem);
             arrivalListItem = itemDao.findById(arrivalListItem.getId());
+            return res;
         } else {
             WebUtil.addErrorMessage("不可修改");
+            return false;
         }
     }
 
@@ -438,7 +459,11 @@ public class AssetInstallationController {
     }
 
     public List<AssetInfo> getParentAssetList() {
-    	parentAssetList=assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
+        if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+            parentAssetList = assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
+        } else {
+            parentAssetList = Collections.EMPTY_LIST;
+        }
         return parentAssetList;
     }
 
@@ -490,6 +515,9 @@ public class AssetInstallationController {
             this.arrivalListItem.setFinancingNum(financingNum);
         }
         onDepartNumChange("financingNum");
+
+        //save
+        saveItem();
     }
 
     public String getQrCodeImageForAsset() {
@@ -505,14 +533,14 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
-        String tempSiteUid=arrivalListItem.getArrivalList().getSiteUID();
+        String tempSiteUid = arrivalListItem.getArrivalList().getSiteUID();
         //check to delete
-        String tempQrCode=asset.getQrCode();
-        if(StringUtils.isNotEmpty(tempQrCode)){
-        	QrCodeLib tempQrCodeLib = qrCodeService.findByQrCode(tempQrCode,tempSiteUid );
-        	if(tempQrCodeLib==null){
-        		qrCodeService.createSpecialQrCodeWithStatus(tempQrCode, tempSiteUid,5);
-        	}
+        String tempQrCode = asset.getQrCode();
+        if (StringUtils.isNotEmpty(tempQrCode)) {
+            QrCodeLib tempQrCodeLib = qrCodeService.findByQrCode(tempQrCode, tempSiteUid);
+            if (tempQrCodeLib == null) {
+                qrCodeService.createSpecialQrCodeWithStatus(tempQrCode, tempSiteUid, 5);
+            }
         }
         //delete
         return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId, tempSiteUid);
@@ -552,27 +580,27 @@ public class AssetInstallationController {
         arrivalListItem.setClinicalOwnerUid(useOwner == null ? null : useOwner.getUid());
     }
 
-    public void onQrCodeChange(){
-        if(!Strings.isNullOrEmpty(oldQrCode)){
+    public void onQrCodeChange() {
+        if (!Strings.isNullOrEmpty(oldQrCode)) {
             //release old qrCode
             qrCodeService.releaseQrCode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
             //delete old qrCode
             qrCodeService.deleteQrcode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
         }
-        if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
-            String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
-            if(Strings.isNullOrEmpty(availableQrcode)){
+        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
+            String availableQrcode = qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+            if (Strings.isNullOrEmpty(availableQrcode)) {
 //                WebUtil.addErrorMessage("二维码不正确");
                 arrivalListItem.setQrCode("");
-            }else{
-                oldQrCode=arrivalListItem.getQrCode();
+            } else {
+                oldQrCode = arrivalListItem.getQrCode();
             }
-        }else{
-            oldQrCode="";
+        } else {
+            oldQrCode = "";
         }
         onDepartNumChange("qrCode");
     }
-    
+
     public void onDepartNumChange(String fieldName) {
         if (config == null) {
             return;
@@ -599,11 +627,11 @@ public class AssetInstallationController {
                         default:
                     }
 
-                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
-                        num = num.substring(0, 16);
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 64) {
+                        num = num.substring(0, 64);
                         if (null != arrivalListItem.getQrCode()) {
                             arrivalListItem.setQrCode(num);
-                            WebUtil.addErrorMessage("二维码超长,最大16位");
+                            WebUtil.addErrorMessage("二维码超长,最大64位");
                         }
                     }
                     arrivalListItem.setFinancingNum(num);
@@ -667,14 +695,13 @@ public class AssetInstallationController {
             parentAssetList = getParentAssetList();
         }
     }
-    
-    public void onParentAssetInfoChange(){
-    	if(this.parentAssetInfo!=null){
-    		this.arrivalListItem.setParentAssetId(this.parentAssetInfo.getId());
-    	}
-    	else{
-    		this.arrivalListItem.setParentAssetId(null);
-    	}
+
+    public void onParentAssetInfoChange() {
+        if (this.parentAssetInfo != null) {
+            this.arrivalListItem.setParentAssetId(this.parentAssetInfo.getId());
+        } else {
+            this.arrivalListItem.setParentAssetId(null);
+        }
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -684,9 +711,9 @@ public class AssetInstallationController {
     public List<UserAccount> completeClinicalOwnerList(String query) {
         return autoCompleteService.completeClinicalOwnerList(query, clinicalOwnerList);
     }
-    
-    public List<AssetInfo> completeParentAssetInfoList(String query){
-    	return autoCompleteService.completeAssetInfoList(query, parentAssetList);
+
+    public List<AssetInfo> completeParentAssetInfoList(String query) {
+        return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
 
     public List<QrCodeTemplate> getQrCodeTemplates() {
@@ -702,19 +729,19 @@ public class AssetInstallationController {
         return ownerList;
     }
 
-    public void exportReport(String reportType){
+    public void exportReport(String reportType) {
         //List<ArrivalListItem> tempList = new ArrayList();
         //tempList.add(this.selected);
-        try{
+        try {
             Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
             //List<Map<String, Object>> data = assetInstallationReportService.createReportDataList(tempList);
             byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
 
-            if(templateBytes != null){
+            if (templateBytes != null) {
                 exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
                 //exportFile = assetInstallationReportService.exportZip(data, templateBytes, reportType);
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
             WebUtil.addErrorMessage("导出失败");
         }
@@ -739,7 +766,6 @@ public class AssetInstallationController {
 //    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
 //        this.arrivalListItem = arrivalListItem;
 //    }
-
 //    public List<I18nMessage> getCode68List() {
 //        return code68List;
 //    }
@@ -747,7 +773,6 @@ public class AssetInstallationController {
 //    public void setCode68List(List<I18nMessage> code68List) {
 //        this.code68List = code68List;
 //    }
-
 //    public String getGbCodeName() {
 //        return gbCodeName;
 //    }
@@ -755,7 +780,6 @@ public class AssetInstallationController {
 //    public void setGbCodeName(String gbCodeName) {
 //        this.gbCodeName = gbCodeName;
 //    }
-
 //    public GbCode getSelectedGb() {
 //        return selectedGb;
 //    }
@@ -763,7 +787,6 @@ public class AssetInstallationController {
 //    public void setSelectedGb(GbCode selectedGb) {
 //        this.selectedGb = selectedGb;
 //    }
-
 //    public TreeNode getSelectedNode() {
 //        return selectedNode;
 //    }
@@ -771,7 +794,6 @@ public class AssetInstallationController {
 //    public void setSelectedNode(TreeNode selectedNode) {
 //        this.selectedNode = selectedNode;
 //    }
-
 //    public TreeNode getSelectedGbNode() {
 //        return selectedGbNode;
 //    }
@@ -779,7 +801,6 @@ public class AssetInstallationController {
 //    public void setSelectedGbNode(TreeNode selectedGbNode) {
 //        this.selectedGbNode = selectedGbNode;
 //    }
-
 //    public TreeNode getGbTree() {
 //        return gbTree;
 //    }
@@ -787,7 +808,6 @@ public class AssetInstallationController {
 //    public void setGbTree(TreeNode gbTree) {
 //        this.gbTree = gbTree;
 //    }
-
 //    public String getExportQrCodeTemplateId() {
 //        return exportQrCodeTemplateId;
 //    }
@@ -795,7 +815,6 @@ public class AssetInstallationController {
 //    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
 //        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
 //    }
-
 //    public String getDeptName() {
 //        return deptName;
 //    }
@@ -803,7 +822,6 @@ public class AssetInstallationController {
 //    public void setDeptName(String deptName) {
 //        this.deptName = deptName;
 //    }
-
     public boolean isNeedInstorageCheck() {
         return needInstorageCheck;
     }
@@ -819,7 +837,6 @@ public class AssetInstallationController {
 //    public void setOwner1(UserAccount owner1) {
 //        this.owner1 = owner1;
 //    }
-
 //    public UserAccount getOwner2() {
 //        return owner2;
 //    }
@@ -827,7 +844,6 @@ public class AssetInstallationController {
 //    public void setOwner2(UserAccount owner2) {
 //        this.owner2 = owner2;
 //    }
-
 //    public UserAccount getOwner3() {
 //        return owner3;
 //    }
@@ -835,7 +851,6 @@ public class AssetInstallationController {
 //    public void setOwner3(UserAccount owner3) {
 //        this.owner3 = owner3;
 //    }
-
 //    public UserAccount getUseOwner() {
 //        return useOwner;
 //    }

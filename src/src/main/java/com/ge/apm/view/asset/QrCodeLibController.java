@@ -11,18 +11,19 @@ import com.ge.apm.service.common.UserCommonService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.service.asset.QrCodeExportStream;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import webapp.framework.web.mvc.GenericCRUDController;
 
@@ -222,9 +223,17 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void exportQrCode() throws Exception {
         List<QrCodeLib> exportList = dao.findBySearchFilter(searchFilters);
-        zipFile = qrCodeService.exportQrCodeList(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()));
-    }
+//        if(exportList.size()>5000){
+//            WebUtil.addErrorMessage("超出下载数量限制5000");
+//            return;
+//        }
 
+        Map<String,String> orgNamesMap = orgInfoDao.findByUids(exportList.stream().map(QrCodeLib::getSiteUID).distinct().collect(Collectors.toSet()))
+                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
+        QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()),null,orgNamesMap);
+        zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed","qrCodes.zip");
+    }
+    
     public String getFullorgName(String uid) {
         OrgInfo tempOrgInfo = orgInfoDao.getByUid(uid);
         String tempInstitutionName = orgInfoDao.getByUid(tempOrgInfo.getInstitutionUID()).getName();

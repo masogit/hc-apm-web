@@ -308,3 +308,22 @@ update message_subscriber set meter_hit =false where meter_hit is null
 --2019-v1.2
 ALTER TABLE public.nurse_site_maintain_config DROP COLUMN check_items;
 update pm_order_rule_check_list set status = 1 where status is null;
+
+--v 19.2.1
+alter table public.asset_info alter column qr_code type varchar(64) using qr_code::varchar(64);
+alter table public.qr_code_lib alter column qr_code type varchar(64) using qr_code::varchar(64);
+
+-- bi
+create table dashboard_role_res_tenant_revoke
+(
+  id serial,
+  role_id            integer,
+  res_type           varchar(100),
+  res_id             integer,
+  tenant_uid         varchar(32),
+  PRIMARY KEY (id)
+);
+
+
+
+

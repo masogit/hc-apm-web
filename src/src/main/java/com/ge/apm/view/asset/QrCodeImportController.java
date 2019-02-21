@@ -51,6 +51,8 @@ public class QrCodeImportController {
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
         qrcodeService = WebUtil.getBean(QrCodeService.class);
+        
+        selectedSiteUID=UserContextService.getCurrentUserAccount().getSiteUID();
     }
 
     public void cancelUpload() {

@@ -220,7 +220,7 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.departNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.departNum} #{msg.ValidationRequire}">
+                                                 requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" maxlength="64">
                                         <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)" />
                                     </p:inputText>
                                 </h:panelGroup>
@@ -229,7 +229,7 @@
                                 <h:panelGroup >
                                     <label class="label">#{msg.financingNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['financingNum'].arrivalRequired}" 
-                                                  requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}">
+                                                  requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" maxlength="64">
                                         <p:ajax event="keyup" process="@this" update="@(.generateFinancingNum)"/>
                                         <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="@(.generateFinancingNum) @(.financingNum)"/>
                                     </p:inputText>
@@ -241,7 +241,7 @@
                                 <h:panelGroup id="qrCode" class="financingNum">
                                     <label class="label">#{msg.qrCode}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired)? '*':''}</span></label>
                                     <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" required="#{assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['qrCode'].arrivalRequired}" 
-                                                  requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}">
+                                                  requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}" maxlength="64" >
                                         <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />
                                     </p:inputText>
                                     <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>

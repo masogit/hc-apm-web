@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
+
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoListController.class);
 
     private static final long serialVersionUID = -1L;
@@ -79,7 +80,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private boolean terminate = false;
 
     private Date varWarrantyDateTo = null;
+
     private String warrantyFormatTime = null;
+    private String manufactDateFormatTime = null;
+    private String installDateFormatTime = null;
+    private String arriveDateFormatTime = null;
+    private String factoryWarrantyDateFormatTime = null;
+
     private Boolean needShowAssetApproval;
 
     private StreamedContent excelFile;
@@ -109,7 +116,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterAssetStatus = null;
     private String filterWarrantyDate = null;
     private Integer assetId;
-    
+
     private Map<String, Object> selectedObject;
 
     @Override
@@ -170,7 +177,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
 
-        if (orgUids.isEmpty()) return;
+        if (orgUids.isEmpty()) {
+            return;
+        }
 
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
@@ -366,7 +375,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
 //        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
 //                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
@@ -409,7 +417,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
-        }else {
+        } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
 
@@ -438,7 +446,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()), exportQrCodeTemplateId);
+//        if(exportList.size()>5000){
+//            WebUtil.addErrorMessage("超出下载数量限制5000");
+//            return;
+//        }
+        Map<String, String> orgNamesMap = orgDao.findByUids(exportList.stream().map(AssetInfo::getSiteUID).distinct().collect(Collectors.toSet()))
+                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
+        QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 
     @Override
@@ -520,7 +535,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-                .filter(distinctByOrgName(OrgInfo::getName))  //display unique clinical name only
+                .filter(distinctByOrgName(OrgInfo::getName)) //display unique clinical name only
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -542,7 +557,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
-            filterClinicalDeptOrg = (String)((SelectEvent) event).getObject();
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
         if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
@@ -559,10 +574,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
-            filterAssetDeptOrg = (String)((SelectEvent) event).getObject();
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
         if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
@@ -592,11 +608,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void assetGroupSecondaryChangeListener() {
 
-
     }
-    
-     public OrgInfo getOrgInfoByUid(String uid) {
-        if(Strings.isNullOrEmpty(uid)){
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
         return orgDao.getByUid(uid);
@@ -777,6 +792,36 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObject(Map<String, Object> selectedObject) {
         this.selectedObject = selectedObject;
     }
-    
-    
+
+    public String getManufactDateFormatTime() {
+        return manufactDateFormatTime;
+    }
+
+    public void setManufactDateFormatTime(String manufactDateFormatTime) {
+        this.manufactDateFormatTime = manufactDateFormatTime;
+    }
+
+    public String getInstallDateFormatTime() {
+        return installDateFormatTime;
+    }
+
+    public void setInstallDateFormatTime(String installDateFormatTime) {
+        this.installDateFormatTime = installDateFormatTime;
+    }
+
+    public String getArriveDateFormatTime() {
+        return arriveDateFormatTime;
+    }
+
+    public void setArriveDateFormatTime(String arriveDateFormatTime) {
+        this.arriveDateFormatTime = arriveDateFormatTime;
+    }
+
+    public String getFactoryWarrantyDateFormatTime() {
+        return factoryWarrantyDateFormatTime;
+    }
+
+    public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
+        this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
 }

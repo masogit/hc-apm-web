@@ -90,7 +90,6 @@
                     </p:dataGrid>
                     <p:fileUpload id="type2" fileUploadListener="#{workOrderMgrController.handleFileUploadPDF}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
@@ -118,8 +117,6 @@
                                     <p:column headerText="备件名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
-
-
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
@@ -164,7 +161,7 @@
                                         <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
 
-                                    <p:column headerText="#{msg.Actions}">
+                                    <p:column headerText="#{msg.Actions}"><!--操作-->
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item.id)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList)" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">

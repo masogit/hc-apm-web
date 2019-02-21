@@ -244,7 +244,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "warranty_month")
     private Integer warrantyMonth;//质保时间（月）
 
-    @Size(max = 256)
+    @Size(max = 64)
     @Column(name = "qr_code")
     private String qrCode;//二维码
 

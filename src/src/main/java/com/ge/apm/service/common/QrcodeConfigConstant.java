@@ -37,6 +37,7 @@ public class QrcodeConfigConstant {
             FieldsMap.put("makerShortName", WebUtil.getMessage("makerShortName"));       //品牌/制造商简称  AssetInfo.makerShortName
             FieldsMap.put("systemId", WebUtil.getMessage("systemId"));           //SystemID/厂商报修ID  AssetInfo.systemId
             FieldsMap.put("installDate", WebUtil.getMessage("installDate"));           //启用日期  AssetInfo.installDate
+            FieldsMap.put("qrCode", WebUtil.getMessage("QRCode"));           //启用日期  AssetInfo.installDate
 
         }
         return FieldsMap;
