@@ -126,6 +126,12 @@
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">无备件费用自动关单?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.closeWithoutParts}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">是否工时必填?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.hourRequired}">
