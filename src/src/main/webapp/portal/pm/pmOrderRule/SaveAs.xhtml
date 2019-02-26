@@ -109,6 +109,19 @@
                        	 &nbsp;&nbsp;
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleSaveAsForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
+
+                    <h:panelGroup rendered="#{userContextService.hasRole('AssetHead')}">
+                        <!-- hide while creation -->
+                        <label class="label">保养模版</label>
+                        <p:commandLink value="下载模版示例" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" ajax="false">
+                            <p:fileDownload value="#{pmOrderRuleController.reportTemplateFile}"/>
+                        </p:commandLink><br/>
+                        <h:panelGroup id="importReportTemplate">
+                            <p:commandButton value="导入模版" process="@this" update="importReportTemplate" oncomplete="PF('uploadDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
+                            <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
+                            <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
                        
 	                  <!-- <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
@@ -123,6 +136,8 @@
                      </h:panelGroup> -->
                    </p:panelGrid>
 					 &nbsp;&nbsp;
+
+
                     
                     <!--<p:scrollPanel  style="height:150px">
                         <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="pageDirection" columns="1"  styleClass="checkboxGroup"
