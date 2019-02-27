@@ -1169,6 +1169,28 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 		}
 		return listResult;
 	}
+    public List<OrgInfo> findAccessDept(String siteUid,String userUid) {
+		Set<String> listResult = new HashSet<String>();
+		List<OrgInfo> listResultOrg=new ArrayList<OrgInfo>();
+		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+				listResult.add(listUserOrgInfo.get(i).getOrgUid());
+			}
+		}
+		if (listResult != null && listResult.size()>0) {
+			List<OrgInfo> listOrgInfo=orgInfoDao.findClinicalDeptByOrgUid(listResult);
+			if(listOrgInfo!=null && listOrgInfo.size()>0){
+				for(int i=0;i<listOrgInfo.size();++i){
+					OrgInfo tempOrg=listOrgInfo.get(i);
+					if(tempOrg.getSiteUID().equals(siteUid)){
+						listResultOrg.add(tempOrg);
+					}
+				}
+			}
+		}
+		return listResultOrg;
+	}
     
     public Map<Integer,Set<String>> findAccessOrgUidListByUserUid(String userUid) {
 		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
