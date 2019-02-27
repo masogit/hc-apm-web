@@ -629,7 +629,7 @@ public class MaintainController implements ServerEventInterface {
 //			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
 //		}
 		nurseSiteMaintainService.save(listMaintainData);
-		boolean result=nurseSiteMaintainService.addBatchJob("create",nurseSiteMaintainConfig,startBatchDate,endBatchDate,currentUser.getUid());
+		boolean result=nurseSiteMaintainService.addBatchJob("create",nurseSiteMaintainConfig,startBatchDate,endBatchDate,currentUser.getUid(),null);
 		if(result){
 			addMessage("工单详情后台生成中，请耐心等待。。。");
 		}
