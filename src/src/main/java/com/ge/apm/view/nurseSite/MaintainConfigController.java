@@ -134,10 +134,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void onBeforeNewObject(NurseSiteMaintainConfig object) {
         super.onBeforeNewObject(object);
-        object.setTenantUID(currentUser.getTenantUID());
-        object.setInstitutionUID(currentUser.getInstitutionUID());
-        object.setHospitalUID(currentUser.getHospitalUID());
-        object.setSiteUID(currentUser.getSiteUID());
+//        object.setTenantUID(currentUser.getTenantUID());
+//        object.setInstitutionUID(currentUser.getInstitutionUID());
+//        object.setHospitalUID(currentUser.getHospitalUID());
+//        object.setSiteUID(currentUser.getSiteUID());
     }
 
     @Override
@@ -359,10 +359,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig,boolean isSave) {
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
-			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
-			nurseSiteMaintainConfig.setInstitutionUID(currentUser.getInstitutionUID());
-			nurseSiteMaintainConfig.setHospitalUID(currentUser.getHospitalUID());
-			nurseSiteMaintainConfig.setSiteUID(currentUser.getSiteUID());
+//			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
+//			nurseSiteMaintainConfig.setInstitutionUID(currentUser.getInstitutionUID());
+//			nurseSiteMaintainConfig.setHospitalUID(currentUser.getHospitalUID());
+//			nurseSiteMaintainConfig.setSiteUID(currentUser.getSiteUID());
 			nurseSiteMaintainConfig.setCreateBy(currentUser);
 			nurseSiteMaintainConfig.setCreateByUid(currentUser.getUid());
 			nurseSiteMaintainConfig.setCreateDate(currentDate);
