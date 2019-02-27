@@ -113,7 +113,7 @@ public class SearchService {
 	}
 	
 	public List<OrgInfo> fetchAccessOrgInfo(String siteUid,String userUid) {
-		List<OrgInfo> result = uaaService.getOrgDeptList(siteUid, userUid);
+		List<OrgInfo> result = uaaService.findAccessDept(siteUid, userUid);
 		return result;
 	}
 	
