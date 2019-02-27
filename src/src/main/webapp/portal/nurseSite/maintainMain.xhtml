@@ -31,7 +31,8 @@
                     </h:panelGrid>
                 </h:form>
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="1000" resizable="true" draggable="true">
-                    <h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
+                	<h:outputText rendered="#{empty maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" value="工单详情后台生成中，请稍候刷新页面查看。"></h:outputText>
+                    <h:form id="maintainDlgTable" rendered="#{not empty maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}">
                         <div class="ui-datatable ui-widget" style="overflow: auto;height:480px;">
                             <div class="ui-datatable-tablewrapper" style="padding-left:10px;padding-right:10px;">
                                 <table>
