@@ -18,4 +18,7 @@ public interface NurseSiteMaintainConfigItemRepository extends GenericRepository
 	
 	@Query(value="select o.* from nurse_site_maintain_config_item o where o.parent_id=?1",nativeQuery=true)
 	public List<NurseSiteMaintainConfigItem> findByParentId(String parentId);
+	
+	@Query(value="select exists (select 1 from nurse_site_maintain_config_item o where o.asset_uid=?1)",nativeQuery=true)
+	public Boolean findExistsAssetUid(String assetUid);
 }
