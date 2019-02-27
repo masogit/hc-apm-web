@@ -351,14 +351,25 @@ public class NurseSiteMaintainService {
 		}
 		return false;
 	}
+	
+	public void deleteAssetUid(String assetUid){
+		if(StringUtils.isNotEmpty(assetUid)){
+			Boolean result=nurseSiteMaintainConfigItemRepository.findExistsAssetUid(assetUid);
+			if(result!=null && result){
+				addBatchJob("deleteAssetInfo", null, null, null, null,assetUid);
+			}
+		}
+	}
 
-	public boolean addBatchJob(String action,NurseSiteMaintainConfig config, Date startDate, Date endDate, String userUid) {
+	public boolean addBatchJob(String action,NurseSiteMaintainConfig config, Date startDate, Date endDate, String userUid,String other) {
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		String content = "";
 		sb.append(action);
 		sb.append(",");
-		sb.append(config.getId());
+		if(config!=null){
+			sb.append(config.getId());
+		}
 		sb.append(",");
 		if(startDate!=null){
 			sb.append(sdf.format(startDate));
@@ -368,15 +379,27 @@ public class NurseSiteMaintainService {
 			sb.append(sdf.format(endDate));
 		}
 		sb.append(",");
-		sb.append(userUid);
+		if(StringUtils.isNotEmpty(userUid)){
+			sb.append(userUid);
+		}
+		sb.append(",");
+		if(StringUtils.isNotEmpty(other)){
+			sb.append(other);
+		}
+		sb.append(",");
 		content = sb.toString();
-		List<BatchJob> listJob = batchJobRepository.findNewBatchJobWithContentSite(content, config.getSiteUID());
+		List<BatchJob> listJob=null;
+		if(config!=null){
+			listJob = batchJobRepository.findNewBatchJobWithContentSite(content, config.getSiteUID());
+		}
 		if (listJob != null && listJob.size() > 0) {
 			return false;
 		} else {
 			BatchJob batchJob = new BatchJob();
 			batchJob.setContent(content);
-			batchJob.setSiteUID(config.getSiteUID());
+			if(config!=null){
+				batchJob.setSiteUID(config.getSiteUID());
+			}
 			batchJob.setCreateTime(new Date());
 			batchJob.setCreateByUid(userUid);
 			batchJob.setName(BatchJob.NAME_NURSESITE);
@@ -1016,7 +1039,7 @@ public class NurseSiteMaintainService {
 		saveConfigChildren(tempConfig, listCheckAssets);
 		if (tempConfig.getApplyDirectly()) {
 //			updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
-			addBatchJob("update",tempConfig, null, null, currentUser.getUid());
+			addBatchJob("update",tempConfig, null, null, currentUser.getUid(),null);
 		}
 		return true;
 	}
