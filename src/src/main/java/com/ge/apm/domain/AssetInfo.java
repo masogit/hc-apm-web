@@ -172,7 +172,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_valid")
     private boolean isValid;//在用？
 
-    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
+    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用,6:报警
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
