@@ -1277,6 +1277,8 @@ public void repairResultSet(){
                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
            }
             accessoryList.add(itemDetail);
+           //调用微服务来存附件
+            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
         cancelWorkdetail();
     }
@@ -1293,6 +1295,7 @@ public void repairResultSet(){
         coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
+    //index == 1 是删除备件  ，index=2是删除协作人
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
 
@@ -1300,7 +1303,8 @@ public void repairResultSet(){
             detailDao.delete(itemDetail);*/
 
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-       //     detailDao.deleteById(itemId);
+            //调用微服务删除备件
+            serviceRequestApiService.delAccess(token,itemId);
 
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));

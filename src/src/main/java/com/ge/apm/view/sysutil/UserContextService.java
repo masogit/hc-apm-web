@@ -227,6 +227,12 @@ public class UserContextService implements Serializable {
 
         return userAccount;
     }
+
+    public boolean isIBTenant(){
+        UserAccount currentUser = getLoginUser();
+        int siteId= currentUser.getSiteId();
+        return siteId==46;
+    }
     
     private Boolean flagIsAgentTenant = null;
     public boolean isAgentTenant() {
@@ -542,9 +548,7 @@ public class UserContextService implements Serializable {
     public boolean isIBEndUser(){
         if(isOpsOrSiteAdminUser()) return false;
         
-        UserAccount currentUser = getLoginUser();
-        int siteId= currentUser.getSiteId();
-        return siteId==46;
+        return isIBTenant();
     }
     
     public boolean isUltraSoundIBEndUser(){
