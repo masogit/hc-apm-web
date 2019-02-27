@@ -222,13 +222,18 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             if (queryAsset.getRuleStatus() != null) {
                 uids = new ArrayList<>();
                 if (queryAsset.getRuleStatus() == 1) {// 已配置
-                    uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    if(StringUtils.isNotEmpty(queryAsset.getQueryLevel())){
+                        uids = getAssetUids(user.getTenantUID(),queryAsset.getQueryLevel());
+                    }else{
+                        uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    }
                     assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-/*                    if (CollectionUtils.isNotEmpty(uids)) {
-                        assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-                    }*/
                 } else if (queryAsset.getRuleStatus() == 2) {// 未配置
-                    uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    if(StringUtils.isNotEmpty(queryAsset.getQueryLevel())){
+                        uids = getAssetUids(user.getTenantUID(),queryAsset.getQueryLevel());
+                    }else{
+                        uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+                    }
                     assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
                 }
             }
@@ -239,13 +244,22 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return new ArrayList<>();
     }
 
+    public List<String> getAssetUids(String tenantUid,String pmOrderRuleLevel){
+        List<String> uids = null;
+        if("2".equals(pmOrderRuleLevel)){//二级保养规则
+            uids = relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(tenantUid);
+        }else if("3".equals(pmOrderRuleLevel)){
+            uids = relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(tenantUid);
+        }else{
+            uids = relRuleAssetRepository.findAssetUidsByTenantUID(tenantUid);
+        }
+        return uids;
+    }
+
     public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
         if(selectedUserOrg != null){
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
-            /*if(selectedUserOrg.getOrgType() == 0){
-                filter.addAll(userCommonService.getSelectedOrgFilters(selectedUserOrg));
-            }*/
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
             //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
