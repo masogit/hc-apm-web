@@ -58,6 +58,7 @@ public class AssetInstallationReportService {
         reportData.put("invoice_num", arrivalListItem.getArrivalList().getInvoiceNum());//发票号
         reportData.put("contract_price", arrivalListItem.getArrivalList().getContractPrice());//合同价格
         reportData.put("contract_qua", arrivalListItem.getArrivalList().getQuantity());//数量
+        reportData.put("manufacture", arrivalListItem.getArrivalList().getManufacture());//生产厂家
 
         //技术验收
         reportData.put("technical_third_party_name", "");//第三方检查单位

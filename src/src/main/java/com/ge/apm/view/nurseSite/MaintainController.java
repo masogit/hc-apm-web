@@ -293,7 +293,7 @@ public class MaintainController implements ServerEventInterface {
 	}
 	
 	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData,Integer sequence){		
-		NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets,sequence);
+		NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintainWithoutItem(date,currentUser,nurseSiteMaintainConfig,sequence);
         listMaintainData.add(tempNurseSiteMaintain);
 	}
 	
@@ -537,7 +537,7 @@ public class MaintainController implements ServerEventInterface {
 //		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
 //	}
 
-	//1:day,2:week,3:month,4:year
+	
 	public String batchSaveMaintainData() {
 		if(nurseSiteMaintainConfig==null){
 			addMessage("请创建并选择配置模板");
@@ -624,11 +624,18 @@ public class MaintainController implements ServerEventInterface {
 				}
 			}
 		}
-		if(listMaintainData.size()>0){
-			List<NurseSiteMaintain> listRemoveMain=getMaintainDataNeedToRemove(listMaintainData);
-			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
+//		if(listMaintainData.size()>0){
+//			List<NurseSiteMaintain> listRemoveMain=getMaintainDataNeedToRemove(listMaintainData);
+//			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
+//		}
+		nurseSiteMaintainService.save(listMaintainData);
+		boolean result=nurseSiteMaintainService.addBatchJob("create",nurseSiteMaintainConfig,startBatchDate,endBatchDate,currentUser.getUid(),null);
+		if(result){
+			addMessage("工单详情后台生成中，请耐心等待。。。");
 		}
-		addMessage("工单已批量生成");
+		else{
+			addMessage("已经有相同工单详情后台生成中，请耐心等待。。。");
+		}
 		return "maintainMain?faces-redirect=true";
 	}
 	public String batchCompleteMaintainData(){
@@ -652,8 +659,13 @@ public class MaintainController implements ServerEventInterface {
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
-			addMessage("工单已批量填写");
+			boolean result=nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			if(result){
+				addMessage("工单已批量填写");
+			}
+			else{
+				addMessage("工单后台生成中，请稍候进行批量操作。");
+			}
 		}
 		else{
 			addMessage("未找到符合条件的工单");

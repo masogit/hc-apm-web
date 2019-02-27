@@ -36,7 +36,30 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-
+    public String delAccess(String token,String accId){
+        HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSDEL);
+        String url = gatewayURL.replace("{id}", accId.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+    public String addAccess(String token,String assetUid,V2_WorkOrder_Detail workOrderDetail){
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
+        String url = gatewayURL.replace("{assetUid}",assetUid);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
     public Map<String, Object> getReponserByAsset(String token, Integer assetId,String orgUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);

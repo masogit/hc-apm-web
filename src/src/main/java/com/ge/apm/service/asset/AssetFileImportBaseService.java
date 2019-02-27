@@ -493,6 +493,14 @@ public class AssetFileImportBaseService {
                 }
             }
 
+            if (!StringUtils.isEmpty(newAsset.getFinancingNum()) && newAsset.getFinancingNum().length() > 64) {
+
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 资产编码不能超过64位");
+                continue;
+            }
+
             //check QrCode
             if (!StringUtils.isEmpty(newAsset.getQrCode())) {
                 if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {

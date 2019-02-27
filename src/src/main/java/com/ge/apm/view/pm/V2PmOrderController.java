@@ -30,6 +30,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -77,6 +78,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+    private ServiceRequestApiService serviceRequestApiService;
+    private String token;
     @Setter@Getter
     private Boolean nochange=false;
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -391,7 +394,6 @@ private  String cancelInt;
                         try {
                             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
                             InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
-
                             String safetySchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-safety-report"))
                                     .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
                             String performanceSchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-performance-report"))
@@ -405,7 +407,7 @@ private  String cancelInt;
                     if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
 
                     Map<String, Object> datas = populateReportContent(selected);
-
+                    
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
                     // render policy for accessory information.
@@ -598,7 +600,6 @@ private  String cancelInt;
 
         // update select box option values
         Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
-
         final String emptyStr = "";
         final String prefix = component.toString();
         for(TableGroup group : table.getGroups()) {
@@ -1115,6 +1116,8 @@ private  String cancelInt;
     }
     ///
     protected void init() {
+        token = UserContextService.getAccessToken();
+        serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
@@ -1858,6 +1861,8 @@ private  String cancelInt;
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
+        //调用微服务删除备件
+        serviceRequestApiService.delAccess(token,itemId);
     }
 
     public void prepareBatchComplete() {
@@ -1884,6 +1889,10 @@ private  String cancelInt;
             }
             accessoryList.add(itemDetail);
         }
+
+        //调用微服务来添加备件
+        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetUid(),itemDetail);
+
     }
 
     public List<TableDefinition> getTablesName(V2_PmOrder v2) {
@@ -1904,7 +1913,7 @@ private  String cancelInt;
         if(strList.isEmpty()){
             strList.add("");
         }
-         pmcl = pmckLstDao.findPMCL(strList,ruleUid);
+        pmcl = pmckLstDao.findPMCL(strList,ruleUid);
         return pmcl;
     }
 

@@ -216,6 +216,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name="ack_need_sign")
     private Boolean ackNeedSign; //验收是否需要签名
 
+    @Column(name="close_without_parts")
+    private Boolean closeWithoutParts;  // 没有备件费用直接关单
+
     public Boolean getPartsNeedSign() {
         return partsNeedSign;
     }
@@ -712,6 +715,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setHourRequired(Boolean hourRequired) {
         this.hourRequired = hourRequired;
+    }
+
+    public Boolean getCloseWithoutParts() {
+        return closeWithoutParts;
+    }
+
+    public void setCloseWithoutParts(Boolean closeWithoutParts) {
+        this.closeWithoutParts = closeWithoutParts;
     }
 
     @Override
