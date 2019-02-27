@@ -118,11 +118,14 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public OrgInfo findFirstByParentUIDAndShortName(String parentUID, String name);
     
-    @Query(value = "select o.uid from org_info o where (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1) and o.org_type=4",nativeQuery = true)
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and (o.tenant_uid = ?1 or o.institution_uid = ?1 or o.hospital_uid = ?1 or o.site_uid = ?1)",nativeQuery = true)
     public Set<String> findClinicalDeptOrgUidListByOrgUid(String orgUid);
     
-    @Query(value = "select o.uid from org_info o where (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1)) and o.org_type=4",nativeQuery = true)
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1) or o.uid in (?1))",nativeQuery = true)
     public Set<String> findClinicalDeptOrgUidListByOrgUid(Set<String> orgUid);
+    
+    @Query(value = "select o.* from org_info o where o.org_type=4 and (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1)) or o.uid in (?1)",nativeQuery = true)
+    public List<OrgInfo> findClinicalDeptByOrgUid(Set<String> orgUid);
 
     public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
 
