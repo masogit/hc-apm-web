@@ -46,6 +46,8 @@
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
