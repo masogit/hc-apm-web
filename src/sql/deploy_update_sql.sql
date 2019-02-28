@@ -327,5 +327,6 @@ create table dashboard_role_res_tenant_revoke
 
 --v19.3.1
 update v2_service_request set report_source = '1' where report_source is null;
+update v2_work_order_detail set mvs_application = false where mvs_application is null;
 
 
