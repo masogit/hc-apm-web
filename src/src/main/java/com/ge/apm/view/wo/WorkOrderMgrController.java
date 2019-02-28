@@ -1138,14 +1138,11 @@ public void repairResultSet(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-        if (Strings.isNullOrEmpty(asset.getLocationName())) {
+            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             asset.setLocationName(lName);
             locationName = lName;
-        } else {
-            locationName = asset.getLocationName();
-        }
     }
 
     @Override
