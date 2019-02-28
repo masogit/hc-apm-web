@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "batch_job")
