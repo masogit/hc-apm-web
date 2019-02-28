@@ -43,6 +43,7 @@ import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.Map.Entry;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -397,7 +398,23 @@ public class UaaService {
         return root;
     }
 
+    private boolean filterNodeByOrgTypeOrgLevel(Entry<String, TreeNode> node, int maxOrgType, int maxOrgLevel){
+        if(maxOrgType<0 && maxOrgLevel<0) return true; // means ignore OrgType & OrgLevel Filter
+        
+        boolean filterOut = false;
+        OrgInfo org = (OrgInfo)node.getValue().getData();
+        if(maxOrgType>=0) filterOut = org.getOrgType()>maxOrgType;
+        if(maxOrgLevel>=0) filterOut = filterOut || org.getOrgLevel()>maxOrgLevel;
+
+        return !filterOut;
+    }
+
     public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords){
+        return getFilterOrgTreeByYuanQu(siteUID,keywords, -1, -1);
+    }
+    
+    public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords, int maxOrgType, int maxOrgLevel){
+        System.err.println("**************** getFilterOrgTreeByYuanQu, " + keywords + "; "+ maxOrgType + "; " + maxOrgLevel);
         treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
         //xTreeMap
@@ -414,6 +431,9 @@ public class UaaService {
             }
             buildTreeByKeyYuanqu(node,keywords);
         }
+        
+        treeNodeMap = treeNodeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
+        
         //构建过虑好的树
         for(Map.Entry<String, TreeNode> nodeItem: treeNodeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
