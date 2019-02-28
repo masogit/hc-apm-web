@@ -181,4 +181,10 @@ public class ContractInfoService {
         return res;
     }
 
+    @Transactional
+    public void updateContractStatus(String id, String status) {
+        int result = contractDao.updateContractStatus(id, status);
+        System.out.println("id: " + id + ", status: " + status + ", result: " + result);
+    }
+
 }
