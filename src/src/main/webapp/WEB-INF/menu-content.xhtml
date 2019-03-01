@@ -137,7 +137,8 @@
                 <!--  <p:menuitem id="um494" value="#{msg.WorkFlowConfig}" outcome="/portal/config/workFlowConfig/Edit.xhtml"/> -->
                 <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.qrCode')}"/>
                 <p:menuitem id="um488" value="#{msg.QRCodeTemplateMgmt}" outcome="/portal/asset/qrCode/qrCodeTemplate.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin') and userContextService.versionContains('config.qrCodeMgt')}"/>
-                <p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/SetOwners.xhtml" rendered="#{userContextService.versionContains('config.repairOwner')}"/>
+                <!--<p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/SetOwners.xhtml" rendered="#{userContextService.versionContains('config.repairOwner')}"/>-->
+                <p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/ownerConfigMain.xhtml" rendered="#{userContextService.versionContains('config.repairOwner')}"/>
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.versionContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.versionContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml" rendered="#{userContextService.versionContains('config.workFlow')}"/>
