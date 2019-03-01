@@ -484,4 +484,10 @@ public class TenantInfoConfig {
 	public void setSelectedNodes(TreeNode[] selectedNodes) {
 		this.selectedNodes = selectedNodes;
 	}
+	public List<String> getListLabel(){
+		return this.listLabel;
+	}
+	public List<String> getListKey(){
+		return this.listKey;
+	}
 }
