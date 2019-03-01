@@ -30,8 +30,9 @@
 				</p:panelGrid>
 				<p:commandButton actionListener="#{adminConsoleController.updateVersion()}" value="批量更新所有租户" update=":growl"></p:commandButton>
 			</p:fieldset>
-
-
+			<p:fieldset legend="批量矫正护士站SiteUid，从跟随创建人变为跟随设备（只用点击一次即可，请勿重复点击）">
+				<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteUID()}" value="批量更新所有租户护士站UID" update=":growl"></p:commandButton>
+			</p:fieldset>
 		</h:form>
 	</ui:define>
 

@@ -58,5 +58,11 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	
 	@Query(value="select count(o.id) from nurse_site_maintain o where o.config_id = ?1",nativeQuery=true)
 	public Integer fetchCountByConfigId(String configId);
+	
+	@Query(value="select o.* from nurse_site_maintain o order by o.create_date limit ?1 offset ?2",nativeQuery=true)
+	public List<NurseSiteMaintain> findByLimit(int limit,int offset);
+	
+	@Query(value="select o.* from nurse_site_maintain o where o.config_id in ?1",nativeQuery=true)
+	public List<NurseSiteMaintain> findByConfig(Set<String> configIds);
 }
 
