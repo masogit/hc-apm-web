@@ -365,8 +365,6 @@ public class NurseSiteMaintainService {
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		String content = "";
-		sb.append(action);
-		sb.append(",");
 		if(config!=null){
 			sb.append(config.getId());
 		}
@@ -396,6 +394,7 @@ public class NurseSiteMaintainService {
 			return false;
 		} else {
 			BatchJob batchJob = new BatchJob();
+			batchJob.setSubName(action);
 			batchJob.setContent(content);
 			if(config!=null){
 				batchJob.setSiteUID(config.getSiteUID());
