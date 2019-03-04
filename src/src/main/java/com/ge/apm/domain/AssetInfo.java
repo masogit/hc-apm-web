@@ -504,7 +504,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private String subjectProject;
 
     @Column(name = "has_open_alert")
-    private boolean hasOpenAlert;
+    private Boolean hasOpenAlert;
 
     @Transient
     private int lineNum;
@@ -1684,11 +1684,11 @@ public class AssetInfo implements ChineseName,Serializable {
         this.proprietaryClass = proprietaryClass;
     }
 
-    public boolean isHasOpenAlert() {
+    public Boolean isHasOpenAlert() {
         return hasOpenAlert;
     }
 
-    public void setHasOpenAlert(boolean hasOpenAlert) {
+    public void setHasOpenAlert(Boolean hasOpenAlert) {
         this.hasOpenAlert = hasOpenAlert;
     }
 
