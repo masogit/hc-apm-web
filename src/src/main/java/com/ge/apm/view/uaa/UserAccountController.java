@@ -294,22 +294,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
 
         }*/
-
         roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
-
         assignedRoles = new ArrayList<>();
-
-        Map<Integer,String> tempCR = new HashMap<>();
         List<CustomRole> customRoles = uaaService.getTenantCustomRoles(selected.getTenantUID());
         if(CollectionUtils.isNotEmpty(customRoles)){
-            customRoles.stream().forEach( role -> tempCR.put(role.getId(),role.getName()));
-        }
-        for (UserRole userRole : selected.getUserRoleList()) {
-            if(userRole.getRoleType() == 0){
-                assignedRoles.add(userRole.getRole().getRoleDesc());
-            }else if(userRole.getRoleType() == 1){
-                assignedRoles.add(tempCR.get(userRole.getRoleId()));
+            for (CustomRole customRole : customRoles) {
+                assignedRoles.add(customRole.getName());
             }
+        }
+        List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
+        for (UserRole userRole : sysRoleList) {
+            assignedRoles.add(userRole.getRole().getRoleDesc());
         }
         prepareUserScope();
     }
