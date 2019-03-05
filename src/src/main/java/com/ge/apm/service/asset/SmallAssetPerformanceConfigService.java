@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
@@ -41,8 +42,7 @@ public class SmallAssetPerformanceConfigService {
 	private final String HEADER_RATE = "占比";
 
 	@Autowired
-	private AssetInfoRepository assetInfoDao;
-
+	private AssetInfoRepository assetInfoRepository;
 	@Autowired
 	private SmallAssetPerformanceConfigRepository smallAssetPerformanceConfigDao;
 
@@ -54,6 +54,9 @@ public class SmallAssetPerformanceConfigService {
 		else{
 			return false;
 		}
+	}
+	public void save(SmallAssetPerformanceConfig config){
+		smallAssetPerformanceConfigDao.save(config);
 	}
 	public boolean checkData(SmallAssetPerformanceConfig detail,String id,boolean deleteAction) {
 		boolean pass=true;
@@ -130,7 +133,7 @@ public class SmallAssetPerformanceConfigService {
 		List<AssetInfo> listAssetInfo = null;
 
 		if (!StringHelper.isNullOrEmptyString(name)) {
-			listAssetInfo = assetInfoDao.getAssetInfoByNameAndSiteUID(name, siteUID);
+			listAssetInfo = assetInfoRepository.getAssetInfoByNameAndSiteUID(name, siteUID);
 		}
 
 		return listAssetInfo;
@@ -147,6 +150,10 @@ public class SmallAssetPerformanceConfigService {
 			checkData(newDetail,null,false);
 			smallAssetPerformanceConfigDao.save(newDetail);
 		}
+	}
+	
+	public List<AssetInfo> getAccessAssetInfo(String siteUid){
+		return assetInfoRepository.findBySiteUid(siteUid);
 	}
 
 	public List<SmallAssetPerformanceConfig> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {

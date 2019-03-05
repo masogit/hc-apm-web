@@ -63,6 +63,9 @@ public class SmallAssetPerformanceConfig implements Serializable {
     
     @Column(name = "status_code")
     private String statusCode;
+    
+    @Transient
+    AssetInfo assetInfo;
 
     @Transient
     private String statusDisplay;
@@ -158,7 +161,7 @@ public class SmallAssetPerformanceConfig implements Serializable {
     public void setExcelIdex(Integer excelIdex) {
         this.excelIdex = excelIdex;
     }
-    
+
 	public String getStatusDisplay() {
 		if (this.status != null) {
 			String result="";
@@ -232,6 +235,14 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
 	public void setStatusCode(String statusCode) {
 		this.statusCode = statusCode;
+	}
+
+	public AssetInfo getAssetInfo() {
+		return assetInfo;
+	}
+
+	public void setAssetInfo(AssetInfo assetInfo) {
+		this.assetInfo = assetInfo;
 	}
 
 	@Override
