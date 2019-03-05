@@ -371,7 +371,7 @@ private  String cancelInt;
      * @return true if the mantenance report item has been selected, false otherwise.
      */
     public boolean isTargetSelected() {
-        return this.selected != null;
+        return this.selected != null || !selectedMap.isEmpty();
     }
 
     /**
