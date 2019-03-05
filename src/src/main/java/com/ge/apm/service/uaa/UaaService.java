@@ -414,7 +414,6 @@ public class UaaService {
     }
     
     public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords, int maxOrgType, int maxOrgLevel){
-        System.err.println("**************** getFilterOrgTreeByYuanQu, " + keywords + "; "+ maxOrgType + "; " + maxOrgLevel);
         treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
         //xTreeMap
