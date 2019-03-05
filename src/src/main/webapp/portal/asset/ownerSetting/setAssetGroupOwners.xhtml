@@ -11,18 +11,44 @@
         <h:form id="assetGroupOwnerForm">
             <p:fieldset legend="设备类型设置" >
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">*#{msg.hospitalId}</label>
+                        <p:inputText id="selectedOrgName_assetGroup"
+                                     value="#{assetGroupOwnerSettingController.selectedOrg==null ? '': assetGroupOwnerSettingController.selectedOrg.name}"
+                                     readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                        <p:commandButton id="btnOrg_assetGroup" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                        <p:overlayPanel id="popupPanel_assetGroup" widgetVar="varPanelOrg_assetGroup" for="btnOrg_assetGroup" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
+                                        value="#{assetGroupOwnerSettingController.orgTree}"
+                                        selection="#{assetGroupOwnerSettingController.selectedNode}" var="node"
+                                        selectionMode="single">
+                                    <p:ajax process="@this" event="select" update="ownerConfigTab:assetGroupOwnerForm:selectedOrgName_assetGroup ownerConfigTab:assetGroupOwnerForm:assetGroup ownerConfigTab:assetGroupOwnerForm:woOwner_assetGroup ownerConfigTab:assetGroupOwnerForm:pmOwner_assetGroup"
+                                            listener="#{assetGroupOwnerSettingController.onSelectTreeNode}"
+                                            oncomplete="PF('varPanelOrg_assetGroup').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+
                     <h:panelGroup >
                         <label class="label">#{msg.assetGroup}*</label>
-                        <p:selectOneMenu id="assetGroupID" value="#{assetGroupOwnerSettingController.assetGroupID}" required="true" requiredMessage="请设置设备类型">
-                            <p:ajax  listener="#{assetGroupOwnerSettingController.loadOwnerConfig()}" update="woOwnerSelecter_assetGroup woOwnerSelecter_assetGroup2 woOwnerSelecter_assetGroup3 pmOwnerSelecter_assetGroup" />
+                        <p:selectOneMenu id="assetGroup" value="#{assetGroupOwnerSettingController.assetGroupID}" required="true" requiredMessage="请设置设备类型">
+                            <p:ajax  listener="#{assetGroupOwnerSettingController.loadOwnerConfig()}" update="woOwner_assetGroup pmOwner_assetGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{assetGroupOwnerSettingController.i18nMessageList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="#{msg.AssetOwnerSetting}" >
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="woOwner_assetGroup">
                     <h:panelGroup id="woOwnerSelecter_assetGroup">
                         <p:selectBooleanCheckbox itemLabel="#{msg.SettingOwner}#{msg.assetOwnerName}" value="#{assetGroupOwnerSettingController.chanegeWoOwner}" >
                             <p:ajax listener="#{assetGroupOwnerSettingController.onCheckChange}"  update="woOwnerSelecter_assetGroup" />
@@ -53,7 +79,7 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="保养责任人设置" >
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="pmOwner_assetGroup">
                     <h:panelGroup id="pmOwnerSelecter_assetGroup">
                         <p:selectBooleanCheckbox itemLabel="设置保养负责人" value="#{assetGroupOwnerSettingController.chanegePmOwner}" >
                             <p:ajax listener="#{assetGroupOwnerSettingController.onCheckChange}"  update="pmOwnerSelecter_assetGroup" />
