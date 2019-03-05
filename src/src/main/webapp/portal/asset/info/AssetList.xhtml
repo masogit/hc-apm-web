@@ -386,7 +386,7 @@
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
 									
                                     <f:facet name="filter">
-										<p:autoComplete id="btnOrg2" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
+										<p:autoComplete id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
 										<p:overlayPanel widgetVar="varPanelOrg2" for="btnOrg2" hideEffect="fade" dynamic="false" modal="false">
 											<p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
 											<p:commandButton partialSubmit="true" icon="ui-icon-search" process=":AssetInfoListForm:datalist:treeNodeNameFilter2 @this" update="AssetInfoListForm:datalist:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
