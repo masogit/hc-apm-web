@@ -96,7 +96,6 @@ public class BatchJob implements Serializable {
     private String log;
     
     @Column(name="content")
-    @Type(type = "text")
     private String content;
 	
 	public BatchJob() {
