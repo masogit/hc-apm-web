@@ -361,7 +361,7 @@ public class UserContextService implements Serializable {
     public static boolean isMVSAdmin(){
     	UserAccount userAccount=getCurrentUserAccount();
     	Integer mvsRoleType=userAccount.getMvsRoleType();
-    	if(mvsRoleType!=null && mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN){
+    	if(mvsRoleType!=null && (mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
     		return true;
     	}
     	else{
@@ -372,7 +372,8 @@ public class UserContextService implements Serializable {
     public static boolean isMVSRole(){
         UserAccount userAccount=getCurrentUserAccount();
         Integer mvsRoleType=userAccount.getMvsRoleType();
-        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE)){
+        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE
+                                    || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2 || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE_2)){
             return true;
         }
         else{

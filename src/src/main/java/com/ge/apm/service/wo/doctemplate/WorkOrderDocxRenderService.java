@@ -57,7 +57,7 @@ public class WorkOrderDocxRenderService {
 
         COPY_KEY_MAPPING.put("issue_number", "报修单号");
         COPY_KEY_MAPPING.put("issue_reporter", "报修人");
-        COPY_KEY_MAPPING.put("issue_reporter_phone", "联系电话");
+        COPY_KEY_MAPPING.put("issue_reporter_phone", "报修人电话");
         COPY_KEY_MAPPING.put("issue_report_time", "报修时间");
         COPY_KEY_MAPPING.put("issue_report_status", "报修状态");
         COPY_KEY_MAPPING.put("issue_device_stop_time", "停机时间");
