@@ -8,27 +8,43 @@
 
     <ui:composition>
 
-        <p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
+        <p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="800" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
             <h:form id="CustomRoleEditForm">
-                <h:panelGroup id="display">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{customRoleController.selected != null}">
-                        
-                        <h:panelGroup>
-                            <label class ="label">#{msg.name}*</label>
-                            <p:inputText id="name" value="#{customRoleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
+                <h:panelGroup id="display" >
+                    <p:fieldset id = "title" legend="角色描述" >
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class ="label">#{msg.name}*</label>
+                                <p:inputText id="name" value="#{customRoleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class ="label">角色描述</label>
+                                <p:inputText id="roleDesc" value="#{customRoleController.selected.roleDesc}" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="false">
+                                <label class ="label">主页</label>
+                                <p:inputText id="homePage" value="#{customRoleController.selected.homePage}" disabled="true" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
 
-                        <h:panelGroup>
-                            <label class ="label">角色描述</label>
-                            <p:inputText id="roleDesc" value="#{customRoleController.selected.roleDesc}" />
-                        </h:panelGroup>
-                    </p:panelGrid>
-                    &nbsp;&nbsp;
+                    <p:fieldset id = "assetInventory" legend="盘点权限配置">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class ="label">权限</label>
+                                <p:selectManyCheckbox value="#{customRoleController.authorities}" layout="responsive" columns="4">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetInventoryAuthority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                </p:selectManyCheckbox>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class ="label">卡片</label>
+                                <p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4" >
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetInventoryCard')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                </p:selectManyCheckbox>
+                            </h:panelGroup>
+                        </p:panelGrid>
 
-                    <h3>权限列表</h3>
-                    <p:selectManyCheckbox id="grid2" value="#{customRoleController.authIds}" layout="responsive" columns="3" >
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('sysAuthority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                    </p:selectManyCheckbox>
+                    </p:fieldset>
 
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{customRoleController.save}" value="#{msg.Save}" update="display,:CustomRoleEditDlg, :CustomRoleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'CustomRoleEditDialog');"/>

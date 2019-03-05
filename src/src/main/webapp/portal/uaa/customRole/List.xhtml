@@ -30,8 +30,14 @@
                     <p:column headerText="#{msg.roleDesc}" sortBy="#{item.roleDesc}" filterBy="#{item.roleDesc}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.roleDesc}"/>
                     </p:column>
-                    <p:column headerText="权限" >
-                        <h:outputText value="#{customRoleController.getRoleAuth(item.id)}"/>
+<!--                    <p:column headerText="主页" sortBy="#{item.homePage}" filterBy="#{item.homePage}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.homePage}"/>
+                    </p:column>-->
+                    <p:column headerText="权限" sortBy="#{item.authoritiesCH}" filterBy="#{item.authoritiesCH}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.authoritiesCH}"/>
+                    </p:column>
+                    <p:column headerText="卡片" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.cardsCH}"/>
                     </p:column>
 
                     <f:facet name="{Toolbar}">
