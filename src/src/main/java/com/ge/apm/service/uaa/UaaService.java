@@ -417,8 +417,9 @@ public class UaaService {
         treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
         //xTreeMap
-        Iterator<Map.Entry<String, TreeNode>> iterator = xtreeMap.entrySet().iterator();
-        for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
+        
+        Map<String, TreeNode> tempTreeMap = xtreeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
+        for(Map.Entry<String, TreeNode> nodeItem: tempTreeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
             OrgInfo org = (OrgInfo)node.getData();
             //租户必须作为根节点先加入

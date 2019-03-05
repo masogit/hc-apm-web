@@ -253,7 +253,6 @@ public class UserContextService implements Serializable {
         UserAccount user = getLoginUser();
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        System.err.println("**************** getTenantConfig="+tenant.getTenantConfig());
         flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
         
         return flagIsUltraSoundTenant;
