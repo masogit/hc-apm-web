@@ -479,12 +479,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	
 	public void saveCheckListItem(){
 		if(listPairCheckItems.contains(objPairCheckItem)){
-			
 		}
 		else{
 			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
-			initObjPairCheckItem();
 		}
+		initObjPairCheckItem();
 		checkSaveDisable();
 	}
 	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){

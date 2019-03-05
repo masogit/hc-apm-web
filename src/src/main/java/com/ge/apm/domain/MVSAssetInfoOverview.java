@@ -101,6 +101,7 @@ public class MVSAssetInfoOverview implements Serializable {
 	private String v2WorkOrderFEOwnerName;
 	private String v2WorkOrderFEOwnerNamePyCode;
 	private String v2WorkOrderAssetInfoDepartNum;
+	private String v2WorkOrderAssetInfoQrCode;
 	private String v2WorkOrderAssetInfoName;
 	private String v2WorkOrderAssetInfoNamePyCode;
 	private String v2WorkOrderAssetInfoMvsEquip;
@@ -513,6 +514,14 @@ public class MVSAssetInfoOverview implements Serializable {
 
 	public void setV2WorkOrderAssetInfoTenantUID(String v2WorkOrderAssetInfoTenantUID) {
 		this.v2WorkOrderAssetInfoTenantUID = v2WorkOrderAssetInfoTenantUID;
+	}
+
+	public String getV2WorkOrderAssetInfoQrCode() {
+		return v2WorkOrderAssetInfoQrCode;
+	}
+
+	public void setV2WorkOrderAssetInfoQrCode(String v2WorkOrderAssetInfoQrCode) {
+		this.v2WorkOrderAssetInfoQrCode = v2WorkOrderAssetInfoQrCode;
 	}
 
 	@Override

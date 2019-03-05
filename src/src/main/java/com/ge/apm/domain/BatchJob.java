@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "batch_job")
@@ -62,6 +62,9 @@ public class BatchJob implements Serializable {
 	
 	@Column(name="name")
 	private String name;
+	
+	@Column(name="sub_name")
+	private String subName;
 
 	@Transient
 	private UserAccount createBy;
@@ -93,7 +96,6 @@ public class BatchJob implements Serializable {
     private String log;
     
     @Column(name="content")
-    @Type(type = "text")
     private String content;
 	
 	public BatchJob() {
@@ -212,6 +214,14 @@ public class BatchJob implements Serializable {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getSubName() {
+		return subName;
+	}
+
+	public void setSubName(String subName) {
+		this.subName = subName;
 	}
 
 	@Override

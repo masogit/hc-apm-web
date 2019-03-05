@@ -1,0 +1,6 @@
+#盘点
+新建盘点工单 : assetInventory.create
+关闭盘点工单 : assetInventory.close
+查看盘点工单 : assetInventory.view
+扫码盘点 : assetInventory.scan
+
