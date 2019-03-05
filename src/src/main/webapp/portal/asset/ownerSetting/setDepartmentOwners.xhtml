@@ -12,17 +12,44 @@
             <p:fieldset legend="科室设置" >
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">#{msg.clinicalDeptName}*</label>
-                        <p:selectOneMenu id="clinicalDeptName" value="#{departmentOwnerSettingController.clinicalDeptUID}" required="true" requiredMessage="请设置科室">
-                            <p:ajax  listener="#{departmentOwnerSettingController.loadOwnerConfig()}" update="woOwnerSelecter_department woOwnerSelecter_department2 woOwnerSelecter_department3 pmOwnerSelecter_department" />
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}"/>
-                        </p:selectOneMenu>
+                        <label class="label">*#{msg.hospitalId}</label>
+                        <p:inputText id="selectedOrgName_department"
+                                     value="#{departmentOwnerSettingController.selectedOrg==null ? '': departmentOwnerSettingController.selectedOrg.name}"
+                                     readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                        <p:commandButton id="btnOrg_department" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                        <p:overlayPanel id="popupPanel_department" widgetVar="varPanelOrg_department" for="btnOrg_department" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree_department" class="tree" style="width:98%;border:0;"
+                                        value="#{departmentOwnerSettingController.orgTree}"
+                                        selection="#{departmentOwnerSettingController.selectedNode}" var="node"
+                                        selectionMode="single">
+                                    <p:ajax process="@this" event="select" update="ownerConfigTab:departmentOwnerForm:selectedOrgName_department ownerConfigTab:departmentOwnerForm:deptOrg ownerConfigTab:departmentOwnerForm:woOwnerSetting_department ownerConfigTab:departmentOwnerForm:pmOwnerSetting_department"
+                                            listener="#{departmentOwnerSettingController.onSelectTreeNode}"
+                                            oncomplete="PF('varPanelOrg_department').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">*#{msg.clinicalDeptName}</label>
+                        <p:autoComplete id="deptOrg" dropdown="true" value="#{departmentOwnerSettingController.deptOrg}"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteDept}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange" required="true" requiredMessage="所属科室不能为空">
+                            <p:ajax event="itemSelect" listener="#{departmentOwnerSettingController.loadOwnerConfig()}" update="woOwnerSetting_department pmOwnerSetting_department"/>
+                        </p:autoComplete>
+                    </h:panelGroup>
+
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="#{msg.AssetOwnerSetting}" >
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="woOwnerSetting_department">
                     <h:panelGroup id="woOwnerSelecter_department">
                         <p:selectBooleanCheckbox itemLabel="#{msg.SettingOwner}#{msg.assetOwnerName}" value="#{departmentOwnerSettingController.chanegeWoOwner}" >
                             <p:ajax listener="#{departmentOwnerSettingController.onCheckChange}"  update="woOwnerSelecter_department" />
@@ -53,7 +80,7 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="保养责任人设置" >
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="pmOwnerSetting_department">
                     <h:panelGroup id="pmOwnerSelecter_department">
                         <p:selectBooleanCheckbox itemLabel="设置保养负责人" value="#{departmentOwnerSettingController.chanegePmOwner}" >
                             <p:ajax listener="#{departmentOwnerSettingController.onCheckChange}"  update="pmOwnerSelecter_department" />
