@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
@@ -120,6 +122,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<String> editableFieldsList;
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
+    @Getter
+    @Setter
+    private Supplier newSupplier;
 
     @Override
     protected void init() {
@@ -1011,4 +1017,35 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
+
+    public void prepareCreateSupplier() {
+        newSupplier = new Supplier();
+    }
+
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        if(newSupplier.getMaintainerT()) {
+            supplierController.setMaintainerT(true);
+        } else {
+            supplierController.setMaintainerT(false);
+        }
+        if(newSupplier.getManufacturerT()) {
+            supplierController.setManufacturerT(true);
+        } else {
+            supplierController.setManufacturerT(false);
+        }
+        if(newSupplier.getSupplierT()) {
+            supplierController.setSupplierT(true);
+        } else {
+            supplierController.setSupplierT(false);
+        }
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if(StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
+        }
+    }
+
 }

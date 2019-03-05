@@ -226,6 +226,8 @@
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
             </p:autoComplete>
+
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
@@ -245,6 +247,7 @@
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}" />
             </p:autoComplete>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
         <h:panelGroup>
             <label class="label">#{msg.vendorTel}</label>
@@ -260,6 +263,7 @@
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
             </p:autoComplete>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitananceTel')}" >
