@@ -43,8 +43,8 @@
 
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
-				actionListener="#{smallAssetPerformanceConfigController.prepareCreate}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg"
-				oncomplete="PF('smallAssetPerformanceConfigEditDialog').show()" />
+				actionListener="#{smallAssetPerformanceConfigController.prepareCreate}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateDlg"
+				oncomplete="PF('smallAssetPerformanceConfigCreateDialog').show()" />
 			<p:commandButton id="editButton" actionListener="#{smallAssetPerformanceConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
 				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg" oncomplete="PF('smallAssetPerformanceConfigEditDialog').show()"
 				disabled="#{empty smallAssetPerformanceConfigController.selected.id}" />
@@ -57,5 +57,5 @@
 	</p:dataTable>
 </h:form>
 <ui:include src="smallAssetPerformanceConfigEdit.xhtml" />
-
+<ui:include src="smallAssetPerformanceConfigCreate.xhtml" />
 </html>
