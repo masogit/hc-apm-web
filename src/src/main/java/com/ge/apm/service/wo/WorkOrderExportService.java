@@ -185,7 +185,7 @@ public class WorkOrderExportService {
             workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
             workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
             workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
-            workOrderMap.put("联系电话", workOrderExportPojo.getTelephone());
+            workOrderMap.put("报修人电话", workOrderExportPojo.getTelephone());
             workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
             workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
 
