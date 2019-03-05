@@ -389,10 +389,10 @@
 										<p:autoComplete id="btnOrg2" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
 										<p:overlayPanel widgetVar="varPanelOrg2" for="btnOrg2" hideEffect="fade" dynamic="false" modal="false">
 											<p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
-											<p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+											<p:commandButton partialSubmit="true" icon="ui-icon-search" process=":AssetInfoListForm:datalist:treeNodeNameFilter2 @this" update="AssetInfoListForm:datalist:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
 											<p:scrollPanel style="height:300px;border: 0" mode="native">
 												<p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-													<p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+													<p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg2').hide();"/>
 													<p:ajax process="@this" event="expand"/>
 													<p:ajax process="@this" event="collapse"/>
 													<p:treeNode type="org">
