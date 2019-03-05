@@ -206,6 +206,11 @@ public class UaaService {
        return customRoleRepository.findByTenantUID(tenantUID);
     }
 
+    public List<UserRole> getSystemRoles(Integer userId){
+        UserRoleRepository userAccountRepository = WebUtil.getBean(UserRoleRepository.class);
+        return userAccountRepository.findByUserIdAndRoleType(userId,0);
+    }
+
     @Transactional
     public UserAccount loadUserWithUserRoles(int userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
