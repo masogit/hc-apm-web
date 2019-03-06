@@ -346,7 +346,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      * @return true if the mantenance report item has been selected, false otherwise.
      */
     public boolean isTargetSelected() {
-        return !selectedMap.isEmpty();
+        return !selectedMap.isEmpty() && selectedMap.values().contains(true);
     }
 
     /**
@@ -1107,7 +1107,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
-            
+
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -1278,9 +1278,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     unData.setKey(item.getUid());
                     hmCheck.put(item.getUid(), unData);
                 });
-        
+
         }
-        
+
 //        if (pmCheckItemList != null) {
 //            if (hmCheck.isEmpty()) {
 //                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
