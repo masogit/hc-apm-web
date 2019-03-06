@@ -35,6 +35,12 @@
 					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.00" maxValue="1.00" requiredMessage="占比不能为空" />
 				</h:panelGroup> -->
 				<h:panelGroup>
+					<label class="label">是否均摊</label>
+					<p:selectBooleanCheckbox value="#{smallAssetPerformanceConfigController.selected.average}" required="false" />
+				</h:panelGroup>
+			</p:panelGrid>
+			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceConfigController.selected != null}">
+				<h:panelGroup>
 					<label class="label">增加设备*</label>
 					<p:dataTable id="addAssetConfig" value="#{smallAssetPerformanceConfigController.listNewConfig}" var="item" widgetVar="addAssetConfig" lazy="false" paginator="false"
 						rowKey="#{item.assetName}" rows="1000" emptyMessage="#{msg.noRecordFound}" style="width:900px">
@@ -56,6 +62,7 @@
 						</p:column>
 					</p:dataTable>
 				</h:panelGroup>
+				
 			</p:panelGrid>
 			<br />
 			<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"

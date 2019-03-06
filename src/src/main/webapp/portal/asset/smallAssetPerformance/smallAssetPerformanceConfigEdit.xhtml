@@ -38,7 +38,11 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">占比</label>
-					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.00" maxValue="1.00" requiredMessage="占比不能为空" />
+					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.0000" maxValue="1.0000" requiredMessage="占比不能为空" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">是否均摊</label>
+					<p:selectBooleanCheckbox value="#{smallAssetPerformanceConfigController.selected.average}" required="false" />
 				</h:panelGroup>
 			</p:panelGrid>
 			<br />
