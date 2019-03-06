@@ -64,6 +64,9 @@ public class SmallAssetPerformanceConfig implements Serializable {
     @Column(name = "status_code")
     private String statusCode;
     
+    @Column(name="average")
+    private Boolean average=false;
+    
     @Transient
     AssetInfo assetInfo;
 
@@ -115,7 +118,7 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
     public Double getRate() {
     	if(rate==null)
-    		rate=0.00;
+    		rate=0.0000;
         return rate;
     }
 
@@ -243,6 +246,17 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
 	public void setAssetInfo(AssetInfo assetInfo) {
 		this.assetInfo = assetInfo;
+	}
+
+	public Boolean getAverage() {
+		if(average==null){
+			return false;
+		}
+		return average;
+	}
+
+	public void setAverage(Boolean average) {
+		this.average = average;
 	}
 
 	@Override

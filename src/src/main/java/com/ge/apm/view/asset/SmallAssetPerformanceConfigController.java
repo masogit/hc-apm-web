@@ -114,6 +114,14 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	// TODO Auto-generated method stub
     	super.prepareEdit();
     	type=1;
+    	String departName=selected.getDepartment();
+    	String assetName=selected.getAssetName();
+    	if(StringUtils.isNotEmpty(departName)){
+    		selectedObjectMap.put("clinicalDept", service.getOrgInfoByName(clinicalDeptList, departName));
+    	}
+    	if(StringUtils.isNotEmpty(assetName)){
+    		selectedObjectMap.put("asset", service.getAssetInfoByName(assetInfoList, assetName));
+    	}
     }
 
     @Override
@@ -140,6 +148,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     			tempConfig.setInstitutionUID(currentUser.getInstitutionUID());
     			tempConfig.setHospitalUID(currentUser.getHospitalUID());
     			tempConfig.setSiteUID(currentUser.getSiteUID());
+    			tempConfig.setAverage(selected.getAverage());
     			if(service.checkConfigExists(tempConfig)){
     				WebUtil.addErrorMessage("项目名称和设备名称唯一，请勿重复添加！");
         			this.selected=null;
