@@ -574,6 +574,10 @@ public class MaintainController implements ServerEventInterface {
 						batchCreateMaintainData(date, listMaintainData,i+1);
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 			else if(type==2){
@@ -591,6 +595,10 @@ public class MaintainController implements ServerEventInterface {
 						}
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 			else if(type==3){
@@ -621,14 +629,16 @@ public class MaintainController implements ServerEventInterface {
 							startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 						}
 					}
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 		}
-//		if(listMaintainData.size()>0){
-//			List<NurseSiteMaintain> listRemoveMain=getMaintainDataNeedToRemove(listMaintainData);
-//			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
-//		}
-		nurseSiteMaintainService.save(listMaintainData);
+		if(listMaintainData.size()>0){
+			nurseSiteMaintainService.save(listMaintainData);
+		}
 		boolean result=nurseSiteMaintainService.addBatchJob("create",nurseSiteMaintainConfig,startBatchDate,endBatchDate,currentUser.getUid(),null);
 		if(result){
 			addMessage("工单详情后台生成中，请耐心等待。。。");
