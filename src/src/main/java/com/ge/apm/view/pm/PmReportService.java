@@ -308,9 +308,13 @@ public class PmReportService {
     }
 
     public DefaultStreamedContent generate(Map<String, Boolean> pmOrders, Boolean isInsulate, UserAccount user) throws IOException {
+        if (!pmOrders.values().contains(true)) {
+            throw new BusinessException("未选中保养记录");
+        }
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(bout)) {
+            List<String> ids = new ArrayList<>();
             pmOrders.forEach((id, selected) -> {
                 if (selected) {
                     try {
@@ -321,12 +325,18 @@ public class PmReportService {
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();
+                            ids.add(id);
                         }
-                    } catch (IOException e) {
+                    } catch (BusinessException e) {
                         e.printStackTrace();
+                    } catch (IOException e) {
+                        throw new BusinessException("报告创建失败", e);
                     }
                 }
             });
+            if (ids.isEmpty()) {
+                throw new BusinessException("报告创建失败");
+            }
             zout.close();
             return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Maintenance_Reports.zip");
         }
