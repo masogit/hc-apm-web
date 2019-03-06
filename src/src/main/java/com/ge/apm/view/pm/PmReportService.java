@@ -22,6 +22,7 @@ import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.model.DefaultStreamedContent;
@@ -312,6 +313,7 @@ public class PmReportService {
             throw new BusinessException("未选中保养记录");
         }
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+        String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(bout)) {
             List<String> ids = new ArrayList<>();
@@ -338,7 +340,7 @@ public class PmReportService {
                 throw new BusinessException("报告创建失败");
             }
             zout.close();
-            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Maintenance_Reports.zip");
+            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
         }
     }
 
