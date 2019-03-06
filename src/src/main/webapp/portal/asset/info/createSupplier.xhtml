@@ -1,0 +1,86 @@
+<html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@this" header="#{msg.Supplier}">
+        <h:form id="SupplierEditForm">
+            <h:panelGroup id="display">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
+                    <h:panelGroup>
+                        <label class="label">#{msg.name}*</label>
+                        <p:inputText id="name" value="#{assetInfoEditController.newSupplier.name}"
+                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.city}</label>
+                        <p:inputText id="city" value="#{assetInfoEditController.newSupplier.city}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.address}</label>
+                        <p:inputText id="address"
+                                     value="#{assetInfoEditController.newSupplier.address}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zipcode}</label>
+                        <p:inputText id="zipcode"
+                                     value="#{assetInfoEditController.newSupplier.zipcode}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.contactor}</label>
+                        <p:inputText id="contactor"
+                                     value="#{assetInfoEditController.newSupplier.contactor}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.tel}</label>
+                        <p:inputText id="tel" value="#{assetInfoEditController.newSupplier.tel}"/>
+                    </h:panelGroup>
+                    <h:panelGroup class="test1">
+                        <label class="label">类型*</label>
+                        <h:panelGrid columns="3">
+                            <h:panelGrid columns="3">
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox id="wxs" value="#{assetInfoEditController.newSupplier.maintainerT}"/>
+                                        <p:outputLabel value="维修商 "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{assetInfoEditController.newSupplier.manufacturerT}"/>
+                                        <p:outputLabel value="制造商 "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{assetInfoEditController.newSupplier.supplierT}"/>
+                                        <p:outputLabel value="供应商 "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <br/>
+                <p:commandButton validateClient="true"
+                                 actionListener="#{assetInfoEditController.saveNewSupplier}"
+                                 value="#{msg.Save}"
+                                 icon="ui-icon-check"
+                                 update="AssetInfoEditForm:manufacture AssetInfoEditForm:vendor3 AssetInfoEditForm:vendor :growl"
+                                 oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
+                <p:commandButton immediate="true"
+                                 value="#{msg.Cancel}"
+                                 icon="ui-icon-cancel"
+                                 onclick="PF('SupplierEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+    -->
+</ui:composition>
+</html>

@@ -1714,4 +1714,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.view', '查看盘点工单', 'assetInventory.view', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.scan', '扫码盘点', 'assetInventory.scan', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryCard', 'mgr_inv', '盘点角色卡片', 'assetInventoryCard', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryCard', 'mgr_inv', '盘点', 'assetInventoryCard', NULL, '-1');

@@ -8,10 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.ge.apm.domain.UserRole;
 
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
 public interface UserRoleRepository extends GenericRepository<UserRole> {
     @Modifying
+    @Transactional
     //@Query("delete from UserRole o where o.userAccount=?1")
     @Query(value="delete from user_role where user_id = ?1",nativeQuery = true)
     public void deleteByUserAccount(Integer userId);
@@ -20,4 +22,7 @@ public interface UserRoleRepository extends GenericRepository<UserRole> {
     public void deleteByUserRoleIds(Set<Integer> ids);
     
     public List<UserRole> findByUserId(int userId);
+
+    //0 means sys role 1 means custom role
+    List<UserRole> findByUserIdAndRoleType(Integer userId, Integer roleType);
 }

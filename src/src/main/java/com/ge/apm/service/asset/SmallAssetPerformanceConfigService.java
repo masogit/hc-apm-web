@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
@@ -41,8 +42,7 @@ public class SmallAssetPerformanceConfigService {
 	private final String HEADER_RATE = "占比";
 
 	@Autowired
-	private AssetInfoRepository assetInfoDao;
-
+	private AssetInfoRepository assetInfoRepository;
 	@Autowired
 	private SmallAssetPerformanceConfigRepository smallAssetPerformanceConfigDao;
 
@@ -55,6 +55,9 @@ public class SmallAssetPerformanceConfigService {
 			return false;
 		}
 	}
+	public void save(SmallAssetPerformanceConfig config){
+		smallAssetPerformanceConfigDao.save(config);
+	}
 	public boolean checkData(SmallAssetPerformanceConfig detail,String id,boolean deleteAction) {
 		boolean pass=true;
 		if(deleteAction == false){
@@ -62,8 +65,15 @@ public class SmallAssetPerformanceConfigService {
 				pass=false;
 			}
 		}
-		if(!checkListConfig(detail, id, deleteAction)){
-			pass=false;
+		if(detail.getAverage()!=null && detail.getAverage()==true){
+			if(!checkListConfigAverage(detail, id, deleteAction)){
+				pass=false;
+			}
+		}
+		else{
+			if(!checkListConfig(detail, id, deleteAction)){
+				pass=false;
+			}
 		}
 		return pass;
 	}
@@ -81,6 +91,31 @@ public class SmallAssetPerformanceConfigService {
 		return pass;
 	}
 	
+	public boolean checkListConfigAverage(SmallAssetPerformanceConfig detail,String id,boolean deleteAction){
+		boolean pass=true;
+		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
+		double rate=0;
+		if(listDetails!=null && listDetails.size()>0){
+			double size=listDetails.size();
+			double total=1;
+			if(StringUtils.isEmpty(id)){
+				rate=total/(size+1);
+			}
+			else{
+				rate=total/(size);
+			}
+			for(SmallAssetPerformanceConfig config: listDetails){
+				config.setRate(rate);
+				config.setAverage(true);
+			}
+			detail.setRate(rate);
+			smallAssetPerformanceConfigDao.save(listDetails);
+			updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,true);
+			detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
+		}
+		return pass;
+	}
+	
 	public boolean checkListConfig(SmallAssetPerformanceConfig detail,String id,boolean deleteAction){
 		boolean pass=true;
 		//check configList rate
@@ -88,15 +123,13 @@ public class SmallAssetPerformanceConfigService {
 		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
 			for(SmallAssetPerformanceConfig config: listDetails){
-				if(config.getProjectName().equals(detail.getProjectName())){
-					if(config.getRate()!=null){
-						//update, so ignore the saved id
-						if(id!=null && id.equals(config.getId())){
-							continue;
-						}
-						else{
-							rate+=config.getRate();
-						}
+				if(config.getRate()!=null){
+					//update, so ignore the saved id
+					if(id!=null && id.equals(config.getId())){
+						continue;
+					}
+					else{
+						rate+=config.getRate();
 					}
 				}
 			}
@@ -130,7 +163,7 @@ public class SmallAssetPerformanceConfigService {
 		List<AssetInfo> listAssetInfo = null;
 
 		if (!StringHelper.isNullOrEmptyString(name)) {
-			listAssetInfo = assetInfoDao.getAssetInfoByNameAndSiteUID(name, siteUID);
+			listAssetInfo = assetInfoRepository.getAssetInfoByNameAndSiteUID(name, siteUID);
 		}
 
 		return listAssetInfo;
@@ -148,7 +181,37 @@ public class SmallAssetPerformanceConfigService {
 			smallAssetPerformanceConfigDao.save(newDetail);
 		}
 	}
+	
+	public List<AssetInfo> getAccessAssetInfo(String siteUid){
+		return assetInfoRepository.findBySiteUid(siteUid);
+	}
 
+	public OrgInfo getOrgInfoByName(List<OrgInfo> list,String name){
+		OrgInfo orgInfo=null;
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				OrgInfo temp=list.get(i);
+				if(name.equals(temp.getName())){
+					orgInfo=temp;
+					break;
+				}
+			}
+		}
+		return orgInfo;
+	}
+	public AssetInfo getAssetInfoByName(List<AssetInfo> list,String name){
+		AssetInfo r=null;
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				AssetInfo temp=list.get(i);
+				if(name.equals(temp.getName())){
+					r=temp;
+					break;
+				}
+			}
+		}
+		return r;
+	}
 	public List<SmallAssetPerformanceConfig> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 		List<SmallAssetPerformanceConfig> importFailedDataList = new ArrayList<>();
