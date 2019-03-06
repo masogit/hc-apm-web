@@ -346,27 +346,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      * @return true if the mantenance report item has been selected, false otherwise.
      */
     public boolean isTargetSelected() {
-        return this.selected != null || !selectedMap.isEmpty();
+        return !selectedMap.isEmpty();
     }
 
     /**
      * Generate maintenance report.
      */
     public void doExportMaintenanceReport() {
-        {
-            if (this.selected != null) {
-                maintenanceReport = null;
-                try {
-                    maintenanceReport = pmReportService.generate(selected, isInsulate, user);
-                } catch (BusinessException e) {
-                    WebUtil.addErrorMessage(e.getMessage());
-                } catch (Exception e) {
-                    Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
-                    WebUtil.addErrorMessage("保养报告生成失败");
-                }
-            }
+        maintenanceReport = null;
+        try {
+            maintenanceReport = pmReportService.generate(selectedMap, isInsulate, user);
+        } catch (BusinessException e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+            WebUtil.addErrorMessage("保养报告生成失败");
         }
-
     }
 
     /**
