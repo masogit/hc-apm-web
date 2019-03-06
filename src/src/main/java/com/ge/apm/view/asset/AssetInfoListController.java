@@ -82,7 +82,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
-    private NurseSiteMaintainService nurseSiteMaintainService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -158,7 +157,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        nurseSiteMaintainService=WebUtil.getBean(NurseSiteMaintainService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
@@ -423,9 +421,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
-
             assetInfo.setStatus(4);
             dao.save(assetInfo);
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
@@ -512,14 +510,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
-            updateNurseSiteMaintain(assetInfo.getUid());
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
     
-    public void updateNurseSiteMaintain(String assetUid){
-    	nurseSiteMaintainService.deleteAssetUid(assetUid);
-    }
 
     public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);
