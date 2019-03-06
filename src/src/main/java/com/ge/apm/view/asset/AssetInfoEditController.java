@@ -504,6 +504,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         this.save();
+        if(this.selected.getStatus()==4){
+        	aimService.updateNurseSiteMaintain(this.selected.getUid());
+        }
         assetDepreciationService.saveAssetDerpeciation(selected);
 
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
