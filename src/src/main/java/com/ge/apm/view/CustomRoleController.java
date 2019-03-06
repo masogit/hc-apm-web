@@ -73,7 +73,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         return dao.find();
     }
 
-    @Override
+/*    @Override
     public void onBeforeSave(CustomRole role) {
         role.setTenantUID(user.getTenantUID());
         role.setInstitutionUID(user.getInstitutionUID());
@@ -95,7 +95,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         role.setLastModifiedBy(user.getLoginName());
         role.setLastModifiedDate(new Date());
-    }
+    }*/
 
 
     @Transactional
@@ -105,6 +105,18 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
             WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
             return;
         }
+        selected.setTenantUID(user.getTenantUID());
+        selected.setInstitutionUID(user.getInstitutionUID());
+        selected.setHospitalUID(user.getHospitalUID());
+        selected.setSiteUID(user.getSiteUID());
+        if(selected.getCreatedBy() == null){
+            selected.setCreatedBy(user.getLoginName());
+        }
+        if(selected.getCreatedDate() == null){
+            selected.setCreatedDate(new Date());
+        }
+        selected.setLastModifiedBy(user.getLoginName());
+        selected.setLastModifiedDate(new Date());
         List<I18nMessage> messages;
         Map<String,I18nMessage> map = new HashMap<>();
         if(authorities.length > 0 || cards.length > 0){
@@ -164,7 +176,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
             return "";
         }
         if(s.endsWith(",")){
-            return s.substring(0,s.length() - 2);
+            return s.substring(0,s.length() - 1);
         }
         if(s.length() > 15){
             return s.substring(0,14)+"...";
