@@ -129,7 +129,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String filterPlanTime;
     private Map<String, Boolean> selectedMap;
     private TableDefinitionRepository tableDao;
-    private UnstructuredDataRepository unstructuredDataDao;
     private PmOrderRuleCheckListRepository pmckLstDao;
     HashMap<String, UnstructuredData> hmCheck;
     private Boolean isSelectedCurrentPage = false;
@@ -360,7 +359,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (this.selected != null) {
                 maintenanceReport = null;
                 try {
-                    maintenanceReport = pmReportService.generate(selected, isInsulate, user, reportList, this.hmCheck, this.getCoWorkerList(), this.getAccessoryList(), this.aquirePmOrderStep(), this.getPmCheckItemList());
+                    maintenanceReport = pmReportService.generate(selected, isInsulate, user, this.hmCheck);
                 } catch (BusinessException e) {
                     WebUtil.addErrorMessage(e.getMessage());
                 } catch (Exception e) {
@@ -808,8 +807,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
-        unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
-        //  pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -1586,23 +1583,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
-        /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
-        * key就是检查项uid*/
-        List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
-        UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
-        if(unsD==null){
-            return pmcl;
-        }
-        List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
-        List<String> strList=new ArrayList<String>();
-        byCollectionId.stream().forEach(item->strList.add(item.getKey()));
-        if(strList.isEmpty()){
-            strList.add("");
-        }
-        pmcl = pmckLstDao.findPMCL(strList,ruleUid);
-        return pmcl;
-    }
 
     public List<PmOrderRuleCheckList> acPmOrderUleCheckList(V2_PmOrder v2PmOrder) {
         if (v2PmOrder == null)
@@ -1614,7 +1594,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        // return pmckLstDao.findAllByRuleUID_full(pmOrderRule.getUid());
 
         if(v2PmOrder.isFinished()) {
-         return getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
+         return pmOrderService.getPmRuleCLclosed(v2PmOrder,pmOrderRule.getUid());
         }
         else {
             return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
@@ -1624,7 +1604,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<UnstructuredDataCollection> unDataCollection;
     UnstructuredDataCollection unCollection;
     PmOrderRuleCheckList pmCheckItem;
-    UnstructuredDataCollectionRepository reportDao;
+    private UnstructuredDataCollectionRepository reportDao;
     List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
 
     public void loadHmCheck(V2_PmOrder v2PmOrder) {
