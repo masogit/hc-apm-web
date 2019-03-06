@@ -100,6 +100,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private SysRoleRepository sysRoleRepository;
 
+    private CustomRoleRepository customRoleRepository;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -121,6 +123,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -296,7 +299,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }*/
         roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
         assignedRoles = new ArrayList<>();
-        List<CustomRole> customRoles = uaaService.getTenantCustomRoles(selected.getTenantUID());
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
         if(CollectionUtils.isNotEmpty(customRoles)){
             for (CustomRole customRole : customRoles) {
                 assignedRoles.add(customRole.getName());

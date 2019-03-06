@@ -73,7 +73,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
