@@ -150,7 +150,7 @@ public class PmReportService {
      * @param hmCheck hmCheck
      * @return description, or 'n/a'
      */
-    private String getCheckListResult(String uid, HashMap<String, UnstructuredData> hmCheck) {
+    private String getCheckListResult(String uid, Map<String, UnstructuredData> hmCheck) {
         UnstructuredData data = hmCheck.get(uid);
         if (data != null) {
             try {
@@ -162,7 +162,7 @@ public class PmReportService {
         return "n/a";
     }
 
-    private Map<String, Object> populateReportContent(V2_PmOrder pmOrder, List<UnstructuredDataCollection> reportList, HashMap<String, UnstructuredData> hmCheck, List<V2_WorkOrderCoworker> coWorkerList, List<V2_WorkOrder_Detail> accessoryList, List<PmOrderSteps> pmOrderSteps, List<PmOrderRuleCheckList> pmCheckItemList) {
+    private Map<String, Object> populateReportContent(V2_PmOrder pmOrder, List<UnstructuredDataCollection> reportList, Map<String, UnstructuredData> hmCheck, List<V2_WorkOrderCoworker> coWorkerList, List<V2_WorkOrder_Detail> accessoryList, List<PmOrderSteps> pmOrderSteps, List<PmOrderRuleCheckList> pmCheckItemList) {
         Map<String, Object> content = new HashMap<>();
 
         // Device information
@@ -304,16 +304,17 @@ public class PmReportService {
         return content;
     }
 
-    public DefaultStreamedContent generate(V2_PmOrder pmOrder, Boolean isInsulate, UserAccount user, HashMap<String, UnstructuredData> hmCheck) throws IOException {
+    public DefaultStreamedContent generate(V2_PmOrder pmOrder, Boolean isInsulate, UserAccount user) throws IOException {
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
-        List<V2_WorkOrderCoworker> coWorkerList = pmOrderService.getWorkOrderCoworker(pmOrder.getId());
-        List<V2_WorkOrder_Detail> accessoryList = pmOrderService.getWorkOrderDetails(pmOrder.getId());
+        List<V2_WorkOrderCoworker> coWorkerList = getCoWorkerList(pmOrderService.getWorkOrderCoworker(pmOrder.getId()));
+        List<V2_WorkOrder_Detail> accessoryList = getAccessoryList(pmOrderService.getWorkOrderDetails(pmOrder.getId()));
         List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
         PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
         if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
         // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
-        List<PmOrderRuleCheckList> pmCheckItemList = pmOrderService.getPmRuleCLclosed(pmOrder, rule.getUid());
+        List<PmOrderRuleCheckList> pmCheckItemList = pmOrderService.getPmOrderRuleCheckLists(pmOrder, rule);
+        Map<String, UnstructuredData> hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
         InputStream rawTemplate;
         if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.
@@ -351,5 +352,35 @@ public class PmReportService {
 
         InputStream doc = new ByteArrayInputStream(out.toByteArray());
         return new DefaultStreamedContent(doc, "application/msword", "maintenance-report.docx");
+    }
+
+    public List<V2_WorkOrder_Detail> getAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {
+        if (accessoryList == null) {
+            return null;
+        }
+        V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
+        emptyDetail.setId("000");
+        if (!accessoryList.contains(emptyDetail)) {
+            accessoryList.add(emptyDetail);
+        } else {
+            accessoryList.remove(emptyDetail);
+            accessoryList.add(emptyDetail);
+        }
+        return accessoryList;
+    }
+
+    public List<V2_WorkOrderCoworker> getCoWorkerList(List<V2_WorkOrderCoworker> coWorkerList) {
+        if (coWorkerList == null) {
+            return null;
+        }
+        V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
+        emptyDetail.setId("000");
+        if (!coWorkerList.contains(emptyDetail)) {
+            coWorkerList.add(emptyDetail);
+        } else {
+            coWorkerList.remove(emptyDetail);
+            coWorkerList.add(emptyDetail);
+        }
+        return coWorkerList;
     }
 }
