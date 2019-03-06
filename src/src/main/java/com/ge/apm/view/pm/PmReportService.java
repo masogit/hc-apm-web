@@ -147,7 +147,7 @@ public class PmReportService {
      * Translate check item description.
      *
      * @param uid     check item uid
-     * @param hmCheck
+     * @param hmCheck hmCheck
      * @return description, or 'n/a'
      */
     private String getCheckListResult(String uid, HashMap<String, UnstructuredData> hmCheck) {
@@ -185,10 +185,9 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
         // Coworker List
-        List<V2_WorkOrderCoworker> coworkers = coWorkerList;
-        if (coworkers != null) {
+        if (coWorkerList != null) {
             int count = 0;
-            for (V2_WorkOrderCoworker coworker : coworkers) {
+            for (V2_WorkOrderCoworker coworker : coWorkerList) {
                 // ignore fake empty coworker
                 if ("000".equalsIgnoreCase(coworker.getId())) continue;
                 if (count == 0) {
@@ -305,10 +304,16 @@ public class PmReportService {
         return content;
     }
 
-    public DefaultStreamedContent generate(V2_PmOrder pmOrder, Boolean isInsulate, UserAccount user, List<UnstructuredDataCollection> reportList, HashMap<String, UnstructuredData> hmCheck, List<V2_WorkOrderCoworker> coWorkerList, List<V2_WorkOrder_Detail> accessoryList, List<PmOrderSteps> pmOrderSteps, List<PmOrderRuleCheckList> pmCheckItemList) throws IOException {
+    public DefaultStreamedContent generate(V2_PmOrder pmOrder, Boolean isInsulate, UserAccount user, HashMap<String, UnstructuredData> hmCheck) throws IOException {
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+        List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
+        List<V2_WorkOrderCoworker> coWorkerList = pmOrderService.getWorkOrderCoworker(pmOrder.getId());
+        List<V2_WorkOrder_Detail> accessoryList = pmOrderService.getWorkOrderDetails(pmOrder.getId());
+        List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
         PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
         if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+        // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
+        List<PmOrderRuleCheckList> pmCheckItemList = pmOrderService.getPmRuleCLclosed(pmOrder, rule.getUid());
         InputStream rawTemplate;
         if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.

@@ -4,12 +4,14 @@
  * and open the template in the editor.
  */
 package com.ge.apm.service.pm;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import org.apache.commons.lang3.StringUtils;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,44 +20,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BiomedGroupRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.ElectricSafetyDataRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
-import com.ge.apm.dao.ServiceRequestMsgRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.WorkOrderCoworkerRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.dao.WorkOrderStepRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ElectricSafetyData;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UnstructuredDataCollection;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.pure.TableSchema;
-import com.ge.apm.service.common.UserCommonService;
-/*import com.ge.apm.service.wo.PmOrderActionForm;
-import com.ge.apm.service.wo.WorkOrderForm;*/
-import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.PmOrderActionForm;
-
 import webapp.framework.web.WebUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 /**
  *
  * @author 212579464
@@ -109,6 +77,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private UnstructuredDataCollectionRepository reportDao;
     @Autowired
     private ElectricSafetyDataRepository electricSafetyDataRepository;
+    @Autowired
+    private UnstructuredDataRepository unstructuredDataDao;
+    @Autowired
+    private PmOrderRuleCheckListRepository pmckLstDao;
 
     public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
@@ -621,6 +593,24 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     
     public V2_PmOrder findById(String id){
     	return woDao.findById(id);
+    }
+
+    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder, String ruleUid){
+        /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
+        * key就是检查项uid*/
+        List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
+        UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
+        if(unsD==null){
+            return pmcl;
+        }
+        List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
+        List<String> strList= new ArrayList<>();
+        byCollectionId.forEach(item->strList.add(item.getKey()));
+        if(strList.isEmpty()){
+            strList.add("");
+        }
+        pmcl = pmckLstDao.findPMCL(strList,ruleUid);
+        return pmcl;
     }
 }
 
