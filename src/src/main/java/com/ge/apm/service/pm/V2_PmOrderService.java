@@ -12,6 +12,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -379,11 +380,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("批量转单成功");
         }
     }
+
     public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
-        // String token = UserContextService.getAccessToken();
-        //PmOrderActionForm formData = new PmOrderActionForm();
-        List<PmOrderSteps> pmOrderStepsList = ucService.getPmOrderStepsList(pmOrderId);
-        return pmOrderStepsList;
+        List<PmOrderSteps> pmOrderSteps = ucService.getPmOrderStepsList(pmOrderId);
+        return pmOrderSteps == null ? new ArrayList<>() : pmOrderSteps;
     }
 
     public void approvePMorder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){
@@ -571,12 +571,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
     public List<UserAccount> getWorkerList(Integer assetId) {
-        List<UserAccount> workerList = ucService.getWorkerList(assetId,"");
-        return workerList;
+        return ucService.getWorkerList(assetId,"");
     }
     public List<UserAccount> getApproveList(String assetUid) {
-        List<UserAccount> workerList = ucService.getApproveList(assetUid);
-        return workerList;
+        return ucService.getApproveList(assetUid);
     }
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);
@@ -595,7 +593,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     	return woDao.findById(id);
     }
 
-    public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder, String ruleUid){
+    private List<PmOrderRuleCheckList> getPmRuleCLClosed(V2_PmOrder v2PmOrder, String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
@@ -611,6 +609,35 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         pmcl = pmckLstDao.findPMCL(strList,ruleUid);
         return pmcl;
+    }
+
+    public List<PmOrderRuleCheckList> getPmOrderRuleCheckLists(V2_PmOrder v2PmOrder, PmOrderRule pmOrderRule) {
+        if (v2PmOrder.isFinished()) {
+            return getPmRuleCLClosed(v2PmOrder, pmOrderRule.getUid());
+        } else {
+            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+        }
+    }
+
+    public Map<String, UnstructuredData> fetchHmCheck(List<PmOrderRuleCheckList> pmCheckItemList, V2_PmOrder v2PmOrder) {
+        Map<String, UnstructuredData> hmCheck = new HashMap<>();
+        if (pmCheckItemList != null && !pmCheckItemList.isEmpty()) {
+            List<UnstructuredDataCollection> unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");
+            if (unDataCollection != null && !unDataCollection.isEmpty()) {
+                UnstructuredDataCollection unCollection = unDataCollection.get(0);
+                if (unCollection != null) {
+                    List<UnstructuredData> dataList = unCollection.getData();
+                    for (PmOrderRuleCheckList aPmCheckItemList : pmCheckItemList) {
+                        for (UnstructuredData unsData : dataList) {
+                            if (StringUtils.equalsIgnoreCase(unsData.getKey(), aPmCheckItemList.getUid())) {
+                                hmCheck.put(aPmCheckItemList.getUid(), unsData);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return hmCheck;
     }
 }
 
