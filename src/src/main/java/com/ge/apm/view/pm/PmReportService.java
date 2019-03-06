@@ -21,6 +21,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.google.common.base.Strings;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.model.DefaultStreamedContent;
@@ -33,6 +34,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PmReportService {
@@ -304,14 +307,38 @@ public class PmReportService {
         return content;
     }
 
-    public DefaultStreamedContent generate(V2_PmOrder pmOrder, Boolean isInsulate, UserAccount user) throws IOException {
+    public DefaultStreamedContent generate(Map<String, Boolean> pmOrders, Boolean isInsulate, UserAccount user) throws IOException {
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             ZipOutputStream zout = new ZipOutputStream(bout)) {
+            pmOrders.forEach((id, selected) -> {
+                if (selected) {
+                    try {
+                        V2_PmOrder pmOrder = pmOrderService.findById(id);
+                        byte[] bytes = generate(pmOrder, activeTemplateBytes);
+                        if (bytes != null) {
+                            String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+                            zout.putNextEntry(new ZipEntry(name));
+                            IOUtils.write(bytes, zout);
+                            zout.closeEntry();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            zout.close();
+            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Maintenance_Reports.zip");
+        }
+    }
+
+    public byte[] generate(V2_PmOrder pmOrder, byte[] activeTemplateBytes) throws IOException {
+        PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
+        if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
         List<V2_WorkOrderCoworker> coWorkerList = getCoWorkerList(pmOrderService.getWorkOrderCoworker(pmOrder.getId()));
         List<V2_WorkOrder_Detail> accessoryList = getAccessoryList(pmOrderService.getWorkOrderDetails(pmOrder.getId()));
         List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
-        PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
-        if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
         // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
         List<PmOrderRuleCheckList> pmCheckItemList = pmOrderService.getPmOrderRuleCheckLists(pmOrder, rule);
         Map<String, UnstructuredData> hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
@@ -349,9 +376,7 @@ public class PmReportService {
         template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         template.render(datas);
         template.write(out);
-
-        InputStream doc = new ByteArrayInputStream(out.toByteArray());
-        return new DefaultStreamedContent(doc, "application/msword", "maintenance-report.docx");
+        return out.toByteArray();
     }
 
     public List<V2_WorkOrder_Detail> getAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {
