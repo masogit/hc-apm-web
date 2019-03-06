@@ -312,6 +312,7 @@ public class PmReportService {
         if (!pmOrders.values().contains(true)) {
             throw new BusinessException("未选中保养记录");
         }
+        long count = pmOrders.values().stream().filter(i -> i).count();
         byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -330,14 +331,16 @@ public class PmReportService {
                             ids.add(id);
                         }
                     } catch (BusinessException e) {
-                        e.printStackTrace();
+                        if (count == 1) {
+                            throw e;
+                        }
                     } catch (IOException e) {
-                        throw new BusinessException("报告创建失败", e);
+                        throw new BusinessException("报告下载失败", e);
                     }
                 }
             });
             if (ids.isEmpty()) {
-                throw new BusinessException("报告创建失败");
+                throw new BusinessException("报告下载失败");
             }
             zout.close();
             return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
