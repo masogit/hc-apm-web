@@ -1475,7 +1475,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
 //        保存检查项
-        saveCheckItemDataBatch(orderNumList);
+       // saveCheckItemDataBatch(orderNumList);
         pmOrderService.repairWorkOrderBatch(endTime, totalManHours,         currentPagePmOrders, selectedMap);
         selectedMap = new HashMap<String, Boolean>();
     }
