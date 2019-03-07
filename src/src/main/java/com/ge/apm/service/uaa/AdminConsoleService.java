@@ -33,6 +33,7 @@ import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 
 @Service
 public class AdminConsoleService {
@@ -74,7 +75,8 @@ public class AdminConsoleService {
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
 	
-
+	@Autowired
+	NurseSiteMaintainService nurseSiteMaintainService;
 	
 	public void addVersion(String version,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
@@ -140,7 +142,17 @@ public class AdminConsoleService {
 			}
 		}
 	}
-	
+	public void updateNurseSiteDeleteAsset(){
+		int limit=1000;
+		int offset=0;
+		List<NurseSiteMaintainConfigItem> listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteDeleteAsset(listR);
+			++offset;
+			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
+			logger.info("updateNurseSiteUID done.");
+		}
+	}
 	public void updateNurseSiteUID(){
 		int limit=1000;
 		int offset=0;
@@ -150,6 +162,42 @@ public class AdminConsoleService {
 			++offset;
 			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
 			logger.info("updateNurseSiteUID done.");
+		}
+	}
+	@Transactional
+	public void tUpdateNurseSiteDeleteAsset(List<NurseSiteMaintainConfigItem> listR){
+		Set<String> setAssetUid=new HashSet<String>();
+		Map<String,AssetInfo> mapAsset=new HashMap<String,AssetInfo>();
+		Map<String,AssetInfo> mapConfigIdAsset=new HashMap<String,AssetInfo>();
+		List<NurseSiteMaintainConfigItem> listNew=new ArrayList<NurseSiteMaintainConfigItem>();
+		Set<String> setConfigId=new HashSet<String>();
+		List<NurseSiteMaintain> listNoCheckMaintain=new ArrayList<NurseSiteMaintain>();
+		List<NurseSiteMaintainConfig> listConfig=null;
+		List<NurseSiteMaintain> listMaintain=null;
+		List<AssetInfo> listAssetInfo=null;
+		for(int i=0;i<listR.size();++i){
+			setAssetUid.add(listR.get(i).getAssetUid());
+		}
+		if(setAssetUid.size()>0){
+			listAssetInfo=assetInfoRepository.getByUids(setAssetUid);
+		}
+		if(listAssetInfo!=null && listAssetInfo.size()>0){
+			for(int i=0;i<listAssetInfo.size();++i){
+				AssetInfo tempAsset=listAssetInfo.get(i);
+				if(tempAsset.getStatus()==4 || tempAsset.getIsValid()==false || tempAsset.getIsDeleted()==true){
+					mapAsset.put(tempAsset.getUid(), tempAsset);
+				}
+			}
+		}
+		if(mapAsset.size()>0){
+			for(int i=0;i<listR.size();++i){
+				NurseSiteMaintainConfigItem tempItem=listR.get(i);
+				AssetInfo tempAsset=mapAsset.get(tempItem.getAssetUid());
+				if(tempAsset==null){
+					continue;
+				}
+				nurseSiteMaintainService.deleteAssetUid(tempAsset.getUid());
+			}
 		}
 	}
 	@Transactional
