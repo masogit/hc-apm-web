@@ -478,6 +478,7 @@ public class UserAccount implements ChineseName, Serializable {
 	public String getUserRoleNames() {
 		String roleNames = "";
 		if (CollectionUtils.isEmpty(userRoleList)) {
+
 			return roleNames;
 		}
 		for (UserRole userRole : userRoleList) {
@@ -533,7 +534,9 @@ public class UserAccount implements ChineseName, Serializable {
 		if (userRoleNames == null) {
 			userRoleNames = new ArrayList<>();
 			for (UserRole userRole : userRoleList) {
-				userRoleNames.add(userRole.getRole().getName());
+				if(userRole.getRoleType() == 0){
+					userRoleNames.add(userRole.getRole().getName());
+				}
 			}
 
 			if (this.isSuperAdmin)

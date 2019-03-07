@@ -102,6 +102,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private CustomRoleRepository customRoleRepository;
 
+    private UserRoleRepository userRoleRepository;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -898,6 +900,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             logger.error(ex.getMessage());
         }
 	}
+
+	public String getCurrentUserRoleNames(Integer userId){
+        //Integer userId = selected.getId();
+        List<SysRole> sysRoles = getSystemRolesByUserId(userId);
+        StringBuilder sb = new StringBuilder();
+        if(CollectionUtils.isNotEmpty(sysRoles)){
+            for (SysRole sysRole :sysRoles) {
+                sb.append(sysRole.getRoleDesc()).append(" ");
+            }
+        }
+        List<CustomRole> customRoles = getCustomRoleByUserId(userId);
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole :customRoles) {
+                sb.append(customRole.getName()).append(" ");
+            }
+        }
+        return sb.toString();
+    }
+    
+    public List<SysRole> getSystemRolesByUserId(Integer userId){
+        return sysRoleRepository.getSysRoles(userId);
+    }
+
+    public List<CustomRole> getCustomRoleByUserId(Integer userId){
+        return customRoleRepository.findCustomRolesByUserId(userId);
+    }
 
 	public StreamedContent getExportFile() {
 		return exportFile;
