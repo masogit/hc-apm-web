@@ -799,7 +799,7 @@ public class NurseSiteMaintainService {
 		return false;
 	}
 
-	private void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
+	public void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
 		Set<String> setMaintainDataIds = new HashSet<String>();
