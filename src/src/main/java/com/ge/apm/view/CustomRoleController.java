@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -134,11 +135,14 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         if(authorities.length > 0){
             StringBuilder sb1 = new StringBuilder();
+            Set<String> group = new HashSet<>();
             for (String authority: authorities) {
                 if(map.containsKey(authority)){
+                    group.add(authority.split("\\.")[0]);
                     sb1.append(map.get(authority).getValue()+",");
                 }
             }
+            selected.setGroups(StringUtils.join(group,","));
             selected.setAuthoritiesCH(removeComma(sb1));
             selected.setAuthorities( StringUtils.join(authorities,","));
         }

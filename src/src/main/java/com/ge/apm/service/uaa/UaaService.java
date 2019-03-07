@@ -1,18 +1,11 @@
 package com.ge.apm.service.uaa;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
@@ -209,6 +202,32 @@ public class UaaService {
     public List<UserRole> getSystemRoles(Integer userId){
         UserRoleRepository userAccountRepository = WebUtil.getBean(UserRoleRepository.class);
         return userAccountRepository.findByUserIdAndRoleType(userId,0);
+    }
+
+    public List<String> getAuthorities(Integer userId){
+        SysRoleRepository sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
+        List<SysRole> sysRoles = sysRoleRepository.getSysRoles(userId);
+        List<String> authorities = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(sysRoles)){
+            for (SysRole role : sysRoles) {
+                if(StringUtils.isNotEmpty(role.getAuthorities())){
+                    authorities.addAll(Arrays.asList(role.getAuthorities().split(",")));
+                }
+            }
+        }
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole :customRoles) {
+                if(StringUtils.isNotEmpty(customRole.getAuthorities())){
+                    authorities.addAll(Arrays.asList(customRole.getAuthorities().split(",")));
+                }
+            }
+        }
+        return authorities;
+    }
+
+    public Boolean hasAuthority(Integer userId,String authority){
+        return getAuthorities(userId).contains(authority);
     }
 
     @Transactional

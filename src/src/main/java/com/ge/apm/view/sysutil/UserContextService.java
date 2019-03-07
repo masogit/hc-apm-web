@@ -1,8 +1,7 @@
 package com.ge.apm.view.sysutil;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -11,22 +10,16 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ApmConstant;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
-import java.util.Objects;
 
 import javaslang.control.Option;
 import webapp.framework.dao.SearchFilter;
@@ -115,7 +108,7 @@ public class UserContextService implements Serializable {
     //add MVSAdmin,MVSFE
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
-
+        Integer userId = user.getId();
         if(user.getIsSuperAdmin()){
             return true;
         }
@@ -131,6 +124,23 @@ public class UserContextService implements Serializable {
             boolean roleAllowed = userRoles.contains(role);
             if (roleAllowed) {
                 return true;
+            }
+        }
+        //增加自定义角色判断
+        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+        List<String> names = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole : customRoles) {
+                if(StringUtils.isNotEmpty(customRole.getGroups())){
+                    names.addAll(Arrays.asList(customRole.getGroups().split(",")));
+                }
+            }
+            names = names.stream().distinct().collect(Collectors.toList());
+            for (String role : roles) {
+                if(names.contains(role.trim())){
+                    return true;
+                }
             }
         }
         return false;
