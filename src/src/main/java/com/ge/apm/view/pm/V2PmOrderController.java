@@ -59,9 +59,24 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+    //选定科室过滤
+    private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
+    //搜索字串
+    private String oneSearchStr;
+    //选定的院区
+    private OrgInfo selectSite;
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfoTreeService orgInfoTreeService;
+    private Set<String> clinicalDeptOrgUidSet;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
     private String token;
+    private List<UnstructuredDataCollection> unDataCollection;
+    private UnstructuredDataCollection unCollection;
+    private PmOrderRuleCheckList pmCheckItem;
+    private UnstructuredDataCollectionRepository reportDao;
+    private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
     @Setter
     @Getter
     private Boolean nochange = false;
@@ -246,8 +261,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setClosedTime(null);
         }
     }
-
-
     public void arrivalTimeSet() {
         if (itemDetail == null) return;
         if (itemDetail.getArrived() == true)
@@ -326,8 +339,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
     }
-
-
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -1461,15 +1472,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-
-
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
 //        保存检查项
-            saveCheckItemDataBatch(orderNumList);
-
-
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
+        saveCheckItemDataBatch(orderNumList);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours,         currentPagePmOrders, selectedMap);
         selectedMap = new HashMap<String, Boolean>();
     }
 
@@ -1522,16 +1529,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
-    //选定科室过滤
-    private String filterClinicalDeptOrg;
-    private String filterAssetDeptOrg;
-    //搜索字串
-    private String oneSearchStr;
-    //选定的院区
-    private OrgInfo selectSite;
-    private List<OrgInfo> clinicalDeptList;
-    private OrgInfoTreeService orgInfoTreeService;
-    private Set<String> clinicalDeptOrgUidSet;
+
 
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
@@ -1669,17 +1667,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    List<UnstructuredDataCollection> unDataCollection;
-    UnstructuredDataCollection unCollection;
-    PmOrderRuleCheckList pmCheckItem;
-    UnstructuredDataCollectionRepository reportDao;
-    List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
 
-    public void loadHmCheckBatch(){
 
-//gaolei
-    }
-//hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
+    //hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
     public void loadHmCheck(V2_PmOrder v2PmOrder) {
         hmCheck = new   HashMap<String, UnstructuredData>();
         //pmCheckItemList:检查项
