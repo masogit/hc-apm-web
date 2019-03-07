@@ -5,29 +5,25 @@
  */
 package com.ge.apm.service.utils;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
-
 import com.ge.apm.service.common.GatewayURL;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- *
  * @author 212579464
  */
 @Component
@@ -152,9 +148,11 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return null;
 
     }
+
     public String getAuthenticateByUserPassword(String userName, String password) {
         return doGetAuthenticateByUserPassword(userName, password, false); //password is in plain text
     }
+
     public String getAuthenticateByUserPasswordEncrypted(String userName, String password) {
         return doGetAuthenticateByUserPassword(userName, password, true); //password is already encrypted
     }
@@ -172,11 +170,11 @@ public class MicroServiceUtil extends MicroServiceInvoker {
                 postParameters, headers);
 
         String gatewayURL;
-        if(isPasswordEncrypted)
+        if (isPasswordEncrypted)
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED);
         else
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD);
-        
+
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {
@@ -195,7 +193,33 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public String getUrl_downloadFile() {
-        return  downLoadURL.concat(GatewayURL.DOWNLOAD_FILE.toString());
+        return downLoadURL.concat(GatewayURL.DOWNLOAD_FILE.toString());
+    }
+
+    public byte[] docxToPdf(byte[] content) {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
+        headers.setContentType(type);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        ByteArrayResource arrayResource = new ByteArrayResource(content){
+            @Override
+            public String getFilename() throws IllegalStateException {
+                return ".\\dummy.docx";
+            }
+
+        };
+        body.add("files", arrayResource);
+
+        String url = docxToPdfUrl + "/convert/office";
+        HttpEntity<Map> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<byte[]> response = template.postForEntity(url, requestEntity, byte[].class);
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            return response.getBody();
+        }
+        return null;
     }
 
 }
