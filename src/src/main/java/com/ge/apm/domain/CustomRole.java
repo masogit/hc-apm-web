@@ -41,6 +41,9 @@ public class CustomRole implements Serializable {
     @Column(name = "cards_ch")
     private String cardsCH;
 
+    @Column(name = "groups")
+    private String groups;
+
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -74,6 +77,14 @@ public class CustomRole implements Serializable {
     @Temporal(TemporalType.DATE)
     @JsonIgnore
     private Date lastModifiedDate = new Date();
+
+    public String getGroups() {
+        return groups;
+    }
+
+    public void setGroups(String groups) {
+        this.groups = groups;
+    }
 
     public String getAuthoritiesCH() {
         return authoritiesCH;
