@@ -1105,6 +1105,7 @@ public void repairResultSet(){
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        newServiceRequest.setCasePriority(3); //紧急程度默认是设置为一般
         faultReason="设备故障";
     }
 
