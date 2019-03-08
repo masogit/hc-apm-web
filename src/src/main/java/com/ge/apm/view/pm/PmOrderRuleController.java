@@ -523,10 +523,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 
     public void initSaveAs() {
-        Integer newId = selected.getId();
-        selected = null;
-        selected = dao.findById(newId);
+        //Integer newId = selected.getId();
+        //selected = null;
+        //selected = dao.findById(newId);
         selected.setPeriod(null);
+        selected.setReportStorageId(null);
+        selected.setReportTemplateName(null);
         selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
@@ -649,7 +651,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
      * Remote Report template from master-data.
      */
     public void removeReportTemplate() {
-        if (selected != null) {
+        if (selected != null && selected.getId() != null) {
             blobService.deleteBlobFileById(selected.getReportStorageId());
             selected.setReportStorageId(null);
             selected.setReportTemplateName(null);

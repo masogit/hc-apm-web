@@ -121,17 +121,18 @@ public class PmOrderReportTemplateService {
         MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
         // add dynamic table.
         if (rule != null) {
-            TableSchema schema;
-            schema = getTableSchemaById(rule.getSafetyReport());
-            if (schema != null) {
-                builder.safetyReport(schema);
-            }
-            schema = getTableSchemaById(rule.getPerformanceReport());
-            if (schema != null) {
-                builder.performanceReport(schema);
+            if(rule.getId() != null){
+                TableSchema schema;
+                schema = getTableSchemaById(rule.getSafetyReport());
+                if (schema != null) {
+                    builder.safetyReport(schema);
+                }
+                schema = getTableSchemaById(rule.getPerformanceReport());
+                if (schema != null) {
+                    builder.performanceReport(schema);
+                }
             }
         }
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
         template.write(out);
