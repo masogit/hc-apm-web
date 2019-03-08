@@ -130,9 +130,6 @@ public class NurseSiteMaintain implements Serializable {
 	@Transient
 	private List<String> showLables;
 	
-	@Transient
-	private boolean needGetItem=true;
-	
 	public NurseSiteMaintain() {
 		super();
 		this.status=0;
@@ -290,14 +287,6 @@ public class NurseSiteMaintain implements Serializable {
 	public void setShowLables(List<String> showLables) {
 		this.showLables = showLables;
 	}
-	
-	public boolean isNeedGetItem() {
-		return needGetItem;
-	}
-
-	public void setNeedGetItem(boolean needGetItem) {
-		this.needGetItem = needGetItem;
-	}
 
 	public String getClinicalDeptUID() {
 		return clinicalDeptUID;
@@ -355,7 +344,7 @@ public class NurseSiteMaintain implements Serializable {
 //		}
 //		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 //	}
-	
+
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
 		String strStatus="未检查";
