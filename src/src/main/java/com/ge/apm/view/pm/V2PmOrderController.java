@@ -22,6 +22,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.map.HashedMap;
@@ -60,7 +61,9 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
     //选定科室过滤
+    @Setter @Getter
     private String filterClinicalDeptOrg;
+    @Setter @Getter
     private String filterAssetDeptOrg;
     //搜索字串
     private String oneSearchStr;
@@ -68,6 +71,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private OrgInfo selectSite;
     private List<OrgInfo> clinicalDeptList;
     private OrgInfoTreeService orgInfoTreeService;
+    @Setter @Getter
     private Set<String> clinicalDeptOrgUidSet;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
@@ -77,13 +81,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmOrderRuleCheckList pmCheckItem;
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
-    @Setter
-    @Getter
+    @Setter @Getter
     private Boolean nochange = false;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
+    @Getter @Setter
     private String fileterOrgName;
-    private String fileterAssetDeptOrgName;
+    @Getter @Setter
     private Integer casePriority;
     private  String cancelInt;
     private String supplierName;
@@ -92,6 +96,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private V2_PmOrderRepository dao;
     private Double totalManHours;
+    @Getter @Setter
     private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
@@ -202,9 +207,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void cancelPMorder() {
-
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
-
     }
 
     public boolean allowChanged() {
@@ -515,7 +518,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return true;
     }
 
-    @Transactional
     public void saveCheckItemDataBatch(List<String> pmOrderNumList){
         List<V2_PmOrder> batchPmOrderList = dao.getBatchPmOrderList(pmOrderNumList);
         //循环处理每一条工单，将其保养规则对应的保养检查项目存到undatastructCollection和undatastruct中
@@ -557,7 +559,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
     }
-    @Transactional
     public void saveCheckItemData() {
         UnstructuredDataCollection unColl = new UnstructuredDataCollection();
         ArrayList<UnstructuredData> unD = new ArrayList<UnstructuredData>();
@@ -806,16 +807,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-        if (selectedPmOrder != null) {
-            selectedAsset = selectedPmOrder.getAssetInfo();
-            if (Strings.isNullOrEmpty(selectedAsset.getLocationName())) {
-                final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-                dptName = orgDao.getByUid(orgInfoUID).getName();
-            } else {
-                dptName = selectedAsset.getLocationName();
-            }
-        }
-        //  pmOrderService.closePM(selectedPmOrder,picList);
+        final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        dptName = orgDao.getByUid(orgInfoUID).getName();
+
     }
 
     public void saveServiceRequest() {
@@ -1557,11 +1551,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return;
         }
         assetName = asset.getName();
-        if (Strings.isNullOrEmpty(asset.getClinicalDeptName())) {
-            dptName = null;
-        } else {
-            dptName = asset.getClinicalDeptName();
-        }
+        String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        dptName = orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -1916,14 +1907,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.assetName = assetName;
     }
 
-    public String getDptName() {
-        return dptName;
-    }
-
-    public void setDptName(String dptName) {
-        this.dptName = dptName;
-    }
-
     public Integer getRuleLevel() {
         return ruleLevel;
     }
@@ -2257,46 +2240,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.orgInfoTreeService = orgInfoTreeService;
     }
 
-    public Set<String> getClinicalDeptOrgUidSet() {
-        return clinicalDeptOrgUidSet;
-    }
-
-    public void setClinicalDeptOrgUidSet(Set<String> clinicalDeptOrgUidSet) {
-        this.clinicalDeptOrgUidSet = clinicalDeptOrgUidSet;
-    }
-
-    public String getFilterClinicalDeptOrg() {
-        return filterClinicalDeptOrg;
-    }
-
-    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
-        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
-    }
-
-    public String getFilterAssetDeptOrg() {
-        return filterAssetDeptOrg;
-    }
-
-    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
-        this.filterAssetDeptOrg = filterAssetDeptOrg;
-    }
-
-    public String getFileterAssetDeptOrgName() {
-        return fileterAssetDeptOrgName;
-    }
-
-    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
-        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
-    }
-
-    public String getFileterOrgName() {
-        return fileterOrgName;
-    }
-
-    public void setFileterOrgName(String fileterOrgName) {
-        this.fileterOrgName = fileterOrgName;
-    }
-
     public String getCancelInt() {
         return cancelInt;
     }
@@ -2305,11 +2248,4 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.cancelInt = cancelInt;
     }
 
-    public Integer getCasePriority() {
-        return casePriority;
-    }
-
-    public void setCasePriority(Integer casePriority) {
-        this.casePriority = casePriority;
-    }
 }
