@@ -79,11 +79,13 @@ public class MaintainController implements ServerEventInterface {
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
     private SearchController searchController;
+    private MaintainItemController maintainItemController;
 
     @PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
+		maintainItemController= WebUtil.getBean(MaintainItemController.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
@@ -369,53 +371,42 @@ public class MaintainController implements ServerEventInterface {
 		}
 	}
 	
-	private void generateNurseSiteMaintainData(){
-		List<String> showLables=nurseSiteMaintain.getShowLables();
-		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
-		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		if(showLables==null){
-			showLables=new ArrayList<String>();
-		}
-		else{
-			showLables.clear();
-		}
-		try {
-			if(listItem!=null && listItem.size()>0){
-				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
-				if(listTempData!=null){
-					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
-					while(it.hasNext()){
-						NurseSiteMaintainData tempData=it.next();
-						showLables.add(tempData.getCheckItem());
-					}
-//					showLables.sort(new StringComparator());
-				}
-			}
-			nurseSiteMaintain.setShowLables(showLables);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error("getLables error"+e.getMessage());
-		}
-	}
+//	private void generateNurseSiteMaintainData(){
+//		List<String> showLables=nurseSiteMaintain.getShowLables();
+//		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
+//		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+//		if(showLables==null){
+//			showLables=new ArrayList<String>();
+//		}
+//		else{
+//			showLables.clear();
+//		}
+//		try {
+//			if(listItem!=null && listItem.size()>0){
+//				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
+//				if(listTempData!=null){
+//					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
+//					while(it.hasNext()){
+//						NurseSiteMaintainData tempData=it.next();
+//						showLables.add(tempData.getCheckItem());
+//					}
+////					showLables.sort(new StringComparator());
+//				}
+//			}
+//			nurseSiteMaintain.setShowLables(showLables);
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			LOGGER.error("getLables error"+e.getMessage());
+//		}
+//	}
 	
 	public void checkRightAll(){
-		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-		while(it.hasNext()){
-			NurseSiteMaintainItem tempItem=it.next();
-			List<NurseSiteMaintainData> listData=tempItem.getListData();
-			Iterator<NurseSiteMaintainData> itData=listData.iterator();
-			while(itData.hasNext()){
-				NurseSiteMaintainData tempData=itData.next();
-				tempData.setCheckValue(true);
-			}
-		}
+		nurseSiteMaintainService.checkRightAll(nurseSiteMaintain);
 	}
 
 	public void saveMaintain() {
 		Date currentDate=new Date();
-		nurseSiteMaintainService.updateMaintainData(nurseSiteMaintain,currentDate,currentUser);
-		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain,currentDate,currentUser);
 		lazyEventModel.updateEvent(event);
 		addMessage("工单已保存");
 	}
@@ -523,7 +514,8 @@ public class MaintainController implements ServerEventInterface {
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
-		generateNurseSiteMaintainData();
+//		generateNurseSiteMaintainData();
+		maintainItemController.reset(nurseSiteMaintain);
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
