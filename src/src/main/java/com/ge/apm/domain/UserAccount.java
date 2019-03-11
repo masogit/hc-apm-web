@@ -552,7 +552,7 @@ public class UserAccount implements ChineseName, Serializable {
 			if (this.getMvsRoleType() != null) {
 				if (this.getMvsRoleType() == 1 || this.getMvsRoleType() == 3) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_ADMIN);
-				} else if (this.getMvsRoleType() == 2 || this.getMvsRoleType() == 4) {
+				} else if (this.getMvsRoleType() == 2) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_FE);
 				}
 			} else {

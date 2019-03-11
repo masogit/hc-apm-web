@@ -382,7 +382,7 @@ public class UserContextService implements Serializable {
         UserAccount userAccount=getCurrentUserAccount();
         Integer mvsRoleType=userAccount.getMvsRoleType();
         if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE
-                                    || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2 || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE_2)){
+                                    || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
             return true;
         }
         else{
