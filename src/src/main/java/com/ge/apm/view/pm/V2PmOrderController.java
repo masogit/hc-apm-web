@@ -807,8 +807,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-        final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-        dptName = orgDao.getByUid(orgInfoUID).getName();
+        if (selectedPmOrder != null) {
+            selectedAsset = selectedPmOrder.getAssetInfo();
+            if (Strings.isNullOrEmpty(selectedAsset.getLocationName())) {
+                final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+                dptName = orgDao.getByUid(orgInfoUID).getName();
+            } else {
+                dptName = selectedAsset.getLocationName();
+            }
+        }
+        casePriority =3;//一般
 
     }
 
@@ -1551,8 +1559,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return;
         }
         assetName = asset.getName();
-        String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-        dptName = orgDao.getByUid(orgInfoUID).getName();
+        //String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
