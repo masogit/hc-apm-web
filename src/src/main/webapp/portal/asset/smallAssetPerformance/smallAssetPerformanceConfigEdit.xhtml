@@ -18,10 +18,10 @@
 					<p:inputText value="#{smallAssetPerformanceConfigController.selected.projectNumber}" />
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">科室名称*</label>
+					<label class="label">科室名称</label>
 					<!--                         <p:inputText value="#{smallAssetPerformanceConfigController.selected.department}"/> -->
 					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" scrollHeight="300"
-						forceSelection="true" required="true"
+						forceSelection="true" required="false"
 						requiredMessage="科室名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
 						itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
 						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}"/>
