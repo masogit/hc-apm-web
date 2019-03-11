@@ -756,7 +756,7 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyByUid(user.getUid());
 			tempItem.setModifyDate(date);
 			List<NurseSiteMaintainData> listData = tempItem.getListData();
-			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			Iterator<NurseSiteMaintainData> itData = listData.iterator(); 
 			// single,0:未检查，2：已通过，3：有问题，4：进行中
 			while (itData.hasNext()) {
 				NurseSiteMaintainData tempData = itData.next();
