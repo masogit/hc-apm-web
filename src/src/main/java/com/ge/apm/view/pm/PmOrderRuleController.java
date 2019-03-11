@@ -30,6 +30,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
@@ -567,9 +568,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void prepareEdit() {
         super.prepareEdit();
-        Integer newId = selected.getId();
+/*        Integer newId = selected.getId();
         selected = null;
-        selected = dao.findById(newId);
+        selected = dao.findById(newId);*/
         selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
@@ -635,7 +636,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         this.checkItemLists = checkItemLists;
     }
 
-    public void generateReportTemplateFile() {
+    public void generateReportTemplateFile() throws IOException{
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx");
 
         try {
@@ -644,6 +645,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
             WebUtil.addErrorMessage("Word模版生成失败");
+        }finally {
+            stream.close();
         }
     }
 
@@ -652,7 +655,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
      */
     public void removeReportTemplate() {
         if (selected != null && selected.getId() != null) {
-            blobService.deleteBlobFileById(selected.getReportStorageId());
+            //不再删除附件，防止同一个附件被多个保养规则引用
+            //blobService.deleteBlobFileById(selected.getReportStorageId());
             selected.setReportStorageId(null);
             selected.setReportTemplateName(null);
             this.dao.save(selected);
