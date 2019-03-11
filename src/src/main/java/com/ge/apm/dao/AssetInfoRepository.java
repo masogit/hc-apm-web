@@ -71,6 +71,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     
     @Query(value="select o.* from asset_info o where o.site_uid=?1",nativeQuery=true)
     public List<AssetInfo> findBySiteUid(String siteUid);
+    
+    @Query(value="select o.* from asset_info o where o.is_valid=true and o.is_deleted=false and o.status!=4 and o.site_uid=?1 and o.clinical_dept_uid=?2",nativeQuery=true)
+    public List<AssetInfo> findBySiteAndClinical(String siteUid,String departUid);
 
     @Query(value = "select count(1) from v2_work_order where asset_id = ?1 and status = 1", nativeQuery = true)
     public int fetchCurrentWorkOrders(Integer id);
