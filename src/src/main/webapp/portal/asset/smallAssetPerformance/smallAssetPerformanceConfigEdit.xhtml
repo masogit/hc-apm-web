@@ -10,7 +10,7 @@
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceConfigController.selected != null}">
 
 				<h:panelGroup>
-					<label class="label">项目名称</label>
+					<label class="label">项目名称*</label>
 					<p:inputText value="#{smallAssetPerformanceConfigController.selected.projectName}" required="true" requiredMessage="项目名称不能为空" />
 				</h:panelGroup>
 				<h:panelGroup>
@@ -18,26 +18,26 @@
 					<p:inputText value="#{smallAssetPerformanceConfigController.selected.projectNumber}" />
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">科室名称</label>
+					<label class="label">科室名称*</label>
 					<!--                         <p:inputText value="#{smallAssetPerformanceConfigController.selected.department}"/> -->
 					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" scrollHeight="300"
 						forceSelection="true" required="true"
-						requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
+						requiredMessage="科室名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
 						itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
 						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}"/>
 					</p:autoComplete>
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">设备名称</label>
+					<label class="label">设备名称*</label>
 					<!-- <p:inputText value="#{smallAssetPerformanceConfigController.selected.assetName}" required="true" requiredMessage="设备名称不能为空" /> -->
 					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" scrollHeight="300"
-							forceSelection="true" required="true" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}"
+							forceSelection="true" required="true" requiredMessage="设备名称不能为空"
 							completeMethod="#{smallAssetPerformanceConfigController.autoCompleteAsset}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
 							<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
 						</p:autoComplete>
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">占比</label>
+					<label class="label">占比*</label>
 					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.0000" maxValue="1.0000" requiredMessage="占比不能为空" />
 				</h:panelGroup>
 				<h:panelGroup>
