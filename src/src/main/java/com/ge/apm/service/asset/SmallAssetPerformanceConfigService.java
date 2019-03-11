@@ -185,6 +185,10 @@ public class SmallAssetPerformanceConfigService {
 	public List<AssetInfo> getAccessAssetInfo(String siteUid){
 		return assetInfoRepository.findBySiteUid(siteUid);
 	}
+	
+	public List<AssetInfo> getAccessAssetInfo(String siteUid,String clinicalUid){
+		return assetInfoRepository.findBySiteAndClinical(siteUid,clinicalUid);
+	}
 
 	public OrgInfo getOrgInfoByName(List<OrgInfo> list,String name){
 		OrgInfo orgInfo=null;
