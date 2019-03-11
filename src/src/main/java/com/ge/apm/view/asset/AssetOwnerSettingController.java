@@ -93,7 +93,7 @@ public class AssetOwnerSettingController {
             hasAssetGroupSecondary = Boolean.FALSE;
         }
 
-        userAccountList = userCommonService.getWorkerList(null,"");
+        userAccountList = userCommonService.getWorkerList(null,null);
         //not display data initially
 //        getQueryAssetsList();
 
@@ -145,13 +145,12 @@ public class AssetOwnerSettingController {
 
     public List<UserAccount> autoCompleteOwner(String query) {
 
-        //List<UserAccount> userAccountList = userCommonService.getWorkerList(null,"");
         if (userAccountList == null) {
             return Collections.emptyList();
         }
         List<UserAccount> res = userAccountList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
+        //res.sort(new PinYinComparatorByName());
         return res;
     }
 
