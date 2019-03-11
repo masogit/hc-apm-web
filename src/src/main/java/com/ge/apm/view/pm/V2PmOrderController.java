@@ -818,7 +818,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         casePriority =3;//一般
         System.out.println("-------hxx---------------=============");
-        logger.info("------xxxxxxx------------hxxxx");
+        logger.info("------xxyyyyxxxxx------------hxxxx");
 
     }
 
