@@ -1624,6 +1624,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if(itemDetail.getClosedPrice()==null) {
                 itemDetail.setClosedPrice(itemDetail.getPartsPrice());
             }
+
+            itemDetail.setArrivedGoodReturn(false);
+            itemDetail.setArrivedGood(false);
             accessoryList.add(itemDetail);
         }
         //调用微服务来添加备件

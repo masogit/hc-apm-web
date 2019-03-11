@@ -1274,6 +1274,8 @@ public void repairResultSet(){
            if(itemDetail.getClosedPrice()==null) {
                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
            }
+           itemDetail.setArrivedGood(false);
+           itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
            //调用微服务来存附件
             serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
