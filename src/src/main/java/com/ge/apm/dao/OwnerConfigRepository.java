@@ -10,6 +10,10 @@ import java.util.List;
  */
 public interface OwnerConfigRepository extends GenericRepositoryUUID<OwnerConfig> {
 
-    public List<OwnerConfig> findByOwnerConfigTypeAndTypeUIDAndSiteUID(String ownerConfig, String typeUID, String siteUID);
+    public List<OwnerConfig> findByDeptUIDAndSiteUID(String deptUID, String siteUID);
+
+    public List<OwnerConfig> findByAssetGroupIDAndSiteUID(Integer assetGroupID, String siteUID);
+
+    public List<OwnerConfig> findByAssetGroupIDAndAssetGroupSecondaryIDAndSiteUID(Integer assetGroupID, Integer assetGroupSecondaryID, String siteUID);
 
 }

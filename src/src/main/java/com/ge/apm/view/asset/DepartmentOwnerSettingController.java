@@ -1,28 +1,33 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.OwnerConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.OwnerConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.OwnerConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,10 +35,12 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @ViewScoped
-public class DepartmentOwnerSettingController {
+public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<OwnerConfig> {
 
+    private OwnerConfigRepository dao;
     private UserCommonService userCommonService;
     private OwnerConfigService ownerConfigService;
+    private OrgInfoRepository orgInfoDao;
 
     private List<UserAccount> userAccountList;
 
@@ -41,15 +48,6 @@ public class DepartmentOwnerSettingController {
     private UserAccount woOwner2;
     private UserAccount woOwner3;
     private UserAccount pmOwner;
-    private Boolean isChanegeWoOwner;
-    private Boolean isChanegeWoOwner2;
-    private Boolean isChanegeWoOwner3;
-    private Boolean isChanegePmOwner;
-
-    private String woOwnerConfigID;
-    private String woOwnerConfigID2;
-    private String woOwnerConfigID3;
-    private String pmOwnerConfigID;
 
     private UserAccount currentUser;
 
@@ -62,19 +60,78 @@ public class DepartmentOwnerSettingController {
     private OrgInfo deptOrg;
     private List<OrgInfo> clinicalDeptList;
 
-    @PostConstruct
+    //选定科室过滤
+    private OrgInfoTreeService orgInfoTreeService;
+    private String filterClinicalDeptOrgName;
+    private Set<String> clinicalDeptOrgUidSetFilter;
+    private List<OrgInfo> filterClinicalDeptList;
+
+    @Override
     protected void init() {
 
+        dao = WebUtil.getBean(OwnerConfigRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         ownerConfigService = WebUtil.getBean(OwnerConfigService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
-        userAccountList = userCommonService.getWorkerList(null,"");
+        userAccountList = userCommonService.getWorkerList(null,null);
         currentUser = UserContextService.getCurrentUserAccount();
 
+        this.selectedOrg = orgInfoDao.getByUid(currentUser.getSiteUID());
         this.initOrgTree();
 
+        this.loadClinicalDept();
+        this.loadClinicalDeptFilter();
+
+    }
+
+    @Override
+    protected OwnerConfigRepository getDAO(){
+        return dao;
+    }
+
+    protected Page<OwnerConfig> loadData(PageRequest pageRequest) {
+
+        if (this.searchFilters == null) {
+            this.searchFilters = new ArrayList<>();
+        }
+
+        this.removeFilterOnField("tenantUID");
+        this.removeFilterOnField("institutionUID");
+        this.removeFilterOnField("hospitalUID");
+        this.removeFilterOnField("siteUID");
+        this.removeFilterOnField("deptUID");
+
+        this.updateSearchFilter(new SearchFilter("ownerConfigType", SearchFilter.Operator.EQ, OwnerConfig.OwnerConfigType.Department.name()));
+        if(this.selectedOrg.getOrgLevel() == 0){
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 1){
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 2){
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 3){
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+
+        if(this.clinicalDeptOrgUidSetFilter != null && !this.clinicalDeptOrgUidSetFilter.isEmpty()){
+            this.updateSearchFilter(new SearchFilter("deptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetFilter)));
+        }
+
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    public void onSelectOwnerConfig(){
+        this.deptOrg = this.selected.getDeptOrgInfo();
+        this.woOwner = this.selected.getWoOwner();
+        this.woOwner2 = this.selected.getWoOwner2();
+        this.woOwner3 = this.selected.getWoOwner3();
+        this.pmOwner = this.selected.getPmOwner();
     }
 
     public List<UserAccount> autoCompleteOwner(String query) {
@@ -84,7 +141,7 @@ public class DepartmentOwnerSettingController {
         }
         List<UserAccount> res = userAccountList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
+        //res.sort(new PinYinComparatorByName());
         return res;
     }
 
@@ -92,106 +149,68 @@ public class DepartmentOwnerSettingController {
 
         this.resetOwnerConfig();
 
-        if(deptOrg == null){
+        if(deptOrg != null){
+            List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
+            for(OwnerConfig ownerConfig : ownerConfigList){
+                this.woOwner = ownerConfig.getWoOwner();
+                this.woOwner2 = ownerConfig.getWoOwner2();
+                this.woOwner3 = ownerConfig.getWoOwner3();
+                this.pmOwner = ownerConfig.getPmOwner();
+            }
+        }
+    }
+
+    private void resetOwnerConfig(){
+        this.woOwner = null;
+        this.woOwner2 = null;
+        this.woOwner3 = null;
+        this.pmOwner = null;
+    }
+
+    public void createOwerConfig(){
+        this.resetOwnerConfig();
+        this.deptOrg = null;
+        this.selected = new OwnerConfig();
+    }
+
+    public void saveChange() {
+
+        if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
+            WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
             return;
         }
 
         List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
 
-        for(OwnerConfig ownerConfig : ownerConfigList){
-            if(OwnerConfig.OwnerType.WO.name().equals(ownerConfig.getOwnerType())){
-                if(1 == ownerConfig.getIndex()){
-                    isChanegeWoOwner = Boolean.TRUE;
-                    woOwner = ownerConfig.getOwner();
-                    woOwnerConfigID = ownerConfig.getId();
-                }else if(2 == ownerConfig.getIndex()){
-                    isChanegeWoOwner2 = Boolean.TRUE;
-                    woOwner2 = ownerConfig.getOwner();
-                    woOwnerConfigID2 = ownerConfig.getId();
-                }else if(3 == ownerConfig.getIndex()){
-                    isChanegeWoOwner3 = Boolean.TRUE;
-                    woOwner3 = ownerConfig.getOwner();
-                    woOwnerConfigID3 = ownerConfig.getId();
-                }
-            }else if(OwnerConfig.OwnerType.PM.name().equals(ownerConfig.getOwnerType())){
-                if(1 == ownerConfig.getIndex()){
-                    isChanegePmOwner = Boolean.TRUE;
-                    pmOwner = ownerConfig.getOwner();
-                    pmOwnerConfigID = ownerConfig.getId();
-                }
-            }
-        }
-
-    }
-
-    private void resetOwnerConfig(){
-        woOwner = null;
-        woOwner2 = null;
-        woOwner3 = null;
-        pmOwner = null;
-
-        woOwnerConfigID = null;
-        woOwnerConfigID2 = null;
-        woOwnerConfigID3 = null;
-        pmOwnerConfigID = null;
-
-        isChanegeWoOwner = Boolean.FALSE;
-        isChanegeWoOwner2 = Boolean.FALSE;
-        isChanegeWoOwner3 = Boolean.FALSE;
-        isChanegePmOwner = Boolean.FALSE;
-    }
-
-    public void saveChange() {
-
-        if(!isChanegeWoOwner && !isChanegeWoOwner2 && !isChanegeWoOwner3 && !isChanegePmOwner){
-            WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
-            return;
-        }
-
-        List<OwnerConfig> ownerConfigList = new ArrayList<>();
-
-        if(isChanegeWoOwner){
-            ownerConfigList.add(buildOwnerConfig(1, OwnerConfig.OwnerType.WO.name(), woOwner, woOwnerConfigID));
-        }
-        if(isChanegeWoOwner2){
-            ownerConfigList.add(buildOwnerConfig(2, OwnerConfig.OwnerType.WO.name(), woOwner2, woOwnerConfigID2));
-        }
-        if(isChanegeWoOwner3){
-            ownerConfigList.add(buildOwnerConfig(3, OwnerConfig.OwnerType.WO.name(), woOwner3, woOwnerConfigID3));
-        }
-        if(isChanegePmOwner){
-            ownerConfigList.add(buildOwnerConfig(1, OwnerConfig.OwnerType.PM.name(), pmOwner, pmOwnerConfigID));
-        }
-
-        ownerConfigService.saveDepartmentOwner(ownerConfigList);
-
-        WebUtil.addErrorMessage("保存成功");
-    }
-
-    private OwnerConfig buildOwnerConfig(Integer index, String ownerType, UserAccount owner, String ownerConfigID){
         OwnerConfig ownerConfig = new OwnerConfig();
 
-        if(ownerConfigID != null){
-            ownerConfig.setId(ownerConfigID);
+        for (OwnerConfig tempOwnerConfig : ownerConfigList) {
+            ownerConfig.setId(tempOwnerConfig.getId());
         }
-
         ownerConfig.setTenantUID(selectedOrg.getTenantUID());
         ownerConfig.setInstitutionUID(selectedOrg.getInstitutionUID());
         ownerConfig.setHospitalUID(selectedOrg.getHospitalUID());
         ownerConfig.setSiteUID(selectedOrg.getSiteUID());
 
-        ownerConfig.setOwnerUID(owner != null ? owner.getUid() : null);
-        ownerConfig.setIndex(index);
-        ownerConfig.setOwnerType(ownerType);
+        ownerConfig.setWoOwnerUID(woOwner != null ? woOwner.getUid() : null);
+        ownerConfig.setWoOwnerUID2(woOwner2 != null ? woOwner2.getUid() : null);
+        ownerConfig.setWoOwnerUID3(woOwner3 != null ? woOwner3.getUid() : null);
+        ownerConfig.setPmOwnerUID(pmOwner != null ? pmOwner.getUid() : null);
+
         ownerConfig.setOwnerConfigType(OwnerConfig.OwnerConfigType.Department.name());
-        ownerConfig.setTypeUID(deptOrg != null ? deptOrg.getUid() : null);
+        ownerConfig.setDeptUID(deptOrg != null ? deptOrg.getUid() : null);
 
         ownerConfig.setCreatedBy(currentUser.getLoginName());
         ownerConfig.setCreatedDate(new Date());
         ownerConfig.setLastModifiedBy(currentUser.getLoginName());
         ownerConfig.setLastModifiedDate(new Date());
 
-        return ownerConfig;
+        dao.save(ownerConfig);
+
+        this.resetOwnerConfig();
+        this.clinicalDeptOrgUidSetFilter = Collections.emptySet();
+        this.filterClinicalDeptOrgName = null;
+        WebUtil.addErrorMessage("保存成功");
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -202,7 +221,9 @@ public class DepartmentOwnerSettingController {
         } else {
             selectedOrg = (OrgInfo) node.getData();
         }
+
         this.loadClinicalDept();
+        this.loadClinicalDeptFilter();
         this.resetOwnerConfig();
         this.deptOrg = null;
     }
@@ -212,14 +233,15 @@ public class DepartmentOwnerSettingController {
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().add(treeNode);
-        rootNode.setExpanded(true);
+        orgTree.getChildren().add(treeNode);
+        orgTree.setExpanded(true);
 
+        TreeNode selectedTempOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedTempOrg) {
+            selectedTempOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedTempOrg);
+        }
     }
 
     public List<OrgInfo> autoCompleteDept(String query) {
@@ -243,7 +265,53 @@ public class DepartmentOwnerSettingController {
         }
     }
 
-    public void onCheckChange(){
+    private void loadClinicalDeptFilter() {
+        filterClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectedOrg) {
+            filterClinicalDeptList = filterClinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectedOrg.getSiteUID()) || item.getHospitalUID().equals(selectedOrg.getSiteUID())
+                    || item.getInstitutionUID().equals(selectedOrg.getSiteUID()) || item.getTenantUID().equals(selectedOrg.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+
+    public List<String> autoCompleteDeptFilter(String query) {
+        if (filterClinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.filterClinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrgName = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrgName) && !filterClinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrgName.equals(item.getName()))) {
+            filterClinicalDeptOrgName = null;
+        }
+
+        if (filterClinicalDeptOrgName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.filterClinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrgName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, filterClinicalDeptList);
+            clinicalDeptOrgUidSetFilter = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSetFilter = Collections.emptySet();
+        }
+
+    }
+
+    public void deleteOwerConfig(){
+        dao.delete(this.selected);
+        this.selected = null;
+        WebUtil.addErrorMessage("删除成功");
     }
 
     public void onOwnerChange(SelectEvent event){
@@ -282,38 +350,6 @@ public class DepartmentOwnerSettingController {
         this.pmOwner = pmOwner;
     }
 
-    public Boolean getChanegeWoOwner() {
-        return isChanegeWoOwner;
-    }
-
-    public void setChanegeWoOwner(Boolean chanegeWoOwner) {
-        isChanegeWoOwner = chanegeWoOwner;
-    }
-
-    public Boolean getChanegeWoOwner2() {
-        return isChanegeWoOwner2;
-    }
-
-    public void setChanegeWoOwner2(Boolean chanegeWoOwner2) {
-        isChanegeWoOwner2 = chanegeWoOwner2;
-    }
-
-    public Boolean getChanegeWoOwner3() {
-        return isChanegeWoOwner3;
-    }
-
-    public void setChanegeWoOwner3(Boolean chanegeWoOwner3) {
-        isChanegeWoOwner3 = chanegeWoOwner3;
-    }
-
-    public Boolean getChanegePmOwner() {
-        return isChanegePmOwner;
-    }
-
-    public void setChanegePmOwner(Boolean chanegePmOwner) {
-        isChanegePmOwner = chanegePmOwner;
-    }
-
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }
@@ -344,5 +380,13 @@ public class DepartmentOwnerSettingController {
 
     public void setDeptOrg(OrgInfo deptOrg) {
         this.deptOrg = deptOrg;
+    }
+
+    public String getFilterClinicalDeptOrgName() {
+        return filterClinicalDeptOrgName;
+    }
+
+    public void setFilterClinicalDeptOrgName(String filterClinicalDeptOrgName) {
+        this.filterClinicalDeptOrgName = filterClinicalDeptOrgName;
     }
 }

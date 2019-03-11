@@ -18,24 +18,18 @@ public class OwnerConfigService {
     private OwnerConfigRepository ownerConfigDao;
 
     public List<OwnerConfig> loadDepartmentOwnerConfig(String clinicalDeptUID, String siteUID){
-        return  ownerConfigDao.findByOwnerConfigTypeAndTypeUIDAndSiteUID(OwnerConfig.OwnerConfigType.Department.name(), clinicalDeptUID, siteUID);
+        return ownerConfigDao.findByDeptUIDAndSiteUID(clinicalDeptUID, siteUID);
     }
 
-    public List<OwnerConfig> loadAssetGroupOwnerConfig(String assetGroupID, String siteUID){
-        return  ownerConfigDao.findByOwnerConfigTypeAndTypeUIDAndSiteUID(OwnerConfig.OwnerConfigType.AssetGroup.name(), assetGroupID, siteUID);
+    public List<OwnerConfig> loadAssetGroupOwnerConfig(Integer assetGroupID, Integer assetGroupSecondaryID, String siteUID){
+        return ownerConfigDao.findByAssetGroupIDAndAssetGroupSecondaryIDAndSiteUID(assetGroupID, assetGroupSecondaryID, siteUID);
     }
 
     @Transactional
     public void saveDepartmentOwner(List<OwnerConfig> ownerConfigList) {
 
         for (OwnerConfig ownerConfig : ownerConfigList) {
-            if(ownerConfig.getOwnerUID() != null){
-                ownerConfigDao.save(ownerConfig);
-            }else{
-                if(ownerConfig.getId() != null){
-                    ownerConfigDao.delete(ownerConfig.getId());
-                }
-            }
+            ownerConfigDao.save(ownerConfig);
         }
 
     }

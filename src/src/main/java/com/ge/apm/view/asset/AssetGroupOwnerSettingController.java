@@ -1,14 +1,20 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.OwnerConfigRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.OwnerConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.OwnerConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -16,7 +22,11 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -32,52 +42,99 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @ViewScoped
-public class AssetGroupOwnerSettingController {
+public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<OwnerConfig> {
 
+    private OwnerConfigRepository dao;
     private UserCommonService userCommonService;
     private OwnerConfigService ownerConfigService;
+    private OrgInfoRepository orgInfoDao;
 
     private List<UserAccount> userAccountList;
 
-    private String assetGroupID;
+    private Integer assetGroupID;
+    private Integer assetGroupSecondaryID;
+    private List<I18nMessage> assetGroupSecondaryList;
 
     private UserAccount woOwner;
     private UserAccount woOwner2;
     private UserAccount woOwner3;
     private UserAccount pmOwner;
-    private Boolean isChanegeWoOwner;
-    private Boolean isChanegeWoOwner2;
-    private Boolean isChanegeWoOwner3;
-    private Boolean isChanegePmOwner;
-
-    private String woOwnerConfigID;
-    private String woOwnerConfigID2;
-    private String woOwnerConfigID3;
-    private String pmOwnerConfigID;
 
     private UserAccount currentUser;
 
-    private AssetInfoService assetInfoService;
     private UaaService uaaService;
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
 
-    private List<I18nMessage> i18nMessageList;
+    private I18nMessageRepository i18nDao;
 
-    @PostConstruct
+    private Integer assetGroupFilter;
+    private List<I18nMessage> assetGroupSecondaryListFilter;
+
+    @Override
     protected void init() {
 
+        dao = WebUtil.getBean(OwnerConfigRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         ownerConfigService = WebUtil.getBean(OwnerConfigService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 
-        userAccountList = userCommonService.getWorkerList(null,"");
         currentUser = UserContextService.getCurrentUserAccount();
+        userAccountList = userCommonService.getWorkerList(null,null);
 
+        this.selectedOrg = orgInfoDao.getByUid(currentUser.getSiteUID());
         this.initOrgTree();
+    }
 
+    @Override
+    protected OwnerConfigRepository getDAO(){
+        return dao;
+    }
+
+    protected Page<OwnerConfig> loadData(PageRequest pageRequest) {
+
+        if (this.searchFilters == null) {
+            this.searchFilters = new ArrayList<>();
+        }
+
+        this.removeFilterOnField("tenantUID");
+        this.removeFilterOnField("institutionUID");
+        this.removeFilterOnField("hospitalUID");
+        this.removeFilterOnField("siteUID");
+
+        this.updateSearchFilter(new SearchFilter("ownerConfigType", SearchFilter.Operator.EQ, OwnerConfig.OwnerConfigType.AssetGroup.name()));
+        if(this.selectedOrg.getOrgLevel() == 0){
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 1){
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 2){
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+        if(this.selectedOrg.getOrgLevel() == 3){
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
+        }
+
+        this.loadAssetGroupSecondary();
+
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    public void onSelectOwnerConfig(){
+        this.assetGroupID = this.selected.getAssetGroupID();
+        this.assetGroupSecondaryID = this.selected.getAssetGroupSecondaryID();
+        this.woOwner = this.selected.getWoOwner();
+        this.woOwner2 = this.selected.getWoOwner2();
+        this.woOwner3 = this.selected.getWoOwner3();
+        this.pmOwner = this.selected.getPmOwner();
+
+        if(this.assetGroupID != null){
+            assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + this.assetGroupID, currentUser.getSiteId());
+        }
     }
 
     public List<UserAccount> autoCompleteOwner(String query) {
@@ -87,7 +144,6 @@ public class AssetGroupOwnerSettingController {
         }
         List<UserAccount> res = userAccountList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
         return res;
     }
 
@@ -95,102 +151,63 @@ public class AssetGroupOwnerSettingController {
 
         this.resetOwnerConfig();
 
-        List<OwnerConfig> ownerConfigList = ownerConfigService.loadAssetGroupOwnerConfig(assetGroupID, selectedOrg.getSiteUID());
-
-        for(OwnerConfig ownerConfig : ownerConfigList){
-            if(OwnerConfig.OwnerType.WO.name().equals(ownerConfig.getOwnerType())){
-                if(1 == ownerConfig.getIndex()){
-                    isChanegeWoOwner = Boolean.TRUE;
-                    woOwner = ownerConfig.getOwner();
-                    woOwnerConfigID = ownerConfig.getId();
-                }else if(2 == ownerConfig.getIndex()){
-                    isChanegeWoOwner2 = Boolean.TRUE;
-                    woOwner2 = ownerConfig.getOwner();
-                    woOwnerConfigID2 = ownerConfig.getId();
-                }else if(3 == ownerConfig.getIndex()){
-                    isChanegeWoOwner3 = Boolean.TRUE;
-                    woOwner3 = ownerConfig.getOwner();
-                    woOwnerConfigID3 = ownerConfig.getId();
-                }
-            }else if(OwnerConfig.OwnerType.PM.name().equals(ownerConfig.getOwnerType())){
-                if(1 == ownerConfig.getIndex()){
-                    isChanegePmOwner = Boolean.TRUE;
-                    pmOwner = ownerConfig.getOwner();
-                    pmOwnerConfigID = ownerConfig.getId();
-                }
+        if(assetGroupID != null){
+            List<OwnerConfig> ownerConfigList = ownerConfigService.loadAssetGroupOwnerConfig(assetGroupID, assetGroupSecondaryID, selectedOrg.getSiteUID());
+            for(OwnerConfig ownerConfig : ownerConfigList){
+                this.woOwner = ownerConfig.getWoOwner();
+                this.woOwner2 = ownerConfig.getWoOwner2();
+                this.woOwner3 = ownerConfig.getWoOwner3();
+                this.pmOwner = ownerConfig.getPmOwner();
             }
         }
-
     }
 
     private void resetOwnerConfig(){
-        woOwner = null;
-        woOwner2 = null;
-        woOwner3 = null;
-        pmOwner = null;
-
-        woOwnerConfigID = null;
-        woOwnerConfigID2 = null;
-        woOwnerConfigID3 = null;
-        pmOwnerConfigID = null;
-
-        isChanegeWoOwner = Boolean.FALSE;
-        isChanegeWoOwner2 = Boolean.FALSE;
-        isChanegeWoOwner3 = Boolean.FALSE;
-        isChanegePmOwner = Boolean.FALSE;
+        this.woOwner = null;
+        this.woOwner2 = null;
+        this.woOwner3 = null;
+        this.pmOwner = null;
     }
 
     public void saveChange() {
 
-        if(!isChanegeWoOwner && !isChanegeWoOwner2 && !isChanegeWoOwner3 && !isChanegePmOwner){
+        if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
             WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
             return;
         }
 
-        List<OwnerConfig> ownerConfigList = new ArrayList<>();
+        List<OwnerConfig> ownerConfigList = ownerConfigService.loadAssetGroupOwnerConfig(assetGroupID, assetGroupSecondaryID, selectedOrg.getSiteUID());
 
-        if(isChanegeWoOwner){
-            ownerConfigList.add(buildOwnerConfig(1, OwnerConfig.OwnerType.WO.name(), woOwner, woOwnerConfigID));
-        }
-        if(isChanegeWoOwner2){
-            ownerConfigList.add(buildOwnerConfig(2, OwnerConfig.OwnerType.WO.name(), woOwner2, woOwnerConfigID2));
-        }
-        if(isChanegeWoOwner3){
-            ownerConfigList.add(buildOwnerConfig(3, OwnerConfig.OwnerType.WO.name(), woOwner3, woOwnerConfigID3));
-        }
-        if(isChanegePmOwner){
-            ownerConfigList.add(buildOwnerConfig(1, OwnerConfig.OwnerType.PM.name(), pmOwner, pmOwnerConfigID));
-        }
-
-        ownerConfigService.saveDepartmentOwner(ownerConfigList);
-
-        WebUtil.addErrorMessage("保存成功");
-    }
-
-    private OwnerConfig buildOwnerConfig(Integer index, String ownerType, UserAccount owner, String ownerConfigID){
         OwnerConfig ownerConfig = new OwnerConfig();
 
-        if(ownerConfigID != null){
-            ownerConfig.setId(ownerConfigID);
+        for (OwnerConfig tempOwnerConfig : ownerConfigList) {
+            ownerConfig.setId(tempOwnerConfig.getId());
         }
-
         ownerConfig.setTenantUID(selectedOrg.getTenantUID());
         ownerConfig.setInstitutionUID(selectedOrg.getInstitutionUID());
         ownerConfig.setHospitalUID(selectedOrg.getHospitalUID());
         ownerConfig.setSiteUID(selectedOrg.getSiteUID());
 
-        ownerConfig.setOwnerUID(owner != null ? owner.getUid() : null);
-        ownerConfig.setIndex(index);
-        ownerConfig.setOwnerType(ownerType);
+        ownerConfig.setWoOwnerUID(woOwner != null ? woOwner.getUid() : null);
+        ownerConfig.setWoOwnerUID2(woOwner2 != null ? woOwner2.getUid() : null);
+        ownerConfig.setWoOwnerUID3(woOwner3 != null ? woOwner3.getUid() : null);
+        ownerConfig.setPmOwnerUID(pmOwner != null ? pmOwner.getUid() : null);
+
         ownerConfig.setOwnerConfigType(OwnerConfig.OwnerConfigType.AssetGroup.name());
-        ownerConfig.setTypeUID(assetGroupID);
+        ownerConfig.setAssetGroupID(assetGroupID);
+        ownerConfig.setAssetGroupSecondaryID(assetGroupSecondaryID);
 
         ownerConfig.setCreatedBy(currentUser.getLoginName());
         ownerConfig.setCreatedDate(new Date());
         ownerConfig.setLastModifiedBy(currentUser.getLoginName());
         ownerConfig.setLastModifiedDate(new Date());
 
-        return ownerConfig;
+        dao.save(ownerConfig);
+
+        this.resetOwnerConfig();
+        this.assetGroupID = null;
+        this.assetGroupSecondaryID = null;
+        WebUtil.addErrorMessage("保存成功");
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -202,9 +219,9 @@ public class AssetGroupOwnerSettingController {
             selectedOrg = (OrgInfo) node.getData();
         }
 
-        this.loadAssetGroup();
         this.resetOwnerConfig();
         this.assetGroupID = null;
+        this.assetGroupSecondaryID = null;
     }
 
     public void initOrgTree() {
@@ -212,17 +229,51 @@ public class AssetGroupOwnerSettingController {
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().add(treeNode);
-        rootNode.setExpanded(true);
+        orgTree.getChildren().add(treeNode);
+        orgTree.setExpanded(true);
+
+        TreeNode selectedTempOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedTempOrg) {
+            selectedTempOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedTempOrg);
+        }
     }
 
-    private void loadAssetGroup(){
-        i18nMessageList = FieldValueMessageController.getFieldValueList("assetGroup", selectedOrg.getSiteId());
+    public void createOwerConfig(){
+        this.resetOwnerConfig();
+        this.assetGroupID = null;
+        this.assetGroupSecondaryID = null;
+        this.selected = new OwnerConfig();
+    }
+
+    public void deleteOwerConfig(){
+        dao.delete(this.selected);
+        this.selected = null;
+        WebUtil.addErrorMessage("删除成功");
+    }
+
+    public void loadAssetGroupSecondary() {
+        this.loadOwnerConfig();
+        if(this.assetGroupID != null){
+            assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + this.assetGroupID, currentUser.getSiteId());
+        }
+    }
+
+    public void loadAssetGroupSecondaryFilter() {
+
+        assetGroupSecondaryListFilter = Collections.emptyList();
+
+        if(this.hasFilterOnField("assetGroupID")){
+            for (SearchFilter sf : this.searchFilters) {
+                //判断是否有计量等级的过滤条件
+                if(sf.fieldName.equals("assetGroupID")){
+                    if(sf.value != null){
+                        assetGroupSecondaryListFilter = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + sf.value.toString(), currentUser.getSiteId());
+                    }
+                }
+            }
+        }
     }
 
     public void onCheckChange(){
@@ -231,11 +282,11 @@ public class AssetGroupOwnerSettingController {
     public void onOwnerChange(SelectEvent event){
     }
 
-    public String getAssetGroupID() {
+    public Integer getAssetGroupID() {
         return assetGroupID;
     }
 
-    public void setAssetGroupID(String assetGroupID) {
+    public void setAssetGroupID(Integer assetGroupID) {
         this.assetGroupID = assetGroupID;
     }
 
@@ -271,38 +322,6 @@ public class AssetGroupOwnerSettingController {
         this.pmOwner = pmOwner;
     }
 
-    public Boolean getChanegeWoOwner() {
-        return isChanegeWoOwner;
-    }
-
-    public void setChanegeWoOwner(Boolean chanegeWoOwner) {
-        isChanegeWoOwner = chanegeWoOwner;
-    }
-
-    public Boolean getChanegeWoOwner2() {
-        return isChanegeWoOwner2;
-    }
-
-    public void setChanegeWoOwner2(Boolean chanegeWoOwner2) {
-        isChanegeWoOwner2 = chanegeWoOwner2;
-    }
-
-    public Boolean getChanegeWoOwner3() {
-        return isChanegeWoOwner3;
-    }
-
-    public void setChanegeWoOwner3(Boolean chanegeWoOwner3) {
-        isChanegeWoOwner3 = chanegeWoOwner3;
-    }
-
-    public Boolean getChanegePmOwner() {
-        return isChanegePmOwner;
-    }
-
-    public void setChanegePmOwner(Boolean chanegePmOwner) {
-        isChanegePmOwner = chanegePmOwner;
-    }
-
     public TreeNode getOrgTree() {
         return orgTree;
     }
@@ -327,11 +346,35 @@ public class AssetGroupOwnerSettingController {
         this.selectedOrg = selectedOrg;
     }
 
-    public List<I18nMessage> getI18nMessageList() {
-        return i18nMessageList;
+    public Integer getAssetGroupSecondaryID() {
+        return assetGroupSecondaryID;
     }
 
-    public void setI18nMessageList(List<I18nMessage> i18nMessageList) {
-        this.i18nMessageList = i18nMessageList;
+    public void setAssetGroupSecondaryID(Integer assetGroupSecondaryID) {
+        this.assetGroupSecondaryID = assetGroupSecondaryID;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondaryList() {
+        return assetGroupSecondaryList;
+    }
+
+    public void setAssetGroupSecondaryList(List<I18nMessage> assetGroupSecondaryList) {
+        this.assetGroupSecondaryList = assetGroupSecondaryList;
+    }
+
+    public Integer getAssetGroupFilter() {
+        return assetGroupFilter;
+    }
+
+    public void setAssetGroupFilter(Integer assetGroupFilter) {
+        this.assetGroupFilter = assetGroupFilter;
+    }
+
+    public List<I18nMessage> getAssetGroupSecondaryListFilter() {
+        return assetGroupSecondaryListFilter;
+    }
+
+    public void setAssetGroupSecondaryListFilter(List<I18nMessage> assetGroupSecondaryListFilter) {
+        this.assetGroupSecondaryListFilter = assetGroupSecondaryListFilter;
     }
 }
