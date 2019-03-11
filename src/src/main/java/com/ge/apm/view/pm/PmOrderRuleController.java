@@ -524,14 +524,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 
     public void initSaveAs() {
-        //Integer newId = selected.getId();
-        //selected = null;
-        //selected = dao.findById(newId);
+        prepareEdit();
         selected.setPeriod(null);
-        selected.setReportStorageId(null);
-        selected.setReportTemplateName(null);
-        selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
-        initCheckItemLists();
+        /*selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
+        initCheckItemLists();*/
     }
 
     public String getFilterPmRuleLevel() {
@@ -568,9 +564,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void prepareEdit() {
         super.prepareEdit();
-/*        Integer newId = selected.getId();
-        selected = null;
-        selected = dao.findById(newId);*/
         selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
