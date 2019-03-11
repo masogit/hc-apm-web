@@ -43,11 +43,11 @@ public class SmallAssetPerformanceService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmallAssetPerformanceService.class);
 
 	private final String HEADER_DEPARTMENT = "科室";
-	private final String HEADER_COSTTYPE = "费别";
+	private final String HEADER_COSTTYPE = "费用类别";
 	private final String HEADER_CODE = "编码";
 	private final String HEADER_PROJECTNAME = "项目名称";
 	private final String HEADER_PROJECTNUMBER = "项目编号";
-	private final String HEADER_STANDARD = "一类标准";
+	private final String HEADER_STANDARD = "单价";
 	private final String HEADER_QUANTITY = "数量";
 	private final String HEADER_AMOUNT = "金额";
 	private final String HEADER_HAPPENDATE = "日期";
