@@ -136,7 +136,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     @Override
     public void save() {
     	if(type==0){
-    		for(int i=0;i>=0 && i<listNewConfig.size();++i){
+    		for(int i=0;i<listNewConfig.size();++i){
     			SmallAssetPerformanceConfig tempConfig=listNewConfig.get(i);
     			if(StringUtils.isEmpty(tempConfig.getAssetName())){
     				continue;
@@ -156,10 +156,10 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     			}
     			service.checkData(tempConfig, tempConfig.getId(), false);
     			service.save(tempConfig);
-    			listNewConfig.remove(i);
-    			--i;
     		}
-    		
+    		listNewConfig.clear();
+    		editConfig=new SmallAssetPerformanceConfig();
+            listNewConfig.add(editConfig);
     	}
     	else if(type==1){
     		if(this.selected.hashCode()==0){
@@ -174,6 +174,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	}
     	WebUtil.addSuccessMessage("保存成功！");
     	this.selected=null;
+    	selectedObjectMap=new HashMap<String,Object>();
     }
     
     @Override
