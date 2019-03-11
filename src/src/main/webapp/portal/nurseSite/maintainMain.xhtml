@@ -76,7 +76,7 @@
 							</h:panelGrid>
 							<p:commandButton actionListener="#{maintainItemController.pre()}" value="上一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnPre}"></p:commandButton>
 							<p:commandButton actionListener="#{maintainItemController.next()}" value="下一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnNext}"></p:commandButton>
-							<p:commandButton id="checkRightButton" value="全部通过" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable"/>
+							<p:commandButton id="checkRightButton" value="全部通过(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable"/>
 							<p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
 								oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
 							<p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages"
