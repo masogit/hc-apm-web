@@ -46,7 +46,8 @@
                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroupID)}"/>
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList_assetGroupOwner').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
-                            <p:ajax listener="#{assetGroupOwnerSettingController.onCheckChange}" /><!--update="assetGroupSeconday" />-->
+                            <p:ajax event="itemSelect" listener="#{assetGroupOwnerSettingController.loadAssetGroupSecondaryFilter}" /><!--update="assetGroupSeconday" />-->
+                            <p:ajax listener="#{assetGroupOwnerSettingController.loadAssetGroupSecondaryFilter}" /><!--update="assetGroupSeconday" />-->
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -55,7 +56,7 @@
                 <!--<p:column  headerText="#{msg.assetGroupSecondary}" sortBy="#{item.assetGroupSecondaryID}" filterBy="#{item.assetGroupSecondaryID}" filterMatchMode="EQ">
                     <h:outputText value="#{fieldMsg.fieldValue('assetGroupSecondary_'.concat(item.assetGroupID), item.assetGroupSecondaryID)}"/>
                     <f:facet name="filter">
-                        <p:selectOneMenu id="assetGroupSeconday" onchange="PF('varDataList_assetGroupOwner').filter()"  autoWidth="false" style="max-width: 150px;" height="300" class="assetGroupChange">
+                        <p:selectOneMenu id="assetGroupSeconday" value="#{assetGroupOwnerSettingController.assetGroupSecondaryIDFilter}" onchange="PF('varDataList_assetGroupOwner').filter()"  autoWidth="false" style="max-width: 150px;" height="300" class="assetGroupChange">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{assetGroupOwnerSettingController.assetGroupSecondaryListFilter}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>

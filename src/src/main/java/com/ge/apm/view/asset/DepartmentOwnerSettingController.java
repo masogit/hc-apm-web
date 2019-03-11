@@ -126,6 +126,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
+    //得到所选记录数据信息
     public void onSelectOwnerConfig(){
         this.deptOrg = this.selected.getDeptOrgInfo();
         this.woOwner = this.selected.getWoOwner();
@@ -134,6 +135,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.pmOwner = this.selected.getPmOwner();
     }
 
+    //维修工程师自动填写列表
     public List<UserAccount> autoCompleteOwner(String query) {
 
         if (userAccountList == null) {
@@ -145,6 +147,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         return res;
     }
 
+    //新增修改时选择所属科室时得到责任人数据
     public void loadOwnerConfig(){
 
         this.resetOwnerConfig();
@@ -167,12 +170,14 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.pmOwner = null;
     }
 
+    //新增按钮动作
     public void createOwerConfig(){
         this.resetOwnerConfig();
         this.deptOrg = null;
         this.selected = new OwnerConfig();
     }
 
+    //保存按钮动作
     public void saveChange() {
 
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
@@ -213,6 +218,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         WebUtil.addErrorMessage("保存成功");
     }
 
+    //选择院区树后的动作
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
@@ -228,6 +234,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.deptOrg = null;
     }
 
+    //院区选择树数据初始
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -244,6 +251,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         }
     }
 
+    //新增修改所属科室控件自动填写列表
     public List<OrgInfo> autoCompleteDept(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();
@@ -254,6 +262,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         return res;
     }
 
+    //获取新增修改所属科室控件的数据
     private void loadClinicalDept(){
         if(null == selectedOrg){
             clinicalDeptList = Collections.EMPTY_LIST;
@@ -265,6 +274,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         }
     }
 
+    //获取所属科室过滤控件的数据
     private void loadClinicalDeptFilter() {
         filterClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
@@ -274,6 +284,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         }
     }
 
+    //所属科室过滤控件自动填写列表
     public List<String> autoCompleteDeptFilter(String query) {
         if (filterClinicalDeptList == null) {
             return Collections.emptyList();
@@ -287,6 +298,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    //所属科室过滤
     public void onClinicalDeptFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
@@ -308,6 +320,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
 
     }
 
+    //删除按钮动作
     public void deleteOwerConfig(){
         dao.delete(this.selected);
         this.selected = null;

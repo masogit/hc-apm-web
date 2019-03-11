@@ -70,6 +70,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     private I18nMessageRepository i18nDao;
 
     private Integer assetGroupFilter;
+    private Integer assetGroupSecondaryIDFilter;
     private List<I18nMessage> assetGroupSecondaryListFilter;
 
     @Override
@@ -124,6 +125,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
+    //得到所选记录数据信息
     public void onSelectOwnerConfig(){
         this.assetGroupID = this.selected.getAssetGroupID();
         this.assetGroupSecondaryID = this.selected.getAssetGroupSecondaryID();
@@ -137,6 +139,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         }
     }
 
+    //维修工程师自动填写列表
     public List<UserAccount> autoCompleteOwner(String query) {
 
         if (userAccountList == null) {
@@ -147,6 +150,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         return res;
     }
 
+    //新增修改时选择设备类型或设备类型2时得到责任人数据
     public void loadOwnerConfig(){
 
         this.resetOwnerConfig();
@@ -169,6 +173,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         this.pmOwner = null;
     }
 
+    //保存按钮动作
     public void saveChange() {
 
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
@@ -210,6 +215,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         WebUtil.addErrorMessage("保存成功");
     }
 
+    //选择院区树后的动作
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
@@ -224,6 +230,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         this.assetGroupSecondaryID = null;
     }
 
+    //院区选择树数据初始
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -240,6 +247,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         }
     }
 
+    //新增按钮动作
     public void createOwerConfig(){
         this.resetOwnerConfig();
         this.assetGroupID = null;
@@ -247,21 +255,25 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         this.selected = new OwnerConfig();
     }
 
+    //删除按钮动作
     public void deleteOwerConfig(){
         dao.delete(this.selected);
         this.selected = null;
         WebUtil.addErrorMessage("删除成功");
     }
 
+    //新增修改时选择设备分类时的动作（得到责任人信息和设备分类2的数据）
     public void loadAssetGroupSecondary() {
+        this.assetGroupSecondaryID = null;
         this.loadOwnerConfig();
         if(this.assetGroupID != null){
             assetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_" + this.assetGroupID, currentUser.getSiteId());
         }
     }
 
+    //过滤时选择选择设备分类时的动作（得到设备分类2过滤列表数据）
     public void loadAssetGroupSecondaryFilter() {
-
+        this.assetGroupSecondaryIDFilter = null;
         assetGroupSecondaryListFilter = Collections.emptyList();
 
         if(this.hasFilterOnField("assetGroupID")){
@@ -368,6 +380,14 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
 
     public void setAssetGroupFilter(Integer assetGroupFilter) {
         this.assetGroupFilter = assetGroupFilter;
+    }
+
+    public Integer getAssetGroupSecondaryIDFilter() {
+        return assetGroupSecondaryIDFilter;
+    }
+
+    public void setAssetGroupSecondaryIDFilter(Integer assetGroupSecondaryIDFilter) {
+        this.assetGroupSecondaryIDFilter = assetGroupSecondaryIDFilter;
     }
 
     public List<I18nMessage> getAssetGroupSecondaryListFilter() {
