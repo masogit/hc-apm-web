@@ -475,7 +475,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             selected.setHospitalUID(selectedUserOrg.getHospitalUID());
             selected.setSiteUID(selectedUserOrg.getSiteUID());
         }*/
-        selected.setId(null);
+        //selected.setId(null);
         selected.setStatus(0);
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -492,7 +492,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if (selected.getPeriod() != null && selected.getPeriod() > 0) {
             return selected.getPeriod();
         } else {
-            List<Integer> itemIds = new ArrayList<Integer>();
+            List<Integer> itemIds = new ArrayList<>();
             checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
             if (!checkItemLists.isEmpty()) {
                 Iterator it = checkItemLists.iterator();
@@ -504,10 +504,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             Integer period = 1;
             if (itemIds.size() > 0) {
                 Collections.sort(itemIds);
-                period =  itemIds.get(0);//pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(), itemIds);
-            }
-            if (period <= 0) {
-                period = 1;
+                period =  itemIds.get(0);
             }
             return period;
         }
@@ -525,6 +522,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void initSaveAs() {
         prepareEdit();
+        selected.setId(null);
         selected.setPeriod(null);
         /*selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();*/
@@ -647,12 +645,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
      * Remote Report template from master-data.
      */
     public void removeReportTemplate() {
-        if (selected != null && selected.getId() != null) {
+        if (selected != null) {
             //不再删除附件，防止同一个附件被多个保养规则引用
             //blobService.deleteBlobFileById(selected.getReportStorageId());
             selected.setReportStorageId(null);
             selected.setReportTemplateName(null);
-            this.dao.save(selected);
+            //this.dao.save(selected);
             this.uploadedFile = null;
         }
     }

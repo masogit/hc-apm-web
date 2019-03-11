@@ -119,7 +119,7 @@
                         <h:panelGroup id="importReportTemplate">
                             <p:commandButton value="导入模版" process="@this" update="importReportTemplate" oncomplete="PF('uploadSaveAsDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
                             <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
-                            <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadSaveAsDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
+                            <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleSaveAsForm:importReportTemplate :uploadSaveAsDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
                         </h:panelGroup>
                     </h:panelGroup>
                        
