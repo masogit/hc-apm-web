@@ -287,8 +287,8 @@ public class PccExamineReportService {
 		return result;
 	}
 
-	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
-		return uaaService.findAccessClinicalUidListByUserUid(userUid);
+	public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid) {
+		return uaaService.findAccessUidByUserUid(userUid);
 	}
 
 	public List<ApmStreamedContent> batchGenerateReport(List<PccExamineReport> listPcc) {
