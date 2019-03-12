@@ -91,6 +91,18 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select o.* from org_info o where o.org_type=4 and (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1) or o.uid in (?1)) ",nativeQuery = true)
     public List<OrgInfo> findClinicalDeptByOrgUid(Set<String> orgUid);
     
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.site_uid in (?1) ",nativeQuery = true)
+    public List<String> findClinicalUidBySiteUid(Set<String> orgUid);
+    
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.hospital_uid in (?1) ",nativeQuery = true)
+    public List<String> findClinicalUidByHospitalUid(Set<String> orgUid);
+    
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.institution_uid in (?1) ",nativeQuery = true)
+    public List<String> findClinicalUidByInstitutionUid(Set<String> orgUid);
+    
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.tenant_uid in (?1) ",nativeQuery = true)
+    public List<String> findClinicalUidByTenantUid(Set<String> orgUid);
+    
     public OrgInfo getByUid(String uid);
 
     @Query(value = "select o from OrgInfo o where o.uid in ?1")

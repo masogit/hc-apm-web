@@ -1213,6 +1213,70 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 		}
 		return listResult;
 	}
+    //
+    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid){
+    	Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
+    	List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+    	Set<String> listResult = new HashSet<String>();
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+				UserOrgInfo temp=listUserOrgInfo.get(i);
+				Integer type=temp.getOrgType();
+				if(map.containsKey(type)){
+					map.get(type).add(temp.getOrgUid());
+				}
+				else{
+					Set<String> tempSet=new HashSet<String>();
+					tempSet.add(temp.getOrgUid());
+					map.put(type, tempSet);
+				}
+			}
+			if(map.size()>0){
+				Set<String> tempSet=null;
+				Set<String> clinicalSet=null;
+				tempSet=map.get(4);
+				boolean hasClinical=false;
+				if(tempSet!=null){
+					hasClinical=true;
+					clinicalSet=tempSet;
+				}
+				if(!hasClinical){
+					clinicalSet=new HashSet<String>();
+					map.put(4, clinicalSet);
+				}
+				tempSet=map.get(3);
+				if(tempSet!=null){
+					List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
+					if(re!=null){
+						clinicalSet.addAll(re);
+					}
+				}
+				tempSet=map.get(2);
+				if(tempSet!=null){
+					List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
+					if(re!=null){
+						clinicalSet.addAll(re);
+					}
+				}
+				tempSet=map.get(1);
+				if(tempSet!=null){
+					List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
+					if(re!=null){
+						clinicalSet.addAll(re);
+					}
+				}
+				tempSet=map.get(0);
+				if(tempSet!=null){
+					List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
+					if(re!=null){
+						clinicalSet.addAll(re);
+					}
+				}
+			}
+		}
+		return map;
+    }
+    
     public List<OrgInfo> findAccessDept(String siteUid,String userUid) {
 		Set<String> listResult = new HashSet<String>();
 		List<OrgInfo> listResultOrg=new ArrayList<OrgInfo>();
