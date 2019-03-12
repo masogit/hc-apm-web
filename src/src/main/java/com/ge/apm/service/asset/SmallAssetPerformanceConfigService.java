@@ -206,8 +206,10 @@ public class SmallAssetPerformanceConfigService {
 		Set<String> setName=new HashSet<String>();
 		if(listAsset!=null && listAsset.size()>0){
 			for(int i=0;i<listAsset.size();++i){
-				if(!setName.contains(listAsset.get(i).getName())){
-					listNewAsset.add(listAsset.get(i));
+				AssetInfo temp=listAsset.get(i);
+				if(!setName.contains(temp.getName())){
+					setName.add(temp.getName());
+					listNewAsset.add(temp);
 				}
 			}
 		}
