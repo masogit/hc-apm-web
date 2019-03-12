@@ -299,16 +299,16 @@ public class SmallAssetPerformanceConfigService {
 				if(StringUtils.isNotEmpty(projectName)&&StringUtils.isNotEmpty(assetName)&&StringUtils.isNotEmpty(department)){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				}
-				if(!pass){
-					importFailedDataList.add(detail);
-					continue;
-				}
 				detail.setProjectName(projectName);
 				detail.setProjectNumber(projectNumber);
 				detail.setDepartment(department);
 				detail.setAssetName(assetName);
 				detail.setRate(rate);
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
+				if(!pass){
+					importFailedDataList.add(detail);
+					continue;
+				}
 //				checkData(detail,null,false);
 //				smallAssetPerformanceConfigDao.save(detail);
 				saveSmallAssetPerformanceConfig(detail);
