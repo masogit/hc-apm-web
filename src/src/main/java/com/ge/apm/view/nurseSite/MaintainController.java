@@ -655,16 +655,12 @@ public class MaintainController implements ServerEventInterface {
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
 				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime() && tempMaintain.getStatus()==0){
+					tempMaintain.setStatus(2);
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			boolean result=nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
-			if(result){
-				addMessage("工单已批量填写");
-			}
-			else{
-				addMessage("工单后台生成中，请稍候进行批量操作。");
-			}
+			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			addMessage("工单后台完成中，请稍候刷新页面查看。");
 		}
 		else{
 			addMessage("未找到符合条件的工单");
