@@ -60,6 +60,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     private int type;//0:create,1:edit
     private SmallAssetPerformanceConfig editConfig;
     private AssetInfoService assetInfoService;
+    private boolean blnSaveable=false;
     @Override
     protected void init() {
         dao = WebUtil.getBean(SmallAssetPerformanceConfigRepository.class);
@@ -244,6 +245,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 				break;
 			}
 		}
+		checkSaveable();
 	}
 	public void saveCheckListItem(){
 		boolean add=true;
@@ -262,6 +264,16 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 		}
 		else{
 			editConfig=tempConfig;
+		}
+		checkSaveable();
+	}
+	
+	public void checkSaveable(){
+		if(listNewConfig.size()>1){
+			blnSaveable=true;
+		}
+		else{
+			blnSaveable=false;
 		}
 	}
 	public void onAssetDeptChange(String idx) {
@@ -329,6 +341,14 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 
 	public void setEditConfig(SmallAssetPerformanceConfig editConfig) {
 		this.editConfig = editConfig;
+	}
+
+	public boolean isBlnSaveable() {
+		return blnSaveable;
+	}
+
+	public void setBlnSaveable(boolean blnSaveable) {
+		this.blnSaveable = blnSaveable;
 	}
     
 }
