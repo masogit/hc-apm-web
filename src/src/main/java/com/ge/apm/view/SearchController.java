@@ -224,7 +224,7 @@ public class SearchController {
 
 	public void fetchDeptOrgList(OrgInfo orgInfo) {
 		if (blnAccessScope) {
-			listOrgDept = searchService.fetchAccessOrgInfo(orgInfo.getSiteUID(), currentUser.getUid());
+			listOrgDept = searchService.fetchAccessOrgInfo(currentUser.getUid(),orgInfo.getSiteUID());
 		} else {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}

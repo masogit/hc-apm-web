@@ -161,13 +161,6 @@ public class NurseSiteMaintainService {
 		return assetInfoRepository.getByUid(uid);
 	}
 
-	public List<AssetInfo> getListAsset(String siteUid, String userUid) {
-		return assetInfoRepository.findBySelfScope(siteUid, userUid);
-	}
-
-	public List<AssetInfo> getListAssetBySelfClinicalScope(String siteUid, String userUid, String clinicalDeptUid) {
-		return assetInfoRepository.findBySelfClinicalScope(siteUid, userUid, clinicalDeptUid);
-	}
 
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids) {
 		return assetInfoRepository.findByUidIn(assetUids);
@@ -181,24 +174,13 @@ public class NurseSiteMaintainService {
 		return assetInfoRepository.findBySearchFilter(listFilter, sort);
 	}
 
-	public List<OrgInfo> getListClinicalByUid(List<String> listUid) {
-		return orgInfoRepository.findClinicalByUids(listUid);
-	}
-
-	public List<OrgInfo> getListClinicalByUid(Set<String> listUid) {
-		return orgInfoRepository.findClinicalByUids(listUid);
-	}
 
 	public List<OrgInfo> getListClinicalByUidAndParent(Set<String> listUid, String parentUid) {
-		return orgInfoRepository.findClinicalByUidsAndParent(listUid, parentUid);
+		return orgInfoRepository.findByUidAndParentUid(listUid, parentUid);
 	}
 
 	public List<OrgInfo> getListParentSiteByUid(Set<String> listUid) {
 		return orgInfoRepository.findParentSiteByUids(listUid);
-	}
-
-	public List<OrgInfo> getListSiteByUid(Set<String> listUid) {
-		return orgInfoRepository.findSiteByUids(listUid);
 	}
 
 	public OrgInfo findOrgInfoByUid(String uid) {
@@ -1288,20 +1270,7 @@ public class NurseSiteMaintainService {
 	}
 
 	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
-		Set<String> listResult = new HashSet<String>();
-		List<UserOrgInfo> listUserOrgInfo = userOrgInfoRepository.findOrgUidListByUserUid(userUid);
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				listResult.add(listUserOrgInfo.get(i).getOrgUid());
-			}
-		}
-		if (listResult != null && listResult.size() > 0) {
-			Set<String> tempResult = orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
-			if (tempResult != null) {
-				listResult.addAll(tempResult);
-			}
-		}
-		return listResult;
+		return uaaService.findAccessClinicalUidByUserUid(userUid);
 	}
 
 	public boolean existMaintain(NurseSiteMaintain tempMaintain) {

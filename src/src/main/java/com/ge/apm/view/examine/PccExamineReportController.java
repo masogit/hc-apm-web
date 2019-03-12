@@ -151,7 +151,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			listSelected = mapListSelected.get(currentPage);
 		}
 		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2*"));
 		Set<String> setInstitution=mapUserUids.get(1);
 		Set<String> setHospital=mapUserUids.get(2);
 		Set<String> setSite=mapUserUids.get(3);

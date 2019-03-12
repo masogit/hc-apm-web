@@ -1196,28 +1196,11 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         return regulatorUids;
 
     }
-
-    public Set<String> findAccessClinicalUidListByUserUid(String userUid) {
-		Set<String> listResult = new HashSet<String>();
+    
+    //where or
+    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid) {
 		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				listResult.add(listUserOrgInfo.get(i).getOrgUid());
-			}
-		}
-		if (listResult != null && listResult.size()>0) {
-			Set<String> tempResult=orgInfoDao.findClinicalDeptOrgUidListByOrgUid(listResult);
-			if(tempResult!=null){
-				listResult.addAll(tempResult);
-			}
-		}
-		return listResult;
-	}
-    //
-    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid){
-    	Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
-    	List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-    	Set<String> listResult = new HashSet<String>();
+		Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
 				UserOrgInfo temp=listUserOrgInfo.get(i);
@@ -1231,93 +1214,97 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 					map.put(type, tempSet);
 				}
 			}
-			if(map.size()>0){
-				Set<String> tempSet=null;
-				Set<String> clinicalSet=null;
-				tempSet=map.get(4);
-				boolean hasClinical=false;
-				if(tempSet!=null){
-					hasClinical=true;
-					clinicalSet=tempSet;
+		}
+		return map;
+	}
+    
+    //where or
+    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid,String siteUid) {
+		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
+		Set<String> orgUids=new HashSet<String>();
+		List<OrgInfo> listOrgInfo=null;
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+				UserOrgInfo temp=listUserOrgInfo.get(i);
+				orgUids.add(temp.getOrgUid());
+			}
+		}
+		if(orgUids.size()>0){
+			listOrgInfo=orgInfoDao.findByUidAndSiteUid(orgUids,siteUid);
+		}
+		if (listOrgInfo != null && listOrgInfo.size() > 0) {
+			for (int i = 0; i < listOrgInfo.size(); ++i) {
+				OrgInfo temp=listOrgInfo.get(i);
+				Integer type=temp.getOrgType();
+				if(map.containsKey(type)){
+					map.get(type).add(temp.getUid());
 				}
-				if(!hasClinical){
-					clinicalSet=new HashSet<String>();
-					map.put(4, clinicalSet);
-				}
-				tempSet=map.get(3);
-				if(tempSet!=null){
-					List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
-					if(re!=null){
-						clinicalSet.addAll(re);
-					}
-				}
-				tempSet=map.get(2);
-				if(tempSet!=null){
-					List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
-					if(re!=null){
-						clinicalSet.addAll(re);
-					}
-				}
-				tempSet=map.get(1);
-				if(tempSet!=null){
-					List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
-					if(re!=null){
-						clinicalSet.addAll(re);
-					}
-				}
-				tempSet=map.get(0);
-				if(tempSet!=null){
-					List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
-					if(re!=null){
-						clinicalSet.addAll(re);
-					}
+				else{
+					Set<String> tempSet=new HashSet<String>();
+					tempSet.add(temp.getUid());
+					map.put(type, tempSet);
 				}
 			}
 		}
 		return map;
+	}
+    
+  //where and
+    public Set<String> findAccessClinicalUidByUserUid(String userUid){
+    	Map<Integer,Set<String>> map=findAccessUidByUserUid(userUid);
+    	if(map.size()>0){
+			Set<String> tempSet=null;
+			Set<String> clinicalSet=null;
+			tempSet=map.get(4);
+			boolean hasClinical=false;
+			if(tempSet!=null){
+				hasClinical=true;
+				clinicalSet=tempSet;
+			}
+			if(!hasClinical){
+				clinicalSet=new HashSet<String>();
+				map.put(4, clinicalSet);
+			}
+			tempSet=map.get(3);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(2);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(1);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(0);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+		}
+		return map.get(4);
     }
     
-    public List<OrgInfo> findAccessDept(String siteUid,String userUid) {
-		Set<String> listResult = new HashSet<String>();
-		List<OrgInfo> listResultOrg=new ArrayList<OrgInfo>();
-		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				listResult.add(listUserOrgInfo.get(i).getOrgUid());
-			}
-		}
-		if (listResult != null && listResult.size()>0) {
-			List<OrgInfo> listOrgInfo=orgInfoDao.findClinicalDeptByOrgUid(listResult);
-			if(listOrgInfo!=null && listOrgInfo.size()>0){
-				for(int i=0;i<listOrgInfo.size();++i){
-					OrgInfo tempOrg=listOrgInfo.get(i);
-					if(tempOrg.getSiteUID().equals(siteUid)){
-						listResultOrg.add(tempOrg);
-					}
-				}
-			}
-		}
-		return listResultOrg;
-	}
-    
-    public Map<Integer,Set<String>> findAccessOrgUidListByUserUid(String userUid) {
-		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,Set<String>> mapResult=new HashMap<Integer,Set<String>>();
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for(int j=0;j<5;++j){
-				Set<String> setResult=new HashSet<String>();
-				mapResult.put(j, setResult);
-				for (int i = 0; i>-1 && i < listUserOrgInfo.size(); ++i) {
-					UserOrgInfo tempOrg=listUserOrgInfo.get(i);
-					Integer type=tempOrg.getOrgType();
-					if(type.equals(j)){
-						setResult.add(tempOrg.getOrgUid());
-						listUserOrgInfo.remove(i);
-						--i;
-					}
-				}
-			}
-		}
-		return mapResult;
-	}
+  //where and
+    public List<OrgInfo> findAccessClinicalUidByUserUid(String userUid,String siteUid){
+    	Set<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
+    	List<OrgInfo> re=null;
+    	if(setAccessClinical!=null && setAccessClinical.size()>0){
+    		re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);
+    	}
+    	return re;
+    }
 }
