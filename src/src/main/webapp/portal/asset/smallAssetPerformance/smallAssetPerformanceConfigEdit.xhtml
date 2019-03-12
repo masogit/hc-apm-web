@@ -18,10 +18,10 @@
 					<p:inputText value="#{smallAssetPerformanceConfigController.selected.projectNumber}" />
 				</h:panelGroup>
 				<h:panelGroup>
-					<label class="label">科室名称</label>
+					<label class="label">科室名称*</label>
 					<!--                         <p:inputText value="#{smallAssetPerformanceConfigController.selected.department}"/> -->
 					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" scrollHeight="300"
-						forceSelection="true" required="false"
+						forceSelection="true" required="true"
 						requiredMessage="科室名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
 						itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
 						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}"/>
@@ -38,7 +38,7 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">占比*</label>
-					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.0000" maxValue="1.0000" requiredMessage="占比不能为空" />
+					<p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.00" maxValue="1.00" requiredMessage="占比不能为空" />
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">是否均摊</label>
@@ -47,9 +47,8 @@
 			</p:panelGrid>
 			<br />
 			<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"
-				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg, :smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl"
+				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl"
 				icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');" />
-
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceConfigEditDialog').hide()" />
 		</h:form>
 	</p:dialog>
