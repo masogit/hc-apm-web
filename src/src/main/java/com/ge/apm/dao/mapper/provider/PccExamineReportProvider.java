@@ -27,7 +27,7 @@ public class PccExamineReportProvider {
 				addDefaultFilter(sb, searchFilter);
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			sb.append(" 1=1 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -60,7 +60,7 @@ public class PccExamineReportProvider {
 				addDefaultFilter(sb, searchFilter);
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			sb.append(" 1=1 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
