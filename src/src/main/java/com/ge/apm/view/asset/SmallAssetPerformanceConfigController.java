@@ -184,7 +184,14 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	super.delete();
     	this.selected=null;
     }
-    
+    public void rateCalculate(){
+    	String projectName=selected.getProjectName();
+    	if(StringUtils.isEmpty(projectName)){
+    		WebUtil.addErrorMessage("项目名称不能为空！");
+    		return;
+    	}
+    	service.rateCalculate(listNewConfig,projectName, currentUser.getSiteUID());
+    }
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();

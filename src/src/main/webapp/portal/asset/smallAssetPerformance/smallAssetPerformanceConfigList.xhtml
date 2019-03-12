@@ -27,7 +27,7 @@
 		</p:column>
 		<p:column headerText="占比" sortBy="#{item.rate}" >
             <h:outputText value="#{item.rate}" >
-            	<f:convertNumber pattern="#.####"></f:convertNumber>
+            	<f:convertNumber pattern="#.##"></f:convertNumber>
             </h:outputText>
 		</p:column>
 		<p:column headerText="校验结果" filterBy="#{item.statusCode}" filterMatchMode="EQ">

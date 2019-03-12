@@ -27,7 +27,7 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "department")
 	private String department;
 
-	// 费别
+	// 费别=费用类别
 	@Column(name = "cost_type")
 	private String costType;
 
@@ -43,7 +43,7 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "projectNumber")
 	private String projectNumber;
 
-	// 一类标准
+	// 一类标准=单价
 	@Column(name = "standard")
 	private Double standard;
 

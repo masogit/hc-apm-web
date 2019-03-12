@@ -61,7 +61,7 @@ public class SmallAssetPerformanceConfigService {
 	public boolean checkData(SmallAssetPerformanceConfig detail,String id,boolean deleteAction) {
 		boolean pass=true;
 		if(deleteAction == false){
-			if(!checkOneConfig(detail, id)){
+			if(!checkOneConfig(detail)){
 				pass=false;
 			}
 		}
@@ -78,7 +78,7 @@ public class SmallAssetPerformanceConfigService {
 		return pass;
 	}
 	
-	private boolean checkOneConfig(SmallAssetPerformanceConfig detail,String id){
+	private boolean checkOneConfig(SmallAssetPerformanceConfig detail){
 		boolean pass=true;
 		//check asset exists
 		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndSiteUID(detail.getAssetName(), detail.getSiteUID());
@@ -147,6 +147,22 @@ public class SmallAssetPerformanceConfigService {
 			detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
 		}
 		return pass;
+	}
+	
+	public void rateCalculate(List<SmallAssetPerformanceConfig> list,String projectName,String siteUid){
+		double size=list.size()-1;
+		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+		if(listDetails!=null && listDetails.size()>0){
+			size+=listDetails.size();
+		}
+    	double total=1;
+    	double re=total/size;
+    	for(int i=0;i<list.size();++i){
+    		SmallAssetPerformanceConfig tempConfig=list.get(i);
+    		if(StringUtils.isNotEmpty(tempConfig.getAssetName())){
+    			tempConfig.setRate(re);
+    		}
+    	}
 	}
 	
 	private void updateOtherConfigList(List<SmallAssetPerformanceConfig> list,SmallAssetPerformanceConfig detail,UploadFileErrorTypeEnum statusDisplay,boolean pass ){
@@ -276,7 +292,11 @@ public class SmallAssetPerformanceConfigService {
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"设备名称不能为空；");
 					pass=false;
 				}
-				if(StringUtils.isNotEmpty(projectName)&&StringUtils.isNotEmpty(assetName)){
+				if(StringUtils.isEmpty(department)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isNotEmpty(projectName)&&StringUtils.isNotEmpty(assetName)&&StringUtils.isNotEmpty(department)){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				}
 				if(!pass){
