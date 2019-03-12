@@ -45,7 +45,7 @@ public class AssetOptRecordService {
 	}
 	
 	public Set<String> findAccessClinicalUidListByUserUid(String userUid){
-		return uaaService.findAccessClinicalUidListByUserUid(userUid);
+		return uaaService.findAccessClinicalUidByUserUid(userUid);
 	}
 	private String generateCostTime(Date start,Date end){
 		Calendar ca1=Calendar.getInstance();

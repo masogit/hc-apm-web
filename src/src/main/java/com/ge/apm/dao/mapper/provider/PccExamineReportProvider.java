@@ -1,8 +1,11 @@
 package com.ge.apm.dao.mapper.provider;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.alibaba.fastjson.JSONObject;
 
 import webapp.framework.dao.SearchFilter;
 
@@ -27,7 +30,7 @@ public class PccExamineReportProvider {
 				addDefaultFilter(sb, searchFilter);
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=1 ");
+			sb.append(" 1=2 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -60,7 +63,7 @@ public class PccExamineReportProvider {
 				addDefaultFilter(sb, searchFilter);
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=1 ");
+			sb.append(" 1=2 ");
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -98,28 +101,24 @@ public class PccExamineReportProvider {
 		if(op.equals(SearchFilter.Operator.IN)){
 			String strValue=getSetValue(value);
 			if (tempColumn.equals("assetInfo.siteUID")) {
-				sb.append("b.site_uid in " + strValue + " and ");
+				sb.append("b.site_uid in " + strValue + " or ");
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
-				sb.append("b.hospital_uid in " + strValue + " and ");
+				sb.append("b.hospital_uid in " + strValue + " or ");
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
-				sb.append("b.institution_uid in " + strValue + " and ");
-			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid in " + strValue + " and ");
+				sb.append("b.institution_uid in " + strValue + " or ");
 			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid in " + strValue + " and ");
+				sb.append("b.clinical_dept_uid in " + strValue + " or ");
 			}
 		}
 		else{
 			if (tempColumn.equals("assetInfo.siteUID")) {
-				sb.append("b.site_uid='" + value + "' and ");
+				sb.append("b.site_uid='" + value + "' or ");
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
-				sb.append("b.hospital_uid='" + value + "' and ");
+				sb.append("b.hospital_uid='" + value + "' or ");
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
-				sb.append("b.institution_uid='" + value + "' and ");
-			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid='" + value + "' and ");
-			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid='" + value + "' and ");
+				sb.append("b.institution_uid='" + value + "' or ");
+			}  else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
+				sb.append("b.clinical_dept_uid='" + value + "' or ");
 			}
 		}
 	}
@@ -218,6 +217,10 @@ public class PccExamineReportProvider {
 		} else if (tempColumn.equals("assetInfohospitalName")) {
 			sb.append("(d.name like '%" + value + "%' or ");
 			sb.append("d.name_py_code like '%" + value + "%') and ");
+		}else if (tempColumn.equals("assetInfo.tenantUID")) {
+			sb.append("b.tenant_uid='" + value + "' and ");
 		}
 	}
+	
+	
 }
