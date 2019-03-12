@@ -98,15 +98,15 @@ public class PccExamineReportProvider {
 		if(op.equals(SearchFilter.Operator.IN)){
 			String strValue=getSetValue(value);
 			if (tempColumn.equals("assetInfo.siteUID")) {
-				sb.append("b.site_uid in " + strValue + " or ");
+				sb.append("b.site_uid in " + strValue + " and ");
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
-				sb.append("b.hospital_uid in " + strValue + " or ");
+				sb.append("b.hospital_uid in " + strValue + " and ");
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
-				sb.append("b.institution_uid in " + strValue + " or ");
+				sb.append("b.institution_uid in " + strValue + " and ");
 			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid in " + strValue + " or ");
+				sb.append("b.tenant_uid in " + strValue + " and ");
 			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid in " + strValue + " or ");
+				sb.append("b.clinical_dept_uid in " + strValue + " and ");
 			}
 		}
 		else{
