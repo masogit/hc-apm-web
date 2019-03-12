@@ -807,20 +807,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-       /* if (selectedPmOrder != null) {
+        if (selectedPmOrder != null) {
             selectedAsset = selectedPmOrder.getAssetInfo();
-            if (Strings.isNullOrEmpty(selectedAsset.getLocationName())) {
-                final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-                dptName = orgDao.getByUid(orgInfoUID).getName();
-            } else {
-                dptName = selectedAsset.getLocationName();
-            }
-        }*/
+            currentStatus=3;
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            dptName = orgDao.getByUid(orgInfoUID).getName();
+            casePriority =3;//一般
+        }
 
-        final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-        dptName = orgDao.getByUid(orgInfoUID).getName();
-        casePriority =3;//一般
-        System.out.println("-------uuu---------------=============");
+
+        System.out.println("-------uuuxxx---------------=============");
 
     }
 
