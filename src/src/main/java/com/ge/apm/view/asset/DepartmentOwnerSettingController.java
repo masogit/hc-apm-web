@@ -57,6 +57,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
 
+    private OrgInfo ownerOrgInfo;
     private OrgInfo deptOrg;
     private List<OrgInfo> clinicalDeptList;
 
@@ -128,6 +129,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
 
     //得到所选记录数据信息
     public void onSelectOwnerConfig(){
+        this.ownerOrgInfo = this.selected.getSiteOrgInfo();
         this.deptOrg = this.selected.getDeptOrgInfo();
         this.woOwner = this.selected.getWoOwner();
         this.woOwner2 = this.selected.getWoOwner2();
@@ -175,6 +177,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.resetOwnerConfig();
         this.deptOrg = null;
         this.selected = new OwnerConfig();
+        this.ownerOrgInfo = this.selectedOrg;
     }
 
     //保存按钮动作
@@ -185,17 +188,17 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             return;
         }
 
-        List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
+        List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), ownerOrgInfo.getSiteUID());
 
         OwnerConfig ownerConfig = new OwnerConfig();
 
         for (OwnerConfig tempOwnerConfig : ownerConfigList) {
             ownerConfig.setId(tempOwnerConfig.getId());
         }
-        ownerConfig.setTenantUID(selectedOrg.getTenantUID());
-        ownerConfig.setInstitutionUID(selectedOrg.getInstitutionUID());
-        ownerConfig.setHospitalUID(selectedOrg.getHospitalUID());
-        ownerConfig.setSiteUID(selectedOrg.getSiteUID());
+        ownerConfig.setTenantUID(ownerOrgInfo.getTenantUID());
+        ownerConfig.setInstitutionUID(ownerOrgInfo.getInstitutionUID());
+        ownerConfig.setHospitalUID(ownerOrgInfo.getHospitalUID());
+        ownerConfig.setSiteUID(ownerOrgInfo.getSiteUID());
 
         ownerConfig.setWoOwnerUID(woOwner != null ? woOwner.getUid() : null);
         ownerConfig.setWoOwnerUID2(woOwner2 != null ? woOwner2.getUid() : null);
@@ -231,6 +234,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.loadClinicalDept();
         this.loadClinicalDeptFilter();
         this.resetOwnerConfig();
+        this.ownerOrgInfo = this.selectedOrg;
         this.deptOrg = null;
     }
 
@@ -401,5 +405,13 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
 
     public void setFilterClinicalDeptOrgName(String filterClinicalDeptOrgName) {
         this.filterClinicalDeptOrgName = filterClinicalDeptOrgName;
+    }
+
+    public OrgInfo getOwnerOrgInfo() {
+        return ownerOrgInfo;
+    }
+
+    public void setOwnerOrgInfo(OrgInfo ownerOrgInfo) {
+        this.ownerOrgInfo = ownerOrgInfo;
     }
 }

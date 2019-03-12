@@ -67,6 +67,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
 
+    private OrgInfo ownerOrgInfo;
     private I18nMessageRepository i18nDao;
 
     private Integer assetGroupFilter;
@@ -127,6 +128,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
 
     //得到所选记录数据信息
     public void onSelectOwnerConfig(){
+        this.ownerOrgInfo = this.selected.getSiteOrgInfo();
         this.assetGroupID = this.selected.getAssetGroupID();
         this.assetGroupSecondaryID = this.selected.getAssetGroupSecondaryID();
         this.woOwner = this.selected.getWoOwner();
@@ -181,17 +183,17 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
             return;
         }
 
-        List<OwnerConfig> ownerConfigList = ownerConfigService.loadAssetGroupOwnerConfig(assetGroupID, assetGroupSecondaryID, selectedOrg.getSiteUID());
+        List<OwnerConfig> ownerConfigList = ownerConfigService.loadAssetGroupOwnerConfig(assetGroupID, assetGroupSecondaryID, ownerOrgInfo.getSiteUID());
 
         OwnerConfig ownerConfig = new OwnerConfig();
 
         for (OwnerConfig tempOwnerConfig : ownerConfigList) {
             ownerConfig.setId(tempOwnerConfig.getId());
         }
-        ownerConfig.setTenantUID(selectedOrg.getTenantUID());
-        ownerConfig.setInstitutionUID(selectedOrg.getInstitutionUID());
-        ownerConfig.setHospitalUID(selectedOrg.getHospitalUID());
-        ownerConfig.setSiteUID(selectedOrg.getSiteUID());
+        ownerConfig.setTenantUID(ownerOrgInfo.getTenantUID());
+        ownerConfig.setInstitutionUID(ownerOrgInfo.getInstitutionUID());
+        ownerConfig.setHospitalUID(ownerOrgInfo.getHospitalUID());
+        ownerConfig.setSiteUID(ownerOrgInfo.getSiteUID());
 
         ownerConfig.setWoOwnerUID(woOwner != null ? woOwner.getUid() : null);
         ownerConfig.setWoOwnerUID2(woOwner2 != null ? woOwner2.getUid() : null);
@@ -226,6 +228,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         }
 
         this.resetOwnerConfig();
+        this.ownerOrgInfo = this.selectedOrg;
         this.assetGroupID = null;
         this.assetGroupSecondaryID = null;
     }
@@ -250,6 +253,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     //新增按钮动作
     public void createOwerConfig(){
         this.resetOwnerConfig();
+        this.ownerOrgInfo = this.selectedOrg;
         this.assetGroupID = null;
         this.assetGroupSecondaryID = null;
         this.selected = new OwnerConfig();
@@ -396,5 +400,13 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
 
     public void setAssetGroupSecondaryListFilter(List<I18nMessage> assetGroupSecondaryListFilter) {
         this.assetGroupSecondaryListFilter = assetGroupSecondaryListFilter;
+    }
+
+    public OrgInfo getOwnerOrgInfo() {
+        return ownerOrgInfo;
+    }
+
+    public void setOwnerOrgInfo(OrgInfo ownerOrgInfo) {
+        this.ownerOrgInfo = ownerOrgInfo;
     }
 }
