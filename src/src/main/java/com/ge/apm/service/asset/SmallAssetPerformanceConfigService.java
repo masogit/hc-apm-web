@@ -3,8 +3,10 @@ package com.ge.apm.service.asset;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -199,7 +201,17 @@ public class SmallAssetPerformanceConfigService {
 	}
 	
 	public List<AssetInfo> getAccessAssetInfo(String siteUid){
-		return assetInfoRepository.findBySiteUid(siteUid);
+		List<AssetInfo> listAsset=assetInfoRepository.findBySiteUid(siteUid);
+		List<AssetInfo> listNewAsset=new ArrayList<AssetInfo>();
+		Set<String> setName=new HashSet<String>();
+		if(listAsset!=null && listAsset.size()>0){
+			for(int i=0;i<listAsset.size();++i){
+				if(!setName.contains(listAsset.get(i).getName())){
+					listNewAsset.add(listAsset.get(i));
+				}
+			}
+		}
+		return listNewAsset;
 	}
 	
 	public List<AssetInfo> getAccessAssetInfo(String siteUid,String clinicalUid){

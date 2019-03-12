@@ -655,7 +655,6 @@ public class MaintainController implements ServerEventInterface {
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
 				if(tempDate.getTime()>=startBatchDate.getTime() && tempDate.getTime()<endBatchDate.getTime() && tempMaintain.getStatus()==0){
-					tempMaintain.setStatus(2);
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
