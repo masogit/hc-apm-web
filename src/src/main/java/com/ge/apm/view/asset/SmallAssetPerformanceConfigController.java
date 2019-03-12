@@ -258,6 +258,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 		if(add){
 			editConfig=new SmallAssetPerformanceConfig();
 			listNewConfig.add(editConfig);
+			selectedObjectMap.put("asset",null);
 		}
 		else{
 			editConfig=tempConfig;

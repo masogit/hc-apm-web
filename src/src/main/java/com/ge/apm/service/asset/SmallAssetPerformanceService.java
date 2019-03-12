@@ -44,7 +44,6 @@ public class SmallAssetPerformanceService {
 
 	private final String HEADER_DEPARTMENT = "科室";
 	private final String HEADER_COSTTYPE = "费用类别";
-	private final String HEADER_CODE = "编码";
 	private final String HEADER_PROJECTNAME = "项目名称";
 	private final String HEADER_PROJECTNUMBER = "项目编号";
 	private final String HEADER_STANDARD = "单价";
@@ -149,7 +148,7 @@ public class SmallAssetPerformanceService {
 		List<String> headers = new ArrayList<>();
 		headers.add(HEADER_DEPARTMENT);
 		headers.add(HEADER_COSTTYPE);
-		headers.add(HEADER_CODE);
+//		headers.add(HEADER_CODE);
 		headers.add(HEADER_PROJECTNAME);
 		headers.add(HEADER_PROJECTNUMBER);
 		headers.add(HEADER_STANDARD);
@@ -172,7 +171,7 @@ public class SmallAssetPerformanceService {
 		
 		int departmentIndex=header.get(HEADER_DEPARTMENT);
 		int costtypeIndex=header.get(HEADER_COSTTYPE);
-		int codeIndex=header.get(HEADER_CODE);
+//		int codeIndex=header.get(HEADER_CODE);
 		int projectnameIndex=header.get(HEADER_PROJECTNAME);
 		int projectnumberIndex=header.get(HEADER_PROJECTNUMBER);
 		int standardIndex=header.get(HEADER_STANDARD);
@@ -195,7 +194,7 @@ public class SmallAssetPerformanceService {
 				detail.setSiteUID(user.getSiteUID());
 				department=ExcelParser.getCellStringValue(row, departmentIndex);
 				costtype=ExcelParser.getCellStringValue(row, costtypeIndex);
-				code=ExcelParser.getCellStringValue(row, codeIndex);
+//				code=ExcelParser.getCellStringValue(row, codeIndex);
 				projectname=ExcelParser.getCellStringValue(row, projectnameIndex);
 				projectnumber=ExcelParser.getCellStringValue(row, projectnumberIndex);
 				standard=ExcelParser.getCellNumberValue(row, standardIndex);
@@ -219,7 +218,7 @@ public class SmallAssetPerformanceService {
 				}
 				detail.setDepartment(department);
 				detail.setCostType(costtype);
-				detail.setCode(code);
+//				detail.setCode(code);
 				detail.setProjectName(projectname);
 				detail.setProjectNumber(projectnumber);
 				detail.setStandard(standard);
