@@ -35,6 +35,8 @@ public class UserContextService implements Serializable {
 //    public static final String MVS_ADMIN="MVSAdmin";
 //    private static final String MVS_FE="MVSFE";
 
+    TenantInfo tenant = null;
+
     private UserAccount userAccount = null;
 
     public static void setLoginUser(UserAccount user) {
@@ -150,10 +152,17 @@ public class UserContextService implements Serializable {
         return !hasAnyRole(roleList);
     }
     
+    public TenantInfo getTenantInfo(){
+        if(tenant!=null) return tenant;
+        
+    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+    	tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
+        return tenant;
+    }
+    
     public boolean versionContains(String menuNameList){
     	UserAccount user = getLoginUser();
-    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-    	TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
+    	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
     	if(StringUtils.isNotEmpty(configStr)){
     		try {
@@ -249,8 +258,7 @@ public class UserContextService implements Serializable {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
             
         UserAccount user = getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        tenant = getTenantInfo();
         flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
         
         return flagIsAgentTenant;
@@ -261,8 +269,7 @@ public class UserContextService implements Serializable {
         if(flagIsUltraSoundTenant!=null) return flagIsUltraSoundTenant;
             
         UserAccount user = getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        TenantInfo tenant = getTenantInfo();
         flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
         
         return flagIsUltraSoundTenant;
@@ -303,7 +310,7 @@ public class UserContextService implements Serializable {
     }
 
     public String getLoginUserSiteName() {
-        return Option.of(getLoginUser()).map(u -> WebUtil.getBean(TenantInfoRepository.class).findById(getLoginUser().getSiteId()).getName()).getOrElse("");
+        return Option.of(getTenantInfo().getName()).getOrElse("");
     }
 
     public int getLoginUserHospitalId() {
@@ -606,10 +613,8 @@ public class UserContextService implements Serializable {
 
     public static boolean isInsulate() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        UserAccount user = userContextService.getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        if(tenant.getInsulate() != null && tenant.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
+        TenantInfo tenantInfo = userContextService.getTenantInfo();
+        if(tenantInfo.getInsulate() != null && tenantInfo.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
             return true;
         }
         return false;
