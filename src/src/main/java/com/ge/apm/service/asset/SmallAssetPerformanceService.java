@@ -209,13 +209,14 @@ public class SmallAssetPerformanceService {
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"日期不能为空；");
 					pass=false;
 				}
-				if(StringUtils.isNotEmpty(projectname) && (happendate != null)){
+				if(department==null){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isNotEmpty(projectname) && (happendate != null) &&(department!=null)){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				}
-				if(!pass){
-					importFailedDataList.add(detail);
-					continue;
-				}
+				
 				detail.setDepartment(department);
 				detail.setCostType(costtype);
 //				detail.setCode(code);
@@ -226,7 +227,10 @@ public class SmallAssetPerformanceService {
 				detail.setAmount(amount);
 				detail.setHappenDate(happendate);
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
-
+				if(!pass){
+					importFailedDataList.add(detail);
+					continue;
+				}
 				if(checkData(detail)){
 //					smallAssetPerformanceDao.save(detail);
 					saveSmallAssetPerformance(detail);
