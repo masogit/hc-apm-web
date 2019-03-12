@@ -7,7 +7,7 @@
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,NursingStaff,assetInventory') and userContextService.versionContains('asset')}">
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
-                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('asset.info')}"/>
+                <p:menuitem id="um1002" value="设备定位" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.getTenantInfo().locationEn ne null}"/>                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('asset.info')}"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml"/>
                 <p:menuitem id="um05" value="#{msg.AssetDocumentMgmt}" rendered="false" outcome="/portal/asset/fileAttachment/List"/>
                 <p:menuitem id="um06" value="#{msg.AssetValueAnalysis}" rendered="false" outcome="/empty"/>
