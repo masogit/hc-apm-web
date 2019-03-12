@@ -914,32 +914,41 @@ public class NurseSiteMaintainService {
 		}
 	}
 
-	@Transactional
 	public boolean batchCompleteMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user) {
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				tBatchCompleteMaintain(listMaintain, signatureId, date, user);
+			}
+		});
+		t.start();
+		return false;
+	}
+	
+	public void tBatchCompleteMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user){
+		for(int i=0;i<listMaintain.size();++i){
+			tBatchCompleteMaintain(listMaintain.get(i), signatureId, date, user);
+		}
+	}
+	
+	@Transactional
+	public void tBatchCompleteMaintain(NurseSiteMaintain maintain, String signatureId, Date date, UserAccount user){
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
 		Set<String> setMaintainDataIds = new HashSet<String>();
-		if (listMaintain != null && listMaintain.size() > 0) {
-			for (int i = 0; i < listMaintain.size(); ++i) {
-				setMaintainIds.add(listMaintain.get(i).getId());
-			}
-		}
+		setMaintainIds.add(maintain.getId());
 		if (setMaintainIds.size() > 0) {
 			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
 		}
 		if (setMaintainItemIds.size() > 0) {
 			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
 		}
-		if (setMaintainDataIds.size() > 0 && setMaintainItemIds.size() > 0 && setMaintainIds.size() > 0) {
+		if (setMaintainDataIds.size() > 0) {
 			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
 			nurseSiteMaintainItemRepository.completeMaintainItem(setMaintainItemIds, signatureId, user.getUid(), date);
 			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
-			return true;
 		}
-		else{
-			blobFileService.deleteBlobFilesByStorageId(signatureId);
-		}
-		return false;
 	}
 
 	public void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
