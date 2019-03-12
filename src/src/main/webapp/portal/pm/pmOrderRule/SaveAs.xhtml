@@ -207,7 +207,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
                         <p:commandButton immediate="false" validateClient="true" actionListener="#{pmOrderRuleController.finishUpload()}" disabled="#{empty pmOrderRuleController.uploadedFile}" value="#{msg.Confirm}"
-                                         update=":PmOrderRuleEditForm:importReportTemplate :uploadSaveAsDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadSaveAsDialog');"/>
+                                         update=":PmOrderRuleSaveAsForm:importReportTemplate :uploadSaveAsDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadSaveAsDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{pmOrderRuleController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadSaveAsDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>

@@ -190,7 +190,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
                         <p:commandButton immediate="false" validateClient="true" actionListener="#{pmOrderRuleController.finishUpload()}" disabled="#{empty pmOrderRuleController.uploadedFile}" value="#{msg.Confirm}"
-                                         update=":PmOrderRuleEditForm:importReportTemplate :uploadApproveDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadApproveDialog');"/>
+                                         update=":PmOrderRuleApproveForm:importReportTemplate :uploadApproveDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadApproveDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{pmOrderRuleController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadApproveDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
