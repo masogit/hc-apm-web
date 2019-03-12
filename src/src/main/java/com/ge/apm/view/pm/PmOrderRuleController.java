@@ -340,29 +340,27 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Transactional
     public void applyChange() {
-        {
-            selected.setPeriod(getPeriod());
-            if (selected.getId() != null) {
-                onBeforeSave(selected.getUid(),deletedCheckListIds);
-            }
-            getName();
-            if(selectedUserOrg != null){
-                selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
-                selected.setHospitalUID(selectedUserOrg.getHospitalUID());
-                selected.setSiteUID(selectedUserOrg.getSiteUID());
-            }
-            dao.save(selected);
-            if (CollectionUtils.isNotEmpty(checkItemLists)) {
-                checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
-                for (PmOrderRuleCheckList item : checkItemLists) {
-                    item.setId(null);
-                    item.setRuleUID(selected.getUid());
-                }
-                pmOrderRuleCheckListRepository.save(checkItemLists);
-            }
-            checkItemLists.clear();
-            WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
+        selected.setPeriod(getPeriod());
+        if (selected.getId() != null) {
+            onBeforeSave(selected.getUid(),deletedCheckListIds);
         }
+        getName();
+        if(selectedUserOrg != null){
+            selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+            selected.setHospitalUID(selectedUserOrg.getHospitalUID());
+            selected.setSiteUID(selectedUserOrg.getSiteUID());
+        }
+        dao.save(selected);
+        if (CollectionUtils.isNotEmpty(checkItemLists)) {
+            checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
+            for (PmOrderRuleCheckList item : checkItemLists) {
+                item.setId(null);
+                item.setRuleUID(selected.getUid());
+            }
+            pmOrderRuleCheckListRepository.save(checkItemLists);
+        }
+        checkItemLists.clear();
+        WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
     }
 
     public void getName() {
@@ -551,6 +549,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         try {
             this.selected = null;
             this.checkItemLists = null;
+            this.uploadedFile = null;
             super.prepareCreate();
             initCheckItemLists();
             selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
