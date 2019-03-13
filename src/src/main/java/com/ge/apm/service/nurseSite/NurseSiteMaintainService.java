@@ -253,7 +253,9 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		nurseSiteMaintainRepository.delete(maintain);
+		List<NurseSiteMaintain> listMaintain=new ArrayList<NurseSiteMaintain>();
+		listMaintain.add(maintain);
+		nativeDeleteMaintain(listMaintain);
 		return true;
 	}
 
