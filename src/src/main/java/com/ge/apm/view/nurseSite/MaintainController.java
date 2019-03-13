@@ -651,6 +651,9 @@ public class MaintainController implements ServerEventInterface {
 			if(StringUtils.isNotEmpty(signatureContent)){
 				signatureId=nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
 			}
+			if(signatureId==null){
+				signatureId="";
+			}
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
@@ -658,7 +661,17 @@ public class MaintainController implements ServerEventInterface {
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			if(listNewNurseSiteMaintain.size()>0){
+				nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+				if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
+					nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),signatureId+",");
+				}
+				else{
+					for(int i=0;i<listCheckClinicalOrgInfo.size();++i){
+						nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),signatureId+","+listCheckClinicalOrgInfo.get(i).getUid());
+					}
+				}
+			}
 			addMessage("工单后台完成中，请稍候刷新页面查看。");
 		}
 		else{
