@@ -217,7 +217,19 @@ public class SmallAssetPerformanceConfigService {
 	}
 	
 	public List<AssetInfo> getAccessAssetInfo(String siteUid,String clinicalUid){
-		return assetInfoRepository.findBySiteAndClinical(siteUid,clinicalUid);
+		List<AssetInfo> listAsset=assetInfoRepository.findBySiteAndClinical(siteUid,clinicalUid);
+		List<AssetInfo> listNewAsset=new ArrayList<AssetInfo>();
+		Set<String> setName=new HashSet<String>();
+		if(listAsset!=null && listAsset.size()>0){
+			for(int i=0;i<listAsset.size();++i){
+				AssetInfo temp=listAsset.get(i);
+				if(!setName.contains(temp.getName())){
+					setName.add(temp.getName());
+					listNewAsset.add(temp);
+				}
+			}
+		}
+		return listNewAsset;
 	}
 
 	public OrgInfo getOrgInfoByName(List<OrgInfo> list,String name){
