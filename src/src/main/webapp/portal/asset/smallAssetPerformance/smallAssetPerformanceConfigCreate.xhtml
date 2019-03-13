@@ -93,7 +93,7 @@
 					</h:panelGroup>
 				</p:panelGrid>
 				<p:commandButton validateClient="true" actionListener="#{smallAssetPerformanceConfigController.saveCheckListItem}"
-					update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig" value="#{msg.Save}" icon="ui-icon-check"
+					update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:btnSave" value="#{msg.Save}" icon="ui-icon-check"
 					oncomplete="handleSubmit(args, 'checkItemEditDlg');" />
                  <p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
 			</h:panelGroup>
