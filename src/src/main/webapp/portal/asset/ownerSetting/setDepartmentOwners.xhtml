@@ -16,7 +16,7 @@
                         <p:outputLabel value="#{departmentOwnerSettingController.ownerOrgInfo == null ? '': departmentOwnerSettingController.ownerOrgInfo.name}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">*#{msg.clinicalDeptName}</label>
+                        <label class="label">#{msg.clinicalDeptName}*</label>
                         <p:autoComplete id="deptOrg" dropdown="true" value="#{departmentOwnerSettingController.deptOrg}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteDept}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">

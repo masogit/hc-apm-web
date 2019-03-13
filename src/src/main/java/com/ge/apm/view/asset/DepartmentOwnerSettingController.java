@@ -183,6 +183,11 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     //保存按钮动作
     public void saveChange() {
 
+        if(deptOrg == null){
+            WebUtil.addErrorMessage("请设置所属科室");
+            return;
+        }
+
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
             WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
             return;
