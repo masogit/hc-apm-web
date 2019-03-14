@@ -69,7 +69,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         currentUser = UserContextService.getCurrentUserAccount();
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());
-        assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID());
+        assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
         listNewConfig=new LinkedList<SmallAssetPerformanceConfig>();
         editConfig=new SmallAssetPerformanceConfig();
         listNewConfig.add(editConfig);
@@ -155,9 +155,10 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         			this.selected=null;
         			return;
     			}
-    			service.checkData(tempConfig, tempConfig.getId(), false);
+    			service.checkData(tempConfig);
     			service.save(tempConfig);
     		}
+    		service.init();
     		listNewConfig.clear();
     		editConfig=new SmallAssetPerformanceConfig();
             listNewConfig.add(editConfig);
@@ -170,8 +171,9 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         			return;
         		}
         	}
-        	service.checkData(this.selected,this.selected.getId(),false);
+        	service.checkData(this.selected);
         	super.save();
+        	service.init();
     	}
     	WebUtil.addSuccessMessage("保存成功！");
     	this.selected=null;
@@ -181,8 +183,9 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
-    	service.checkListConfig(this.selected, this.selected.getId(), true);
+    	service.checkListConfig(selected,true);
     	super.delete();
+    	service.init();
     	this.selected=null;
     }
     public void rateCalculate(){
@@ -281,8 +284,15 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         switch (idx) {
             case "clinicalDept":
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
-                selected.setDepartment(clinicalDept.getName());
-                assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),clinicalDept.getUid());
+                if(clinicalDept==null){
+                	selected.setDepartment("");
+                	assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
+                }
+                else{
+                	selected.setDepartment(clinicalDept.getName());
+                    assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),clinicalDept.getUid());
+                }
+                
                 break;
             case "assetDept":
                 break;
@@ -349,6 +359,14 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 
 	public void setBlnSaveable(boolean blnSaveable) {
 		this.blnSaveable = blnSaveable;
+	}
+
+	public List<AssetInfo> getAssetInfoList() {
+		return assetInfoList;
+	}
+
+	public void setAssetInfoList(List<AssetInfo> assetInfoList) {
+		this.assetInfoList = assetInfoList;
 	}
     
 }

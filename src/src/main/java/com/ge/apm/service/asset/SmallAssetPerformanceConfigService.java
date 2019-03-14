@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
@@ -46,10 +48,17 @@ public class SmallAssetPerformanceConfigService {
 	@Autowired
 	private AssetInfoRepository assetInfoRepository;
 	@Autowired
+	private OrgInfoRepository orgInfoRepository;
+	@Autowired
 	private SmallAssetPerformanceConfigRepository smallAssetPerformanceConfigDao;
+	
+	private Map<String,List<AssetInfo>> mapAssetInfoSiteUid=new HashMap<String,List<AssetInfo>>();
+	private Map<String,List<OrgInfo>> mapOrgInfoSiteUid=new HashMap<String,List<OrgInfo>>();
+	private Map<String,List<SmallAssetPerformanceConfig>> mapSmallConfig=new HashMap<String,List<SmallAssetPerformanceConfig>>();
+	private UserAccount currentUser;
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
-		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getSiteUID());
+		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
 		if(result!=null && result==1){
 			return true;
 		}
@@ -60,42 +69,25 @@ public class SmallAssetPerformanceConfigService {
 	public void save(SmallAssetPerformanceConfig config){
 		smallAssetPerformanceConfigDao.save(config);
 	}
-	public boolean checkData(SmallAssetPerformanceConfig detail,String id,boolean deleteAction) {
+	public boolean checkData(SmallAssetPerformanceConfig detail) {
 		boolean pass=true;
-		if(deleteAction == false){
-			if(!checkOneConfig(detail)){
-				pass=false;
-			}
-		}
 		if(detail.getAverage()!=null && detail.getAverage()==true){
-			if(!checkListConfigAverage(detail, id, deleteAction)){
+			if(!checkListConfigAverage(detail)){
 				pass=false;
 			}
 		}
 		else{
-			if(!checkListConfig(detail, id, deleteAction)){
+			if(!checkListConfig(detail,false)){
 				pass=false;
 			}
 		}
 		return pass;
 	}
 	
-	private boolean checkOneConfig(SmallAssetPerformanceConfig detail){
+	public boolean checkListConfigAverage(SmallAssetPerformanceConfig detail){
 		boolean pass=true;
-		//check asset exists
-		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndSiteUID(detail.getAssetName(), detail.getSiteUID());
-		if (listAssetInfo != null && listAssetInfo.size() > 0) {
-			detail.setStatusDisplay(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS,true);
-		} else {
-			detail.setStatusDisplay(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS,false);
-			pass=false;
-		}
-		return pass;
-	}
-	
-	public boolean checkListConfigAverage(SmallAssetPerformanceConfig detail,String id,boolean deleteAction){
-		boolean pass=true;
-		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
+		String id=detail.getId();
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(), detail.getSiteUID());
 		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
 			double size=listDetails.size();
@@ -118,10 +110,16 @@ public class SmallAssetPerformanceConfigService {
 		return pass;
 	}
 	
-	public boolean checkListConfig(SmallAssetPerformanceConfig detail,String id,boolean deleteAction){
+	public void init(){
+		mapSmallConfig.clear();
+		mapAssetInfoSiteUid.clear();
+		mapOrgInfoSiteUid.clear();
+	}
+	public boolean checkListConfig(SmallAssetPerformanceConfig detail,boolean delete){
 		boolean pass=true;
+		String id=detail.getId();
 		//check configList rate
-		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(), detail.getSiteUID());
 		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
 			for(SmallAssetPerformanceConfig config: listDetails){
@@ -136,7 +134,7 @@ public class SmallAssetPerformanceConfigService {
 				}
 			}
 		}
-		if(!deleteAction){
+		if(!delete){
 			rate+=detail.getRate();
 		}
 		if(rate!=1){
@@ -153,7 +151,7 @@ public class SmallAssetPerformanceConfigService {
 	
 	public void rateCalculate(List<SmallAssetPerformanceConfig> list,String projectName,String siteUid){
 		double size=list.size()-1;
-		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(projectName, siteUid);
 		if(listDetails!=null && listDetails.size()>0){
 			size+=listDetails.size();
 		}
@@ -176,40 +174,132 @@ public class SmallAssetPerformanceConfigService {
 		}
 		smallAssetPerformanceConfigDao.save(list);
 	}
-
-	private List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID) {
-		List<AssetInfo> listAssetInfo = null;
-
-		if (!StringHelper.isNullOrEmptyString(name)) {
-			listAssetInfo = assetInfoRepository.getAssetInfoByNameAndSiteUID(name, siteUID);
-		}
-
-		return listAssetInfo;
-	}
 	
 	private void saveSmallAssetPerformanceConfig(SmallAssetPerformanceConfig newDetail){
-		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getSiteUID());
+		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getDepartment(),newDetail.getSiteUID());
 		if(dbDetail!=null){
 			newDetail.setId(dbDetail.getId());
-			checkData(newDetail,dbDetail.getId(),false);
+			checkData(newDetail);
 			smallAssetPerformanceConfigDao.save(newDetail);
 		}
 		else{
-			checkData(newDetail,null,false);
+			checkData(newDetail);
 			smallAssetPerformanceConfigDao.save(newDetail);
 		}
 	}
 	
-	public List<AssetInfo> getAccessAssetInfo(String siteUid){
-		List<AssetInfo> listAsset=assetInfoRepository.findBySiteUid(siteUid);
+	public boolean checkDepartName(List<OrgInfo> list,String name){
+		boolean result=false;
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				if(list.get(i).getName().equals(name)){
+					return true;
+				}
+			}
+		}
+		return result;
+	}
+	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+		String str=projectName+siteUid;
+		List<SmallAssetPerformanceConfig> listRe=mapSmallConfig.get(str);
+		if(listRe==null){
+			listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+			mapSmallConfig.put(str, listRe);
+		}
+		return listRe;
+	}
+	
+	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
+		List<SmallAssetPerformanceConfig> listRe=getConfig(projectName,siteUid);
+		List<SmallAssetPerformanceConfig> listNew=new ArrayList<SmallAssetPerformanceConfig>();
+		if(listRe!=null&& listRe.size()>0){
+			for(int i=0;i<listRe.size();++i){
+				SmallAssetPerformanceConfig tempConfig=listRe.get(i);
+				if(tempConfig.getDepartment().equals(department)){
+					listNew.add(tempConfig);
+				}
+			}
+		}
+		return listNew;
+	}
+	
+	public List<OrgInfo> getDepart(List<OrgInfo> list,String name){
+		List<OrgInfo> listRe=new ArrayList<OrgInfo>();
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				OrgInfo tempOrg=list.get(i);
+				if(tempOrg.getName().equals(name)){
+					listRe.add(tempOrg);
+				}
+			}
+		}
+		return listRe;
+	}
+	
+	public boolean checkAssetInfoName(List<AssetInfo> listAsset,List<OrgInfo> listOrg,String name){
+		boolean result=false;
+		if(listAsset!=null && listAsset.size()>0 && listOrg!=null && listOrg.size()>0){
+			for(int i=0;i<listAsset.size();++i){
+				AssetInfo tempAsset=listAsset.get(i);
+				if(tempAsset.getName().equals(name)){
+					for(int j=0;j<listOrg.size();++j){
+						OrgInfo tempOrg=listOrg.get(j);
+						if(tempAsset.getClinicalDeptUID().equals(tempOrg.getUid())){
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	public List<OrgInfo> getAccessClinical(String siteUid){
+		List<OrgInfo> listOrg=mapOrgInfoSiteUid.get(siteUid);
+		if(listOrg==null){
+			listOrg=orgInfoRepository.getDeptListBySiteUid(siteUid);
+			mapOrgInfoSiteUid.put(siteUid, listOrg);
+		}
+		return listOrg;
+	}
+	
+	public List<AssetInfo> getAccessAssetInfo(String siteUid,boolean blnDistinct){
+		List<AssetInfo> listAsset=mapAssetInfoSiteUid.get(siteUid);
+		if(listAsset==null){
+			listAsset=assetInfoRepository.findBySiteUid(siteUid);
+			mapAssetInfoSiteUid.put(siteUid, listAsset);
+		}
+		if(blnDistinct){
+			List<AssetInfo> listNewAsset=new ArrayList<AssetInfo>();
+			Set<String> setName=new HashSet<String>();
+			if(listAsset!=null && listAsset.size()>0){
+				for(int i=0;i<listAsset.size();++i){
+					AssetInfo temp=listAsset.get(i);
+					if(!setName.contains(temp.getName())){
+						setName.add(temp.getName());
+						listNewAsset.add(temp);
+					}
+				}
+			}
+			return listNewAsset;
+		}
+		else{
+			return listAsset;
+		}
+	}
+	
+	public List<AssetInfo> getAccessAssetInfo(String siteUid,String assetName,String department){
+		List<AssetInfo> listAsset=mapAssetInfoSiteUid.get(siteUid);
+		if(listAsset==null){
+			listAsset=assetInfoRepository.findBySiteUid(siteUid);
+			mapAssetInfoSiteUid.put(siteUid, listAsset);
+		}
 		List<AssetInfo> listNewAsset=new ArrayList<AssetInfo>();
-		Set<String> setName=new HashSet<String>();
 		if(listAsset!=null && listAsset.size()>0){
 			for(int i=0;i<listAsset.size();++i){
-				AssetInfo temp=listAsset.get(i);
-				if(!setName.contains(temp.getName())){
-					setName.add(temp.getName());
-					listNewAsset.add(temp);
+				AssetInfo tempAsset=listAsset.get(i);
+				if(tempAsset.getName().equals(assetName)&& department.equals(orgInfoRepository.findByUid(tempAsset.getClinicalDeptUID()).getName())){
+					listNewAsset.add(tempAsset);
 				}
 			}
 		}
@@ -310,6 +400,7 @@ public class SmallAssetPerformanceConfigService {
 				department=ExcelParser.getCellStringValue(row, departmentIndex);
 				assetName=ExcelParser.getCellStringValue(row, assetNameIndex);
 				rate=ExcelParser.getCellNumberValue(row, rateIndex);
+				detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				if(StringUtils.isEmpty(projectName)){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不能为空；");
 					pass=false;
@@ -322,8 +413,15 @@ public class SmallAssetPerformanceConfigService {
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不能为空；");
 					pass=false;
 				}
-				if(StringUtils.isNotEmpty(projectName)&&StringUtils.isNotEmpty(assetName)&&StringUtils.isNotEmpty(department)){
-					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
+				if(pass){
+					pass=checkDepartName(getAccessClinical(detail.getSiteUID()), department);
+					if(!pass){
+						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不存在");
+					}
+					pass=checkAssetInfoName(getAccessAssetInfo(detail.getSiteUID(),false),getDepart(getAccessClinical(detail.getSiteUID()), department), assetName);
+					if(!pass){
+						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"对应科室设备名称不存在");
+					}
 				}
 				detail.setProjectName(projectName);
 				detail.setProjectNumber(projectNumber);

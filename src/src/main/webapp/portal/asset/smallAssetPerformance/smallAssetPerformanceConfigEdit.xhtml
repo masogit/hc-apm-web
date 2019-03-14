@@ -19,22 +19,21 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">科室名称*</label>
-					<!--                         <p:inputText value="#{smallAssetPerformanceConfigController.selected.department}"/> -->
-					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" scrollHeight="300"
-						forceSelection="true" required="true"
-						requiredMessage="科室名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
-						itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
-						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}"/>
-					</p:autoComplete>
+					<p:selectOneMenu value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" converter="orgInfoUidConverter" style="width:100%;"
+						rendered="true" requiredMessage="科室名称不能为空">
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update="idAssetName" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{smallAssetPerformanceConfigController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					</p:selectOneMenu>
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">设备名称*</label>
-					<!-- <p:inputText value="#{smallAssetPerformanceConfigController.selected.assetName}" required="true" requiredMessage="设备名称不能为空" /> -->
-					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" scrollHeight="300"
-							forceSelection="true" required="true" requiredMessage="设备名称不能为空"
-							completeMethod="#{smallAssetPerformanceConfigController.autoCompleteAsset}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
-							<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
-						</p:autoComplete>
+					<p:selectOneMenu id="idAssetName" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" converter="assetInfoConverter"
+						style="width:100%;" rendered="true" requiredMessage="设备名称不能为空">
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{smallAssetPerformanceConfigController.assetInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					</p:selectOneMenu>
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">占比*</label>
@@ -47,8 +46,8 @@
 			</p:panelGrid>
 			<br />
 			<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"
-				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl"
-				icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');" />
+				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl" icon="ui-icon-check"
+				oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceConfigEditDialog').hide()" />
 		</h:form>
 	</p:dialog>
