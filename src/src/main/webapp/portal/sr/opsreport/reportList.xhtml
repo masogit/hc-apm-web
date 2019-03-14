@@ -1,16 +1,11 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="preRenderView">
-        <!--        <f:metadata>
-                    <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
-                    <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
-                </f:metadata>
-                <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
     </ui:define>
 
     <ui:define name="head">
@@ -71,17 +66,19 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="开始时间"
-                                  sortBy="#{item.srOpenDate}"
-                                  filterBy="#{item.srOpenDate}"
+                        <p:column headerText="开始时间" sortBy="#{item.srOpenDate}" filterBy="#{item.srOpenDate}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.srOpenDate}"/>
+                            <h:outputText value="#{item.srOpenDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="计划时间"
-                                  sortBy="#{item.srOpenDate}"
-                                  filterBy="#{item.srOpenDate}"
+                                  sortBy="#{item.srScheduleDate}"
+                                  filterBy="#{item.srScheduleDate}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.srOpenDate}"/>
+                            <h:outputText value="#{item.srScheduleDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="FE SSO"
                                   sortBy="#{item.feSso}"
