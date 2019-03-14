@@ -10,8 +10,8 @@ public class OpsSrReport {
     private String systemId;
     private String modality;
     private String srType;
-    private String srOpenDate;
-    private String srScheduleDate;
+    private Date srOpenDate;
+    private Date srScheduleDate;
     private String feSso;
 
     public String getSrId() {
@@ -70,19 +70,19 @@ public class OpsSrReport {
         this.srType = srType;
     }
 
-    public String getSrOpenDate() {
+    public Date getSrOpenDate() {
         return srOpenDate;
     }
 
-    public void setSrOpenDate(String srOpenDate) {
+    public void setSrOpenDate(Date srOpenDate) {
         this.srOpenDate = srOpenDate;
     }
 
-    public String getSrScheduleDate() {
+    public Date getSrScheduleDate() {
         return srScheduleDate;
     }
 
-    public void setSrScheduleDate(String srScheduleDate) {
+    public void setSrScheduleDate(Date srScheduleDate) {
         this.srScheduleDate = srScheduleDate;
     }
 
