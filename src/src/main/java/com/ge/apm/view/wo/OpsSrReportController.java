@@ -1,19 +1,16 @@
 package com.ge.apm.view.wo;
 
-import com.ge.apm.dao.AssetLifecycleEventRepository;
-import com.ge.apm.domain.AssetLifecycleEvent;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.domain.OpsSrReport;
+import com.ge.apm.service.wo.OpsSrReportService;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.MyCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,51 +18,30 @@ import java.util.List;
  */
 @ManagedBean
 @ViewScoped
-public class OpsSrReportController extends GenericCRUDUUIDController<AssetLifecycleEvent> implements Serializable {
+public class OpsSrReportController extends MyCRUDController<OpsSrReport> implements Serializable {
 
-    public static final int SR_CLOSED = 2;
-    private AssetLifecycleEventRepository assetLifecycleEventRepository;
-
-    public static final int SR_REPAIR = 3;
-    public static final int SR_PM = 4;
-    public static final int SR_REMOTE_PM = 5;
-    private static final List<Integer> EVENT_TYPE_LIST = Arrays.asList(SR_REPAIR, SR_PM, SR_REMOTE_PM);
+    private OpsSrReportService opsSrReportService;
 
     protected void init() {
-        assetLifecycleEventRepository = WebUtil.getBean(AssetLifecycleEventRepository.class);
+        opsSrReportService = WebUtil.getBean(OpsSrReportService.class);
     }
 
     @Override
-    protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
-        return assetLifecycleEventRepository;
+    protected BaseMapper<OpsSrReport> getDAO() {
+        return null;
     }
 
     @Override
-    protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
-        this.setSearchFilter();
-        this.selected = null;
-        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.IN, EVENT_TYPE_LIST));
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, SR_CLOSED));
-        searchFilters.add(new SearchFilter("reports", SearchFilter.Operator.IsEmpty, null));
-        return assetLifecycleEventRepository.findBySearchFilter(searchFilters, pageRequest);
-    }
-
-    @Override
-    public void setSearchFilter() {
-        if (this.searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        }
-    }
-
-    public void searchList(Integer buttonIndex) {
-        cancel();
+    protected List<OpsSrReport> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        EntityWrapper<OpsSrReport> ew = new EntityWrapper<>();
+        wrapSearchFilter(ew);
+        lazyModel.setRowCount(opsSrReportService.selectCount(ew));
+        ew.orderBy("event_uid", isAscending);
+        return opsSrReportService.loadData(pageRequest, ew);
     }
 
     public void cancel() {
         selected = null;
     }
 
-    public AssetLifecycleEvent getServiceRequest(String srId) {
-        return assetLifecycleEventRepository.findById(srId);
-    }
 }
