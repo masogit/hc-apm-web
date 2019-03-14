@@ -28,7 +28,7 @@
 
 	<div class="ui-g-12 card">
 		<h:form id="dataListForm">
-			<p:fieldset legend="导入失败的数据">
+			<p:fieldset legend="错误的数据">
 				<p:dataTable id="datalist" rendered="#{not empty smallAssetPerformanceController.importFailedDataList}"
 					value="#{smallAssetPerformanceController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
 					paginatorAlwaysVisible="true"
