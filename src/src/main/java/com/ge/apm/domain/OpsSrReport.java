@@ -3,7 +3,7 @@ package com.ge.apm.domain;
 import java.util.Date;
 
 public class OpsSrReport {
-    private String id;
+    private String srId;
     private String assetName;
     private String srNumber;
     private Date updateTime;
@@ -14,12 +14,12 @@ public class OpsSrReport {
     private String srScheduleDate;
     private String feSso;
 
-    public String getId() {
-        return id;
+    public String getSrId() {
+        return srId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSrId(String srId) {
+        this.srId = srId;
     }
 
     public String getAssetName() {

@@ -36,12 +36,8 @@ public class OpsSrReportController extends MyCRUDController<OpsSrReport> impleme
         EntityWrapper<OpsSrReport> ew = new EntityWrapper<>();
         wrapSearchFilter(ew);
         lazyModel.setRowCount(opsSrReportService.selectCount(ew));
-        ew.orderBy("event_uid", isAscending);
+        ew.orderBy("srNumber", isAscending);
         return opsSrReportService.loadData(pageRequest, ew);
-    }
-
-    public void cancel() {
-        selected = null;
     }
 
 }

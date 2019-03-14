@@ -12,36 +12,48 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface OpsSrReportMapper extends BaseMapper {
-    @Select("select " +
-            "distinct sr.id as sr_id, sr.asset_name, sr.event_uid, sr.create_time, asset.system_id, sieble.modality, sieble.sr_type, " +
-            "sieble.sr_open_time, sieble.sr_scheduled_date, sieble.sr_owner_sso from asset_lifecycle_event sr " +
-            "left join service_request_report report on sr.id = report.alce_id " +
-            "inner join asset_info asset on asset.uid = sr.asset_uid " +
-            "inner join sieble_sr_data sieble on sr.event_uid = sieble.sr_number " +
-            "where sr.event_type in (3, 4, 5) and sr.status = 2 and report.alce_id is null and asset.ib_status = 1 " +
-            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.status !=2 ${ew.sqlSegment}")
+    String SELECT_START = "select * from(";
+    String SELECT_COLUMNS_FROM_SR = "select distinct sr.id as srId, sr.asset_name as assetName, " +
+            "sr.event_uid as srNumber, sr.create_time as updateTime, asset.system_id as systemId, " +
+            "sieble.modality as modality, sieble.sr_type as srType, sieble.sr_open_time as srOpenDate, " +
+            "sieble.sr_scheduled_date as srScheduleDate, sieble.sr_owner_sso as feSso from asset_lifecycle_event sr ";
+    String LEFT_JOIN_SR_REPORT = "left join service_request_report report on sr.id = report.alce_id ";
+    String INNER_JOIN_ASSET = "inner join asset_info asset on asset.uid = sr.asset_uid ";
+    String INNER_JOIN_SIEBLE = "inner join sieble_sr_data sieble on sr.event_uid = sieble.sr_number ";
+    String WHERE_CONDITIONS = "where sr.event_type in (3, 4, 5) and sr.status = 2 and report.alce_id is null and asset.ib_status = 1 " +
+            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.status !=2";
+    String SELECT_END = ") as resultgroup WHERE 1 = 1 ${ew.sqlSegment}";
+
+    @Select(SELECT_START +
+            SELECT_COLUMNS_FROM_SR +
+            LEFT_JOIN_SR_REPORT +
+            INNER_JOIN_ASSET +
+            INNER_JOIN_SIEBLE +
+            WHERE_CONDITIONS +
+            SELECT_END)
     @Results({
-            @Result(id = true, column = "sr_id", property = "id"),
-            @Result(column = "asset_name", property = "assetName"),
-            @Result(column = "event_uid", property = "srNumber"),
-            @Result(column = "create_time", property = "updateTime"),
-            @Result(column = "system_id", property = "systemId"),
+            @Result(id = true, column = "srId", property = "srId"),
+            @Result(column = "assetName", property = "assetName"),
+            @Result(column = "srNumber", property = "srNumber"),
+            @Result(column = "updateTime", property = "updateTime"),
+            @Result(column = "systemId", property = "systemId"),
             @Result(column = "modality", property = "modality"),
-            @Result(column = "sr_type", property = "srType"),
-            @Result(column = "sr_open_time", property = "srOpenDate"),
-            @Result(column = "sr_scheduled_date", property = "srScheduleDate"),
-            @Result(column = "sr_owner_sso", property = "feSso"),
+            @Result(column = "srType", property = "srType"),
+            @Result(column = "srOpenDate", property = "srOpenDate"),
+            @Result(column = "srScheduleDate", property = "srScheduleDate"),
+            @Result(column = "feSso", property = "feSso"),
     })
     List<OpsSrReport> findSRWithoutReports(@Param("page") Pagination pageRequest, @Param("ew") Wrapper<OpsSrReport> wrapper);
 
 
-    @Select("select count(*) from (select distinct " +
-            "sr.id, sr.asset_name, sr.event_uid, sr.create_time, asset.system_id, sieble.modality, sieble.sr_type, " +
-            "sieble.sr_open_time, sieble.sr_scheduled_date, sieble.sr_owner_sso from asset_lifecycle_event sr " +
-            "left join service_request_report report on sr.id = report.alce_id " +
-            "inner join asset_info asset on asset.uid = sr.asset_uid " +
-            "inner join sieble_sr_data sieble on sr.event_uid = sieble.sr_number " +
-            "where sr.event_type in (3, 4, 5) and sr.status = 2 and report.alce_id is null and asset.ib_status = 1 " +
-            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.status !=2 ${ew.sqlSegment}) as totalcount")
+    @Select("select count(*) from (" +
+            SELECT_START +
+            SELECT_COLUMNS_FROM_SR +
+            LEFT_JOIN_SR_REPORT +
+            INNER_JOIN_ASSET +
+            INNER_JOIN_SIEBLE +
+            WHERE_CONDITIONS +
+            SELECT_END +
+            ") as the_count")
     int count(@Param("ew") Wrapper<OpsSrReport> wrapper);
 }
