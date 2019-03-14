@@ -36,7 +36,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.qrCode = ?1 and o.siteUID= ?2")
     public AssetInfo getByQrCodeAndSiteUid(String qrCode,String site_uid);
 
-    @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status in (1,2,3)")
+    @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status!=4")
     public List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID);
 
     @Modifying
@@ -49,12 +49,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     public AssetInfo findByUid(String uid);
 
-    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and o.siteUID=?2")
+    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.siteUID=?2 and o.isValid=true and o.isDeleted=false and o.status!=4")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
     
-    @Query(value="select o.* from asset_info o where o.site_uid=?1",nativeQuery=true)
+    @Query(value="select o.* from asset_info o where o.site_uid=?1 and o.is_valid=true and o.is_deleted=false and o.status!=4",nativeQuery=true)
     public List<AssetInfo> findBySiteUid(String siteUid);
     
     @Query(value="select o.* from asset_info o where o.is_valid=true and o.is_deleted=false and o.status!=4 and o.site_uid=?1 and o.clinical_dept_uid=?2",nativeQuery=true)
