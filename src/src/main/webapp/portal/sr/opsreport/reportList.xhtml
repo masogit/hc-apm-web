@@ -26,7 +26,7 @@
                                  widgetVar="varDataList"
                                  selectionMode="single" selection="#{opsSrReportController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.srId}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.srId}" sortMode="single" sortOrder="descending" sortBy="#{item.srNumber}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
