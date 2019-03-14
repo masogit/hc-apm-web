@@ -1,8 +1,7 @@
 package com.ge.apm.view.sysutil;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -11,22 +10,16 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ApmConstant;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
-import java.util.Objects;
 
 import javaslang.control.Option;
 import webapp.framework.dao.SearchFilter;
@@ -41,6 +34,8 @@ public class UserContextService implements Serializable {
     public static final String ADMIN = "SuperAdmin,ITAdmin";
 //    public static final String MVS_ADMIN="MVSAdmin";
 //    private static final String MVS_FE="MVSFE";
+
+    TenantInfo tenant = null;
 
     private UserAccount userAccount = null;
 
@@ -115,7 +110,7 @@ public class UserContextService implements Serializable {
     //add MVSAdmin,MVSFE
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
-
+        Integer userId = user.getId();
         if(user.getIsSuperAdmin()){
             return true;
         }
@@ -133,6 +128,23 @@ public class UserContextService implements Serializable {
                 return true;
             }
         }
+        //增加自定义角色判断
+        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+        List<String> names = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole : customRoles) {
+                if(StringUtils.isNotEmpty(customRole.getGroups())){
+                    names.addAll(Arrays.asList(customRole.getGroups().split(",")));
+                }
+            }
+            names = names.stream().distinct().collect(Collectors.toList());
+            for (String role : roles) {
+                if(names.contains(role.trim())){
+                    return true;
+                }
+            }
+        }
         return false;
     }
     //add MVSAdmin,MVSFE
@@ -140,10 +152,17 @@ public class UserContextService implements Serializable {
         return !hasAnyRole(roleList);
     }
     
+    public TenantInfo getTenantInfo(){
+        if(tenant!=null) return tenant;
+        
+    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+    	tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
+        return tenant;
+    }
+    
     public boolean versionContains(String menuNameList){
     	UserAccount user = getLoginUser();
-    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-    	TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
+    	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
     	if(StringUtils.isNotEmpty(configStr)){
     		try {
@@ -239,8 +258,7 @@ public class UserContextService implements Serializable {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
             
         UserAccount user = getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        tenant = getTenantInfo();
         flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
         
         return flagIsAgentTenant;
@@ -251,9 +269,7 @@ public class UserContextService implements Serializable {
         if(flagIsUltraSoundTenant!=null) return flagIsUltraSoundTenant;
             
         UserAccount user = getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        System.err.println("**************** getTenantConfig="+tenant.getTenantConfig());
+        TenantInfo tenant = getTenantInfo();
         flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
         
         return flagIsUltraSoundTenant;
@@ -294,7 +310,7 @@ public class UserContextService implements Serializable {
     }
 
     public String getLoginUserSiteName() {
-        return Option.of(getLoginUser()).map(u -> WebUtil.getBean(TenantInfoRepository.class).findById(getLoginUser().getSiteId()).getName()).getOrElse("");
+        return Option.of(getTenantInfo().getName()).getOrElse("");
     }
 
     public int getLoginUserHospitalId() {
@@ -361,7 +377,7 @@ public class UserContextService implements Serializable {
     public static boolean isMVSAdmin(){
     	UserAccount userAccount=getCurrentUserAccount();
     	Integer mvsRoleType=userAccount.getMvsRoleType();
-    	if(mvsRoleType!=null && mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN){
+    	if(mvsRoleType!=null && (mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
     		return true;
     	}
     	else{
@@ -372,7 +388,8 @@ public class UserContextService implements Serializable {
     public static boolean isMVSRole(){
         UserAccount userAccount=getCurrentUserAccount();
         Integer mvsRoleType=userAccount.getMvsRoleType();
-        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE)){
+        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE
+                                    || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
             return true;
         }
         else{
@@ -596,10 +613,8 @@ public class UserContextService implements Serializable {
 
     public static boolean isInsulate() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        UserAccount user = userContextService.getLoginUser();
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
-        if(tenant.getInsulate() != null && tenant.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
+        TenantInfo tenantInfo = userContextService.getTenantInfo();
+        if(tenantInfo.getInsulate() != null && tenantInfo.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
             return true;
         }
         return false;

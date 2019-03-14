@@ -116,7 +116,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<SearchFilter> listNewSearchFilter;
 	private List<PccExamineReport> listDetail;
 	private List<String> userRoleNames;
-	private Set<String> setUserUids;
+	private Map<Integer,Set<String>> mapUserUids;
 	private int currentPage;
 	private String sortField;
 	private boolean isAscending;
@@ -137,7 +137,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		if (userRoleNames.contains("AssetStaff") || currentUser.getIsSuperAdmin()) {
 			blnEditable = true;
 		}
-		setUserUids = service.findAccessOrgUidListByUserUid(currentUser.getUid());
+		mapUserUids = service.findAccessUidByUserUid(currentUser.getUid());
 		mapListSelected = new HashMap<Integer, List<PccExamineReport>>();
 	}
 
@@ -151,11 +151,23 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			listSelected = mapListSelected.get(currentPage);
 		}
 		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2*"));
+		Set<String> setInstitution=mapUserUids.get(1);
+		Set<String> setHospital=mapUserUids.get(2);
+		Set<String> setSite=mapUserUids.get(3);
+		Set<String> setClinical=mapUserUids.get(4);
+		if(setInstitution!=null){
+			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, setInstitution, "1*2+"));
+		}
+		if(setHospital!=null){
+			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, setHospital, "1*2+"));
+		}
+		if(setSite!=null){
+			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, setSite, "1*2+"));
+		}
+		if(setClinical!=null){
+			searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setClinical, "1*2+"));
+		}
 		// if(userRoleNames.contains("AssetHead")||userRoleNames.contains("AssetStaff")){
 		// searchFilters.add(new SearchFilter("assetInfo.tenantUID",
 		// SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));

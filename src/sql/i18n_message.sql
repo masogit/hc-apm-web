@@ -1692,14 +1692,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Equipment Up', 'Equipment Up', 'Equipment Up', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Closed', 'Closed', 'Closed', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '1',  '编辑','edit', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '2',  '排班','schedule', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '3',  '调剂','adjust', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '4',  '盘点','check', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '5',  '巡检','patrol', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '6', '977', '977', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '7',  '派工','dispatch', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '8',  '审核','approve', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('sysAuthority', '1',  '盘点','asset check', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CustomRole', '自定义角色', 'cumtom role', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'containsKeyRole', '自定义角色名字不能是系统角色!', 'custom role cannt be sys role !', NULL, '-1');
@@ -1712,3 +1705,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('alertConfigDeviceType', '6', 'NM CT', 'NM CT', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'AssetsIsBlank', '设备列表不能为空！', 'assets list cannot be blank!', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmOrderRuleLevel', '2', '二级规则', 'secondary level', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmOrderRuleLevel', '3', '三级规则', 'third level', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.create', '新建盘点工单', 'assetInventory.create', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.close', '关闭盘点工单', 'assetInventory.close', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.view', '查看盘点工单', 'assetInventory.view', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryAuthority', 'assetInventory.scan', '扫码盘点', 'assetInventory.scan', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryCard', 'mgr_inv', '盘点', 'assetInventoryCard', NULL, '-1');

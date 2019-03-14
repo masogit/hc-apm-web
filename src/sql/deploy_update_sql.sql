@@ -325,5 +325,12 @@ create table dashboard_role_res_tenant_revoke
 );
 
 
+--v19.3.1
+update v2_service_request set report_source = '1' where report_source is null;
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'NursingStaff';
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetStaff';
+update sys_role set authorities = 'assetInventory.close,assetInventory.create,assetInventory.scan,assetInventory.view',authorities_ch = '关闭盘点工单,新建盘点工单,扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetHead';
+
+
 
 

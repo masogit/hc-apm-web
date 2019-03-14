@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -28,12 +27,10 @@ import org.slf4j.LoggerFactory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -79,11 +76,13 @@ public class MaintainController implements ServerEventInterface {
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     private Set<String> orgUidList;
     private SearchController searchController;
+    private MaintainItemController maintainItemController;
 
     @PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
+		maintainItemController= WebUtil.getBean(MaintainItemController.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
 		searchController.setUpdateViewIDs(":maintainForm:maintain");
@@ -293,7 +292,7 @@ public class MaintainController implements ServerEventInterface {
 	}
 	
 	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData,Integer sequence){		
-		NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets,sequence);
+		NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintainWithoutItem(date,currentUser,nurseSiteMaintainConfig,sequence);
         listMaintainData.add(tempNurseSiteMaintain);
 	}
 	
@@ -369,53 +368,42 @@ public class MaintainController implements ServerEventInterface {
 		}
 	}
 	
-	private void generateNurseSiteMaintainData(){
-		List<String> showLables=nurseSiteMaintain.getShowLables();
-		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
-		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		if(showLables==null){
-			showLables=new ArrayList<String>();
-		}
-		else{
-			showLables.clear();
-		}
-		try {
-			if(listItem!=null && listItem.size()>0){
-				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
-				if(listTempData!=null){
-					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
-					while(it.hasNext()){
-						NurseSiteMaintainData tempData=it.next();
-						showLables.add(tempData.getCheckItem());
-					}
-//					showLables.sort(new StringComparator());
-				}
-			}
-			nurseSiteMaintain.setShowLables(showLables);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error("getLables error"+e.getMessage());
-		}
-	}
+//	private void generateNurseSiteMaintainData(){
+//		List<String> showLables=nurseSiteMaintain.getShowLables();
+//		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain);
+//		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+//		if(showLables==null){
+//			showLables=new ArrayList<String>();
+//		}
+//		else{
+//			showLables.clear();
+//		}
+//		try {
+//			if(listItem!=null && listItem.size()>0){
+//				List<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
+//				if(listTempData!=null){
+//					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
+//					while(it.hasNext()){
+//						NurseSiteMaintainData tempData=it.next();
+//						showLables.add(tempData.getCheckItem());
+//					}
+////					showLables.sort(new StringComparator());
+//				}
+//			}
+//			nurseSiteMaintain.setShowLables(showLables);
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			LOGGER.error("getLables error"+e.getMessage());
+//		}
+//	}
 	
 	public void checkRightAll(){
-		List<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
-		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-		while(it.hasNext()){
-			NurseSiteMaintainItem tempItem=it.next();
-			List<NurseSiteMaintainData> listData=tempItem.getListData();
-			Iterator<NurseSiteMaintainData> itData=listData.iterator();
-			while(itData.hasNext()){
-				NurseSiteMaintainData tempData=itData.next();
-				tempData.setCheckValue(true);
-			}
-		}
+		nurseSiteMaintainService.checkRightAll(nurseSiteMaintain);
 	}
 
 	public void saveMaintain() {
 		Date currentDate=new Date();
-		nurseSiteMaintainService.updateMaintainData(nurseSiteMaintain,currentDate,currentUser);
-		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain,currentDate,currentUser);
 		lazyEventModel.updateEvent(event);
 		addMessage("工单已保存");
 	}
@@ -523,7 +511,8 @@ public class MaintainController implements ServerEventInterface {
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
-		generateNurseSiteMaintainData();
+//		generateNurseSiteMaintainData();
+		maintainItemController.reset(nurseSiteMaintain);
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
@@ -537,7 +526,7 @@ public class MaintainController implements ServerEventInterface {
 //		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
 //	}
 
-	//1:day,2:week,3:month,4:year
+	
 	public String batchSaveMaintainData() {
 		if(nurseSiteMaintainConfig==null){
 			addMessage("请创建并选择配置模板");
@@ -574,6 +563,10 @@ public class MaintainController implements ServerEventInterface {
 						batchCreateMaintainData(date, listMaintainData,i+1);
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 			else if(type==2){
@@ -591,6 +584,10 @@ public class MaintainController implements ServerEventInterface {
 						}
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 			else if(type==3){
@@ -621,14 +618,23 @@ public class MaintainController implements ServerEventInterface {
 							startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 						}
 					}
+					if(listMaintainData.size()>30){
+						nurseSiteMaintainService.save(listMaintainData);
+						listMaintainData.clear();
+					}
 				}
 			}
 		}
 		if(listMaintainData.size()>0){
-			List<NurseSiteMaintain> listRemoveMain=getMaintainDataNeedToRemove(listMaintainData);
-			nurseSiteMaintainService.saveAndDelete(listMaintainData,listRemoveMain);
+			nurseSiteMaintainService.save(listMaintainData);
 		}
-		addMessage("工单已批量生成");
+		boolean result=nurseSiteMaintainService.addBatchJob("create",nurseSiteMaintainConfig,startBatchDate,endBatchDate,currentUser.getUid(),null);
+		if(result){
+			addMessage("工单详情后台生成中，请耐心等待。。。");
+		}
+		else{
+			addMessage("已经有相同工单详情后台生成中，请耐心等待。。。");
+		}
 		return "maintainMain?faces-redirect=true";
 	}
 	public String batchCompleteMaintainData(){
@@ -645,6 +651,9 @@ public class MaintainController implements ServerEventInterface {
 			if(StringUtils.isNotEmpty(signatureContent)){
 				signatureId=nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
 			}
+			if(signatureId==null){
+				signatureId="";
+			}
 			for(int i=0;i<listMaintainData.size();++i){
 				NurseSiteMaintain tempMaintain=listMaintainData.get(i);
 				Date tempDate=tempMaintain.getScheduleDate();
@@ -652,8 +661,18 @@ public class MaintainController implements ServerEventInterface {
 					listNewNurseSiteMaintain.add(tempMaintain);
 				}
 			}
-			nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
-			addMessage("工单已批量填写");
+			if(listNewNurseSiteMaintain.size()>0){
+				nurseSiteMaintainService.batchCompleteMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+				if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
+					nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),signatureId+",");
+				}
+				else{
+					for(int i=0;i<listCheckClinicalOrgInfo.size();++i){
+						nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),signatureId+","+listCheckClinicalOrgInfo.get(i).getUid());
+					}
+				}
+			}
+			addMessage("工单后台完成中，请稍候刷新页面查看。");
 		}
 		else{
 			addMessage("未找到符合条件的工单");

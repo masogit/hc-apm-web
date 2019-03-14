@@ -43,11 +43,10 @@ public class SmallAssetPerformanceService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmallAssetPerformanceService.class);
 
 	private final String HEADER_DEPARTMENT = "科室";
-	private final String HEADER_COSTTYPE = "费别";
-	private final String HEADER_CODE = "编码";
+	private final String HEADER_COSTTYPE = "费用类别";
 	private final String HEADER_PROJECTNAME = "项目名称";
 	private final String HEADER_PROJECTNUMBER = "项目编号";
-	private final String HEADER_STANDARD = "一类标准";
+	private final String HEADER_STANDARD = "单价";
 	private final String HEADER_QUANTITY = "数量";
 	private final String HEADER_AMOUNT = "金额";
 	private final String HEADER_HAPPENDATE = "日期";
@@ -149,7 +148,7 @@ public class SmallAssetPerformanceService {
 		List<String> headers = new ArrayList<>();
 		headers.add(HEADER_DEPARTMENT);
 		headers.add(HEADER_COSTTYPE);
-		headers.add(HEADER_CODE);
+//		headers.add(HEADER_CODE);
 		headers.add(HEADER_PROJECTNAME);
 		headers.add(HEADER_PROJECTNUMBER);
 		headers.add(HEADER_STANDARD);
@@ -172,7 +171,7 @@ public class SmallAssetPerformanceService {
 		
 		int departmentIndex=header.get(HEADER_DEPARTMENT);
 		int costtypeIndex=header.get(HEADER_COSTTYPE);
-		int codeIndex=header.get(HEADER_CODE);
+//		int codeIndex=header.get(HEADER_CODE);
 		int projectnameIndex=header.get(HEADER_PROJECTNAME);
 		int projectnumberIndex=header.get(HEADER_PROJECTNUMBER);
 		int standardIndex=header.get(HEADER_STANDARD);
@@ -195,7 +194,7 @@ public class SmallAssetPerformanceService {
 				detail.setSiteUID(user.getSiteUID());
 				department=ExcelParser.getCellStringValue(row, departmentIndex);
 				costtype=ExcelParser.getCellStringValue(row, costtypeIndex);
-				code=ExcelParser.getCellStringValue(row, codeIndex);
+//				code=ExcelParser.getCellStringValue(row, codeIndex);
 				projectname=ExcelParser.getCellStringValue(row, projectnameIndex);
 				projectnumber=ExcelParser.getCellStringValue(row, projectnumberIndex);
 				standard=ExcelParser.getCellNumberValue(row, standardIndex);
@@ -210,16 +209,17 @@ public class SmallAssetPerformanceService {
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"日期不能为空；");
 					pass=false;
 				}
-				if(StringUtils.isNotEmpty(projectname) && (happendate != null)){
+				if(StringUtils.isEmpty(department)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isNotEmpty(projectname) && (happendate != null) &&(StringUtils.isNotEmpty(department))){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				}
-				if(!pass){
-					importFailedDataList.add(detail);
-					continue;
-				}
+				
 				detail.setDepartment(department);
 				detail.setCostType(costtype);
-				detail.setCode(code);
+//				detail.setCode(code);
 				detail.setProjectName(projectname);
 				detail.setProjectNumber(projectnumber);
 				detail.setStandard(standard);
@@ -227,7 +227,10 @@ public class SmallAssetPerformanceService {
 				detail.setAmount(amount);
 				detail.setHappenDate(happendate);
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
-
+				if(!pass){
+					importFailedDataList.add(detail);
+					continue;
+				}
 				if(checkData(detail)){
 //					smallAssetPerformanceDao.save(detail);
 					saveSmallAssetPerformance(detail);

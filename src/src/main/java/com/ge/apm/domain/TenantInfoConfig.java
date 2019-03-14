@@ -423,6 +423,8 @@ public class TenantInfoConfig {
 				listLabel.add("组织机构管理");
 				listKey.add("config.user");
 				listLabel.add("用户管理");
+				listKey.add("config.customRole");
+				listLabel.add("自定义角色");
 				listKey.add("config.assetMessage");
 				listLabel.add("设备消息订阅");
 				listKey.add("config.qrCode");
@@ -483,5 +485,11 @@ public class TenantInfoConfig {
 
 	public void setSelectedNodes(TreeNode[] selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+	public List<String> getListLabel(){
+		return this.listLabel;
+	}
+	public List<String> getListKey(){
+		return this.listKey;
 	}
 }

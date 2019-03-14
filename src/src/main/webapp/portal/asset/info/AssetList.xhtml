@@ -46,6 +46,8 @@
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
@@ -299,8 +301,14 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetUsage'}">
-                                <p:column headerText="#{msg.assetUsage}" >
+                                <p:column id="assetUsage" headerText="#{msg.assetUsage}" sortBy="#{item.assetUsage}" filterBy="#{item.assetUsage}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetValueCategory'}">
@@ -309,13 +317,26 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'capitalSource'}">
-                                <p:column headerText="#{msg.capitalSource}" >
+                                <p:column id="capitalSource" headerText="#{msg.capitalSource}" sortBy="#{item.capitalSource}" filterBy="#{item.capitalSource}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
+
                             </c:if>
                             <c:if test="#{columnItem eq 'capitalSource2'}">
-                                <p:column headerText="#{msg.capitalSource2}" >
+                                <p:column id="capitalSource2" headerText="#{msg.capitalSource2}" sortBy="#{item.capitalSource2}" filterBy="#{item.capitalSource2}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource2)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measureGrade'}">
@@ -329,13 +350,25 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'emergencyEquipment'}">
-                                <p:column headerText="#{msg.emergencyEquipment}" >
+                                <p:column id="emergencyEquipment" headerText="#{msg.emergencyEquipment}" sortBy="#{item.emergencyEquipment}" filterBy="#{item.emergencyEquipment}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'importEquipment'}">
-                                <p:column headerText="#{msg.importEquipment}" >
+                                <p:column id="importEquipment" headerText="#{msg.importEquipment}" sortBy="#{item.importEquipment}" filterBy="#{item.importEquipment}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measuringItemCategory'}">
@@ -349,7 +382,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'siteUID'}">
-                                <p:column headerText="#{msg.hospitalId}" >
+                                <p:column headerText="#{msg.hospitalId}">
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
                                 </p:column>
                             </c:if>
@@ -425,8 +458,14 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'deviceStatus'}">
-                                <p:column headerText="#{msg.deviceStatus}" >
-                                    <h:outputText value=" #{fieldMsg.fieldValue('deviceStatus',item.deviceStatus)}"/>
+                                <p:column id="deviceStatus" headerText="#{msg.deviceStatus}" sortBy="#{item.deviceStatus}" filterBy="#{item.deviceStatus}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('deviceStatus', item.deviceStatus)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'manufactDate'}">
@@ -526,8 +565,14 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'repairForm'}">
-                                <p:column  headerText="#{msg.repairForm}" >
-                                    <h:outputText value="#{fieldMsg.fieldValue('repairForm',item.repairForm)}"/>
+                                <p:column id="repairForm" headerText="#{msg.repairForm}" sortBy="#{item.repairForm}" filterBy="#{item.repairForm}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'comments'}">

@@ -75,8 +75,11 @@
 						<p:column headerText="所属院区">
 							<h:outputText value="#{item.siteOrgName}" />
 						</p:column>
-						<p:column headerText="设备编号" filterBy="#{item.v2WorkOrderAssetInfoDepartNum}" filterMatchMode="LIKE">
-							<h:outputText value="#{item.v2WorkOrderAssetInfoDepartNum}" />
+<!-- 						<p:column headerText="设备编号" filterBy="#{item.v2WorkOrderAssetInfoDepartNum}" filterMatchMode="LIKE"> -->
+<!-- 							<h:outputText value="#{item.v2WorkOrderAssetInfoDepartNum}" /> -->
+<!-- 						</p:column> -->
+						<p:column headerText="二维码" filterBy="#{item.v2WorkOrderAssetInfoQrCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.v2WorkOrderAssetInfoQrCode}" />
 						</p:column>
 						<p:column headerText="设备名称" filterBy="#{item.v2WorkOrderAssetInfoNamePyCode}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.v2WorkOrderAssetInfoName}" />
