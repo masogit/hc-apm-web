@@ -209,11 +209,11 @@ public class SmallAssetPerformanceService {
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"日期不能为空；");
 					pass=false;
 				}
-				if(department==null){
+				if(StringUtils.isEmpty(department)){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室不能为空；");
 					pass=false;
 				}
-				if(StringUtils.isNotEmpty(projectname) && (happendate != null) &&(department!=null)){
+				if(StringUtils.isNotEmpty(projectname) && (happendate != null) &&(StringUtils.isNotEmpty(department))){
 					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
 				}
 				

@@ -178,6 +178,11 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     //保存按钮动作
     public void saveChange() {
 
+        if(assetGroupID == null){
+            WebUtil.addErrorMessage("请设置设备分类");
+            return;
+        }
+
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
             WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
             return;
