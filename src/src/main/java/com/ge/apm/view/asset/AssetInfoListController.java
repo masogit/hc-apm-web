@@ -1,19 +1,25 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.*;
-import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -25,22 +31,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeTemplate;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetFileDynamicTemplate;
+import com.ge.apm.service.asset.AssetFileExportService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.QrCodeExportStream;
+import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -136,7 +157,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
@@ -401,9 +421,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
-
             assetInfo.setStatus(4);
             dao.save(assetInfo);
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
@@ -490,9 +510,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
+    
 
     public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);

@@ -68,6 +68,13 @@
                             <!-- <h:outputText  value="#{item.contractAmount}"/> -->
                             <p:inputNumber value="#{item.amount}" readonly="true"> </p:inputNumber>
                         </p:column>
+                        <p:column headerText="#{msg.Actions}">
+                            <p:commandButton value="合同完成"
+                                             rendered="#{item.contractType == 'Equipment'}"
+                                             disabled="#{item.isContractComplete()}"
+                                             update=":AssetContractListForm:datalist"
+                                             action="#{contractInfoController.completeContract(item)}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{contractInfoController.createAction}" />
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{contractInfoController.prepareView}" update=":AssetContractViewDlg" oncomplete="PF('AssetContractViewDialog').show()" disabled="#{empty contractInfoController.selected}"/>-->

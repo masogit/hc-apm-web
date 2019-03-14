@@ -19,7 +19,7 @@
 					<p>
 						1. <a href="APM_SmallAssetPerformance_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
-					<p>2. 文件中填入要导入的数据，其中[项目名称]和[日期]必填</p>
+					<p>2. 文件中填入要导入的数据，其中[项目名称][日期][科室]必填</p>
 					<p>3. 上传文件进行导入</p>
 				</h:panelGroup>
 			</p:fieldset>
@@ -40,19 +40,19 @@
 					<p:column headerText="科室">
 						<h:outputText value="#{item.department}" />
 					</p:column>
-					<p:column headerText="费别">
+					<p:column headerText="费用类别">
 						<h:outputText value="#{item.costType}" />
 					</p:column>
-					<p:column headerText="编码">
+					<!-- <p:column headerText="编码">
 						<h:outputText value="#{item.code}" />
-					</p:column>
+					</p:column> -->
 					<p:column headerText="项目名称">
 						<h:outputText value="#{item.projectName}" />
 					</p:column>
 					<p:column headerText="项目编号">
 						<h:outputText value="#{item.projectNumber}" />
 					</p:column>
-					<p:column headerText="一类标准">
+					<p:column headerText="单价">
 						<h:outputText value="#{item.standard}" />
 					</p:column>
 					<p:column headerText="数量">

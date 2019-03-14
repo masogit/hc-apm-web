@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -16,12 +21,18 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.SmallAssetPerformanceConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -42,13 +53,27 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     private SmallAssetPerformanceConfigService service;
     private UploadedFile file;
     private List<SmallAssetPerformanceConfig> importFailedDataList;
-    
+    private Map<String,Object> selectedObjectMap;
+    private List<SmallAssetPerformanceConfig> listNewConfig;
+    private List<OrgInfo> clinicalDeptList;
+    private List<AssetInfo> assetInfoList;
+    private int type;//0:create,1:edit
+    private SmallAssetPerformanceConfig editConfig;
+    private AssetInfoService assetInfoService;
+    private boolean blnSaveable=false;
     @Override
     protected void init() {
         dao = WebUtil.getBean(SmallAssetPerformanceConfigRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         service = WebUtil.getBean(SmallAssetPerformanceConfigService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());
+        assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID());
+        listNewConfig=new LinkedList<SmallAssetPerformanceConfig>();
+        editConfig=new SmallAssetPerformanceConfig();
+        listNewConfig.add(editConfig);
+        selectedObjectMap=new HashMap<String,Object>();
     }
 
     @Override
@@ -79,6 +104,26 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     public void onServerEvent(String eventName, Object eventObject) {
 
     }
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    	// TODO Auto-generated method stub
+    	super.prepareCreate();
+    	type=0;
+    }
+    @Override
+    public void prepareEdit() {
+    	// TODO Auto-generated method stub
+    	super.prepareEdit();
+    	type=1;
+    	String departName=selected.getDepartment();
+    	String assetName=selected.getAssetName();
+    	if(StringUtils.isNotEmpty(departName)){
+    		selectedObjectMap.put("clinicalDept", service.getOrgInfoByName(clinicalDeptList, departName));
+    	}
+    	if(StringUtils.isNotEmpty(assetName)){
+    		selectedObjectMap.put("asset", service.getAssetInfoByName(assetInfoList, assetName));
+    	}
+    }
 
     @Override
     public void onBeforeNewObject(SmallAssetPerformanceConfig object) {
@@ -91,16 +136,46 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 
     @Override
     public void save() {
-    	if(this.selected.hashCode()==0){
-    		if(service.checkConfigExists(this.selected)){
-    			FacesMessage message = new FacesMessage("错误", "项目名称和设备名称唯一，请勿重复添加！");
-    			this.selected=null;
-    			return;
+    	if(type==0){
+    		for(int i=0;i<listNewConfig.size();++i){
+    			SmallAssetPerformanceConfig tempConfig=listNewConfig.get(i);
+    			if(StringUtils.isEmpty(tempConfig.getAssetName())){
+    				continue;
+    			}
+    			tempConfig.setDepartment(selected.getDepartment());
+    			tempConfig.setProjectName(selected.getProjectName());
+    			tempConfig.setProjectNumber(selected.getProjectNumber());
+    			tempConfig.setTenantUID(currentUser.getTenantUID());
+    			tempConfig.setInstitutionUID(currentUser.getInstitutionUID());
+    			tempConfig.setHospitalUID(currentUser.getHospitalUID());
+    			tempConfig.setSiteUID(currentUser.getSiteUID());
+    			tempConfig.setAverage(selected.getAverage());
+    			if(service.checkConfigExists(tempConfig)){
+    				WebUtil.addErrorMessage("项目名称和设备名称唯一，请勿重复添加！");
+        			this.selected=null;
+        			return;
+    			}
+    			service.checkData(tempConfig, tempConfig.getId(), false);
+    			service.save(tempConfig);
     		}
+    		listNewConfig.clear();
+    		editConfig=new SmallAssetPerformanceConfig();
+            listNewConfig.add(editConfig);
     	}
-    	service.checkData(this.selected,this.selected.getId(),false);
-    	super.save();
-        this.selected=null;
+    	else if(type==1){
+    		if(this.selected.hashCode()==0){
+        		if(service.checkConfigExists(this.selected)){
+        			WebUtil.addErrorMessage("项目名称和设备名称唯一，请勿重复添加！");
+        			this.selected=null;
+        			return;
+        		}
+        	}
+        	service.checkData(this.selected,this.selected.getId(),false);
+        	super.save();
+    	}
+    	WebUtil.addSuccessMessage("保存成功！");
+    	this.selected=null;
+    	selectedObjectMap=new HashMap<String,Object>();
     }
     
     @Override
@@ -110,7 +185,14 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	super.delete();
     	this.selected=null;
     }
-    
+    public void rateCalculate(){
+    	String projectName=selected.getProjectName();
+    	if(StringUtils.isEmpty(projectName)){
+    		WebUtil.addErrorMessage("项目名称不能为空！");
+    		return;
+    	}
+    	service.rateCalculate(listNewConfig,projectName, currentUser.getSiteUID());
+    }
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
@@ -133,11 +215,140 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 	public void setImportFailedDataList(List<SmallAssetPerformanceConfig> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
+	public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+	public List<AssetInfo> autoCompleteAsset(String query) {
+        if (assetInfoList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetInfo> res = this.assetInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+	public void setObjCheckItem(SmallAssetPerformanceConfig config){
+		editConfig=config;
+		selectedObjectMap.put("asset", editConfig.getAssetInfo());
+	}
+	public void deleteItemDetail(SmallAssetPerformanceConfig config){
+		for(int i=0;i<listNewConfig.size();++i){
+			SmallAssetPerformanceConfig tempConfig=listNewConfig.get(i);
+			if(tempConfig.getAssetName().equals(config.getAssetName())){
+				listNewConfig.remove(i);
+				break;
+			}
+		}
+		checkSaveable();
+	}
+	public void saveCheckListItem(){
+		boolean add=true;
+		SmallAssetPerformanceConfig tempConfig=null;
+		for(int i=0;i<listNewConfig.size();++i){
+			tempConfig=listNewConfig.get(i);
+			if(StringUtils.isEmpty(tempConfig.getAssetName())){
+				add=false;
+				break;
+			}
+		}
+		if(add){
+			editConfig=new SmallAssetPerformanceConfig();
+			listNewConfig.add(editConfig);
+			selectedObjectMap.put("asset",null);
+		}
+		else{
+			editConfig=tempConfig;
+		}
+		checkSaveable();
+	}
 	
+	public void checkSaveable(){
+		if(listNewConfig.size()>1){
+			blnSaveable=true;
+		}
+		else{
+			blnSaveable=false;
+		}
+	}
+	public void onAssetDeptChange(String idx) {
+        OrgInfo clinicalDept = null;
+        switch (idx) {
+            case "clinicalDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
+                selected.setDepartment(clinicalDept.getName());
+                assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),clinicalDept.getUid());
+                break;
+            case "assetDept":
+                break;
+        }
+    }
+	public void onAssetChange(String idx) {
+        AssetInfo tempAsset = null;
+        switch (idx) {
+            case "asset":
+            	tempAsset = (AssetInfo) selectedObjectMap.get("asset");
+                if(type==0){
+                    editConfig.setAssetName(tempAsset.getName());
+                    editConfig.setAssetInfo(tempAsset);
+                }
+                else if(type==1){
+                	selected.setAssetName(tempAsset.getName());
+                }
+                break;
+            case "assetDept":
+                break;
+        }
+    }
 	@Override
 	protected String getActionMessage(String actionName) {
 		// TODO Auto-generated method stub
 		return "设备绩效配置"+" "+WebUtil.getMessage(actionName);
+	}
+
+	public Map<String, Object> getSelectedObjectMap() {
+		return selectedObjectMap;
+	}
+
+	public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+		this.selectedObjectMap = selectedObjectMap;
+	}
+
+	public List<OrgInfo> getClinicalDeptList() {
+		return clinicalDeptList;
+	}
+
+	public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+		this.clinicalDeptList = clinicalDeptList;
+	}
+
+	public List<SmallAssetPerformanceConfig> getListNewConfig() {
+		return listNewConfig;
+	}
+
+	public void setListNewConfig(List<SmallAssetPerformanceConfig> listNewConfig) {
+		this.listNewConfig = listNewConfig;
+	}
+
+	public SmallAssetPerformanceConfig getEditConfig() {
+		return editConfig;
+	}
+
+	public void setEditConfig(SmallAssetPerformanceConfig editConfig) {
+		this.editConfig = editConfig;
+	}
+
+	public boolean isBlnSaveable() {
+		return blnSaveable;
+	}
+
+	public void setBlnSaveable(boolean blnSaveable) {
+		this.blnSaveable = blnSaveable;
 	}
     
 }

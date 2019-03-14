@@ -19,11 +19,20 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId);
 	
+	@Query(value="select count(o.id) from nurse_site_maintain_item o where o.parent_id=?1",nativeQuery=true)
+	public Integer findCountMaintainItemByParentId(String parentId);
+	
+	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1 limit ?2 offset ?3",nativeQuery=true)
+	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId,int pageSize,int page);
+	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(Set<String> parentIds);
 	
 	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
 	public Set<String> findIdsByParentId(Set<String> parentIds);
+	
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status=?2)",nativeQuery=true)
+	public Boolean findExistsItemStatus(String parentId,int status);
 	
 	@Transactional
 	@Modifying

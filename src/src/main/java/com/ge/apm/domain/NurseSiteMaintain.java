@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "nurse_site_maintain")
@@ -129,9 +129,6 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Transient
 	private List<String> showLables;
-	
-	@Transient
-	private boolean needGetItem=true;
 	
 	public NurseSiteMaintain() {
 		super();
@@ -290,14 +287,6 @@ public class NurseSiteMaintain implements Serializable {
 	public void setShowLables(List<String> showLables) {
 		this.showLables = showLables;
 	}
-	
-	public boolean isNeedGetItem() {
-		return needGetItem;
-	}
-
-	public void setNeedGetItem(boolean needGetItem) {
-		this.needGetItem = needGetItem;
-	}
 
 	public String getClinicalDeptUID() {
 		return clinicalDeptUID;
@@ -355,7 +344,7 @@ public class NurseSiteMaintain implements Serializable {
 //		}
 //		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 //	}
-	
+
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
 		String strStatus="未检查";

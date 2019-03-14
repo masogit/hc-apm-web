@@ -1105,6 +1105,7 @@ public void repairResultSet(){
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        newServiceRequest.setCasePriority(3); //紧急程度默认是设置为一般
         faultReason="设备故障";
     }
 
@@ -1138,14 +1139,11 @@ public void repairResultSet(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-        if (Strings.isNullOrEmpty(asset.getLocationName())) {
+            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             asset.setLocationName(lName);
             locationName = lName;
-        } else {
-            locationName = asset.getLocationName();
-        }
     }
 
     @Override
@@ -1276,7 +1274,11 @@ public void repairResultSet(){
            if(itemDetail.getClosedPrice()==null) {
                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
            }
+           itemDetail.setArrivedGood(false);
+           itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
+           //调用微服务来存附件
+            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
         cancelWorkdetail();
     }
@@ -1293,6 +1295,7 @@ public void repairResultSet(){
         coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
+    //index == 1 是删除备件  ，index=2是删除协作人
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
 
@@ -1300,7 +1303,8 @@ public void repairResultSet(){
             detailDao.delete(itemDetail);*/
 
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-       //     detailDao.deleteById(itemId);
+            //调用微服务删除备件
+            serviceRequestApiService.delAccess(token,itemId);
 
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
