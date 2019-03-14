@@ -27,8 +27,8 @@ public interface BatchJobRepository extends GenericRepositoryUUID<BatchJob> {
     @Query(value="select o.* from batch_job o where o.status=0 and o.name=?1 order by o.create_time limit 1",nativeQuery=true)
     List<BatchJob> findNewBatchJobWithName(String name);
     
-    @Query(value="select o.* from batch_job o where o.status=0 and o.content=?1 and o.site_uid=?2 order by o.create_time limit 1",nativeQuery=true)
-    List<BatchJob> findNewBatchJobWithContentSite(String content,String siteUid);
+    @Query(value="select o.* from batch_job o where o.status=0 and o.sub_name=?1 and o.content=?2 and o.site_uid=?3 order by o.create_time limit 1",nativeQuery=true)
+    List<BatchJob> findNewBatchJobWithContentSite(String action,String content,String siteUid);
     
     @Query(value="select o.* from batch_job o where o.status=0 and o.site_uid=?1 order by o.create_time limit 1",nativeQuery=true)
     List<BatchJob> findNewBatchJobWithSite(String siteUid);

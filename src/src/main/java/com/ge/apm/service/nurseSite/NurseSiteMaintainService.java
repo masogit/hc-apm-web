@@ -253,7 +253,9 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		nurseSiteMaintainRepository.delete(maintain);
+		List<NurseSiteMaintain> listMaintain=new ArrayList<NurseSiteMaintain>();
+		listMaintain.add(maintain);
+		nativeDeleteMaintain(listMaintain);
 		return true;
 	}
 
@@ -385,11 +387,11 @@ public class NurseSiteMaintainService {
 		if(StringUtils.isNotEmpty(other)){
 			sb.append(other);
 		}
-		sb.append(",");
+		sb.append(",0");
 		content = sb.toString();
 		List<BatchJob> listJob=null;
 		if(config!=null){
-			listJob = batchJobRepository.findNewBatchJobWithContentSite(content, config.getSiteUID());
+			listJob = batchJobRepository.findNewBatchJobWithContentSite(action,content, config.getSiteUID());
 		}
 		if (listJob != null && listJob.size() > 0) {
 			return false;
@@ -915,40 +917,12 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean batchCompleteMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user) {
-		Thread t=new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				tBatchCompleteMaintain(listMaintain, signatureId, date, user);
-			}
-		});
-		t.start();
-		return false;
-	}
-	
-	public void tBatchCompleteMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user){
-		for(int i=0;i<listMaintain.size();++i){
-			tBatchCompleteMaintain(listMaintain.get(i), signatureId, date, user);
-		}
-	}
-	
-	@Transactional
-	public void tBatchCompleteMaintain(NurseSiteMaintain maintain, String signatureId, Date date, UserAccount user){
 		Set<String> setMaintainIds = new HashSet<String>();
-		Set<String> setMaintainItemIds = new HashSet<String>();
-		Set<String> setMaintainDataIds = new HashSet<String>();
-		setMaintainIds.add(maintain.getId());
-		if (setMaintainIds.size() > 0) {
-			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+		for(int i=0;i<listMaintain.size();++i){
+			setMaintainIds.add(listMaintain.get(i).getId());
 		}
-		if (setMaintainItemIds.size() > 0) {
-			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
-		}
-		if (setMaintainDataIds.size() > 0) {
-			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
-			nurseSiteMaintainItemRepository.completeMaintainItem(setMaintainItemIds, signatureId, user.getUid(), date);
-			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
-		}
+		nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		return true;
 	}
 
 	public void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {

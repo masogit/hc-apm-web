@@ -7,7 +7,8 @@
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,NursingStaff,assetInventory') and userContextService.versionContains('asset')}">
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
-                <p:menuitem id="um1002" value="设备定位" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.getTenantInfo().locationEn ne null}"/>                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('asset.info')}"/>
+                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.versionContains('asset.info')}"/>
+                <p:menuitem id="um1002" value="设备定位" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.getTenantInfo().locationEn ne null}"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml"/>
                 <p:menuitem id="um05" value="#{msg.AssetDocumentMgmt}" rendered="false" outcome="/portal/asset/fileAttachment/List"/>
                 <p:menuitem id="um06" value="#{msg.AssetValueAnalysis}" rendered="false" outcome="/empty"/>
@@ -113,7 +114,7 @@
                 <p:menuitem id="um19" value="#{msg.DeviceMaintainanceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um21" value="#{msg.SparePartsConsumptionAnalysis}" rendered="false" outcome="/home"/>
                 <p:menuitem id="um22" value="#{msg.ProcessAnalysis}" url="/portal/analysis/reports.xhtml#/ProcessAnalysis" rendered="false"/>
-                <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}" url="/portal/analysis/reports.xhtml#/ScanDetails" rendered="false"/>
+                <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}" url="/geapm/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.loginUserSiteId eq 112}"/>
                <p:menuitem id="um151" value="CT球管预测" rendered="#{userContextService.isAgentTenant() and userContextService.versionContains('performance.CT')}" outcome="/portal/config/tubeData/List.xhtml"/>
                 <p:menuitem id="um50" value="设备绩效配置" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.config')}"/>
                 <p:menuitem id="um51" value="设备绩效导入" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.import')}"/>
