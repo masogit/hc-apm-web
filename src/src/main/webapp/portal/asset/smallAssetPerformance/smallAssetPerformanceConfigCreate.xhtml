@@ -19,12 +19,12 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">科室名称*</label>
-					<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" scrollHeight="300"
-						forceSelection="true" required="true"
-						requiredMessage="科室名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteDept}" var="t"
-						itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
-						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}"/>
-					</p:autoComplete>
+					<p:selectOneMenu value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" converter="orgInfoUidConverter" style="width:100%;"
+						rendered="true" requiredMessage="科室名称不能为空">
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update=":smallAssetPerformanceConfigTab:checkItemEditForm" />
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{smallAssetPerformanceConfigController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					</p:selectOneMenu>
 				</h:panelGroup>
 				<!-- <h:panelGroup>
 					<label class="label">设备名称</label>
@@ -44,8 +44,8 @@
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceConfigController.selected != null}">
 				<h:panelGroup>
 					<label class="label">增加设备*</label>
-					<p:dataTable id="addAssetConfig" value="#{smallAssetPerformanceConfigController.listNewConfig}" var="item" widgetVar="addAssetConfig" lazy="false" paginator="false"
-						rowKey="#{item.assetName}" rows="1000" emptyMessage="#{msg.noRecordFound}" style="width:900px">
+					<p:dataTable id="addAssetConfig" value="#{smallAssetPerformanceConfigController.listNewConfig}" var="item" widgetVar="addAssetConfig" lazy="false"
+						paginator="false" rowKey="#{item.assetName}" rows="1000" emptyMessage="#{msg.noRecordFound}" style="width:900px">
 						<p:column headerText="设备名称">
 							<h:outputText value="#{item.assetName}" />
 						</p:column>
@@ -56,36 +56,40 @@
 							<p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":smallAssetPerformanceConfigTab:checkItemEditDlg"
 								oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.assetName}" />
 							<p:commandButton process="@this" icon="ui-icon-edit" style="zoom:0.8;" title="#{msg.Edit}"
-								actionListener="#{smallAssetPerformanceConfigController.setObjCheckItem(item)}" update=":smallAssetPerformanceConfigTab:checkItemEditDlg" oncomplete="PF('checkItemEditDlg').show()"
-								rendered="#{not empty item.assetName}" />
+								actionListener="#{smallAssetPerformanceConfigController.setObjCheckItem(item)}" update=":smallAssetPerformanceConfigTab:checkItemEditDlg"
+								oncomplete="PF('checkItemEditDlg').show()" rendered="#{not empty item.assetName}" />
 							<p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
-								actionListener="#{smallAssetPerformanceConfigController.deleteItemDetail(item)}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:btnSave,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig"
+								actionListener="#{smallAssetPerformanceConfigController.deleteItemDetail(item)}"
+								update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:btnSave,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig"
 								rendered="#{not empty item.assetName}"></p:commandButton>
 						</p:column>
 					</p:dataTable>
 				</h:panelGroup>
-				
+
 			</p:panelGrid>
 			<br />
 			<p:commandButton id="btnSave" validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"
 				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateDlg, :smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl"
-				icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigCreateDialog');" disabled="#{!smallAssetPerformanceConfigController.blnSaveable}"/>
-			<p:commandButton id="btnRateCalculate" disabled="#{!smallAssetPerformanceConfigController.selected.average}" actionListener="#{smallAssetPerformanceConfigController.rateCalculate}" update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig" value="均摊预览"/>
+				icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigCreateDialog');"
+				disabled="#{!smallAssetPerformanceConfigController.blnSaveable}" />
+			<p:commandButton id="btnRateCalculate" disabled="#{!smallAssetPerformanceConfigController.selected.average}"
+				actionListener="#{smallAssetPerformanceConfigController.rateCalculate}"
+				update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig" value="均摊预览" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceConfigCreateDialog').hide()" />
 		</h:form>
 	</p:dialog>
-	<p:dialog id="checkItemEditDlg" widgetVar="checkItemEditDlg" width="400"
-		header="配置">
+	<p:dialog id="checkItemEditDlg" widgetVar="checkItemEditDlg" width="400" header="配置">
 		<h:form id="checkItemEditForm" rendered="#{smallAssetPerformanceConfigController.editConfig!=null}">
 			<h:panelGroup id="display" class="checkItemEditDlg">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="height:300px">
 					<h:panelGroup>
 						<label>设备名称*</label>
-						<p:autoComplete dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" scrollHeight="300"
-							forceSelection="true" required="true" requiredMessage="设备名称不能为空"
-							completeMethod="#{smallAssetPerformanceConfigController.autoCompleteAsset}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
-							<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
-						</p:autoComplete>
+						<p:selectOneMenu value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" converter="assetInfoConverter" style="width:100%;"
+							rendered="true" requiredMessage="设备名称不能为空">
+							<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{smallAssetPerformanceConfigController.assetInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+						</p:selectOneMenu>
 					</h:panelGroup>
 					<h:panelGroup>
 						<label>占比*</label>
@@ -93,9 +97,9 @@
 					</h:panelGroup>
 				</p:panelGrid>
 				<p:commandButton validateClient="true" actionListener="#{smallAssetPerformanceConfigController.saveCheckListItem}"
-					update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:btnSave" value="#{msg.Save}" icon="ui-icon-check"
-					oncomplete="handleSubmit(args, 'checkItemEditDlg');" />
-                 <p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
+					update=":growl,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:addAssetConfig,:smallAssetPerformanceConfigTab:smallAssetPerformanceConfigCreateForm:btnSave"
+					value="#{msg.Save}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'checkItemEditDlg');" />
+				<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
 			</h:panelGroup>
 		</h:form>
 	</p:dialog>
