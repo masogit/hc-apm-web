@@ -21,7 +21,7 @@
 					<label class="label">科室名称*</label>
 					<p:selectOneMenu value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" converter="orgInfoUidConverter" style="width:100%;"
 						rendered="true" requiredMessage="科室名称不能为空">
-						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update=":smallAssetPerformanceConfigTab:checkItemEditForm" />
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update=":smallAssetPerformanceConfigTab:checkItemEditForm,btnSave" />
 						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						<f:selectItems value="#{smallAssetPerformanceConfigController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					</p:selectOneMenu>
