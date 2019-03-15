@@ -87,7 +87,7 @@ public class SmallAssetPerformanceService {
 	}
 	
 	private boolean checkConfigRight(SmallAssetPerformance detail){
-		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(),detail.getSiteUID());
 		boolean pass=true;
 		for(SmallAssetPerformanceConfig config : listConfig){
 			if(!config.getStatusCode().equals("1")){
@@ -201,7 +201,6 @@ public class SmallAssetPerformanceService {
 	}
 	public void init(){
 		mapConfigError.clear();
-		smallAssetPerformanceConfigService.init();
 	}
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -288,11 +287,11 @@ public class SmallAssetPerformanceService {
 					pass=false;
 				}
 				if(pass){
-					pass=checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, detail.getSiteUID()),projectname);
+					pass=checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, department,detail.getSiteUID()),projectname);
 					if(!pass){
 						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不存在");
 					}
-					int result=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname, detail.getSiteUID()),department);
+					int result=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname,department, detail.getSiteUID()),department);
 					if(result==0){
 						pass=false;
 						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不存在");
@@ -341,7 +340,7 @@ public class SmallAssetPerformanceService {
 	public void insertReportData(SmallAssetPerformance detail){
 		//no update action, so delete it.
 		deleteReportData(detail);
-		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(),detail.getSiteUID());
 		if(listConfig!=null && listConfig.size()>0){
 			List<AssetInfo> listAssetInfo=null;
 			List<SmallAssetPerformanceReport> listReport=new ArrayList<SmallAssetPerformanceReport>();
