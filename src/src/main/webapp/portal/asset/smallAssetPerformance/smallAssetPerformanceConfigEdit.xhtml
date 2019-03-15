@@ -21,7 +21,7 @@
 					<label class="label">科室名称*</label>
 					<p:selectOneMenu value="#{smallAssetPerformanceConfigController.selectedObjectMap['clinicalDept']}" converter="orgInfoUidConverter" style="width:100%;"
 						rendered="true" requiredMessage="科室名称不能为空">
-						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update="idAssetName" />
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetDeptChange('clinicalDept')}" update="idAssetName,idEditSave" />
 						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						<f:selectItems value="#{smallAssetPerformanceConfigController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					</p:selectOneMenu>
@@ -30,7 +30,7 @@
 					<label class="label">设备名称*</label>
 					<p:selectOneMenu id="idAssetName" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" converter="assetInfoConverter"
 						style="width:100%;" rendered="true" requiredMessage="设备名称不能为空">
-						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" update="idEditSave"/>
 						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						<f:selectItems value="#{smallAssetPerformanceConfigController.assetInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					</p:selectOneMenu>
@@ -45,9 +45,9 @@
 				</h:panelGroup>
 			</p:panelGrid>
 			<br />
-			<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"
+			<p:commandButton id="idEditSave" validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}"
 				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl" icon="ui-icon-check"
-				oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');" />
+				oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');" disabled="#{!smallAssetPerformanceConfigController.blnSaveable}"/>
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceConfigEditDialog').hide()" />
 		</h:form>
 	</p:dialog>
