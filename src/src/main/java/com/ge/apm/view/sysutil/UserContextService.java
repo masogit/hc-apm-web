@@ -439,7 +439,7 @@ public class UserContextService implements Serializable {
             return "/login.xhtml";
         } else {
             if(isIBorUltraSoundIBEndUser())
-                return "portal/woMgr/workOrderList.xhtml";
+                return "portal/profile.xhtml";
             
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
