@@ -276,7 +276,7 @@ public class PmReportService {
         if (this.pmOrderService.getServiceRequestMessageList(pmOrder.getId()) != null) {
             for (ServiceRequestMsg item : this.pmOrderService.getServiceRequestMessageList(pmOrder.getId())) {
                 Map<String, Object> auditMsgMap = new HashMap<>();
-                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.TIME.toString(), item.getSendTime());
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.TIME.toString(), DateFormatUtils.format(item.getSendTime(), "yyyy-MM-dd HH:mm:ss"));
                 auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.OWNER.toString(), item.getSenderUserName());
                 auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.INFO.toString(), item.getMessage());
 
