@@ -87,7 +87,7 @@ public class SmallAssetPerformanceService {
 	}
 	
 	private boolean checkConfigRight(SmallAssetPerformance detail){
-		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(),detail.getSiteUID());
 		boolean pass=true;
 		for(SmallAssetPerformanceConfig config : listConfig){
 			if(!config.getStatusCode().equals("1")){
@@ -125,20 +125,25 @@ public class SmallAssetPerformanceService {
 	
 	
 	
-	public boolean checkDepartName(List<OrgInfo> listOrg,List<SmallAssetPerformanceConfig> listConfig,String department){
-		boolean result=false;
+	public int checkDepartName(List<OrgInfo> listOrg,List<SmallAssetPerformanceConfig> listConfig,String department){
+		int result=0;
+		boolean has1=false;
 		if(listOrg!=null && listOrg.size()>0 && listConfig!=null && listConfig.size()>0){
 			for(int i=0;i<listOrg.size();++i){
 				OrgInfo tempOrg=listOrg.get(i);
 				if(tempOrg.getName().equals(department)){
+					has1=true;
 					for(int j=0;j<listConfig.size();++j){
 						SmallAssetPerformanceConfig tempConfig=listConfig.get(j);
 						if(department.equals(tempConfig.getDepartment())){
-							return true;
+							return 2;
 						}
 					}
 				}
 			}
+		}
+		if(has1){
+			result=1;
 		}
 		return result;
 	}
@@ -196,7 +201,6 @@ public class SmallAssetPerformanceService {
 	}
 	public void init(){
 		mapConfigError.clear();
-		smallAssetPerformanceConfigService.init();
 	}
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -283,13 +287,21 @@ public class SmallAssetPerformanceService {
 					pass=false;
 				}
 				if(pass){
-					pass=checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, detail.getSiteUID()),projectname);
+					pass=checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, department,detail.getSiteUID()),projectname);
 					if(!pass){
 						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不存在");
 					}
-					pass=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname, detail.getSiteUID()),department);
-					if(!pass){
+					int result=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname,department, detail.getSiteUID()),department);
+					if(result==0){
+						pass=false;
 						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不存在");
+					}
+					else if(result==1){
+						pass=false;
+						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"配置项目中科室名称不存在");
+					}
+					else if(result==2){
+						pass=true;
 					}
 				}
 				detail.setDepartment(department);
@@ -328,8 +340,7 @@ public class SmallAssetPerformanceService {
 	public void insertReportData(SmallAssetPerformance detail){
 		//no update action, so delete it.
 		deleteReportData(detail);
-		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getSiteUID());
-		System.out.println("xxx"+listConfig.size());
+		List<SmallAssetPerformanceConfig> listConfig=smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(),detail.getSiteUID());
 		if(listConfig!=null && listConfig.size()>0){
 			List<AssetInfo> listAssetInfo=null;
 			List<SmallAssetPerformanceReport> listReport=new ArrayList<SmallAssetPerformanceReport>();
@@ -337,8 +348,6 @@ public class SmallAssetPerformanceService {
 			SmallAssetPerformanceReport report=null;
 			for(SmallAssetPerformanceConfig obj : listConfig){
 				listAssetInfo=smallAssetPerformanceConfigService.getAccessAssetInfo(obj.getSiteUID(), obj.getAssetName(), obj.getDepartment());
-				System.out.println("xxx"+obj.getSiteUID()+" "+obj.getAssetName()+" "+obj.getDepartment());
-				System.out.println("xxx"+listAssetInfo.size());
 				if(listAssetInfo!=null && listAssetInfo.size()>0){
 					count=listAssetInfo.size();
 					for(AssetInfo assetInfo: listAssetInfo){
