@@ -29,6 +29,9 @@ public class SmallAssetPerformanceConfig implements Serializable {
     //科室
     @Column(name = "department")
     private String department;
+    
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备所属科室
 
     //项目编号
     @Column(name = "projectNumber")
@@ -257,6 +260,14 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
 	public void setAverage(Boolean average) {
 		this.average = average;
+	}
+
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
 	}
 
 	@Override

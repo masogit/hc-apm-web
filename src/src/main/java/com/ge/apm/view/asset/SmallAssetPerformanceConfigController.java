@@ -70,10 +70,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());
         assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
-        listNewConfig=new LinkedList<SmallAssetPerformanceConfig>();
-        editConfig=new SmallAssetPerformanceConfig();
-        listNewConfig.add(editConfig);
-        selectedObjectMap=new HashMap<String,Object>();
+        
     }
 
     @Override
@@ -109,19 +106,30 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	// TODO Auto-generated method stub
     	super.prepareCreate();
     	type=0;
+    	blnSaveable=false;
+    	listNewConfig=new LinkedList<SmallAssetPerformanceConfig>();
+        editConfig=new SmallAssetPerformanceConfig();
+        listNewConfig.add(editConfig);
+        selectedObjectMap=new HashMap<String,Object>();
     }
     @Override
     public void prepareEdit() {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
     	type=1;
+    	blnSaveable=true;
+        selectedObjectMap=new HashMap<String,Object>();
     	String departName=selected.getDepartment();
     	String assetName=selected.getAssetName();
+    	String clinicalUid=selected.getClinicalDeptUID();
     	if(StringUtils.isNotEmpty(departName)){
     		selectedObjectMap.put("clinicalDept", service.getOrgInfoByName(clinicalDeptList, departName));
     	}
     	if(StringUtils.isNotEmpty(assetName)){
     		selectedObjectMap.put("asset", service.getAssetInfoByName(assetInfoList, assetName));
+    		if(StringUtils.isNotEmpty(clinicalUid)){
+    			assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),clinicalUid);
+    		}
     	}
     }
 
@@ -150,15 +158,15 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     			tempConfig.setHospitalUID(currentUser.getHospitalUID());
     			tempConfig.setSiteUID(currentUser.getSiteUID());
     			tempConfig.setAverage(selected.getAverage());
+    			tempConfig.setClinicalDeptUID(selected.getClinicalDeptUID());
     			if(service.checkConfigExists(tempConfig)){
-    				WebUtil.addErrorMessage("项目名称和设备名称唯一，请勿重复添加！");
+    				WebUtil.addErrorMessage("项目名称,科室名称，设备名称唯一，请勿重复添加！");
         			this.selected=null;
         			return;
     			}
     			service.checkData(tempConfig);
     			service.save(tempConfig);
     		}
-    		service.init();
     		listNewConfig.clear();
     		editConfig=new SmallAssetPerformanceConfig();
             listNewConfig.add(editConfig);
@@ -173,7 +181,6 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         	}
         	service.checkData(this.selected);
         	super.save();
-        	service.init();
     	}
     	WebUtil.addSuccessMessage("保存成功！");
     	this.selected=null;
@@ -185,16 +192,20 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	// TODO Auto-generated method stub
     	service.checkListConfig(selected,true);
     	super.delete();
-    	service.init();
     	this.selected=null;
     }
     public void rateCalculate(){
     	String projectName=selected.getProjectName();
+    	String department=selected.getDepartment();
     	if(StringUtils.isEmpty(projectName)){
     		WebUtil.addErrorMessage("项目名称不能为空！");
     		return;
     	}
-    	service.rateCalculate(listNewConfig,projectName, currentUser.getSiteUID());
+    	if(StringUtils.isEmpty(department)){
+    		WebUtil.addErrorMessage("科室名称不能为空！");
+    		return;
+    	}
+    	service.rateCalculate(listNewConfig,projectName, department,currentUser.getSiteUID());
     }
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
@@ -272,11 +283,20 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 	}
 	
 	public void checkSaveable(){
-		if(listNewConfig.size()>1){
-			blnSaveable=true;
+		blnSaveable=false;
+		if(type==0){
+			if(listNewConfig.size()>1){
+				if(selectedObjectMap.get("clinicalDept")!=null && StringUtils.isNotEmpty(selected.getDepartment())){
+					blnSaveable=true;
+				}
+			}
 		}
-		else{
-			blnSaveable=false;
+		else if(type==1){
+			if(selectedObjectMap.get("clinicalDept")!=null &&StringUtils.isNotEmpty(selected.getDepartment())){
+				if(selectedObjectMap.get("asset")!=null &&StringUtils.isNotEmpty(selected.getAssetName())){
+					blnSaveable=true;
+				}
+			}
 		}
 	}
 	public void onAssetDeptChange(String idx) {
@@ -286,10 +306,12 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
                 if(clinicalDept==null){
                 	selected.setDepartment("");
+                	selected.setClinicalDeptUID("");
                 	assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
                 }
                 else{
                 	selected.setDepartment(clinicalDept.getName());
+                	selected.setClinicalDeptUID(clinicalDept.getUid());
                     assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),clinicalDept.getUid());
                 }
                 
@@ -297,6 +319,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
             case "assetDept":
                 break;
         }
+        checkSaveable();
     }
 	public void onAssetChange(String idx) {
         AssetInfo tempAsset = null;
@@ -304,16 +327,28 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
             case "asset":
             	tempAsset = (AssetInfo) selectedObjectMap.get("asset");
                 if(type==0){
-                    editConfig.setAssetName(tempAsset.getName());
-                    editConfig.setAssetInfo(tempAsset);
+                	if(tempAsset!=null){
+                		editConfig.setAssetName(tempAsset.getName());
+                        editConfig.setAssetInfo(tempAsset);
+                	}
+                	else{
+                		editConfig.setAssetName("");
+                        editConfig.setAssetInfo(null);
+                	}
                 }
                 else if(type==1){
-                	selected.setAssetName(tempAsset.getName());
+                	if(tempAsset!=null){
+                		selected.setAssetName(tempAsset.getName());
+                	}
+                	else{
+                		selected.setAssetName("");
+                	}
                 }
                 break;
             case "assetDept":
                 break;
         }
+        checkSaveable();
     }
 	@Override
 	protected String getActionMessage(String actionName) {
