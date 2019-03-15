@@ -54,8 +54,6 @@ public class SmallAssetPerformanceConfigService {
 	
 	private Map<String,List<AssetInfo>> mapAssetInfoSiteUid=new HashMap<String,List<AssetInfo>>();
 	private Map<String,List<OrgInfo>> mapOrgInfoSiteUid=new HashMap<String,List<OrgInfo>>();
-	private Map<String,List<SmallAssetPerformanceConfig>> mapSmallConfig=new HashMap<String,List<SmallAssetPerformanceConfig>>();
-	private UserAccount currentUser;
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
 		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
@@ -87,7 +85,7 @@ public class SmallAssetPerformanceConfigService {
 	public boolean checkListConfigAverage(SmallAssetPerformanceConfig detail){
 		boolean pass=true;
 		String id=detail.getId();
-		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(),detail.getDepartment(), detail.getSiteUID());
 		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
 			double size=listDetails.size();
@@ -103,15 +101,13 @@ public class SmallAssetPerformanceConfigService {
 				config.setAverage(true);
 			}
 			detail.setRate(rate);
-			smallAssetPerformanceConfigDao.save(listDetails);
-			updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,true);
-			detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
 		}
+		updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,true);
+		detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
 		return pass;
 	}
 	
 	public void init(){
-		mapSmallConfig.clear();
 		mapAssetInfoSiteUid.clear();
 		mapOrgInfoSiteUid.clear();
 	}
@@ -119,7 +115,7 @@ public class SmallAssetPerformanceConfigService {
 		boolean pass=true;
 		String id=detail.getId();
 		//check configList rate
-		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(), detail.getSiteUID());
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(detail.getProjectName(), detail.getDepartment(),detail.getSiteUID());
 		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
 			for(SmallAssetPerformanceConfig config: listDetails){
@@ -149,9 +145,9 @@ public class SmallAssetPerformanceConfigService {
 		return pass;
 	}
 	
-	public void rateCalculate(List<SmallAssetPerformanceConfig> list,String projectName,String siteUid){
+	public void rateCalculate(List<SmallAssetPerformanceConfig> list,String projectName,String department,String siteUid){
 		double size=list.size()-1;
-		List<SmallAssetPerformanceConfig> listDetails=getConfig(projectName, siteUid);
+		List<SmallAssetPerformanceConfig> listDetails=getConfig(projectName, department,siteUid);
 		if(listDetails!=null && listDetails.size()>0){
 			size+=listDetails.size();
 		}
@@ -199,14 +195,8 @@ public class SmallAssetPerformanceConfigService {
 		}
 		return result;
 	}
-	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
-		String str=projectName+siteUid;
-		List<SmallAssetPerformanceConfig> listRe=mapSmallConfig.get(str);
-		if(listRe==null){
-			listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
-			mapSmallConfig.put(str, listRe);
-		}
-		return listRe;
+	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+		return smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
 	}
 	
 	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
