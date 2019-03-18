@@ -620,7 +620,7 @@
                             <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and !assetInfoListController.toBeTerminatedAppraisal and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
 
                             <p:commandButton icon="ui-icon-arrow-1-s" title="#{msg.toBeTerminatedAppraisal}" rendered="#{assetInfoListController.toBeTerminatedAppraisal}"
-                                             actionListener="#{assetInfoListController.toBeTerminatedAppraisalFile}" update=":growl"
+                                             actionListener="#{assetInfoListController.exportToBeTerminatedAppraisalFile}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoListController.toBeTerminatedAppraisalFile}" />
                             </p:commandButton>
