@@ -619,6 +619,12 @@
                             </p:commandButton>
                             <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and !assetInfoListController.toBeTerminatedAppraisal and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
 
+                            <p:commandButton icon="ui-icon-arrow-1-s" title="#{msg.toBeTerminatedAppraisal}" rendered="#{assetInfoListController.toBeTerminatedAppraisal}"
+                                             actionListener="#{assetInfoListController.toBeTerminatedAppraisalFile}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{assetInfoListController.toBeTerminatedAppraisalFile}" />
+                            </p:commandButton>
+
                             <ui:fragment rendered="#{!assetInfoListController.terminate and !assetInfoListController.toBeTerminatedAppraisal and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>

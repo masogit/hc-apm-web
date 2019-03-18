@@ -50,7 +50,6 @@ import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.asset.QrCodeExportStream;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -114,6 +113,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private StreamedContent excelFile;
 
     private StreamedContent zipFile;
+
+    private StreamedContent toBeTerminatedAppraisalFile;
 
     private String exportQrCodeTemplateId;
 
@@ -409,6 +410,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("exported asset list to excel, start to get input stream");
 
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+    }
+
+    public void exportToBeTerminatedAppraisalFile() {
+        for(Map.Entry assetInfo : selectedMap.entrySet()) {
+            System.out.println(assetInfo.getKey());
+            System.out.println(assetInfo.getValue());
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        toBeTerminatedAppraisalFile = null;
     }
 
     public void batchProcessToBeTerminated() {
@@ -710,6 +724,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setExcelFile(StreamedContent excelFile) {
         this.excelFile = excelFile;
+    }
+
+    public StreamedContent getToBeTerminatedAppraisalFile() {
+        return toBeTerminatedAppraisalFile;
+    }
+
+    public void setToBeTerminatedAppraisalFile(StreamedContent toBeTerminatedAppraisalFile) {
+        this.toBeTerminatedAppraisalFile = toBeTerminatedAppraisalFile;
     }
 
     public String getExportQrCodeTemplateId() {
