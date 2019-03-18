@@ -23,6 +23,7 @@
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.hasAnyRole('AssetHead') or userContextService.isAssetApprover()) and userContextService.versionContains('asset.audit')}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.batchImportData')}"/>
                 <p:menuitem id="um088" value="盘点工单" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{(not userContextService.isIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,NursingStaff,assetInventory') and userContextService.versionContains('asset.inventory')}"/>
+                <p:menuitem id="um089" value="报损鉴定表导出" outcome="/portal/asset/info/AssetList.xhtml?tobeterminatedappraisal=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.scrap')}"/>
 
             </p:submenu>
 
