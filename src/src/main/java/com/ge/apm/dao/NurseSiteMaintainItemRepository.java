@@ -22,7 +22,7 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select count(o.id) from nurse_site_maintain_item o where o.parent_id=?1",nativeQuery=true)
 	public Integer findCountMaintainItemByParentId(String parentId);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1 limit ?2 offset ?3",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1 order by o.id limit ?2 offset ?3",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId,int pageSize,int page);
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
