@@ -173,7 +173,7 @@ public class SmallAssetPerformanceService {
 					SmallAssetPerformanceConfig tempConfig=listConfig.get(i);
 					result=checkAssetInfo(siteUid, tempConfig.getAssetName(), department);
 					if(!result){
-						mapConfigError.put(str, "项目配置错误，设备未找到："+tempConfig.getAssetName());
+						mapConfigError.put(str, "科室内不存在设备："+tempConfig.getAssetName());
 						break;
 					}
 					else{
@@ -201,6 +201,7 @@ public class SmallAssetPerformanceService {
 	}
 	public void init(){
 		mapConfigError.clear();
+		smallAssetPerformanceConfigService.init();
 	}
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -291,17 +292,19 @@ public class SmallAssetPerformanceService {
 					if(!pass){
 						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不存在");
 					}
-					int result=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname,department, detail.getSiteUID()),department);
-					if(result==0){
-						pass=false;
-						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不存在");
-					}
-					else if(result==1){
-						pass=false;
-						detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"配置项目中科室名称不存在");
-					}
-					else if(result==2){
-						pass=true;
+					if(pass){
+						int result=checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()), smallAssetPerformanceConfigService.getConfig(projectname,department, detail.getSiteUID()),department);
+						if(result==0){
+							pass=false;
+							detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室名称不存在");
+						}
+						else if(result==1){
+							pass=false;
+							detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"配置项目中科室名称不存在");
+						}
+						else if(result==2){
+							pass=true;
+						}
 					}
 				}
 				detail.setDepartment(department);
