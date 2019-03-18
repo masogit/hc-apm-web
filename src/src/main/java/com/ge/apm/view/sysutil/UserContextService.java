@@ -35,18 +35,27 @@ public class UserContextService implements Serializable {
 //    public static final String MVS_ADMIN="MVSAdmin";
 //    private static final String MVS_FE="MVSFE";
 
-    TenantInfo tenant = null;
+    private TenantInfo tenant = null;
 
     private UserAccount userAccount = null;
 
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
+
+        // reset previous cached data
         userContextService.isDispatcher = null;
         userContextService.isPmDispatcher = null;
         userContextService.isAssetApprover = null;
         userContextService.needAssetApproval = null;
         userContextService.needInstorageCheck = null;
+
+        userContextService.flagIsAgentTenant = null;        
+        userContextService.flagIsUltraSoundTenant = null;
+        userContextService.flagIsHospitalUser = null;
+
+        userContextService.tenant = null;
+        userContextService.getTenantInfo();
     }
 
     public void processAfterLogin() {
@@ -430,7 +439,7 @@ public class UserContextService implements Serializable {
             return "/login.xhtml";
         } else {
             if(isIBorUltraSoundIBEndUser())
-                return "portal/woMgr/workOrderList.xhtml";
+                return "portal/profile.xhtml";
             
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
