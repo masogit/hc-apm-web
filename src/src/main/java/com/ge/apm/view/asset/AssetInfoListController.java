@@ -99,6 +99,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneSearchStr;
 
     private boolean terminate = false;
+    private boolean toBeTerminatedAppraisal = false;
 
     private Date varWarrantyDateTo = null;
 
@@ -158,6 +159,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        toBeTerminatedAppraisal = Boolean.valueOf(WebUtil.getRequestParameter("tobeterminatedappraisal"));
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
         exportService = WebUtil.getBean(AssetFileExportService.class);
@@ -231,6 +233,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
         } else {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        }
+
+        if (toBeTerminatedAppraisal) {
+            this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.EQ, 4));
         }
 
         if (!UserContextService.isMVSRole()) {
@@ -732,6 +738,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setTerminate(boolean terminate) {
         this.terminate = terminate;
+    }
+
+    public boolean isToBeTerminatedAppraisal() {
+        return toBeTerminatedAppraisal;
+    }
+
+    public void setToBeTerminatedAppraisal(boolean toBeTerminatedAppraisal) {
+        this.toBeTerminatedAppraisal = toBeTerminatedAppraisal;
     }
 
     public Map<String, Boolean> getSelectedMap() {
