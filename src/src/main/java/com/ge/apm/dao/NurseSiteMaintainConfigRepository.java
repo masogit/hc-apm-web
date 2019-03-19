@@ -14,7 +14,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
  */
 public interface NurseSiteMaintainConfigRepository extends GenericRepositoryUUID<NurseSiteMaintainConfig> {
 	@Query(value="select distinct o.* from nurse_site_maintain_config o where o.clinical_dept_uid in (?1) order by o.modify_date desc",nativeQuery=true)
-	public List<NurseSiteMaintainConfig> findByOrgUids(Set<String> orgUids);
+	public List<NurseSiteMaintainConfig> findByOrgUids(List<String> orgUids);
 	
 	@Query(value="select o.* from nurse_site_maintain_config o where o.id=?1",nativeQuery=true)
 	public NurseSiteMaintainConfig findById(String id);
