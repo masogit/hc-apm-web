@@ -37,7 +37,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
 
 	private UserAccount currentUser;
 	private InventoryOrderRepository dao;
-	private Map<Integer,Set<String>> mapAccess;
+	private Map<Integer,List<String>> mapAccess;
     private UaaService uaaService;
 
 	@Override
@@ -73,7 +73,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         }
         Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
         if(mapAccess.get(4)!=null){
-        	Set<String> setClinical=mapAccess.get(4);
+        	List<String> setClinical=mapAccess.get(4);
         	if(pageRe.hasContent()){
             	List<InventoryOrder> listRe=pageRe.getContent();
             	List<InventoryOrder> listNewRe=new ArrayList<InventoryOrder>();

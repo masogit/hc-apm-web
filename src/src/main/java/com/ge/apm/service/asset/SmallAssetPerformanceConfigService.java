@@ -195,7 +195,7 @@ public class SmallAssetPerformanceConfigService {
 		}
 		return result;
 	}
-	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
 		return smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
 	}
 	

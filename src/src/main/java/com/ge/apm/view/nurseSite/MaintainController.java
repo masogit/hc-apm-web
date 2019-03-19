@@ -74,7 +74,7 @@ public class MaintainController implements ServerEventInterface {
     private StreamedContent signatureContentWeiXin;
     private boolean blnWebSignatureEidt;
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-    private Set<String> orgUidList;
+    private List<String> orgUidList;
     private SearchController searchController;
     private MaintainItemController maintainItemController;
 
