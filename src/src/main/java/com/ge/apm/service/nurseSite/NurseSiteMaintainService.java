@@ -249,13 +249,11 @@ public class NurseSiteMaintainService {
 	}
 
 	@Transactional
-	public boolean deleteMaintain(NurseSiteMaintain maintain) {
+	public boolean deleteMaintain(NurseSiteMaintain maintain,String userUid) {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		List<NurseSiteMaintain> listMaintain=new ArrayList<NurseSiteMaintain>();
-		listMaintain.add(maintain);
-		nativeDeleteMaintain(listMaintain);
+		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
 	}
 
@@ -297,10 +295,6 @@ public class NurseSiteMaintainService {
 
 	public void save(NurseSiteMaintainConfig obj) {
 		nurseSiteMaintainConfigRepository.save(obj);
-	}
-
-	public void delete(NurseSiteMaintain obj) {
-		deleteMaintain(obj);
 	}
 
 	public void deleteNurseSiteMaintainConfigItem(List<NurseSiteMaintainConfigItem> list) {

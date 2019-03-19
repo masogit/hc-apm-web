@@ -438,7 +438,7 @@ public class MaintainController implements ServerEventInterface {
 		if (event.getId() != null) {
 			if (lazyEventModel.deleteEvent(event)) {
 				nurseSiteMaintain=(NurseSiteMaintain) event.getData();
-				nurseSiteMaintainService.deleteMaintain(nurseSiteMaintain);
+				nurseSiteMaintainService.deleteMaintain(nurseSiteMaintain,currentUser.getUid());
 				listMaintainData.remove(nurseSiteMaintain);
 				addMessage("工单已删除");
 			}
@@ -538,14 +538,21 @@ public class MaintainController implements ServerEventInterface {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
-		Integer type=nurseSiteMaintainConfig.getType();
-		String typeValue=nurseSiteMaintainConfig.getTypeValue();
-		List<NurseSiteMaintain> listMaintainData=new ArrayList<NurseSiteMaintain>();
 		Calendar currentCalendar=Calendar.getInstance();
 		Calendar startCalendar=Calendar.getInstance();
 		startCalendar.setTime(startBatchDate);
 		Calendar endCalendar=Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
+		Calendar maxCalendar=Calendar.getInstance();
+		maxCalendar.setTime(startBatchDate);
+		maxCalendar.add(Calendar.YEAR, 1);
+		if(endCalendar.getTimeInMillis()>maxCalendar.getTimeInMillis()){
+			addMessage("请选择一年之内的日期");
+			return "maintainMain?faces-redirect=false";
+		}
+		Integer type=nurseSiteMaintainConfig.getType();
+		String typeValue=nurseSiteMaintainConfig.getTypeValue();
+		List<NurseSiteMaintain> listMaintainData=new ArrayList<NurseSiteMaintain>();
 		if(StringUtils.isNotEmpty(typeValue)){
 			String arr[]=typeValue.split(",");
 			if(type==1){
