@@ -77,7 +77,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<AssetInfo> checkListAssets;
   	private List<OrgInfo> checkListOrgInfo;
   	private List<OrgInfo> checkListParentOrgInfo;
-  	private Set<String> setOrgUid;
+  	private List<String> setOrgUid;
   	private List<String> listOrgUid;
   	private DualListModel<AssetInfo> availableAssets;
   	private boolean isSaveDisable=true;
