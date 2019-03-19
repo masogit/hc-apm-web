@@ -44,7 +44,7 @@ public class AssetOptRecordService {
 		return assetOptRecordRepository;
 	}
 	
-	public Set<String> findAccessClinicalUidListByUserUid(String userUid){
+	public List<String> findAccessClinicalUidListByUserUid(String userUid){
 		return uaaService.findAccessClinicalUidByUserUid(userUid);
 	}
 	private String generateCostTime(Date start,Date end){

@@ -1198,9 +1198,9 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     }
     
     //where or
-    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid) {
+    public Map<Integer,List<String>> findAccessUidByUserUid(String userUid) {
 		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
+		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
 				UserOrgInfo temp=listUserOrgInfo.get(i);
@@ -1209,7 +1209,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 					map.get(type).add(temp.getOrgUid());
 				}
 				else{
-					Set<String> tempSet=new HashSet<String>();
+					List<String> tempSet=new ArrayList<String>();
 					tempSet.add(temp.getOrgUid());
 					map.put(type, tempSet);
 				}
@@ -1219,15 +1219,17 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 	}
     
     //where or
-    public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid,String siteUid) {
+    public Map<Integer,List<String>> findAccessUidByUserUid(String userUid,String siteUid) {
 		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,Set<String>> map=new HashMap<Integer,Set<String>>();
-		Set<String> orgUids=new HashSet<String>();
+		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
+		List<String> orgUids=new ArrayList<String>();
 		List<OrgInfo> listOrgInfo=null;
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
 				UserOrgInfo temp=listUserOrgInfo.get(i);
-				orgUids.add(temp.getOrgUid());
+				if(!orgUids.contains(temp.getOrgUid())){
+					orgUids.add(temp.getOrgUid());
+				}
 			}
 		}
 		if(orgUids.size()>0){
@@ -1241,7 +1243,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 					map.get(type).add(temp.getUid());
 				}
 				else{
-					Set<String> tempSet=new HashSet<String>();
+					List<String> tempSet=new ArrayList<String>();
 					tempSet.add(temp.getUid());
 					map.put(type, tempSet);
 				}
@@ -1251,11 +1253,11 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 	}
     
   //where and
-    public Set<String> findAccessClinicalUidByUserUid(String userUid){
-    	Map<Integer,Set<String>> map=findAccessUidByUserUid(userUid);
+    public List<String> findAccessClinicalUidByUserUid(String userUid){
+    	Map<Integer,List<String>> map=findAccessUidByUserUid(userUid);
     	if(map.size()>0){
-			Set<String> tempSet=null;
-			Set<String> clinicalSet=null;
+			List<String> tempSet=null;
+			List<String> clinicalSet=null;
 			tempSet=map.get(4);
 			boolean hasClinical=false;
 			if(tempSet!=null){
@@ -1263,7 +1265,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
 				clinicalSet=tempSet;
 			}
 			if(!hasClinical){
-				clinicalSet=new HashSet<String>();
+				clinicalSet=new ArrayList<String>();
 				map.put(4, clinicalSet);
 			}
 			tempSet=map.get(3);
@@ -1300,7 +1302,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     
   //where and
     public List<OrgInfo> findAccessClinicalUidByUserUid(String userUid,String siteUid){
-    	Set<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
+    	List<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
     	List<OrgInfo> re=null;
     	if(setAccessClinical!=null && setAccessClinical.size()>0){
     		re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);

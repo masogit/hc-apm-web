@@ -49,7 +49,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 	private String assetGroupFilter;
 	private SearchController searchController;
 	private OrgInfo selectOrgInfo;
-	private Set<String> setUserUids;
+	private List<String> setUserUids;
 
 	@Override
 	protected void init() {
