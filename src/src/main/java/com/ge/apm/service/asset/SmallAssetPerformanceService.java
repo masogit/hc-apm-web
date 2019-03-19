@@ -166,24 +166,24 @@ public class SmallAssetPerformanceService {
         boolean result = true;
         String errorMessage = mapConfigMsg.get(str);
         if (errorMessage == null) {
-            mapConfigMsg.put(str, "");
+            StringBuilder sb=new StringBuilder();
             List<SmallAssetPerformanceConfig> listConfig = smallAssetPerformanceConfigService.getConfig(projectName, department, siteUid);
             if (listConfig != null && listConfig.size() > 0) {
                 for (int i = 0; i < listConfig.size(); ++i) {
                     SmallAssetPerformanceConfig tempConfig = listConfig.get(i);
                     result = checkAssetInfo(siteUid, tempConfig.getAssetName(), department);
                     if (!result) {
-                        mapConfigMsg.put(str, "科室内不存在设备：" + tempConfig.getAssetName());
-                        break;
+                    	sb.append(tempConfig.getAssetName()+";");
                     }
                 }
             }
+            mapConfigMsg.put(str, sb.toString());
         }
         errorMessage = mapConfigMsg.get(str);
         if (errorMessage.length() == 0) {
         } else {
             result = false;
-            detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, errorMessage);
+            detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室内不存在设备："+errorMessage);
         }
         return result;
     }
@@ -286,21 +286,27 @@ public class SmallAssetPerformanceService {
                     pass = false;
                 }
                 if (pass) {
-                    pass = checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), projectname);
+                    pass = checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname,detail.getSiteUID()), projectname);
                     if (!pass) {
                         detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "项目不存在");
                     }
-                    if (pass) {
-                        int result = checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()),
-                                smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), department);
-                        if (result == 0) {
-                            pass = false;
-                            detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室名称不存在");
-                        } else if (result == 1) {
-                            pass = false;
-                            detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "配置项目中科室名称不存在");
-                        } else if (result == 2) {
-                            pass = true;
+                    if(pass){
+                    	pass = checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), projectname);
+                        if (!pass) {
+                            detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室不存在");
+                        }
+                        if (pass) {
+                            int result = checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()),
+                                    smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), department);
+                            if (result == 0) {
+                                pass = false;
+                                detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室名称不存在");
+                            } else if (result == 1) {
+                                pass = false;
+                                detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "配置项目中科室名称不存在");
+                            } else if (result == 2) {
+                                pass = true;
+                            }
                         }
                     }
                 }
