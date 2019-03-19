@@ -178,7 +178,6 @@ public class ElectricSafetyService {
 
 	@Transactional
 	public void insertUpdateData(List<ElectricSafetyData> list) {
-		List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
 		String financingNum = "";
 		for (ElectricSafetyData detail : list) {
 			detail.setTenantUID(user.getTenantUID());
@@ -187,6 +186,7 @@ public class ElectricSafetyService {
 			detail.setInstitutionUID(user.getInstitutionUID());
 			financingNum = detail.getFinancingNum();
 			if (financingNum != null) {
+				List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
 				listSearch.add(new SearchFilter("financingNum", Operator.EQ, financingNum));
 				List<AssetInfo> listInfo = assetInfoRepository.findBySearchFilter(listSearch);
 				if (listInfo != null && listInfo.size() == 1) {
@@ -358,7 +358,7 @@ public class ElectricSafetyService {
 		}
 		if (setFinancingNum.size() > 0) {
 			List<SearchFilter> listSearch=getSearchFilterByAccess(user.getUid(), user.getSiteUID());
-			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum));
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum,"1*"));
 			listAssetInfo = assetInfoRepository.findBySearchFilter(listSearch);
 		}
 		if (listAssetInfo != null && listAssetInfo.size() > 0) {

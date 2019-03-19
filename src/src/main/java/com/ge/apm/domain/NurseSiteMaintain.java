@@ -130,6 +130,9 @@ public class NurseSiteMaintain implements Serializable {
 	@Transient
 	private List<String> showLables;
 	
+	@Transient
+	private List<String> checkData;
+	
 	public NurseSiteMaintain() {
 		super();
 		this.status=0;
@@ -344,6 +347,14 @@ public class NurseSiteMaintain implements Serializable {
 //		}
 //		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 //	}
+
+	public List<String> getCheckData() {
+		return checkData;
+	}
+
+	public void setCheckData(List<String> checkData) {
+		this.checkData = checkData;
+	}
 
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
