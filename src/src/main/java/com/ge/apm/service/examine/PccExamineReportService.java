@@ -286,7 +286,7 @@ public class PccExamineReportService {
 		return result;
 	}
 
-	public Map<Integer,Set<String>> findAccessUidByUserUid(String userUid) {
+	public Map<Integer,List<String>> findAccessUidByUserUid(String userUid) {
 		return uaaService.findAccessUidByUserUid(userUid);
 	}
 

@@ -117,7 +117,7 @@ public class NurseSiteMaintainService {
 	private static final String STR_SIGNATURE = "签名";
 	private static final String STR_NURSESITEREPORT = "护士站日常维护报表";
 
-	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(Set<String> orgUids) {
+	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(List<String> orgUids) {
 		return nurseSiteMaintainConfigRepository.findByOrgUids(orgUids);
 	}
 
@@ -125,7 +125,7 @@ public class NurseSiteMaintainService {
 		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 
-	public List<NurseSiteMaintain> getDefaultMaintainData(Set<String> orgUids, Date startDate, Date endDate) {
+	public List<NurseSiteMaintain> getDefaultMaintainData(List<String> orgUids, Date startDate, Date endDate) {
 		return nurseSiteMaintainRepository.findDefaultData(orgUids, startDate, endDate);
 	}
 
@@ -137,11 +137,11 @@ public class NurseSiteMaintainService {
 		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate, configId);
 	}
 
-	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(Set<String> orgUids, Date startDate, Date endDate, Integer status, String configId) {
+	public List<NurseSiteMaintain> getDefaultMaintainDataByStatus(List<String> orgUids, Date startDate, Date endDate, Integer status, String configId) {
 		return nurseSiteMaintainRepository.findDefaultDataByStatus(orgUids, startDate, endDate, status, configId);
 	}
 
-	public List<NurseSiteMaintain> getDefaultMaintainDataChecked(Set<String> orgUids, Date startDate, Date endDate, String configId) {
+	public List<NurseSiteMaintain> getDefaultMaintainDataChecked(List<String> orgUids, Date startDate, Date endDate, String configId) {
 		return nurseSiteMaintainRepository.findDefaultDataChecked(orgUids, startDate, endDate, configId);
 	}
 
@@ -175,11 +175,11 @@ public class NurseSiteMaintainService {
 	}
 
 
-	public List<OrgInfo> getListClinicalByUidAndParent(Set<String> listUid, String parentUid) {
+	public List<OrgInfo> getListClinicalByUidAndParent(List<String> listUid, String parentUid) {
 		return orgInfoRepository.findByUidAndParentUid(listUid, parentUid);
 	}
 
-	public List<OrgInfo> getListParentSiteByUid(Set<String> listUid) {
+	public List<OrgInfo> getListParentSiteByUid(List<String> listUid) {
 		return orgInfoRepository.findParentSiteByUids(listUid);
 	}
 
@@ -1246,7 +1246,7 @@ public class NurseSiteMaintainService {
 		nativeDeleteMaintain(listMaintain);
 	}
 
-	public Set<String> findAccessOrgUidListByUserUid(String userUid) {
+	public List<String> findAccessOrgUidListByUserUid(String userUid) {
 		return uaaService.findAccessClinicalUidByUserUid(userUid);
 	}
 

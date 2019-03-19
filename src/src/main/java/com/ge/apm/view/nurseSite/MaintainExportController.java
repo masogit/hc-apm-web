@@ -44,7 +44,7 @@ public class MaintainExportController implements ServerEventInterface{
 	private OrgInfo selectedParentOrgInfo;
     //show
     private List<OrgInfo> listOrgInfo; 
-    private Set<String> orgUidList;
+    private List<String> orgUidList;
     private StreamedContent exportFile;
     private Date startDate;
     private Date endDate;
@@ -239,11 +239,11 @@ public class MaintainExportController implements ServerEventInterface{
 		this.listMaintainData = listMaintainData;
 	}
 
-	public Set<String> getOrgUidList() {
+	public List<String> getOrgUidList() {
 		return orgUidList;
 	}
 
-	public void setOrgUidList(Set<String> orgUidList) {
+	public void setOrgUidList(List<String> orgUidList) {
 		this.orgUidList = orgUidList;
 	}
 
