@@ -90,6 +90,27 @@ public class ElectricSafetyService {
 
 	@Autowired
 	UaaService uaaService;
+	
+	private Map<String,List<AssetInfo>> mapFinancingNumAssetInfo=new HashMap<String,List<AssetInfo>>();
+	
+	public ElectricSafetyService(){
+		mapFinancingNumAssetInfo.clear();
+	}
+	
+	private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum){
+		List<AssetInfo> listInfo=mapFinancingNumAssetInfo.get(financingNum);
+		if(listInfo==null || listInfo.size()==0){
+			List<String> listFinancingNum=new ArrayList<String>();
+			listFinancingNum.add(financingNum);
+			listFinancingNum.add(financingNum.toLowerCase());
+			listFinancingNum.add(financingNum.toUpperCase());
+			List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, listFinancingNum));
+			listInfo = assetInfoRepository.findBySearchFilter(listSearch);
+			mapFinancingNumAssetInfo.put(financingNum, listInfo);
+		}
+		return listInfo;
+	}
 
 	public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr = readFileByLine(file);
@@ -178,7 +199,6 @@ public class ElectricSafetyService {
 
 	@Transactional
 	public void insertUpdateData(List<ElectricSafetyData> list) {
-		List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
 		String financingNum = "";
 		for (ElectricSafetyData detail : list) {
 			detail.setTenantUID(user.getTenantUID());
@@ -187,8 +207,7 @@ public class ElectricSafetyService {
 			detail.setInstitutionUID(user.getInstitutionUID());
 			financingNum = detail.getFinancingNum();
 			if (financingNum != null) {
-				listSearch.add(new SearchFilter("financingNum", Operator.EQ, financingNum));
-				List<AssetInfo> listInfo = assetInfoRepository.findBySearchFilter(listSearch);
+				List<AssetInfo> listInfo = getAssetInfoByFinancingNum(financingNum);
 				if (listInfo != null && listInfo.size() == 1) {
 					String uid = listInfo.get(0).getUid();
 					detail.setAssetId(listInfo.get(0).getId());
@@ -360,7 +379,7 @@ public class ElectricSafetyService {
 		}
 		if (setFinancingNum.size() > 0) {
 			List<SearchFilter> listSearch=getSearchFilterByAccess(user.getUid(), user.getSiteUID());
-			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum));
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum,"1*"));
 			listAssetInfo = assetInfoRepository.findBySearchFilter(listSearch);
 		}
 		if (listAssetInfo != null && listAssetInfo.size() > 0) {
