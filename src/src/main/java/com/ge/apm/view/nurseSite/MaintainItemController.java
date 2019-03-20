@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ibm.icu.util.Calendar;
 
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -43,16 +46,16 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private boolean blnPre;
 	private boolean blnNext;
 	private Map<String,Boolean> mapCheckData;
+	private MaintainController maintainController;
 	@PostConstruct
 	public void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		mapCheckData=new HashMap<String,Boolean>();
-		// test
 	}
 
-	public void reset(NurseSiteMaintain nurseSiteMaintain) {
+	public void reset(NurseSiteMaintain nurseSiteMaintain,MaintainController maintainController) {
 		this.nurseSiteMaintain = nurseSiteMaintain;
 		mapCheckData.clear();
 		page=0;
@@ -60,6 +63,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		generateLabel();
 		size=getItemSize();
 		pageButtonChange();
+		this.maintainController=maintainController;
 	}
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
@@ -82,6 +86,11 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	}
 	public void checkRightAll(){
 		nurseSiteMaintainService.checkRightAll(nurseSiteMaintain);
+	}
+	public void completeMaintain(){
+		nurseSiteMaintainService.completeMaintain(nurseSiteMaintain, new Date(), currentUser);
+		this.maintainController.updateEvent();
+		addMessage("工单已保存");
 	}
 	public void saveCheckData(){
 		List<String> listCheckData=new ArrayList<String>();

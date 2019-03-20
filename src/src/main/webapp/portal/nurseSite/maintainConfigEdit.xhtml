@@ -126,8 +126,7 @@
 					</p:pickList>
 				</h:panelGroup>
 				<h:panelGroup rendered="#{maintainConfigController.selected.id!=null}">
-					<label>覆盖历史未完成检查</label>
-					<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyDirectly}" />
+					<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyDirectly}" label="覆盖历史未完成检查"/>
 				</h:panelGroup>
 			</p:panelGrid>
 			<br />

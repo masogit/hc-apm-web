@@ -62,7 +62,7 @@ import com.ge.apm.service.utils.NurseSiteMaintainComparator;
 import webapp.framework.dao.SearchFilter;
 
 /**
- * Created by 212605082 on 2018/5/8.
+ * Created by 503035627
  */
 @Service
 public class NurseSiteMaintainService {
@@ -705,6 +705,7 @@ public class NurseSiteMaintainService {
 	}
 	public void checkRightAll(NurseSiteMaintain obj){
 		List<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
+		List<String> listCheckData=obj.getCheckData();
 		if(listItem!=null){
 			Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 			while(it.hasNext()){
@@ -713,7 +714,9 @@ public class NurseSiteMaintainService {
 				Iterator<NurseSiteMaintainData> itData=listData.iterator();
 				while(itData.hasNext()){
 					NurseSiteMaintainData tempData=itData.next();
-					tempData.setCheckValue(true);
+					if(listCheckData.contains(tempData.getCheckItem())){
+						tempData.setCheckValue(true);
+					}
 				}
 			}
 		}
@@ -910,12 +913,34 @@ public class NurseSiteMaintainService {
 		}
 	}
 
-	public boolean batchCompleteMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user) {
+	public boolean completeMaintain(List<NurseSiteMaintain> listMaintain, String signatureId, Date date, UserAccount user) {
 		Set<String> setMaintainIds = new HashSet<String>();
 		for(int i=0;i<listMaintain.size();++i){
 			setMaintainIds.add(listMaintain.get(i).getId());
 		}
 		nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		return true;
+	}
+	public boolean nativeCompleteMaintain(NurseSiteMaintain maintain, String signatureId, Date date, UserAccount user) {
+		Set<String> setMaintainIds = new HashSet<String>();
+		Set<String> setMaintainItemIds = new HashSet<String>();
+		Set<String> setMaintainDataIds = new HashSet<String>();
+		setMaintainIds.add(maintain.getId());
+		if (setMaintainIds.size() > 0) {
+			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+		}
+		if (setMaintainItemIds.size() > 0) {
+			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
+		}
+		if (setMaintainDataIds.size() > 0) {
+			nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
+		}
+		if (setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainItemRepository.completeMaintainItem(setMaintainItemIds, signatureId, user.getUid(), date);
+		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainRepository.completeMaintain(setMaintainIds, signatureId, user.getUid(), date);
+		}
 		return true;
 	}
 
@@ -1041,6 +1066,34 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
+		updateMaintainItem(tempNurseSiteMaintain,date,user);
+		saveMaintainItem(tempNurseSiteMaintain);
+		updateMaintain(tempNurseSiteMaintain,date,user);
+		save(tempNurseSiteMaintain);
+		return true;
+	}
+	
+	public boolean completeMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
+		Set<String> setMaintainIds = new HashSet<String>();
+		Set<String> setMaintainItemIds = new HashSet<String>();
+		Set<String> setMaintainDataIds = new HashSet<String>();
+		setMaintainIds.add(tempNurseSiteMaintain.getId());
+		if (setMaintainIds.size() > 0) {
+			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+		}
+		if (setMaintainItemIds.size() > 0) {
+			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
+		}
+		if (setMaintainDataIds.size() > 0) {
+			List<String> listCheckData=tempNurseSiteMaintain.getCheckData();
+			if(listCheckData!=null && listCheckData.size()>0){
+				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds,listCheckData);
+			}
+			else{
+				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
+			}
+		}
+		supplementMaintain(tempNurseSiteMaintain, 0, 0, true);
 		updateMaintainItem(tempNurseSiteMaintain,date,user);
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
@@ -1251,18 +1304,12 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean existMaintain(NurseSiteMaintain tempMaintain) {
-		Date startDate = tempMaintain.getScheduleDate();
-		Date endDate = tempMaintain.getScheduleDate();
-		Calendar ca = Calendar.getInstance();
-		ca.setTime(endDate);
-		ca.add(Calendar.DATE, 1);
-		endDate = ca.getTime();
 		Boolean result = null;
 		if (tempMaintain.getSequence() != null) {
-			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), startDate, endDate, tempMaintain.getConfigId(),
+			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), tempMaintain.getScheduleDate(), tempMaintain.getScheduleDate(), tempMaintain.getConfigId(),
 					tempMaintain.getSequence());
 		} else {
-			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), startDate, endDate, tempMaintain.getConfigId());
+			result = nurseSiteMaintainRepository.findExistsDefaultData(tempMaintain.getClinicalDeptUID(), tempMaintain.getScheduleDate(), tempMaintain.getScheduleDate(), tempMaintain.getConfigId());
 		}
 
 		return result == null ? false : result;
