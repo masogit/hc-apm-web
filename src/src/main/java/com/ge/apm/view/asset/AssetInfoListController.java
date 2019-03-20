@@ -20,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import com.ge.apm.service.asset.*;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -42,14 +43,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.asset.AssetFileDynamicTemplate;
-import com.ge.apm.service.asset.AssetFileExportService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.QrCodeExportStream;
-import com.ge.apm.service.asset.QrCodeService;
-import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -74,7 +67,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-//    private AssetFileImportService importService;
+    //    private AssetFileImportService importService;
     private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
@@ -142,6 +135,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private Map<String, Object> selectedObject;
 
+    private ExportToBeTerminatedAppraisalService exportToBeTerminatedAppraisalService;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -161,8 +156,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         toBeTerminatedAppraisal = Boolean.valueOf(WebUtil.getRequestParameter("tobeterminatedappraisal"));
+        exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
 
-//        importService = WebUtil.getBean(AssetFileImportService.class);
         exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
@@ -208,7 +203,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
 
-        currentPageAssets.stream().forEach(item -> {
+        currentPageAssets.forEach(item -> {
             if (item.getClinicalDeptUID() != null) {
                 OrgInfo found = orgInfoMap.get((item.getClinicalDeptUID()));
                 if (found != null) {
@@ -413,16 +408,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void exportToBeTerminatedAppraisalFile() {
-        for(Map.Entry assetInfo : selectedMap.entrySet()) {
-            System.out.println(assetInfo.getKey());
-            System.out.println(assetInfo.getValue());
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        toBeTerminatedAppraisalFile = null;
+        List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+
+        toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds);
     }
 
     public void batchProcessToBeTerminated() {
@@ -492,7 +480,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //        }
         Map<String, String> orgNamesMap = orgDao.findByUids(exportList.stream().map(AssetInfo::getSiteUID).distinct().collect(Collectors.toSet()))
                 .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
-        QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId, orgNamesMap);
         zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 
@@ -534,7 +522,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         this.selectedMap.clear();
     }
-    
+
 
     public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);
@@ -576,7 +564,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                 .filter(distinctByOrgName(OrgInfo::getName)) //display unique clinical name only
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
@@ -590,7 +578,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
