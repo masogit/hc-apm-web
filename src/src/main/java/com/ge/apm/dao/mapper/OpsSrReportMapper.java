@@ -21,7 +21,7 @@ public interface OpsSrReportMapper extends BaseMapper {
     String INNER_JOIN_ASSET = "inner join asset_info asset on asset.uid = sr.asset_uid ";
     String INNER_JOIN_SIEBLE = "inner join sieble_sr_data sieble on sr.event_uid = sieble.sr_number ";
     String WHERE_CONDITIONS = "where sr.event_type in (3, 4, 5) and sr.status = 2 and report.alce_id is null and asset.ib_status = 1 " +
-            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.status !=2";
+            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.is_valid = true and asset.status !=2";
     String SELECT_END = ") as resultgroup WHERE 1 = 1 ${ew.sqlSegment}";
 
     @Select(SELECT_START +
