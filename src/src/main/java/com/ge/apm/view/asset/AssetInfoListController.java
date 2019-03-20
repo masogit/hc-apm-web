@@ -321,6 +321,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onSelectSiteTreeNode2(NodeSelectEvent event) {
+        // Compared with the above method "onSelectSiteTreeNode", 
+        // this method does not clear existing filters
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+        if(selectSite==null) this.removeFilterOnField("siteUID");
+
+        loadClinicalDeptList();
+    }
+    
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
