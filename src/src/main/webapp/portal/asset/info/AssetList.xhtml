@@ -50,7 +50,7 @@
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :dataTableFilterByHospital :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -740,8 +740,9 @@
             </h:form>
         </p:dialog>
 
-        <h:form id="dataTableFilterByHospital">
-            <p:overlayPanel widgetVar="varPanelOrg2" for="AssetInfoListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false">
+        <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
+            <h:form id="dataTableFilterByHospital">
+            <p:overlayPanel widgetVar="varPanelOrg2" for="AssetInfoListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
                     <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -756,6 +757,7 @@
                     </p:scrollPanel>
             </p:overlayPanel>
         </h:form>
+        </c:if>        
 
         <script>
             //<![CDATA[
