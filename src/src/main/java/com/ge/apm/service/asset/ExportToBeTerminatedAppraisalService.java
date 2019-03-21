@@ -28,21 +28,7 @@ public class ExportToBeTerminatedAppraisalService {
     private AssetInfoRepository assetInfoRepository;
 
     public StreamedContent export(List<String> selectedIds) {
-        Map<String, Object> datas = new HashMap<>();
-
-        List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
-        for (String id : selectedIds) {
-            AssetInfo assetInfo = assetInfoRepository.findByUid(id);
-            Map<ASSET_DETAIL, Object> map = new HashMap<>();
-            map.put(ASSET_DETAIL.financing_num, assetInfo.getFinancingNum());
-            map.put(ASSET_DETAIL.asset_name, assetInfo.getName());
-            map.put(ASSET_DETAIL.function_type, assetInfo.getFunctionType());
-            Date createdDate = assetInfo.getCreatedDate();
-            map.put(ASSET_DETAIL.create_time, createdDate == null ? "" : createdDate.toString());
-            list.add(map);
-        }
-
-        datas.put("asset_detail_table", list);
+        Map<String, Object> datas = getData(selectedIds);
 
         byte[] bytes;
         XWPFTemplate template = null;
@@ -71,6 +57,23 @@ public class ExportToBeTerminatedAppraisalService {
 
             }
         }
+    }
+
+    public Map<String, Object> getData(List<String> selectedIds) {
+        Map<String, Object> datas = new HashMap<>();
+        List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
+        for (String id : selectedIds) {
+            AssetInfo assetInfo = assetInfoRepository.findByUid(id);
+            Map<ASSET_DETAIL, Object> map = new HashMap<>();
+            map.put(ASSET_DETAIL.financing_num, assetInfo.getFinancingNum());
+            map.put(ASSET_DETAIL.asset_name, assetInfo.getName());
+            map.put(ASSET_DETAIL.function_type, assetInfo.getFunctionType());
+            Date createdDate = assetInfo.getCreatedDate();
+            map.put(ASSET_DETAIL.create_time, createdDate == null ? "" : createdDate.toString());
+            list.add(map);
+        }
+        datas.put("asset_detail_table", list);
+        return datas;
     }
 
     private class AssetDetailsRenderPolicy extends AbstractWoTableRenderPolicy {
