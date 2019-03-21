@@ -116,7 +116,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<SearchFilter> listNewSearchFilter;
 	private List<PccExamineReport> listDetail;
 	private List<String> userRoleNames;
-	private Map<Integer,Set<String>> mapUserUids;
+	private Map<Integer,List<String>> mapUserUids;
 	private int currentPage;
 	private String sortField;
 	private boolean isAscending;
@@ -152,10 +152,10 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		}
 		// need list or set
 		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2*"));
-		Set<String> setInstitution=mapUserUids.get(1);
-		Set<String> setHospital=mapUserUids.get(2);
-		Set<String> setSite=mapUserUids.get(3);
-		Set<String> setClinical=mapUserUids.get(4);
+		List<String> setInstitution=mapUserUids.get(1);
+		List<String> setHospital=mapUserUids.get(2);
+		List<String> setSite=mapUserUids.get(3);
+		List<String> setClinical=mapUserUids.get(4);
 		if(setInstitution!=null){
 			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, setInstitution, "1*2+"));
 		}

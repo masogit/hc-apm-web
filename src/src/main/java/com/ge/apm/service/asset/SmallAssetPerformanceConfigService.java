@@ -195,7 +195,7 @@ public class SmallAssetPerformanceConfigService {
 		}
 		return result;
 	}
-	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
 		return smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
 	}
 	
@@ -340,6 +340,7 @@ public class SmallAssetPerformanceConfigService {
 	}
 	public List<SmallAssetPerformanceConfig> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		init();
 		List<SmallAssetPerformanceConfig> importFailedDataList = new ArrayList<>();
 		Workbook workbook = null;
 		if(file.getFileName().toLowerCase().endsWith(".xls")){

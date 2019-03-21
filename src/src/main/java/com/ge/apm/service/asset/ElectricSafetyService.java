@@ -90,6 +90,27 @@ public class ElectricSafetyService {
 
 	@Autowired
 	UaaService uaaService;
+	
+	private Map<String,List<AssetInfo>> mapFinancingNumAssetInfo=new HashMap<String,List<AssetInfo>>();
+	
+	public ElectricSafetyService(){
+		mapFinancingNumAssetInfo.clear();
+	}
+	
+	private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum){
+		List<AssetInfo> listInfo=mapFinancingNumAssetInfo.get(financingNum);
+		if(listInfo==null || listInfo.size()==0){
+			List<String> listFinancingNum=new ArrayList<String>();
+			listFinancingNum.add(financingNum);
+			listFinancingNum.add(financingNum.toLowerCase());
+			listFinancingNum.add(financingNum.toUpperCase());
+			List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, listFinancingNum));
+			listInfo = assetInfoRepository.findBySearchFilter(listSearch);
+			mapFinancingNumAssetInfo.put(financingNum, listInfo);
+		}
+		return listInfo;
+	}
 
 	public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr = readFileByLine(file);
@@ -151,26 +172,26 @@ public class ElectricSafetyService {
 	}
 
 	public List<SearchFilter> getSearchFilterByAccess(String userUid, String siteUid) {
-		Map<Integer, Set<String>> mapAccess = uaaService.findAccessUidByUserUid(userUid, siteUid);
+		Map<Integer, List<String>> mapAccess = uaaService.findAccessUidByUserUid(userUid, siteUid);
 		List<SearchFilter> listSearchFilter = new ArrayList<SearchFilter>();
 		if (mapAccess.get(0) != null) {
-			SearchFilter s = new SearchFilter("tenantUID", Operator.IN, "1*2+");
+			SearchFilter s = new SearchFilter("tenantUID", Operator.IN,mapAccess.get(0), "1*2+");
 			listSearchFilter.add(s);
 		}
 		if (mapAccess.get(1) != null) {
-			SearchFilter s = new SearchFilter("institutionUID", Operator.IN, "1*2+");
+			SearchFilter s = new SearchFilter("institutionUID", Operator.IN, mapAccess.get(1),"1*2+");
 			listSearchFilter.add(s);
 		}
 		if (mapAccess.get(2) != null) {
-			SearchFilter s = new SearchFilter("hospitalUID", Operator.IN, "1*2+");
+			SearchFilter s = new SearchFilter("hospitalUID", Operator.IN,mapAccess.get(2), "1*2+");
 			listSearchFilter.add(s);
 		}
 		if (mapAccess.get(3) != null) {
-			SearchFilter s = new SearchFilter("siteUID", Operator.IN, "1*2+");
+			SearchFilter s = new SearchFilter("siteUID", Operator.IN, mapAccess.get(3),"1*2+");
 			listSearchFilter.add(s);
 		}
 		if (mapAccess.get(4) != null) {
-			SearchFilter s = new SearchFilter("clinicalDeptUID", Operator.IN, "1*2+");
+			SearchFilter s = new SearchFilter("clinicalDeptUID", Operator.IN, mapAccess.get(4),"1*2+");
 			listSearchFilter.add(s);
 		}
 		return listSearchFilter;
@@ -178,7 +199,6 @@ public class ElectricSafetyService {
 
 	@Transactional
 	public void insertUpdateData(List<ElectricSafetyData> list) {
-		List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
 		String financingNum = "";
 		for (ElectricSafetyData detail : list) {
 			detail.setTenantUID(user.getTenantUID());
@@ -187,8 +207,7 @@ public class ElectricSafetyService {
 			detail.setInstitutionUID(user.getInstitutionUID());
 			financingNum = detail.getFinancingNum();
 			if (financingNum != null) {
-				listSearch.add(new SearchFilter("financingNum", Operator.EQ, financingNum));
-				List<AssetInfo> listInfo = assetInfoRepository.findBySearchFilter(listSearch);
+				List<AssetInfo> listInfo = getAssetInfoByFinancingNum(financingNum);
 				if (listInfo != null && listInfo.size() == 1) {
 					String uid = listInfo.get(0).getUid();
 					detail.setAssetId(listInfo.get(0).getId());
@@ -345,20 +364,22 @@ public class ElectricSafetyService {
 		Date startDate = startCa.getTime();
 		Date endDate = endCa.getTime();
 
-		Set<String> setFinancingNum = new HashSet<String>();
+		List<String> setFinancingNum = new ArrayList<String>();
 		Set<String> setAssetUids = new HashSet<String>();
 		List<AssetInfo> listAssetInfo = null;
 		if (listData != null && listData.size() > 0) {
 			for (int i = 0; i < listData.size(); ++i) {
 				ElectricSafetyData tempData = listData.get(i);
-				setFinancingNum.add(tempData.getFinancingNum());
-				setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
-				setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+				if(!setFinancingNum.contains(tempData.getFinancingNum())){
+					setFinancingNum.add(tempData.getFinancingNum());
+					setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
+					setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+				}
 			}
 		}
 		if (setFinancingNum.size() > 0) {
 			List<SearchFilter> listSearch=getSearchFilterByAccess(user.getUid(), user.getSiteUID());
-			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum));
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum,"1*"));
 			listAssetInfo = assetInfoRepository.findBySearchFilter(listSearch);
 		}
 		if (listAssetInfo != null && listAssetInfo.size() > 0) {
