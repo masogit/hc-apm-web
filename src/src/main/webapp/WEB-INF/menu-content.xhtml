@@ -128,7 +128,7 @@
             </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin')  and userContextService.versionContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.org')}"/>
-                <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/admin/uaa/userAccount/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.user')}"/>
+                <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') and userContextService.versionContains('config.user')}"/>
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.versionContains('config.assetMessage')}"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false and userContextService.versionContains('config.org')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') eq false and userContextService.versionContains('config.user')}"/>
