@@ -77,12 +77,6 @@ public class MaintainExportController implements ServerEventInterface{
 			ca.add(Calendar.MONTH, 1);
 			end=ca.getTime();
 		}
-		else{
-			Calendar endCa=Calendar.getInstance();
-			endCa.setTime(end);
-			endCa.add(Calendar.DATE, 1);
-			end=endCa.getTime();
-		}
 		if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
 			listMaintainData=findDefaultMaintain(start,end);
 		}
@@ -197,13 +191,6 @@ public class MaintainExportController implements ServerEventInterface{
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
-	}
-	
-	public boolean isValideDate() {
-		Calendar calender = Calendar.getInstance();
-		calender.setTime(new Date());
-		calender.add(Calendar.DAY_OF_MONTH, -1);
-		return true;
 	}
 
 	public UserAccount getCurrentUser() {

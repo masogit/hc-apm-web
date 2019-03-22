@@ -34,6 +34,15 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status=?2)",nativeQuery=true)
 	public Boolean findExistsItemStatus(String parentId,int status);
 	
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status in ?2)",nativeQuery=true)
+	public Boolean findExistsItemStatus(String parentId,Integer[] status);
+	
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and date_trunc('day',o.check_date)>o.schedule_date)",nativeQuery=true)
+	public Boolean findDelay(String parentId);
+	
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.comment!='' and o.comment is not null)",nativeQuery=true)
+	public Boolean findHasComment(String parentId);
+	
 	@Transactional
 	@Modifying
 	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=2 where id in ?1", nativeQuery = true)

@@ -11,7 +11,7 @@ import com.ge.apm.domain.NurseSiteMaintainData;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627
  */
 public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<NurseSiteMaintainData> {
 	
@@ -31,6 +31,11 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "update nurse_site_maintain_data set check_value=true where id in ?1", nativeQuery = true)
 	void completeMaintainData(Set<String> ids);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_data set check_value=true where id in ?1 and check_item in ?2", nativeQuery = true)
+	void completeMaintainData(Set<String> ids,List<String> listCheckData);
 	
 	@Transactional
 	@Modifying

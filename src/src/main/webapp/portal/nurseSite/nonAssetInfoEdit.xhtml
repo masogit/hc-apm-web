@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<p:dialog id="nonAssetInfoEditDlg" widgetVar="nonAssetInfoEditDialog" modal="true" resizable="true" draggable="true"
+		appendTo="@(body)" header="编辑">
+		<h:form id="nonAssetInfoEditForm">
+			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{nonAssetInfoController.selected != null}">
+
+				<h:panelGroup>
+					<label class="label">名称*</label>
+					<p:inputText value="#{nonAssetInfoController.selected.name}" required="true" requiredMessage="名称不能为空" />
+				</h:panelGroup>
+				
+			</p:panelGrid>
+			<br />
+			<p:commandButton id="idEditSave" validateClient="true" value="#{msg.Save}" actionListener="#{nonAssetInfoController.save}"
+				update=":nonAssetInfoListForm:datalist, :growl" icon="ui-icon-check"
+				oncomplete="handleSubmit(args, 'nonAssetInfoEditDialog');"/>
+			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('nonAssetInfoEditDialog').hide()" />
+		</h:form>
+	</p:dialog>
+
+</ui:composition>
+
+</html>

@@ -54,6 +54,7 @@ public class SmallAssetPerformanceConfigService {
 	
 	private Map<String,List<AssetInfo>> mapAssetInfoSiteUid=new HashMap<String,List<AssetInfo>>();
 	private Map<String,List<OrgInfo>> mapOrgInfoSiteUid=new HashMap<String,List<OrgInfo>>();
+	private Map<String,List<SmallAssetPerformanceConfig>> mapConfigSiteUid=new HashMap<String,List<SmallAssetPerformanceConfig>>();
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
 		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
@@ -196,7 +197,13 @@ public class SmallAssetPerformanceConfigService {
 		return result;
 	}
 	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
-		return smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+		String str=projectName+siteUid;
+		List<SmallAssetPerformanceConfig> listRe=mapConfigSiteUid.get(str);
+		if(listRe==null || listRe.size()==0){
+			listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+			mapConfigSiteUid.put(str, listRe);
+		}
+		return listRe;
 	}
 	
 	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
@@ -340,7 +347,6 @@ public class SmallAssetPerformanceConfigService {
 	}
 	public List<SmallAssetPerformanceConfig> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-		init();
 		List<SmallAssetPerformanceConfig> importFailedDataList = new ArrayList<>();
 		Workbook workbook = null;
 		if(file.getFileName().toLowerCase().endsWith(".xls")){

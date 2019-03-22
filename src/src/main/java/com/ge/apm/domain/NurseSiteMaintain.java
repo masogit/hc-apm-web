@@ -104,7 +104,7 @@ public class NurseSiteMaintain implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private List<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过，3有问题,4进行中
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	@Column(name = "status")
 	private Integer status;
 	
@@ -129,6 +129,9 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Transient
 	private List<String> showLables;
+	
+	@Transient
+	private List<String> checkData;
 	
 	public NurseSiteMaintain() {
 		super();
@@ -344,6 +347,14 @@ public class NurseSiteMaintain implements Serializable {
 //		}
 //		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 //	}
+
+	public List<String> getCheckData() {
+		return checkData;
+	}
+
+	public void setCheckData(List<String> checkData) {
+		this.checkData = checkData;
+	}
 
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
