@@ -90,6 +90,17 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	public void updateNurseSiteStatus(){
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				adminConsoleService.updateNurseSiteStatus();
+			}
+		});
+		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 	private void formatVersionInfo(){
 		List<String> listKey=tenantConfig.getListKey();
 		List<String> listLabel=tenantConfig.getListLabel();

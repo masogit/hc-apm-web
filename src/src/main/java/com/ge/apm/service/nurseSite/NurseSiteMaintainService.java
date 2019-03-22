@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -782,7 +783,7 @@ public class NurseSiteMaintainService {
 		}
 	}
 	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
-	private void updateMaintain(NurseSiteMaintain obj, Date date, UserAccount user) {
+	public void updateMaintain(NurseSiteMaintain obj, Date date, UserAccount user) {
 		Boolean blnNotChecked=false;
 		Boolean blnNotPass=false;
 		Boolean blnPass=false;
@@ -798,7 +799,7 @@ public class NurseSiteMaintainService {
 		passArr[3]=7;
 		boolean delay=nurseSiteMaintainItemRepository.findDelay(obj.getId());
 		boolean hasComment=nurseSiteMaintainItemRepository.findHasComment(obj.getId());
-		blnNotPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),errArr);
+		blnNotPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),Arrays.asList(errArr));
 		if(blnNotPass!=null && blnNotPass){
 			if(delay){
 				status=3;
@@ -814,7 +815,7 @@ public class NurseSiteMaintainService {
 			}
 			else {
 				blnNotChecked=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),0);
-				blnPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),passArr);
+				blnPass=nurseSiteMaintainItemRepository.findExistsItemStatus(obj.getId(),Arrays.asList(passArr));
 				if(blnNotChecked!=null && blnPass!=null && blnNotChecked && blnPass){
 					status=4;
 				}
