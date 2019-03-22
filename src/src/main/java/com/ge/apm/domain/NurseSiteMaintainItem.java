@@ -112,7 +112,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
-	private Integer status;
+	private Integer status=0;
 	
 	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
@@ -137,7 +137,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	private Integer sequence;
 	
 	@Column(name="comment")
-	private String comment;
+	private String comment="";
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
@@ -147,7 +147,6 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	public NurseSiteMaintainItem() {
 		super();
-		this.status=0;
 	}
 
 	public String getId() {

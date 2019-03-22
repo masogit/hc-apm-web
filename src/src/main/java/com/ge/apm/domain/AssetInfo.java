@@ -127,6 +127,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;//安装位置
+    
+    @Size(max = 64)
+    @Column(name = "nurse_location")
+    private String nurseLocation;//护士检查设备位置
 
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//所属科室
@@ -990,7 +994,15 @@ public class AssetInfo implements ChineseName,Serializable {
         this.locationName = locationName;
     }
 
-    public Integer getClinicalDeptId() {
+    public String getNurseLocation() {
+		return nurseLocation;
+	}
+
+	public void setNurseLocation(String nurseLocation) {
+		this.nurseLocation = nurseLocation;
+	}
+
+	public Integer getClinicalDeptId() {
         return clinicalDeptId;
     }
 
@@ -1709,13 +1721,16 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getPinYin() {
 		return getNamePyCode();
 	}
-
-    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
-    	this.name=name;
-    	this.uid=uid;
-    	this.departNum=departNum;
-    	this.serialNum=serialNum;
-    	this.functionType=functionType;
+    
+    public AssetInfo(String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName=clinicalDeptName;
+        this.clinicalDeptUID=clinicalDeptUID;
+        this.nurseLocation=nurseLocation;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {
