@@ -12,7 +12,7 @@ import com.ge.apm.domain.NurseSiteMaintainItem;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627
  */
 public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<NurseSiteMaintainItem> {
 	
@@ -34,7 +34,7 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status=?2)",nativeQuery=true)
 	public Boolean findExistsItemStatus(String parentId,int status);
 	
-	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status in ?2)",nativeQuery=true)
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status in (?2) )",nativeQuery=true)
 	public Boolean findExistsItemStatus(String parentId,List<Integer> status);
 	
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and date_trunc('day',o.check_date)>o.schedule_date)",nativeQuery=true)
