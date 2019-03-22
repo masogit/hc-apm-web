@@ -28,7 +28,9 @@
                     <p:tab class="ui-g-12" title="远程保养"  id="pmOrderListRemote" rendered="#{not userContextService.isAccountEndUser()}">
                         <ui:include src="pmOrderListRemote.xhtml"/>
                     </p:tab>
-
+					<p:tab class="ui-g-12" title="外部远程保养"  id="pmOrderListRemote" rendered="#{not userContextService.isAccountEndUser()}">
+                        <ui:include src="pmOrderListOutRemote.xhtml"/>
+                    </p:tab>
 
 
                 </p:tabView>

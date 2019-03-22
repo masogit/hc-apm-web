@@ -51,6 +51,7 @@ public class SmallAssetPerformanceController extends GenericCRUDUUIDController<S
         dao = WebUtil.getBean(SmallAssetPerformanceRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         service = WebUtil.getBean(SmallAssetPerformanceService.class);
+        service.init();
         currentUser = UserContextService.getCurrentUserAccount();
     }
 

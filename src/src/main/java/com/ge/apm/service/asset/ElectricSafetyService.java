@@ -51,7 +51,7 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.dao.SearchFilter.Operator;
 
 /**
- * Created by 212605082 on 2017/11/7.
+ * Created by 503035627
  */
 @Service
 public class ElectricSafetyService {
@@ -90,27 +90,6 @@ public class ElectricSafetyService {
 
 	@Autowired
 	UaaService uaaService;
-	
-	private Map<String,List<AssetInfo>> mapFinancingNumAssetInfo=new HashMap<String,List<AssetInfo>>();
-	
-	public ElectricSafetyService(){
-		mapFinancingNumAssetInfo.clear();
-	}
-	
-	private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum){
-		List<AssetInfo> listInfo=mapFinancingNumAssetInfo.get(financingNum);
-		if(listInfo==null || listInfo.size()==0){
-			List<String> listFinancingNum=new ArrayList<String>();
-			listFinancingNum.add(financingNum);
-			listFinancingNum.add(financingNum.toLowerCase());
-			listFinancingNum.add(financingNum.toUpperCase());
-			List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
-			listSearch.add(new SearchFilter("financingNum", Operator.IN, listFinancingNum));
-			listInfo = assetInfoRepository.findBySearchFilter(listSearch);
-			mapFinancingNumAssetInfo.put(financingNum, listInfo);
-		}
-		return listInfo;
-	}
 
 	public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr = readFileByLine(file);
@@ -207,7 +186,9 @@ public class ElectricSafetyService {
 			detail.setInstitutionUID(user.getInstitutionUID());
 			financingNum = detail.getFinancingNum();
 			if (financingNum != null) {
-				List<AssetInfo> listInfo = getAssetInfoByFinancingNum(financingNum);
+				List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
+				listSearch.add(new SearchFilter("financingNum", Operator.EQ, financingNum));
+				List<AssetInfo> listInfo = assetInfoRepository.findBySearchFilter(listSearch);
 				if (listInfo != null && listInfo.size() == 1) {
 					String uid = listInfo.get(0).getUid();
 					detail.setAssetId(listInfo.get(0).getId());

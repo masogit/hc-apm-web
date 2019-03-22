@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="1000">
+		<h:outputText rendered="#{empty maintainItemController.lazyModel}" value="工单详情后台生成中，请稍候刷新页面查看。"></h:outputText>
+		<h:form id="maintainDlgTable" rendered="#{not empty maintainItemController.lazyModel}">
+			<div class="ui-datatable ui-widget" style="overflow: auto; height: 480px;">
+				<div class="ui-datatable-tablewrapper" style="padding-left: 10px; padding-right: 10px;">
+					<table>
+						<tr>
+							<th><label class="label">名称</label></th>
+							<th><label class="label">设备编号</label></th>
+							<th><label class="label">制造商序列号</label></th>
+							<th><label class="label">设备型号</label></th>
+							<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item">
+								<th><label class="label">#{item}</label></th>
+							</p:repeat>
+							<th><label class="label">备注</label></th>
+							<!-- <th>
+                                            <label class="label">查看签名</label>
+                                        </th> -->
+						</tr>
+						<p:repeat value="#{maintainItemController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item2">
+							<tr>
+								<td><h:outputText value="#{item2.assetInfo.name}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.departNum}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.serialNum}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.functionType}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.nurseLocation}" /></td>
+								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
+									<td><p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox></td>
+								</p:repeat>
+								<td><p:inputText value="#{item2.comment}" maxlength="200"></p:inputText></td>
+							</tr>
+						</p:repeat>
+					</table>
+				</div>
+			</div>
+			<div class="ui-datatable-tablewrapper" style="padding-left: 10px; padding-right: 10px;">
+				<h:panelGrid columnClasses="value" columns="2">
+					<h:panelGroup>
+						<label>负责人: </label>
+						<h:outputText value="#{maintainItemController.nurseSiteMaintain.modifyBy.name}"></h:outputText>
+					</h:panelGroup>
+					<h:panelGroup>
+						<label>检测时间: </label>
+						<h:outputText value="#{maintainItemController.nurseSiteMaintain.checkDate}">
+							<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+						</h:outputText>
+					</h:panelGroup>
+				</h:panelGrid>
+				<p:commandButton actionListener="#{maintainItemController.pre()}" value="上一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnPre}"></p:commandButton>
+				<p:commandButton actionListener="#{maintainItemController.next()}" value="下一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnNext}"></p:commandButton>
+				<p:commandButton id="btnCheckData" value="检查项" update="checkDataDlg" oncomplete="PF('checkDataDlg').show()" />
+				<p:commandButton id="checkRightButton" value="全部通过(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable" />
+				<p:commandButton id="checkAllRightButton" value="全部通过(保存)" actionListener="#{maintainItemController.completeMaintain()}" update=":messages"
+					oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
+				<p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
+					oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
+				<p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages"
+					disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();">
+					<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+				</p:commandButton>
+				<p:commandButton id="openSignature"
+					actionListener="#{maintainController.getMaintainSignature(maintainController.nurseSiteMaintain.signatureId,maintainController.nurseSiteMaintain.signatureSourceType)}"
+					value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();" />
+			</div>
+		</h:form>
+	</p:dialog>
+	<p:dialog id="checkDataDlg" widgetVar="checkDataDlg" header="请选择检查项" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="600">
+		<h:form id="checkDataForm">
+			<h:panelGrid columnClasses="value" columns="6">
+				<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item">
+					<p:selectBooleanCheckbox value="#{maintainItemController.mapCheckData[item]}" label="#{item}"></p:selectBooleanCheckbox>
+				</p:repeat>
+			</h:panelGrid>
+			<p:commandButton value="确认" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();" />
+			<p:commandButton value="重置" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
+		</h:form>
+	</p:dialog>
+</ui:composition>
+</html>
