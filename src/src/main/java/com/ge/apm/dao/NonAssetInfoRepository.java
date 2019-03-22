@@ -4,7 +4,7 @@ import com.ge.apm.domain.NonAssetInfo;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627.
  */
 public interface NonAssetInfoRepository extends GenericRepositoryUUID<NonAssetInfo> {
 	

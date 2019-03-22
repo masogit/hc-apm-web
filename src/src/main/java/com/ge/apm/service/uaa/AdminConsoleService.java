@@ -1,6 +1,8 @@
 package com.ge.apm.service.uaa;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -153,6 +155,21 @@ public class AdminConsoleService {
 			logger.info("updateNurseSiteUID done.");
 		}
 	}
+	public void updateNurseSiteStatus(){
+		int limit=1000;
+		int offset=0;
+		Calendar ca=Calendar.getInstance();
+		Integer []intArr=new Integer[2];
+		intArr[0]=2;
+		intArr[1]=3;
+		List<NurseSiteMaintain> listR=nurseSiteMaintainRepository.findByLimit(limit, offset,ca.getTime(),Arrays.asList(intArr));
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteStatus(listR);
+			++offset;
+			listR=nurseSiteMaintainRepository.findByLimit(limit, offset,ca.getTime(),Arrays.asList(intArr));
+			logger.info("updateNurseSiteUID done.");
+		}
+	}
 	public void updateNurseSiteUID(){
 		int limit=1000;
 		int offset=0;
@@ -162,6 +179,13 @@ public class AdminConsoleService {
 			++offset;
 			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
 			logger.info("updateNurseSiteUID done.");
+		}
+	}
+	public void tUpdateNurseSiteStatus(List<NurseSiteMaintain> listR){
+		for(int i=0;i<listR.size();++i){
+			NurseSiteMaintain tempMaintain=listR.get(i);
+			nurseSiteMaintainService.updateMaintain(tempMaintain,tempMaintain.getModifyDate(),tempMaintain.getModifyBy());
+			nurseSiteMaintainRepository.save(tempMaintain);
 		}
 	}
 	@Transactional
