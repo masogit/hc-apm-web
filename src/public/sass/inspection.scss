@@ -4,11 +4,27 @@
 .schedule-item-nocheck{
 
 }
+.schedule-item-pass-c{
+	color: white !important;
+	background-color: lightgreen !important;	
+}
+.schedule-item-pass-cd{
+	color: white !important;
+	background-color: gold !important;	
+}
 .schedule-item-pass{
 	color: white !important;
 	background-color: green !important;	
 }
+.schedule-item-pass-d{
+	color: white !important;
+	background-color: lightyellow !important;	
+}
 .schedule-item-nopass{
+	color: white !important;
+	background-color: pink !important;
+}
+.schedule-item-nopass-d{
 	color: white !important;
 	background-color: red !important;
 }

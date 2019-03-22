@@ -29,6 +29,7 @@
 								<td><h:outputText value="#{item2.assetInfo.departNum}" /></td>
 								<td><h:outputText value="#{item2.assetInfo.serialNum}" /></td>
 								<td><h:outputText value="#{item2.assetInfo.functionType}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.nurseLocation}" /></td>
 								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
 									<td><p:triStateCheckbox value="#{item2.getDataValue(item3).checkValueWeb}"></p:triStateCheckbox></td>
 								</p:repeat>

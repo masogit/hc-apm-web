@@ -152,7 +152,15 @@ public class MaintainController implements ServerEventInterface {
 								tempEvent.setStyleClass("schedule-item-nocheck");
 							} else if (status == 2) {
 								tempEvent.setStyleClass("schedule-item-pass");
+							} else if (status == 5) {
+								tempEvent.setStyleClass("schedule-item-pass-c");
+							} else if (status == 6) {
+								tempEvent.setStyleClass("schedule-item-pass-cd");
+							} else if (status == 7) {
+								tempEvent.setStyleClass("schedule-item-pass-d");
 							} else if (status == 3) {
+								tempEvent.setStyleClass("schedule-item-nopass-d");
+							} else if (status == 8) {
 								tempEvent.setStyleClass("schedule-item-nopass");
 							} else if (status == 4) {
 								tempEvent.setStyleClass("schedule-item-partialpass");
@@ -444,8 +452,8 @@ public class MaintainController implements ServerEventInterface {
 			}
 		}
 	}
-	
-	public void updateEvent(){
+
+	public void updateEvent() {
 		if (event.getId() != null) {
 			lazyEventModel.updateEvent(event);
 		}
@@ -514,7 +522,7 @@ public class MaintainController implements ServerEventInterface {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain) event.getData();
 		// generateNurseSiteMaintainData();
-		maintainItemController.reset(nurseSiteMaintain,this);
+		maintainItemController.reset(nurseSiteMaintain, this);
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
@@ -869,15 +877,15 @@ public class MaintainController implements ServerEventInterface {
 	public void onServerEvent(String eventName, Object eventObject) {
 		// TODO Auto-generated method stub
 		OrgInfo tempOrg = (OrgInfo) eventObject;
-		if (tempOrg != null) {
-			if (listCheckClinicalOrgInfo != null) {
-				listCheckClinicalOrgInfo.clear();
-			} else {
-				listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
-			}
-			listCheckClinicalOrgInfo.add(tempOrg);
-			onClinicalOrgInfoChange();
+		if (listCheckClinicalOrgInfo != null) {
+			listCheckClinicalOrgInfo.clear();
+		} else {
+			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
 		}
+		if (tempOrg != null) {
+			listCheckClinicalOrgInfo.add(tempOrg);
+		}
+		onClinicalOrgInfoChange();
 	}
 
 }
