@@ -71,7 +71,12 @@
 					</p:selectManyMenu>
 				</h:panelGroup>
 			</p:panelGrid>
-			<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>
+            <p:fieldset>
+                <!--<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>-->
+            </p:fieldset>
+            <p:fieldset>
+                <ui:include src="assetList.xhtml"/>
+            </p:fieldset>
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
