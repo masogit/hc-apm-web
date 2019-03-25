@@ -182,4 +182,19 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<String> findMVSTenantUid();
 
     public AssetInfo findByUidAndTenantUID(String uid, String tenantUID);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set vendor=?1 where supplierId=?2 and tenantUID=?3")
+    public void updateSupplierName(String name, int supplierId, String tenantUid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set maitanance=?1 where maitananceId=?2 and tenantUID=?3")
+    public void updateMaintainerName(String name, String supplierId, String tenantUid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set manufacture=?1 where manufactureId=?2 and tenantUID=?3")
+    public void updateManufactureName(String name, String supplierId, String tenantUid);
 }
