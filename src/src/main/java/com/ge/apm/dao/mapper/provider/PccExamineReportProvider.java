@@ -151,7 +151,7 @@ public class PccExamineReportProvider {
 	
 	private String getSetValue(Object value){
 		StringBuilder sb=new StringBuilder();
-		Set<String> set=(Set<String>)value;
+		List<String> set=(List<String>)value;
 		if(set!=null){
 			Iterator<String> it=set.iterator();
 			sb.append("(");
