@@ -184,8 +184,8 @@ public class AdminConsoleService {
 	public void tUpdateNurseSiteStatus(List<NurseSiteMaintain> listR){
 		for(int i=0;i<listR.size();++i){
 			NurseSiteMaintain tempMaintain=listR.get(i);
-			nurseSiteMaintainService.updateMaintain(tempMaintain,tempMaintain.getModifyDate(),tempMaintain.getModifyBy());
-			nurseSiteMaintainRepository.save(tempMaintain);
+			nurseSiteMaintainService.supplementMaintain(tempMaintain,0,0,true);
+			nurseSiteMaintainService.saveMaintain(tempMaintain,tempMaintain.getModifyDate(),tempMaintain.getModifyBy());
 		}
 	}
 	@Transactional
