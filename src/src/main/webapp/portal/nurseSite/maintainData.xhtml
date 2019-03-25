@@ -70,13 +70,13 @@
 			</div>
 		</h:form>
 	</p:dialog>
-	<p:dialog id="checkDataDlg" widgetVar="checkDataDlg" header="请选择检查项" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="600">
+	<p:dialog id="checkDataDlg" widgetVar="checkDataDlg" header="请选择检查项" modal="true" resizable="true" draggable="true" appendTo="@(body)">
 		<h:form id="checkDataForm">
-			<h:panelGrid columnClasses="value" columns="6">
+			<p:panelGrid columns="6">
 				<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item">
 					<p:selectBooleanCheckbox value="#{maintainItemController.mapCheckData[item]}" label="#{item}"></p:selectBooleanCheckbox>
 				</p:repeat>
-			</h:panelGrid>
+			</p:panelGrid>
 			<p:commandButton value="确认" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();" />
 			<p:commandButton value="重置" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
 		</h:form>
