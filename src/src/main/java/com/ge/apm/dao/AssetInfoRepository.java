@@ -190,8 +190,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Modifying
     @Transactional
-    @Query(value = "update AssetInfo set maitanance=?1 where maitananceId=?2 and tenantUID=?3")
-    public void updateMaintainerName(String name, String supplierId, String tenantUid);
+    @Query(value = "update AssetInfo set maitanance=?1, maitananceTel=?2 where maitananceId=?3 and tenantUID=?4")
+    public void updateMaintainerName(String name, String tel, String supplierId, String tenantUid);
 
     @Modifying
     @Transactional

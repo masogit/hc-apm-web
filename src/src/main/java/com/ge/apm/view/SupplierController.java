@@ -117,7 +117,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         if (supplier.getName().equals(selected.getName())) return;
 
         assetInfoDao.updateSupplierName(selected.getName(), selected.getId(), selected.getTenantUID());
-        assetInfoDao.updateMaintainerName(selected.getName(), String.valueOf(selected.getId()), selected.getTenantUID());
+        assetInfoDao.updateMaintainerName(selected.getName(), selected.getTel(), String.valueOf(selected.getId()), selected.getTenantUID());
         assetInfoDao.updateManufactureName(selected.getName(), String.valueOf(selected.getId()), selected.getTenantUID());
 
 
