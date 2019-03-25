@@ -144,7 +144,7 @@ public class MaintainController implements ServerEventInterface {
 				}
 				if (listMaintainData != null) {
 					for (NurseSiteMaintain data : listMaintainData) {
-						DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data), data.getScheduleDate(), data.getScheduleDate(), true);
+						DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(data.getShowTitle(), data.getScheduleDate(), data.getScheduleDate(), true);
 						tempEvent.setData(data);
 						Integer status = data.getStatus();
 						if (status != null) {
@@ -198,28 +198,6 @@ public class MaintainController implements ServerEventInterface {
 		}
 	}
 
-	private String getShowTitle(NurseSiteMaintain tempNurseSiteMaintain) {
-		// 0：未检查,1:已检查，2:通过，3有问题
-		String strStatus = "未检查";
-		if (tempNurseSiteMaintain.getStatus() == null || tempNurseSiteMaintain.getStatus() == 0) {
-		} else if (tempNurseSiteMaintain.getStatus() == 1) {
-			strStatus = "已检查";
-		} else if (tempNurseSiteMaintain.getStatus() == 2) {
-			strStatus = "通过";
-		} else if (tempNurseSiteMaintain.getStatus() == 3) {
-			strStatus = "有问题";
-		} else if (tempNurseSiteMaintain.getStatus() == 4) {
-			strStatus = "进行中";
-		}
-
-		String str = tempNurseSiteMaintain.getName();
-		if (tempNurseSiteMaintain.getSequence() == null || tempNurseSiteMaintain.getSequence() <= 0) {
-			str += "-" + strStatus;
-		} else {
-			str += "-" + tempNurseSiteMaintain.getSequence() + "-" + strStatus;
-		}
-		return str;
-	}
 
 	// private String getShowTitle_backup(NurseSiteMaintain
 	// tempNurseSiteMaintain) {
@@ -297,7 +275,7 @@ public class MaintainController implements ServerEventInterface {
 	}
 
 	private List<NurseSiteMaintain> getMaintainDataNeedToRemove(List<NurseSiteMaintain> listSave) {
-		List<NurseSiteMaintain> existMaintainDataNoCheck = nurseSiteMaintainService.getDefaultMaintainDataByStatus(orgUidList, startBatchDate, endBatchDate, 0,
+		List<NurseSiteMaintain> existMaintainDataNoCheck = nurseSiteMaintainService.getDefaultMaintainDataUnchecked(orgUidList, startBatchDate, endBatchDate, 
 				nurseSiteMaintainConfig.getId());
 		List<NurseSiteMaintain> existMaintainDataChecked = nurseSiteMaintainService.getDefaultMaintainDataChecked(orgUidList, startBatchDate, endBatchDate,
 				nurseSiteMaintainConfig.getId());
