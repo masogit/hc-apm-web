@@ -35,6 +35,7 @@ public class OpsSrReportController extends MyCRUDController<OpsSrReport> impleme
     protected List<OpsSrReport> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
         EntityWrapper<OpsSrReport> ew = new EntityWrapper<>();
         wrapSearchFilter(ew);
+        ew.orderBy(sortField, isAscending);
         lazyModel.setRowCount(opsSrReportService.selectCount(ew));
         return opsSrReportService.loadData(pageRequest, ew);
     }
