@@ -1,6 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -35,6 +36,9 @@ public class AssetSelectService {
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
+
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
 
     public TreeNode loadOrgTree() {
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
@@ -72,6 +76,15 @@ public class AssetSelectService {
     public List<AssetInfo> loadAssetsBySearchFilter(List<SearchFilter> searchFilters) {
         List<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFilters);
         return assetInfoList;
+    }
+
+    public List<AssetInfo> loadSelectedAssetByConfig(String configParentId) {
+        List<AssetInfo> assetInfoList = assetInfoRepository.findAssetByMaintainConfigParentId(configParentId);
+        return assetInfoList;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoRepository.findByUid(uid);
     }
 
     private List<String> getDeptsWithAsset(OrgInfo selectedOrg) {

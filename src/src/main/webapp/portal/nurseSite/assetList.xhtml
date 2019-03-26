@@ -8,7 +8,7 @@
 
 <ui:composition>
     <div class="common-search-div">
-        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">所属院区</label>
                 <p:inputText id="selectedOrgName" value="#{assetSelectController.selectedOrg.name}" readonly="true" required="true"
@@ -34,10 +34,13 @@
             <h:panelGroup>
                 <!--指代所属科室或使用科室-->
                 <label class="label">科室</label>
-                <p:selectOneMenu id="deptOrgInfo" value="#{assetSelectController.selectedDept}" disabled="false" converter="orgInfoConverter" style="width:100%;">
-                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                    <f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-                </p:selectOneMenu>
+                <p:autoComplete id="deptOrgInfo"
+                                dropdown="true" value="#{assetSelectController.selectedDeptName}"
+                                required="true" requiredMessage="科室 #{msg.ValidationRequire}"
+                                scrollHeight="300"  forceSelection="true" size="20"
+                                completeMethod="#{assetSelectController.autoCompleteDeptName}">
+                    <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
+                </p:autoComplete>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备名称</label>
@@ -60,11 +63,38 @@
             </h:panelGroup>
             <p:commandButton validateClient="true"
                              value="查询"
-                             actionListener="#{assetSelectController.findAssets2Maintain}"/>
+                             update="assets4maintain"
+                             action="#{assetSelectController.findAssets2Maintain}"/>
         </p:panelGrid>
 
         <!--asset search result list-->
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+            <p:dataTable id="assets4maintain" value="#{assetSelectController.assets4Maintain}" var="asset"
+                         selectionMode="single"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:column width="24" id="checkBoxCol">
+                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
+                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":maintainConfigCreateForm:saveButtonId"/>
+                        <f:attribute name="assetObj" value="#{asset}"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage}" update="@(.selectCheckBox) :maintainConfigCreateForm:saveButtonId"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                    <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}">
+                    <h:outputText value="#{asset.departNum}"/>
+                </p:column>
+            </p:dataTable>
         </p:panelGrid>
     </div>
 </ui:composition>
