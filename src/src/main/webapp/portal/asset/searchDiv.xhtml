@@ -30,10 +30,10 @@
 			</h:panelGroup>
 			<h:panelGroup rendered="#{searchController.blnDepartOrg}">
 				<label class="label">所属科室</label>
-				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoConverter" style="width:100%;">
+				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoColumnFilterConverter"
+					style="width:100%;">
 					<p:ajax listener="#{searchController.onOrgDeptChange()}"
 						update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 				</p:selectOneMenu>
 			</h:panelGroup>
