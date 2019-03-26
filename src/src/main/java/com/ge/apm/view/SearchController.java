@@ -228,6 +228,13 @@ public class SearchController {
 		} else {
 			listOrgDept = searchService.getDeptListBySiteUid(orgInfo.getUid());
 		}
+		if(listOrgDept==null){
+			listOrgDept=new ArrayList<OrgInfo>();
+		}
+		OrgInfo tempOrgInfo=new OrgInfo();
+		tempOrgInfo.setId(-1);
+		tempOrgInfo.setName("请选择...");
+		listOrgDept.add(0,tempOrgInfo);
 	}
 
 	private void triggerEvent() {
@@ -236,9 +243,14 @@ public class SearchController {
 				callingController.onServerEvent("change", selectedAssetInfo);
 			} else if (type == 3) {
 				if (selectedOrgDepart != null) {
-					callingController.onServerEvent("change", selectedOrgDepart);
+					if(StringUtils.isNotEmpty(selectedOrgDepart.getUid())){
+						callingController.onServerEvent("change", selectedOrgDepart);
+					}
+					else{
+						callingController.onServerEvent("change", null);
+					}
 				} else {
-					callingController.onServerEvent("change", selectedOrg);
+					callingController.onServerEvent("change", null);
 				}
 			} else if (type == 4) {
 				callingController.onServerEvent("change", listSelectedAssetInfo);

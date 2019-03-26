@@ -23,7 +23,7 @@ public class OrgInfoColumnFilterConverter implements Converter {
     OrgInfo emptyOrg = new OrgInfo();
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
-
+    	emptyOrg.setId(-1);
         if (value != null && value.trim().length() > 0) {
             try {
                 if (Integer.parseInt(value) < 0) {
