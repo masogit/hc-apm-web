@@ -66,6 +66,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         dao = WebUtil.getBean(SmallAssetPerformanceConfigRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         service = WebUtil.getBean(SmallAssetPerformanceConfigService.class);
+        service.init();
         currentUser = UserContextService.getCurrentUserAccount();
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());

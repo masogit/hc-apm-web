@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627
  */
 @Entity
 @Table(name = "small_asset_performance_config")

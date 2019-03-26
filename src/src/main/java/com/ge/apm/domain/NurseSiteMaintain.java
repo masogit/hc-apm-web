@@ -104,9 +104,9 @@ public class NurseSiteMaintain implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private List<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过，3有问题,4进行中
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	@Column(name = "status")
-	private Integer status;
+	private Integer status=0;
 	
 	@Column(name="config_id")
 	private String configId;
@@ -130,9 +130,11 @@ public class NurseSiteMaintain implements Serializable {
 	@Transient
 	private List<String> showLables;
 	
+	@Transient
+	private List<String> checkData;
+	
 	public NurseSiteMaintain() {
 		super();
-		this.status=0;
 	}
 
 	public String getId() {
@@ -345,21 +347,29 @@ public class NurseSiteMaintain implements Serializable {
 //		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
 //	}
 
+	public List<String> getCheckData() {
+		return checkData;
+	}
+
+	public void setCheckData(List<String> checkData) {
+		this.checkData = checkData;
+	}
+
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
 		String strStatus="未检查";
-		if(getStatus()==null || getStatus()==0){
+		if(status==null || status==0){
 		}
-		else if(getStatus()==1){
+		else if(status==1){
 			strStatus="已检查";
 		}
-		else if(getStatus()==2){
+		else if(status==2|| status==5|| status==6|| status==7){
 			strStatus="通过";
 		}
-		else if(getStatus()==3){
+		else if(status==3 || status==8){
 			strStatus="有问题";
 		}
-		else if(getStatus()==4){
+		else if(status==4){
 			strStatus="进行中";
 		}
 		

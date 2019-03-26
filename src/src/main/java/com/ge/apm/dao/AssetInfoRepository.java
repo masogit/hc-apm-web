@@ -170,7 +170,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
     public List<AssetInfo> getByUids(Set<String> setUids);
     
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType) from AssetInfo u where u.uid in ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid in ?1 ")
     public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
@@ -182,4 +182,19 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<String> findMVSTenantUid();
 
     public AssetInfo findByUidAndTenantUID(String uid, String tenantUID);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set vendor=?1 where supplierId=?2 and tenantUID=?3")
+    public void updateSupplierName(String name, int supplierId, String tenantUid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set maitanance=?1, maitananceTel=?2 where maitananceId=?3 and tenantUID=?4")
+    public void updateMaintainerName(String name, String tel, String supplierId, String tenantUid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update AssetInfo set manufacture=?1 where manufactureId=?2 and tenantUID=?3")
+    public void updateManufactureName(String name, String supplierId, String tenantUid);
 }

@@ -2,8 +2,11 @@ package com.ge.apm.view.nurseSite;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -11,11 +14,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -24,11 +25,9 @@ import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ibm.icu.util.Calendar;
 
-import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
@@ -46,20 +45,25 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private int size=0;
 	private boolean blnPre;
 	private boolean blnNext;
+	private Map<String,Boolean> mapCheckData;
+	private MaintainController maintainController;
 	@PostConstruct
 	public void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
-		// test
+		mapCheckData=new HashMap<String,Boolean>();
 	}
 
-	public void reset(NurseSiteMaintain nurseSiteMaintain) {
+	public void reset(NurseSiteMaintain nurseSiteMaintain,MaintainController maintainController) {
 		this.nurseSiteMaintain = nurseSiteMaintain;
+		mapCheckData.clear();
 		page=0;
 		generateNurseSiteMaintainData(pageSize, page);
+		generateLabel();
 		size=getItemSize();
 		pageButtonChange();
+		this.maintainController=maintainController;
 	}
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
@@ -82,6 +86,25 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	}
 	public void checkRightAll(){
 		nurseSiteMaintainService.checkRightAll(nurseSiteMaintain);
+	}
+	public void completeMaintain(){
+		nurseSiteMaintainService.completeMaintain(nurseSiteMaintain, new Date(), currentUser);
+		this.maintainController.updateEvent();
+		addMessage("工单已保存");
+	}
+	public void saveCheckData(){
+		List<String> listCheckData=new ArrayList<String>();
+		for(String label: mapCheckData.keySet()){
+			if(mapCheckData.get(label)){
+				listCheckData.add(label);
+			}
+		}
+		nurseSiteMaintain.setCheckData(listCheckData);
+	}
+	public void resetCheckData(){
+		for(String label: mapCheckData.keySet()){
+			mapCheckData.put(label, true);
+		}
 	}
 	private void pageButtonChange(){
 		if(size<=pageSize){
@@ -110,13 +133,11 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		if(nurseSiteMaintain==null){
 			return;
 		}
-		List<String> showLables = nurseSiteMaintain.getShowLables();
-		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain, pageSize, page, false);
+		nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain, pageSize, page,false);
 		lazyModel = nurseSiteMaintain.getListNurseSiteMaintainItem();
-		if(lazyModel==null || lazyModel.size()==0){
-			return;
-		}
-		//get label
+	}
+	private void generateLabel(){
+		List<String> showLables = nurseSiteMaintain.getShowLables();
 		if (showLables == null) {
 			showLables = new ArrayList<String>();
 		} else {
@@ -132,14 +153,13 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 				}
 			}
 			nurseSiteMaintain.setShowLables(showLables);
+			for(int i=0;i<showLables.size();++i){
+				mapCheckData.put(showLables.get(i), true);
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("getLables error" + e.getMessage());
 		}
-		//get label end
-		//check all right
-		//check all right end
-		
 	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
@@ -176,6 +196,14 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 
 	public void setBlnNext(boolean blnNext) {
 		this.blnNext = blnNext;
+	}
+
+	public Map<String, Boolean> getMapCheckData() {
+		return mapCheckData;
+	}
+
+	public void setMapCheckData(Map<String, Boolean> mapCheckData) {
+		this.mapCheckData = mapCheckData;
 	}
 	
 }
