@@ -72,16 +72,13 @@
 				</h:panelGroup>
 			</p:panelGrid>
             <p:fieldset>
-                <!--<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>-->
-            </p:fieldset>
-            <p:fieldset>
-                <ui:include src="assetList.xhtml"/>
+                <ui:include src="assetList.xhtml"></ui:include>
             </p:fieldset>
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
-				oncomplete="PF('maintainConfigCreateDialog').hide();handleSubmit(args, 'maintainConfigCreateDialog')" action="#{maintainConfigController.save}"
-				disabled="#{maintainConfigController.saveDisable}" timeout="180000" />
+				oncomplete="PF('maintainConfigCreateDialog').hide();handleSubmit(args, 'maintainConfigCreateDialog')" actionListener="#{maintainConfigController.save}"
+                disabled="#{maintainConfigController.saveDisable}" timeout="180000" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigCreateDialog').hide()" />
 		</h:form>
 	</p:dialog>

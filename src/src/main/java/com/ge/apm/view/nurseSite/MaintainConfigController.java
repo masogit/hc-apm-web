@@ -90,8 +90,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         searchController = WebUtil.getBean(SearchController.class);
-        assetSelectController = WebUtil.getBean(AssetSelectController.class);
         searchController.setCallingController(this);
+        assetSelectController = WebUtil.getBean(AssetSelectController.class);
+        assetSelectController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
@@ -144,7 +145,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     }
 
     @Override
-    public void save() {
+    public void save(){
     	saveMaintainConfig(this.selected,true);
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
@@ -201,7 +202,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		setDefaultValueForAssetList();
 		//TODO
-        assetSelectController.loadData4Edit();
+        assetSelectController.loadData4Edit(this.selected);
 	}
 	private void initValues(){
 		this.listCheckAssets=new LinkedList<AssetInfo>();
