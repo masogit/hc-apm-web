@@ -1,5 +1,6 @@
 package com.ge.apm.dao.mapper.provider;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -120,7 +121,7 @@ public class AssetOptRecordProvider {
 
 	private String getSetValue(Object value) {
 		StringBuilder sb = new StringBuilder();
-		Set<String> set = (Set<String>) value;
+		Collection<String> set = (Collection<String>) value;
 		if (set != null) {
 			Iterator<String> it = set.iterator();
 			sb.append("(");
