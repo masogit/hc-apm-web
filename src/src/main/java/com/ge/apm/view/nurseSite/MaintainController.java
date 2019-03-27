@@ -478,15 +478,20 @@ public class MaintainController implements ServerEventInterface {
 			showListNurseSiteMaintainConfig.clear();
 		}
 		if (listNurseSiteMaintainConfig != null) {
-			Set<String> setClinicalDeptUid = new HashSet<String>();
-			for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-				setClinicalDeptUid.add(listCheckClinicalOrgInfo.get(i).getUid());
-			}
-			for (int i = 0; i < listNurseSiteMaintainConfig.size(); ++i) {
-				String tempUid = listNurseSiteMaintainConfig.get(i).getClinicalDeptUID();
-				if (setClinicalDeptUid.contains(tempUid)) {
-					showListNurseSiteMaintainConfig.add(listNurseSiteMaintainConfig.get(i));
+			if(listCheckClinicalOrgInfo!=null && listCheckClinicalOrgInfo.size()>0){
+				Set<String> setClinicalDeptUid = new HashSet<String>();
+				for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
+					setClinicalDeptUid.add(listCheckClinicalOrgInfo.get(i).getUid());
 				}
+				for (int i = 0; i < listNurseSiteMaintainConfig.size(); ++i) {
+					String tempUid = listNurseSiteMaintainConfig.get(i).getClinicalDeptUID();
+					if (setClinicalDeptUid.contains(tempUid)) {
+						showListNurseSiteMaintainConfig.add(listNurseSiteMaintainConfig.get(i));
+					}
+				}
+			}
+			else{
+				showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 			}
 		}
 		loadMaintainData();
