@@ -84,11 +84,15 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<Integer> listAssetGroup;
   	private boolean isCreate=false;
   	private SearchController searchController;
+  	private AssetSelectController assetSelectController;
+
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         searchController = WebUtil.getBean(SearchController.class);
         searchController.setCallingController(this);
+        assetSelectController = WebUtil.getBean(AssetSelectController.class);
+        assetSelectController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
@@ -141,7 +145,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     }
 
     @Override
-    public void save() {
+    public void save(){
     	saveMaintainConfig(this.selected,true);
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
@@ -185,6 +189,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		isCreate=true;
 		initValues();
 		loadMaintainConfig(this.selected);
+		//TODO
+        assetSelectController.loadData4Create();
 	}
 	
 	@Override
@@ -195,6 +201,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		initValues();
 		loadMaintainConfig(this.selected);
 		setDefaultValueForAssetList();
+		//TODO
+        assetSelectController.loadData4Edit(this.selected);
 	}
 	private void initValues(){
 		this.listCheckAssets=new LinkedList<AssetInfo>();

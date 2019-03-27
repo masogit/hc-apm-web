@@ -197,4 +197,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Transactional
     @Query(value = "update AssetInfo set manufacture=?1 where manufactureId=?2 and tenantUID=?3")
     public void updateManufactureName(String name, String supplierId, String tenantUid);
+
+    @Query(value = "select distinct clinical_dept_uid from asset_info where status <> 4 and is_valid = true and is_deleted = false and site_uid = ?1", nativeQuery = true)
+    List<String> findDistinctClinicalDeptUids(String siteUid);
+
+    @Query(value = "select distinct asset_dept_uid from asset_info where status <> 4 and is_valid = true and is_deleted = false and site_uid = ?1", nativeQuery = true)
+    List<String> findDistinctAssetDeptUids(String siteUid);
+
 }
