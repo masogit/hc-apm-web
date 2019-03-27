@@ -71,7 +71,7 @@
 			</div>
 		</h:form>
 	</p:dialog>
-	<p:dialog id="checkDataDlg" widgetVar="checkDataDlg" header="请选择检查项" modal="true" resizable="true" draggable="true" appendTo="@(body)">
+	<p:dialog id="checkDataDlg" widgetVar="checkDataDlg" header="请选择检查项" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="300">
 		<h:form id="checkDataForm">
 			<p:panelGrid columns="6">
 				<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item">
@@ -79,7 +79,8 @@
 				</p:repeat>
 			</p:panelGrid>
 			<p:commandButton value="确认" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();" />
-			<p:commandButton value="重置" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
+			<p:commandButton value="全选" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
+			<p:commandButton value="全不选" actionListener="#{maintainItemController.resetCheckData2()}" update=":checkDataForm"  />
 		</h:form>
 	</p:dialog>
 </ui:composition>
