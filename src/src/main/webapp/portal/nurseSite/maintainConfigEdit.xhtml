@@ -73,9 +73,14 @@
 					</p:selectManyMenu>
 				</h:panelGroup>
 			</p:panelGrid>
-			<p:fieldset>
-				<ui:include src="assetList.xhtml"></ui:include>
-			</p:fieldset>
+			<h:panelGroup>
+				<p:fieldset>
+					<ui:include src="assetList.xhtml"></ui:include>
+				</p:fieldset>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{maintainConfigController.selected.id!=null}">
+				<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyDirectly}" label="覆盖历史未完成检查"/>
+			</h:panelGroup>
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"

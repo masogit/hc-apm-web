@@ -17,7 +17,7 @@
                 <p:overlayPanel id="orgPanel" widgetVar="varOrgPanel" for="orgBtn" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"
                                 style="width:300px;" modal="false">
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}" selection="#{assetSelectController.selectedNode}"
+                        <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}"
                                 var="node" selectionMode="single">
                             <p:ajax process="@this" event="select"
                                     update="@parent:selectedOrgName,@parent:deptOrgInfo"
@@ -36,10 +36,11 @@
                 <label class="label">科室</label>
                 <p:autoComplete id="deptOrgInfo"
                                 dropdown="true" value="#{assetSelectController.selectedDeptName}"
-                                required="true" requiredMessage="科室 #{msg.ValidationRequire}"
                                 scrollHeight="300"  forceSelection="true" size="20"
                                 completeMethod="#{assetSelectController.autoCompleteDeptName}">
                     <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
+                    <f:validator validatorId="assetSearchValidator"/>
+                    <f:attribute name="departNumComponent" value="#{departNumComponent}"/>
                 </p:autoComplete>
             </h:panelGroup>
             <h:panelGroup>
@@ -58,8 +59,9 @@
                 <p:inputText value="#{assetSelectController.functionType}"/>
             </h:panelGroup>
             <h:panelGroup>
+                <p:log></p:log>
                 <label class="label">设备编号</label>
-                <p:inputText value="#{assetSelectController.departNum}"/>
+                <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
             </h:panelGroup>
             <p:commandButton validateClient="true"
                              value="查询"
@@ -77,7 +79,7 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:column width="24" id="checkBoxCol">
+                <p:column width="40" id="checkBoxCol">
                     <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
                         <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":maintainConfigCreateForm:saveButtonId"/>
                         <f:attribute name="assetObj" value="#{asset}"/>

@@ -41,8 +41,6 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private OrgInfo selectedOrg;
 
-    private OrgInfo selectedDept;
-
     private String assetName;
 
     private String assetGroup;
@@ -51,19 +49,15 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private String departNum;
 
-    private Boolean isAllSelected = false;
+    private Boolean isAllSelected = Boolean.FALSE;
 
     private List<OrgInfo> deptList;
 
     private TreeNode orgTree;
 
-    private TreeNode selectedNode;
-
     private String selectedDeptName;
 
     private UserAccount currentUser;
-
-    private AssetSelectService assetSelectService;
 
     private List<SearchFilter> searchFilters;
 
@@ -74,6 +68,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private Map<String, Boolean> selectedAssetUids;
 
     private ServerEventInterface callingController;
+
+    private AssetSelectService assetSelectService;
 
     @Override
     protected GenericRepositoryUUID<AssetInfo> getDAO() {
@@ -96,12 +92,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
         this.orgTree = assetSelectService.loadOrgTree();
+        this.selectedOrg = assetSelectService.loadSelectedOrg();
+
         this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
         this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
-        OrgInfo selectedOrg = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
-        this.setSelectedDept(selectedOrg);
+        OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
+        this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
+        this.selectedDeptName = selectedDept.getName();
+
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
-        this.setSelectedOrg(selectedOrg);
+
         this.findAssets2Maintain();
     }
 
@@ -120,6 +120,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.buildAdvancedSearchFilters();
         assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
         log.debug("{} assets has been loaded", assets4Maintain.size());
+        this.searchFilters.clear();
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
@@ -185,7 +186,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID(), "1*"));
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
         // for valid asset
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
@@ -211,9 +212,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             if(StringUtils.isNotBlank(this.getFunctionType())) {
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
             }
-            String selectedDeptUid = deptList.stream().filter(dept ->selectedDeptName.equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
-            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
+            if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
+                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
+                searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
+                searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
+            }
         }
     }
 
