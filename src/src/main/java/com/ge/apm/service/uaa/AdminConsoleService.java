@@ -190,7 +190,7 @@ public class AdminConsoleService {
 		offset=0;
 		listR=nurseSiteMaintainItemRepository.findError8ByLimit(limit, offset,date);
 		while(listR!=null && listR.size()>0){
-			tUpdateNurseSiteStatus(listR,2,8);
+			tUpdateNurseSiteStatus(listR,3,8);
 			++offset;
 			listR=nurseSiteMaintainItemRepository.findError8ByLimit(limit, offset,date);
 		}
