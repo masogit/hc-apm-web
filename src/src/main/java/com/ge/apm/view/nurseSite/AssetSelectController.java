@@ -51,6 +51,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private Boolean isAllSelected = Boolean.FALSE;
 
+    private Boolean is4Edit = Boolean.FALSE;
+
     private List<OrgInfo> deptList;
 
     private TreeNode orgTree;
@@ -91,6 +93,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
+        this.is4Edit = Boolean.TRUE;
         this.orgTree = assetSelectService.loadOrgTree();
         this.selectedOrg = assetSelectService.loadSelectedOrg();
 
@@ -184,9 +187,18 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private void buildBaseSearchFilters() {
         // for access control
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID(), "1*"));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
-//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
+        if(currentUser.getOrgLevel() == 1) {
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
+        }
+        if(currentUser.getOrgLevel() == 2) {
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
+        }
+        if(currentUser.getOrgLevel() == 3) {
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
+        }
         // for valid asset
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
