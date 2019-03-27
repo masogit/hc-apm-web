@@ -58,8 +58,7 @@
                 <label class="label">设备型号</label>
                 <p:inputText value="#{assetSelectController.functionType}"/>
             </h:panelGroup>
-            <h:panelGroup>
-                <p:log></p:log>
+            <h:panelGroup rendered="#{!assetSelectController.is4Edit}">
                 <label class="label">设备编号</label>
                 <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
             </h:panelGroup>
