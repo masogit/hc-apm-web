@@ -106,6 +106,11 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 			mapCheckData.put(label, true);
 		}
 	}
+	public void resetCheckData2(){
+		for(String label: mapCheckData.keySet()){
+			mapCheckData.put(label, false);
+		}
+	}
 	private void pageButtonChange(){
 		if(size<=pageSize){
 			blnNext=false;
