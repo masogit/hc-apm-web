@@ -100,6 +100,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 			}
 		}
 		nurseSiteMaintain.setCheckData(listCheckData);
+		completeMaintain();
 	}
 	public void resetCheckData(){
 		for(String label: mapCheckData.keySet()){
