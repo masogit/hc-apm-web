@@ -172,6 +172,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     
     @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid in ?1 ")
     public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
+    
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid = ?1 ")
+    public AssetInfo getSimpleDataByUids(String uid);
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
