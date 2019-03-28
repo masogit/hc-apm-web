@@ -6,6 +6,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -84,12 +85,19 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         searchFilters = new ArrayList<>(8);
         selectedAssetUids = new HashMap<>(32);
         selectedAssets = new HashSet<>();
+        currentUser = UserContextService.getCurrentUserAccount();
     }
 
     public void loadData4Create() {
         this.orgTree = assetSelectService.loadOrgTree();
         this.selectedOrg = assetSelectService.loadSelectedOrg();
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
+
+        this.assets4Maintain = null;
+        this.assetGroup = null;
+        this.assetName = null;
+        this.selectedDeptName = null;
+
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
