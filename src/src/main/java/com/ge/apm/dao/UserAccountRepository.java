@@ -86,6 +86,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid in ?1 ")
     public List<UserAccount> getSimpleByUids(Set<String> setUids);
     
+    @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid = ?1 ")
+    public UserAccount getSimpleByUids(String uid);
+    
     @Query(value= "select o.* from user_account o where o.id in ?1 ",nativeQuery=true)
     public List<UserAccount> getByIds(Set<Integer> setIds);
 
