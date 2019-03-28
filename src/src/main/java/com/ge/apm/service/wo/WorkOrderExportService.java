@@ -67,7 +67,7 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList){
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -127,6 +127,12 @@ public class WorkOrderExportService {
         }
         if (statusList != null && !statusList.isEmpty()) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
+        }
+        if(filterParts != null){
+            searchFilters.add(new SearchFilter("filterParts", SearchFilter.Operator.EQ, filterParts));
+        }
+        if(filterTotalPrice != null){
+            searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
 
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
