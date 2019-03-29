@@ -2,7 +2,13 @@ package com.ge.apm.service.common;
 
 
 public enum GatewayURL {
-
+    //Transaction
+    LISt_ALL_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
+    CREATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
+    DELETE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    QUERY_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    UPDATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    GET_DEPTRASACTION_LOG_SUMMARY("/hcapmassetservice/api/apm/asset/deptTransaction/summary"),
 
     CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
     // Security
