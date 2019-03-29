@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template-polymer.xhtml">
+    <ui:define name="content">
+     <div class="ui-g clearfix">
+        <div class="ui-g-12 card cardTitle">
+        <p:outputLabel class="pageTitle" value="事务型管理"/>
+        </div>
+         <div class="ui-g-12 card">
+             <h:form id="transactionManageForm">
+                 <p:dataTable id="datalist"
+                              value="#{transactionManageController.lazyModel}"
+                              var="item"
+                              widgetVar="varDataList"
+                              selectionMode="single" selection="#{transactionManageController.selected}"
+                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                              rows="20" emptyMessage="#{msg.noRecordFound}"
+                              rowsPerPageTemplate="20,50,100,500">
+                     <p:ajax event="rowSelect" update="@(.btn)" listener="#{transactionManageController.onSelectTM()}"/>
+                     <p:column headerText="事务名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+
+                         <h:outputText value="#{item.name}"/>
+                     </p:column>
+                     <p:column headerText="开始时间" filterBy="#{item.startTime}" filterMatchMode="LIKE">
+                         <h:outputText value="#{item.startTime}">
+                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                         </h:outputText>
+                     </p:column>
+                     <p:column headerText="结束时间" filterBy="#{item.endTime}" filterMatchMode="LIKE">
+                         <h:outputText value="#{item.endTime}">
+                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                         </h:outputText>
+                     </p:column>
+
+
+                     <f:facet name="{Toolbar}">
+                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{transactionManageController.prepareCreate}" update=":newTranManForm" oncomplete="PF('transactionManageDlg').show()"/>
+                         <p:commandButton id="deleteButton"  title="#{msg.Delete}" update=":transactionManageForm:datalist,@(.btn) :growl" disabled="#{transactionManageController.selected eq null }" icon="ui-icon-close" class="btn btn-sm btn-gray" actionListener="#{transactionManageController.delete}">
+                             <p:confirm header="#{msg.DeleteConformation}"
+                                        message="确定删除该事务管理？"
+                                        icon="ui-icon-warning"/>
+                         </p:commandButton>
+                        <!-- <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{transactionManageController.prepareEdit}"  oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
+
+                         -->
+                        <!-- <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                             <p:dataExporter type="xls" target="datalist" fileName="PmOrderRule_export"/>
+                         </p:commandButton>-->
+                     </f:facet>
+                 </p:dataTable>
+
+             </h:form>
+             <ui:include src="newTranMan.xhtml"/>
+         </div>
+
+
+     </div>
+    </ui:define>
+</ui:composition>
