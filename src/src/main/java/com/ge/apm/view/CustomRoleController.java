@@ -106,6 +106,16 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
             WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
             return;
         }
+        if(authorities.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("authoritiesIsBlank"));
+            return;
+        }
+        if(cards.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("cardsIsBlank"));
+            return;
+        }
         selected.setTenantUID(user.getTenantUID());
         selected.setInstitutionUID(user.getInstitutionUID());
         selected.setHospitalUID(user.getHospitalUID());
@@ -158,6 +168,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
 
         dao.save(selected);
+        authorities = new String[200];
+        cards = new String[100];
+    }
+
+    public void clear(){
         authorities = new String[200];
         cards = new String[100];
     }
