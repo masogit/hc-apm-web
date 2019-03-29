@@ -47,6 +47,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -149,8 +150,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setTenantUid(String tenantUid) {
         searchFilters.clear();
         this.tenantUid = tenantUid;
-/*        
-        //orgTree not used, so comment below code.
+
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
@@ -173,7 +173,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedUserOrg.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedUserOrg);
         }
-*/
     }
     
     public String getOrgFullNameByUid(String orgUid) {
