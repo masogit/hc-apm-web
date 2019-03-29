@@ -144,10 +144,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
-
     public String faultReason;
-public CustomConfigService customConfigService;
-
+    public CustomConfigService customConfigService;
 
     protected void init() {
         customConfigService=WebUtil.getBean(CustomConfigService.class);
