@@ -12,7 +12,7 @@
             text-align: left;
         }
     </style>
-    <p:dialog id="transactionManageDlg" widgetVar="transactionManageDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{transactionManageController.getTitleName()}事务">
+    <p:dialog id="transactionManageDlg" widgetVar="transactionManageDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{transactionManageController.getTitleName()}科务">
         <h:form id="newTranManForm">
             <h:panelGroup id="display" >
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{transactionManageController.selected!=null}">
@@ -21,7 +21,7 @@
                         <p:inputText id="tName" value="#{transactionManageController.selected.name}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                     </h:panelGroup>-->
                     <h:panelGroup >
-                        <label class="label">事务名称*</label>
+                        <label class="label">科务名称*</label>
                         <p:selectOneMenu value="#{transactionManageController.tmCategory}"  onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('transaction')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
