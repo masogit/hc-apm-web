@@ -84,7 +84,7 @@
 
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <label class="label">配件金额区间</label>
+                    <label class="label">备件金额区间</label>
                     <p:inputNumber id="minPrice_woDetail" decimalPlaces="0" minValue="0" maxValue="999999999" emptyValue="true" value="#{workOrderDetailExportController.filterMinPrice}">
                         <f:convertNumber pattern="0" type="number"/>
                     </p:inputNumber>
@@ -97,7 +97,7 @@
 
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <p:inputText id="searchText_woDetail" value="#{workOrderDetailExportController.searchStr}" placeholder="设备编号/工单编号/发票号/公司名称" maxlength="100" style="width: 500px"/>
+                    <p:inputText id="searchText_woDetail" value="#{workOrderDetailExportController.searchStr}" placeholder="设备编号/工单编号/发票号/供应商" maxlength="100" style="width: 500px"/>
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
@@ -124,20 +124,20 @@
 
             <p:column selectionMode="multiple"  style="width:50px;text-align:center" >
             </p:column>
-            <p:column headerText="部门名称">
-                <h:outputText value="#{item.部门名称}"/>
+            <p:column headerText="科室">
+                <h:outputText value="#{item.科室}"/>
             </p:column>
-            <p:column headerText="卡片编号">
-                <h:outputText value="#{item.卡片编号}"/>
+            <p:column headerText="设备编号">
+                <h:outputText value="#{item.设备编号}"/>
             </p:column>
             <p:column headerText="资产名称">
                 <h:outputText value="#{item.资产名称}"/>
             </p:column>
-            <p:column headerText="卡片编号">
-                <h:outputText value="#{item.供货单位名称}"/>
+            <p:column headerText="供应商">
+                <h:outputText value="#{item.供应商}"/>
             </p:column>
-            <p:column headerText="配件名称">
-                <h:outputText value="#{item.配件名称}"/>
+            <p:column headerText="备件名称">
+                <h:outputText value="#{item.备件名称}"/>
             </p:column>
             <p:column headerText="数量">
                 <h:outputText value="#{item.数量}"/>
@@ -151,8 +151,8 @@
             <p:column headerText="开票日期">
                 <h:outputText value="#{item.开票日期}"/>
             </p:column>
-            <p:column headerText="经手人员">
-                <h:outputText value="#{item.经手人员}"/>
+            <p:column headerText="审核人">
+                <h:outputText value="#{item.审核人}"/>
             </p:column>
             <p:column headerText="合同号">
                 <h:outputText value="#{item.合同号}"/>
