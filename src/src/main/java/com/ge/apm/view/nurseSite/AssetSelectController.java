@@ -93,11 +93,14 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.selectedOrg = assetSelectService.loadSelectedOrg();
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
+        // ugly way to reset below arguments, it seems this controller won't be release without submit
+        // need to investigate this issue later
+        //TODO
         this.assets4Maintain = null;
         this.assetGroup = null;
         this.assetName = null;
         this.selectedDeptName = null;
-
+        this.is4Edit = Boolean.FALSE;
     }
 
     public void loadData4Edit(NurseSiteMaintainConfig config) {
@@ -114,6 +117,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
         this.findAssets2Maintain();
+        //sort assets by selected for edit view
+        List<AssetInfo> assetsWithoutSelected = this.assets4Maintain.stream()
+                .filter(t -> !this.selectedAssetUids.containsKey(t.getUid()))
+                .collect(Collectors.toList());
+        this.assets4Maintain = new ArrayList<>(this.selectedAssets);
+        this.assets4Maintain.addAll(assetsWithoutSelected);
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
@@ -223,8 +232,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, this.getDepartNum(), "1*"));
         } else {
             if(StringUtils.isNotBlank(this.getAssetName())) {
-                searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, this.getAssetName(), "1*3+"));
-                searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, this.getAssetName(), "1*3+"));
+                searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
+                searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
             }
             if(StringUtils.isNotBlank(this.getAssetGroup())) {
                 searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.getAssetGroup(), "1*"));
