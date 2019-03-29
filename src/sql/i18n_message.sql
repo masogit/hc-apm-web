@@ -1716,7 +1716,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetInventoryCard', 'mgr_inv', '盘点', 'assetInventoryCard', NULL, '-1');
 
-
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '1', '带教', 'daijiao', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '2', '接待', 'jiedai', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '3', '会议', 'huiyi', NULL, '-1');
@@ -1725,3 +1724,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '6', '计量', 'jiliang', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '7', '论证', 'lunzheng', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('transaction', '8', '其它', 'qita', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'authoritiesIsBlank', '盘点权限不能为空!', 'authorities is blank !', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'cardsIsBlank', '盘点卡片不能为空!', 'cards is blank !', NULL, '-1');
+
