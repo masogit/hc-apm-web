@@ -145,7 +145,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
         log.debug("{} assets has been loaded", assets4Maintain.size());
         this.searchFilters.clear();
-        this.tiggerEvent();
+//        this.tiggerEvent();
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {

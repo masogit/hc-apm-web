@@ -12,8 +12,8 @@
             <h:panelGroup>
                 <label class="label">所属院区</label>
                 <p:inputText id="selectedOrgName" value="#{assetSelectController.selectedOrg.name}" readonly="true" required="true"
-                             requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" />
-                <p:commandButton id="orgBtn" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
+                             requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" disabled="#{assetSelectController.is4Edit}"/>
+                <p:commandButton id="orgBtn" process="@this" disabled="#{assetSelectController.is4Edit}" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                 <p:overlayPanel id="orgPanel" widgetVar="varOrgPanel" for="orgBtn" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"
                                 style="width:300px;" modal="false">
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -36,7 +36,7 @@
                 <label class="label">科室</label>
                 <p:autoComplete id="deptOrgInfo"
                                 dropdown="true" value="#{assetSelectController.selectedDeptName}"
-                                scrollHeight="300"  forceSelection="true" size="20"
+                                scrollHeight="300"  forceSelection="true" size="20" disabled="#{assetSelectController.is4Edit}"
                                 completeMethod="#{assetSelectController.autoCompleteDeptName}">
                     <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
                     <f:validator validatorId="assetSearchValidator"/>
@@ -64,7 +64,7 @@
             </h:panelGroup>
             <p:commandButton validateClient="true"
                              value="查询"
-                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
                              action="#{assetSelectController.findAssets2Maintain}"/>
         </p:panelGrid>
 
