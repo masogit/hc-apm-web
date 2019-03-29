@@ -28,6 +28,14 @@
         </script>
 
         <style>
+            .warrantyExpired {
+            background-color: #fca752!important;
+            color: #000000!important;
+            }
+            .warrantyExpireSoon {
+            background-color: #f04134!important;
+            color: #000000!important;
+            }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
@@ -42,6 +50,13 @@
             <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
+                    <h:panelGroup style="position: absolute; float: right; right: 50px;">
+                        <span >图例：</span>
+                        <span class="warrantyExpireSoon">维保或质保即将过期</span>
+                        <span></span>
+                        <span class="warrantyExpired">维保或质保已经过期</span>
+                    </h:panelGroup>
+                    
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
@@ -89,6 +104,7 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
