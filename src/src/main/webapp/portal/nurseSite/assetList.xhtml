@@ -64,7 +64,7 @@
             </h:panelGroup>
             <p:commandButton validateClient="true"
                              value="查询"
-                             update="assets4maintain"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId"
                              action="#{assetSelectController.findAssets2Maintain}"/>
         </p:panelGrid>
 
