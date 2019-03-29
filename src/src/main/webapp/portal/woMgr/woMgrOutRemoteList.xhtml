@@ -16,16 +16,16 @@
 				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent6Controller.selected}">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent6Controller.blnAllSelected}"
-							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo6" class="selectCheckBoxHeader" value="#{assetLifecycleEvent6Controller.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo6,selectCheckBoxItemWo6');">
 							<p:ajax listener="#{assetLifecycleEvent6Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
 					</f:facet>
-					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo6">
 						<p:ajax listener="#{assetLifecycleEvent6Controller.onItemSelect(item)}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
-				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');"></p:ajax>
+				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo6,selectCheckBoxItemWo6');"></p:ajax>
 				<p:ajax event="filter" listener="#{assetLifecycleEvent6Controller.onFilter}" />
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
