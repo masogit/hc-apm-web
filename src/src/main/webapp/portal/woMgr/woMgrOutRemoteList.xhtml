@@ -2,32 +2,31 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition>
 	<div class="ui-g-12 card">
 		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
-		<h:form id="pmOrderListOutRemoteForm">
+		<h:form id="woMgrOutRemoteListForm">
 
-			<p:dataTable id="datalist4" value="#{assetLifecycleEvent6Controller.lazyModel}" var="item" widgetVar="varDataList4"
-				selection="#{assetLifecycleEvent6Controller.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-				rowKey="#{item.id}" selectionMode="single"
+			<p:dataTable id="datalist6" value="#{assetLifecycleEvent6Controller.lazyModel}" var="item" widgetVar="varWoMgrOutRemoteDataList" lazy="true" paginator="true"
+				paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}" selectionMode="single"
 				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
-				rowsPerPageTemplate="20,50,100,500">
-				<p:ajax event="filter" listener="#{assetLifecycleEvent6Controller.onFilter}" />
-				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('pmTab:pmOrderListOutRemoteForm,selectCheckBoxHeaderPmRemote,selectCheckBoxItemPmRemote');"></p:ajax>
+				rowsPerPageTemplate="20,50,100,500" selection="#{assetLifecycleEvent6Controller.selected}">
 				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
 					<f:facet name="header">
-						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmRemote" class="selectCheckBoxHeader" value="#{assetLifecycleEvent6Controller.blnAllSelected}"
-							onchange="CommonUtilsJS.multipleSelect('pmTab:pmOrderListOutRemoteForm,selectCheckBoxHeaderPmRemote,selectCheckBoxItemPmRemote');">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderWo" class="selectCheckBoxHeader" value="#{assetLifecycleEvent6Controller.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');">
 							<p:ajax listener="#{assetLifecycleEvent6Controller.onSelectAllItemsEvent()}"></p:ajax>
 						</p:selectBooleanCheckbox>
 					</f:facet>
-					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemPmRemote">
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemWo">
 						<p:ajax listener="#{assetLifecycleEvent6Controller.onItemSelect(item)}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
+				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('woTab:woMgrOutRemoteListForm,selectCheckBoxHeaderWo,selectCheckBoxItemWo');"></p:ajax>
+				<p:ajax event="filter" listener="#{assetLifecycleEvent6Controller.onFilter}" />
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>
@@ -48,21 +47,16 @@
 				</p:column>
 				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
 					<f:facet name="filter">
-						<p:selectOneMenu onchange="PF('varDataList4').filter()" value="#{assetLifecycleEvent6Controller.descriptionStatusFilter}">
+						<p:selectOneMenu onchange="PF('varWoMgrOutRemoteDataList').filter()">
 							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 							<f:selectItem itemLabel="Open" itemValue="Open" />
+							<f:selectItem itemLabel="Assigned" itemValue="Assigned" />
+							<f:selectItem itemLabel="Equipment Up" itemValue="Equipment Up" />
 							<f:selectItem itemLabel="Closed" itemValue="Closed" />
-							<f:selectItem itemLabel="Cancelled" itemValue="Cancelled" />
 						</p:selectOneMenu>
 					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent6Controller.getMsStatus(item)}" />
 				</p:column>
-				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
-					<h:outputText value="#{item.scheduleDate}">
-						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-					</h:outputText>
-				</p:column>
-
 				<p:column headerText="报告下载" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
@@ -72,11 +66,12 @@
 					</p:repeat>
 				</p:column>
 				<f:facet name="{Toolbar}">
-					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent6Controller.exportSelected}" update=":growl" ajax="false">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
+						actionListener="#{assetLifecycleEvent6Controller.exportSelected}" update=":growl" ajax="false">
 						<p:fileDownload value="#{assetLifecycleEvent6Controller.exportFile}" />
 					</p:commandButton>
 					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
-						actionListener="#{assetLifecycleEvent6Controller.downloadSelectedReport()}" process="datalist4" update=":growl">
+						actionListener="#{assetLifecycleEvent6Controller.downloadSelectedReport()}" process=":woTab:woMgrOutRemoteListForm:datalist6" update=":growl">
 						<p:fileDownload value="#{assetLifecycleEvent6Controller.exportFile}" />
 					</p:commandButton>
 				</f:facet>
@@ -84,5 +79,18 @@
 		</h:form>
 
 	</div>
+
+
+	<script>
+		//<![CDATA[
+		afterPageLoad = function() {
+			var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+			var isActive = "#{userContextService.isActive()}";
+			if (isActive == '1') {
+				PF('ActiveDlg').show();
+			}
+		};
+		//]]>
+	</script>
 </ui:composition>
 </html>
