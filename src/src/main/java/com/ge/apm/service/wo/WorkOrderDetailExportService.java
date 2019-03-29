@@ -111,16 +111,16 @@ public class WorkOrderDetailExportService {
             Map<String, Object> workOrderDetailMap = new HashedMap();
 
             workOrderDetailMap.put("wodID", workOrderDetailPojo.getId());
-            workOrderDetailMap.put("部门名称", workOrderDetailPojo.getAssetClinicalDeptName());
-            workOrderDetailMap.put("卡片编号", workOrderDetailPojo.getAssetDepartNum());
+            workOrderDetailMap.put("科室", workOrderDetailPojo.getAssetClinicalDeptName());
+            workOrderDetailMap.put("设备编号", workOrderDetailPojo.getAssetDepartNum());
             workOrderDetailMap.put("资产名称", workOrderDetailPojo.getAssetName());
-            workOrderDetailMap.put("供货单位名称", workOrderDetailPojo.getSupplierName());
-            workOrderDetailMap.put("配件名称", workOrderDetailPojo.getPartsName());
+            workOrderDetailMap.put("供应商", workOrderDetailPojo.getSupplierName());
+            workOrderDetailMap.put("备件名称", workOrderDetailPojo.getPartsName());
             workOrderDetailMap.put("数量", workOrderDetailPojo.getPartsQuantity());
-            workOrderDetailMap.put("发生费用", workOrderDetailPojo.getClosedPrice());
+            workOrderDetailMap.put("发生费用", workOrderDetailPojo.getClosedPrice() * workOrderDetailPojo.getPartsQuantity());
             workOrderDetailMap.put("发票号", workOrderDetailPojo.getInvoiceNum());
             workOrderDetailMap.put("开票日期", formatDate(workOrderDetailPojo.getInvoiceTime()));
-            workOrderDetailMap.put("经手人员", workOrderDetailPojo.getApproverName());
+            workOrderDetailMap.put("审核人", workOrderDetailPojo.getApproverName());
             workOrderDetailMap.put("合同号", workOrderDetailPojo.getContractNum());
             workOrderDetailMap.put("备注", workOrderDetailPojo.getComment());
             if(workOrderDetailPojo.getStatementStatus() != null){
