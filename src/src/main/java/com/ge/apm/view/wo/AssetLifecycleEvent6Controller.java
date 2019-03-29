@@ -32,17 +32,4 @@ public class AssetLifecycleEvent6Controller extends AssetLifecycleEventControlle
 		super.init();
         tabStatus=6;
     }
-    
-    protected void downloadFile(List<Map<String,Object>> data){
-		try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/pm/pmOrderListRemote_export.xlsx");
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = service.exportData(doc, data);
-            if (exportFlag) {
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "PmOrder_export.xlsx");
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }
-	}
 }
