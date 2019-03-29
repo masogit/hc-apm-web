@@ -103,6 +103,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private CustomRoleRepository customRoleRepository;
 
     private UserRoleRepository userRoleRepository;
+    private List<OrgInfo> deptList;
 
     @Override
     protected void init() {
@@ -126,6 +127,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        
+        deptList = uaaService.getFullOrgListBySiteId(UserContextService.getSiteId());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -143,6 +146,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setTenantUid(String tenantUid) {
         searchFilters.clear();
         this.tenantUid = tenantUid;
+/*        
+        //orgTree not used, so comment below code.
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
@@ -165,6 +170,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedUserOrg.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedUserOrg);
         }
+*/
     }
     
     public String getOrgFullNameByUid(String orgUid) {
@@ -236,7 +242,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     	generateListSearchFilter();
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
-        	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
+            List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
+            if(orgListByUid.size()>0)
+                user.setOrgInfo(orgListByUid.get(0));
         }
         return pageUserAccount;
     }
@@ -934,4 +942,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
 	}
+        
+    public List<String> autoCompleteDeptName(String query) {
+        if (deptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.deptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    private  String filterClinicalDeptOrg = null;
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+        if(filterClinicalDeptOrg==null) return;
+        
+        List<OrgInfo> orgListByName = this.deptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+        if(orgListByName.size()<1)
+            selectedUserOrg = null;
+        else{
+            selectedUserOrg = orgListByName.get(0);
+        }
+    }
+    
+    public String getSelectedOrgName(){
+        if(selectedUserOrg==null)  return "";
+        
+        return selectedUserOrg.getName();
+    }
+    
+    public void setSelectedOrgName(String orgName){
+        //ignore the input orgName, just provide a Setter for UI input Component
+    }
 }
