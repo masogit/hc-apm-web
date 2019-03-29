@@ -18,12 +18,18 @@ public class DeptTransactionLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    @Column(name = "uid", columnDefinition = "CHAR(32)")
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name="id")
-    private String id;
+    private String uid;
 
-    @Column(name = "authorName")
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;
+    @Column(name = "author_name")
     private String authorName;
 
    /* @Basic(optional = false)
@@ -33,41 +39,42 @@ public class DeptTransactionLog implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Column(name = "startTime")
+    @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
 
     @Basic(optional = false)
     @NotNull
-    @Column(name = "endTime")
+    @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endTime;
 
     @Size(min = 1, max = 64)
-    @Column(name="transactionUID")
+    @Column(name="transaction_uid")
     private String transactionUID;
 
     @Size(min = 1, max = 256)
     @Column(name="remark")
     private String remark;
 
-    @Column(name="tenantUID",columnDefinition = "CHAR(32)")
+    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
 
-    @Column(name="institutionUID",columnDefinition = "CHAR(32)")
+    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
     private String institutionUID;
 
-    @Column(name="hospitalUID",columnDefinition = "CHAR(32)")
+    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
-    @Column(name="siteUID",columnDefinition = "CHAR(32)")
+    @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
 
     @Column(name="category")
     private Integer category;
-
+    @Column(name="author_id")
+    private Integer authorId;
 
     public String getAuthorName() {
         return authorName;
@@ -89,12 +96,20 @@ public class DeptTransactionLog implements Serializable {
         return serialVersionUID;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     @NotNull
@@ -172,6 +187,23 @@ public class DeptTransactionLog implements Serializable {
         this.name = name;
     }
   */
+
+    public Integer getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Integer authorId) {
+        this.authorId = authorId;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

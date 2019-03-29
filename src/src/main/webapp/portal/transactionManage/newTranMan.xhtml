@@ -12,24 +12,35 @@
             text-align: left;
         }
     </style>
-    <p:dialog id="transactionManageDlg" widgetVar="transactionManageDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="新增事务">
+    <p:dialog id="transactionManageDlg" widgetVar="transactionManageDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{transactionManageController.getTitleName()}事务">
         <h:form id="newTranManForm">
-            <h:panelGroup id="display">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup id="display" >
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{transactionManageController.selected!=null}">
                   <!--  <h:panelGroup>
                         <label class ="label">事务名称</label>
                         <p:inputText id="tName" value="#{transactionManageController.selected.name}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                     </h:panelGroup>-->
                     <h:panelGroup >
                         <label class="label">事务名称*</label>
-                        <p:selectOneMenu value="#{transactionManageController.deptTransactionCategory}" required="false" filter="true" var="t" converter="transactionConverter" requiredMessage="事务#{msg.ValidationRequire}">
+                        <p:selectOneMenu value="#{transactionManageController.tmCategory}"  onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('transaction')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+
+
+                        <!--<p:selectOneMenu value="#{transactionManageController.tmCategory}" required="false" filter="true" var="t" requiredMessage="事务#{msg.ValidationRequire}">
                             <p:ajax event="itemSelect" listener="#{transactionManageController.onSelectTM()}"></p:ajax>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{transactionManageController.getTranManList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-                            <p:column>
-                                <h:outputText value="#{t.name}"/>
-                            </p:column>
-                        </p:selectOneMenu>
+                            <f:selectItem itemLabel="带教" itemValue="1" />
+                            <f:selectItem itemLabel="接待" itemValue="2" />
+                            <f:selectItem itemLabel="会议" itemValue="3" />
+                            <f:selectItem itemLabel="培训" itemValue="4" />
+                            <f:selectItem itemLabel="巡查回访" itemValue="5" />
+                            <f:selectItem itemLabel="计量" itemValue="6" />
+                            <f:selectItem itemLabel="论证" itemValue="7" />
+                            <f:selectItem itemLabel="其它" itemValue="8" />
+
+                        </p:selectOneMenu>-->
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -39,6 +50,11 @@
                     <h:panelGroup>
                         <label class="label">结束时间*</label>
                         <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{transactionManageController.selected.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea id="comment" value="#{transactionManageController.remark}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </h:panelGroup>
