@@ -96,6 +96,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         // ugly way to reset below arguments, it seems this controller won't be release without submit
         // need to investigate this issue later
         //TODO
+        this.selectedAssetUids.clear();
+        this.selectedAssets.clear();
         this.assets4Maintain = null;
         this.assetGroup = null;
         this.assetName = null;
@@ -116,9 +118,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
-        this.findAssets2Maintain();
         //sort assets by selected for edit view
-        List<AssetInfo> assetsWithoutSelected = this.assets4Maintain.stream()
+        List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
                 .filter(t -> !this.selectedAssetUids.containsKey(t.getUid()))
                 .collect(Collectors.toList());
         this.assets4Maintain = new ArrayList<>(this.selectedAssets);
@@ -135,12 +136,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     }
 
     public void findAssets2Maintain() {
+        //clear selected asset for each search
+        this.selectedAssetUids.clear();
+        this.selectedAssets.clear();
         log.debug("findAssets2Maintain");
         this.buildBaseSearchFilters();
         this.buildAdvancedSearchFilters();
         assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
         log.debug("{} assets has been loaded", assets4Maintain.size());
         this.searchFilters.clear();
+        this.tiggerEvent();
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
@@ -190,6 +195,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    private List<AssetInfo> loadAssets4EditView() {
+        log.debug("loadAssets4EditView");
+        this.buildBaseSearchFilters();
+        this.buildAdvancedSearchFilters();
+        List<AssetInfo> assetInfos = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+        log.debug("{} assets has been loaded", assetInfos.size());
+        this.searchFilters.clear();
+        return assetInfos;
     }
 
     private void tiggerEvent() {
