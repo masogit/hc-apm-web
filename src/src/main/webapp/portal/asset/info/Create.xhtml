@@ -196,7 +196,7 @@
                                 <!--</p:selectOneMenu>-->
 
                                 <p:autoComplete id="vendor2" dropdown="true" value="#{assetInfoController.supplier}" scrollHeight="300"  forceSelection="true"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{assetInfoController.autoCompleteSupplier}"
-                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                     <p:ajax event="itemSelect" listener="#{assetInfoController.onSupplierChange}"/>
                                     <p:ajax listener="#{assetInfoController.onSupplierChange}"/>
                                 </p:autoComplete>

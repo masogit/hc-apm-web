@@ -22,6 +22,9 @@
                     <p:tab class="ui-g-12" title="外部工单" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser()}">
                         <ui:include src="woMgrOutList.xhtml"/>
                     </p:tab>
+                    <p:tab class="ui-g-12" title="外部远程工单"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser()}">
+                        <ui:include src="woMgrOutRemoteList.xhtml"/>
+                    </p:tab>
                 </p:tabView>
             </div>
         </div>
