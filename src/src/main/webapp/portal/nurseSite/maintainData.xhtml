@@ -78,7 +78,7 @@
 					<p:selectBooleanCheckbox value="#{maintainItemController.mapCheckData[item]}" label="#{item}"></p:selectBooleanCheckbox>
 				</p:repeat>
 			</p:panelGrid>
-			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();" />
+			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" />
 			<p:commandButton value="全选" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
 			<p:commandButton value="全不选" actionListener="#{maintainItemController.resetCheckData2()}" update=":checkDataForm"  />
 		</h:form>
