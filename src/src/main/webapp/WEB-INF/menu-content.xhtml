@@ -69,7 +69,7 @@
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,SiteAdmin,AssetHead')  and userContextService.versionContains('maintain')}">
                 <p:menuitem value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.versionContains('maintain.workbench')}"/>
-                <p:menuitem id="um240" value="事务管理" outcome="/portal/transactionManage/transactionManage.xhtml"/>
+
 <!--                <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>-->
                 <!--<p:menuitem id="um261" value="#{msg.PreventiveMaintaincePlanning}" url="/portal/analysis/reports.xhtml#/MaintenanceStats"/>-->
@@ -107,7 +107,8 @@
                 <p:menuitem id="um36" value="#{msg.DeviceUpgradMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um37" value="#{msg.AdvancedDeviceInfoTracking}" rendered="false" style="color: orange;" outcome="/empty"/>
             </p:submenu>
-            <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead')  and userContextService.versionContains('performance')}">
+            <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}--" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead')  and userContextService.versionContains('performance')}">
+                <p:menuitem id="um240" value="科务管理" outcome="/portal/transactionManage/transactionManage.xhtml"/>
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('performance.scan')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>
                 <p:menuitem id="um171" value="#{msg.FailureAnalysis}" url="/portal/analysis/reports.xhtml#/FailureAnalysis" rendered="false"/>
