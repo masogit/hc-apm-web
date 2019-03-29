@@ -64,7 +64,7 @@
             </h:panelGroup>
             <p:commandButton validateClient="true"
                              value="查询"
-                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"
                              action="#{assetSelectController.findAssets2Maintain}"/>
         </p:panelGrid>
 
@@ -80,12 +80,12 @@
                          rowsPerPageTemplate="20,50,100,500">
                 <p:column width="40" id="checkBoxCol">
                     <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
-                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":maintainConfigCreateForm:saveButtonId"/>
+                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"/>
                         <f:attribute name="assetObj" value="#{asset}"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage}" update="@(.selectCheckBox) :maintainConfigCreateForm:saveButtonId"/>
+                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage}" update="@(.selectCheckBox) :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
