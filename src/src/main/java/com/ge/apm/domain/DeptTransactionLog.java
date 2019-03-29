@@ -12,8 +12,9 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "transaction_manage")
-public class TransactionManage implements Serializable {
+@Table(name = "dept_transaction_log")
+public class DeptTransactionLog implements Serializable {
+
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -22,39 +23,67 @@ public class TransactionManage implements Serializable {
     @Column(name="id")
     private String id;
 
+    @Column(name = "authorName")
+    private String authorName;
+
+   /* @Basic(optional = false)
+    @NotNull
+    @Column(name = "name")
+    private String name;*/
+
     @Basic(optional = false)
     @NotNull
-    @Column(name = "start_time")
+    @Column(name = "startTime")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
 
     @Basic(optional = false)
     @NotNull
-    @Column(name = "end_time")
+    @Column(name = "endTime")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endTime;
 
     @Size(min = 1, max = 64)
-    @Column(name="transaction_uid")
+    @Column(name="transactionUID")
     private String transactionUID;
 
     @Size(min = 1, max = 256)
     @Column(name="remark")
     private String remark;
 
-    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    @Column(name="tenantUID",columnDefinition = "CHAR(32)")
     private String tenantUID;
 
-    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    @Column(name="institutionUID",columnDefinition = "CHAR(32)")
     private String institutionUID;
 
-    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    @Column(name="hospitalUID",columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
-    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    @Column(name="siteUID",columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @Column(name="category")
+    private Integer category;
+
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public Integer getCategory() {
+        return category;
+    }
+
+    public void setCategory(Integer category) {
+        this.category = category;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -132,5 +161,32 @@ public class TransactionManage implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+   /* @NotNull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
+    }
+  */
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof DeptTransactionLog)) {
+            return false;
+        }
+        DeptTransactionLog other = (DeptTransactionLog) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
 }
