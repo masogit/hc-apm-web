@@ -41,6 +41,19 @@ public class TransactionService extends MicroServiceInvoker {
             return null;
         }
     }
+
+    public String updateTransaction(TransactionForm formData,String token){
+        HttpEntity<TransactionForm> requestEntity = new HttpEntity<TransactionForm>(formData, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_DEPTTRANSACTION_LOG);
+        gatewayURL = gatewayURL.replace("{id}",formData.getId().toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("bizStatusCode");
+        } else {
+            return null;
+        }
+    }
     @Transactional
     public void deleteTm(DeptTransactionLog tm)
     {
