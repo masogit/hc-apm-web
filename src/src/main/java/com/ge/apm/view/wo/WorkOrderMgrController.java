@@ -1098,6 +1098,8 @@ public void repairResultSet(){
                 currentStatus = 3;
             }
         }
+//                紧急程度
+//                当前状态
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
