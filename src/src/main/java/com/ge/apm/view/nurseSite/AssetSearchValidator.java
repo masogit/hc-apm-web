@@ -26,7 +26,7 @@ public class AssetSearchValidator implements Validator {
         logger.debug("enter AssetSearchValidator");
 
         UIInput departNumComponent = (UIInput) uiComponent.getAttributes().get("departNumComponent");
-        String inputDepartNum = (String)departNumComponent.getValue();
+        String inputDepartNum = (String)departNumComponent.getSubmittedValue();
         String departOrg = null;
         if(value != null) {
             departOrg = (String)value;
