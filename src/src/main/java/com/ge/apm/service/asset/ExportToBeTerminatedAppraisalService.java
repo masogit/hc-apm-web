@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
+
 @Component
 public class ExportToBeTerminatedAppraisalService {
 
-    private enum ASSET_DETAIL {financing_num, asset_name, quantity, book_value, function_type, create_time}
+    protected enum ASSET_DETAIL {financing_num, asset_name, quantity, book_value, function_type, create_time}
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
@@ -65,11 +67,11 @@ public class ExportToBeTerminatedAppraisalService {
         for (String id : selectedIds) {
             AssetInfo assetInfo = assetInfoRepository.findByUid(id);
             Map<ASSET_DETAIL, Object> map = new HashMap<>();
-            map.put(ASSET_DETAIL.financing_num, assetInfo.getFinancingNum());
-            map.put(ASSET_DETAIL.asset_name, assetInfo.getName());
-            map.put(ASSET_DETAIL.function_type, assetInfo.getFunctionType());
+            map.put(financing_num, assetInfo.getFinancingNum());
+            map.put(asset_name, assetInfo.getName());
+            map.put(function_type, assetInfo.getFunctionType());
             Date createdDate = assetInfo.getCreatedDate();
-            map.put(ASSET_DETAIL.create_time, createdDate == null ? "" : createdDate.toString());
+            map.put(create_time, createdDate == null ? "" : createdDate.toString());
             list.add(map);
         }
         datas.put("asset_detail_table", list);
@@ -83,12 +85,12 @@ public class ExportToBeTerminatedAppraisalService {
                 List<Map<ASSET_DETAIL, Object>> parts = (List) o;
                 for (Map<ASSET_DETAIL, Object> part : parts) {
                     XWPFTableRow row = addRow(table, n++);
-                    addCell(row, extractValue(part, ASSET_DETAIL.financing_num));
-                    addCell(row, extractValue(part, ASSET_DETAIL.asset_name));
-                    addCell(row, extractValue(part, ASSET_DETAIL.quantity));
-                    addCell(row, extractValue(part, ASSET_DETAIL.book_value));
-                    addCell(row, extractValue(part, ASSET_DETAIL.function_type));
-                    addCell(row, extractValue(part, ASSET_DETAIL.create_time));
+                    addCell(row, extractValue(part, financing_num));
+                    addCell(row, extractValue(part, asset_name));
+                    addCell(row, extractValue(part, quantity));
+                    addCell(row, extractValue(part, book_value));
+                    addCell(row, extractValue(part, function_type));
+                    addCell(row, extractValue(part, create_time));
                 }
             }
             table.removeRow(1);
