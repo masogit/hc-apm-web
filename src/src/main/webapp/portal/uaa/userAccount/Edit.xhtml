@@ -12,10 +12,7 @@
             <h:form id="UserAccountEditForm">
                 <h:panelGroup id="display" rendered="#{userAccountController.selected ne null}">
                     
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}">
-                    </p:panelGrid>
-                    
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}" style="min-width: 500px;">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}">
                         <h:panelGroup>
                             <label class="label">#{msg.orgId}</label>
                             <p:autoComplete size="40" dropdown="true" value="#{userAccountController.selectedOrgName}"
@@ -23,6 +20,9 @@
                                 <p:ajax event="itemSelect" listener="#{userAccountController.onClinicalDeptNameFilterChange}" process="@this"  update="@parent" />
                             </p:autoComplete>
                         </h:panelGroup>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}" style="min-width: 500px;">
                         <h:panelGroup>
                             <label class="label">#{msg.login_name}*</label>
                             <p:inputText id="loginName" value="#{userAccountController.selected.loginName}" required="true" requiredMessage="#{msg.login_name} #{msg.ValidationRequire}"/>
