@@ -120,7 +120,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
         //sort assets by selected for edit view
         List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
-                .filter(t -> !this.selectedAssetUids.containsKey(t.getUid()))
+                .filter(t -> !this.selectedAssetUids.getOrDefault(t.getUid(), Boolean.FALSE))
                 .collect(Collectors.toList());
         this.assets4Maintain = new ArrayList<>(this.selectedAssets);
         this.assets4Maintain.addAll(assetsWithoutSelected);
