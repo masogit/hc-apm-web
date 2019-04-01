@@ -224,6 +224,7 @@ public class WorkOrderDetailExportController implements Serializable {
         Boolean flag = Boolean.FALSE;
         if(selectedItems.isEmpty()){
             WebUtil.addErrorMessage("请选择要操作的数据");
+            return;
         }
         if("close".equals(actionType)){
             flag = workOrderDetailExportService.closeStatement(selectedItems);
