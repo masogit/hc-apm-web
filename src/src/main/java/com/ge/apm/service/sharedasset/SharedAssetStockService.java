@@ -256,10 +256,13 @@ public class SharedAssetStockService {
                 }
                 voucherInfo.put("设备编号", asset.getDepartNum());
                 voucherInfo.put("设备名称", asset.getName());
-                voucherInfo.put("设备型号", getRealTimeAssetInfo(asset.getUid()).getFunctionType());
+                
+                AssetInfo realTimeAssetInfo = getRealTimeAssetInfo(asset.getUid());
+                
+                voucherInfo.put("设备型号", realTimeAssetInfo.getFunctionType());
                 voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
-                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(getRealTimeAssetInfo(asset.getUid())));
+                voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(realTimeAssetInfo));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
                 voucherInfo.put("附属物品", AllocationCenterUtils.getPdfAccessories(sharedAssetReqDetail));
                 voucherInfo.put("科室名称", sharedAssetReqDetail.getClinicalDeptName() == null ? null : sharedAssetReqDetail.getClinicalDept().getName());
