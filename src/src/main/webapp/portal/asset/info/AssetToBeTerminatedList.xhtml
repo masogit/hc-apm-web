@@ -573,10 +573,14 @@
                         <p:fileDownload value="#{assetInfoToBeTerminatedListController.excelFile}" />
                     </p:commandButton>
 
-                    <p:commandButton icon="ui-icon-arrow-1-s" title="#{msg.toBeTerminatedAppraisal}" rendered="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisal}"
+                    <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}" update=":growl"
-                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
                         <p:fileDownload value="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisalFile}" />
+                    </p:commandButton>
+
+                    <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray batch-terminated" title="批量报废" actionListener="#{assetInfoToBeTerminatedListController.batchProcessToTerminated}" update=":woTab:AssetInfoListForm1" disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
+                        <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
                     </p:commandButton>
 
                 </f:facet>
