@@ -20,10 +20,9 @@ import javax.faces.convert.FacesConverter;
  */
 @FacesConverter("orgInfoColumnFilterConverter")
 public class OrgInfoColumnFilterConverter implements Converter {
-    OrgInfo emptyOrg = new OrgInfo();
+    OrgInfo emptyOrg = new OrgInfo(-1);
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
-
         if (value != null && value.trim().length() > 0) {
             try {
                 if (Integer.parseInt(value) < 0) {

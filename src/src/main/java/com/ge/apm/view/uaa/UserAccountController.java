@@ -24,7 +24,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -42,8 +41,13 @@ import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import javax.faces.event.AjaxBehaviorEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -103,6 +107,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private CustomRoleRepository customRoleRepository;
 
     private UserRoleRepository userRoleRepository;
+    private List<OrgInfo> deptList;
 
     @Override
     protected void init() {
@@ -126,6 +131,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        
+        deptList = uaaService.getFullOrgListBySiteId(UserContextService.getSiteId());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -143,6 +150,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setTenantUid(String tenantUid) {
         searchFilters.clear();
         this.tenantUid = tenantUid;
+
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
@@ -236,7 +244,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     	generateListSearchFilter();
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
-        	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
+            List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
+            if(orgListByUid.size()>0)
+                user.setOrgInfo(orgListByUid.get(0));
         }
         return pageUserAccount;
     }
@@ -934,4 +944,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
 	}
+        
+    public List<String> autoCompleteDeptName(String query) {
+        if (deptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.deptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    private  String filterClinicalDeptOrg = null;
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+        if(filterClinicalDeptOrg==null) return;
+        
+        List<OrgInfo> orgListByName = this.deptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+        if(orgListByName.size()<1)
+            selectedUserOrg = null;
+        else{
+            selectedUserOrg = orgListByName.get(0);
+        }
+    }
+    
+    public String getSelectedOrgName(){
+        if(selectedUserOrg==null)  return "";
+        
+        return selectedUserOrg.getName();
+    }
+    
+    public void setSelectedOrgName(String orgName){
+        //ignore the input orgName, just provide a Setter for UI input Component
+    }
 }

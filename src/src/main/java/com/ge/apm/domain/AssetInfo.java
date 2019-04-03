@@ -22,6 +22,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import org.joda.time.DateTime;
+import webapp.framework.util.TimeUtil;
 
 /**
  * @author 212547631
@@ -127,6 +129,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;//安装位置
+    
+    @Size(max = 64)
+    @Column(name = "nurse_location")
+    private String nurseLocation;//护士检查设备位置
 
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//所属科室
@@ -993,7 +999,15 @@ public class AssetInfo implements ChineseName,Serializable {
         this.locationName = locationName;
     }
 
-    public Integer getClinicalDeptId() {
+    public String getNurseLocation() {
+		return nurseLocation;
+	}
+
+	public void setNurseLocation(String nurseLocation) {
+		this.nurseLocation = nurseLocation;
+	}
+
+	public Integer getClinicalDeptId() {
         return clinicalDeptId;
     }
 
@@ -1720,13 +1734,16 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getPinYin() {
 		return getNamePyCode();
 	}
-
-    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
-    	this.name=name;
-    	this.uid=uid;
-    	this.departNum=departNum;
-    	this.serialNum=serialNum;
-    	this.functionType=functionType;
+    
+    public AssetInfo(String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName=clinicalDeptName;
+        this.clinicalDeptUID=clinicalDeptUID;
+        this.nurseLocation=nurseLocation;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {
@@ -1773,5 +1790,33 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
+    }
+    
+    @Transient
+    private String warrantyAlertStatus = null;
+
+    public String getWarrantyAlertStatus(){
+        return warrantyAlertStatus;
+    }
+    
+    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays){
+        if(warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
+
+        if(warrantyDate!=null){
+            // first check Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(warrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
+        else if(factoryWarrantyDate!=null){
+            // then check factory Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
     }
 }
