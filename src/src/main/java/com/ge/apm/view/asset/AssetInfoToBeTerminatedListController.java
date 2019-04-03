@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -15,11 +16,13 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,6 +35,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -73,9 +77,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     //搜索字串
     private String oneSearchStr;
-
-    private boolean terminate = false;
-    private boolean toBeTerminatedAppraisal = false;
 
     private Date varWarrantyDateTo = null;
 
@@ -119,6 +120,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private ExportToBeTerminatedAppraisalService exportToBeTerminatedAppraisalService;
 
+    private UserAccount user;
+    private TenantInfoRepository tenantInfoRepository;
+    private Boolean isInsulate;
+
+    private UploadedFile uploadedFile;
+    private BlobFileService blobFileService;
+    private V2_BlobObject uploadedFileObject;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -126,6 +135,12 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     @Override
     protected void init() {
+        user = UserContextService.getCurrentUserAccount();
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
+        blobFileService = WebUtil.getBean(BlobFileService.class);
+
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -135,8 +150,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
-        toBeTerminatedAppraisal = Boolean.valueOf(WebUtil.getRequestParameter("tobeterminatedappraisal"));
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
 
         exportService = WebUtil.getBean(AssetFileExportService.class);
@@ -159,7 +172,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
         if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
+            searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
         selected = null;
@@ -169,6 +182,37 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         addMisingClinicalDeptOrg(currentPageAssets);
 
         return res;
+    }
+
+
+    public StreamedContent getActiveTemplate() {
+        try {
+            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("Fail to download template");
+        }
+        return null;
+    }
+
+    public void exportToBeTerminatedAppraisalFile() {
+        try {
+            List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("Fail to download report");
+        }
+    }
+
+    public void uploadDataFile(FileUploadEvent event) {
+        this.uploadedFile = event.getFile();
+        String fileName = uploadedFile.getFileName();
+        if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
+            throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
+        }
+        uploadedFileObject = blobFileService.uploadFile(uploadedFile);
+        logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -323,8 +367,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     public void onSelectAsset() throws IOException {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
-                + "&asset_name=" + selected.getName()
-                + "&terminate=" + this.terminate;
+                + "&asset_name=" + selected.getName();
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -340,8 +383,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public String getEditPage(String assetId, String assetName) {
         String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetId
-                + "&asset_name=" + assetName
-                + "&terminate=" + this.terminate;
+                + "&asset_name=" + assetName;
         return UrlEncryptController.encodeUrlParam(operation);
     }
 
@@ -376,12 +418,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         logger.info("exported asset list to excel, start to get input stream");
 
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
-    }
-
-    public void exportToBeTerminatedAppraisalFile() {
-        List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
-
-        toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds);
     }
 
     public boolean isChecked() {
@@ -571,33 +607,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         return needShowAssetApproval;
     }
 
-    public void setAssetStatusFilter() {
-        if (filterAssetStatus == null && filterWarrantyDate == null) {
-            return;
-        }
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
-        /*if (filterAssetStatus != null) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
-        }
-        if (assetId != null) {
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
-        }*/
-        if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
-            Date warrantyDate = new Date();
-            //2个月内，则是保修到期时间在2个月后时间之前所有
-            Calendar c = Calendar.getInstance();
-            c.setTime(warrantyDate);
-            c.add(Calendar.MONTH, 2);
-            varWarrantyDateTo = c.getTime();
-            searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
-            searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
-            //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-            //filterWarrantyDate = null;
-        }
-    }
-
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -648,22 +657,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public String getOneSearchStr() {
         return oneSearchStr;
-    }
-
-    public boolean getTerminate() {
-        return terminate;
-    }
-
-    public void setTerminate(boolean terminate) {
-        this.terminate = terminate;
-    }
-
-    public boolean isToBeTerminatedAppraisal() {
-        return toBeTerminatedAppraisal;
-    }
-
-    public void setToBeTerminatedAppraisal(boolean toBeTerminatedAppraisal) {
-        this.toBeTerminatedAppraisal = toBeTerminatedAppraisal;
     }
 
     public Map<String, Boolean> getSelectedMap() {
@@ -777,5 +770,13 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
     }
 }

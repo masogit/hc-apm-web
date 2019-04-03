@@ -572,13 +572,6 @@
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                         <p:fileDownload value="#{assetInfoTerminatedListController.excelFile}" />
                     </p:commandButton>
-
-                    <p:commandButton icon="ui-icon-arrow-1-s" title="#{msg.toBeTerminatedAppraisal}" rendered="#{assetInfoTerminatedListController.toBeTerminatedAppraisal}"
-                                     actionListener="#{assetInfoTerminatedListController.exportToBeTerminatedAppraisalFile}" update=":growl"
-                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                        <p:fileDownload value="#{assetInfoTerminatedListController.toBeTerminatedAppraisalFile}" />
-                    </p:commandButton>
-
                 </f:facet>
             </p:dataTable>
 

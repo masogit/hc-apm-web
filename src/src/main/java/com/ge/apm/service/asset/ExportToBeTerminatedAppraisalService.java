@@ -2,10 +2,13 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.WorkOrderExportTemplate;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
@@ -29,17 +32,18 @@ public class ExportToBeTerminatedAppraisalService {
     @Autowired
     private AssetInfoRepository assetInfoRepository;
 
-    public StreamedContent export(List<String> selectedIds) {
+
+    @Autowired
+    private AssetTerminationReportTemplateRepository templateRepository;
+
+    @Autowired
+    private BlobFileService blobService;
+
+    public StreamedContent export(List<String> selectedIds, byte[] templateBytes) {
         Map<String, Object> datas = getData(selectedIds);
 
         byte[] bytes;
         XWPFTemplate template = null;
-        byte[] templateBytes;
-        try {
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/tobeterminated_template.docx"));
-        } catch (IOException e) {
-            return null;
-        }
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
@@ -96,4 +100,44 @@ public class ExportToBeTerminatedAppraisalService {
             table.removeRow(1);
         }
     }
+
+
+    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
+        byte[] templateBytes = null;
+        List<String> uids = new ArrayList<>();
+        populateUidList(uids, siteUID);
+        if (!isInsulate) {
+            populateUidList(uids, hospitalUID);
+            populateUidList(uids, institutionUID);
+            populateUidList(uids, tenantUID);
+        }
+
+        WorkOrderExportTemplate template = null;//getPrioritizedTemplate(uids);
+
+        if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
+            templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
+        }
+        if (templateBytes == null) {
+            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/tobeterminated_template.docx"));
+        }
+        return templateBytes;
+    }
+
+    private WorkOrderExportTemplate getPrioritizedTemplate(List<String> uids) {
+        List<WorkOrderExportTemplate> templates = templateRepository.findBySiteUIDList(uids);
+        for (String uid : uids) {
+            Optional<WorkOrderExportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
+            if (optional.isPresent()) {
+                return optional.get();
+            }
+        }
+        return null;
+    }
+
+    private void populateUidList(List<String> uids, String siteUID) {
+        if (StringUtils.isNotEmpty(siteUID)) {
+            uids.add(siteUID);
+        }
+    }
+
 }
