@@ -28,6 +28,14 @@
         </script>
 
         <style>
+            .warrantyExpireSoon {
+            background-color: #fca752!important;
+            color: #000000!important;
+            }
+            .warrantyExpired {
+            background-color: #f04134!important;
+            color: #000000!important;
+            }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
@@ -42,6 +50,13 @@
             <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
+                    <h:panelGroup style="position: absolute; float: right; right: 50px;">
+                        <span >图例：</span>
+                        <span class="warrantyExpireSoon">维保或质保即将到期</span>
+                        <span></span>
+                        <span class="warrantyExpired">维保或质保已经到期</span>
+                    </h:panelGroup>
+                    
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
@@ -50,7 +65,7 @@
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -89,6 +104,7 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -382,8 +398,11 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'siteUID'}">
-                                <p:column headerText="#{msg.hospitalId}">
+                                <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
+                                    <f:facet name="filter">
+                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'parentAssetId'}">
@@ -736,6 +755,25 @@
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>
         </p:dialog>
+
+        <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
+            <h:form id="dataTableFilterByHospital">
+            <p:overlayPanel widgetVar="varPanelOrg2" for="AssetInfoListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
+                    <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                            </p:tree>
+                    </p:scrollPanel>
+            </p:overlayPanel>
+        </h:form>
+        </c:if>        
 
         <script>
             //<![CDATA[

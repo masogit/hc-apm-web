@@ -205,7 +205,6 @@ public class SmallAssetPerformanceService {
     public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<SmallAssetPerformance> importFailedDataList = new ArrayList<>();
-        init();
         Workbook workbook = null;
         if (file.getFileName().toLowerCase().endsWith(".xls")) {
             workbook = new HSSFWorkbook(file.getInputstream());

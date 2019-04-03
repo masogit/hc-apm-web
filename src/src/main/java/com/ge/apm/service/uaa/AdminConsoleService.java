@@ -1,6 +1,9 @@
 package com.ge.apm.service.uaa;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +23,7 @@ import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SysRoleRepository;
@@ -32,6 +36,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
+import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 
@@ -68,6 +73,9 @@ public class AdminConsoleService {
 	
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
+	
+	@Autowired
+	NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
 	
 	@Autowired
 	NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
@@ -150,8 +158,43 @@ public class AdminConsoleService {
 			tUpdateNurseSiteDeleteAsset(listR);
 			++offset;
 			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
-			logger.info("updateNurseSiteUID done.");
+			logger.info("updateNurseSiteDeleteAsset done.");
 		}
+	}
+	public void updateNurseSiteStatus(){
+		int limit=1000;
+		int offset=0;
+		Calendar ca=Calendar.getInstance();
+		ca.add(Calendar.DAY_OF_YEAR, -1);
+		Date date=ca.getTime();
+		List<NurseSiteMaintainItem> listR=nurseSiteMaintainItemRepository.findError5ByLimit(limit, offset,date);
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteStatus(listR,2,5);
+			++offset;
+			listR=nurseSiteMaintainItemRepository.findError5ByLimit(limit, offset,date);
+		}
+		offset=0;
+		listR=nurseSiteMaintainItemRepository.findError6ByLimit(limit, offset,date);
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteStatus(listR,2,6);
+			++offset;
+			listR=nurseSiteMaintainItemRepository.findError6ByLimit(limit, offset,date);
+		}
+		offset=0;
+		listR=nurseSiteMaintainItemRepository.findError7ByLimit(limit, offset,date);
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteStatus(listR,2,7);
+			++offset;
+			listR=nurseSiteMaintainItemRepository.findError7ByLimit(limit, offset,date);
+		}
+		offset=0;
+		listR=nurseSiteMaintainItemRepository.findError8ByLimit(limit, offset,date);
+		while(listR!=null && listR.size()>0){
+			tUpdateNurseSiteStatus(listR,3,8);
+			++offset;
+			listR=nurseSiteMaintainItemRepository.findError8ByLimit(limit, offset,date);
+		}
+		logger.info("updateNurseSiteStatus done.");
 	}
 	public void updateNurseSiteUID(){
 		int limit=1000;
@@ -161,7 +204,17 @@ public class AdminConsoleService {
 			tUpdateNurseSiteUID(listR);
 			++offset;
 			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
-			logger.info("updateNurseSiteUID done.");
+		}
+		logger.info("updateNurseSiteUID done.");
+	}
+	public void tUpdateNurseSiteStatus(List<NurseSiteMaintainItem> listR,int originStatus,int newStatus){
+		Set<String> setIds=new HashSet<String>();
+		for(int i=0;i<listR.size();++i){
+			NurseSiteMaintainItem tempMaintainItem=listR.get(i);
+			setIds.add(tempMaintainItem.getParentId());
+		}
+		if(setIds.size()>0){
+			nurseSiteMaintainRepository.updateErrorMaintain(setIds, originStatus, newStatus);
 		}
 	}
 	@Transactional
