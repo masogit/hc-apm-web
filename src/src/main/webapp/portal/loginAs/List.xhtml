@@ -39,7 +39,7 @@
                     </p:overlayPanel>
 
 
-                    <p:dataTable id="datalist" value="#{userAccountController.lazyModel}" var="item" widgetVar="varDataList"
+                    <p:dataTable id="datalist" class="datalist" value="#{userAccountController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{userAccountController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
