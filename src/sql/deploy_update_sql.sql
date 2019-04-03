@@ -332,5 +332,5 @@ update sys_role set authorities = 'assetInventory.scan,assetInventory.view',auth
 update sys_role set authorities = 'assetInventory.close,assetInventory.create,assetInventory.scan,assetInventory.view',authorities_ch = '关闭盘点工单,新建盘点工单,扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetHead';
 
 
-
+--v19.4.1
 update asset_info set system_id = null where system_id is not null and trim(system_id) = '';
