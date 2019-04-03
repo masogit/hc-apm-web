@@ -1104,7 +1104,7 @@ public void repairResultSet(){
         CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         //从配置信息获取当前状态
         String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
-        String strAssetStatus = (String)JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]");
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
