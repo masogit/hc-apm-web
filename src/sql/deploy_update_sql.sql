@@ -333,4 +333,4 @@ update sys_role set authorities = 'assetInventory.close,assetInventory.create,as
 
 
 
-
+update asset_info set system_id = null where system_id is not null and trim(system_id) = '';
