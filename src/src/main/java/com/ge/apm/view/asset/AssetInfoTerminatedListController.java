@@ -74,9 +74,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     //搜索字串
     private String oneSearchStr;
 
-    private boolean terminate = false;
-    private boolean toBeTerminatedAppraisal = false;
-
     private Date varWarrantyDateTo = null;
 
     private String warrantyFormatTime = null;
@@ -117,8 +114,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     private Map<String, Object> selectedObject;
 
-    private ExportToBeTerminatedAppraisalService exportToBeTerminatedAppraisalService;
-
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -135,9 +130,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
-        toBeTerminatedAppraisal = Boolean.valueOf(WebUtil.getRequestParameter("tobeterminatedappraisal"));
-        exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
 
         exportService = WebUtil.getBean(AssetFileExportService.class);
 
@@ -319,11 +311,11 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         }
     }
 
-    public void onSelectAsset() throws IOException {
+    public void onSelectAsset() {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
                 + "&asset_name=" + selected.getName()
-                + "&terminate=" + this.terminate;
+                + "&terminate=true";
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -340,7 +332,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     public String getEditPage(String assetId, String assetName) {
         String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetId
                 + "&asset_name=" + assetName
-                + "&terminate=" + this.terminate;
+                + "&terminate=true";
         return UrlEncryptController.encodeUrlParam(operation);
     }
 
@@ -406,11 +398,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             }
         }
         return "";
-    }
-
-    public List<QrCodeTemplate> getQrCodeTemplates() {
-        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
-        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
     }
 
     @Override
@@ -628,22 +615,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     public String getOneSearchStr() {
         return oneSearchStr;
-    }
-
-    public boolean getTerminate() {
-        return terminate;
-    }
-
-    public void setTerminate(boolean terminate) {
-        this.terminate = terminate;
-    }
-
-    public boolean isToBeTerminatedAppraisal() {
-        return toBeTerminatedAppraisal;
-    }
-
-    public void setToBeTerminatedAppraisal(boolean toBeTerminatedAppraisal) {
-        this.toBeTerminatedAppraisal = toBeTerminatedAppraisal;
     }
 
     public Map<String, Boolean> getSelectedMap() {
