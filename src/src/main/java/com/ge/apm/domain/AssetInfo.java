@@ -1807,7 +1807,7 @@ public class AssetInfo implements ChineseName,Serializable {
             DateTime dt = TimeUtil.toJodaDate(warrantyDate);
             if(dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
-            else if(dt.minusDays(warrantyAlertDays-1).isBeforeNow())
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
         }
         else if(factoryWarrantyDate!=null){
@@ -1815,7 +1815,7 @@ public class AssetInfo implements ChineseName,Serializable {
             DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
             if(dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
-            else if(dt.minusDays(warrantyAlertDays-1).isBeforeNow())
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
         }
     }
