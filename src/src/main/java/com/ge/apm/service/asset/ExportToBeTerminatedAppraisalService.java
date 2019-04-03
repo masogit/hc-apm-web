@@ -10,6 +10,7 @@ import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
 
@@ -31,7 +33,6 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
-
 
     @Autowired
     private AssetTerminationReportTemplateRepository templateRepository;
@@ -84,23 +85,22 @@ public class ExportToBeTerminatedAppraisalService {
 
     private class AssetDetailsRenderPolicy extends AbstractWoTableRenderPolicy {
         public void render(XWPFTable table, Object o) {
-            int n = 2;
+            XWPFTableRow labelRow = table.getRow(1);
+            List<XWPFTableCell> tableCells = labelRow.getTableCells();
+            List<String> values = tableCells.stream().map(i -> i.getText()).collect(Collectors.toList());
+
+            int n = 3;
             if (o instanceof List) {
                 List<Map<ASSET_DETAIL, Object>> parts = (List) o;
                 for (Map<ASSET_DETAIL, Object> part : parts) {
                     XWPFTableRow row = addRow(table, n++);
-                    addCell(row, extractValue(part, financing_num));
-                    addCell(row, extractValue(part, asset_name));
-                    addCell(row, extractValue(part, quantity));
-                    addCell(row, extractValue(part, book_value));
-                    addCell(row, extractValue(part, function_type));
-                    addCell(row, extractValue(part, create_time));
+                    values.forEach(i -> addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i))));
                 }
             }
+            table.removeRow(2);
             table.removeRow(1);
         }
     }
-
 
     public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
         byte[] templateBytes = null;
