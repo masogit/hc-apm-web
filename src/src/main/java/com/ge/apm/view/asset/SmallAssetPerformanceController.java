@@ -51,6 +51,7 @@ public class SmallAssetPerformanceController extends GenericCRUDUUIDController<S
         dao = WebUtil.getBean(SmallAssetPerformanceRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         service = WebUtil.getBean(SmallAssetPerformanceService.class);
+        service.init();
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
@@ -119,10 +120,14 @@ public class SmallAssetPerformanceController extends GenericCRUDUUIDController<S
     }
     
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
         importFailedDataList=service.handleExcel(file, currentUser);
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        if(importFailedDataList.size()==0){
+        	WebUtil.addSuccessMessage("导入完成！");
+        }
+        else{
+        	WebUtil.addErrorMessage("导入失败！请修改错误数据");
+        }
     }
     
     public UploadedFile getFile() {

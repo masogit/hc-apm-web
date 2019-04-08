@@ -13,7 +13,8 @@
 
             <div class="ui-g-12 card">
                 <h:form >
-                    <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    <p:commandButton id="qrCodeLibCreateButton" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    <p:commandButton value="导入二维码" title="导入二维码" action="/portal/asset/qrCode/importQrcode?faces-redirect=true"/>
                 </h:form>
 
                 <h:form id="qrCodeLibListForm">
@@ -91,7 +92,7 @@
 
 
                 <ui:include src="qrCodeLibCreate.xhtml"/>
-                <ui:include src="qrCodeLibShow.xhtml"/>
+                <ui:include src="../qrCodeLibShow.xhtml"/>
                 <!--<ui:include src="generateQrCodes.xhtml"/>-->
             </div>
             <p:dialog modal="true" id="statusDialog" widgetVar="statusDialog" draggable="false" closable="false" resizable="false">

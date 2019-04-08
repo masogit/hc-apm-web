@@ -1,5 +1,6 @@
 package com.ge.apm.dao.mapper.provider;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -22,12 +23,21 @@ public class PccExamineReportProvider {
 		if (columns != null && columns.size() > 0) {
 			sb.append(" and (");
 			Iterator<SearchFilter> it = columns.iterator();
+			boolean blnAdd=false;
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
-				addDefaultFilter(sb, searchFilter);
+				boolean re=addDefaultFilter(sb, searchFilter);
+				if(re){
+					blnAdd=true;
+				}
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			if(blnAdd){
+				sb.append(" 1=2 ");
+			}
+			else{
+				sb.append(" 1=1 ");
+			}
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -55,12 +65,21 @@ public class PccExamineReportProvider {
 		if (columns != null && columns.size() > 0) {
 			sb.append(" and (");
 			Iterator<SearchFilter> it = columns.iterator();
+			boolean blnAdd=false;
 			while (it.hasNext()) {
 				SearchFilter searchFilter = it.next();
-				addDefaultFilter(sb, searchFilter);
+				boolean re=addDefaultFilter(sb, searchFilter);
+				if(re){
+					blnAdd=true;
+				}
 //				addFilter(sb, searchFilter);
 			}
-			sb.append(" 1=2 ");
+			if(blnAdd){
+				sb.append(" 1=2 ");
+			}
+			else{
+				sb.append(" 1=1 ");
+			}
 			sb.append(")");
 		}
 		if (columns != null && columns.size() > 0) {
@@ -91,10 +110,11 @@ public class PccExamineReportProvider {
 		sb.append(" offset " + offset);
 	}
 
-	private void addDefaultFilter(StringBuilder sb, SearchFilter searchFilter) {
+	private boolean addDefaultFilter(StringBuilder sb, SearchFilter searchFilter) {
 		String tempColumn = searchFilter.fieldName;
 		Object value = searchFilter.value;
 		SearchFilter.Operator op = searchFilter.operator;
+		boolean blnAdd=true;
 		if(op.equals(SearchFilter.Operator.IN)){
 			String strValue=getSetValue(value);
 			if (tempColumn.equals("assetInfo.siteUID")) {
@@ -103,30 +123,33 @@ public class PccExamineReportProvider {
 				sb.append("b.hospital_uid in " + strValue + " or ");
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
 				sb.append("b.institution_uid in " + strValue + " or ");
-			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid in " + strValue + " or ");
 			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
 				sb.append("b.clinical_dept_uid in " + strValue + " or ");
+			}
+			else{
+				blnAdd=false;
 			}
 		}
 		else{
 			if (tempColumn.equals("assetInfo.siteUID")) {
-				sb.append("b.site_uid='" + value + "' and ");
+				sb.append("b.site_uid='" + value + "' or ");
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
-				sb.append("b.hospital_uid='" + value + "' and ");
+				sb.append("b.hospital_uid='" + value + "' or ");
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
-				sb.append("b.institution_uid='" + value + "' and ");
-			} else if (tempColumn.equals("assetInfo.tenantUID")) {
-				sb.append("b.tenant_uid='" + value + "' and ");
-			} else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
-				sb.append("b.clinical_dept_uid='" + value + "' and ");
+				sb.append("b.institution_uid='" + value + "' or ");
+			}  else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
+				sb.append("b.clinical_dept_uid='" + value + "' or ");
+			}
+			else{
+				blnAdd=false;
 			}
 		}
+		return blnAdd;
 	}
 	
 	private String getSetValue(Object value){
 		StringBuilder sb=new StringBuilder();
-		Set<String> set=(Set<String>)value;
+		Collection<String> set=(Collection<String>)value;
 		if(set!=null){
 			Iterator<String> it=set.iterator();
 			sb.append("(");
@@ -218,6 +241,11 @@ public class PccExamineReportProvider {
 		} else if (tempColumn.equals("assetInfohospitalName")) {
 			sb.append("(d.name like '%" + value + "%' or ");
 			sb.append("d.name_py_code like '%" + value + "%') and ");
+		}else if (tempColumn.equals("assetInfo.tenantUID")) {
+			sb.append("b.tenant_uid='" + value + "' and ");
+			sb.append("d.tenant_uid='" + value + "' and ");
 		}
 	}
+	
+	
 }

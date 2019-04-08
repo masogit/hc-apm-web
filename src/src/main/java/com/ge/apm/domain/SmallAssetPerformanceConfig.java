@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627
  */
 @Entity
 @Table(name = "small_asset_performance_config")
@@ -29,6 +29,9 @@ public class SmallAssetPerformanceConfig implements Serializable {
     //科室
     @Column(name = "department")
     private String department;
+    
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备所属科室
 
     //项目编号
     @Column(name = "projectNumber")
@@ -63,6 +66,12 @@ public class SmallAssetPerformanceConfig implements Serializable {
     
     @Column(name = "status_code")
     private String statusCode;
+    
+    @Column(name="average")
+    private Boolean average=false;
+    
+    @Transient
+    AssetInfo assetInfo;
 
     @Transient
     private String statusDisplay;
@@ -112,7 +121,7 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
     public Double getRate() {
     	if(rate==null)
-    		rate=0.00;
+    		rate=0.0000;
         return rate;
     }
 
@@ -158,7 +167,7 @@ public class SmallAssetPerformanceConfig implements Serializable {
     public void setExcelIdex(Integer excelIdex) {
         this.excelIdex = excelIdex;
     }
-    
+
 	public String getStatusDisplay() {
 		if (this.status != null) {
 			String result="";
@@ -232,6 +241,33 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
 	public void setStatusCode(String statusCode) {
 		this.statusCode = statusCode;
+	}
+
+	public AssetInfo getAssetInfo() {
+		return assetInfo;
+	}
+
+	public void setAssetInfo(AssetInfo assetInfo) {
+		this.assetInfo = assetInfo;
+	}
+
+	public Boolean getAverage() {
+		if(average==null){
+			return false;
+		}
+		return average;
+	}
+
+	public void setAverage(Boolean average) {
+		this.average = average;
+	}
+
+	public String getClinicalDeptUID() {
+		return clinicalDeptUID;
+	}
+
+	public void setClinicalDeptUID(String clinicalDeptUID) {
+		this.clinicalDeptUID = clinicalDeptUID;
 	}
 
 	@Override

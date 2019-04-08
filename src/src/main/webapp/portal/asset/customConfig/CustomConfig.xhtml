@@ -150,6 +150,136 @@
                                 </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
+                        <p:tab title="微信端报修页面">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:dataList id="MobileWorkOrderFieldsList" value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.group}" var="groupItem" varStatus="groupIndex" type="definition" >
+                                    <p:fieldset legend="资产信息显示字段组" rendered="#{groupItem.type eq 'assetInfo'}">
+                                        <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                        <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                        <!--                                        <h:panelGroup style="float:right;padding-left: 5px">
+                                                                                    <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="上移"  update=":customConfigForm "   disabled="false"/>
+                                                                                    <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="下移"  update=":customConfigForm "  disabled="false"/>
+                                                                                    <p:selectBooleanCheckbox style="padding-left: 5px"  label="显示" value="#{groupItem.show}" />
+                                                                                </h:panelGroup>-->
+                                    </p:fieldset>
+                                    <p:fieldset legend="报修信息填写" rendered="#{groupItem.type eq 'orderFields'}">
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="priorityGroup">
+                                            <h:panelGroup >
+                                                <label class="label">显示紧急程度</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.priority.enable}" >
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <!--                                            <h:panelGroup>
+                                                                                            <label class="label">必填</label>
+                                                                                            <p:selectBooleanCheckbox value="#{groupItem.priority.required}" disabled="true" />
+                                                                                        </h:panelGroup>-->
+                                            <h:panelGroup >
+                                                <label class="label">默认值</label>
+                                                <p:selectOneMenu value="#{groupItem.priority.defaultValue}" >
+                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
+                                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="assetStatusGroup">
+                                            <h:panelGroup >
+                                                <label class="label">显示资产状态</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.assetStatus.enable}" >
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <!--                                            <h:panelGroup >
+                                                                                            <label class="label">必填</label>
+                                                                                            <p:selectBooleanCheckbox value="#{groupItem.assetStatus.required}" disabled="true" />
+                                                                                        </h:panelGroup>-->
+                                            <h:panelGroup >
+                                                <label class="label">默认值</label>
+                                                <p:selectOneMenu value="#{groupItem.assetStatus.defaultValue}" >
+                                                    <f:selectItem   itemLabel="#{fieldMsg.fieldValue('assetStatus',2)}" itemValue="2"/>
+                                                    <f:selectItem   itemLabel="#{fieldMsg.fieldValue('assetStatus',3)}" itemValue="3"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+                                        <h:panelGroup style="float:right;padding-left: 5px">
+                                            <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="上移"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}"/>
+                                            <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="下移"  update=":customConfigForm "  disabled="#{groupIndex.index eq 2}"/>
+                                            <p:selectBooleanCheckbox style="padding-left: 5px"  label="报修页面显示" value="#{groupItem.show}" />
+                                        </h:panelGroup>
+                                    </p:fieldset>
+                                    <p:fieldset legend="故障描述填写" rendered="#{groupItem.type eq 'descriptions'}" id="descriptionsSet">
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="attachmentsGroup">
+                                            <h:panelGroup >
+                                                <label class="label">显示上传图片</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.attachments.enable}" >
+                                                    <p:ajax listener="#{customConfigController.onCheckConfig('attachments.enable')}" update="descriptionsSet"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <label class="label">必填</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.attachments.required}"  disabled="#{!groupItem.attachments.enable}">
+                                                    <p:ajax />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="voiceAttachmentGroup">
+                                            <h:panelGroup >
+                                                <label class="label">显示上传语音</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.voiceAttachment.enable}" >
+                                                    <p:ajax listener="#{customConfigController.onCheckConfig('voiceAttachment.enable')}" update="descriptionsSet"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <label class="label">必填</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.voiceAttachment.required}" disabled="#{!groupItem.voiceAttachment.enable}">
+                                                    <p:ajax listener="#{customConfigController.onCheckConfig('voiceAttachment.required')}" update="descriptionsSet"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="requestReasonGroup">
+                                            <h:panelGroup >
+                                                <label class="label">显示文字描述</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.requestReason.enable}" >
+                                                    <p:ajax listener="#{customConfigController.onCheckConfig('requestReason.enable')}" update="descriptionsSet"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <label class="label">必填</label>
+                                                <p:selectBooleanCheckbox value="#{groupItem.requestReason.required}" disabled="#{!groupItem.requestReason.enable}">
+                                                    <p:ajax listener="#{customConfigController.onCheckConfig('requestReason.required')}" update="descriptionsSet"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <label class="label">默认值</label>
+                                                <p:inputText value="#{groupItem.requestReason.defaultValue}" maxlength="200" >
+                                                    <p:ajax />
+                                                </p:inputText>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+                                        <br/>
+                                        
+                                        <h:panelGroup >
+                                            <label class="label">语音文字必填一项</label>
+                                            <p:selectBooleanCheckbox value="#{groupItem.voiceOrReasonRequired}" disabled="#{!groupItem.requestReason.enable or !groupItem.voiceAttachment.enable}" >
+                                                <p:ajax listener="#{customConfigController.onCheckConfig('voiceOrReasonRequired')}" update="descriptionsSet"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup style="float:right;padding-left: 5px">
+                                            <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'up')}" value="上移"  update=":customConfigForm "   disabled="#{groupIndex.index eq 1}" />
+                                            <p:commandLink style="padding-left: 5px" actionListener="#{customConfigController.moveItem(groupItem,'down')}" value="下移"  update=":customConfigForm "  disabled="#{groupIndex.index eq 2}"/>
+                                            <p:selectBooleanCheckbox style="padding-left: 5px"  label="报修页面显示" value="#{groupItem.show}" >
+                                                <p:ajax />
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+                                    </p:fieldset>
+                                </p:dataList>
+
+
+                            </p:panelGrid>
+                        </p:tab>
                     </p:tabView>
 
                     <h:panelGroup >

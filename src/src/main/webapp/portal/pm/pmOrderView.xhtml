@@ -68,6 +68,17 @@
                             <label class="label">保养结果</label>
                             <p:outputLabel value="#{fieldMsg.fieldValue('qualityChecking',v2PmOrderController.selected.qualityChecking)}"></p:outputLabel>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">取消人</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.cancelPerson}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">取消原因</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.cancelReason}"></p:outputLabel>
+                        </h:panelGroup>
+
+
                     </p:panelGrid>
 
                     <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
@@ -91,7 +102,7 @@
                         <h:panelGroup rendered="#{not empty v2PmOrderController.getWorkOrderDetailON()}">
                         <label class="label">使用的备件</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="#{msg.accessory}">
+                            <p:column headerText="备件名称">
                                 <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
 
@@ -103,10 +114,16 @@
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
                             </p:column>
+                            <p:column headerText="合同价格(元)">
+                                <h:outputText value="#{detailItem.closedPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+
+                            </p:column>
                             <p:column headerText="审核状态">
                                 <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
                             </p:column>
-                            <p:column headerText="类型">
+                            <p:column headerText="备件类别">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                             </p:column>
                             <p:column headerText="发票号">
@@ -137,11 +154,6 @@
                             </p:column>
                             <p:column headerText="到货">
                                 <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" rendered="#{detailItem.id ne '000'}"/>
-                            </p:column>
-                            <p:column headerText="合同价格(元)">
-                                <h:outputText value="#{detailItem.closedPrice}">
-                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
-                                </h:outputText>
                             </p:column>
                             <p:column headerText="操作">
                                <!-- <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetHead')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>-->

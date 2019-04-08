@@ -161,6 +161,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, "资产价值分类", assetValueCategoryList, true);
         createDropdownWithNamedRange(rowNum++, "资金来源2", capitalSource2List, true);
         createDropdownWithNamedRange(rowNum++, "资产状态", deviceStatusList, true);
+        createDropdownWithNamedRange(rowNum++, "专有分类", proprietaryClassList, true);
 
         dynamicListSheet.setSelected(false);
     }

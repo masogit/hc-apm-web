@@ -15,7 +15,7 @@ public class PartTableRenderPolicy extends AbstractWoTableRenderPolicy {
                 XWPFTableRow row = addRow(table);
                 addCell(row, extractValue(part, "备件名"));
                 addCell(row, extractValue(part, "数量"));
-                addCell(row, extractValue(part, "单价"));
+                addCell(row, extractValue(part, "合同价格"));
                 addCell(row, extractValue(part, "类型"));
                 addCell(row, extractValue(part, "序列号"));
                 addCell(row, extractValue(part, "质保期"));

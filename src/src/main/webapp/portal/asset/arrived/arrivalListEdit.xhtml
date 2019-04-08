@@ -429,7 +429,7 @@
                             </p:dataTable>
                             <h:panelGroup >
                                 <p:commandButton validateClient="true"  actionListener="#{assetArrivedListEditController.applyChange}" value="#{msg.Save}" update=":AssetArrivalEditForm  :growl" icon="ui-icon-check" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
-                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList" update="display,:AssetArrivalEditForm :growl"/>
+                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
                                 <p:commandButton validateClient="true" value="#{msg.Submit}"  actionListener="#{assetArrivedListEditController.submitArrivalList}" update=":AssetArrivalEditForm :growl" disabled="#{assetArrivedListEditController.selected.status ne 1}" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
                             </h:panelGroup>
 

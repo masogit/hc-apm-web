@@ -60,7 +60,7 @@ public class BySearchFilterSpecification {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.lessThanOrEqualTo(expression, (Comparable) filter.value)));
                                 break;
                             case IN:
-                                List list = (List) filter.value;
+                                Collection list = (Collection) filter.value;
                                 if (list.isEmpty()) {
                                     list.add("");
                                 }

@@ -9,31 +9,31 @@
 		<h:form id="smallAssetPerformanceEditForm">
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceController.selected != null}">
 				<h:panelGroup>
-					<label class="label">科室</label>
+					<label class="label">科室名称*</label>
 					<p:inputText value="#{smallAssetPerformanceController.selected.department}" required="true" requiredMessage="科室名称不能为空" />
 
-					<label class="label">费别</label>
+					<label class="label">费用类别*</label>
 					<p:inputText value="#{smallAssetPerformanceController.selected.costType}" required="true" requiredMessage="费别不能为空" />
 
-					<label class="label">编码</label>
-					<p:inputText value="#{smallAssetPerformanceController.selected.code}" required="true" requiredMessage="编码不能为空" />
+					<!-- <label class="label">编码</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.code}" required="true" requiredMessage="编码不能为空" /> -->
 
-					<label class="label">项目名称</label>
+					<label class="label">项目名称*</label>
 					<p:inputText value="#{smallAssetPerformanceController.selected.projectName}" required="true" requiredMessage="项目名称不能为空" />
 
 					<label class="label">项目编号</label>
 					<p:inputText value="#{smallAssetPerformanceController.selected.projectNumber}" />
 
-					<label class="label">一类标准</label>
+					<label class="label">单价</label>
 					<p:inputNumber value="#{smallAssetPerformanceController.selected.standard}" />
 
-					<label class="label">数量</label>
+					<label class="label">数量*</label>
 					<p:inputNumber value="#{smallAssetPerformanceController.selected.quantity}" required="true" requiredMessage="数量不能为空" />
 
-					<label class="label">金额</label>
+					<label class="label">金额*</label>
 					<p:inputNumber value="#{smallAssetPerformanceController.selected.amount}" required="true" requiredMessage="金额不能为空" />
 
-					<label class="label">日期</label>
+					<label class="label">日期*</label>
 					<p:calendar id="button" value="#{smallAssetPerformanceController.selected.happenDate}" showOn="button" required="true" requiredMessage="日期不能为空" />
 				</h:panelGroup>
 

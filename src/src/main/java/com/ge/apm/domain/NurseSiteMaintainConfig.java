@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "nurse_site_maintain_config")
@@ -79,9 +79,6 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
-	
-	@Column(name="check_items",columnDefinition="text")
-	private String checkItems;
 	
 	@Column(name="check_items_detail",columnDefinition="text")
 	private String checkItemsDetail;
@@ -191,14 +188,6 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 
 	public void setModifyBy(UserAccount modifyBy) {
 		this.modifyBy = modifyBy;
-	}
-
-	public String getCheckItems() {
-		return checkItems;
-	}
-
-	public void setCheckItems(String checkItems) {
-		this.checkItems = checkItems;
 	}
 
 	public Integer getType() {

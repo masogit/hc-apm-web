@@ -126,9 +126,16 @@ public class ContractExportService {
 
             for(ContractInfoItem contractInfoItem : contractInfoItemList){
                 Map<String, Object> contractInfoItemMap = new HashedMap();
-                contractInfoItemMap.put("资产名称", contractInfoItem.getAssetInfo().getName());
-                contractInfoItemMap.put("制造商序列号", contractInfoItem.getAssetInfo().getSerialNum());
-                contractInfoItemMap.put("所属科室", contractInfoItem.getAssetInfo().getClinicalDeptName());
+                if(contractInfoItem.getAssetInfo() != null){
+                    contractInfoItemMap.put("资产名称", contractInfoItem.getAssetInfo().getName());
+                    contractInfoItemMap.put("制造商序列号", contractInfoItem.getAssetInfo().getSerialNum());
+                    contractInfoItemMap.put("所属科室", contractInfoItem.getAssetInfo().getClinicalDeptName());
+                }else{
+                    contractInfoItemMap.put("资产名称", contractInfoItem.getContractAssetName());
+                    contractInfoItemMap.put("制造商序列号", "");
+                    contractInfoItemMap.put("所属科室", "");
+                }
+
                 contractInfoItemMap.put("合同名称", contractInfoMap.get("名称").toString());
                 contractInfoItemMap.put("合同UID", contractInfoMap.get("合同UID").toString());
                 contractInfoItemMap.put("资产UID", contractInfoItem.getAssetUid());

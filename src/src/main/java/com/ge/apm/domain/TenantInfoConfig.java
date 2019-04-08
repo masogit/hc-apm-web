@@ -359,6 +359,8 @@ public class TenantInfoConfig {
 				listLabel.add("维修流程");
 				listKey.add("repair.workbench");
 				listLabel.add("维修工作台");
+				listKey.add("repair.count");
+				listLabel.add("设备维修统计");
 				listKey.add("repair.message");
 				listLabel.add("设备消息订阅");
 				listKey.add("repair.report");
@@ -397,6 +399,8 @@ public class TenantInfoConfig {
 				listLabel.add("日常维护设置");
 				listKey.add("nurseSite.report");
 				listLabel.add("日常维护报表");
+				listKey.add("nurseSite.optRecord");
+				listLabel.add("开关机检查");
 				listKey.add("knowledge");
 				listLabel.add("知识文档");
 				listKey.add("knowledge.mgt");
@@ -419,6 +423,8 @@ public class TenantInfoConfig {
 				listLabel.add("组织机构管理");
 				listKey.add("config.user");
 				listLabel.add("用户管理");
+				listKey.add("config.customRole");
+				listLabel.add("自定义角色");
 				listKey.add("config.assetMessage");
 				listLabel.add("设备消息订阅");
 				listKey.add("config.qrCode");
@@ -445,6 +451,8 @@ public class TenantInfoConfig {
 				listLabel.add("探头检测");
 				listKey.add("examineMgt.pccConfig");
 				listLabel.add("探头检测配置");
+				listKey.add("examineMgt.ssoImp");
+				listLabel.add("SSO用户导入");
 			}
 		}
 	}
@@ -477,5 +485,11 @@ public class TenantInfoConfig {
 
 	public void setSelectedNodes(TreeNode[] selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+	public List<String> getListLabel(){
+		return this.listLabel;
+	}
+	public List<String> getListKey(){
+		return this.listKey;
 	}
 }

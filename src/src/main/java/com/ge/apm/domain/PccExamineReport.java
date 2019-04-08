@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "pcc_examine_report")
@@ -45,25 +45,25 @@ public class PccExamineReport implements Serializable {
 
 	// 创建日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "create_date")
 	private Date createDate;
 
 	// 修改日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "modify_date")
 	private Date modifyDate;
 
 	// 生成报告日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "report_date")
 	private Date reportDate;
 
 	// 检测日期
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@JsonFormat(pattern = "MM/dd/yyyy HH", timezone = "GMT+8")
 	@Column(name = "check_date")
 	private Date checkDate;
 
@@ -170,6 +170,8 @@ public class PccExamineReport implements Serializable {
 	private String recommandStatus;
 	@Column(name = "comment")
 	private String comment;
+	@Transient
+	private boolean blnHasId=true;
 
 	@Transient
 	private boolean needGetItem = true;
@@ -179,9 +181,6 @@ public class PccExamineReport implements Serializable {
 	}
 
 	public String getId() {
-		if (id == null) {
-			id = UUID.randomUUID().toString().replace("-", "");
-		}
 		return id;
 	}
 
@@ -563,6 +562,13 @@ public class PccExamineReport implements Serializable {
 
 	public void setAssetInfohospitalName(String assetInfohospitalName) {
 		this.assetInfohospitalName = assetInfohospitalName;
+	}
+	public boolean isBlnHasId() {
+		return blnHasId;
+	}
+
+	public void setBlnHasId(boolean blnHasId) {
+		this.blnHasId = blnHasId;
 	}
 
 	@Override

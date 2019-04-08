@@ -205,6 +205,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Transient
 	private Integer orgType;
 
+	@Transient
+	private int lineNum;
+
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
 	private List<UserRole> userRoleList;
@@ -475,6 +478,7 @@ public class UserAccount implements ChineseName, Serializable {
 	public String getUserRoleNames() {
 		String roleNames = "";
 		if (CollectionUtils.isEmpty(userRoleList)) {
+
 			return roleNames;
 		}
 		for (UserRole userRole : userRoleList) {
@@ -530,7 +534,9 @@ public class UserAccount implements ChineseName, Serializable {
 		if (userRoleNames == null) {
 			userRoleNames = new ArrayList<>();
 			for (UserRole userRole : userRoleList) {
-				userRoleNames.add(userRole.getRole().getName());
+				if(userRole.getRoleType() == 0){
+					userRoleNames.add(userRole.getRole().getName());
+				}
 			}
 
 			if (this.isSuperAdmin)
@@ -544,9 +550,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 			//add mvs role
 			if (this.getMvsRoleType() != null) {
-				if (this.getMvsRoleType() == 1) {
+				if (this.getMvsRoleType() == 1 || this.getMvsRoleType() == 3) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_ADMIN);
-				} else {
+				} else if (this.getMvsRoleType() == 2) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_FE);
 				}
 			} else {
@@ -1041,6 +1047,12 @@ public class UserAccount implements ChineseName, Serializable {
     public void setGeSso(String geSso) {
         this.geSso = geSso;
     }
-        
-        
+
+	public int getLineNum() {
+		return lineNum;
+	}
+
+	public void setLineNum(int lineNum) {
+		this.lineNum = lineNum;
+	}
 }

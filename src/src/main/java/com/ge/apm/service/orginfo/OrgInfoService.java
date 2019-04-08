@@ -383,13 +383,22 @@ public class OrgInfoService {
             List<OrgInfo> list = findOrgByParent(orgInfo.getUid(), orgInfoList);
             if (list.size() > 0) {
                 exportOrgByParent(orgInfo.getUid(), orgInfoList, orgInfoMap, resultList);
-
-            } else {
-                exportOrg(orgInfo, resultList, orgInfoMap);
-
             }
-
+            exportOrg(orgInfo, resultList, orgInfoMap);
         }
+    }
+    
+    //为科室寻找商机医院(院区 or 医院 or 集团), 考虑多级科室的情形，需要向上寻找到院区
+    private OrgInfo getParentHospitalForDepartment(OrgInfo dept, final Map<String, OrgInfo> orgInfoMap) {
+        OrgInfo parentOrg = orgInfoMap.get(dept.getParentUID());
+        while(parentOrg!=null){ //如果是多级科室，需要向上寻找到院区
+            if(parentOrg.getOrgType()<=3) break;
+            parentOrg = orgInfoMap.get(parentOrg.getParentUID()); 
+        }
+        if(parentOrg==null) 
+            parentOrg = dept;  //如果没有找到，则返回本身。
+        
+        return parentOrg;
     }
 
     private void exportOrg(OrgInfo orgInfo, List<Map<String, Object>> resultList, final Map<String, OrgInfo> orgInfoMap) {
@@ -410,15 +419,15 @@ public class OrgInfoService {
             if (orgInfo.getOrgLevel() == 0) {
 
             } else if (orgInfo.getOrgLevel() == 1) {
-                OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
             } else if (orgInfo.getOrgLevel() == 2) {
-                OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
                 map.put("医院", hospitalLevelOrg.getName());
             } else {
-                OrgInfo siteLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+                OrgInfo siteLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo hospitalLevelOrg = orgInfoMap.get(siteLevelOrg.getParentUID());
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
@@ -426,7 +435,7 @@ public class OrgInfoService {
                 map.put("院区", siteLevelOrg.getName());
             }
 
-            map.put("科室", orgInfo.getShortName());
+            map.put("科室", orgInfo.getName());
 
         }
 

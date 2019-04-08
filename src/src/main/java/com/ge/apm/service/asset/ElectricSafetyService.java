@@ -16,7 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.jfree.util.Log;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,335 +43,361 @@ import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ibm.icu.util.Calendar;
 
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.dao.SearchFilter.Operator;
+
 /**
- * Created by 212605082 on 2017/11/7.
+ * Created by 503035627
  */
 @Service
 public class ElectricSafetyService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ElectricSafetyService.class);
-    
-//    private Properties properties;
-    private final String UPDATE="UPDATE";
-    private final String INSERT="INSERT";
-    private UserAccount user;
-    
-    @Autowired
-    AssetInfoRepository assetInfoRepository;
-    
-    @Autowired
-    TableDefinitionService tableDefinitionService;
-    
-    @Autowired
-    V2_PmOrderRepository v2_PmOrderRepository;
-    
-    @Autowired
-    PmOrderRuleRepository pmOrderRuleRepository;
-    
-    @Autowired
-    TableDefinitionRepository tableDefinitionRepository;
-    
-    @Autowired
-    ElectricSafetyDataRepository electricSafetyDataRepository;
-    
-    @Autowired
-    UnstructuredDataCollectionRepository unstructuredDataCollectionRepository;
-    
-    @Autowired
-    UnstructuredDataRepository unstructuredDataRepository;
-    
-    
-    public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
-		String[] strArr=readFileByLine(file);
-		this.user=user;
-		return analysis(strArr,file.getFileName());
-    }
-    
-    private boolean updateExistReport(UnstructuredDataCollection tempReport,ElectricSafetyData detail){
-    	String schemaId=tempReport.getSchemaId();
-		if(StringUtils.isNotEmpty(schemaId)){
+	private static final Logger LOGGER = LoggerFactory.getLogger(ElectricSafetyService.class);
+
+	// private Properties properties;
+	private final String UPDATE = "UPDATE";
+	private final String INSERT = "INSERT";
+	private UserAccount user;
+	private Pattern p = Pattern.compile("([+-\\.0-9]+).*");
+	private final String STR_MA = "mA";
+
+	@Autowired
+	AssetInfoRepository assetInfoRepository;
+
+	@Autowired
+	TableDefinitionService tableDefinitionService;
+
+	@Autowired
+	V2_PmOrderRepository v2_PmOrderRepository;
+
+	@Autowired
+	PmOrderRuleRepository pmOrderRuleRepository;
+
+	@Autowired
+	TableDefinitionRepository tableDefinitionRepository;
+
+	@Autowired
+	ElectricSafetyDataRepository electricSafetyDataRepository;
+
+	@Autowired
+	UnstructuredDataCollectionRepository unstructuredDataCollectionRepository;
+
+	@Autowired
+	UnstructuredDataRepository unstructuredDataRepository;
+
+	@Autowired
+	UaaService uaaService;
+
+	public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
+		String[] strArr = readFileByLine(file);
+		this.user = user;
+		return analysis(strArr, file.getFileName());
+	}
+
+	private boolean updateExistReport(UnstructuredDataCollection tempReport, ElectricSafetyData detail) {
+		String schemaId = tempReport.getSchemaId();
+		if (StringUtils.isNotEmpty(schemaId)) {
 			TableDefinition tableDefinition = tableDefinitionService.getTemplateById(schemaId);
-			TableSchema table=JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
-			Map<String,Object>tableValue = new HashMap<String, Object>();
-			List<UnstructuredData> dataList=tempReport.getData();
+			TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+			Map<String, Object> tableValue = new HashMap<String, Object>();
+			List<UnstructuredData> dataList = tempReport.getData();
 			dataList.forEach(item -> {
-	            try{
-	                tableValue.put(item.getKey(),item.getValue());
-	            }catch(ClassNotFoundException e){
-	                tableValue.put(item.getKey(),item.getValueSerialized());
-	            }
-	        });
-			parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), detail);
-			tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue,table));
-			tableDefinitionService.saveTableDate(tempReport,tableValue);
-		}
-		else{
+				try {
+					tableValue.put(item.getKey(), item.getValue());
+				} catch (ClassNotFoundException e) {
+					tableValue.put(item.getKey(), item.getValueSerialized());
+				}
+			});
+			parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(), tableDefinition.getSchema(), detail);
+			tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue, table));
+			tableDefinitionService.saveTableDate(tempReport, tableValue);
+		} else {
 			detail.setWarnMessage("报告模板未找到");
 			return false;
 		}
 		return true;
-    }
-    
-    private boolean newReport(String assetUid,String pmOrderId,ElectricSafetyData detail){
-    	if(StringUtils.isNotEmpty(assetUid)){
-    		PmOrderRule pmOrderRule=pmOrderRuleRepository.findPmOrderRuleLevel3(assetUid);
-    		if(pmOrderRule!=null){
-    			List<TableDefinition> tableDefinitions = tableDefinitionRepository.findSafetyReportTable(pmOrderRule.getUid());
-    			if(tableDefinitions!=null && tableDefinitions.size()==1){
-    				TableDefinition tableDefinition=tableDefinitions.get(0);
-    				TableSchema table=JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
-    				Map<String,Object>tableValue = new HashMap<String, Object>();
-    				UnstructuredDataCollection report=new UnstructuredDataCollection();
-    				report.setBoUuid(pmOrderId);
-    				report.setSchemaId(tableDefinition.getId());
-    				report.setBoType("pm-safety-report");
-    				unstructuredDataCollectionRepository.save(report);
-    				parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), detail);
-    				tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue, table));
-    				tableDefinitionService.saveTableDate(report,tableValue);
-    			}
-    			else{
-    				detail.setWarnMessage("报告模板未找到");
-    			}
-    		}
-    		else{
-    			detail.setWarnMessage("保养规则未找到");
-    		}
-    	}
-    	else{
-    		return false;
-    	}
-    	return true;
-    }
-    
-    @Transactional
-    public void insertUpdateData(List<ElectricSafetyData> list){
-    	String financingNum="";
-    	for(ElectricSafetyData detail: list){
-    		detail.setTenantUID(user.getTenantUID());
-    		detail.setHospitalUID(user.getHospitalUID());
-    		detail.setSiteUID(user.getSiteUID());
-    		detail.setInstitutionUID(user.getInstitutionUID());
-    		financingNum=detail.getFinancingNum();
-    		if(financingNum!=null){
-            List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNumAccessScope(financingNum,user.getSiteUID(),user.getUid());
-        		if(listInfo!=null && listInfo.size()==1){
-        			String uid=listInfo.get(0).getUid();
-        			detail.setAssetId(listInfo.get(0).getId());
-//            		detail.setAssetInfo(info);
-            		detail.setAssetUid(uid);
-//        			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
-            		V2_PmOrder order=detail.getV2PmOrder();
-        			if(order!=null){
-                		detail.setV2_PmOrderId(order.getId());
-                		List<UnstructuredDataCollection> listUnstructuredDataCollection=unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(),"pm-safety-report");
-        				if(listUnstructuredDataCollection!=null && listUnstructuredDataCollection.size()>0){
-        					//find report
-        					if(updateExistReport(listUnstructuredDataCollection.get(0), detail)==false){
-        						detail.setWarnMessage("报告未生成");
-        					}
-        				}
-        				else{
-        					//no report
-        					if(newReport(uid, order.getId(), detail)==false){
-    							detail.setWarnMessage("报告未生成");
-    						}
-        				}
-        			}
-        			else{
-        				detail.setWarnMessage("工单未找到");
-        			}
-        		}
-        		else if(listInfo!=null && listInfo.size()>1){
-        			detail.setWarnMessage("找到多台设备");
-        		}
-        		else{
-        			detail.setWarnMessage("设备未找到");
-        		}
-        		try {
-        			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate(),detail.getSiteUID());
-        			if(dbData!=null){
-        				detail.setId(dbData.getId());
-        				setDefaultValue(detail,UPDATE);
-        			}
-        			else{
-        				setDefaultValue(detail,INSERT);
-        			}
-        			if(StringUtils.isEmpty(detail.getWarnMessage())){
-        				detail.setWarnMessage("报告已生成");
-        			}
-        			if(detail.getAssetId()!=null){
-        				electricSafetyDataRepository.save(detail);
-        			}
+	}
+
+	private boolean newReport(String assetUid, String pmOrderId, ElectricSafetyData detail) {
+		if (StringUtils.isNotEmpty(assetUid)) {
+			PmOrderRule pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel3(assetUid);
+			if (pmOrderRule != null) {
+				List<TableDefinition> tableDefinitions = tableDefinitionRepository.findSafetyReportTable(pmOrderRule.getUid());
+				if (tableDefinitions != null && tableDefinitions.size() == 1) {
+					TableDefinition tableDefinition = tableDefinitions.get(0);
+					TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+					Map<String, Object> tableValue = new HashMap<String, Object>();
+					UnstructuredDataCollection report = new UnstructuredDataCollection();
+					report.setBoUuid(pmOrderId);
+					report.setSchemaId(tableDefinition.getId());
+					report.setBoType("pm-safety-report");
+					unstructuredDataCollectionRepository.save(report);
+					parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(), tableDefinition.getSchema(), detail);
+					tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue, table));
+					tableDefinitionService.saveTableDate(report, tableValue);
+				} else {
+					detail.setWarnMessage("报告模板未找到");
+				}
+			} else {
+				detail.setWarnMessage("保养规则未找到");
+			}
+		} else {
+			return false;
+		}
+		return true;
+	}
+
+	public List<SearchFilter> getSearchFilterByAccess(String userUid, String siteUid) {
+		Map<Integer, List<String>> mapAccess = uaaService.findAccessUidByUserUid(userUid, siteUid);
+		List<SearchFilter> listSearchFilter = new ArrayList<SearchFilter>();
+		if (mapAccess.get(0) != null) {
+			SearchFilter s = new SearchFilter("tenantUID", Operator.IN,mapAccess.get(0), "1*2+");
+			listSearchFilter.add(s);
+		}
+		if (mapAccess.get(1) != null) {
+			SearchFilter s = new SearchFilter("institutionUID", Operator.IN, mapAccess.get(1),"1*2+");
+			listSearchFilter.add(s);
+		}
+		if (mapAccess.get(2) != null) {
+			SearchFilter s = new SearchFilter("hospitalUID", Operator.IN,mapAccess.get(2), "1*2+");
+			listSearchFilter.add(s);
+		}
+		if (mapAccess.get(3) != null) {
+			SearchFilter s = new SearchFilter("siteUID", Operator.IN, mapAccess.get(3),"1*2+");
+			listSearchFilter.add(s);
+		}
+		if (mapAccess.get(4) != null) {
+			SearchFilter s = new SearchFilter("clinicalDeptUID", Operator.IN, mapAccess.get(4),"1*2+");
+			listSearchFilter.add(s);
+		}
+		return listSearchFilter;
+	}
+
+	@Transactional
+	public void insertUpdateData(List<ElectricSafetyData> list) {
+		String financingNum = "";
+		for (ElectricSafetyData detail : list) {
+			detail.setTenantUID(user.getTenantUID());
+			detail.setHospitalUID(user.getHospitalUID());
+			detail.setSiteUID(user.getSiteUID());
+			detail.setInstitutionUID(user.getInstitutionUID());
+			financingNum = detail.getFinancingNum();
+			if (financingNum != null) {
+				List<SearchFilter> listSearch = getSearchFilterByAccess(user.getUid(), user.getSiteUID());
+				listSearch.add(new SearchFilter("financingNum", Operator.EQ, financingNum));
+				List<AssetInfo> listInfo = assetInfoRepository.findBySearchFilter(listSearch);
+				if (listInfo != null && listInfo.size() == 1) {
+					String uid = listInfo.get(0).getUid();
+					detail.setAssetId(listInfo.get(0).getId());
+					// detail.setAssetInfo(info);
+					detail.setAssetUid(uid);
+					// V2_PmOrder
+					// order=v2_PmOrderRepository.findByAssetUid(uid);
+					V2_PmOrder order = detail.getV2PmOrder();
+					if (order != null) {
+						detail.setV2_PmOrderId(order.getId());
+						List<UnstructuredDataCollection> listUnstructuredDataCollection = unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(), "pm-safety-report");
+						if (listUnstructuredDataCollection != null && listUnstructuredDataCollection.size() > 0) {
+							// find report
+							if (updateExistReport(listUnstructuredDataCollection.get(0), detail) == false) {
+								detail.setWarnMessage("报告未生成");
+							}
+						} else {
+							// no report
+							if (newReport(uid, order.getId(), detail) == false) {
+								detail.setWarnMessage("报告未生成");
+							}
+						}
+					} else {
+						detail.setWarnMessage("工单未找到");
+					}
+				} else if (listInfo != null && listInfo.size() > 1) {
+					detail.setWarnMessage("找到多台设备");
+				} else {
+					detail.setWarnMessage("设备未找到");
+				}
+				try {
+					ElectricSafetyData dbData = electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(), detail.getCheckDate(), detail.getSiteUID());
+					if (dbData != null) {
+						detail.setId(dbData.getId());
+						setDefaultValue(detail, UPDATE);
+					} else {
+						setDefaultValue(detail, INSERT);
+					}
+					if (StringUtils.isEmpty(detail.getWarnMessage())) {
+						detail.setWarnMessage("报告已生成");
+					}
+					if (detail.getAssetId() != null) {
+						electricSafetyDataRepository.save(detail);
+					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					LOGGER.info("insert electric safety data failed. Reason is "+e.getMessage());
+					LOGGER.info("insert electric safety data failed. Reason is " + e.getMessage());
 					detail.setWarnMessage("导入失败");
 				}
-    		}
-    		else{
-    			detail.setWarnMessage("导入失败");
-    		}
-    	}
-    }
-    
-    
-    private void setDefaultValue(ElectricSafetyData detail,String type){
-    	
-    	if(type.equals(INSERT)){
-    		detail.setCreatedBy(UserContextService.getCurrentUserAccount().getId());
-        	detail.setCreatedDate(new Date());
-    	}
-    	detail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getId());
+			} else {
+				detail.setWarnMessage("导入失败");
+			}
+		}
+	}
+
+	private void setDefaultValue(ElectricSafetyData detail, String type) {
+
+		if (type.equals(INSERT)) {
+			detail.setCreatedBy(UserContextService.getCurrentUserAccount().getId());
+			detail.setCreatedDate(new Date());
+		}
+		detail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getId());
 		detail.setLastModifiedDate(new Date());
-    }
-	
-    private List<ElectricSafetyData> analysis(String[] arrStr,String filename){
-//		getProperties();
-		List<ElectricSafetyData> listData=new ArrayList<ElectricSafetyData>();
-		for(int i=0;i<arrStr.length;++i){
-			ElectricSafetyData data=new ElectricSafetyData();
+	}
+
+	private List<ElectricSafetyData> analysis(String[] arrStr, String filename) {
+		// getProperties();
+		List<ElectricSafetyData> listData = new ArrayList<ElectricSafetyData>();
+		for (int i = 0; i < arrStr.length; ++i) {
+			ElectricSafetyData data = new ElectricSafetyData();
 			data.setFileName(filename);
-			data.setLineIndex(i+1);
-			parseValues(arrStr[i],data);
-			if(data.getValues()!=null){
+			data.setLineIndex(i + 1);
+			parseValues(arrStr[i], data);
+			if (data.getValues() != null) {
 				listData.add(data);
 			}
 		}
 		analysisFinancingNum(listData);
 		return listData;
 	}
-	
-	
-    private String[] readFileByLine(UploadedFile file){
-		try{
-			String str=new String(file.getContents());
-			String [] strArr=str.split("\n");
+
+	private String[] readFileByLine(UploadedFile file) {
+		try {
+			String str = new String(file.getContents());
+			String[] strArr = str.split("\n");
 			return strArr;
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
 		return null;
 	}
-	
-	private Map<String,Object> parseValues(String strLine,ElectricSafetyData data){
-		strLine=" "+strLine;
-		Map<String,Object> map=new HashMap<String,Object>();
-		String regex="[^0-9a-zA-Z][0-9]+,";
-		Pattern p=Pattern.compile(regex);
-		String preKey="";
-		int currentEnd=0;
-		int nextStart=0;
+
+	private Map<String, Object> parseValues(String strLine, ElectricSafetyData data) {
+		strLine = " " + strLine;
+		Map<String, Object> map = new HashMap<String, Object>();
+		String regex = "[^0-9a-zA-Z][0-9]+,";
+		Pattern p = Pattern.compile(regex);
+		String preKey = "";
+		int currentEnd = 0;
+		int nextStart = 0;
 		try {
-			Matcher matcher=p.matcher(strLine);
-			while(matcher.find()){
-				if(currentEnd==0){
-					currentEnd=matcher.end();
-					preKey=getKey(matcher);
-				}
-				else{
-					nextStart=matcher.start();
-					map.put(preKey, strLine.substring(currentEnd,nextStart));
-					currentEnd=matcher.end();
-					preKey=getKey(matcher);
+			Matcher matcher = p.matcher(strLine);
+			while (matcher.find()) {
+				if (currentEnd == 0) {
+					currentEnd = matcher.end();
+					preKey = getKey(matcher);
+				} else {
+					nextStart = matcher.start();
+					map.put(preKey, strLine.substring(currentEnd, nextStart));
+					currentEnd = matcher.end();
+					preKey = getKey(matcher);
 				}
 			}
-			map.put(preKey, strLine.substring(currentEnd,strLine.length()));
+			map.put(preKey, strLine.substring(currentEnd, strLine.length()));
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.info(e.getMessage());
 		}
-		if(StringUtils.isNotEmpty(preKey)){
-			convertValues(map,data);
+		if (StringUtils.isNotEmpty(preKey)) {
+			convertValues(map, data);
 			setCheckType(map.get("2").toString(), data);
-//			data.setValues(convertKeys(map));
+			// data.setValues(convertKeys(map));
 			data.setValues(map);
 		}
 		return map;
 	}
-	
-	private String getKey(Matcher matcher){
-		String key=matcher.group().trim().replace(",", "");
+
+	private String getKey(Matcher matcher) {
+		String key = matcher.group().trim().replace(",", "");
 		return key;
 	}
-	
-//	private Map<String,Object> convertKeys(Map<String,Object> map){
-//		Map<String,Object> newMap=new HashMap<String,Object>();
-//		String newKey="";
-//		for(String key:map.keySet()){
-//			if(properties.get(key)==null){
-//				newKey=key;
-//			}
-//			else{
-//				newKey=(String)properties.get(key);
-//			}
-//			newMap.put(newKey, map.get(key));
-//		}
-//		return newMap;
-//	}
-	
-	private void getListAssetInfo(List<ElectricSafetyData> listData,Map<String,List<AssetInfo>> mapAsset,Map<String,V2_PmOrder> mapPmOrder,Map<String,List<V2_PmOrder>> mapListPmOrder){
-		Calendar startCa=Calendar.getInstance();
+
+	// private Map<String,Object> convertKeys(Map<String,Object> map){
+	// Map<String,Object> newMap=new HashMap<String,Object>();
+	// String newKey="";
+	// for(String key:map.keySet()){
+	// if(properties.get(key)==null){
+	// newKey=key;
+	// }
+	// else{
+	// newKey=(String)properties.get(key);
+	// }
+	// newMap.put(newKey, map.get(key));
+	// }
+	// return newMap;
+	// }
+
+	private void getListAssetInfo(List<ElectricSafetyData> listData, Map<String, List<AssetInfo>> mapAsset, Map<String, V2_PmOrder> mapPmOrder,
+			Map<String, List<V2_PmOrder>> mapListPmOrder) {
+		Calendar startCa = Calendar.getInstance();
 		startCa.add(Calendar.MONTH, -6);
-		Calendar endCa=Calendar.getInstance();
+		Calendar endCa = Calendar.getInstance();
 		endCa.add(Calendar.MONTH, 6);
-		Date startDate=startCa.getTime();
-		Date endDate=endCa.getTime();
-		
-		Set<String> setFinancingNum=new HashSet<String>();
-		Set<String> setAssetUids=new HashSet<String>();
-		List<AssetInfo> listAssetInfo=null;
-		if(listData!=null && listData.size()>0){
-			for(int i=0;i<listData.size();++i){
-				ElectricSafetyData tempData=listData.get(i);
-				setFinancingNum.add(tempData.getFinancingNum());
-				setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
-				setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+		Date startDate = startCa.getTime();
+		Date endDate = endCa.getTime();
+
+		List<String> setFinancingNum = new ArrayList<String>();
+		Set<String> setAssetUids = new HashSet<String>();
+		List<AssetInfo> listAssetInfo = null;
+		if (listData != null && listData.size() > 0) {
+			for (int i = 0; i < listData.size(); ++i) {
+				ElectricSafetyData tempData = listData.get(i);
+				if(!setFinancingNum.contains(tempData.getFinancingNum())){
+					setFinancingNum.add(tempData.getFinancingNum());
+					setFinancingNum.add(tempData.getFinancingNum().toLowerCase());
+					setFinancingNum.add(tempData.getFinancingNum().toUpperCase());
+				}
 			}
 		}
-		if(setFinancingNum.size()>0){
-			listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(setFinancingNum,user.getSiteUID(),user.getUid());
+		if (setFinancingNum.size() > 0) {
+			List<SearchFilter> listSearch=getSearchFilterByAccess(user.getUid(), user.getSiteUID());
+			listSearch.add(new SearchFilter("financingNum", Operator.IN, setFinancingNum,"1*"));
+			listAssetInfo = assetInfoRepository.findBySearchFilter(listSearch);
 		}
-		if(listAssetInfo!=null && listAssetInfo.size()>0){
-			for(int i=0;i<listAssetInfo.size();++i){
-				AssetInfo tempAsset=listAssetInfo.get(i);
+		if (listAssetInfo != null && listAssetInfo.size() > 0) {
+			for (int i = 0; i < listAssetInfo.size(); ++i) {
+				AssetInfo tempAsset = listAssetInfo.get(i);
 				setAssetUids.add(tempAsset.getUid());
-				if(mapAsset.containsKey(tempAsset.getFinancingNum())){
+				if (mapAsset.containsKey(tempAsset.getFinancingNum())) {
 					mapAsset.get(tempAsset.getFinancingNum()).add(tempAsset);
-				}
-				else{
-					List<AssetInfo> tempListAsset=new ArrayList<AssetInfo>();
+				} else {
+					List<AssetInfo> tempListAsset = new ArrayList<AssetInfo>();
 					tempListAsset.add(tempAsset);
 					mapAsset.put(tempAsset.getFinancingNum(), tempListAsset);
 				}
 			}
 		}
-		if(setAssetUids.size()>0){
-			Set<V2_PmOrder> setV2_PmOrder=v2_PmOrderRepository.findByAssetUids(setAssetUids);
-			if(setV2_PmOrder!=null && setV2_PmOrder.size()>0){
-				Iterator<V2_PmOrder> itV2_PmOrder=setV2_PmOrder.iterator();
-				while(itV2_PmOrder.hasNext()){
-					V2_PmOrder tempPmOrder=itV2_PmOrder.next();
+		if (setAssetUids.size() > 0) {
+			Set<V2_PmOrder> setV2_PmOrder = v2_PmOrderRepository.findByAssetUids(setAssetUids);
+			if (setV2_PmOrder != null && setV2_PmOrder.size() > 0) {
+				Iterator<V2_PmOrder> itV2_PmOrder = setV2_PmOrder.iterator();
+				while (itV2_PmOrder.hasNext()) {
+					V2_PmOrder tempPmOrder = itV2_PmOrder.next();
 					mapPmOrder.put(tempPmOrder.getAssetUid(), tempPmOrder);
 				}
 			}
-			
-			//set list pmOrder
-			List<V2_PmOrder> listV2_PmOrder=v2_PmOrderRepository.findMultiByAssetUids(setAssetUids,startDate,endDate);
-			if(listV2_PmOrder!=null && listV2_PmOrder.size()>0){
-				for(int i=0;i<listV2_PmOrder.size();++i){
-					V2_PmOrder tempOrder=listV2_PmOrder.get(i);
-					String assetUid=tempOrder.getAssetUid();
-					List<V2_PmOrder> listTempV2PmOrder=null;
-					if(mapListPmOrder.containsKey(assetUid)){
-						listTempV2PmOrder=mapListPmOrder.get(tempOrder.getAssetUid());
+
+			// set list pmOrder
+			List<V2_PmOrder> listV2_PmOrder = v2_PmOrderRepository.findMultiByAssetUids(setAssetUids, startDate, endDate);
+			if (listV2_PmOrder != null && listV2_PmOrder.size() > 0) {
+				for (int i = 0; i < listV2_PmOrder.size(); ++i) {
+					V2_PmOrder tempOrder = listV2_PmOrder.get(i);
+					String assetUid = tempOrder.getAssetUid();
+					List<V2_PmOrder> listTempV2PmOrder = null;
+					if (mapListPmOrder.containsKey(assetUid)) {
+						listTempV2PmOrder = mapListPmOrder.get(tempOrder.getAssetUid());
 						listTempV2PmOrder.add(tempOrder);
-					}
-					else{
-						listTempV2PmOrder=new ArrayList<V2_PmOrder>();
+					} else {
+						listTempV2PmOrder = new ArrayList<V2_PmOrder>();
 						listTempV2PmOrder.add(tempOrder);
 						mapListPmOrder.put(tempOrder.getAssetUid(), listTempV2PmOrder);
 					}
@@ -382,10 +407,10 @@ public class ElectricSafetyService {
 	}
 
 	private void analysisFinancingNum(List<ElectricSafetyData> listData) {
-		Map<String,List<AssetInfo>> mapAsset=new HashMap<String,List<AssetInfo>>();
-		Map<String,V2_PmOrder> mapPmOrder=new HashMap<String,V2_PmOrder>();
-		Map<String,List<V2_PmOrder>> mapListPmOrder=new HashMap<String,List<V2_PmOrder>>();
-		getListAssetInfo(listData,mapAsset,mapPmOrder,mapListPmOrder);
+		Map<String, List<AssetInfo>> mapAsset = new HashMap<String, List<AssetInfo>>();
+		Map<String, V2_PmOrder> mapPmOrder = new HashMap<String, V2_PmOrder>();
+		Map<String, List<V2_PmOrder>> mapListPmOrder = new HashMap<String, List<V2_PmOrder>>();
+		getListAssetInfo(listData, mapAsset, mapPmOrder, mapListPmOrder);
 		if (listData != null && listData.size() > 0) {
 			for (int i = 0; i < listData.size(); ++i) {
 				ElectricSafetyData data = listData.get(i);
@@ -402,26 +427,24 @@ public class ElectricSafetyService {
 					if (listAssetInfo != null && listAssetInfo.size() == 1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())) {
 						data.setAssetInfo(listAssetInfo.get(0));
 						V2_PmOrder order = mapPmOrder.get(listAssetInfo.get(0).getUid());
-						List<V2_PmOrder> listPmOrder=mapListPmOrder.get(listAssetInfo.get(0).getUid());
+						List<V2_PmOrder> listPmOrder = mapListPmOrder.get(listAssetInfo.get(0).getUid());
 						if (order != null) {
 							data.setV2PmOrder(order);
 						} else {
-							if(listPmOrder!=null && listPmOrder.size()>0){
+							if (listPmOrder != null && listPmOrder.size() > 0) {
 								data.setV2PmOrder(listPmOrder.get(0));
-							}
-							else{
+							} else {
 								data.setWarnMessage("工单未找到");
 							}
 						}
-						if(listPmOrder!=null){
-							if(order!=null){
-								if(!listPmOrder.contains(order)){
+						if (listPmOrder != null) {
+							if (order != null) {
+								if (!listPmOrder.contains(order)) {
 									listPmOrder.add(order);
 								}
 							}
 							data.setListV2PmOrder(listPmOrder);
-						}
-						else{
+						} else {
 						}
 					} else if (listAssetInfo != null && listAssetInfo.size() > 1) {
 						data.setWarnMessage("找到多台设备");
@@ -435,209 +458,207 @@ public class ElectricSafetyService {
 			}
 		}
 	}
-	
-	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyData data){
-		String strValue="";
-		for(String key:map.keySet()){
-			strValue=map.get(key).toString();
-			//60,设备编号
-			if(!StringUtils.equals(key, "60")){
-				if(needRemoveTailer(strValue)){
-					strValue=getNumber(strValue);
-				}
+
+	private Map<String, Object> convertValues(Map<String, Object> map, ElectricSafetyData data) {
+		String strValue = "";
+		double dbValue = 0;
+		for (String key : map.keySet()) {
+			strValue = map.get(key).toString();
+			// 60,设备编号
+			// format data
+			if (!StringUtils.equals(key, "60")) {
+				dbValue = parseDouble(strValue);
 			}
-			//5,测试仪日期（格式：日-月-年）22.09.17 6,测试仪时间（格式：H:M:S）13:24:09
-			if(StringUtils.equals(key, "5")){
-				Date date=null;
-				if(map.get("6")!=null){
-					date=convertStringDate("dd.MM.yy H:mm:ss", strValue+" "+map.get("6").toString());
-				}
-				else{
-					date=convertStringDate("dd.MM.yy", strValue);
+			// 5,测试仪日期（格式：日-月-年）22.09.17 6,测试仪时间（格式：H:M:S）13:24:09
+			if (StringUtils.equals(key, "5")) {
+				Date date = null;
+				if (map.get("6") != null) {
+					date = convertStringDate("dd.MM.yy H:mm:ss", strValue + " " + map.get("6").toString());
+				} else {
+					date = convertStringDate("dd.MM.yy", strValue);
 				}
 				data.setCheckDate(date);
 			}
-			//55,存储器日期（格式：日-月-年）30.10.18 56,存储器时间（格式：H:M）13:20
-			else if(StringUtils.equals(key, "55")){
-				Date date=null;
-				if(map.get("56")!=null){
-					date=convertStringDate("dd.MM.yy H:mm", strValue+" "+map.get("56").toString());
-				}
-				else{
-					date=convertStringDate("dd.MM.yy", strValue);
+			// 55,存储器日期（格式：日-月-年）30.10.18 56,存储器时间（格式：H:M）13:20
+			else if (StringUtils.equals(key, "55")) {
+				Date date = null;
+				if (map.get("56") != null) {
+					date = convertStringDate("dd.MM.yy H:mm", strValue + " " + map.get("56").toString());
+				} else {
+					date = convertStringDate("dd.MM.yy", strValue);
 				}
 				data.setStorageDate(date);
 			}
-			//60,设备编号
-			else if(StringUtils.equals(key, "60")){
-//				strValue=strValue.replaceAll(" ", "");
-				if(StringUtils.isNotEmpty(strValue)){
-					String strArr[]=strValue.split(" ");
-					strValue=strArr[0];
+			// 60,设备编号
+			else if (StringUtils.equals(key, "60")) {
+				// strValue=strValue.replaceAll(" ", "");
+				if (StringUtils.isNotEmpty(strValue)) {
+					String strArr[] = strValue.split(" ");
+					strValue = strArr[0];
 					data.setFinancingNum(strValue);
 				}
 			}
-//			4，——》类别General/Defi
-			else if(StringUtils.equals(key, "4")){
+			// 4，——》类别General/Defi
+			else if (StringUtils.equals(key, "4")) {
 				data.setType(strValue.replaceAll("\\+", "").trim());
 			}
-//			5，——》测试仪日期（格式：日-月-年）
-			else if(StringUtils.equals(key, "5")){
+			// 5，——》测试仪日期（格式：日-月-年）
+			else if (StringUtils.equals(key, "5")) {
 				data.setOriginCheckDate(strValue.replaceAll("\\+", "").trim());
 			}
-//			6，——》测试仪时间（格式：H:M:S）
-			else if(StringUtils.equals(key, "6")){
+			// 6，——》测试仪时间（格式：H:M:S）
+			else if (StringUtils.equals(key, "6")) {
 				data.setOriginCheckTime(strValue.replaceAll("\\+", "").trim());
 			}
-//			7，——》保护接地阻抗（单位：Ω）
-			else if(StringUtils.equals(key, "7")){
-				data.setProtectGroundImpedance(strValue.replaceAll("\\+", "").trim());
+			// 7，——》保护接地阻抗（单位：Ω）
+			else if (StringUtils.equals(key, "7")) {
+				data.setProtectGroundImpedance(dbValue + "");
 			}
-//			8，——》保护接地阻抗参考值（<0.2Ω）
-			else if(StringUtils.equals(key, "8")){
-				data.setProtectGroundImpedanceRefVal(strValue.replaceAll("\\+", "").trim());
+			// 8，——》保护接地阻抗参考值（<0.2Ω）
+			else if (StringUtils.equals(key, "8")) {
+				data.setProtectGroundImpedanceRefVal(dbValue + "");
 			}
-//			21，——》等效设备漏电流（单位：μA）
-			else if(StringUtils.equals(key, "21")){
-				data.setEquipmentElectricLeakage(strValue.replaceAll("\\+", "").trim());
+			// 21，——》等效设备漏电流（单位：μA）
+			else if (StringUtils.equals(key, "21")) {
+				data.setEquipmentElectricLeakage(dbValue + "");
 			}
-//			22，——》等效设备漏电流参考值（<1.0mA）
-			else if(StringUtils.equals(key, "22")){
-				data.setEquipmentElectricLeakageRefVal(strValue.replaceAll("\\+", "").trim());
+			// 22，——》等效设备漏电流参考值（<1.0mA）
+			else if (StringUtils.equals(key, "22")) {
+				data.setEquipmentElectricLeakageRefVal(dbValue + "");
 			}
-//			23，——》患者漏电流（应用部分加电）（单位：μA）
-			else if(StringUtils.equals(key, "23")){
-				data.setPatientElectricLeakage_app(strValue.replaceAll("\\+", "").trim());
+			// 23，——》患者漏电流（应用部分加电）（单位：μA）
+			else if (StringUtils.equals(key, "23")) {
+				data.setPatientElectricLeakage_app(dbValue + "");
 			}
-//			24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "24")){
-				data.setPatientElectricLeakageRefVal_app(strValue.replaceAll("\\+", "").trim());
+			// 24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
+			else if (StringUtils.equals(key, "24")) {
+				data.setPatientElectricLeakageRefVal_app(dbValue + "");
 			}
-//			25，——》对地漏电流（正常状态）（单位：mA）
-			else if(StringUtils.equals(key, "25")){
-				data.setGroundElectricLeakage_normal(strValue.replaceAll("\\+", "").trim());
+			// 25，——》对地漏电流（正常状态）（单位：mA）
+			else if (StringUtils.equals(key, "25")) {
+				data.setGroundElectricLeakage_normal(dbValue + "");
 			}
-//			26，——》对地漏电流（正常状态）参考值（<0.5mA）
-			else if(StringUtils.equals(key, "26")){
-				data.setGroundElectricLeakageRefVal_normal(strValue.replaceAll("\\+", "").trim());
+			// 26，——》对地漏电流（正常状态）参考值（<0.5mA）
+			else if (StringUtils.equals(key, "26")) {
+				data.setGroundElectricLeakageRefVal_normal(dbValue + "");
 			}
-//			27，——》对地漏电流（单一故障状态）（单位：mA）
-			else if(StringUtils.equals(key, "27")){
-				data.setGroundElectricLeakage_singleError(strValue.replaceAll("\\+", "").trim());
+			// 27，——》对地漏电流（单一故障状态）（单位：mA）
+			else if (StringUtils.equals(key, "27")) {
+				data.setGroundElectricLeakage_singleError(dbValue + "");
 			}
-//			28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
-			else if(StringUtils.equals(key, "28")){
-				data.setGroundElectricLeakageRefVal_singleError(strValue.replaceAll("\\+", "").trim());
+			// 28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
+			else if (StringUtils.equals(key, "28")) {
+				data.setGroundElectricLeakageRefVal_singleError(dbValue + "");
 			}
-//			29，——》外壳漏电流（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "29")){
-				data.setShellElectricLeakage_normal(strValue.replaceAll("\\+", "").trim());
+			// 29，——》外壳漏电流（正常状态）（单位：μA）
+			else if (StringUtils.equals(key, "29")) {
+				data.setShellElectricLeakage_normal(dbValue + "");
 			}
-//			30，——》外壳漏电流（正常状态）参考值（<100μA）
-			else if(StringUtils.equals(key, "30")){
-				data.setShellElectricLeakageRefVal_normal(strValue.replaceAll("\\+", "").trim());
+			// 30，——》外壳漏电流（正常状态）参考值（<100μA）
+			else if (StringUtils.equals(key, "30")) {
+				data.setShellElectricLeakageRefVal_normal(dbValue + "");
 			}
-//			31，——》外壳漏电流（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "31")){
-				data.setShellElectricLeakage_singleError(strValue.replaceAll("\\+", "").trim());
+			// 31，——》外壳漏电流（单一故障状态）（单位：μA）
+			else if (StringUtils.equals(key, "31")) {
+				data.setShellElectricLeakage_singleError(dbValue + "");
 			}
-//			32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
-			else if(StringUtils.equals(key, "32")){
-				data.setShellElectricLeakageRefVal_singleError(strValue.replaceAll("\\+", "").trim());
+			// 32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
+			else if (StringUtils.equals(key, "32")) {
+				data.setShellElectricLeakageRefVal_singleError(dbValue + "");
 			}
-//			33，——》患者漏电流AC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "33")){
-				data.setPatientElectricLeakageAC_normal(strValue.replaceAll("\\+", "").trim());
+			// 33，——》患者漏电流AC（正常状态）（单位：μA）
+			else if (StringUtils.equals(key, "33")) {
+				data.setPatientElectricLeakageAC_normal(dbValue + "");
 			}
-//			34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "34")){
-				data.setPatientElectricLeakageRefValAC_normal(strValue.replaceAll("\\+", "").trim());
+			// 34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
+			else if (StringUtils.equals(key, "34")) {
+				data.setPatientElectricLeakageRefValAC_normal(dbValue + "");
 			}
-//			35，——》患者漏电流AC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "35")){
-				data.setShellElectricLeakageAC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 35，——》患者漏电流AC（单一故障状态）（单位：μA）
+			else if (StringUtils.equals(key, "35")) {
+				data.setShellElectricLeakageAC_singleError(dbValue + "");
 			}
-//			36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "36")){
-				data.setShellElectricLeakageRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
+			else if (StringUtils.equals(key, "36")) {
+				data.setShellElectricLeakageRefValAC_singleError(dbValue + "");
 			}
-//			37，——》患者漏电流DC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "37")){
-				data.setPatientElectricLeakageDC_normal(strValue.replaceAll("\\+", "").trim());
+			// 37，——》患者漏电流DC（正常状态）（单位：μA）
+			else if (StringUtils.equals(key, "37")) {
+				data.setPatientElectricLeakageDC_normal(dbValue + "");
 			}
-//			38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "38")){
-				data.setPatientElectricLeakageRefValDC_normal(strValue.replaceAll("\\+", "").trim());
+			// 38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
+			else if (StringUtils.equals(key, "38")) {
+				data.setPatientElectricLeakageRefValDC_normal(dbValue + "");
 			}
-//			39，——》患者漏电流DC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "39")){
-				data.setShellElectricLeakageDC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 39，——》患者漏电流DC（单一故障状态）（单位：μA）
+			else if (StringUtils.equals(key, "39")) {
+				data.setShellElectricLeakageDC_singleError(dbValue + "");
 			}
-//			40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "40")){
-				data.setShellElectricLeakageRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
+			else if (StringUtils.equals(key, "40")) {
+				data.setShellElectricLeakageRefValDC_singleError(dbValue + "");
 			}
-//			41，——》患者辅助电流AC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "41")){
-				data.setPatientAssisElectricAC_normal(strValue.replaceAll("\\+", "").trim());
+			// 41，——》患者辅助电流AC（正常状态）（单位：μA）
+			else if (StringUtils.equals(key, "41")) {
+				data.setPatientAssisElectricAC_normal(dbValue + "");
 			}
-//			42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "42")){
-				data.setPatientAssisElectricRefValAC_normal(strValue.replaceAll("\\+", "").trim());
+			// 42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
+			else if (StringUtils.equals(key, "42")) {
+				data.setPatientAssisElectricRefValAC_normal(dbValue + "");
 			}
-//			43，——》患者辅助电流AC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "43")){
-				data.setPatientAssisElectricAC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 43，——》患者辅助电流AC（单一故障状态）（单位：μA）
+			else if (StringUtils.equals(key, "43")) {
+				data.setPatientAssisElectricAC_singleError(dbValue + "");
 			}
-//			44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "44")){
-				data.setPatientAssisElectricRefValAC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
+			else if (StringUtils.equals(key, "44")) {
+				data.setPatientAssisElectricRefValAC_singleError(dbValue + "");
 			}
-//			45，——》患者辅助电流DC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "45")){
-				data.setPatientAssisElectricDC_normal(strValue.replaceAll("\\+", "").trim());
+			// 45，——》患者辅助电流DC（正常状态）（单位：μA）
+			else if (StringUtils.equals(key, "45")) {
+				data.setPatientAssisElectricDC_normal(dbValue + "");
 			}
-//			46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "46")){
-				data.setPatientAssisElectricRefValDC_normal(strValue.replaceAll("\\+", "").trim());
+			// 46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
+			else if (StringUtils.equals(key, "46")) {
+				data.setPatientAssisElectricRefValDC_normal(dbValue + "");
 			}
-//			47，——》患者辅助电流DC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "47")){
-				data.setPatientAssisElectricDC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 47，——》患者辅助电流DC（单一故障状态）（单位：μA）
+			else if (StringUtils.equals(key, "47")) {
+				data.setPatientAssisElectricDC_singleError(dbValue + "");
 			}
-//			48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "48")){
-				data.setPatientAssisElectricRefValDC_singleError(strValue.replaceAll("\\+", "").trim());
+			// 48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
+			else if (StringUtils.equals(key, "48")) {
+				data.setPatientAssisElectricRefValDC_singleError(dbValue + "");
 			}
-//			51，——》市电电压实际值
-			else if(StringUtils.equals(key, "51")){
-				data.setCityVoltage(strValue.replaceAll("\\+", "").trim());
+			// 51，——》市电电压实际值
+			else if (StringUtils.equals(key, "51")) {
+				data.setCityVoltage(dbValue + "");
 			}
-//			52，——》市电电压参考值（230V）
-			else if(StringUtils.equals(key, "52")){
-				data.setCityVoltageRefVal(strValue.replaceAll("\\+", "").trim());
+			// 52，——》市电电压参考值（230V）
+			else if (StringUtils.equals(key, "52")) {
+				data.setCityVoltageRefVal(dbValue + "");
 			}
-//			55，——》存储器日期（格式：日-月-年）
-			else if(StringUtils.equals(key, "55")){
+			// 55，——》存储器日期（格式：日-月-年）
+			else if (StringUtils.equals(key, "55")) {
 				data.setOriginStorageDate(strValue.replaceAll("\\+", "").trim());
 			}
-//			56，——》存储器时间（格式：H:M）
-			else if(StringUtils.equals(key, "56")){
+			// 56，——》存储器时间（格式：H:M）
+			else if (StringUtils.equals(key, "56")) {
 				data.setOriginStorageTime(strValue.replaceAll("\\+", "").trim());
 			}
-//			75，——》序号
-			else if(StringUtils.equals(key, "75")){
+			// 75，——》序号
+			else if (StringUtils.equals(key, "75")) {
 				data.setSequenceNum(strValue.replaceAll("\\+", "").trim());
 			}
 			map.put(key, strValue);
 		}
 		return map;
 	}
-	
-	private Date convertStringDate(String pattern,String value){
-		//yyMMdd=180130
-		SimpleDateFormat format=new SimpleDateFormat(pattern);
-		Date date=new Date();
+
+	private Date convertStringDate(String pattern, String value) {
+		// yyMMdd=180130
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		Date date = new Date();
 		try {
 			date = format.parse(value);
 		} catch (ParseException e) {
@@ -646,64 +667,45 @@ public class ElectricSafetyService {
 		}
 		return date;
 	}
-	
-	private String getNumber(String str){
-		Pattern p=Pattern.compile("[^,]*[0-9]+");
-		Matcher m=p.matcher(str);
-		if(m.find()){
-			return str.substring(m.start(), m.end());
-		}
-		return str;
-	}
-	
-	private boolean needRemoveTailer(String str){
-		Pattern p=Pattern.compile("[^,]*[0-9]+[^0-9]+");
-		Matcher m=p.matcher(str);
-		if(str.length()<40){
-			if(m.find()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-//	private void getProperties(){
-//		if(properties!=null)
-//			return;
-//		properties=new Properties();
-//		try {
-//			String filePath=URLDecoder.decode(ElectricSafetyService.class.getResource("/").getPath(),"UTF-8")+"electricSafetyMapping.properties";
-//			InputStream input=new FileInputStream(new File(filePath));
-//			properties.load(input);
-//			input.close();
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			LOGGER.info(e.getMessage());
-//		}
-//	}
-	
-	private void parseTableValue(List<UnstructuredData> listData,String jsonStrInstrumentData,String schemaStr,ElectricSafetyData electricSafetyData){
-		TableSchema table=null;
-		if(StringUtils.isNotEmpty(schemaStr)){
+
+	// private void getProperties(){
+	// if(properties!=null)
+	// return;
+	// properties=new Properties();
+	// try {
+	// String
+	// filePath=URLDecoder.decode(ElectricSafetyService.class.getResource("/").getPath(),"UTF-8")+"electricSafetyMapping.properties";
+	// InputStream input=new FileInputStream(new File(filePath));
+	// properties.load(input);
+	// input.close();
+	// } catch (Exception e) {
+	// // TODO: handle exception
+	// LOGGER.info(e.getMessage());
+	// }
+	// }
+
+	private void parseTableValue(List<UnstructuredData> listData, String jsonStrInstrumentData, String schemaStr, ElectricSafetyData electricSafetyData) {
+		TableSchema table = null;
+		if (StringUtils.isNotEmpty(schemaStr)) {
 			table = JSONObject.parseObject(schemaStr, TableSchema.class);
 		}
-		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& electricSafetyData!=null){
-			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
-			if(obj!=null){
-				if(electricSafetyData!=null){
-					for(String key:obj.keySet()){
-						if(table!=null){
-							List<TableGroup> listTableGroup=table.getGroups();
-							if(listTableGroup!=null && listTableGroup.size()>0){
-								for(int i=0;i<listTableGroup.size();++i){
-									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
-									if(listTableItem!=null && listTableItem.size()>0){
-										for(int j=0;j<listTableItem.size();++j){
-											TableItem temp=listTableItem.get(j);
-											if(temp.getKey().equals(key)){
-												for(int z=0;z<listData.size();++z){
-													UnstructuredData tempData=listData.get(z);
-													if(tempData.getKey().equals(key)){
+		if (StringUtils.isNotEmpty(jsonStrInstrumentData) && electricSafetyData != null) {
+			JSONObject obj = JSONObject.parseObject(jsonStrInstrumentData);
+			if (obj != null) {
+				if (electricSafetyData != null) {
+					for (String key : obj.keySet()) {
+						if (table != null) {
+							List<TableGroup> listTableGroup = table.getGroups();
+							if (listTableGroup != null && listTableGroup.size() > 0) {
+								for (int i = 0; i < listTableGroup.size(); ++i) {
+									List<TableItem> listTableItem = listTableGroup.get(i).getItems();
+									if (listTableItem != null && listTableItem.size() > 0) {
+										for (int j = 0; j < listTableItem.size(); ++j) {
+											TableItem temp = listTableItem.get(j);
+											if (temp.getKey().equals(key)) {
+												for (int z = 0; z < listData.size(); ++z) {
+													UnstructuredData tempData = listData.get(z);
+													if (tempData.getKey().equals(key)) {
 														tempData.setValue(getInstrumentValue(obj.getString(key), electricSafetyData));
 													}
 												}
@@ -718,26 +720,26 @@ public class ElectricSafetyService {
 			}
 		}
 	}
-	
-	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,ElectricSafetyData electricSafetyData){
-		TableSchema table=null;
-		if(StringUtils.isNotEmpty(schemaStr)){
+
+	public void parseTableValue(Map<String, Object> tableValue, String jsonStrInstrumentData, String schemaStr, ElectricSafetyData electricSafetyData) {
+		TableSchema table = null;
+		if (StringUtils.isNotEmpty(schemaStr)) {
 			table = JSONObject.parseObject(schemaStr, TableSchema.class);
 		}
-		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& electricSafetyData!=null){
-			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
-			if(obj!=null){
-				if(electricSafetyData!=null){
-					for(String key:obj.keySet()){
-						if(table!=null){
-							List<TableGroup> listTableGroup=table.getGroups();
-							if(listTableGroup!=null && listTableGroup.size()>0){
-								for(int i=0;i<listTableGroup.size();++i){
-									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
-									if(listTableItem!=null && listTableItem.size()>0){
-										for(int j=0;j<listTableItem.size();++j){
-											TableItem temp=listTableItem.get(j);
-											if(temp.getKey().equals(key)){
+		if (StringUtils.isNotEmpty(jsonStrInstrumentData) && electricSafetyData != null) {
+			JSONObject obj = JSONObject.parseObject(jsonStrInstrumentData);
+			if (obj != null) {
+				if (electricSafetyData != null) {
+					for (String key : obj.keySet()) {
+						if (table != null) {
+							List<TableGroup> listTableGroup = table.getGroups();
+							if (listTableGroup != null && listTableGroup.size() > 0) {
+								for (int i = 0; i < listTableGroup.size(); ++i) {
+									List<TableItem> listTableItem = listTableGroup.get(i).getItems();
+									if (listTableItem != null && listTableItem.size() > 0) {
+										for (int j = 0; j < listTableItem.size(); ++j) {
+											TableItem temp = listTableItem.get(j);
+											if (temp.getKey().equals(key)) {
 												tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
 											}
 										}
@@ -750,28 +752,29 @@ public class ElectricSafetyService {
 			}
 		}
 	}
-	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,String boUuid){
-		TableSchema table=null;
-		if(StringUtils.isNotEmpty(schemaStr)){
+
+	public void parseTableValue(Map<String, Object> tableValue, String jsonStrInstrumentData, String schemaStr, String boUuid) {
+		TableSchema table = null;
+		if (StringUtils.isNotEmpty(schemaStr)) {
 			table = JSONObject.parseObject(schemaStr, TableSchema.class);
 		}
-		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& StringUtils.isNotEmpty(boUuid)){
-			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
-			if(obj!=null){
-				V2_PmOrder pmorder=v2_PmOrderRepository.findById(boUuid);
-				if(pmorder!=null && StringUtils.isNotEmpty(pmorder.getAssetUid())){
-					ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByAssetUid(pmorder.getAssetUid());
-					if(electricSafetyData!=null){
-						for(String key:obj.keySet()){
-							if(table!=null){
-								List<TableGroup> listTableGroup=table.getGroups();
-								if(listTableGroup!=null && listTableGroup.size()>0){
-									for(int i=0;i<listTableGroup.size();++i){
-										List<TableItem> listTableItem=listTableGroup.get(i).getItems();
-										if(listTableItem!=null && listTableItem.size()>0){
-											for(int j=0;j<listTableItem.size();++j){
-												TableItem temp=listTableItem.get(j);
-												if(temp.getKey().equals(key)){
+		if (StringUtils.isNotEmpty(jsonStrInstrumentData) && StringUtils.isNotEmpty(boUuid)) {
+			JSONObject obj = JSONObject.parseObject(jsonStrInstrumentData);
+			if (obj != null) {
+				V2_PmOrder pmorder = v2_PmOrderRepository.findById(boUuid);
+				if (pmorder != null && StringUtils.isNotEmpty(pmorder.getAssetUid())) {
+					ElectricSafetyData electricSafetyData = electricSafetyDataRepository.findByAssetUid(pmorder.getAssetUid());
+					if (electricSafetyData != null) {
+						for (String key : obj.keySet()) {
+							if (table != null) {
+								List<TableGroup> listTableGroup = table.getGroups();
+								if (listTableGroup != null && listTableGroup.size() > 0) {
+									for (int i = 0; i < listTableGroup.size(); ++i) {
+										List<TableItem> listTableItem = listTableGroup.get(i).getItems();
+										if (listTableItem != null && listTableItem.size() > 0) {
+											for (int j = 0; j < listTableItem.size(); ++j) {
+												TableItem temp = listTableItem.get(j);
+												if (temp.getKey().equals(key)) {
 													tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
 												}
 											}
@@ -785,6 +788,7 @@ public class ElectricSafetyService {
 			}
 		}
 	}
+
 	private Object getInstrumentValue(String attrName, ElectricSafetyData data) {
 		Object result = null;
 		Field[] fields = ElectricSafetyData.class.getDeclaredFields();
@@ -794,8 +798,8 @@ public class ElectricSafetyService {
 				field.setAccessible(true);
 				try {
 					result = field.get(data);
-					if(result!=null){
-						result=parseDouble(result);
+					if (result != null) {
+						result = parseDouble(result);
 					}
 					field.setAccessible(access);
 				} catch (Exception e) {
@@ -807,117 +811,131 @@ public class ElectricSafetyService {
 		}
 		return result;
 	}
-	
-	private double parseDouble(Object obj){
-		String str=obj.toString();
-		if(StringUtils.isNotEmpty(str)){
-			int length=str.length();
-			while(length>0){
-				try {
-					return Double.parseDouble(str);
-				} catch (Exception e) {
-					// TODO: handle exception
-					LOGGER.error(e.getMessage());
-				}
-				str=str.substring(1, str.length());
-				length=str.length();
+
+	private String getNumber(String str) {
+		Pattern p = Pattern.compile("[^,]*[0-9]+");
+		Matcher m = p.matcher(str);
+		if (m.find()) {
+			return str.substring(m.start(), m.end());
+		}
+		return str;
+	}
+
+	private boolean needRemoveTailer(String str) {
+		Pattern p = Pattern.compile("[^,]*[0-9]+[^0-9]+");
+		Matcher m = p.matcher(str);
+		if (str.length() < 40) {
+			if (m.find()) {
+				return true;
 			}
 		}
-		return 0;
+		return false;
 	}
-	
-	private void setCheckType(String str,ElectricSafetyData data){
-		if(str.length()==40){
-			String a=str.substring(3,4);
-			String b=str.substring(4,5);
-			String c=a+b;
-			
-			if(StringUtils.equals(c, "12")){
+
+	private double parseDouble(Object obj) {
+		double result = 0;
+		try {
+			if (obj != null) {
+				String str = obj.toString();
+				result = Double.parseDouble(str);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return result;
+	}
+
+	private double parseDouble(String str) {
+		double result = 0;
+		if (StringUtils.isNotEmpty(str)) {
+			Matcher m = p.matcher(str);
+			if (m.find()) {
+				try {
+					result = Double.parseDouble(m.group(1));
+					if (str.endsWith(STR_MA)) {
+						result = result * 1000;
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		}
+		return result;
+	}
+
+	private void setCheckType(String str, ElectricSafetyData data) {
+		if (str.length() == 40) {
+			String a = str.substring(3, 4);
+			String b = str.substring(4, 5);
+			String c = a + b;
+
+			if (StringUtils.equals(c, "12")) {
 				data.setCheckType("I B");
-			}
-			else if(StringUtils.equals(c, "1A")){
+			} else if (StringUtils.equals(c, "1A")) {
 				data.setCheckType("I BF");
-			}
-			else if(StringUtils.equals(c, "52")){
+			} else if (StringUtils.equals(c, "52")) {
 				data.setCheckType("I CF");
-			}
-			else if(StringUtils.equals(c, "02")){
+			} else if (StringUtils.equals(c, "02")) {
 				data.setCheckType("II B");
-			}
-			else if(StringUtils.equals(c, "0A")){
+			} else if (StringUtils.equals(c, "0A")) {
 				data.setCheckType("II BF");
-			}
-			else if(StringUtils.equals(c, "42")){
+			} else if (StringUtils.equals(c, "42")) {
 				data.setCheckType("II CF");
 			}
-			a=str.substring(5,6);
-			b=str.substring(12,13);
-			c=a+b;
-			if(StringUtils.equals(c, "07")){
+			a = str.substring(5, 6);
+			b = str.substring(12, 13);
+			c = a + b;
+			if (StringUtils.equals(c, "07")) {
 				data.setName("IEC 60601-1");
 				data.setStandardName("GB 9706.1");
-			}
-			else if(StringUtils.equals(c, "27")){
+			} else if (StringUtils.equals(c, "27")) {
 				data.setName("IEC 60601-1");
 				data.setStandardName("GB 9706.1");
-			}
-			else if(StringUtils.equals(c, "16")){
+			} else if (StringUtils.equals(c, "16")) {
 				data.setName("IEC 62353");
 				data.setStandardName("YY/T 0841");
-			}
-			else if(StringUtils.equals(c, "26")){
+			} else if (StringUtils.equals(c, "26")) {
 				data.setName("IEC 62353");
 				data.setStandardName("YY/T 0841");
-			}
-			else if(StringUtils.equals(c, "09")){
+			} else if (StringUtils.equals(c, "09")) {
 				data.setName("EN 61010-1");
 				data.setStandardName("GB 4793.1");
 			}
-			a=str.substring(18,19);
-			b=str.substring(19,20);
-			c=a+b;
-			if(StringUtils.equals(c, "3C")){
+			a = str.substring(18, 19);
+			b = str.substring(19, 20);
+			c = a + b;
+			if (StringUtils.equals(c, "3C")) {
 				data.setType("General");
-			}
-			else if(StringUtils.equals(c, "42")){
+			} else if (StringUtils.equals(c, "42")) {
 				data.setCheckType("Defi");
 			}
-			a=str.substring(29,30);
-			b=str.substring(31,32);
-			c=a+b;
-			if(StringUtils.equals(c, "51")){
+			a = str.substring(29, 30);
+			b = str.substring(31, 32);
+			c = a + b;
+			if (StringUtils.equals(c, "51")) {
 				data.setCheckType("I B");
-			}
-			else if(StringUtils.equals(c, "52")){
+			} else if (StringUtils.equals(c, "52")) {
 				data.setCheckType("I BF");
-			}
-			else if(StringUtils.equals(c, "53")){
+			} else if (StringUtils.equals(c, "53")) {
 				data.setCheckType("I CF");
-			}
-			else if(StringUtils.equals(c, "61")){
+			} else if (StringUtils.equals(c, "61")) {
 				data.setCheckType("II B");
-			}
-			else if(StringUtils.equals(c, "62")){
+			} else if (StringUtils.equals(c, "62")) {
 				data.setCheckType("II BF");
-			}
-			else if(StringUtils.equals(c, "63")){
+			} else if (StringUtils.equals(c, "63")) {
 				data.setCheckType("II CF");
 			}
-			
-			c=str.substring(33,34);
-			if(StringUtils.equals(c, "0")){
+
+			c = str.substring(33, 34);
+			if (StringUtils.equals(c, "0")) {
 				data.setAppGroupCount("0组应用");
-			}
-			else if(StringUtils.equals(c, "1")){
+			} else if (StringUtils.equals(c, "1")) {
 				data.setAppGroupCount("1组应用");
-			}
-			else if(StringUtils.equals(c, "2")){
+			} else if (StringUtils.equals(c, "2")) {
 				data.setAppGroupCount("2组应用");
-			}
-			else if(StringUtils.equals(c, "5")){
+			} else if (StringUtils.equals(c, "5")) {
 				data.setAppGroupCount("5组应用");
-			}
-			else if(StringUtils.equals(c, "10")){
+			} else if (StringUtils.equals(c, "10")) {
 				data.setAppGroupCount("10组应用");
 			}
 		}

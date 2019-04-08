@@ -18,9 +18,12 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
+    public static final String DEFAULT_MOBILE_PAGE_JSON = "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"siteUID\",\"clinicalDeptName\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
+
+    
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass");
     }
     
     //只读字段
@@ -38,6 +41,11 @@ public class CustomConfigConstant {
 
     static public List<String> getConfigRolesName() {
         return Arrays.asList("HospitalHead", "AssetHead", "DeptHead", "AssetStaff", "ClinicalStaff");
+    }
+    
+    //默认可修改角色
+    static public List<String> getConfigEditRolesName() {
+        return Arrays.asList("AssetHead", "AssetStaff");
     }
 
     public static Map<String, String> getExportFields() {
@@ -119,6 +127,7 @@ public class CustomConfigConstant {
             exportFields.put("是否对维保到期提醒", "warranty");
             exportFields.put("所属课题项目", "subjectProject");
             exportFields.put("创建日期", "createdDate");
+            exportFields.put("专有分类", "proprietaryClass");
 
             exportFields.put("UUID", "UUID");
 
@@ -208,6 +217,7 @@ public class CustomConfigConstant {
             allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
             allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
             allFields.put("createdDate", WebUtil.getMessage("createdDate"));
+            allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
         }
         return allFields;
     }

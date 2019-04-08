@@ -2,7 +2,15 @@ package com.ge.apm.service.common;
 
 
 public enum GatewayURL {
+    //Transaction
+    LISt_ALL_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
+    CREATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
+    DELETE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    QUERY_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    UPDATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    GET_DEPTRASACTION_LOG_SUMMARY("/hcapmassetservice/api/apm/asset/deptTransaction/summary"),
 
+    CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
     // Security
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
@@ -42,6 +50,9 @@ public enum GatewayURL {
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    //备件增删
+    ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
+    ACCESSDEL("/hcapmassetservice/api/apm/asset/workOrderDetails/{id}"),
     // Allocation Center URLs
     SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
     ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList?requestId={requestId}"),
@@ -51,6 +62,9 @@ public enum GatewayURL {
     LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
     GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum");
+
+
+
 
     private final String url;
 

@@ -6,12 +6,13 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetFaultTypeService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -26,9 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -53,8 +57,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
-
-    V2_WorkOrderRepository dao;
+    @Setter@Getter
+    private Boolean nochange=false;
+    private UserAccount ua1;
+    private V2_WorkOrderRepository dao;
     private String supplierName;
     private String fileterOrgName;
     private String fileterAssetDeptOrgName;
@@ -138,10 +144,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
-
     public String faultReason;
+    public CustomConfigService customConfigService;
 
     protected void init() {
+        customConfigService=WebUtil.getBean(CustomConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
@@ -184,12 +191,35 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
         loadClinicalDeptList();
     }
 
+
 public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
 }
 
+
+
+    public UserAccount getUa1() {
+        return ua1;
+    }
+
+    public void setUa1(UserAccount ua1) {
+        this.ua1 = ua1;
+    }
+
+    private List<UserAccount> acker;
+    public List<UserAccount> completeAckList(String query) {
+       //return woService.getAckerList(selectedWorkOrder.getId());
+        if (acker == null) {
+            return Collections.emptyList();
+        }
+
+        List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+//        res.sort(new PinYinComparatorByName());
+        return res;
+    }
 public void repairResultSet(){
     if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
     currentStatus =1;
@@ -856,7 +886,19 @@ public void repairResultSet(){
     private Boolean hourRequired;
 
     public void prepareCompleteOrder(String woid) {
+
         selectedWorkOrder = dao.findById(woid);
+        acker=woService.getAckerList(selectedWorkOrder.getId());
+        Integer userId = selectedWorkOrder.getAckId();
+       if( userId!=null){
+          ua1 = userDao.getById(userId);
+       }else{
+           ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
+
+       }
+
+
+
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
            if (result.equalsIgnoreCase("2")) {
@@ -895,6 +937,7 @@ public void repairResultSet(){
     }
 
     public void saveRepairWorkOrder() {
+        assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage("所填工时不能小于0.01");
@@ -996,6 +1039,7 @@ public void repairResultSet(){
         if (!valid) {
             return;
         }
+        assigneeId =ua1.getId().toString();
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1056,14 +1100,21 @@ public void repairResultSet(){
                 currentStatus = 3;
             }
         }
-        selected = null;
+        //从配置信息获取紧急程度
+        CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //从配置信息获取当前状态
+        String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+        currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
+        newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
         faultReason="设备故障";
+        selected = null;
     }
 
     public void saveServiceRequest() {
@@ -1096,14 +1147,11 @@ public void repairResultSet(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-        if (Strings.isNullOrEmpty(asset.getLocationName())) {
+            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             asset.setLocationName(lName);
             locationName = lName;
-        } else {
-            locationName = asset.getLocationName();
-        }
     }
 
     @Override
@@ -1168,13 +1216,16 @@ public void repairResultSet(){
             supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        nochange=false;
     }
+
 
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        supplierName=itemDetail.getSupplier();
+        nochange = true;
     }
 
 
@@ -1231,7 +1282,11 @@ public void repairResultSet(){
            if(itemDetail.getClosedPrice()==null) {
                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
            }
+           itemDetail.setArrivedGood(false);
+           itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
+           //调用微服务来存附件
+            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
         cancelWorkdetail();
     }
@@ -1248,12 +1303,17 @@ public void repairResultSet(){
         coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
-
+    //index == 1 是删除备件  ，index=2是删除协作人
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
-            accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
 
-            // detailDao.delete(itemId);
+           /* itemDetail =accessoryList.get(0);
+            detailDao.delete(itemDetail);*/
+
+            accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+            //调用微服务删除备件
+            serviceRequestApiService.delAccess(token,itemId);
+
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
@@ -1725,6 +1785,14 @@ public void repairResultSet(){
             itemDetail.setSupplier(supplier.getName());
     }
 
+    public Boolean getNochange() {
+        return nochange;
+    }
+
+    public void setNochange(Boolean nochange) {
+        this.nochange = nochange;
+    }
+
     public String getAssigneeId() {
         return assigneeId;
     }
@@ -1747,6 +1815,10 @@ public void repairResultSet(){
 
     public void setFaultReason(String faultReason) {
         this.faultReason = faultReason;
+    }
+
+    public void setAcker(List<UserAccount> acker) {
+        this.acker = acker;
     }
 }
 

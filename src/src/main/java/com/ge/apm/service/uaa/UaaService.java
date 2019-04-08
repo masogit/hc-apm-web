@@ -1,18 +1,11 @@
 package com.ge.apm.service.uaa;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
@@ -43,6 +36,7 @@ import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.Map.Entry;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -203,6 +197,37 @@ public class UaaService {
 
     public List<CustomRole> getTenantCustomRoles(String tenantUID){
        return customRoleRepository.findByTenantUID(tenantUID);
+    }
+
+    public List<UserRole> getSystemRoles(Integer userId){
+        UserRoleRepository userAccountRepository = WebUtil.getBean(UserRoleRepository.class);
+        return userAccountRepository.findByUserIdAndRoleType(userId,0);
+    }
+
+    public List<String> getAuthorities(Integer userId){
+        SysRoleRepository sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
+        List<SysRole> sysRoles = sysRoleRepository.getSysRoles(userId);
+        List<String> authorities = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(sysRoles)){
+            for (SysRole role : sysRoles) {
+                if(StringUtils.isNotEmpty(role.getAuthorities())){
+                    authorities.addAll(Arrays.asList(role.getAuthorities().split(",")));
+                }
+            }
+        }
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole :customRoles) {
+                if(StringUtils.isNotEmpty(customRole.getAuthorities())){
+                    authorities.addAll(Arrays.asList(customRole.getAuthorities().split(",")));
+                }
+            }
+        }
+        return authorities;
+    }
+
+    public Boolean hasAuthority(Integer userId,String authority){
+        return getAuthorities(userId).contains(authority);
     }
 
     @Transactional
@@ -397,12 +422,28 @@ public class UaaService {
         return root;
     }
 
+    private boolean filterNodeByOrgTypeOrgLevel(Entry<String, TreeNode> node, int maxOrgType, int maxOrgLevel){
+        if(maxOrgType<0 && maxOrgLevel<0) return true; // means ignore OrgType & OrgLevel Filter
+        
+        boolean filterOut = false;
+        OrgInfo org = (OrgInfo)node.getValue().getData();
+        if(maxOrgType>=0) filterOut = org.getOrgType()>maxOrgType;
+        if(maxOrgLevel>=0) filterOut = filterOut || org.getOrgLevel()>maxOrgLevel;
+
+        return !filterOut;
+    }
+
     public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords){
+        return getFilterOrgTreeByYuanQu(siteUID,keywords, -1, -1);
+    }
+    
+    public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords, int maxOrgType, int maxOrgLevel){
         treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
         //xTreeMap
-        Iterator<Map.Entry<String, TreeNode>> iterator = xtreeMap.entrySet().iterator();
-        for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
+        
+        Map<String, TreeNode> tempTreeMap = xtreeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
+        for(Map.Entry<String, TreeNode> nodeItem: tempTreeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
             OrgInfo org = (OrgInfo)node.getData();
             //租户必须作为根节点先加入
@@ -414,6 +455,9 @@ public class UaaService {
             }
             buildTreeByKeyYuanqu(node,keywords);
         }
+        
+        treeNodeMap = treeNodeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
+        
         //构建过虑好的树
         for(Map.Entry<String, TreeNode> nodeItem: treeNodeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
@@ -1152,42 +1196,117 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         return regulatorUids;
 
     }
-
-    public Set<String> findAccessClinicalUidListByUserUid(String userUid) {
-		Set<String> listResult = new HashSet<String>();
+    
+    //where or
+    public Map<Integer,List<String>> findAccessUidByUserUid(String userUid) {
 		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
 		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
 			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
-				listResult.add(listUserOrgInfo.get(i).getOrgUid());
-			}
-		}
-		if (listResult != null && listResult.size()>0) {
-			Set<String> tempResult=orgInfoDao.findClinicalDeptOrgUidListByOrgUid(listResult);
-			if(tempResult!=null){
-				listResult.addAll(tempResult);
-			}
-		}
-		return listResult;
-	}
-    
-    public Map<Integer,Set<String>> findAccessOrgUidListByUserUid(String userUid) {
-		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
-		Map<Integer,Set<String>> mapResult=new HashMap<Integer,Set<String>>();
-		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
-			for(int j=0;j<5;++j){
-				Set<String> setResult=new HashSet<String>();
-				mapResult.put(j, setResult);
-				for (int i = 0; i>-1 && i < listUserOrgInfo.size(); ++i) {
-					UserOrgInfo tempOrg=listUserOrgInfo.get(i);
-					Integer type=tempOrg.getOrgType();
-					if(type.equals(j)){
-						setResult.add(tempOrg.getOrgUid());
-						listUserOrgInfo.remove(i);
-						--i;
-					}
+				UserOrgInfo temp=listUserOrgInfo.get(i);
+				Integer type=temp.getOrgType();
+				if(map.containsKey(type)){
+					map.get(type).add(temp.getOrgUid());
+				}
+				else{
+					List<String> tempSet=new ArrayList<String>();
+					tempSet.add(temp.getOrgUid());
+					map.put(type, tempSet);
 				}
 			}
 		}
-		return mapResult;
+		return map;
 	}
+    
+    //where or
+    public Map<Integer,List<String>> findAccessUidByUserUid(String userUid,String siteUid) {
+		List<UserOrgInfo> listUserOrgInfo = userOrgDao.findOrgUidListByUserUid(userUid);
+		Map<Integer,List<String>> map=new HashMap<Integer,List<String>>();
+		List<String> orgUids=new ArrayList<String>();
+		List<OrgInfo> listOrgInfo=null;
+		if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+			for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+				UserOrgInfo temp=listUserOrgInfo.get(i);
+				if(!orgUids.contains(temp.getOrgUid())){
+					orgUids.add(temp.getOrgUid());
+				}
+			}
+		}
+		if(orgUids.size()>0){
+			listOrgInfo=orgInfoDao.findByUidAndSiteUid(orgUids,siteUid);
+		}
+		if (listOrgInfo != null && listOrgInfo.size() > 0) {
+			for (int i = 0; i < listOrgInfo.size(); ++i) {
+				OrgInfo temp=listOrgInfo.get(i);
+				Integer type=temp.getOrgType();
+				if(map.containsKey(type)){
+					map.get(type).add(temp.getUid());
+				}
+				else{
+					List<String> tempSet=new ArrayList<String>();
+					tempSet.add(temp.getUid());
+					map.put(type, tempSet);
+				}
+			}
+		}
+		return map;
+	}
+    
+  //where and
+    public List<String> findAccessClinicalUidByUserUid(String userUid){
+    	Map<Integer,List<String>> map=findAccessUidByUserUid(userUid);
+    	if(map.size()>0){
+			List<String> tempSet=null;
+			List<String> clinicalSet=null;
+			tempSet=map.get(4);
+			boolean hasClinical=false;
+			if(tempSet!=null){
+				hasClinical=true;
+				clinicalSet=tempSet;
+			}
+			if(!hasClinical){
+				clinicalSet=new ArrayList<String>();
+				map.put(4, clinicalSet);
+			}
+			tempSet=map.get(3);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidBySiteUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(2);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByHospitalUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(1);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByInstitutionUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+			tempSet=map.get(0);
+			if(tempSet!=null){
+				List<String> re=orgInfoDao.findClinicalUidByTenantUid(tempSet);
+				if(re!=null){
+					clinicalSet.addAll(re);
+				}
+			}
+		}
+		return map.get(4);
+    }
+    
+  //where and
+    public List<OrgInfo> findAccessClinicalUidByUserUid(String userUid,String siteUid){
+    	List<String> setAccessClinical=findAccessClinicalUidByUserUid(userUid);
+    	List<OrgInfo> re=null;
+    	if(setAccessClinical!=null && setAccessClinical.size()>0){
+    		re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);
+    	}
+    	return re;
+    }
 }

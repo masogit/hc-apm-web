@@ -51,6 +51,7 @@
 
         <!-- 系统管理 -->
         <intercept-url pattern="/portal/uaa/biomedGroup/List.xhtml**" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/><!-- 维修管理员群组管理 -->
+        <intercept-url pattern="/portal/uaa/customRole/List.xhtml" access="hasAnyRole('SuperAdmin,SiteAdmin,ITAdmin,LocalITAdmin')"/><!-- 自定义角色 -->
         <intercept-url pattern="/portal/uaa/**" access="hasAnyRole('ITAdmin','SiteAdmin','LocalITAdmin')"/>
         <intercept-url pattern="/portal/insp/checkListList**" access="hasAnyRole('SuperAdmin','ITAdmin','AssetHead','AssetStaff','LocalITAdmin')"/> <!-- 巡检条目配置 -->
         <intercept-url pattern="/portal/i18n/FieldCodeType.xhtml**" access="hasAnyRole('SuperAdmin','ITAdmin','AssetHead','LocalITAdmin')"/> <!-- 系统编码配置 -->
@@ -63,7 +64,7 @@
         <intercept-url pattern="/portal/asset/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff', 'ClinicalStaff','ITAdmin','LocalITAdmin','MVSAdmin','MVSFE','NursingStaff')"/>
 
         <!-- 维修管理 -->
-        <intercept-url pattern="/portal/wo/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff')"/> <!-- 维修管理 -->
+        <intercept-url pattern="/portal/wo/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff','DeptHead')"/> <!-- 维修管理 -->
         <intercept-url pattern="/portal/sr/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff')"/> <!-- 维修管理 -->
 
         <!-- 设备监控 -->

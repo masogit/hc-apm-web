@@ -3,6 +3,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -295,9 +297,15 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		selected.setCreateBy(currentUser);
 		selected.setCreateByUid(currentUser.getUid());
 		selected.setCreateDate(new Date());
+		String tempUid=UUID.randomUUID().toString().replace("-", "");
+		this.selected.setId(tempUid);
 	}
 	public void prepareEdit() {
 		// TODO Auto-generated method stub
+		if(!this.selected.isBlnHasId()){
+			String tempUid=UUID.randomUUID().toString().replace("-", "");
+			this.selected.setId(tempUid);
+		}
 		parseBlobObject();
 		parseObject();
 	}

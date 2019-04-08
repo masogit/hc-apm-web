@@ -79,7 +79,8 @@
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
                         <p:column headerText="#{msg.roleId}">
-                            <h:outputText value="#{item.userRoleNames}"/>
+                            <h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
+                            <!--<h:outputText value="#{item.userRoleNames}"/>-->
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="loginAsButton" icon="ui-icon-transfer-within-a-station" title="#{msg.LoginAs}" actionListener="#{userAccountController.loginAs}" ajax="false" rendered="#{userContextService.isSuperAdmin}" disabled="#{empty userAccountController.selected}"/>

@@ -5,12 +5,16 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
@@ -33,6 +37,10 @@ public class AssetInfoMgrService {
     @Autowired
     private AssetInfoRepository assetDao;
     @Autowired
+    private AssetLifecycleEventRepository eventDao;
+    @Autowired
+    private TenantInfoRepository tenantDao;
+    @Autowired
     private ServiceRequestRepository srDao;
     @Autowired
     private V2_PmOrderRepository pmDao;
@@ -42,6 +50,8 @@ public class AssetInfoMgrService {
     private SupplierRepository supplierDao;
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private NurseSiteMaintainService nurseSiteMaintainService;
 
     public void deleteAsset(AssetInfo asset) {
         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
@@ -71,6 +81,11 @@ public class AssetInfoMgrService {
         asset.setDepartNum(null);
         asset.setQrCode(null);
         assetDao.save(asset);
+        updateNurseSiteMaintain(asset.getUid());
+    }
+    
+    public void updateNurseSiteMaintain(String assetUid){
+    	nurseSiteMaintainService.deleteAssetUid(assetUid);
     }
 
     public boolean isInDispenceCenter(AssetInfo assetInfo) {
@@ -183,6 +198,29 @@ public class AssetInfoMgrService {
 
     public AssetInfo getAssetInfoByUid(String assetUid) {
         return assetDao.findByUid(assetUid);
+    }
+
+    public String getMaintanceType(AssetInfo selected) {
+        
+        TenantInfo tenant = tenantDao.findByuid(selected.getTenantUID());
+        if(tenant.getId() == 46){
+            return "external";
+        }
+        JSONObject tenantConfig = JSONObject.parseObject(tenant.getTenantConfig());
+        
+        //超声科室
+        if(Objects.equals(tenantConfig.getString("edition"), "ultrasound")){
+            return "external";
+        }
+        //代理商租户
+        if(Objects.equals(1, tenant.getType())){
+            return "both";
+        }
+        return "internal";
+    }
+
+    public List<AssetLifecycleEvent> getAssetEventsList(AssetInfo selected) {
+        return eventDao.findByAssetUid(selected.getUid());
     }
 
 }

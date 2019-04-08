@@ -142,6 +142,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     copyFiledsValueById(copyFrom);
                 }
                 contractList = contractService.getContractListByUser(currentUser);
+                //移除标记为已完成的设备合同
+                List<ContractInfo> completeEquipmentContracts = contractList.stream()
+                        .filter(item -> (ContractInfo.ContractType.Equipment.toString().equals(item.getContractType()) &&
+                                        ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())))
+                        .collect(Collectors.toList());
+                contractList.removeAll(completeEquipmentContracts);
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
