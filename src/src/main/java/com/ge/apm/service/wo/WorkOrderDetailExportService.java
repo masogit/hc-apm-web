@@ -82,11 +82,11 @@ public class WorkOrderDetailExportService {
         }
         if(filterMap.containsKey("filterMinPrice")){
             Double minPrice = (Double)filterMap.get("filterMinPrice");
-            searchFilters.add(new SearchFilter("closedPrice", SearchFilter.Operator.GTE, minPrice));
+            searchFilters.add(new SearchFilter("totalPrice", SearchFilter.Operator.GTE, minPrice));
         }
         if(filterMap.containsKey("filterMaxPrice")){
             Double maxPrice = (Double)filterMap.get("filterMaxPrice");
-            searchFilters.add(new SearchFilter("closedPrice", SearchFilter.Operator.LTE, maxPrice));
+            searchFilters.add(new SearchFilter("totalPrice", SearchFilter.Operator.LTE, maxPrice));
         }
         if(filterMap.containsKey("filterStatementStatus")){
             String statementStatus = (String) filterMap.get("filterStatementStatus");
