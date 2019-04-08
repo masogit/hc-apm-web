@@ -90,7 +90,6 @@
                     </p:dataGrid>
                     <p:fileUpload id="type2" fileUploadListener="#{workOrderMgrController.handleFileUploadPDF}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
@@ -115,10 +114,9 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="accessList" value="#{workOrderMgrController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.accessory}">
+                                    <p:column headerText="备件名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
-
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
@@ -127,7 +125,13 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <p:column headerText="合同价格(元)">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+
+                                    </p:column>
+                                    <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
                                     <p:column headerText="序列号">
@@ -157,7 +161,7 @@
                                         <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
 
-                                    <p:column headerText="#{msg.Actions}">
+                                    <p:column headerText="#{msg.Actions}"><!--操作-->
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item.id)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList)" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">
@@ -188,13 +192,24 @@
                             </h:panelGroup>
                         </p:panelGrid>
 
-                        <h:panelGroup>
+                      <!--  <h:panelGroup>
                             <label class="label">验收人*</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.assigneeId}" required="true" requiredMessage="验收人 #{msg.ValidationRequire}">
-                                <f:selectItems value="#{workOrderMgrController.getAcker()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{workOrderMgrController.acker}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
+                        <h:panelGroup>
+                            <label class="label">验收人*</label>
+                            <p:autoComplete id="ackerName" converter="userAccountConverter" value="#{workOrderMgrController.ua1}" dropdown="true" forceSelection="true" requiredMessage="验收人#{msg.ValidationRequire}"  var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{workOrderMgrController.completeAckList}">
+                               <!-- <p:ajax event="itemSelect" listener="#{workOrderMgrController.test}" process="@this" />
+                                <p:ajax listener="#{workOrderMgrController.test}" process="@this" />-->
+                                <p:column>
+                                    <h:outputText value="#{t.name}"/>
+                                </p:column>
+
+                            </p:autoComplete>
+                        </h:panelGroup>
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>

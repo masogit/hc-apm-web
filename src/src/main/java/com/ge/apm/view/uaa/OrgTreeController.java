@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,14 @@ public class OrgTreeController {
     private TreeNode selectedDeptOrgNode;
     private TreeNode deptOrgTree;
 
+    private String siteUID;
+
+    // TreeNodeName Filter
+    private String treeNodeNameFilter;
+
     @PostConstruct
     protected void init() {
-
+        siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
     }
 
     public OrgInfo getOrgInfoByUID(String uid){
@@ -104,6 +110,22 @@ public class OrgTreeController {
         return rootNode;
     }
 
+    public void filterTreeNodeByName() {
+        if (!StringUtils.isEmpty(treeNodeNameFilter)) {
+            //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+            if (UserContextService.isOnlyLocalITAdmin()) {
+                siteOrgTree = uaaService.getFilterOrgTreeByYuanQu(siteUID, treeNodeNameFilter, 3, 3);
+            } else {
+                siteOrgTree = uaaService.getFilterOrgTreeByYuanQu(siteUID, treeNodeNameFilter, 3, 3);
+            }
+
+            TreeNodeUtil.expandTreeNode(siteOrgTree);
+        } else {//列出所有机构
+            siteOrgTree = createSiteOrgTree();
+        }
+
+    }
+    
     public TreeNode getSiteOrgTree() {
         if (null == siteOrgTree) {
             siteOrgTree = createSiteOrgTree();
@@ -156,6 +178,14 @@ public class OrgTreeController {
 
     public void setSelectedTenantOrgNode(TreeNode selectedTenantOrgNode) {
         this.selectedTenantOrgNode = selectedTenantOrgNode;
+    }
+    
+    public String getTreeNodeNameFilter() {
+        return treeNodeNameFilter;
+    }
+
+    public void setTreeNodeNameFilter(String treeNodeNameFilter) {
+        this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
 }

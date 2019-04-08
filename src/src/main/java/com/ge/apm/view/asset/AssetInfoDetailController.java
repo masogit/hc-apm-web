@@ -19,6 +19,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -61,7 +62,9 @@ public class AssetInfoDetailController {
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
     
+    private String maintanceType = "internal";
     
+    private List<AssetLifecycleEvent> assetEvents;
 
     @PostConstruct
     protected void init() {
@@ -90,6 +93,9 @@ public class AssetInfoDetailController {
                 selected.setVendorTel(supplier.getTel());
             }
         }
+        
+        maintanceType = aimService.getMaintanceType(selected);
+        assetEvents  = aimService.getAssetEventsList(selected);
 
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
@@ -123,6 +129,17 @@ public class AssetInfoDetailController {
         }
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
+    }
+    
+    public List<AssetLifecycleEvent> getOrderList(Integer type){
+        List<AssetLifecycleEvent> res =  assetEvents.stream().filter(item->item.getEventType() == type).sorted(new Comparator<AssetLifecycleEvent>(){
+            @Override
+            public int compare(AssetLifecycleEvent o1, AssetLifecycleEvent o2) {
+                return o1.getCreateTime().compareTo(o2.getCreateTime());
+            }
+        }).collect(Collectors.toList());
+        
+        return res.size()>3? res.subList(0, 2):res;
     }
 
     public String getContractListLink() {
@@ -238,4 +255,9 @@ public class AssetInfoDetailController {
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
+
+    public String getMaintanceType() {
+        return maintanceType;
+    }
+    
 }

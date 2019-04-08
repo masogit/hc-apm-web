@@ -27,7 +27,7 @@
 				        <p:column headerText="配置名称" filterBy="#{item.name}" filterMatchMode="LIKE">
 				            <h:outputText value="#{item.name}" />
 				        </p:column>
-				        <p:column headerText="创建人" filterBy="#{item.createBy}" filterMatchMode="EQ">
+				        <p:column headerText="创建人">
 				            <h:outputText value="#{item.createBy.name}" />
 				        </p:column>
 				        <p:column headerText="创建日期">
@@ -35,7 +35,7 @@
 				                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 				            </h:outputText>
 				        </p:column>
-				        <p:column headerText="修改人" filterBy="#{item.modifyBy}" filterMatchMode="LIKE">
+				        <p:column headerText="修改人">
 				            <h:outputText value="#{item.modifyBy.name}" />
 				        </p:column>
 				        <p:column headerText="修改日期">

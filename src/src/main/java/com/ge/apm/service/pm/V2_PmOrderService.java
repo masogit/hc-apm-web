@@ -4,12 +4,15 @@
  * and open the template in the editor.
  */
 package com.ge.apm.service.pm;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import org.apache.commons.lang3.StringUtils;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,44 +21,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BiomedGroupRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.ElectricSafetyDataRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
-import com.ge.apm.dao.ServiceRequestMsgRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.WorkOrderCoworkerRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.dao.WorkOrderStepRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ElectricSafetyData;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UnstructuredDataCollection;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.pure.TableSchema;
-import com.ge.apm.service.common.UserCommonService;
-/*import com.ge.apm.service.wo.PmOrderActionForm;
-import com.ge.apm.service.wo.WorkOrderForm;*/
-import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.PmOrderActionForm;
-
 import webapp.framework.web.WebUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 /**
  *
  * @author 212579464
@@ -109,6 +78,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private UnstructuredDataCollectionRepository reportDao;
     @Autowired
     private ElectricSafetyDataRepository electricSafetyDataRepository;
+    @Autowired
+    private UnstructuredDataRepository unstructuredDataDao;
+    @Autowired
+    private PmOrderRuleCheckListRepository pmckLstDao;
 
     public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
@@ -180,7 +153,34 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void saveReport(UnstructuredDataCollection report){
     	reportDao.save(report);
     }
-    
+
+
+    public void invokePmOerCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        //如果是工单是周期性的
+        /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
+        if(selectedPmOrder.getPmType()==1){ //周期性
+             if(cancelInt.equalsIgnoreCase("1")){
+                 formData.setQualityChecking("1");
+             }else{
+                 formData.setQualityChecking("2");
+             }
+        }else{//一次性或重测
+            formData.setQualityChecking("2");
+        }
+
+        formData.setDesc(desc);
+
+        String res = srApi.invokePmOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("取消提交成功");
+        }
+
+    }
+
     public void saveReport(List<UnstructuredDataCollection> listReport){
     	reportDao.save(listReport);
     }
@@ -380,11 +380,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("批量转单成功");
         }
     }
+
     public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
-        // String token = UserContextService.getAccessToken();
-        //PmOrderActionForm formData = new PmOrderActionForm();
-        List<PmOrderSteps> pmOrderStepsList = ucService.getPmOrderStepsList(pmOrderId);
-        return pmOrderStepsList;
+        List<PmOrderSteps> pmOrderSteps = ucService.getPmOrderStepsList(pmOrderId);
+        return pmOrderSteps == null ? new ArrayList<>() : pmOrderSteps;
     }
 
     public void approvePMorder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){
@@ -539,13 +538,16 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
+            V2_PmOrder v2 = woDao.findById(item.getKey());
+
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setActionType("accept");
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
-            if(type==1)
+            formData.setStepId(v2.getCurrentStepId());
+       /*     if(type==1)
                 formData.setStepId("Accept");//抢单Assign和接单都是Accept
             if(type==2)
-                formData.setStepId("Assign");//抢单Assign和接单都是Accept
+                formData.setStepId("Assign");//抢单Assign和接单都是Accept*/
             formData.setPmOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原
@@ -569,12 +571,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
     public List<UserAccount> getWorkerList(Integer assetId) {
-        List<UserAccount> workerList = ucService.getWorkerList(assetId,"");
-        return workerList;
+        return ucService.getWorkerList(assetId,"");
     }
     public List<UserAccount> getApproveList(String assetUid) {
-        List<UserAccount> workerList = ucService.getApproveList(assetUid);
-        return workerList;
+        return ucService.getApproveList(assetUid);
     }
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);
@@ -591,6 +591,53 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     
     public V2_PmOrder findById(String id){
     	return woDao.findById(id);
+    }
+
+    private List<PmOrderRuleCheckList> getPmRuleCLClosed(V2_PmOrder v2PmOrder, String ruleUid){
+        /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
+        * key就是检查项uid*/
+        List<PmOrderRuleCheckList> pmcl =new ArrayList<PmOrderRuleCheckList>();
+        UnstructuredDataCollection unsD = reportDao.findCKByUId(v2PmOrder.getId());
+        if(unsD==null){
+            return pmcl;
+        }
+        List<UnstructuredData> byCollectionId = unstructuredDataDao.findByCollectionId(unsD.getId());
+        List<String> strList= new ArrayList<>();
+        byCollectionId.forEach(item->strList.add(item.getKey()));
+        if(strList.isEmpty()){
+            strList.add("");
+        }
+        pmcl = pmckLstDao.findPMCL(strList,ruleUid);
+        return pmcl;
+    }
+
+    public List<PmOrderRuleCheckList> getPmOrderRuleCheckLists(V2_PmOrder v2PmOrder, PmOrderRule pmOrderRule) {
+        if (v2PmOrder.isFinished()) {
+            return getPmRuleCLClosed(v2PmOrder, pmOrderRule.getUid());
+        } else {
+            return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+        }
+    }
+
+    public Map<String, UnstructuredData> fetchHmCheck(List<PmOrderRuleCheckList> pmCheckItemList, V2_PmOrder v2PmOrder) {
+        Map<String, UnstructuredData> hmCheck = new HashMap<>();
+        if (pmCheckItemList != null && !pmCheckItemList.isEmpty()) {
+            List<UnstructuredDataCollection> unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");
+            if (unDataCollection != null && !unDataCollection.isEmpty()) {
+                UnstructuredDataCollection unCollection = unDataCollection.get(0);
+                if (unCollection != null) {
+                    List<UnstructuredData> dataList = unCollection.getData();
+                    for (PmOrderRuleCheckList aPmCheckItemList : pmCheckItemList) {
+                        for (UnstructuredData unsData : dataList) {
+                            if (StringUtils.equalsIgnoreCase(unsData.getKey(), aPmCheckItemList.getUid())) {
+                                hmCheck.put(aPmCheckItemList.getUid(), unsData);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return hmCheck;
     }
 }
 

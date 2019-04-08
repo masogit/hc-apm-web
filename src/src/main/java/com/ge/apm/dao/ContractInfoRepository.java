@@ -10,6 +10,8 @@ import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.V2_WorkOrder;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
@@ -37,5 +39,9 @@ public interface ContractInfoRepository extends GenericRepositoryUUID<ContractIn
     
     @Query("select o from ContractInfo o where o.contractNum in ?1 and o.tenantUID = ?2 and o.contractType = 'Parts'")
     public List<ContractInfo> findByContractNumIn(Collection<String> numList,String tenantUID);
+
+    @Modifying
+    @Query("update ContractInfo o set o.contractStatus = ?2 where o.id = ?1")
+    public int updateContractStatus(String id, String status);
     
 }

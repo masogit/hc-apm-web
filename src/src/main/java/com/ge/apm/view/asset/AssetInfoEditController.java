@@ -1,11 +1,59 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.GbCodeRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.MvsAssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.GbCode;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.MvsAssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeLib;
+import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.*;
+import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetDepreciationService;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MvsUtil;
@@ -15,23 +63,10 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import org.springframework.transaction.annotation.Transactional;
+
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import webapp.framework.util.TimeUtil;
 
 @ManagedBean
 @ViewScoped
@@ -59,7 +94,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
     private MvsUtil mvsUtil;
-
+    private NurseSiteMaintainService nurseSiteMaintainService;
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
@@ -88,6 +123,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
 
+    @Getter
+    @Setter
+    private Supplier newSupplier;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -101,6 +140,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        nurseSiteMaintainService=WebUtil.getBean(NurseSiteMaintainService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -457,7 +497,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             selected.setNationalStandardCode(selectedGb.getCode());
         }
+
+        //when mvs user create a new record, mark this asset as mvs asset
+        if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
+            this.selected.setMvsEquip(1);
+        }
+
         this.save();
+        if(this.selected.getStatus()==4){
+        	aimService.updateNurseSiteMaintain(this.selected.getUid());
+        }
         assetDepreciationService.saveAssetDerpeciation(selected);
 
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
@@ -600,10 +649,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } else {
                 this.selected.setIsValid(false);
                 this.selected.setTerminateDate(new Date());
+                updateNurseSiteMaintain(this.selected.getUid());
             }
         }
         update();
         return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+    }
+    
+    public void updateNurseSiteMaintain(String assetUid){
+    	nurseSiteMaintainService.deleteAssetUid(assetUid);
     }
 
     public Boolean needAssetApproval(String siteUid) {
@@ -636,11 +690,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                             break;
                         default:
                     }
-                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
-                        qrCode = num.substring(0, 16);
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 64) {
+                        qrCode = num.substring(0, 64);
                         selected.setFinancingNum(qrCode);
                         selected.setDepartNum(qrCode);
-                        WebUtil.addErrorMessage("二维码超长,最大16位");
+                        WebUtil.addErrorMessage("二维码超长,最大64位");
                     } else {
                         qrCode = num;
                         selected.setFinancingNum(num);
@@ -966,4 +1020,35 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
+
+    public void prepareCreateSupplier() {
+        newSupplier = new Supplier();
+    }
+
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        if(newSupplier.getMaintainerT()) {
+            supplierController.setMaintainerT(true);
+        } else {
+            supplierController.setMaintainerT(false);
+        }
+        if(newSupplier.getManufacturerT()) {
+            supplierController.setManufacturerT(true);
+        } else {
+            supplierController.setManufacturerT(false);
+        }
+        if(newSupplier.getSupplierT()) {
+            supplierController.setSupplierT(true);
+        } else {
+            supplierController.setSupplierT(false);
+        }
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if(StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
+        }
+    }
+
 }

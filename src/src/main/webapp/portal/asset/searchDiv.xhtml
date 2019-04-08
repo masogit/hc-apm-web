@@ -11,12 +11,13 @@
 				<p:inputText id="idCSSelectedOrgName" value="#{searchController.selectedOrg.name}" readonly="true" required="true"
 					requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" />
 				<p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
-				<p:overlayPanel id="idCSPanelOrg" widgetVar="varCSPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;"
-					modal="false">
+				<p:overlayPanel id="idCSPanelOrg" widgetVar="varCSPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"
+					style="width:300px;" modal="false">
 					<p:scrollPanel style="height:300px;border: 0" mode="native">
 						<p:tree id="idCSTreeUser" class="tree" style="width:98%;border:0;" value="#{searchController.orgTree}" selection="#{searchController.selectedNode}"
 							var="node" selectionMode="single">
-							<p:ajax process="@this" event="select" update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo"
+							<p:ajax process="@this" event="select"
+								update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo,#{searchController.blnOrgTreeUpdate?searchController.updateViewIDs:''}"
 								listener="#{searchController.onSelectOrgFromTree}" oncomplete="PF('varCSPanelOrg').hide();" />
 							<p:ajax process="@this" event="expand" />
 							<p:ajax process="@this" event="collapse" />
@@ -27,12 +28,12 @@
 					</p:scrollPanel>
 				</p:overlayPanel>
 			</h:panelGroup>
-			<h:panelGroup>
+			<h:panelGroup rendered="#{searchController.blnDepartOrg}">
 				<label class="label">所属科室</label>
-				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoConverter">
-					<p:autoUpdate></p:autoUpdate>
-					<p:ajax listener="#{searchController.onOrgDeptChange()}" update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.updateViewIDs}" />
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoColumnFilterConverter"
+					style="width:100%;">
+					<p:ajax listener="#{searchController.onOrgDeptChange()}"
+						update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
 					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 				</p:selectOneMenu>
 			</h:panelGroup>
@@ -79,7 +80,7 @@
 					requiredMessage="已选设备 #{msg.ValidationRequire}" style="width:850px">
 					<f:facet name="sourceCaption">待选设备</f:facet>
 					<f:facet name="targetCaption">已选设备</f:facet>
-					<p:ajax event="transfer" listener="#{searchController.onAssetsTransfer}"/>
+					<p:ajax event="transfer" listener="#{searchController.onAssetsTransfer}" update="#{searchController.blnAssetUpdate?searchController.updateViewIDs:''}" />
 					<p:column style="float: left;width:25%;text-align:left;">
 						<h:outputText value="#{item.name}" />
 					</p:column>

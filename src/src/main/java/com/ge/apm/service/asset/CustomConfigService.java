@@ -5,7 +5,9 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.CustomConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SysRoleRepository;
@@ -68,9 +70,9 @@ public class CustomConfigService {
             return getDefalutCustomConfigObject();
         }
         CustomConfig config = configList.stream().filter(item -> org.getSiteUID().equals(item.getSiteUID())).findAny()
-                .orElse(configList.stream().filter(item -> org.getHospitalUID().equals(item.getHospitalUID())).findAny()
-                        .orElse(configList.stream().filter(item -> org.getInstitutionUID().equals(item.getInstitutionUID())).findAny()
-                                .orElse(configList.stream().filter(item -> org.getTenantUID().equals(item.getTenantUID())).findAny().orElse(null))));
+                .orElse(configList.stream().filter(item -> org.getHospitalUID().equals(item.getSiteUID())).findAny()
+                        .orElse(configList.stream().filter(item -> org.getInstitutionUID().equals(item.getSiteUID())).findAny()
+                                .orElse(configList.stream().filter(item -> org.getTenantUID().equals(item.getSiteUID())).findAny().orElse(null))));
         return config == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
 
     }
@@ -204,6 +206,10 @@ public class CustomConfigService {
         }
         if (customConfigObject.getAssetsMobilepageHeaderFields().contains(key)) {
             customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
+        }
+        if (JSONPath.containsValue(customConfigObject.getMobilePage(), "$.pageWorkOrder.group[type='assetInfo'].assetInfoFields",key)) {
+            JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).fluentRemove(key));
         }
     }
 

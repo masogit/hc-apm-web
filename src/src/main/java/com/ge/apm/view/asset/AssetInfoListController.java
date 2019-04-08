@@ -1,19 +1,25 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.*;
-import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -25,26 +31,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeTemplate;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetFileDynamicTemplate;
+import com.ge.apm.service.asset.AssetFileExportService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.QrCodeExportStream;
+import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 @ManagedBean
 @ViewScoped
 public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
+
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoListController.class);
 
     private static final long serialVersionUID = -1L;
@@ -79,7 +102,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private boolean terminate = false;
 
     private Date varWarrantyDateTo = null;
+
     private String warrantyFormatTime = null;
+    private String manufactDateFormatTime = null;
+    private String installDateFormatTime = null;
+    private String arriveDateFormatTime = null;
+    private String factoryWarrantyDateFormatTime = null;
+
     private Boolean needShowAssetApproval;
 
     private StreamedContent excelFile;
@@ -109,7 +138,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterAssetStatus = null;
     private String filterWarrantyDate = null;
     private Integer assetId;
-    
+
+    private Integer warrantyAlertDays = null;
+
     private Map<String, Object> selectedObject;
 
     @Override
@@ -129,7 +160,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
@@ -141,6 +171,34 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         loadCustomConfig();
         loadClinicalDeptList();
 
+        warrantyAlertDays = getWarrantyAlertDaysConfig();
+    }
+    
+    private Integer getWarrantyAlertDaysConfig(){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> wfConfigList = wfDao.findByTenantUID(user.getTenantUID());
+        
+        Integer alertSite=null, alertHospital=null, alertInstitution=null, alsertTenant=null;
+        for(int i=0; i<wfConfigList.size(); i++){
+            WorkflowConfig item = wfConfigList.get(i);
+            
+            if(user.getSiteUID().equals(item.getSiteUID()))
+                alertSite = item.getWarrantyRemindDays();
+            else if(user.getHospitalUID().equals(item.getHospitalUID()))
+                alertHospital = item.getWarrantyRemindDays();
+            else if(user.getInstitutionUID().equals(item.getInstitutionUID()))
+                alertInstitution = item.getWarrantyRemindDays();
+            else if(user.getTenantUID().equals(item.getTenantUID()))
+                alsertTenant = item.getWarrantyRemindDays();
+        }
+        
+        if(alertSite!=null) return alertSite;
+        if(alertHospital!=null) return alertHospital;
+        if(alertInstitution!=null) return alertInstitution;
+        if(alsertTenant!=null) return alsertTenant;
+
+        return null;
     }
 
     private void loadCustomConfig() {
@@ -162,7 +220,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
+        setWarrantyAlerts(currentPageAssets);
+
         return res;
+    }
+
+    private void setWarrantyAlerts(List<AssetInfo> assets){
+        assets.stream().forEach(item -> {
+            item.setWarrantyExpireAlertDays(warrantyAlertDays);
+        });
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -170,7 +236,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
 
-        if (orgUids.isEmpty()) return;
+        if (orgUids.isEmpty()) {
+            return;
+        }
 
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
@@ -292,6 +360,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onSelectSiteTreeNode2(NodeSelectEvent event) {
+        // Compared with the above method "onSelectSiteTreeNode", 
+        // this method does not clear existing filters
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+        if(selectSite==null) this.removeFilterOnField("siteUID");
+
+        loadClinicalDeptList();
+    }
+    
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
@@ -366,7 +453,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
 //        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
 //                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
@@ -393,9 +479,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
-
             assetInfo.setStatus(4);
             dao.save(assetInfo);
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
@@ -409,7 +495,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
-        }else {
+        } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
 
@@ -438,7 +524,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()), exportQrCodeTemplateId);
+//        if(exportList.size()>5000){
+//            WebUtil.addErrorMessage("超出下载数量限制5000");
+//            return;
+//        }
+        Map<String, String> orgNamesMap = orgDao.findByUids(exportList.stream().map(AssetInfo::getSiteUID).distinct().collect(Collectors.toSet()))
+                .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
+        QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
+        zipFile = new DefaultStreamedContent(exportStream, "application/x-zip-compressed", "qrCodes.zip");
     }
 
     @Override
@@ -475,9 +568,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetInfo.setIsValid(false);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
+            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
         }
         this.selectedMap.clear();
     }
+    
 
     public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);
@@ -520,7 +615,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-                .filter(distinctByOrgName(OrgInfo::getName))  //display unique clinical name only
+                .filter(distinctByOrgName(OrgInfo::getName)) //display unique clinical name only
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -542,7 +637,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
-            filterClinicalDeptOrg = (String)((SelectEvent) event).getObject();
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
         if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
@@ -559,10 +654,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
-            filterAssetDeptOrg = (String)((SelectEvent) event).getObject();
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
         if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
@@ -592,11 +688,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void assetGroupSecondaryChangeListener() {
 
-
     }
-    
-     public OrgInfo getOrgInfoByUid(String uid) {
-        if(Strings.isNullOrEmpty(uid)){
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        if (Strings.isNullOrEmpty(uid)) {
             return null;
         }
         return orgDao.getByUid(uid);
@@ -777,6 +872,36 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObject(Map<String, Object> selectedObject) {
         this.selectedObject = selectedObject;
     }
-    
-    
+
+    public String getManufactDateFormatTime() {
+        return manufactDateFormatTime;
+    }
+
+    public void setManufactDateFormatTime(String manufactDateFormatTime) {
+        this.manufactDateFormatTime = manufactDateFormatTime;
+    }
+
+    public String getInstallDateFormatTime() {
+        return installDateFormatTime;
+    }
+
+    public void setInstallDateFormatTime(String installDateFormatTime) {
+        this.installDateFormatTime = installDateFormatTime;
+    }
+
+    public String getArriveDateFormatTime() {
+        return arriveDateFormatTime;
+    }
+
+    public void setArriveDateFormatTime(String arriveDateFormatTime) {
+        this.arriveDateFormatTime = arriveDateFormatTime;
+    }
+
+    public String getFactoryWarrantyDateFormatTime() {
+        return factoryWarrantyDateFormatTime;
+    }
+
+    public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
+        this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
 }

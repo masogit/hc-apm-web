@@ -30,4 +30,7 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     public List<I18nMessage> getFaultTypeByAssetType(Integer astypeId);*/
 
     public int countBySiteIdAndMsgTypeStartsWith(int siteId, String msgType);
+
+    @Query(value = "select * from i18n_message where msg_key in ?1",nativeQuery = true)
+    List<I18nMessage> findI18ns(List<String> msgKeys);
 }

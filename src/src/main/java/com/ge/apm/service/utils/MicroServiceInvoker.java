@@ -36,6 +36,9 @@ public class MicroServiceInvoker {
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     protected String downLoadURL;
 
+    @Value("#{systemEnvironment['DOCXTOPDF_URL'] ?: urlProperties.docxtopdf}")
+    protected String docxToPdfUrl;
+
     public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();
     }

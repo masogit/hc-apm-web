@@ -78,6 +78,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
+    private List<AssetInfo> assetInfoList = new ArrayList<>();
+    private Integer total = 0;
+
 
     @Override
 	protected void init() {
@@ -96,7 +99,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		queryAsset.setTenantUID(user.getTenantUID());
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
 		siteUid = user.getSiteUID();
-		initAssets();
+		//initAssets();
         userCommonService = WebUtil.getBean(UserCommonService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -250,7 +253,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return filter;
 	}
 
-	public void addFilter() {
+/*	public void addFilter() {
 		sourceAssets = getAssetList();
 		targetAssets.forEach((item) -> {
 			if (sourceAssets.contains(item)) {
@@ -258,6 +261,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			}
 		});
 		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+	}*/
+
+	public void addFilter(){
+		assetInfoList.clear();
+		assetInfoList = getAssetList();
+		total = assetInfoList.size();
 	}
 
     public List<OrgInfo> getClinicalDeptList(String name){
@@ -294,12 +303,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public void generatePmOrders() {
-		if (targetAssets.isEmpty()) {
-			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+		if (CollectionUtils.isEmpty(assetInfoList)) {
+			WebUtil.addErrorMessage(WebUtil.getMessage("AssetsIsBlank"));
 			return;
 		}
-		List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
-		targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
+		List<AssetRuleModel> models = new ArrayList<>();
+		List<AssetInfo> targetAssets = assetInfoList.stream().distinct().collect(Collectors.toList());
 		if(targetAssets.size() == 1) {
 			AssetInfo ai = targetAssets.get(0);
 			if(ai.getClinicalDeptId() == null) {
@@ -394,6 +403,30 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
 		}
 
+	}
+
+	public void removeItem(String uid){
+		assetInfoList = assetInfoList.stream().filter( assetInfo -> !assetInfo.getUid().equals(uid)).collect(Collectors.toList());
+	}
+
+	public String getName(AssetInfo assetInfo){
+		return StringUtils.isEmpty(assetInfo.getName()) ? "  " : assetInfo.getName();
+	}
+
+	public String getDepartNum(AssetInfo assetInfo){
+		return StringUtils.isEmpty(assetInfo.getDepartNum()) ? "  " : assetInfo.getDepartNum();
+	}
+
+	public String getClinicalDeptName(AssetInfo assetInfo){
+		return StringUtils.isEmpty(assetInfo.getClinicalDeptName()) ? "  " : assetInfo.getClinicalDeptName();
+	}
+
+	public String getFunctionType(AssetInfo assetInfo) {
+		return StringUtils.isEmpty(assetInfo.getFunctionType()) ? "  " : assetInfo.getFunctionType();
+	}
+
+	public String getSeriaNum(AssetInfo assetInfo) {
+		return StringUtils.isEmpty(assetInfo.getSerialNum()) ? "  " : assetInfo.getSerialNum();
 	}
 
 	public String getStrDate(Date lastPmDate) {
@@ -514,5 +547,21 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public void setPmType(Integer pmType) {
 		this.pmType = pmType;
+	}
+
+	public List<AssetInfo> getAssetInfoList() {
+		return assetInfoList;
+	}
+
+	public void setAssetInfoList(List<AssetInfo> assetInfoList) {
+		this.assetInfoList = assetInfoList;
+	}
+
+	public Integer getTotal() {
+		return total;
+	}
+
+	public void setTotal(Integer total) {
+		this.total = total;
 	}
 }

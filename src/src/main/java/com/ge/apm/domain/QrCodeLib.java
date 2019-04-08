@@ -15,6 +15,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -44,6 +46,7 @@ public class QrCodeLib implements Serializable {
 //    private int hospitalId;
     @Basic(optional = false)
     @Column(name = "qr_code")
+    @Size(max = 64)
     private String qrCode;
     @Column(name = "issue_date")
     @Temporal(TemporalType.DATE)

@@ -7,23 +7,12 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -33,6 +22,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import org.joda.time.DateTime;
+import webapp.framework.util.TimeUtil;
 
 /**
  * @author 212547631
@@ -138,6 +129,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;//安装位置
+    
+    @Size(max = 64)
+    @Column(name = "nurse_location")
+    private String nurseLocation;//护士检查设备位置
 
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//所属科室
@@ -183,7 +178,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_valid")
     private boolean isValid;//在用？
 
-    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
+    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用,6:报警
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
@@ -255,7 +250,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "warranty_month")
     private Integer warrantyMonth;//质保时间（月）
 
-    @Size(max = 256)
+    @Size(max = 64)
     @Column(name = "qr_code")
     private String qrCode;//二维码
 
@@ -348,6 +343,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
     private Brand brand;//品牌
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action= NotFoundAction.IGNORE)
+    @JoinColumn(insertable = false, nullable = true,updatable = false,name = "uid")
+    private MvsAssetInfo mvsAssetInfo;
 
     @Column(name = "hospital_id")
     @Basic(optional = false)
@@ -471,6 +472,10 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "ib_status")
     private Integer ibStatus;
+    
+    //专有分类 YHAAO-3890 一般设备、仪器仪表及量具、专用设备 3类
+    @Column(name = "proprietary_class")
+    private String proprietaryClass;
 
     @Column(name = "ge_device_type")
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
@@ -503,6 +508,9 @@ public class AssetInfo implements ChineseName,Serializable {
     // 所属课题项目
     @Column(name = "subject_project")
     private String subjectProject;
+
+    @Column(name = "has_open_alert")
+    private Boolean hasOpenAlert;
 
     @Transient
     private int lineNum;
@@ -991,7 +999,15 @@ public class AssetInfo implements ChineseName,Serializable {
         this.locationName = locationName;
     }
 
-    public Integer getClinicalDeptId() {
+    public String getNurseLocation() {
+		return nurseLocation;
+	}
+
+	public void setNurseLocation(String nurseLocation) {
+		this.nurseLocation = nurseLocation;
+	}
+
+	public Integer getClinicalDeptId() {
         return clinicalDeptId;
     }
 
@@ -1673,7 +1689,23 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setSubjectProject(String subjectProject) {
         this.subjectProject = subjectProject;
     }
-    
+
+    public String getProprietaryClass() {
+        return proprietaryClass;
+    }
+
+    public void setProprietaryClass(String proprietaryClass) {
+        this.proprietaryClass = proprietaryClass;
+    }
+
+    public Boolean isHasOpenAlert() {
+        return hasOpenAlert;
+    }
+
+    public void setHasOpenAlert(Boolean hasOpenAlert) {
+        this.hasOpenAlert = hasOpenAlert;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1702,13 +1734,16 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getPinYin() {
 		return getNamePyCode();
 	}
-
-    public AssetInfo(String name,String uid,String departNum,String serialNum,String functionType){
-    	this.name=name;
-    	this.uid=uid;
-    	this.departNum=departNum;
-    	this.serialNum=serialNum;
-    	this.functionType=functionType;
+    
+    public AssetInfo(String name, String uid, String departNum, String serialNum, String functionType,String clinicalDeptName,String clinicalDeptUID,String nurseLocation) {
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName=clinicalDeptName;
+        this.clinicalDeptUID=clinicalDeptUID;
+        this.nurseLocation=nurseLocation;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {
@@ -1747,5 +1782,41 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
         reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
         return reqDetail;
+    }
+
+    public MvsAssetInfo getMvsAssetInfo() {
+        return mvsAssetInfo;
+    }
+
+    public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
+    }
+    
+    @Transient
+    private String warrantyAlertStatus = null;
+
+    public String getWarrantyAlertStatus(){
+        return warrantyAlertStatus;
+    }
+    
+    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays){
+        if(warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
+
+        if(warrantyDate!=null){
+            // first check Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(warrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
+        else if(factoryWarrantyDate!=null){
+            // then check factory Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
     }
 }

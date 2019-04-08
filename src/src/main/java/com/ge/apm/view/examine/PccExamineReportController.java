@@ -2,14 +2,18 @@ package com.ge.apm.view.examine;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -21,6 +25,7 @@ import javax.faces.context.FacesContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -38,7 +43,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.examine.PccExamineReportService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -97,6 +102,7 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<ApmStreamedContent> listStreamedContent;
 	private ApmStreamedContent tailAttach;
 	private List<PccExamineReport> listSelected;
+	private Map<Integer, List<PccExamineReport>> mapListSelected;
 	private DefaultStreamedContent exportFile;
 	private boolean blnEditable = false;
 	String updateViewIDs;
@@ -110,7 +116,11 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	private List<SearchFilter> listNewSearchFilter;
 	private List<PccExamineReport> listDetail;
 	private List<String> userRoleNames;
-	private Set<String> setUserUids;
+	private Map<Integer,List<String>> mapUserUids;
+	private int currentPage;
+	private String sortField;
+	private boolean isAscending;
+	private Pagination pageRequest;
 
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -127,7 +137,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		if (userRoleNames.contains("AssetStaff") || currentUser.getIsSuperAdmin()) {
 			blnEditable = true;
 		}
-		setUserUids = service.findAccessOrgUidListByUserUid(currentUser.getUid());
+		mapUserUids = service.findAccessUidByUserUid(currentUser.getUid());
+		mapListSelected = new HashMap<Integer, List<PccExamineReport>>();
 	}
 
 	@Override
@@ -135,12 +146,28 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<SearchFilter>();
 		}
+		currentPage = pageRequest.getCurrent();
+		if (mapListSelected.containsKey(currentPage)) {
+			listSelected = mapListSelected.get(currentPage);
+		}
 		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUids, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2*"));
+		List<String> setInstitution=mapUserUids.get(1);
+		List<String> setHospital=mapUserUids.get(2);
+		List<String> setSite=mapUserUids.get(3);
+		List<String> setClinical=mapUserUids.get(4);
+		if(setInstitution!=null){
+			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, setInstitution, "1*2+"));
+		}
+		if(setHospital!=null){
+			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, setHospital, "1*2+"));
+		}
+		if(setSite!=null){
+			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, setSite, "1*2+"));
+		}
+		if(setClinical!=null){
+			searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setClinical, "1*2+"));
+		}
 		// if(userRoleNames.contains("AssetHead")||userRoleNames.contains("AssetStaff")){
 		// searchFilters.add(new SearchFilter("assetInfo.tenantUID",
 		// SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
@@ -152,6 +179,10 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		// updateFilter();
 		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
 		listDetail = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
+		service.supplementRecord(listDetail);
+		this.pageRequest = pageRequest;
+		this.sortField = sortField;
+		this.isAscending = isAscending;
 		return listDetail;
 	}
 
@@ -283,6 +314,10 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		return UrlEncryptController.encodeUrlParam(operation);
 	}
 
+	public void onPageSelect(PageEvent event) {
+		mapListSelected.put(currentPage, listSelected);
+	}
+
 	public String getEditPage(String id, String assetuid, String actionName) {
 		String operation = "pccReportEdit.xhtml?actionName=" + actionName + "&selectedid=" + id + "&assetuid=" + assetuid;
 		return UrlEncryptController.encodeUrlParam(operation);
@@ -402,16 +437,58 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 		}
 	}
 
+	public void exportSelectedExcel() {
+		this.exportFile = null;
+		onPageSelect(null);
+		List<PccExamineReport> listTotalReport = new ArrayList<PccExamineReport>();
+		if (mapListSelected != null && mapListSelected.size() >= 0) {
+			for (List<PccExamineReport> listTemp : mapListSelected.values()) {
+				if (listTemp != null) {
+					listTotalReport.addAll(listTemp);
+				}
+			}
+		} 
+		if(listTotalReport.size()==0){
+			listTotalReport = dao.getAll(searchFilters, sortField, isAscending, Integer.MAX_VALUE, 0);
+		}
+		if(listTotalReport!=null && listTotalReport.size()>0){
+			downloadFile(service.parseMaintainToMap(listTotalReport));
+		}
+		else{
+			WebUtil.addErrorMessage("没有数据！");
+		}
+	}
+
+	private void downloadFile(List<Map<String, Object>> data) {
+		try {
+			InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/examine/pccExamineReportTemplate.xlsx");
+			ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+			Boolean exportFlag = service.exportData(doc, data);
+			if (exportFlag) {
+				exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "pccExamineReport.xlsx");
+			}
+		} catch (IOException ex) {
+			LOGGER.error(ex.getMessage());
+		}
+	}
+
 	public void downloadSelectedReport() {
 		this.exportFile = null;
-		if (listSelected == null || listSelected.size() == 0) {
+		onPageSelect(null);
+		List<PccExamineReport> listTotalReport = new ArrayList<PccExamineReport>();
+		if (mapListSelected == null || mapListSelected.size() == 0) {
 			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
 			return;
 		}
+		for (List<PccExamineReport> listTemp : mapListSelected.values()) {
+			if (listTemp != null) {
+				listTotalReport.addAll(listTemp);
+			}
+		}
 		Set<PccExamineReport> setReportIds = new HashSet<PccExamineReport>();
 		// Map<String,Integer> mapName=new HashMap<String,Integer>();
-		for (int i = 0; i < listSelected.size(); ++i) {
-			PccExamineReport tempPcc = listSelected.get(i);
+		for (int i = 0; i < listTotalReport.size(); ++i) {
+			PccExamineReport tempPcc = listTotalReport.get(i);
 			String tempBoId = tempPcc.getId();
 			Integer status = tempPcc.getStatus();
 			if (status != null && status == 2) {
@@ -442,7 +519,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			zout.close();
 			exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
 		} catch (Exception e) {
-			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+			LOGGER.error(e.getMessage());
+			WebUtil.addErrorMessage("下载报告失败！");
 		}
 	}
 
@@ -487,7 +565,8 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 			zout.close();
 			exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
 		} catch (Exception e) {
-			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+			LOGGER.error(e.getMessage());
+			WebUtil.addErrorMessage("下载报告失败！");
 		}
 	}
 

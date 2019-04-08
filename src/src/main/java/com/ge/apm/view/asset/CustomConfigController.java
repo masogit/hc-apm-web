@@ -5,7 +5,9 @@
  */
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -16,7 +18,6 @@ import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.PinYinComparator;
-import static com.ge.apm.service.utils.TreeNodeUtil.orgInfoComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +35,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import webapp.framework.web.WebUtil;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.primefaces.model.TreeNode;
-
 /**
  *
  * @author 212579464
@@ -50,31 +47,18 @@ public class CustomConfigController {
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
 
-    @Getter
     private OrgInfo selectSite;
-    @Getter
-    @Setter
     private CustomConfigObject customConfigObject;
-    @Getter
-    @Setter
     private Map<String, Boolean> selectedAddFields;
-    @Getter
-    @Setter
     private CustomConfigAssetField currentEditField;
-    @Getter
     private CustomConfig customConfig;
-    @Getter
     private LinkedHashMap<String, String> allFields;
-    @Getter
     private Map<String, String> configRoles;
-    @Getter
     private List<String> addFieldsList;
-    @Getter
     private String addFieldsType;
-    @Getter
     private Map<String, String> configInfo = new HashMap();
-    
-    private PinYinComparator pinYinComparator ;
+
+    private PinYinComparator pinYinComparator;
 
     @PostConstruct
     protected void init() {
@@ -179,9 +163,16 @@ public class CustomConfigController {
             case "RemoveMobileHeaderFields":
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageHeaderFields());
                 break;
+            case "MobileWorkOrderFieldsList":
+                addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
+                break;
+            case "RemoveMobileWorkOrderFieldsList":
+                addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
+                break;
+
         }
 
-        
         addFieldsList.sort((String o1, String o2) -> {
             return pinYinComparator.compare(CustomConfigConstant.getAllFields().get(o1), CustomConfigConstant.getAllFields().get(o2));
         });
@@ -227,6 +218,9 @@ public class CustomConfigController {
             case "EditpageFinicialFields":
             case "RemoveEditpageFinicialFields":
                 return "customConfigForm:tabView:EditpageFinicialFields";
+            case "MobileWorkOrderFieldsList":
+            case "RemoveMobileWorkOrderFieldsList":
+                return "customConfigForm:tabView:MobileWorkOrderFieldsList";
             default:
                 return "";
         }
@@ -264,7 +258,7 @@ public class CustomConfigController {
             case "UsingFields":
                 customConfigObject.getAssetFields().putAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetFields().containsKey(item.getKey()))
-                        .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(), new ArrayList<String>(configRoles.keySet())))));
+                        .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(),CustomConfigConstant.getConfigRolesName(), CustomConfigConstant.getConfigEditRolesName()))));
                 break;
             case "RemoveBasicFields":
                 customConfigObject.getAssetsDetailpageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
@@ -333,6 +327,15 @@ public class CustomConfigController {
             case "RemoveEditpageFinicialFields":
                 customConfigObject.getAssetsEditpageFinicialFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+            case "MobileWorkOrderFieldsList":
+                JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                                .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
+                break;
+            case "RemoveMobileWorkOrderFieldsList":
+                JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                                .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
         }
         cancelAddFields();
@@ -346,7 +349,7 @@ public class CustomConfigController {
 
     //使用的字段
     public List<CustomConfigAssetField> getAssetFieldsList() {
-        List<CustomConfigAssetField> res =customConfigObject.getAssetFields().entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
+        List<CustomConfigAssetField> res = customConfigObject.getAssetFields().entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
         res.sort((CustomConfigAssetField o1, CustomConfigAssetField o2) -> {
             return pinYinComparator.compare(CustomConfigConstant.getAllFields().get(o1.getKey()), CustomConfigConstant.getAllFields().get(o2.getKey()));
         });
@@ -419,6 +422,7 @@ public class CustomConfigController {
     public boolean isSystemFields(String key) {
         return CustomConfigConstant.getSystemFields().contains(key);
     }
+
     public boolean isReadOnlyFields(String key) {
         return CustomConfigConstant.getReadOnlyFields().contains(key);
     }
@@ -435,6 +439,54 @@ public class CustomConfigController {
 
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
+    }
+
+    public void moveItem(JSONObject groupItem, String oper) {
+        JSONArray groups = ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group"));
+        int index = groups.indexOf(groupItem);
+        if ("up".equals(oper) && index >= 1) {
+            groups.set(index, groups.get(index - 1));
+            groups.set(index - 1, groupItem);
+        }
+        if ("down".equals(oper) && index < groups.size() - 1) {
+            groups.set(index, groups.get(index + 1));
+            groups.set(index + 1, groupItem);
+        }
+    }
+
+    public void onCheckConfig(String opt) {
+        switch (opt) {
+            case "attachments.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].attachments.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].attachments.required", Boolean.FALSE);
+                }
+                break;
+            case "voiceAttachment.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
+                }
+                break;
+            case "requestReason.enable":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.enable", Boolean.FALSE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
+                }
+                break;
+            case "voiceAttachment.required":
+            case "requestReason.required":
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.TRUE)
+                        || JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.TRUE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.FALSE);
+                }
+                break;
+            case "voiceOrReasonRequired" :
+                if (JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceOrReasonRequired", Boolean.TRUE)) {
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.required", Boolean.FALSE);
+                    JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='descriptions'].voiceAttachment.required", Boolean.FALSE);
+                }
+            default:
+        }
     }
 
     //for 10.1 update
@@ -457,5 +509,56 @@ public class CustomConfigController {
 //        customConfigDao.save(allConfigList);
 //        WebUtil.addSuccessMessage("updated all config:" + allConfigList.size());
 //    }
+    public Map<String, Boolean> getSelectedAddFields() {
+        return selectedAddFields;
+    }
+
+    public void setSelectedAddFields(Map<String, Boolean> selectedAddFields) {
+        this.selectedAddFields = selectedAddFields;
+    }
+
+    public CustomConfigObject getCustomConfigObject() {
+        return customConfigObject;
+    }
+
+    public void setCustomConfigObject(CustomConfigObject customConfigObject) {
+        this.customConfigObject = customConfigObject;
+    }
+
+    public CustomConfigAssetField getCurrentEditField() {
+        return currentEditField;
+    }
+
+    public void setCurrentEditField(CustomConfigAssetField currentEditField) {
+        this.currentEditField = currentEditField;
+    }
+
+    public CustomConfig getCustomConfig() {
+        return customConfig;
+    }
+
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public Map<String, String> getConfigInfo() {
+        return configInfo;
+    }
+
+    public LinkedHashMap<String, String> getAllFields() {
+        return allFields;
+    }
+
+    public Map<String, String> getConfigRoles() {
+        return configRoles;
+    }
+
+    public List<String> getAddFieldsList() {
+        return addFieldsList;
+    }
+
+    public String getAddFieldsType() {
+        return addFieldsType;
+    }
 
 }

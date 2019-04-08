@@ -23,18 +23,18 @@
 						<p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetName}" />
 						</p:column>
-						<p:column headerText="费别" filterBy="#{item.costType}" filterMatchMode="LIKE">
+						<p:column headerText="费用类别" filterBy="#{item.costType}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.costType}" />
 						</p:column>
 						<p:column headerText="项目名称" filterBy="#{item.projectName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.projectName}" />
 						</p:column>
-						<p:column headerText="一类收费" sortBy="#{item.standard}">
+						<p:column headerText="单价" sortBy="#{item.standard}">
 							<h:outputText value="#{item.standard}" />
 						</p:column>
-						<p:column headerText="数量" sortBy="#{item.quantity}">
+						<!-- <p:column headerText="数量" sortBy="#{item.quantity}">
 							<h:outputText value="#{item.quantity}" />
-						</p:column>
+						</p:column> -->
 						<p:column headerText="金额" sortBy="#{item.amount}">
 							<h:outputText value="#{item.amount}" />
 						</p:column>

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.UserAccount;
 import org.primefaces.context.RequestContext;
 import webapp.framework.dao.SearchFilter;
@@ -23,6 +24,9 @@ import webapp.framework.web.WebUtil;
 public class SupplierController extends JpaCRUDController<Supplier> {
 
     SupplierRepository dao = null;
+
+    AssetInfoRepository assetInfoDao;
+
     Boolean maintainerT =false;
     Boolean manufacturerT =false;
     Boolean supplierT =false;
@@ -38,6 +42,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
+        assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
+
         this.filterBySite = false;
 
     }
@@ -91,11 +97,31 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         selected.setCreatedBy(ua.getLoginName());
         selected.setLastModifiedDate(new Date());
         selected.setLastModifiedBy(ua.getLoginName());
+
+        syncNameChangesWhenUpdating();
+
         super.save();
         selected=null;
         maintainerT=null;
         manufacturerT=null;
         supplierT=null;
+
+
+    }
+
+    private void syncNameChangesWhenUpdating() {
+
+        if (selected.getUid() == null) return;
+
+        Supplier supplier = getDAO().findByUid(selected.getUid());
+        if (supplier.getName().equals(selected.getName())) return;
+
+        assetInfoDao.updateSupplierName(selected.getName(), selected.getId(), selected.getTenantUID());
+        assetInfoDao.updateMaintainerName(selected.getName(), selected.getTel(), String.valueOf(selected.getId()), selected.getTenantUID());
+        assetInfoDao.updateManufactureName(selected.getName(), String.valueOf(selected.getId()), selected.getTenantUID());
+
+
+
     }
 
     @Override

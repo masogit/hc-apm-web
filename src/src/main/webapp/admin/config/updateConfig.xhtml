@@ -8,7 +8,17 @@
     <ui:define name="content">
         <h:form>
             <!--<p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{customConfigController.updateCustomFieldForArrivalRequired()}" value="添加自定义配置字段  到货安装是否必填"/>-->
-            <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{qrCodeTemplateController.updateAllTemplatesJsonField()}" value="二维码模板使用JSON"/>
+            <!--<p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{qrCodeTemplateController.updateAllTemplatesJsonField()}" value="二维码模板使用JSON"/>-->
+            <!--<p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{tableDefinitionController.updateAllTemplatesJsonField()}" value="报表模板去除中文key"/>-->
+            <!--<p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{tableDefinitionController.updateAllTemplatesJsonField()}" value="查找中文key"/>-->
+            
+            <p:inputText placeholder="租户UID" value="#{tableDefinitionController.filedsFindTenantUid}" /> 
+            
+            <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{tableDefinitionController.findAllChineseKey()}" update="datalist" value="查找中文key"/>
+            
+            <p:dataList id="datalist" value="#{tableDefinitionController.findAllChineseKey()}" var="tableItem" >
+                <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{tableDefinitionController.updateAllTemplatesJsonField(tableItem)}" value="替换"/>#{tableItem.name},#{tableItem.schema}
+            </p:dataList>
         </h:form>
     </ui:define>
 

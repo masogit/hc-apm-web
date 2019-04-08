@@ -36,19 +36,25 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="uiTransparent accessCls" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList2" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.accessory}">
+                                    <p:column headerText="备件名称">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
 
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
-                                    <p:column headerText="预估单价">
-                                        <h:outputText value="#{item.partsPrice}">
+                                    <p:column headerText="预估单价(元)">
+                                        <h:outputText disabled="#{v2PmOrderController.nochange}" value="#{item.partsPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <p:column headerText="合同价格(元)">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+
+                                    </p:column>
+                                    <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
                                     <p:column headerText="序列号">
@@ -217,6 +223,8 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+
+
 
             <script>
                 function handleToRepair(xhr, status, args) {

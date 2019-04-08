@@ -1,39 +1,38 @@
 package com.ge.apm.view;
 
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.RoleAuthorityRepository;
 import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.SysAuthorityRepository;
-import com.ge.apm.domain.RoleAuthority;
-import com.ge.apm.domain.CustomRole;
-import com.ge.apm.domain.SysAuthority;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @ManagedBean
 @ViewScoped
 public class CustomRoleController extends JpaCRUDController<CustomRole> {
 
     private CustomRoleRepository dao = null;
-    private RoleAuthorityRepository roleAuthorityRepository;
-    private SysAuthorityRepository sysAuthorityRepository;
-    //private List<String> authIds = new ArrayList<>(10);
-    private String[] authIds = new String[20];
+    private String[] authorities = new String[200];
+    private String[] cards = new String[100];
     private UserAccount user;
+    private I18nMessageRepository i18nMessageRepository;
     public static List<String> keyRoles = new ArrayList<>();
 
     static {
@@ -58,8 +57,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         filterBySite = false;
         user = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(CustomRoleRepository.class);
-        roleAuthorityRepository = WebUtil.getBean(RoleAuthorityRepository.class);
-        sysAuthorityRepository = WebUtil.getBean(SysAuthorityRepository.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
     }
 
     @Override
@@ -76,49 +74,15 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
-/*        if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
-        }*/
-    }
-
-    public String getRoleAuth(Integer id){
-        List<SysAuthority> authorities = sysAuthorityRepository.findSysAuthorityByRoleId(id);
-        if(CollectionUtils.isNotEmpty(authorities)){
-            StringBuilder sb = new StringBuilder();
-            for (SysAuthority sa :authorities) {
-                sb.append(sa.getName()).append(",");
-            }
-            String result = sb.toString();
-            if(result.endsWith(",")){
-                result = result.substring(0,result.length()-1);
-            }
-            return result;
-        }
-        return null;
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
     public List<CustomRole> getItemList() {
-        //to do: change the code if necessary
         return dao.find();
     }
 
-    public String[] getAuthIds() {
-        return authIds;
-    }
-
-    public void setAuthIds(String[] authIds) {
-        this.authIds = authIds;
-    }
-
-    public void onBeforeNewObject(CustomRole object) {
-
-    }
-
-    @Override
+/*    @Override
     public void onBeforeSave(CustomRole role) {
         role.setTenantUID(user.getTenantUID());
         role.setInstitutionUID(user.getInstitutionUID());
@@ -132,7 +96,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
         }
         role.setLastModifiedBy(user.getLoginName());
         role.setLastModifiedDate(new Date());
-    }
+    }*/
 
 
     @Transactional
@@ -142,93 +106,115 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
             WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
             return;
         }
-        super.save();
-        if(selected.getId() != null){
-            roleAuthorityRepository.deleteByRoleId(selected.getId());
+        if(authorities.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("authoritiesIsBlank"));
+            return;
         }
-        Integer id = selected.getId();
-        if(authIds.length > 0){
-            List<RoleAuthority> authorities = new ArrayList<>(10);
-            for (String s : authIds) {
-                RoleAuthority auth = new RoleAuthority();
-                auth.setCreatedBy(user.getLoginName());
-                auth.setCreatedDate(new Date());
-                auth.setLastModifiedBy(user.getLoginName());
-                auth.setLastModifiedDate(new Date());
-                auth.setRoleId(id);
-                auth.setSysAuthId(Integer.parseInt(s));
-                auth.setTenantUID(user.getTenantUID());
-                auth.setInstitutionUID(user.getInstitutionUID());
-                auth.setHospitalUID(user.getHospitalUID());
-                auth.setSiteUID(user.getSiteUID());
-                authorities.add(auth);
+        if(cards.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage(WebUtil.getMessage("cardsIsBlank"));
+            return;
+        }
+        selected.setTenantUID(user.getTenantUID());
+        selected.setInstitutionUID(user.getInstitutionUID());
+        selected.setHospitalUID(user.getHospitalUID());
+        selected.setSiteUID(user.getSiteUID());
+        if(selected.getCreatedBy() == null){
+            selected.setCreatedBy(user.getLoginName());
+        }
+        if(selected.getCreatedDate() == null){
+            selected.setCreatedDate(new Date());
+        }
+        selected.setLastModifiedBy(user.getLoginName());
+        selected.setLastModifiedDate(new Date());
+        List<I18nMessage> messages;
+        Map<String,I18nMessage> map = new HashMap<>();
+        if(authorities.length > 0 || cards.length > 0){
+            List<String> param = new ArrayList<>(500);
+            param.addAll(Arrays.asList(authorities)) ;
+            param.addAll(Arrays.asList(cards));
+            if(CollectionUtils.isNotEmpty(param)){
+                messages = i18nMessageRepository.findI18ns(param);
+                if(CollectionUtils.isNotEmpty(messages)){
+                    for (I18nMessage i18nMessage: messages) {
+                        map.put(i18nMessage.getMsgKey(),i18nMessage);
+                    }
+                }
             }
-            roleAuthorityRepository.save(authorities);
         }
-        authIds = new String[20];
+        if(authorities.length > 0){
+            StringBuilder sb1 = new StringBuilder();
+            Set<String> group = new HashSet<>();
+            for (String authority: authorities) {
+                if(map.containsKey(authority)){
+                    group.add(authority.split("\\.")[0]);
+                    sb1.append(map.get(authority).getValue()+",");
+                }
+            }
+            selected.setGroups(StringUtils.join(group,","));
+            selected.setAuthoritiesCH(removeComma(sb1));
+            selected.setAuthorities( StringUtils.join(authorities,","));
+        }
+        if(cards.length > 0){
+            StringBuilder sb2 = new StringBuilder();
+            for (String card: cards) {
+                if(map.containsKey(card)){
+                    sb2.append(map.get(card).getValue()+",");
+                }
+            }
+            selected.setCardsCH(removeComma(sb2));
+            selected.setCards(StringUtils.join(cards,","));
+        }
+
+        dao.save(selected);
+        authorities = new String[200];
+        cards = new String[100];
+    }
+
+    public void clear(){
+        authorities = new String[200];
+        cards = new String[100];
     }
 
     public void prepareEdit(){
         if(selected.getId() != null){
-            List<Integer> auths = roleAuthorityRepository.findByAuthIds(selected.getId());
-            if(CollectionUtils.isNotEmpty(auths)){
-                authIds = convert(auths);
+            if(StringUtils.isNotEmpty(selected.getAuthorities())){
+                authorities = selected.getAuthorities().split(",");
+            }
+            if(StringUtils.isNotEmpty(selected.getCards())){
+                cards = selected.getCards().split(",");
             }
         }
 
     }
 
-    private String[] convert(List<Integer> auths) {
-        String[] s = new String[auths.size()];
-        for (int i = 0 ; i< auths.size(); i++) {
-            s[i] = auths.get(i).toString();
+    public String removeComma(StringBuilder sb){
+        String s = sb.toString();
+        if(StringUtils.isEmpty(s)){
+            return "";
+        }
+        if(s.endsWith(",")){
+            return s.substring(0,s.length() - 1);
+        }
+        if(s.length() > 15){
+            return s.substring(0,14)+"...";
         }
         return s;
     }
-
-    @Transactional
-    public void delete(){
-        Integer roleId = selected.getId();
-        roleAuthorityRepository.deleteByRoleId(roleId);
-        super.delete();
+    public String[] getCards() {
+        return cards;
     }
 
-    public static List<String> getKeyRoles() {
-        return keyRoles;
+    public String[] getAuthorities() {
+        return authorities;
     }
 
-    public static void setKeyRoles(List<String> keyRoles) {
-        CustomRoleController.keyRoles = keyRoles;
+    public void setAuthorities(String[] authorities) {
+        this.authorities = authorities;
     }
 
-    /*
-    @Override
-
-    
-    @Override
-    public void onAfterNewObject(CustomRole object, boolean isOK) {
+    public void setCards(String[] cards) {
+        this.cards = cards;
     }
-
-    @Override
-    public void onBeforeUpdateObject(CustomRole object) {
-    }
-    
-    @Override
-    public void onAfterUpdateObject(CustomRole object, boolean isOK) {
-    }
-    
-    @Override
-    public void onBeforeDeleteObject(CustomRole object) {
-    }
-    
-    @Override
-    public void onAfterDeleteObject(CustomRole object, boolean isOK) {
-    }
-    
-
-    
-    @Override
-    public void onAfterDataChanged(){
-    };
-*/
 }

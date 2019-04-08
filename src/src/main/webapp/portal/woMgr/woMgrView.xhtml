@@ -18,6 +18,18 @@
                             <label class="label">#{msg.assetName}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.assetName}" />
                         </h:panelGroup>
+
+
+                        <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                            <label class="label">MVS合同起始日</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractStartDate}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
+                            <label class="label">MVS合同截止日</label>
+                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractEndDate}" />
+                        </h:panelGroup>
+
+
                         <h:panelGroup>
                             <label class="label">#{msg.departNum}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.departNum}" />
@@ -231,8 +243,8 @@
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
                                 <label class="label">使用的备件</label>
-                                <p:dataTable value="#{workOrderMgrController.getWorkOrderDetail(woItem.id)}" var="detailItem"  >
-                                    <p:column headerText="#{msg.accessory}">
+                                <p:dataTable id="x3" class="cl3" value="#{workOrderMgrController.getWorkOrderDetail(woItem.id)}" var="detailItem">
+                                    <p:column headerText="#{msg.accessory}名称">
                                         <h:outputText value="#{detailItem.parts}" />
                                     </p:column>
                                     <p:column headerText="#{msg.accessoryQuantity}">
@@ -243,10 +255,15 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="合同价格(元)">
+                                        <h:outputText value="#{detailItem.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+                                    </p:column>
                                     <p:column headerText="审核状态">
                                         <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <p:column headerText="备件类别">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                                     </p:column>
                                     <p:column headerText="序列号">
@@ -278,13 +295,8 @@
                                     <p:column headerText="到货">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
                                     </p:column>
-                                    <p:column headerText="合同价格(元)">
-                                        <h:outputText value="#{detailItem.closedPrice}">
-                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
-                                        </h:outputText>
-                                    </p:column>
-                                    <p:column headerText="操作" >
 
+                                    <p:column headerText="操作" >
                                         <p:commandButton rendered="#{workOrderMgrController.allowChanged()}" process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{workOrderMgrController.allowChangedForDisable() or (detailItem.approved==null?'false': not detailItem.approved)}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
 
                                         <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogViewDlg)" oncomplete="PF('moreAccDialogViewDlg').show()"/>

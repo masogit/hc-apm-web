@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 public class NurseSiteMaintainConfigCheckItem implements Serializable {
 
@@ -33,8 +33,6 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private Long key;
 	private String name;
 	private String description;
-
-	
 
 	public Long getKey() {
 		return key;
@@ -60,4 +58,29 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 		this.description = description;
 	}
 
+	@Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (key != null ? key.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the key fields are
+        // not set
+        if (!(object instanceof NurseSiteMaintainConfigCheckItem)) {
+            return false;
+        }
+        NurseSiteMaintainConfigCheckItem other = (NurseSiteMaintainConfigCheckItem) object;
+        if ((this.key == null && other.key != null) || (this.key != null && !this.key.equals(other.key))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "NurseSiteMaintainConfigCheckItem [ key=" + key + " ]";
+    }
 }

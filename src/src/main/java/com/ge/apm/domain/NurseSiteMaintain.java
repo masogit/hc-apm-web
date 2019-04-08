@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +33,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627 on 2018/3/7.
  */
 @Entity
 @Table(name = "nurse_site_maintain")
+@Cacheable(false)
+@Cache(usage=CacheConcurrencyStrategy.NONE)
 public class NurseSiteMaintain implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintain.class);
 	private static final long serialVersionUID = 1L;
@@ -97,11 +102,11 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
-    private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
+    private List<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	//0：未检查,1:已检查，2:通过，3有问题,4进行中
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	@Column(name = "status")
-	private Integer status;
+	private Integer status=0;
 	
 	@Column(name="config_id")
 	private String configId;
@@ -126,14 +131,10 @@ public class NurseSiteMaintain implements Serializable {
 	private List<String> showLables;
 	
 	@Transient
-	private List<NurseSiteMaintainItem> showListNurseSiteMaintainItem;
-	
-	@Transient
-	private boolean needGetItem=true;
+	private List<String> checkData;
 	
 	public NurseSiteMaintain() {
 		super();
-		this.status=0;
 	}
 
 	public String getId() {
@@ -256,11 +257,11 @@ public class NurseSiteMaintain implements Serializable {
 		this.name = name;
 	}
 
-	public Set<NurseSiteMaintainItem> getListNurseSiteMaintainItem() {
+	public List<NurseSiteMaintainItem> getListNurseSiteMaintainItem() {
 		return listNurseSiteMaintainItem;
 	}
 
-	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
+	public void setListNurseSiteMaintainItem(List<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
 		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
 	}
 
@@ -287,14 +288,6 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setShowLables(List<String> showLables) {
 		this.showLables = showLables;
-	}
-	
-	public boolean isNeedGetItem() {
-		return needGetItem;
-	}
-
-	public void setNeedGetItem(boolean needGetItem) {
-		this.needGetItem = needGetItem;
 	}
 
 	public String getClinicalDeptUID() {
@@ -332,43 +325,51 @@ public class NurseSiteMaintain implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
-		if(showListNurseSiteMaintainItem==null){
-			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
-		}
-		else{
-			showListNurseSiteMaintainItem.clear();
-		}
-		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
-		return showListNurseSiteMaintainItem;
+//	public List<NurseSiteMaintainItem> getShowListNurseSiteMaintainItem() {
+//		if(showListNurseSiteMaintainItem==null){
+//			showListNurseSiteMaintainItem=new ArrayList<NurseSiteMaintainItem>();
+//		}
+//		else{
+//			showListNurseSiteMaintainItem.clear();
+//		}
+//		showListNurseSiteMaintainItem.addAll(listNurseSiteMaintainItem);
+//		return showListNurseSiteMaintainItem;
+//	}
+//
+//	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
+//		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
+//		if(listNurseSiteMaintainItem==null){
+//			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+//		}
+//		else{
+//			listNurseSiteMaintainItem.clear();
+//		}
+//		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
+//	}
+
+	public List<String> getCheckData() {
+		return checkData;
 	}
 
-	public void setShowListNurseSiteMaintainItem(List<NurseSiteMaintainItem> showListNurseSiteMaintainItem) {
-		this.showListNurseSiteMaintainItem = showListNurseSiteMaintainItem;
-		if(listNurseSiteMaintainItem==null){
-			listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		else{
-			listNurseSiteMaintainItem.clear();
-		}
-		listNurseSiteMaintainItem.addAll(showListNurseSiteMaintainItem);
+	public void setCheckData(List<String> checkData) {
+		this.checkData = checkData;
 	}
-	
+
 	public String getShowTitle() {
 		//0：未检查,1:已检查，2:通过，3有问题
 		String strStatus="未检查";
-		if(getStatus()==null || getStatus()==0){
+		if(status==null || status==0){
 		}
-		else if(getStatus()==1){
+		else if(status==1){
 			strStatus="已检查";
 		}
-		else if(getStatus()==2){
+		else if(status==2|| status==5|| status==6|| status==7){
 			strStatus="通过";
 		}
-		else if(getStatus()==3){
+		else if(status==3 || status==8){
 			strStatus="有问题";
 		}
-		else if(getStatus()==4){
+		else if(status==4){
 			strStatus="进行中";
 		}
 		

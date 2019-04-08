@@ -67,7 +67,7 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList){
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -128,6 +128,12 @@ public class WorkOrderExportService {
         if (statusList != null && !statusList.isEmpty()) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
         }
+        if(filterParts != null){
+            searchFilters.add(new SearchFilter("filterParts", SearchFilter.Operator.EQ, filterParts));
+        }
+        if(filterTotalPrice != null){
+            searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
+        }
 
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
 
@@ -185,7 +191,7 @@ public class WorkOrderExportService {
             workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
             workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
             workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
-            workOrderMap.put("联系电话", workOrderExportPojo.getTelephone());
+            workOrderMap.put("报修人电话", workOrderExportPojo.getTelephone());
             workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
             workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
 
@@ -224,8 +230,10 @@ public class WorkOrderExportService {
         for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
             Map<String, Object> part = new HashedMap();
             part.put("报修单号", workOrderPojo.getSrNum());
+            part.put("资产名称", workOrderPojo.getAssetName());
+            part.put("设备编号", workOrderPojo.getAssetDepartNum());
             part.put("备件名", workOrderDetail.getParts());
-            part.put("单价", workOrderDetail.getClosedPrice());
+            part.put("合同价格", workOrderDetail.getClosedPrice());
             part.put("数量", workOrderDetail.getApartsQuantity());
             part.put("类型", workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
             part.put("序列号", workOrderDetail.getSerialNum());

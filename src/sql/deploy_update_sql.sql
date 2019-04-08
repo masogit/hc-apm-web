@@ -304,3 +304,33 @@ update user_role set role_type= 0;
 
 
 update message_subscriber set meter_hit =false where meter_hit is null
+
+--2019-v1.2
+ALTER TABLE public.nurse_site_maintain_config DROP COLUMN check_items;
+update pm_order_rule_check_list set status = 1 where status is null;
+
+--v 19.2.1
+alter table public.asset_info alter column qr_code type varchar(64) using qr_code::varchar(64);
+alter table public.qr_code_lib alter column qr_code type varchar(64) using qr_code::varchar(64);
+
+-- bi
+create table dashboard_role_res_tenant_revoke
+(
+  id serial,
+  role_id            integer,
+  res_type           varchar(100),
+  res_id             integer,
+  tenant_uid         varchar(32),
+  PRIMARY KEY (id)
+);
+
+
+--v19.3.1
+update v2_service_request set report_source = '1' where report_source is null;
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'NursingStaff';
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetStaff';
+update sys_role set authorities = 'assetInventory.close,assetInventory.create,assetInventory.scan,assetInventory.view',authorities_ch = '关闭盘点工单,新建盘点工单,扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetHead';
+
+
+--v19.4.1
+update asset_info set system_id = null where system_id is not null and trim(system_id) = '';

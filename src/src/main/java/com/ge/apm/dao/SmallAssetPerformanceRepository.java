@@ -14,10 +14,10 @@ import webapp.framework.dao.GenericRepositoryUUID;
  */
 public interface SmallAssetPerformanceRepository extends GenericRepositoryUUID<SmallAssetPerformance> {
 	
-	@Query("select o from SmallAssetPerformance o where o.projectName = ?1 and o.happenDate = ?2 and o.siteUID = ?3")
-	public SmallAssetPerformance findByProjectNameAndHappenDate(String projectName, Date happenDate,String siteUID);
+	@Query("select o from SmallAssetPerformance o where o.projectName = ?1 and o.department=?2 and o.happenDate = ?3 and o.siteUID = ?4")
+	public SmallAssetPerformance findByProjectNameAndHappenDate(String projectName,String department, Date happenDate,String siteUID);
 	
 
-	@Query("select 1 from SmallAssetPerformance o where o.projectName = ?1 and o.happenDate = ?2 and o.siteUID = ?3")
-	public Integer findExistsByProjectNameAndHappenDate(String projectName, Date happenDate,String siteUID);
+	@Query("select 1 from SmallAssetPerformance o where o.projectName = ?1 and o.department=?2 and o.happenDate = ?3 and o.siteUID = ?4")
+	public Integer findExistsByProjectNameAndHappenDate(String projectName,String department, Date happenDate,String siteUID);
 }

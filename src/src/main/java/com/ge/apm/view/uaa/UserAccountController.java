@@ -17,13 +17,13 @@ import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -33,14 +33,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BiomedGroupUserRepository;
-import com.ge.apm.dao.JsonTemplateRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -49,8 +41,13 @@ import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import javax.faces.event.AjaxBehaviorEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -67,7 +64,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
-    public static final int ACTIVATION_ROLE = 10;
+    //public static final int ACTIVATION_ROLE = 10;
+    public static final String ACTIVATION_ROLE = "ActivationPerson";
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -104,6 +102,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfoTreeService orgInfoTreeService;
 
+    private SysRoleRepository sysRoleRepository;
+
+    private CustomRoleRepository customRoleRepository;
+
+    private UserRoleRepository userRoleRepository;
+    private List<OrgInfo> deptList;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -124,6 +129,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        
+        deptList = uaaService.getFullOrgListBySiteId(UserContextService.getSiteId());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -141,6 +150,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setTenantUid(String tenantUid) {
         searchFilters.clear();
         this.tenantUid = tenantUid;
+
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
@@ -234,7 +244,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     	generateListSearchFilter();
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
-        	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
+            List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
+            if(orgListByUid.size()>0)
+                user.setOrgInfo(orgListByUid.get(0));
         }
         return pageUserAccount;
     }
@@ -297,22 +309,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
 
         }*/
-
         roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
-
         assignedRoles = new ArrayList<>();
-
-        Map<Integer,String> tempCR = new HashMap<>();
-        List<CustomRole> customRoles = uaaService.getTenantCustomRoles(selected.getTenantUID());
+        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
         if(CollectionUtils.isNotEmpty(customRoles)){
-            customRoles.stream().forEach( role -> tempCR.put(role.getId(),role.getName()));
-        }
-        for (UserRole userRole : selected.getUserRoleList()) {
-            if(userRole.getRoleType() == 0){
-                assignedRoles.add(userRole.getRole().getRoleDesc());
-            }else if(userRole.getRoleType() == 1){
-                assignedRoles.add(tempCR.get(userRole.getRoleId()));
+            for (CustomRole customRole : customRoles) {
+                assignedRoles.add(customRole.getName());
             }
+        }
+        List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
+        for (UserRole userRole : sysRoleList) {
+            assignedRoles.add(userRole.getRole().getRoleDesc());
         }
         prepareUserScope();
     }
@@ -764,18 +771,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
         List<UserRole> roles = loginUser.getUserRoleList();
-        roles = roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(roles)){
-            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-            tenant.setIsEnabled(true);
-            tenant.setActiveTime(new Date());
-            tenant.setActiveUserId(loginUser.getId());
-            tenant.setActiveType(1);
-            tenantInfoRepository.save(tenant);
-            dao.updateMembersStatus(loginUser.getTenantUID());
+        SysRole sysRole = sysRoleRepository.getByName(ACTIVATION_ROLE);
+        if(sysRole != null){
+            roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(roles)){
+                TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+                tenant.setIsEnabled(true);
+                tenant.setActiveTime(new Date());
+                tenant.setActiveUserId(loginUser.getId());
+                tenant.setActiveType(1);
+                tenantInfoRepository.save(tenant);
+                dao.updateMembersStatus(loginUser.getTenantUID());
+            }
+            WebUtil.addSuccessMessage("激活成功！");
+        }else{
+            logger.info("not active person !");
         }
 
-        WebUtil.addSuccessMessage("激活成功！");
     }
 
     @Transactional
@@ -899,6 +911,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 	}
 
+	public String getCurrentUserRoleNames(Integer userId){
+        //Integer userId = selected.getId();
+        List<SysRole> sysRoles = getSystemRolesByUserId(userId);
+        StringBuilder sb = new StringBuilder();
+        if(CollectionUtils.isNotEmpty(sysRoles)){
+            for (SysRole sysRole :sysRoles) {
+                sb.append(sysRole.getRoleDesc()).append(" ");
+            }
+        }
+        List<CustomRole> customRoles = getCustomRoleByUserId(userId);
+        if(CollectionUtils.isNotEmpty(customRoles)){
+            for (CustomRole customRole :customRoles) {
+                sb.append(customRole.getName()).append(" ");
+            }
+        }
+        return sb.toString();
+    }
+    
+    public List<SysRole> getSystemRolesByUserId(Integer userId){
+        return sysRoleRepository.getSysRoles(userId);
+    }
+
+    public List<CustomRole> getCustomRoleByUserId(Integer userId){
+        return customRoleRepository.findCustomRolesByUserId(userId);
+    }
+
 	public StreamedContent getExportFile() {
 		return exportFile;
 	}
@@ -906,4 +944,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
 	}
+        
+    public List<String> autoCompleteDeptName(String query) {
+        if (deptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.deptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    private  String filterClinicalDeptOrg = null;
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+        if(filterClinicalDeptOrg==null) return;
+        
+        List<OrgInfo> orgListByName = this.deptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+        if(orgListByName.size()<1)
+            selectedUserOrg = null;
+        else{
+            selectedUserOrg = orgListByName.get(0);
+        }
+    }
+    
+    public String getSelectedOrgName(){
+        if(selectedUserOrg==null)  return "";
+        
+        return selectedUserOrg.getName();
+    }
+    
+    public void setSelectedOrgName(String orgName){
+        //ignore the input orgName, just provide a Setter for UI input Component
+    }
 }

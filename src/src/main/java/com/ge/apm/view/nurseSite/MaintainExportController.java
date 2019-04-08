@@ -32,9 +32,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-/**
- * Created by 212605082 on 2018/5/8.
- */
 @ManagedBean
 @ViewScoped
 public class MaintainExportController implements ServerEventInterface{
@@ -47,7 +44,7 @@ public class MaintainExportController implements ServerEventInterface{
 	private OrgInfo selectedParentOrgInfo;
     //show
     private List<OrgInfo> listOrgInfo; 
-    private Set<String> orgUidList;
+    private List<String> orgUidList;
     private StreamedContent exportFile;
     private Date startDate;
     private Date endDate;
@@ -58,6 +55,7 @@ public class MaintainExportController implements ServerEventInterface{
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
+		searchController.setBlnDepartOrgUpdate(true);
 		searchController.updateData();
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -78,12 +76,6 @@ public class MaintainExportController implements ServerEventInterface{
 		if(end==null){
 			ca.add(Calendar.MONTH, 1);
 			end=ca.getTime();
-		}
-		else{
-			Calendar endCa=Calendar.getInstance();
-			endCa.setTime(end);
-			endCa.add(Calendar.DATE, 1);
-			end=endCa.getTime();
 		}
 		if(listCheckClinicalOrgInfo==null || listCheckClinicalOrgInfo.size()==0){
 			listMaintainData=findDefaultMaintain(start,end);
@@ -200,13 +192,6 @@ public class MaintainExportController implements ServerEventInterface{
             LOGGER.error(ex.getMessage());
         }
 	}
-	
-	public boolean isValideDate() {
-		Calendar calender = Calendar.getInstance();
-		calender.setTime(new Date());
-		calender.add(Calendar.DAY_OF_MONTH, -1);
-		return true;
-	}
 
 	public UserAccount getCurrentUser() {
 		return currentUser;
@@ -241,11 +226,11 @@ public class MaintainExportController implements ServerEventInterface{
 		this.listMaintainData = listMaintainData;
 	}
 
-	public Set<String> getOrgUidList() {
+	public List<String> getOrgUidList() {
 		return orgUidList;
 	}
 
-	public void setOrgUidList(Set<String> orgUidList) {
+	public void setOrgUidList(List<String> orgUidList) {
 		this.orgUidList = orgUidList;
 	}
 

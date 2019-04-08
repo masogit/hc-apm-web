@@ -28,6 +28,14 @@
         </script>
 
         <style>
+            .warrantyExpireSoon {
+            background-color: #fca752!important;
+            color: #000000!important;
+            }
+            .warrantyExpired {
+            background-color: #f04134!important;
+            color: #000000!important;
+            }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
@@ -42,13 +50,22 @@
             <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
+                    <h:panelGroup style="position: absolute; float: right; right: 50px;">
+                        <span >图例：</span>
+                        <span class="warrantyExpireSoon">维保或质保即将到期</span>
+                        <span></span>
+                        <span class="warrantyExpired">维保或质保已经到期</span>
+                    </h:panelGroup>
+                    
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -87,7 +104,8 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"  
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -299,8 +317,14 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetUsage'}">
-                                <p:column headerText="#{msg.assetUsage}" >
+                                <p:column id="assetUsage" headerText="#{msg.assetUsage}" sortBy="#{item.assetUsage}" filterBy="#{item.assetUsage}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetValueCategory'}">
@@ -309,13 +333,26 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'capitalSource'}">
-                                <p:column headerText="#{msg.capitalSource}" >
+                                <p:column id="capitalSource" headerText="#{msg.capitalSource}" sortBy="#{item.capitalSource}" filterBy="#{item.capitalSource}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
+
                             </c:if>
                             <c:if test="#{columnItem eq 'capitalSource2'}">
-                                <p:column headerText="#{msg.capitalSource2}" >
+                                <p:column id="capitalSource2" headerText="#{msg.capitalSource2}" sortBy="#{item.capitalSource2}" filterBy="#{item.capitalSource2}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource2)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measureGrade'}">
@@ -329,13 +366,25 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'emergencyEquipment'}">
-                                <p:column headerText="#{msg.emergencyEquipment}" >
+                                <p:column id="emergencyEquipment" headerText="#{msg.emergencyEquipment}" sortBy="#{item.emergencyEquipment}" filterBy="#{item.emergencyEquipment}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'importEquipment'}">
-                                <p:column headerText="#{msg.importEquipment}" >
+                                <p:column id="importEquipment" headerText="#{msg.importEquipment}" sortBy="#{item.importEquipment}" filterBy="#{item.importEquipment}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measuringItemCategory'}">
@@ -349,8 +398,11 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'siteUID'}">
-                                <p:column headerText="#{msg.hospitalId}" >
+                                <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
+                                    <f:facet name="filter">
+                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'parentAssetId'}">
@@ -376,6 +428,17 @@
                             <c:if test="#{columnItem eq 'functionGrade'}">
                                 <p:column headerText="#{msg.functionGrade}" >
                                     <h:outputText value="#{fieldMsg.fieldValue('assetFunctionGrade',item.functionGrade)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'proprietaryClass'}">
+                                <p:column headerText="#{msg.proprietaryClass}" sortBy="#{item.proprietaryClass}" filterBy="#{item.proprietaryClass}" filterMatchMode="EQ" >
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('proprietaryClass',item.proprietaryClass)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'maitanance'}">
@@ -414,54 +477,72 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'deviceStatus'}">
-                                <p:column headerText="#{msg.deviceStatus}" >
-                                    <h:outputText value=" #{fieldMsg.fieldValue('deviceStatus',item.deviceStatus)}"/>
+                                <p:column id="deviceStatus" headerText="#{msg.deviceStatus}" sortBy="#{item.deviceStatus}" filterBy="#{item.deviceStatus}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('deviceStatus', item.deviceStatus)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'manufactDate'}">
-                                <p:column headerText="#{msg.manufactDate}" >
+                                <p:column headerText="#{msg.manufactDate}" sortBy="#{item.manufactDate}" filterBy="#{item.manufactDate}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterManufactDate" widgetVar="varFilterManufactDate" value="#{assetInfoListController.manufactDateFormatTime}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.manufactDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'purchaseDate'}">
-                                <p:column headerText="#{msg.purchaseDate}" >
+                                <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}">
                                     <h:outputText value="#{item.purchaseDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'acceptDate'}">
-                                <p:column headerText="#{msg.acceptDate}" >
+                                <p:column headerText="#{msg.acceptDate}" sortBy="#{item.acceptDate}">
                                     <h:outputText value="#{item.acceptDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'arriveDate'}">
-                                <p:column headerText="#{msg.arriveDate}" >
+                                <p:column headerText="#{msg.arriveDate}" sortBy="#{item.arriveDate}" filterBy="#{item.arriveDate}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterArriveDate" widgetVar="varFilterArriveDate" value="#{assetInfoListController.arriveDateFormatTime}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.arriveDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'installDate'}">
-                                <p:column headerText="#{msg.installDate}" >
+                                <p:column headerText="#{msg.installDate}" sortBy="#{item.installDate}" filterBy="#{item.installDate}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterInstallDate" widgetVar="varFilterInstallDate" value="#{assetInfoListController.installDateFormatTime}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.installDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'terminateDate'}">
-                                <p:column headerText="#{msg.terminateDate}" >
+                                <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}">
                                     <h:outputText value="#{item.terminateDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'factoryWarrantyDate'}">
-                                <p:column headerText="质保日期" >
+                                <p:column headerText="质保日期" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate" value="#{assetInfoListController.factoryWarrantyDateFormatTime}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.factoryWarrantyDate}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
@@ -503,8 +584,14 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'repairForm'}">
-                                <p:column  headerText="#{msg.repairForm}" >
-                                    <h:outputText value="#{fieldMsg.fieldValue('repairForm',item.repairForm)}"/>
+                                <p:column id="repairForm" headerText="#{msg.repairForm}" sortBy="#{item.repairForm}" filterBy="#{item.repairForm}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'comments'}">
@@ -590,6 +677,50 @@
             <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
+        <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for=":AssetInfoListForm:datalist:filterManufactDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('manufactDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varManufactDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varManufactDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":AssetInfoListForm:datalist:filterInstallDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('installDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varInstallDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varInstallDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for=":AssetInfoListForm:datalist:filterArriveDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('arriveDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArriveDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varArriveDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterFactoryWarrantyDate" widgetVar="panelFilterFactoryWarrantyDate" for=":AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('factoryWarrantyDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varFactoryWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varFactoryWarrantyDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
 <!--        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
@@ -624,6 +755,25 @@
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>
         </p:dialog>
+
+        <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
+            <h:form id="dataTableFilterByHospital">
+            <p:overlayPanel widgetVar="varPanelOrg2" for="AssetInfoListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
+                    <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                            </p:tree>
+                    </p:scrollPanel>
+            </p:overlayPanel>
+        </h:form>
+        </c:if>        
 
         <script>
             //<![CDATA[

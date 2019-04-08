@@ -109,6 +109,7 @@ public class V2_WorkOrderService {
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
         Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList);
+        System.out.println("-------test--------------");
     }
 
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {
@@ -339,6 +340,7 @@ public class V2_WorkOrderService {
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(4);
+        formData.setAssigneeId(assigneeId);
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setAssetStatus(assetStatus.toString());
@@ -392,7 +394,7 @@ public class V2_WorkOrderService {
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());
         formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
-formData.setAssigneeId(assignId);
+        formData.setAssigneeId(assignId);
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
