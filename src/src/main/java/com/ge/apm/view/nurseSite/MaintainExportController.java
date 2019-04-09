@@ -53,6 +53,7 @@ public class MaintainExportController implements ServerEventInterface{
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		nurseSiteMaintainService.init();
 		searchController = WebUtil.getBean(SearchController.class);
 		searchController.setType(3);
 		searchController.setBlnDepartOrgUpdate(true);
