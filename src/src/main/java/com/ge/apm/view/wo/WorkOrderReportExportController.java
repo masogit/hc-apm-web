@@ -31,6 +31,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -99,6 +103,8 @@ public class WorkOrderReportExportController implements Serializable {
     private List<Map<String, Object>> selectedItems;
 
     private Boolean isInsulate;
+    private String filterParts;
+    private String filterTotalPrice;
 
     @PostConstruct
     protected void init() {
@@ -236,8 +242,27 @@ public class WorkOrderReportExportController implements Serializable {
                 return;
             }
 
+            ZoneId zone = ZoneId.systemDefault();
+            if(null != startTime && null != endTime){
+                LocalDate startDate = LocalDateTime.ofInstant(startTime.toInstant(), zone).toLocalDate();
+                Date tempEndDate = Date.from(startDate.plus(1, ChronoUnit.YEARS).atStartOfDay().atZone(zone).toInstant());
+                if(endTime.after(tempEndDate)){
+                    WebUtil.addErrorMessage("报修时间段最大不能超过一年！");
+                    return;
+                }
+            }
+            if(null != closedStartTime && null != closedEndTime){
+                LocalDate closedStartDate = LocalDateTime.ofInstant(closedStartTime.toInstant(), zone).toLocalDate();
+                Date tempClosedEndDate = Date.from(closedStartDate.plus(1, ChronoUnit.YEARS).atStartOfDay().atZone(zone).toInstant());
+                if(closedEndTime.after(tempClosedEndDate)){
+                    WebUtil.addErrorMessage("关单时间段最大不能超过一年！");
+                    return;
+                }
+            }
+
+
             //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
-            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
+            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice);
         }
 
     }
@@ -505,5 +530,20 @@ public class WorkOrderReportExportController implements Serializable {
     public void setFilterCurrentOwner(UserAccount filterCurrentOwner) {
         this.filterCurrentOwner = filterCurrentOwner;
     }
-    
+
+    public String getFilterParts() {
+        return filterParts;
+    }
+
+    public void setFilterParts(String filterParts) {
+        this.filterParts = filterParts;
+    }
+
+    public String getFilterTotalPrice() {
+        return filterTotalPrice;
+    }
+
+    public void setFilterTotalPrice(String filterTotalPrice) {
+        this.filterTotalPrice = filterTotalPrice;
+    }
 }

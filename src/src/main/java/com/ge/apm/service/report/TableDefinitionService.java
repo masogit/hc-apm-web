@@ -51,7 +51,10 @@ public class TableDefinitionService {
     private BlobFileService blobService;
     @Autowired
     private V2_PmOrderService v2PmOrderService;
-    
+
+    public TableDefinition findById(String id){
+        return templateDao.findById(id);
+    }
 
     public Integer getCountByTemplate(String templateId) {
         return udcDao.getCountByTemplate(templateId);

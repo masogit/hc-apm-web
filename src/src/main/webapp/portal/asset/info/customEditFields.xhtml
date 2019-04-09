@@ -22,7 +22,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'aliasName')}" >
         <h:panelGroup>
             <label class="label">#{msg.aliasName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['aliasName'].required? '*':''}</span></label>
-            <p:inputText id="aliasName" value="#{assetInfoEditController.selected.aliasName}" required="#{assetInfoEditController.customConfig.assetFields['aliasName'].required}" 
+            <p:inputText  id="aliasName" value="#{assetInfoEditController.selected.aliasName}" required="#{assetInfoEditController.customConfig.assetFields['aliasName'].required}" 
                          requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" />
         </h:panelGroup>
     </c:if>
@@ -222,10 +222,12 @@
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
             <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacture']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}" 
-                            completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                            completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
             </p:autoComplete>
+
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
@@ -241,10 +243,11 @@
 
             <p:autoComplete id="vendor" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
-                            completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                            completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}" />
             </p:autoComplete>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
         <h:panelGroup>
             <label class="label">#{msg.vendorTel}</label>
@@ -256,10 +259,11 @@
             <label class="label">#{msg.maitanance}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</span></label>
             <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="#{msg.maitanance}#{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
-                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor3">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
             </p:autoComplete>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitananceTel')}" >

@@ -325,10 +325,17 @@ create table dashboard_role_res_tenant_revoke
 );
 
 
+--v19.3.1
+update v2_service_request set report_source = '1' where report_source is null;
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'NursingStaff';
+update sys_role set authorities = 'assetInventory.scan,assetInventory.view',authorities_ch = '扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetStaff';
+update sys_role set authorities = 'assetInventory.close,assetInventory.create,assetInventory.scan,assetInventory.view',authorities_ch = '关闭盘点工单,新建盘点工单,扫码盘点,查看盘点工单',cards = 'mgr_inv' where name = 'AssetHead';
+
+--v19.4.1
+update asset_info set system_id = null where system_id is not null and trim(system_id) = '';
 
 --v 19.4.1 hotfix
 ALTER TABLE public.nurse_site_maintain
     ALTER COLUMN schedule_date TYPE date ;
-
 ALTER TABLE public.nurse_site_maintain_item
     ALTER COLUMN schedule_date TYPE date ;

@@ -20,9 +20,8 @@ public interface PmOrderRuleCheckListRepository extends GenericRepository<PmOrde
 	@Query("select o from PmOrderRuleCheckList o where o.ruleUID = ?1 and o.status = 1")
 	public List<PmOrderRuleCheckList> findAllByRuleUID(String ruleUID);
 
-
-
-
+	@Query("select o from PmOrderRuleCheckList o where o.ruleUID in ?1 and o.status = 1")
+	public List<PmOrderRuleCheckList> findAllByRuleUIDBatch(List<String> ruleList);
 
 	@Query("select o from PmOrderRuleCheckList o where o.ruleUID = ?1")
 	public List<PmOrderRuleCheckList> findAllByRuleUID_full(String ruleUID);
@@ -35,5 +34,6 @@ public interface PmOrderRuleCheckListRepository extends GenericRepository<PmOrde
 	@Query(value="select o from PmOrderRuleCheckList o where uid in ?1 and ruleUID =?2")
 	@Transactional
 	public List<PmOrderRuleCheckList> findPMCL(List<String> stringList,String ruleUid);
+
 
 }

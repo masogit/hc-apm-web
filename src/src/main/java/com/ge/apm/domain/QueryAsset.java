@@ -11,8 +11,17 @@ public class QueryAsset {
 	//private Integer clinicalDeptId;//使用科室
 	private String brand;//品牌
     private String clinicalDeptUid;//使用科室uid
+	private String queryLevel;//查询规则级别
 
-    public String getClinicalDeptUid() {
+	public String getQueryLevel() {
+		return queryLevel;
+	}
+
+	public void setQueryLevel(String queryLevel) {
+		this.queryLevel = queryLevel;
+	}
+
+	public String getClinicalDeptUid() {
         return clinicalDeptUid;
     }
 

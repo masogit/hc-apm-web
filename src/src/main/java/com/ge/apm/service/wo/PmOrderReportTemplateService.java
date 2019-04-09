@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.apm.dao.PmOrderReportTemplateRepository;
 import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.domain.PmOrderReportTemplate;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
@@ -121,24 +118,48 @@ public class PmOrderReportTemplateService {
         MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
         // add dynamic table.
         if (rule != null) {
-            TableSchema schema;
-            schema = getTableSchemaById(rule.getSafetyReport());
-            if (schema != null) {
-                builder.safetyReport(schema);
-            }
-            schema = getTableSchemaById(rule.getPerformanceReport());
-            if (schema != null) {
-                builder.performanceReport(schema);
+            if(rule.getId() != null){
+                TableSchema schema;
+                schema = getTableSchemaById(rule.getSafetyReport());
+                if (schema != null) {
+                    builder.safetyReport(schema);
+                }
+                schema = getTableSchemaById(rule.getPerformanceReport());
+                if (schema != null) {
+                    builder.performanceReport(schema);
+                }
             }
         }
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
         template.write(out);
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    public InputStream generateReportTemplateBySchemaId(InputStream stream, String fReportId, String pReportId) throws IOException {
+    public InputStream generateMeasureReportTemplateByRule(InputStream stream, MeasureOrderRule rule) throws IOException {
+        MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
+        // add dynamic table.
+        if (rule != null) {
+            if(rule.getId() != null){
+                TableSchema schema;
+                schema = getTableSchemaById(rule.getSafetyReport());
+                if (schema != null) {
+                    builder.safetyReport(schema);
+                }
+                schema = getTableSchemaById(rule.getPerformanceReport());
+                if (schema != null) {
+                    builder.performanceReport(schema);
+                }
+            }
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+        template.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public InputStream generateReportTemplateBySchemaId(byte[] activeTemplateBytes, String fReportId, String pReportId) throws IOException {
+        InputStream stream = new ByteArrayInputStream(activeTemplateBytes);
         MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
         // add dynamic table.
         TableSchema schema;
