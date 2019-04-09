@@ -60,7 +60,7 @@
             </p:panelGrid>
         </p:fieldset>
         <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup id="statusOpen">
                     <p:selectBooleanCheckbox itemLabel="在修" value="#{workOrderReportExportController.statusOpen}">
                     </p:selectBooleanCheckbox>
@@ -72,6 +72,22 @@
                 <h:panelGroup id="statusCancel">
                     <p:selectBooleanCheckbox itemLabel="取消" value="#{workOrderReportExportController.statusCancel}">
                     </p:selectBooleanCheckbox>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">是否有备件</label>
+                    <p:selectOneMenu id="filterParts" value="#{workOrderReportExportController.filterParts}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                        <f:selectItem itemLabel="有备件" itemValue="Exist" />
+                        <f:selectItem itemLabel="无备件" itemValue="UnExist" />
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">是否有维修金额</label>
+                    <p:selectOneMenu id="filterTotalPrice" value="#{workOrderReportExportController.filterTotalPrice}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                        <f:selectItem itemLabel="有维修金额" itemValue="Exist" />
+                        <f:selectItem itemLabel="无维修金额" itemValue="UnExist" />
+                    </p:selectOneMenu>
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>

@@ -22,6 +22,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import org.joda.time.DateTime;
+import webapp.framework.util.TimeUtil;
 
 /**
  * @author 212547631
@@ -176,7 +178,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_valid")
     private boolean isValid;//在用？
 
-    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
+    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用,6:报警
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
@@ -506,6 +508,9 @@ public class AssetInfo implements ChineseName,Serializable {
     // 所属课题项目
     @Column(name = "subject_project")
     private String subjectProject;
+
+    @Column(name = "has_open_alert")
+    private Boolean hasOpenAlert;
 
     @Transient
     private int lineNum;
@@ -1692,7 +1697,15 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setProprietaryClass(String proprietaryClass) {
         this.proprietaryClass = proprietaryClass;
     }
-    
+
+    public Boolean isHasOpenAlert() {
+        return hasOpenAlert;
+    }
+
+    public void setHasOpenAlert(Boolean hasOpenAlert) {
+        this.hasOpenAlert = hasOpenAlert;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1777,5 +1790,33 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
+    }
+    
+    @Transient
+    private String warrantyAlertStatus = null;
+
+    public String getWarrantyAlertStatus(){
+        return warrantyAlertStatus;
+    }
+    
+    public void setWarrantyExpireAlertDays(Integer warrantyAlertDays){
+        if(warrantyAlertDays == null) return; // WarrantyAlertDays not configured, so no Alert for Warranty Alert
+
+        if(warrantyDate!=null){
+            // first check Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(warrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
+        else if(factoryWarrantyDate!=null){
+            // then check factory Warranty Date
+            DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
+            if(dt.isBeforeNow())
+                warrantyAlertStatus = "warrantyExpired";
+            else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
+                warrantyAlertStatus = "warrantyExpireSoon";
+        }
     }
 }

@@ -6,12 +6,13 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetFaultTypeService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -143,10 +144,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //选定的院区
     private OrgInfo selectSite;
 
-
     public String faultReason;
+    public CustomConfigService customConfigService;
 
     protected void init() {
+        customConfigService=WebUtil.getBean(CustomConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
@@ -1098,14 +1100,21 @@ public void repairResultSet(){
                 currentStatus = 3;
             }
         }
-        selected = null;
+        //从配置信息获取紧急程度
+        CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //从配置信息获取当前状态
+        String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+        currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
+        newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
         faultReason="设备故障";
+        selected = null;
     }
 
     public void saveServiceRequest() {
@@ -1138,14 +1147,11 @@ public void repairResultSet(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-        if (Strings.isNullOrEmpty(asset.getLocationName())) {
+            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             asset.setLocationName(lName);
             locationName = lName;
-        } else {
-            locationName = asset.getLocationName();
-        }
     }
 
     @Override
@@ -1276,7 +1282,11 @@ public void repairResultSet(){
            if(itemDetail.getClosedPrice()==null) {
                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
            }
+           itemDetail.setArrivedGood(false);
+           itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
+           //调用微服务来存附件
+            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
         cancelWorkdetail();
     }
@@ -1293,6 +1303,7 @@ public void repairResultSet(){
         coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
+    //index == 1 是删除备件  ，index=2是删除协作人
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
 
@@ -1300,7 +1311,8 @@ public void repairResultSet(){
             detailDao.delete(itemDetail);*/
 
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-       //     detailDao.deleteById(itemId);
+            //调用微服务删除备件
+            serviceRequestApiService.delAccess(token,itemId);
 
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));

@@ -237,11 +237,17 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             .collect(Collectors.toList());
     }
     
+    private Boolean isValid301 = null;
+            
     //301医院则显示打印按钮
     public boolean validate301()
     {
-    	return sharedAssetStockService.validate301();
-    }
+        if(isValid301 == null) {
+            isValid301 = sharedAssetStockService.validate301();
+        }
+        return isValid301;        
+    } 
+    
     
     public void printVoucher(AssetInfo asset)
     {
