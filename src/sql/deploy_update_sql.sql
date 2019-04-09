@@ -326,4 +326,9 @@ create table dashboard_role_res_tenant_revoke
 
 
 
+--v 19.4.1 hotfix
+ALTER TABLE public.nurse_site_maintain
+    ALTER COLUMN schedule_date TYPE date ;
 
+ALTER TABLE public.nurse_site_maintain_item
+    ALTER COLUMN schedule_date TYPE date ;
