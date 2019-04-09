@@ -10,6 +10,10 @@ import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -34,6 +38,10 @@ public class ContractInfo implements Serializable {
     
     public enum AttachmentType {
         Contract, Tenders, Other
+    }
+
+    public enum ContractStatus {
+        COMPLETE
     }
 
     @Id
@@ -225,6 +233,11 @@ public class ContractInfo implements Serializable {
 
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+
+    @Getter
+    @Setter
+    @Column(name = "contract_status")
+    private String contractStatus;
 
     public String getTenderType() {
         return tenderType;
@@ -581,6 +594,14 @@ public class ContractInfo implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public boolean isContractComplete() {
+        boolean isComplete = false;
+        if(ContractStatus.COMPLETE.toString().equals(this.getContractStatus())) {
+            isComplete = true;
+        }
+        return isComplete;
     }
 
 }

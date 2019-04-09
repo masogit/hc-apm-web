@@ -58,10 +58,11 @@
                         </p:column>
 
                         <p:column exportable="false" width="50" headerText="编辑">
-                            <h:panelGroup>
+                            <h:panelGroup id="disabledDiv">
                                 <p:commandButton icon="ui-icon-pencil" class="btn btn-sm btn-gray" style="width: 10px; height: 25px;" disabled="#{sharedAssetInfoController.isBorrow(item.uid)}"
                                                  actionListener="#{sharedAssetInfoController.prepareEditOne(item.uid)}" title="编辑" update=":AssetEditDlg, datalist" oncomplete="PF('AssetEditDialog').show()" />
                             </h:panelGroup>
+                            <p:tooltip for="disabledDiv" value="设备在借中，无法编辑调剂设备名称" position="right" rendered="#{sharedAssetInfoController.isBorrow(item.uid)}"/>
                         </p:column>
 
                         <!--<p:column colspan="2" width="100" rendered="#{sharedAssetInfoController.isBorrow(item.uid)}">-->

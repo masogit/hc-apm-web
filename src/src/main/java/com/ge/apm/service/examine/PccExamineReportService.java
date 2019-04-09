@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.faces.context.FacesContext;
 
+import org.apache.http.client.utils.DateUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -304,30 +305,23 @@ public class PccExamineReportService {
 
 	@Transactional
 	public ApmStreamedContent generateReport(PccExamineReport pcc) {
-		// deleteFile(pcc.getId(), V2_BlobObject.BO_TYPE_PCCReport,
-		// V2_BlobObject.BO_SUB_TYPE_DOCS);
 		AssetInfo tempInfo = pcc.getAssetInfo();
 		if (tempInfo == null) {
 			tempInfo = getAssetInfo(pcc.getAssetUid());
 			pcc.setAssetInfo(tempInfo);
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = pcc.getCheckDate();
 		List<ApmStreamedContent> listPicture = parseBlobObjectImg(pcc.getId());
 		ApmStreamedContent template = getTemplate();
 		if (template != null) {
 			try {
-				String fileName = "";
-				if (date != null) {
-					fileName = sdf.format(date);
-				}
-				String tempFileName = template.getName();
-				int index = tempFileName.lastIndexOf(".");
-				fileName = fileName + tempFileName.substring(index, tempFileName.length());
-				fileName = tempInfo.getName() + "_" + fileName;
+				String dateStr = date != null ? DateUtils.formatDate(date, "yyyy-MM-dd") : "";
+				String fileName = tempInfo.getName() + "_" + dateStr + ".pdf";
 				pcc.setReportDate(new Date());
-				template.settBytes(renderDocx(getTemplateMap(pcc, listPicture), template.gettBytes()));
-				template.setContentType("application/msword");
+				byte[] docxBytes = renderDocx(getTemplateMap(pcc, listPicture), template.gettBytes());
+				byte[] pdfBytes = msService.docxToPdf(docxBytes);
+				template.settBytes(pdfBytes);
+				template.setContentType("application/pdf");
 				template.setName(fileName);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

@@ -5,49 +5,32 @@
  */
 package com.ge.apm.view.pm;
 
-import com.alibaba.fastjson.JSONObject;
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.bo.MaintenanceTemplate;
-import com.ge.apm.domain.bo.parser.SchemaParser;
-import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
-import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
-import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
-import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
 import com.ge.apm.domain.exception.BusinessException;
-import com.ge.apm.domain.pure.TableGroup;
-import com.ge.apm.domain.pure.TableItem;
-import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.wo.PmOrderReportTemplateService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.view.sysutil.CheckItem;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,21 +60,43 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
-    @Setter@Getter
-    private Boolean nochange=false;
-    private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
+    //选定科室过滤
+    @Setter @Getter
+    private String filterClinicalDeptOrg;
+    @Setter @Getter
+    private String filterAssetDeptOrg;
+    //搜索字串
+    private String oneSearchStr;
+    //选定的院区
+    private OrgInfo selectSite;
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfoTreeService orgInfoTreeService;
+    @Setter @Getter
+    private Set<String> clinicalDeptOrgUidSet;
+    private ServiceRequestApiService serviceRequestApiService;
+    private PmOrderRuleRepository pmOrderRuleRepository;
+    private String token;
+    private List<UnstructuredDataCollection> unDataCollection;
+    private UnstructuredDataCollection unCollection;
+    private PmOrderRuleCheckList pmCheckItem;
+    private UnstructuredDataCollectionRepository reportDao;
+    private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
+    @Setter @Getter
+    private Boolean nochange = false;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
+    @Getter @Setter
     private String fileterOrgName;
-    private String fileterAssetDeptOrgName;
+    @Getter @Setter
     private Integer casePriority;
-private  String cancelInt;
+    private  String cancelInt;
     private String supplierName;
     private AutoCompleteService autoCompleteService;
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private V2_PmOrderRepository dao;
     private Double totalManHours;
+    @Getter @Setter
     private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
@@ -107,7 +112,6 @@ private  String cancelInt;
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
     private Boolean terminate;
-    private PmOrderReportTemplateService pmOrderReportTemplateService;
     private UaaService uaaService;
     private UserContextService userContextService;
     private BlobFileService blobService;
@@ -156,7 +160,6 @@ private  String cancelInt;
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
-    private TableDefinitionService tableService;
     // cache for maintenance report
     private StreamedContent maintenanceReport;
     private UserAccount user;
@@ -164,6 +167,7 @@ private  String cancelInt;
     Boolean isInsulate;
     private String reportUid; //selected table base uid
     private Map<String, Object> selectedObjectMap = new HashMap();
+    private PmReportService pmReportService;
 
     private String queryAssetUid;
 
@@ -175,82 +179,80 @@ private  String cancelInt;
         this.head = head;
     }
 
-    public void prepareEditAccDetailonPrice(String itemId){
-        accessoryList= woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-    if(!accessoryList.isEmpty())
-        itemDetail=accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+    public void prepareEditAccDetailonPrice(String itemId) {
+        accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+        if (!accessoryList.isEmpty())
+            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
 
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
 
-        supplierName=itemDetail.getSupplier();
+        supplierName = itemDetail.getSupplier();
         nochange = true;
 
     }
 
-    public void x3(){
-        System.out.println(casePriority);
-    }
-    public void prepareCancel(String itemId){
-        cancelReason=null;
-          selected = dao.findById(itemId);
+    public void prepareCancel(String itemId) {
+        cancelReason = null;
+        selected = dao.findById(itemId);
         int type = selected.getPmType();
-        if(type == 1){
-            cancelInt="2";
+        if (type == 1) {
+            cancelInt = "2";
         }
-        if(type ==2 ){
-            cancelInt="1";
+        if (type == 2) {
+            cancelInt = "1";
         }
-        if(type ==3 ){
-            cancelInt="1";
+        if (type == 3) {
+            cancelInt = "1";
         }
     }
 
-    public void cancelPMorder(){
-
-            pmOrderService.invokePmOerCancel(cancelReason,selected,cancelInt);
-
+    public void cancelPMorder() {
+        pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
 
-    public boolean allowChanged(){
+    public boolean allowChanged() {
         //is closed
-        if(selected==null){
+        if (selected == null) {
             return true;
         }
-        if( selected.isFinished()) {//关单后
-            if(userContextService.hasAnyRole("AssetHead")){
+        if (selected.isFinished()) {//关单后
+            if (userContextService.hasAnyRole("AssetHead")) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
-        }else{
-            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+        } else {
+            if (userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff")) {
                 return true;
             }
         }
         return true;
     }
-    public boolean allowChangedForDisable(){
-        if(selected.isFinished()) {//关单后
-            if(userContextService.hasAnyRole("AssetHead")){
+
+    public boolean allowChangedForDisable() {
+        if (selected.isFinished()) {//关单后
+            if (userContextService.hasAnyRole("AssetHead")) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
-        }else{
-            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
+        } else {
+            if (userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff")) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
         }
 
     }
-    public void partsPriceUpdate(){
-        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
+
+    public void partsPriceUpdate() {
+        if (itemDetail.getClosedPrice() == null || itemDetail.getClosedPrice() == 0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
     }
-    public void closePrcieUpdate(){
+
+    public void closePrcieUpdate() {
         itemDetail.setClosedPrice(itemDetail.getClosedPrice());
     }
 
@@ -262,8 +264,6 @@ private  String cancelInt;
             itemDetail.setClosedTime(null);
         }
     }
-
-
     public void arrivalTimeSet() {
         if (itemDetail == null) return;
         if (itemDetail.getArrived() == true)
@@ -278,6 +278,26 @@ private  String cancelInt;
        /* FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "折叠", "Visibility:" + event.getVisibility());
         FacesContext.getCurrentInstance().addMessage(null, msg);*/
     }
+    ArrayList<String> orderNumList = new ArrayList<String>();
+    public void preparePmOrderBatchComplete() {
+        orderNumList = new ArrayList<String>();
+        List<Map.Entry<String, Boolean>> collect =
+                sameOpHashmap.entrySet().stream().filter(item -> item.getValue()).collect(Collectors.toList());
+        collect.stream().forEach(item -> {
+            orderNumList.add(item.getKey());
+        });
+        final Set<String> assetUidList = dao.getAssetUid(orderNumList);
+        final List<String> pmRuleIdList = pmOrderRuleRepository.findPmRuleForBatch(assetUidList);
+        pmCheckItemList= pmOrderRuleCheckListRepository.findAllByRuleUIDBatch(pmRuleIdList);
+        pmCheckItemList.stream().filter(item -> !hmCheck.containsKey(item.getUid()))
+                .forEach(item -> {
+                    UnstructuredData unData = new UnstructuredData();
+                    unData.setValue("pass");
+                    unData.setKey(item.getUid());
+                    hmCheck.put(item.getUid(), unData);
+                });
+    }
+
 
     public boolean sameType(){
         ArrayList<String> orderNumList = new ArrayList<String>();
@@ -322,8 +342,6 @@ private  String cancelInt;
             }
         }
     }
-
-
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -368,317 +386,22 @@ private  String cancelInt;
      * @return true if the mantenance report item has been selected, false otherwise.
      */
     public boolean isTargetSelected() {
-        return this.selected != null;
+        return !selectedMap.isEmpty() && selectedMap.values().contains(true);
     }
 
     /**
      * Generate maintenance report.
      */
     public void doExportMaintenanceReport() {
-        {
-            if (this.selected != null) {
-                maintenanceReport = null;
-                try {
-                    PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-                    if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
-                    InputStream rawTemplate = null;
-                    if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
-                        // get template if the report storage is set.
-                        StreamedContent template = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-                        rawTemplate = template.getStream();
-                    } else {
-                        // generate template otherwise.
-                        try {
-                            byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
-                            InputStream activeTemplateStream = new ByteArrayInputStream(activeTemplateBytes);
-                            String safetySchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-safety-report"))
-                                    .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
-                            String performanceSchema = reportList.stream().filter(item-> Objects.equals(item.getBoType(),"pm-performance-report"))
-                                    .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
-                            rawTemplate = pmOrderReportTemplateService.generateReportTemplateBySchemaId(activeTemplateStream, safetySchema,performanceSchema);
-                        } catch (IOException e) {
-                            throw new BusinessException("自动模版生成失败");
-                        }
-                    }
-
-                    if (rawTemplate == null) throw new BusinessException("请先上传保养报告模版!");
-
-                    Map<String, Object> datas = populateReportContent(selected);
-                    
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    XWPFTemplate template = XWPFTemplate.compile(rawTemplate);
-                    // render policy for accessory information.
-                    template.registerPolicy(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
-                    // render policy for maintenance workflow.
-                    template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
-                    // render policy for check list
-                    template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
-                    // render policy for audit record
-                    template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
-                    template.render(datas);
-                    template.write(out);
-
-                    InputStream doc = new ByteArrayInputStream(out.toByteArray());
-                    maintenanceReport = new DefaultStreamedContent(doc, "application/msword", "maintenance-report.docx");
-                } catch (BusinessException e) {
-                    WebUtil.addErrorMessage(e.getMessage());
-                } catch (Exception e) {
-                    Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
-                    WebUtil.addErrorMessage("保养报告生成失败");
-                }
-            }
+        maintenanceReport = null;
+        try {
+            maintenanceReport = pmReportService.generate(selectedMap, isInsulate, user);
+        } catch (BusinessException e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+            WebUtil.addErrorMessage("保养报告生成失败");
         }
-
-    }
-
-    private Map<String, Object> populateReportContent(V2_PmOrder pmOrder) {
-        Map<String, Object> content = new HashMap<>();
-
-        // Device information
-        content.put(MaintenanceTemplate.Device.NAME.toString(), pmOrder.getAssetInfo().getName());
-        content.put(MaintenanceTemplate.Device.DEPARTMENT.toString(), pmOrder.getAssetInfo().getClinicalDeptName());
-        content.put(MaintenanceTemplate.Device.TYPE.toString(), pmOrder.getAssetInfo().getFunctionType());
-        content.put(MaintenanceTemplate.Device.OEM.toString(), pmOrder.getAssetInfo().getManufacture());
-        content.put(MaintenanceTemplate.Device.SERIAL.toString(), pmOrder.getAssetInfo().getSerialNum());
-        content.put(MaintenanceTemplate.Device.NUMBER.toString(), pmOrder.getAssetInfo().getDepartNum());
-        content.put(MaintenanceTemplate.Device.QR.toString(), pmOrder.getAssetInfo().getQrCode());
-
-        // Maintenance information
-        content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
-        content.put(MaintenanceTemplate.Maintenance.CREATOR.toString(), pmOrder.getCreatorName());
-        content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
-        content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? DEFAULT_DAY.print(pmOrder.getPlanTime().getTime()) : "");
-        content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? DEFAULT_DAY.print(pmOrder.getEndTime().getTime()) : "");
-        content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
-        content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
-        content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
-        content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
-        // Coworker List
-        List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
-        if (coworkers != null) {
-            int count = 0;
-            for (V2_WorkOrderCoworker coworker : coworkers) {
-                // ignore fake empty coworker
-                if ("000".equalsIgnoreCase(coworker.getId())) continue;
-                if (count == 0) {
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
-                } else if (count == 1) {
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
-                }
-                count++;
-            }
-        }
-
-        // Accessory Information
-        List<Map<String, Object>> accessoryInfoTable = new ArrayList<>();
-        if (this.getAccessoryList().size() > 0) {
-            for (V2_WorkOrder_Detail item : this.getAccessoryList()) {
-                if ("000".equalsIgnoreCase(item.getId())) continue;
-
-                Map<String, Object> accessoryMap = new HashMap<>();
-
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.NAME.toString(), item.getParts());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.QUANTITY.toString(), item.getApartsQuantity());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getClosedPrice());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.TYPE.toString(), FieldValueMessageController.fieldValue("partsType", item.getPartsType()));
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.SERIAL_NUM.toString(), item.getSerialNum());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.WARRANTY_DATE.toString(), item.getWarrantyDate());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.ARRIVED.toString(), item.getArrived());
-
-                accessoryInfoTable.add(accessoryMap);
-            }
-        }
-        content.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), accessoryInfoTable);
-
-        // Accessory Signature
-        String signatureStorageId = pmOrder.getSignature();
-        if (!Strings.isNullOrEmpty(signatureStorageId)) {
-            byte[] signatureBytes = pmOrderReportTemplateService.getSignatureBytes(signatureStorageId);
-            if (signatureBytes != null) {
-                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), SIGNATURE_HOLDER);
-                content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
-            }
-        }
-
-        if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())){
-            byte[] signatureBytes = pmOrderReportTemplateService.getDefaultSignatureBytes();
-            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
-            content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
-        }
-
-        // Maintenance Workflow Information
-        List<Map<String, Object>> maintenanceInfoTable = new ArrayList<>();
-        for (PmOrderSteps item : this.aquirePmOrderStep()) {
-            Map<String, Object> maintenanceInfoMap = new HashMap<>();
-            maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.STEP.toString(), item.getStepName());
-            maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.OWNER.toString(), item.getOwnerName());
-            maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.START_TIME.toString(), item.getStartTime());
-            maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.END_TIME.toString(), item.getEndTime());
-
-            maintenanceInfoTable.add(maintenanceInfoMap);
-        }
-        content.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), maintenanceInfoTable);
-
-        // Check List
-        List<Map<String, Object>> checkListTable = new ArrayList<>();
-        if (this.getPmCheckItemList() != null) {
-            for (PmOrderRuleCheckList item : this.getPmCheckItemList()) {
-                Map<String, Object> checkListMap = new HashMap<>();
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.NAME.toString(), item.getName());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.PERIOD.toString(), item.getPeriod());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.CONTENT.toString(), item.getRemark());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), FieldValueMessageController.fieldValue("checkItem", getCheckListResult(item.getUid())));
-
-                checkListTable.add(checkListMap);
-            }
-        }
-        content.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), checkListTable);
-
-
-        // Audit Message List
-        List<Map<String, Object>> auditMsgTable = new ArrayList<>();
-        if (this.getServiceRequestMessageList(selected.getId()) != null) {
-            for (ServiceRequestMsg item : this.getServiceRequestMessageList(selected.getId())) {
-                Map<String, Object> auditMsgMap = new HashMap<>();
-                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.TIME.toString(), item.getSendTime());
-                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.OWNER.toString(), item.getSenderUserName());
-                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.INFO.toString(), item.getMessage());
-
-                auditMsgTable.add(auditMsgMap);
-            }
-        }
-        content.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), auditMsgTable);
-
-        if (reportList != null) {
-            for (UnstructuredDataCollection item : reportList) {
-                // ignore invalid data
-                if(item == null || Strings.isNullOrEmpty(item.getBoType())) {
-                    continue;
-                }
-                MaintenanceTemplate.Component tableType;
-                switch (item.getBoType()) {
-                    case "pm-safety-report":
-                        tableType = MaintenanceTemplate.Component.SAFETY_REPORT;
-                        break;
-                    case "pm-performance-report":
-                        tableType = MaintenanceTemplate.Component.PERFORMANCE_REPORT;
-                        break;
-                    default:
-                        continue;
-                }
-                renderDynamicTable(item, content, tableType);
-            }
-        }
-        return content;
-    }
-
-    /**
-     * Render Dynamic Table content.
-     *
-     * @param collection data collection
-     * @param content content map
-     */
-    private void renderDynamicTable(UnstructuredDataCollection collection, Map<String, Object> content, MaintenanceTemplate.Component component) {
-        TableDefinition tableDefinition = tableDao.findById(collection.getSchemaId());
-        TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
-        List<UnstructuredData> dataList = collection.getData();
-
-        // Get raw data
-        Map<String, Object> rawTableValue = new HashMap<>();
-        dataList.forEach(item -> {
-            try {
-                rawTableValue.put(item.getKey(), item.getValue());
-            } catch(ClassNotFoundException e) {
-                rawTableValue.put(item.getKey(), item.getValueSerialized());
-            }
-        });
-
-        // update select box option values
-        Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
-        final String emptyStr = "";
-        final String prefix = component.toString();
-        for(TableGroup group : table.getGroups()) {
-            for(TableItem item : group.getItems()) {
-                if (item == null || item.getComponent() == null) {
-                    continue;
-                }
-                switch (item.getComponent()) {
-                    case Number:
-                        if (item.getResKey() != null) {
-                            try {
-                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
-                            } catch (RuntimeException e) {
-                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
-                            }
-                        }
-                        if (item.getKey() != null) {
-                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
-                        }
-                        break;
-                    case Label:
-                        if (item.getResKey() != null) {
-                            try {
-                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
-                            } catch (RuntimeException e) {
-                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
-                            }
-                        }
-                        break;
-                    case Switch:
-                        if (item.getKey() != null) {
-                            try {
-                                boolean res = (Boolean) tableValue.getOrDefault(item.getKey(), false);
-                                content.put(wrap(prefix, item.getKey()), res ? "是" : "否");
-                            } catch (RuntimeException e) {
-                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
-                            }
-                        }
-                        break;
-                    case Date:
-                        if (item.getKey() != null) {
-                            try {
-                                Date dt = (Date) tableValue.getOrDefault(item.getKey(), null);
-                                content.put(wrap(prefix, item.getKey()), dt == null ? "" : DEFAULT_DAY.print(dt.getTime()));
-                            } catch (RuntimeException e) {
-                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
-                            }
-                        }
-                        break;
-                    case Select:
-                    case Text:
-                    case TextArea:
-                    default:
-                        if (item.getKey() != null) {
-                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
-                        }
-                        break;
-                }
-            }
-        }
-    }
-
-    private String wrap(String prefix, String key) {
-        return SchemaParser.UNDERSCORE_JOINER.join(prefix, key);
-    }
-
-    /**
-     * Translate check item description.
-     *
-     * @param uid check item uid
-     * @return description, or 'n/a'
-     */
-    private String getCheckListResult(String uid) {
-        UnstructuredData data = this.hmCheck.get(uid);
-        if (data != null) {
-            try {
-                return (String) data.getValue();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return "n/a";
     }
 
     /**
@@ -795,8 +518,47 @@ private  String cancelInt;
         return true;
     }
 
+    public void saveCheckItemDataBatch(List<String> pmOrderNumList){
+        List<V2_PmOrder> batchPmOrderList = dao.getBatchPmOrderList(pmOrderNumList);
+        //循环处理每一条工单，将其保养规则对应的保养检查项目存到undatastructCollection和undatastruct中
 
-    @Transactional
+        for (int i = 0; i < batchPmOrderList.size(); i++) {
+            HashMap<String, UnstructuredData> hmCheckBatch = new HashMap<String,UnstructuredData>();
+            V2_PmOrder pmOrder=batchPmOrderList.get(i);
+            pmCheckItemList = acPmOrderUleCheckList(pmOrder);
+            if (pmCheckItemList != null){
+                pmCheckItemList.stream().filter(item-> !hmCheckBatch.containsKey(item.getUid()))
+                        .forEach(item -> {
+                            UnstructuredData unData = new UnstructuredData();
+                            unData.setValue("pass");
+                            unData.setKey(item.getUid());
+                            hmCheckBatch.put(item.getUid(), unData);
+                        });
+
+            }
+            Iterator<Map.Entry<String, UnstructuredData>> it = hmCheckBatch.entrySet().iterator();
+            unDataCollection = reportDao.findCKByBoUuid(pmOrder.getId(),"pm-checklist-report");
+            UnstructuredDataCollection unColl = new UnstructuredDataCollection();
+            ArrayList<UnstructuredData> unD = new ArrayList<UnstructuredData>();
+            if(unDataCollection.isEmpty()){
+                unColl.setBoUuid(pmOrder.getId());
+                unColl.setBoType("pm-checklist-report");
+                PmOrderRule pmOrderRule = pmOrderService.acqPmOrderRule(pmOrder);
+                if (pmOrderRule != null) {
+                    unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+                }
+                while (it.hasNext()) {
+                    Map.Entry<String, UnstructuredData> entry = it.next();
+                    untest = entry.getValue();
+                    if (untest.getCollectionId() == null) {
+                        unD.add(untest);
+                    }
+                }
+                unColl.setData(unD);
+                pmOrderService.saveReport(unColl);
+            }
+        }
+    }
     public void saveCheckItemData() {
         UnstructuredDataCollection unColl = new UnstructuredDataCollection();
         ArrayList<UnstructuredData> unD = new ArrayList<UnstructuredData>();
@@ -810,8 +572,7 @@ private  String cancelInt;
                 if (pmOrderRule != null) {
                     unColl.setSchemaId(pmOrderRule.getPerformanceReport());
                 }
-                //将检查项
-                // 的数据保存到UnstructuredDataCollection中.
+                //将检查项的数据保存到UnstructuredDataCollection中.
                 while (it.hasNext()) {
                     Map.Entry<String, UnstructuredData> entry = it.next();
                     untest = entry.getValue();
@@ -820,7 +581,7 @@ private  String cancelInt;
                     }
                 }
                 unColl.setData(unD);
-                pmOrderService.saveReport(unColl);
+                pmOrderService.saveReport(unColl);//insert into unstructured_data_collection
             } else { //更新已经有的检查项
                 //清空原来的unstructuredDataList
                 unDataCollection.get(0).setData(new ArrayList<UnstructuredData>());
@@ -1048,14 +809,12 @@ private  String cancelInt;
         newServiceRequest.setRequestTime(new Date());
         if (selectedPmOrder != null) {
             selectedAsset = selectedPmOrder.getAssetInfo();
-            if (Strings.isNullOrEmpty(selectedAsset.getLocationName())) {
-                final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-                dptName = orgDao.getByUid(orgInfoUID).getName();
-            } else {
-                dptName = selectedAsset.getLocationName();
-            }
+            currentStatus=3;
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            dptName = orgDao.getByUid(orgInfoUID).getName();
+            casePriority =3;//一般
         }
-        //  pmOrderService.closePM(selectedPmOrder,picList);
+
     }
 
     public void saveServiceRequest() {
@@ -1084,7 +843,10 @@ private  String cancelInt;
 
             if(casePriority ==null) {
                 newServiceRequest.setCasePriority(1);
+            }else{
+                newServiceRequest.setCasePriority(casePriority);
             }
+
             woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
@@ -1111,12 +873,15 @@ private  String cancelInt;
         else
             itemDetail.setSupplier(supplier.getName());
     }
-    ///
+    private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
+        token = UserContextService.getAccessToken();
+        pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
+        serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
-        //  pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -1127,16 +892,15 @@ private  String cancelInt;
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
-        tableService = WebUtil.getBean(TableDefinitionService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         this.selectedMap = new HashMap();
+        pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1426,7 +1190,7 @@ private  String cancelInt;
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
-            
+
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -1597,9 +1361,9 @@ private  String cancelInt;
                     unData.setKey(item.getUid());
                     hmCheck.put(item.getUid(), unData);
                 });
-        
+
         }
-        
+
 //        if (pmCheckItemList != null) {
 //            if (hmCheck.isEmpty()) {
 //                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
@@ -1710,35 +1474,21 @@ private  String cancelInt;
     }
 
 
-
-
     //已计划-->批量保养完成
     public void repairPmOrderBatch() {
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
+//        保存检查项
+       // saveCheckItemDataBatch(orderNumList);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours,         currentPagePmOrders, selectedMap);
         selectedMap = new HashMap<String, Boolean>();
     }
 
-/*    public void batchComplete() {
-       *//* List<String> assetIdList = new ArrayList<String>();
-        //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
-        selectedMap.forEach((k,v)->{
-            if(v==true)
-                assetIdList.add(k);
-        });
-        List<V2_PmOrder> pmList = dao.checkSimplify(assetIdList);
-        if(pmList.size()!=assetIdList.size()){//说明选定的工单全都是可以简化即simplify为3
-            //不能选择"抢单"的来做批量"完成"
-            WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
-            return;
-        }*//*
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, currentPagePmOrders, selectedMap);
-    }*/
 
     //已计划-->保养完成
     public void repairPmOrder() {
         if (!requiredCheck()) {
             return;
         }
+        //保存检查项
         saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1781,16 +1531,7 @@ private  String cancelInt;
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
-    //选定科室过滤
-    private String filterClinicalDeptOrg;
-    private String filterAssetDeptOrg;
-    //搜索字串
-    private String oneSearchStr;
-    //选定的院区
-    private OrgInfo selectSite;
-    private List<OrgInfo> clinicalDeptList;
-    private OrgInfoTreeService orgInfoTreeService;
-    private Set<String> clinicalDeptOrgUidSet;
+
 
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
@@ -1818,11 +1559,8 @@ private  String cancelInt;
             return;
         }
         assetName = asset.getName();
-        if (Strings.isNullOrEmpty(asset.getClinicalDeptName())) {
-            dptName = null;
-        } else {
-            dptName = asset.getClinicalDeptName();
-        }
+        //String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -1856,6 +1594,8 @@ private  String cancelInt;
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
+        //调用微服务删除备件
+        serviceRequestApiService.delAccess(token,itemId);
     }
 
     public void prepareBatchComplete() {
@@ -1880,8 +1620,14 @@ private  String cancelInt;
             if(itemDetail.getClosedPrice()==null) {
                 itemDetail.setClosedPrice(itemDetail.getPartsPrice());
             }
+
+            itemDetail.setArrivedGoodReturn(false);
+            itemDetail.setArrivedGood(false);
             accessoryList.add(itemDetail);
         }
+        //调用微服务来添加备件
+        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetUid(),itemDetail);
+
     }
 
     public List<TableDefinition> getTablesName(V2_PmOrder v2) {
@@ -1923,18 +1669,16 @@ private  String cancelInt;
         }
     }
 
-    List<UnstructuredDataCollection> unDataCollection;
-    UnstructuredDataCollection unCollection;
-    PmOrderRuleCheckList pmCheckItem;
-    UnstructuredDataCollectionRepository reportDao;
-    List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
 
+
+    //hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
     public void loadHmCheck(V2_PmOrder v2PmOrder) {
-        hmCheck = new HashMap<String, UnstructuredData>();
+        hmCheck = new   HashMap<String, UnstructuredData>();
+        //pmCheckItemList:检查项
         pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
-        List<CheckItem> checkItemList = new ArrayList<CheckItem>();
         if (pmCheckItemList == null) return ;
+        //The below guys seems to exist no reason.
         for (int i = 0; i < pmCheckItemList.size(); i++) {
             pmCheckItem = (PmOrderRuleCheckList) pmCheckItemList.get(i);
             if (unDataCollection != null && !unDataCollection.isEmpty()) { //
@@ -1944,14 +1688,12 @@ private  String cancelInt;
                     for (int k = 0; k < dataList.size(); k++) {
                         UnstructuredData unsData = (UnstructuredData) dataList.get(k);
                         if (unsData.getKey().equalsIgnoreCase(pmCheckItem.getUid())) {
-                            checkItemList.add(new CheckItem(pmCheckItem.getUid(), unsData));
                             hmCheck.put(pmCheckItem.getUid(), unsData);
                         }
                     }
                 }
             }
         }
-       // return checkItemList;
     }
 
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
@@ -2174,14 +1916,6 @@ private  String cancelInt;
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
-    }
-
-    public String getDptName() {
-        return dptName;
-    }
-
-    public void setDptName(String dptName) {
-        this.dptName = dptName;
     }
 
     public Integer getRuleLevel() {
@@ -2517,46 +2251,6 @@ private  String cancelInt;
         this.orgInfoTreeService = orgInfoTreeService;
     }
 
-    public Set<String> getClinicalDeptOrgUidSet() {
-        return clinicalDeptOrgUidSet;
-    }
-
-    public void setClinicalDeptOrgUidSet(Set<String> clinicalDeptOrgUidSet) {
-        this.clinicalDeptOrgUidSet = clinicalDeptOrgUidSet;
-    }
-
-    public String getFilterClinicalDeptOrg() {
-        return filterClinicalDeptOrg;
-    }
-
-    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
-        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
-    }
-
-    public String getFilterAssetDeptOrg() {
-        return filterAssetDeptOrg;
-    }
-
-    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
-        this.filterAssetDeptOrg = filterAssetDeptOrg;
-    }
-
-    public String getFileterAssetDeptOrgName() {
-        return fileterAssetDeptOrgName;
-    }
-
-    public void setFileterAssetDeptOrgName(String fileterAssetDeptOrgName) {
-        this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
-    }
-
-    public String getFileterOrgName() {
-        return fileterOrgName;
-    }
-
-    public void setFileterOrgName(String fileterOrgName) {
-        this.fileterOrgName = fileterOrgName;
-    }
-
     public String getCancelInt() {
         return cancelInt;
     }
@@ -2565,11 +2259,4 @@ private  String cancelInt;
         this.cancelInt = cancelInt;
     }
 
-    public Integer getCasePriority() {
-        return casePriority;
-    }
-
-    public void setCasePriority(Integer casePriority) {
-        this.casePriority = casePriority;
-    }
 }

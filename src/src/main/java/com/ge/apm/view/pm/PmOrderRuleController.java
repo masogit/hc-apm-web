@@ -30,6 +30,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
@@ -252,6 +253,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
         }*/
         //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
+        tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
         tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNull, null));
@@ -265,6 +267,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public List<TableDefinition> getTableDefinition() {
         List<SearchFilter> tempFilter = new ArrayList<>();
         //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
+        tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
         tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         if (this.selected != null && this.selected.getAssetGroup() != null) {
@@ -339,29 +342,27 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Transactional
     public void applyChange() {
-        {
-            selected.setPeriod(getPeriod());
-            if (selected.getId() != null) {
-                onBeforeSave(selected.getUid(),deletedCheckListIds);
-            }
-            getName();
-            if(selectedUserOrg != null){
-                selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
-                selected.setHospitalUID(selectedUserOrg.getHospitalUID());
-                selected.setSiteUID(selectedUserOrg.getSiteUID());
-            }
-            dao.save(selected);
-            if (CollectionUtils.isNotEmpty(checkItemLists)) {
-                checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
-                for (PmOrderRuleCheckList item : checkItemLists) {
-                    item.setId(null);
-                    item.setRuleUID(selected.getUid());
-                }
-                pmOrderRuleCheckListRepository.save(checkItemLists);
-            }
-            checkItemLists.clear();
-            WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
+        selected.setPeriod(getPeriod());
+        if (selected.getId() != null) {
+            onBeforeSave(selected.getUid(),deletedCheckListIds);
         }
+        getName();
+        if(selectedUserOrg != null){
+            selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+            selected.setHospitalUID(selectedUserOrg.getHospitalUID());
+            selected.setSiteUID(selectedUserOrg.getSiteUID());
+        }
+        dao.save(selected);
+        if (CollectionUtils.isNotEmpty(checkItemLists)) {
+            checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
+            for (PmOrderRuleCheckList item : checkItemLists) {
+                item.setId(null);
+                item.setRuleUID(selected.getUid());
+            }
+            pmOrderRuleCheckListRepository.save(checkItemLists);
+        }
+        checkItemLists.clear();
+        WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
     }
 
     public void getName() {
@@ -474,7 +475,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             selected.setHospitalUID(selectedUserOrg.getHospitalUID());
             selected.setSiteUID(selectedUserOrg.getSiteUID());
         }*/
-        selected.setId(null);
+        //selected.setId(null);
         selected.setStatus(0);
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -491,7 +492,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if (selected.getPeriod() != null && selected.getPeriod() > 0) {
             return selected.getPeriod();
         } else {
-            List<Integer> itemIds = new ArrayList<Integer>();
+            List<Integer> itemIds = new ArrayList<>();
             checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
             if (!checkItemLists.isEmpty()) {
                 Iterator it = checkItemLists.iterator();
@@ -503,10 +504,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             Integer period = 1;
             if (itemIds.size() > 0) {
                 Collections.sort(itemIds);
-                period =  itemIds.get(0);//pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(), itemIds);
-            }
-            if (period <= 0) {
-                period = 1;
+                period =  itemIds.get(0);
             }
             return period;
         }
@@ -523,12 +521,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 
     public void initSaveAs() {
-        Integer newId = selected.getId();
-        selected = null;
-        selected = dao.findById(newId);
+        prepareEdit();
+        selected.setId(null);
         selected.setPeriod(null);
-        selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
-        initCheckItemLists();
+        /*selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
+        initCheckItemLists();*/
     }
 
     public String getFilterPmRuleLevel() {
@@ -554,6 +551,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         try {
             this.selected = null;
             this.checkItemLists = null;
+            this.uploadedFile = null;
             super.prepareCreate();
             initCheckItemLists();
             selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
@@ -565,9 +563,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void prepareEdit() {
         super.prepareEdit();
-        Integer newId = selected.getId();
-        selected = null;
-        selected = dao.findById(newId);
         selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
     }
@@ -633,7 +628,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         this.checkItemLists = checkItemLists;
     }
 
-    public void generateReportTemplateFile() {
+    public void generateReportTemplateFile() throws IOException{
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx");
 
         try {
@@ -642,6 +637,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
             WebUtil.addErrorMessage("Word模版生成失败");
+        }finally {
+            stream.close();
         }
     }
 
@@ -650,10 +647,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
      */
     public void removeReportTemplate() {
         if (selected != null) {
-            blobService.deleteBlobFileById(selected.getReportStorageId());
+            //不再删除附件，防止同一个附件被多个保养规则引用
+            //blobService.deleteBlobFileById(selected.getReportStorageId());
             selected.setReportStorageId(null);
             selected.setReportTemplateName(null);
-            this.dao.save(selected);
+            //this.dao.save(selected);
             this.uploadedFile = null;
         }
     }

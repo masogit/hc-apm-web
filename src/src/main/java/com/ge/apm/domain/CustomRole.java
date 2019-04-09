@@ -29,6 +29,21 @@ public class CustomRole implements Serializable {
     @Column(name = "role_desc")
     private String roleDesc;
 
+    @Column(name = "authorities")
+    private String authorities;
+
+    @Column(name = "cards")
+    private String cards;
+
+    @Column(name = "authorities_ch")
+    private String authoritiesCH;
+
+    @Column(name = "cards_ch")
+    private String cardsCH;
+
+    @Column(name = "groups")
+    private String groups;
+
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -62,6 +77,46 @@ public class CustomRole implements Serializable {
     @Temporal(TemporalType.DATE)
     @JsonIgnore
     private Date lastModifiedDate = new Date();
+
+    public String getGroups() {
+        return groups;
+    }
+
+    public void setGroups(String groups) {
+        this.groups = groups;
+    }
+
+    public String getAuthoritiesCH() {
+        return authoritiesCH;
+    }
+
+    public void setAuthoritiesCH(String authoritiesCH) {
+        this.authoritiesCH = authoritiesCH;
+    }
+
+    public String getCardsCH() {
+        return cardsCH;
+    }
+
+    public void setCardsCH(String cardsCH) {
+        this.cardsCH = cardsCH;
+    }
+
+    public String getCards() {
+        return cards;
+    }
+
+    public void setCards(String cards) {
+        this.cards = cards;
+    }
+
+    public String getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(String authorities) {
+        this.authorities = authorities;
+    }
 
     public String getHomePage() {
         return homePage;

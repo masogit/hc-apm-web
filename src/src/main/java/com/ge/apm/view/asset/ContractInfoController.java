@@ -106,6 +106,12 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         return false;
 
     }
+
+    public void completeContract(ContractInfo contractInfo) {
+        if(contractInfo != null) {
+            contractService.updateContractStatus(contractInfo.getId(), ContractInfo.ContractStatus.COMPLETE.toString());
+        }
+    }
     
     
     public void deleteContract(){
