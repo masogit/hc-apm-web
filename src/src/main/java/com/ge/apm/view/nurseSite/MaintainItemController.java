@@ -52,6 +52,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		nurseSiteMaintainService.init();
 		mapCheckData=new HashMap<String,Boolean>();
 	}
 
