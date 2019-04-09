@@ -37,15 +37,15 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
-                        <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
+                        <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31}" exportable="false">
+                        <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31 or v2PmOrderController.queryIndex == 7}" exportable="false">
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" class="selectCheckBox">
-                                <p:ajax process="@this"  update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton)" oncomplete="updateSelectAllCheckBox();" />
+                                <p:ajax process="@this"  update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report)" oncomplete="updateSelectAllCheckBox();" />
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
-                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report)" oncomplete="updateSelectAllCheckBox();"/>
 
                                  <!-- <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
 
@@ -323,7 +323,7 @@
 
 
 
-        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
+        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养">
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">

@@ -70,7 +70,8 @@
 				<h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }" />
 			</p:column>
 			<p:column headerText="#{msg.roleId}">
-				<h:outputText value="#{item.userRoleNames}" />
+				<h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
+				<!--<h:outputText value="#{item.userRoleNames}" />-->
 			</p:column>
 			<p:column headerText="UUID" visible="false" exportable="true">
 				<h:outputText value="#{item.uid}" />

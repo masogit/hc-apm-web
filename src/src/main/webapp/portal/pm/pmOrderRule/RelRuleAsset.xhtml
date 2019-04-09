@@ -17,7 +17,7 @@
         <h:form id="BatchCreateForm">
 <!--              <p:tabView>
                 <p:tab > -->
-                   <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <p:panelGrid id="queryCondition" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                        <h:panelGroup>
                            <label class="label">#{msg.hospitalId}</label>
                            <p:inputText id="selectedUserOrgName" value="#{relRuleAssetController.getOrgFullName(relRuleAssetController.selectedUserOrg)}" readonly="true" required="false" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
@@ -103,13 +103,22 @@
                            </p:inputText>
                        </h:panelGroup>
 
-		                  <h:panelGroup >
-                                <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
-                                <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
-                                		<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneRadio>
-                            </h:panelGroup>
+                      <h:panelGroup >
+                            <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
+                            <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
+                                    <p:ajax listener="#{relRuleAssetController.addFilter()}" update="queryCondition AssetsPickList" process="@this"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneRadio>
+                      </h:panelGroup>
+
+                       <h:panelGroup id="queryLevel" rendered="#{relRuleAssetController.queryAsset.ruleStatus != null}">
+                           <label class="label">规则等级</label>
+                           <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">
+                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
+                               <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                               <f:selectItems value="#{fieldMsg.getFieldValueList('pmOrderRuleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                           </p:selectOneMenu>
+                       </h:panelGroup>
                     </p:panelGrid>
                     
                     <p:pickList id="AssetsPickList" value="#{relRuleAssetController.availableAssets}" var="item"

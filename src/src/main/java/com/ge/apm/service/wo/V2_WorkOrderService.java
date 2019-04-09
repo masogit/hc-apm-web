@@ -109,6 +109,7 @@ public class V2_WorkOrderService {
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
         Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList);
+        System.out.println("-------test--------------");
     }
 
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {

@@ -41,6 +41,50 @@ public class SysRole implements Serializable {
     @Column(name = "home_page")
     private String homePage;
 
+    @Column(name = "cards")
+    private String cards;
+
+    @Column(name = "authorities")
+    private String authorities;
+
+    @Column(name = "authorities_ch")
+    private String authoritiesCH;
+
+    @Column(name = "cards_ch")
+    private String cardsCH;
+
+    public String getCards() {
+        return cards;
+    }
+
+    public void setCards(String cards) {
+        this.cards = cards;
+    }
+
+    public String getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(String authorities) {
+        this.authorities = authorities;
+    }
+
+    public String getAuthoritiesCH() {
+        return authoritiesCH;
+    }
+
+    public void setAuthoritiesCH(String authoritiesCH) {
+        this.authoritiesCH = authoritiesCH;
+    }
+
+    public String getCardsCH() {
+        return cardsCH;
+    }
+
+    public void setCardsCH(String cardsCH) {
+        this.cardsCH = cardsCH;
+    }
+
     public SysRole() {
     }
 

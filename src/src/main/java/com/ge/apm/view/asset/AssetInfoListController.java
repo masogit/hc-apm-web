@@ -36,11 +36,13 @@ import org.springframework.data.domain.Sort;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFileDynamicTemplate;
@@ -50,7 +52,6 @@ import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.asset.QrCodeExportStream;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -138,6 +139,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterWarrantyDate = null;
     private Integer assetId;
 
+    private Integer warrantyAlertDays = null;
+
     private Map<String, Object> selectedObject;
 
     @Override
@@ -168,6 +171,34 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         loadCustomConfig();
         loadClinicalDeptList();
 
+        warrantyAlertDays = getWarrantyAlertDaysConfig();
+    }
+    
+    private Integer getWarrantyAlertDaysConfig(){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> wfConfigList = wfDao.findByTenantUID(user.getTenantUID());
+        
+        Integer alertSite=null, alertHospital=null, alertInstitution=null, alsertTenant=null;
+        for(int i=0; i<wfConfigList.size(); i++){
+            WorkflowConfig item = wfConfigList.get(i);
+            
+            if(user.getSiteUID().equals(item.getSiteUID()))
+                alertSite = item.getWarrantyRemindDays();
+            else if(user.getHospitalUID().equals(item.getHospitalUID()))
+                alertHospital = item.getWarrantyRemindDays();
+            else if(user.getInstitutionUID().equals(item.getInstitutionUID()))
+                alertInstitution = item.getWarrantyRemindDays();
+            else if(user.getTenantUID().equals(item.getTenantUID()))
+                alsertTenant = item.getWarrantyRemindDays();
+        }
+        
+        if(alertSite!=null) return alertSite;
+        if(alertHospital!=null) return alertHospital;
+        if(alertInstitution!=null) return alertInstitution;
+        if(alsertTenant!=null) return alsertTenant;
+
+        return null;
     }
 
     private void loadCustomConfig() {
@@ -189,7 +220,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
+        setWarrantyAlerts(currentPageAssets);
+
         return res;
+    }
+
+    private void setWarrantyAlerts(List<AssetInfo> assets){
+        assets.stream().forEach(item -> {
+            item.setWarrantyExpireAlertDays(warrantyAlertDays);
+        });
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -321,6 +360,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onSelectSiteTreeNode2(NodeSelectEvent event) {
+        // Compared with the above method "onSelectSiteTreeNode", 
+        // this method does not clear existing filters
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+        if(selectSite==null) this.removeFilterOnField("siteUID");
+
+        loadClinicalDeptList();
+    }
+    
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
