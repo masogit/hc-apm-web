@@ -179,26 +179,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<WorkflowConfig> wfConfigList = wfDao.findByTenantUID(user.getTenantUID());
         
-        Integer alertSite=null, alertHospital=null, alertInstitution=null, alsertTenant=null;
+        WorkflowConfig alertSite=null, alertHospital=null, alertInstitution=null, alsertTenant=null;
         for(int i=0; i<wfConfigList.size(); i++){
             WorkflowConfig item = wfConfigList.get(i);
             
             if(user.getSiteUID().equals(item.getSiteUID()))
-                alertSite = item.getWarrantyRemindDays();
-            else if(user.getHospitalUID().equals(item.getHospitalUID()))
-                alertHospital = item.getWarrantyRemindDays();
-            else if(user.getInstitutionUID().equals(item.getInstitutionUID()))
-                alertInstitution = item.getWarrantyRemindDays();
-            else if(user.getTenantUID().equals(item.getTenantUID()))
-                alsertTenant = item.getWarrantyRemindDays();
+                alertSite = item;
+            else if(user.getSiteUID().equals(item.getHospitalUID()))
+                alertHospital = item;
+            else if(user.getSiteUID().equals(item.getInstitutionUID()))
+                alertInstitution = item;
+            else if(user.getSiteUID().equals(item.getTenantUID()))
+                alsertTenant = item;
         }
         
-        if(alertSite!=null) return alertSite;
-        if(alertHospital!=null) return alertHospital;
-        if(alertInstitution!=null) return alertInstitution;
-        if(alsertTenant!=null) return alsertTenant;
+        if(alertSite!=null) return alertSite.getWarrantyRemindDays();
+        if(alertHospital!=null) return alertHospital.getWarrantyRemindDays();
+        if(alertInstitution!=null) return alertInstitution.getWarrantyRemindDays();
+        if(alsertTenant!=null) return alsertTenant.getWarrantyRemindDays();
 
         return null;
+    }
+
+    public boolean getShowWarrantyAlert(){
+        return warrantyAlertDays!=null;
     }
 
     private void loadCustomConfig() {
