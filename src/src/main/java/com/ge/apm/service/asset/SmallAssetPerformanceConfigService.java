@@ -56,13 +56,11 @@ public class SmallAssetPerformanceConfigService {
 	private Map<String,List<OrgInfo>> mapOrgInfoSiteUid=new HashMap<String,List<OrgInfo>>();
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
-		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
-		if(result!=null && result==1){
+		SmallAssetPerformanceConfig result=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
+		if(result!=null && !result.getId().equals(detail.getId())){
 			return true;
 		}
-		else{
-			return false;
-		}
+		return false;
 	}
 	public void save(SmallAssetPerformanceConfig config){
 		smallAssetPerformanceConfigDao.save(config);
@@ -178,9 +176,9 @@ public class SmallAssetPerformanceConfigService {
 	}
 	
 	private void saveSmallAssetPerformanceConfig(SmallAssetPerformanceConfig newDetail){
-		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getDepartment(),newDetail.getSiteUID());
-		if(dbDetail!=null){
-			newDetail.setId(dbDetail.getId());
+		SmallAssetPerformanceConfig result=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getDepartment(),newDetail.getSiteUID());
+		if(result!=null){
+			newDetail.setId(result.getId());
 			checkData(newDetail);
 			smallAssetPerformanceConfigDao.save(newDetail);
 		}
