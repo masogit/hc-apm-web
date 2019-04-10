@@ -167,7 +167,6 @@ public class SmallAssetPerformanceConfigService {
 		for(SmallAssetPerformanceConfig config: list){
 			if(config.getId().equals(detail.getId())){
 				contains=true;
-				detail.setStatusDisplay(statusDisplay,pass);
 			}
 			else{
 				config.setStatusDisplay(statusDisplay,pass);
