@@ -175,7 +175,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     	else if(type==1){
     		if(this.selected.hashCode()==0){
         		if(service.checkConfigExists(this.selected)){
-        			WebUtil.addErrorMessage("项目名称和设备名称唯一，请勿重复添加！");
+        			WebUtil.addErrorMessage("项目名称,科室名称，设备名称唯一，请勿重复添加！");
         			this.selected=null;
         			return;
         		}
