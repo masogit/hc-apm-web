@@ -54,7 +54,6 @@ public class SmallAssetPerformanceConfigService {
 	
 	private Map<String,List<AssetInfo>> mapAssetInfoSiteUid=new HashMap<String,List<AssetInfo>>();
 	private Map<String,List<OrgInfo>> mapOrgInfoSiteUid=new HashMap<String,List<OrgInfo>>();
-	private Map<String,List<SmallAssetPerformanceConfig>> mapConfigSiteUid=new HashMap<String,List<SmallAssetPerformanceConfig>>();
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
 		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getDepartment(),detail.getSiteUID());
@@ -163,11 +162,17 @@ public class SmallAssetPerformanceConfigService {
 	}
 	
 	private void updateOtherConfigList(List<SmallAssetPerformanceConfig> list,SmallAssetPerformanceConfig detail,UploadFileErrorTypeEnum statusDisplay,boolean pass ){
-		
+		boolean contains=false;
 		for(SmallAssetPerformanceConfig config: list){
-			if(config.getProjectName().equals(detail.getProjectName())){
+			if(config.getId().equals(detail.getId())){
+				contains=true;
+			}
+			else{
 				config.setStatusDisplay(statusDisplay,pass);
 			}
+		}
+		if(contains){
+			list.remove(detail);
 		}
 		smallAssetPerformanceConfigDao.save(list);
 	}
@@ -196,17 +201,12 @@ public class SmallAssetPerformanceConfigService {
 		}
 		return result;
 	}
-	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
-		String str=projectName+siteUid;
-		List<SmallAssetPerformanceConfig> listRe=mapConfigSiteUid.get(str);
-		if(listRe==null || listRe.size()==0){
-			listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
-			mapConfigSiteUid.put(str, listRe);
-		}
+	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+		List<SmallAssetPerformanceConfig> listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
 		return listRe;
 	}
 	
-	public List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
+	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
 		List<SmallAssetPerformanceConfig> listRe=getConfig(projectName,siteUid);
 		List<SmallAssetPerformanceConfig> listNew=new ArrayList<SmallAssetPerformanceConfig>();
 		if(listRe!=null&& listRe.size()>0){
