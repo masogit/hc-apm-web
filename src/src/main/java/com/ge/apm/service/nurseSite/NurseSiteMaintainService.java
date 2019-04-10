@@ -120,6 +120,12 @@ public class NurseSiteMaintainService {
 	
 	private Map<String,UserAccount> mapUserAccount=new HashMap<String,UserAccount>();
 	private Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
+	
+	
+	public void init(){
+		mapUserAccount.clear();
+		mapAssetInfo.clear();
+	}
 
 	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(List<String> orgUids) {
 		return nurseSiteMaintainConfigRepository.findByOrgUids(orgUids);
@@ -143,15 +149,6 @@ public class NurseSiteMaintainService {
 	public List<NurseSiteMaintain> getDataByClinicalOrgUid(List<String> listOrgUid, Date startDate, Date endDate) {
 		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(listOrgUid, startDate, endDate);
 	}
-
-	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters, Sort sort) {
-		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters, sort);
-	}
-
-	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters) {
-		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters);
-	}
-
 	public AssetInfo getAssetInfoByUid(String uid) {
 		return assetInfoRepository.getByUid(uid);
 	}
