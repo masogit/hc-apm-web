@@ -132,7 +132,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         
-        deptList = uaaService.getFullOrgListBySiteId(UserContextService.getSiteId());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -148,17 +147,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void setTenantUid(String tenantUid) {
-        searchFilters.clear();
         this.tenantUid = tenantUid;
-
+        if(selectedTenant!=null && selectedTenant.getUid().equals(tenantUid)) return;
+        
+        searchFilters.clear();
+        selectedOrg = null;
+        
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
+        selectedTenant = tenantDao.findByuid(tenantUid);
+
+        deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
+        
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
-            selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
-            selectedTenant = tenantDao.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
             rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
@@ -167,11 +170,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
         }
-
-        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
-        if (null != selectedUserOrg) {
-            selectedUserOrg.setSelected(true);
-            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        
+        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedOrgNode) {
+            selectedOrgNode.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
     }
     

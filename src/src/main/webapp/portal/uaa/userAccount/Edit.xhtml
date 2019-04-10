@@ -15,10 +15,21 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}">
                         <h:panelGroup>
                             <label class="label">#{msg.orgId}</label>
-                            <p:autoComplete size="40" dropdown="true" value="#{userAccountController.selectedOrgName}"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{userAccountController.autoCompleteDeptName}">
-                                <p:ajax event="itemSelect" listener="#{userAccountController.onClinicalDeptNameFilterChange}" process="@this"  update="@parent" />
-                            </p:autoComplete>
+                            <p:inputText id="selectedUserOrgName" class="selectedUserOrgName" value="#{userAccountController.getOrgFullName(userAccountController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                            <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update="@(.selectedUserOrgName)" listener="#{userAccountController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.shortName}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
                         </h:panelGroup>
                     </p:panelGrid>
                     
