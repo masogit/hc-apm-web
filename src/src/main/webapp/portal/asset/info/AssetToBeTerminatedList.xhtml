@@ -62,7 +62,7 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
 
-                <p:ajax  event="rowSelect" listener="#{assetInfoToBeTerminatedListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="deleteButton "/>
+                <p:ajax  event="rowSelect" listener="#{assetInfoToBeTerminatedListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                 <p:ajax event="filter" listener="#{assetInfoToBeTerminatedListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36"  id="checkBoxColumn">
@@ -74,20 +74,6 @@
                             <p:ajax listener="#{assetInfoToBeTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
-                </p:column>
-                <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
-                    <h:panelGroup rendered="#{empty assetInfoToBeTerminatedListController.filterWarrantyDate}">
-                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoToBeTerminatedListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin')}">
-                            <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
-                        </p:link>
-                        <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoToBeTerminatedListController.deleteAsset(item)}" update="datalist">
-                            <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
-                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                        </p:commandLink>
-                    </h:panelGroup>
-                    <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoToBeTerminatedListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoToBeTerminatedListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
-                        <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
-                    </p:commandButton>
                 </p:column>
                 <c:forEach items="#{assetInfoToBeTerminatedListController.customedColumns}" var="columnItem" >
                     <c:if test="#{columnItem eq 'name'}">
@@ -573,14 +559,14 @@
                         <p:fileDownload value="#{assetInfoToBeTerminatedListController.excelFile}" />
                     </p:commandButton>
 
-                    <!--<p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"-->
-                                     <!--actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}" update=":growl"-->
-                                     <!--onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">-->
-                        <!--<p:fileDownload value="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisalFile}" />-->
-                    <!--</p:commandButton>                    -->
+                    <p:commandButton id="editButton" icon="ui-icon-pencil"
+                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}"
+                                     actionListener="#{assetInfoToBeTerminatedListController.isChecked}"
+                                     update=":woTab:TerminationCauseEditDlg"
+                                     oncomplete="PF('TerminationCauseEditDlg').show()"
+                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"/>
                     <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
-                                     actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}"
                                      update=":woTab:ExportTemplateEditDlg"
                                      oncomplete="PF('ExportTemplateEditDialog').show()"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
@@ -593,9 +579,10 @@
                 </f:facet>
             </p:dataTable>
 
-            <p:remoteCommand name="rc" update=":woTab:AssetInfoListForm1:datalist datalist:deleteButton " immediate="true"/>
+            <p:remoteCommand name="rc" update=":woTab:AssetInfoListForm1:datalist " immediate="true"/>
         </h:form>
-        <ui:include src="ExportTerminationReport.xhtml"/>
+        <ui:include src="TerminationReportExport.xhtml"/>
+        <ui:include src="TerminationCauseEdit.xhtml"/>
     </div>
 </ui:composition>
 </html>

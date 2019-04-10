@@ -56,8 +56,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    //    private AssetFileImportService importService;
-    private AssetFileExportService exportService;
     private UaaService uaaService;
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
@@ -89,8 +87,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private Boolean needShowAssetApproval;
 
     private StreamedContent excelFile;
-
-    private StreamedContent zipFile;
 
     private StreamedContent toBeTerminatedAppraisalFile;
 
@@ -128,6 +124,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private BlobFileService blobFileService;
     private V2_BlobObject uploadedFileObject;
 
+    private String terminationCause;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -151,8 +149,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
-
-        exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -647,14 +643,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         this.toBeTerminatedAppraisalFile = toBeTerminatedAppraisalFile;
     }
 
-    public StreamedContent getZipFile() {
-        return zipFile;
-    }
-
-    public void setZipFile(StreamedContent zipFile) {
-        this.zipFile = zipFile;
-    }
-
     public String getOneSearchStr() {
         return oneSearchStr;
     }
@@ -778,5 +766,13 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
+    }
+
+    public String getTerminationCause() {
+        return terminationCause;
+    }
+
+    public void setTerminationCause(String terminationCause) {
+        this.terminationCause = terminationCause;
     }
 }

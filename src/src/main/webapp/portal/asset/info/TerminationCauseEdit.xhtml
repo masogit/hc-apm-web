@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="TerminationCauseEditDlg" widgetVar="TerminationCauseEditDlg" width="650" height="250" modal="true"
+              resizable="true" draggable="true" onHide="#{assetInfoToBeTerminatedListController.isChecked()}"
+              header="报废鉴定">
+        <h:form id="TerminationCauseEditForm">
+            <h:panelGroup id="display" class="TerminationCauseEditDlg">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label>资产状态：待报废</label>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label>报废原因 *：</label>
+                        <p:inputText id="cause" value="#{assetInfoToBeTerminatedListController.oneSearchStr}"
+                                     required="true"
+                                     requiredMessage="报废原因 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton validateClient="true"
+                                 actionListener="#{assetInfoToBeTerminatedListController.isChecked}"
+                                 value="#{msg.Save}" icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'TerminationCauseEditDlg');"/>
+                &nbsp;&nbsp;
+                <p:commandButton immediate="true" value="#{msg.Cancel}"
+                                 actionListener="#{assetInfoToBeTerminatedListController.isChecked}" update=":growl"
+                                 icon="ui-icon-cancel" onclick="PF('TerminationCauseEditDlg').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>
