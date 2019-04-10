@@ -71,7 +71,6 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());
         assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
-        
     }
 
     @Override
@@ -173,13 +172,11 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
             listNewConfig.add(editConfig);
     	}
     	else if(type==1){
-    		if(this.selected.hashCode()==0){
-        		if(service.checkConfigExists(this.selected)){
-        			WebUtil.addErrorMessage("项目名称,科室名称，设备名称唯一，请勿重复添加！");
-        			this.selected=null;
-        			return;
-        		}
-        	}
+    		if(service.checkConfigExists(this.selected)){
+    			WebUtil.addErrorMessage("项目名称,科室名称，设备名称唯一，请勿重复添加！");
+    			this.selected=null;
+    			return;
+    		}
         	service.checkData(this.selected);
         	super.save();
     	}
