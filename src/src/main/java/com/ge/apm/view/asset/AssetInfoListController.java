@@ -185,11 +185,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             
             if(user.getSiteUID().equals(item.getSiteUID()))
                 alertSite = item;
-            else if(user.getSiteUID().equals(item.getHospitalUID()))
+            else if(user.getHospitalUID().equals(item.getSiteUID()))
                 alertHospital = item;
-            else if(user.getSiteUID().equals(item.getInstitutionUID()))
+            else if(user.getInstitutionUID().equals(item.getSiteUID()))
                 alertInstitution = item;
-            else if(user.getSiteUID().equals(item.getTenantUID()))
+            else if(user.getTenantUID().equals(item.getSiteUID()))
                 alsertTenant = item;
         }
         
