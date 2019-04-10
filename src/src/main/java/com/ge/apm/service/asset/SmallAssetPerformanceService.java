@@ -65,8 +65,12 @@ public class SmallAssetPerformanceService {
 
     @Autowired
     private SmallAssetPerformanceConfigService smallAssetPerformanceConfigService;
+    
+    @Autowired
+	private SmallAssetPerformanceConfigRepository smallAssetPerformanceConfigDao;
 
     private Map<String, String> mapConfigMsg = new HashMap<String, String>();
+    private Map<String,List<SmallAssetPerformanceConfig>> mapConfigSiteUid=new HashMap<String,List<SmallAssetPerformanceConfig>>();
 
     public boolean checkExists(SmallAssetPerformance detail) {
         Integer result = smallAssetPerformanceDao.findExistsByProjectNameAndHappenDate(detail.getProjectName(), detail.getDepartment(), detail.getHappenDate(),
@@ -85,9 +89,33 @@ public class SmallAssetPerformanceService {
         }
         return pass;
     }
+    
+    private List<SmallAssetPerformanceConfig> getConfig(String projectName,String siteUid){
+		String str=projectName+siteUid;
+		List<SmallAssetPerformanceConfig> listRe=mapConfigSiteUid.get(str);
+		if(listRe==null || listRe.size()==0){
+			listRe=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(projectName, siteUid);
+			mapConfigSiteUid.put(str, listRe);
+		}
+		return listRe;
+	}
+	
+	private List<SmallAssetPerformanceConfig> getConfig(String projectName,String department,String siteUid){
+		List<SmallAssetPerformanceConfig> listRe=getConfig(projectName,siteUid);
+		List<SmallAssetPerformanceConfig> listNew=new ArrayList<SmallAssetPerformanceConfig>();
+		if(listRe!=null&& listRe.size()>0){
+			for(int i=0;i<listRe.size();++i){
+				SmallAssetPerformanceConfig tempConfig=listRe.get(i);
+				if(tempConfig.getDepartment().equals(department)){
+					listNew.add(tempConfig);
+				}
+			}
+		}
+		return listNew;
+	}
 
     private boolean checkConfigRight(SmallAssetPerformance detail) {
-        List<SmallAssetPerformanceConfig> listConfig = smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(), detail.getSiteUID());
+        List<SmallAssetPerformanceConfig> listConfig = getConfig(detail.getProjectName(), detail.getDepartment(), detail.getSiteUID());
         boolean pass = true;
         for (SmallAssetPerformanceConfig config : listConfig) {
             if (!config.getStatusCode().equals("1")) {
@@ -167,7 +195,7 @@ public class SmallAssetPerformanceService {
         String errorMessage = mapConfigMsg.get(str);
         if (errorMessage == null) {
             StringBuilder sb=new StringBuilder();
-            List<SmallAssetPerformanceConfig> listConfig = smallAssetPerformanceConfigService.getConfig(projectName, department, siteUid);
+            List<SmallAssetPerformanceConfig> listConfig = getConfig(projectName, department, siteUid);
             if (listConfig != null && listConfig.size() > 0) {
                 for (int i = 0; i < listConfig.size(); ++i) {
                     SmallAssetPerformanceConfig tempConfig = listConfig.get(i);
@@ -200,6 +228,7 @@ public class SmallAssetPerformanceService {
     public void init() {
         mapConfigMsg.clear();
         smallAssetPerformanceConfigService.init();
+        mapConfigSiteUid.clear();
     }
 
     public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
@@ -285,18 +314,17 @@ public class SmallAssetPerformanceService {
                     pass = false;
                 }
                 if (pass) {
-                    pass = checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname,detail.getSiteUID()), projectname);
+                    pass = checkProjectName(getConfig(projectname,detail.getSiteUID()), projectname);
                     if (!pass) {
                         detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "项目不存在");
                     }
                     if(pass){
-                    	pass = checkProjectName(smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), projectname);
+                    	pass = checkProjectName(getConfig(projectname, department, detail.getSiteUID()), projectname);
                         if (!pass) {
                             detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室不存在");
                         }
                         if (pass) {
-                            int result = checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()),
-                                    smallAssetPerformanceConfigService.getConfig(projectname, department, detail.getSiteUID()), department);
+                            int result = checkDepartName(smallAssetPerformanceConfigService.getAccessClinical(detail.getSiteUID()),getConfig(projectname, department, detail.getSiteUID()), department);
                             if (result == 0) {
                                 pass = false;
                                 detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR, "科室名称不存在");
@@ -344,7 +372,7 @@ public class SmallAssetPerformanceService {
     public void insertReportData(SmallAssetPerformance detail) {
         // no update action, so delete it.
         deleteReportData(detail);
-        List<SmallAssetPerformanceConfig> listConfig = smallAssetPerformanceConfigService.getConfig(detail.getProjectName(), detail.getDepartment(), detail.getSiteUID());
+        List<SmallAssetPerformanceConfig> listConfig = getConfig(detail.getProjectName(), detail.getDepartment(), detail.getSiteUID());
         if (listConfig != null && listConfig.size() > 0) {
             List<AssetInfo> listAssetInfo = null;
             List<SmallAssetPerformanceReport> listReport = new ArrayList<SmallAssetPerformanceReport>();
