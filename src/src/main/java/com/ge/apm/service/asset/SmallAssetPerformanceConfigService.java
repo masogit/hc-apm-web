@@ -163,11 +163,18 @@ public class SmallAssetPerformanceConfigService {
 	}
 	
 	private void updateOtherConfigList(List<SmallAssetPerformanceConfig> list,SmallAssetPerformanceConfig detail,UploadFileErrorTypeEnum statusDisplay,boolean pass ){
-		
+		boolean contains=false;
 		for(SmallAssetPerformanceConfig config: list){
-			if(config.getProjectName().equals(detail.getProjectName())){
+			if(config.getId().equals(detail.getId())){
+				contains=true;
+				detail.setStatusDisplay(statusDisplay,pass);
+			}
+			else{
 				config.setStatusDisplay(statusDisplay,pass);
 			}
+		}
+		if(contains){
+			list.remove(detail);
 		}
 		smallAssetPerformanceConfigDao.save(list);
 	}
