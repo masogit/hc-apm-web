@@ -81,6 +81,7 @@ public class MaintainController implements ServerEventInterface {
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+		nurseSiteMaintainService.init();
 		searchController = WebUtil.getBean(SearchController.class);
 		maintainItemController = WebUtil.getBean(MaintainItemController.class);
 		searchController.setType(3);
@@ -528,6 +529,7 @@ public class MaintainController implements ServerEventInterface {
 			addMessage("请创建并选择配置模板");
 			return "maintainMain?faces-redirect=false";
 		}
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 		if (startBatchDate == null) {
 			startBatchDate = new Date();
 		}
@@ -546,6 +548,7 @@ public class MaintainController implements ServerEventInterface {
 			addMessage("请选择一年之内的日期");
 			return "maintainMain?faces-redirect=false";
 		}
+		
 		Integer type = nurseSiteMaintainConfig.getType();
 		String typeValue = nurseSiteMaintainConfig.getTypeValue();
 		List<NurseSiteMaintain> listMaintainData = new ArrayList<NurseSiteMaintain>();
