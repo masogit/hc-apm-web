@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -70,6 +71,11 @@ public class InventoryOrderService {
 	private final Integer INVENTORY_FINISHED = 1; // 已盘点色弱
 	private final Integer INVENTORY_UNDOCUMENTED = 2; // 已盘点
 	private static final String ORG_NAME = "orgName";
+	private List<InventoryOrder> listUserInventoryOrder = new ArrayList<InventoryOrder>();
+
+	public void init() {
+		listUserInventoryOrder.clear();
+	}
 
 	private void setAssetInventoryStatus(InventoryOrder inventoryOrder, Integer inventoryStatus) {
 		List assigneeOrgList = JSON.parseArray(inventoryOrderDao.findById(inventoryOrder.getId()).getAssigneeOrg());
@@ -273,8 +279,45 @@ public class InventoryOrderService {
 		}).collect(Collectors.toList());
 	}
 
-	public List<String> getInventoryClinicalDeptUID(String orderId,boolean sort,int type) {
-		
+	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<String> listAccessClinical) {
+		Page<InventoryOrder> pageRe = null;
+		int page = pageRequest.getPageNumber();
+		int pageSize = pageRequest.getPageSize();
+		List<InventoryOrder> listSmallRe = new ArrayList<InventoryOrder>();
+		if(listUserInventoryOrder.size()>0){
+		}
+		else{
+			List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(tenantUid);
+			if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
+				for (int i = 0; i < listInventoryOrder.size(); ++i) {
+					InventoryOrder tempOrder = listInventoryOrder.get(i);
+					for (String clinicalUid : listAccessClinical) {
+						if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
+							listUserInventoryOrder.add(tempOrder);
+							break;
+						}
+					}
+				}
+			}
+		}
+		int size = listUserInventoryOrder.size();
+		int pre = page * pageSize;
+		int last = (page + 1) * pageSize;
+		for (int i = pre; i < size && i < last; ++i) {
+			listSmallRe.add(listUserInventoryOrder.get(i));
+		}
+		pageRe = new PageImpl<InventoryOrder>(listSmallRe, pageRequest, size);
+		return pageRe;
+	}
+
+	// public List<InventoryOrder> getMoreListInventoryOrder(String
+	// tenantUid,int page,int pageSize){
+	// return
+	// inventoryOrderDao.findByTenantUid(tenantUid,pageSize,page*pageSize);
+	// }
+
+	public List<String> getInventoryClinicalDeptUID(String orderId, boolean sort, int type) {
+
 		List<String> listClinicalDeptName = new ArrayList<String>();
 		if (StringUtils.isEmpty(orderId)) {
 			return listClinicalDeptName;
@@ -287,18 +330,18 @@ public class InventoryOrderService {
 		for (int i = 0; i < array.length(); ++i) {
 			obj = array.getJSONObject(i);
 			temp = obj.getString(ORG_NAME);
-			if(type==0){
+			if (type == 0) {
 				temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
 			}
-			
+
 			if (!listClinicalDeptName.contains(temp)) {
 				listClinicalDeptName.add(temp);
 			}
 		}
-		if(sort){
+		if (sort) {
 			listClinicalDeptName.sort(new PinYinComparator());
 		}
 		return listClinicalDeptName;
 	}
-	
+
 }
