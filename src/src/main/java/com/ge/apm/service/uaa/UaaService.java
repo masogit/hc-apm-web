@@ -441,7 +441,7 @@ public class UaaService {
         treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
         //xTreeMap
-        
+        if(xtreeMap==null) getOrgTreeBySite(siteUID);
         Map<String, TreeNode> tempTreeMap = xtreeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
         for(Map.Entry<String, TreeNode> nodeItem: tempTreeMap.entrySet()){
             TreeNode node = nodeItem.getValue();

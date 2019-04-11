@@ -107,6 +107,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue("设备别名", "setAliasName", true);
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName", true);
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2", true);
+                assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3", true);
                 assetRow.setFieldStringValue("保养负责人", "setPmOwnerName", true);
                 assetRow.setFieldStringValue("所属科室", "setClinicalDeptName", true);
                 assetRow.setFieldStringValue("制造商", "setManufacture", true);

@@ -24,5 +24,6 @@ public interface SmallAssetPerformanceConfigRepository extends GenericRepository
 
 	@Query("select 1 from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.assetName = ?2 and o.department=?3 and o.siteUID = ?4")
 	public Integer findExistsByProjectNameAndAssetName(String projectName, String assetName,String department,String siteUID);
+	
 
 }

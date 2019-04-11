@@ -298,7 +298,7 @@ public class WorkOrderReportProvider {
             "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1) as workStepEndTime, " +
             "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
             "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
-            "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = false or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
+            "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
             "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
             "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepOwnerName, " +
             "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepEndTime, " +
@@ -450,7 +450,7 @@ public class WorkOrderReportProvider {
 
         sb.append("select wod.id as id,ai.clinical_dept_name as assetClinicalDeptName, ai.name as assetName,ai.depart_num as assetDepartNum,wod.supplier as supplierName,wod.parts as partsName,wod.parts_quantity as partsQuantity, " +
                 "wod.closed_price as closedPrice,wod.invoice_num as invoiceNum,wod.invoice_time as invoiceTime,wo.approver_name as approverName,wod.contract_num as contractNum,wod.comment as comment,wod.closed as statementStatus " +
-                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id and (wod.approved = false or wod.approved is null) ");
+                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id and (wod.approved = true or wod.approved is null) ");
 
         String filter = buildFilter_WorkOrderDetail(searchFilterList);
         sb.append(filter);

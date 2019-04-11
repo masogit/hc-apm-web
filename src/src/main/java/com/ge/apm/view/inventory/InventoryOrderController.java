@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -37,15 +38,18 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
 
 	private UserAccount currentUser;
 	private InventoryOrderRepository dao;
-	private Map<Integer,List<String>> mapAccess;
+	private List<String> listAccessClinical;
     private UaaService uaaService;
+    private InventoryOrderService service;
 
 	@Override
     protected void init() {
         dao = WebUtil.getBean(InventoryOrderRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         uaaService=WebUtil.getBean(UaaService.class);
-        mapAccess=uaaService.findAccessUidByUserUid(currentUser.getUid());
+        listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        service=WebUtil.getBean(InventoryOrderService.class);
+        service.init();
     }
 
     @Override
@@ -59,41 +63,14 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        if(mapAccess.get(0)!=null){
-        	searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, mapAccess.get(0), "1*2+"));
-        }
-        if(mapAccess.get(1)!=null){
-        	searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, mapAccess.get(1), "1*2+"));
-        }
-        if(mapAccess.get(2)!=null){
-        	searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, mapAccess.get(2), "1*2+"));
-        }
-        if(mapAccess.get(3)!=null){
-        	searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, mapAccess.get(3), "1*2+"));
-        }
-        Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
-        if(mapAccess.get(4)!=null){
-        	List<String> setClinical=mapAccess.get(4);
-        	if(pageRe.hasContent()){
-            	List<InventoryOrder> listRe=pageRe.getContent();
-            	List<InventoryOrder> listNewRe=new ArrayList<InventoryOrder>();
-            	if(listRe.size()>0){
-            		for(int i=0;i<listRe.size();++i){
-            			InventoryOrder tempOrder=listRe.get(i);
-            			String assigneeOrg=tempOrder.getAssigneeOrg();
-            			if(StringUtils.isNotEmpty(assigneeOrg)) {
-                            for(String clinicalUid:setClinical){
-                            	if(assigneeOrg.contains(clinicalUid)){
-                            		listNewRe.add(tempOrder);
-                            	}
-                            }
-                        }
-            		}
-            	}
-            	Page<InventoryOrder> pageNewRe=new PageImpl<InventoryOrder>(listNewRe,pageRequest,pageRe.getTotalElements());
-            	return pageNewRe;
-            }
-        }
+//        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
+//        if(listAccessClinical!=null){
+//        	for(int i=0;i<listAccessClinical.size();++i){
+//        		searchFilters.add(new SearchFilter("assigneeOrg", SearchFilter.Operator.LIKE, listAccessClinical.get(i), "1*2+"));
+//        	}
+//        }
+//        Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
+        Page<InventoryOrder> pageRe=service.getPageData(pageRequest, currentUser.getTenantUID(), listAccessClinical);
         return pageRe;
     }
 
