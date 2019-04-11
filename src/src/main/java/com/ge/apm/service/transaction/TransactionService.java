@@ -5,6 +5,8 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.DeptTransactionLog;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 
@@ -24,10 +27,65 @@ public class TransactionService extends MicroServiceInvoker {
     @Autowired
     DeptTransactionLogRepository deptTransactionLogRepository;
 
-    @Transactional
-    public void createTm(DeptTransactionLog tm){
-        deptTransactionLogRepository.save(tm);
+
+public HashMap<String,Object> getSummary(String from,String to,String token){
+    HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+    String gatewayURL = getGatewayURL(GatewayURL.GET_DEPTRASACTION_LOG_SUMMARY);
+
+    gatewayURL=gatewayURL.replace("{from}",from);
+    gatewayURL=gatewayURL.replace("{to}",to);
+    ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+    if (isOkay(response)) {
+        LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+        return responseMap;
+    } else {
+        return null;
     }
+}
+    public HashMap<String,Object> getTransactionListByPerson(DepTranForTrans dep, String token){
+        HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.QUERY_DEPTTRANSACTION_LOG);
+        gatewayURL=gatewayURL.replace("{staffId}",dep.getUserId().toString());
+        gatewayURL=gatewayURL.replace("{from}",dep.getStartTime());
+        gatewayURL=gatewayURL.replace("{to}", dep.getEndTime());
+        gatewayURL=gatewayURL.replace("{page}", dep.getPageNumber().toString());
+        gatewayURL=gatewayURL.replace("{pageSize}", dep.getPageSize().toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return responseMap;
+        } else {
+            return null;
+        }
+    }
+    public HashMap<String,Object> getDetailsByItemSelection(String from, String to,Integer authorId, String token){
+        HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.QUERY_DEPTTRANSACTION_LOG);
+
+        gatewayURL=gatewayURL.replace("{staffId}", authorId.toString());
+        gatewayURL=gatewayURL.replace("{from}", from);
+        gatewayURL=gatewayURL.replace("{to}", to);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return responseMap;
+        } else {
+            return null;
+        }
+    }
+
+/*
+    public void remoteAssignRequest(String requestId, String assigneeUID) {
+        String url = getGatewayURL(GatewayURL.REMOTE_ASSIGN_REQUEST);
+        url = url.replace("{requestId}", requestId);
+        url = url.replace("{assigneeUID}", assigneeUID);
+       // String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
+    }*/
 
     public String createTmByLink(TransactionForm formData,String token){
 
@@ -42,10 +100,10 @@ public class TransactionService extends MicroServiceInvoker {
         }
     }
 
-    public String updateTransaction(TransactionForm formData,String token){
+    public String updateTransaction(TransactionForm formData,Integer userId,String token){
         HttpEntity<TransactionForm> requestEntity = new HttpEntity<TransactionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.UPDATE_DEPTTRANSACTION_LOG);
-        gatewayURL = gatewayURL.replace("{id}",formData.getId().toString());
+        gatewayURL = gatewayURL.replace("{id}",userId.toString());
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -60,4 +118,8 @@ public class TransactionService extends MicroServiceInvoker {
         deptTransactionLogRepository.delete(tm);
     }
 
+    @Transactional
+    public void localUpdateTransaction(DeptTransactionLog dptlog){
+        deptTransactionLogRepository.save(dptlog);
+    }
 }

@@ -16,6 +16,9 @@ import com.ge.apm.view.sysutil.UserInfo;
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
+
+    @Query(nativeQuery = true, value = "with recursive t(uid) as ((select uid from org_info where uid in (select org_uid from user_org uo where user_uid = ?1)) union all (select o.uid from org_info o join t on o.parent_uid = t.uid)) select uid from t")
+    public List<String> getAccessScope(String userUID);
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getByLoginName(String loginName);
 
