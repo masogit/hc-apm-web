@@ -196,9 +196,22 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
             byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
             toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
+        } catch (IllegalStateException e) {
+            WebUtil.addErrorMessage(e.getMessage());
         } catch (IOException e) {
             WebUtil.addErrorMessage("Fail to download report");
         }
+    }
+
+    public void saveTerminationCause() {
+        List<AssetInfo> updatedAssets = selectedMap.entrySet().stream().filter(i -> i.getValue()).map(i -> {
+            String assetUid = i.getKey();
+            AssetInfo assetInfo = dao.getByUid(assetUid);
+            assetInfo.setTerminationCause(terminationCause);
+            return assetInfo;
+        }).collect(Collectors.toList());
+        dao.save(updatedAssets);
+        terminationCause = null;
     }
 
     public void uploadDataFile(FileUploadEvent event) {

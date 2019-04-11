@@ -68,9 +68,13 @@ public class ExportToBeTerminatedAppraisalService {
 
     public Map<String, Object> getData(List<String> selectedIds) {
         Map<String, Object> datas = new HashMap<>();
+        String departmentName = null;
+        String terminalCause = null;
         List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
         for (String id : selectedIds) {
             AssetInfo assetInfo = assetInfoRepository.findByUid(id);
+            departmentName = setValue(departmentName, assetInfo.getClinicalDeptName(), "所选设备的科室信息不一致");
+            terminalCause = setValue(terminalCause, assetInfo.getTerminationCause(), "所选设备的报废原因不一致");
             Map<ASSET_DETAIL, Object> map = new HashMap<>();
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
@@ -80,7 +84,18 @@ public class ExportToBeTerminatedAppraisalService {
             list.add(map);
         }
         datas.put("asset_detail_table", list);
+        datas.put("asset_department_name", departmentName);
+        datas.put("asset_termination_cause", terminalCause);
         return datas;
+    }
+
+    public String setValue(String original, String temp, String errorMessage) {
+        if (original == null) {
+            original = temp;
+        } else if (!org.apache.commons.lang3.StringUtils.equals(original, temp)) {
+            throw new IllegalStateException(errorMessage);
+        }
+        return original;
     }
 
     private class AssetDetailsRenderPolicy extends AbstractWoTableRenderPolicy {
