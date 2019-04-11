@@ -3,18 +3,17 @@ package com.ge.apm.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
-
+import org.primefaces.model.LazyDataModel;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Data
 @Table(name = "dept_transaction_log")
-public class DeptTransactionLog implements Serializable {
-
+public class DeptTransactionLog{
+    protected LazyDataModel lazyModel;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,21 +36,27 @@ public class DeptTransactionLog implements Serializable {
     @Column(name = "name")
     private String name;*/
 
+    @Column(name = "hours")
+    private Double hours;
+
     @Basic(optional = false)
-    @NotNull
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
 
     @Basic(optional = false)
-    @NotNull
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endTime;
 
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date date;
     @Size(min = 1, max = 64)
+
     @Column(name="transaction_uid")
     private String transactionUID;
 
@@ -67,6 +72,9 @@ public class DeptTransactionLog implements Serializable {
 
     @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
     private String hospitalUID;
+
+    @Column(name="clinical_dept_uid",columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;
 
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
@@ -112,7 +120,7 @@ public class DeptTransactionLog implements Serializable {
         this.uid = uid;
     }
 
-    @NotNull
+//    @NotNull
     public Date getStartTime() {
         return startTime;
     }
@@ -121,10 +129,7 @@ public class DeptTransactionLog implements Serializable {
         this.startTime = startTime;
     }
 
-    @NotNull
-    public Date getEndTime() {
-        return endTime;
-    }
+//    @NotNull
 
     public void setEndTime(@NotNull Date endTime) {
         this.endTime = endTime;
@@ -178,15 +183,13 @@ public class DeptTransactionLog implements Serializable {
         this.remark = remark;
     }
 
-   /* @NotNull
-    public String getName() {
-        return name;
+    public String getClinicalDeptUID() {
+        return clinicalDeptUID;
     }
 
-    public void setName(@NotNull String name) {
-        this.name = name;
+    public void setClinicalDeptUID(String clinicalDeptUID) {
+        this.clinicalDeptUID = clinicalDeptUID;
     }
-  */
 
     public Integer getAuthorId() {
         return authorId;
@@ -202,6 +205,14 @@ public class DeptTransactionLog implements Serializable {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public Double getHours() {
+        return hours;
+    }
+
+    public void setHours(Double hours) {
+        this.hours = hours;
     }
 
     @Override
@@ -221,4 +232,5 @@ public class DeptTransactionLog implements Serializable {
         }
         return true;
     }
+
 }

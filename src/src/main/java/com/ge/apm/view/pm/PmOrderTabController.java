@@ -3,6 +3,8 @@ package com.ge.apm.view.pm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tabview.TabView;
 import webapp.framework.web.WebUtil;
@@ -15,8 +17,9 @@ import javax.faces.bean.ViewScoped;
 @ManagedBean
 @RequestScoped
 public class PmOrderTabController {
-    private int queryTab;
-
+    @Setter @Getter
+    private Integer queryTab;
+    @Getter @Setter
     private TabView tabView;
 
     @PostConstruct
@@ -36,22 +39,6 @@ public class PmOrderTabController {
             }
 
         }
-    }
-
-    public int getQueryTab() {
-        return queryTab;
-    }
-
-    public void setQueryTab(int queryTab) {
-        this.queryTab = queryTab;
-    }
-
-    public TabView getTabView() {
-        return tabView;
-    }
-
-    public void setTabView(TabView tabView) {
-        this.tabView = tabView;
     }
 
     private void setTabIndexByTabId(String tabId) {

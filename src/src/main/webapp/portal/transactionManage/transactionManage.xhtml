@@ -7,7 +7,7 @@
     <ui:define name="content">
      <div class="ui-g clearfix">
         <div class="ui-g-12 card cardTitle">
-        <p:outputLabel class="pageTitle" value="科务型管理"/>
+        <p:outputLabel class="pageTitle" value="事务型管理"/>
         </div>
          <div class="ui-g-12 card">
              <h:form id="transactionManageForm">
@@ -22,22 +22,10 @@
                               rows="20" emptyMessage="#{msg.noRecordFound}"
                               rowsPerPageTemplate="20,50,100,500">
                      <p:ajax event="rowSelect" update="@(.btn)" listener="#{transactionManageController.onSelectTM()}"/>
-                     <p:ajax event="filter" listener="#{transactionManageController.onFilter}"/>
-                     <p:column headerText="科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
-                         <h:outputText value="#{item.clinicalDeptName}"/>
+                     <p:column headerText="事务名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+
+                         <h:outputText value="#{item.name}"/>
                      </p:column>
-
-                     <p:column headerText="类别"  filterBy="#{item.category}" filterMatchMode="EQ">
-                         <h:outputText value="#{fieldMsg.fieldValue('transaction',item.category)}"/>
-                         <f:facet name="filter">
-                             <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
-                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                 <f:selectItems value="#{fieldMsg.getFieldValueList('transaction')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                             </p:selectOneMenu>
-                         </f:facet>
-
-                     </p:column>
-
                      <p:column headerText="开始时间" filterBy="#{item.startTime}" filterMatchMode="LIKE">
                          <h:outputText value="#{item.startTime}">
                              <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -48,22 +36,15 @@
                              <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                          </h:outputText>
                      </p:column>
-                     <p:column headerText="创建人">
-                         <h:outputText value="#{item.authorName}"/>
-                     </p:column>
-                     <p:column headerText="备注">
-                         <h:outputText value="#{item.remark}"/>
-                     </p:column>
+
 
                      <f:facet name="{Toolbar}">
-                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{transactionManageController.prepareCreate}" update=":transactionManageDlg" oncomplete="PF('transactionManageDlg').show()"/>
-                         <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{transactionManageController.prepareEdit}" update=":transactionManageDlg" oncomplete="PF('transactionManageDlg').show()" disabled="#{empty transactionManageController.selected}"/>
+                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{transactionManageController.prepareCreate}" update=":newTranManForm" oncomplete="PF('transactionManageDlg').show()"/>
                          <p:commandButton id="deleteButton"  title="#{msg.Delete}" update=":transactionManageForm:datalist,@(.btn) :growl" disabled="#{transactionManageController.selected eq null }" icon="ui-icon-close" class="btn btn-sm btn-gray" actionListener="#{transactionManageController.delete}">
                              <p:confirm header="#{msg.DeleteConformation}"
-                                        message="确定删除该科务管理？"
+                                        message="确定删除该事务管理？"
                                         icon="ui-icon-warning"/>
                          </p:commandButton>
-
                         <!-- <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{transactionManageController.prepareEdit}"  oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
 
                          -->
