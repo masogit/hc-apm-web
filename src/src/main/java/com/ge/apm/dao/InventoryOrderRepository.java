@@ -35,7 +35,7 @@ public interface InventoryOrderRepository extends GenericRepositoryUUID<Inventor
     @Query(nativeQuery = true, value = "SELECT assignee_org FROM inventory_order WHERE is_finished = FALSE AND tenant_uid = ?1")
     List<String> findByInventoryOrder(String tenantUID);
     
-    @Query(nativeQuery = true, value = "SELECT o.* FROM inventory_order o WHERE o.tenant_uid = ?1")
+    @Query(nativeQuery = true, value = "SELECT o.* FROM inventory_order o WHERE o.tenant_uid = ?1 order by o.plan_start_time desc")
     List<InventoryOrder> findByTenantUid(String tenantUID);
 
     @Query(nativeQuery = true, value = "SELECT i.id FROM inventory_order i WHERE i.is_finished = FALSE AND assignee_org LIKE '%' || (SELECT clinical_dept_uid FROM asset_info a WHERE a.id = ?1) || '%' LIMIT 1;")
