@@ -9,8 +9,6 @@
 			icon="fa fa-angle-down" iconPos="right" />
 		<p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false" appendTo="@form">
 			<p:scrollPanel style="height:300px;border: 0" mode="native">
-                                <p:inputText class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
-                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree)" actionListener="#{userAccountController.rebuildOrgTree()}" value="检索"/>
 				<p:tree id="orgTree" class="orgTree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}"
 					var="node" selectionMode="single">
 					<p:ajax process="@this" event="select" update=":userAccountTab:UserAccountListForm" listener="#{userAccountController.onSelectTreeNode}"
