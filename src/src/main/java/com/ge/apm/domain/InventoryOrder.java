@@ -221,7 +221,7 @@ public class InventoryOrder implements Serializable {
     }
 
     public String getClinicalDeptLabel() {
-        if(StringUtils.isNotEmpty(this.assigneeOrg)) {
+        if(StringUtils.isNotEmpty(this.assigneeOrg) && StringUtils.isEmpty(clinicalDeptLabel)) {
             List<Map> clinicalDeptList = JSON.parseArray(this.assigneeOrg, Map.class);
             int i=0;
             for (Map map : clinicalDeptList) {
