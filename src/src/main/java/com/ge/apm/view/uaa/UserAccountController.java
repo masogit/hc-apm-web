@@ -46,8 +46,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -158,6 +158,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         
+/*        
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
@@ -170,7 +171,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
         }
-        
+*/
+        uaaService.getOrgTreeBySite(tenantUid);
+        rebuildOrgTree();
+
         TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedOrgNode) {
             selectedOrgNode.setSelected(true);
@@ -178,6 +182,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
     
+    // TreeNodeName Filter
+    private String treeNodeNameFilter;
+    public String getTreeNodeNameFilter() {
+        return treeNodeNameFilter;
+    }
+    public void setTreeNodeNameFilter(String treeNodeNameFilter) {
+        this.treeNodeNameFilter = treeNodeNameFilter;
+    }
+    
+    public void rebuildOrgTree() {
+        if (StringUtils.isEmpty(treeNodeNameFilter)) 
+            treeNodeNameFilter = "";
+        
+        orgTree = uaaService.getFilterOrgTreeByYuanQu(tenantUid, treeNodeNameFilter, -1, -1);
+        TreeNodeUtil.expandTreeNode(orgTree);
+    }
+
     public String getOrgFullNameByUid(String orgUid) {
         OrgInfo org = orgInfoDao.getByUid(orgUid);
         return org == null ? "" : getOrgFullName(org);
