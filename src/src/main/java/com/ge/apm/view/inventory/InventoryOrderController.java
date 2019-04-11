@@ -59,29 +59,13 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, currentUser.getTenantUID(), "1*2+"));
-        Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
         if(listAccessClinical!=null){
-        	if(pageRe.hasContent()){
-            	List<InventoryOrder> listRe=pageRe.getContent();
-            	List<InventoryOrder> listNewRe=new ArrayList<InventoryOrder>();
-            	if(listRe.size()>0){
-            		for(int i=0;i<listRe.size();++i){
-            			InventoryOrder tempOrder=listRe.get(i);
-            			String assigneeOrg=tempOrder.getAssigneeOrg();
-            			if(StringUtils.isNotEmpty(assigneeOrg)) {
-                            for(String clinicalUid:listAccessClinical){
-                            	if(assigneeOrg.contains(clinicalUid)){
-                            		listNewRe.add(tempOrder);
-                            	}
-                            }
-                        }
-            		}
-            	}
-            	Page<InventoryOrder> pageNewRe=new PageImpl<InventoryOrder>(listNewRe,pageRequest,pageRe.getTotalElements());
-            	return pageNewRe;
-            }
+        	for(int i=0;i<listAccessClinical.size();++i){
+        		searchFilters.add(new SearchFilter("assigneeOrg", SearchFilter.Operator.LIKE, listAccessClinical.get(i), "1*2+"));
+        	}
         }
+        Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageRe;
     }
 
