@@ -46,8 +46,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -158,21 +158,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         
-/*        
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
-        if(UserContextService.isOnlyLocalITAdmin()){
-            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
-        }else{
-            OrgInfo rootOrg = new OrgInfo();
-            rootOrg.setId(-1);
-            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
-            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-            orgTree = new DefaultTreeNode("root", null, null);
-            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
-        }
-*/
-        uaaService.getOrgTreeBySite(tenantUid);
         rebuildOrgTree();
 
         TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
@@ -192,11 +177,27 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void rebuildOrgTree() {
+/*        
+        uaaService.getOrgTreeBySite(tenantUid);
+        
         if (StringUtils.isEmpty(treeNodeNameFilter)) 
             treeNodeNameFilter = "";
         
         orgTree = uaaService.getFilterOrgTreeByYuanQu(tenantUid, treeNodeNameFilter, -1, -1);
         TreeNodeUtil.expandTreeNode(orgTree);
+*/
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isOnlyLocalITAdmin()){
+            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
+        }else{
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+        }
     }
 
     public String getOrgFullNameByUid(String orgUid) {
