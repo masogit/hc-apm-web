@@ -62,7 +62,7 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
 
-                <p:ajax  event="rowSelect" listener="#{assetInfoTerminatedListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="deleteButton "/>
+                <p:ajax  event="rowSelect" listener="#{assetInfoTerminatedListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                 <p:ajax event="filter" listener="#{assetInfoTerminatedListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36"  id="checkBoxColumn">

@@ -14,22 +14,25 @@
             <h:panelGroup id="display" class="TerminationCauseEditDlg">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label>资产状态：待报废</label>
+                        <label>资产状态：&nbsp;&nbsp;待报废</label>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label>报废原因 *：</label>
-                        <p:inputText id="cause" value="#{assetInfoToBeTerminatedListController.oneSearchStr}"
-                                     required="true"
-                                     requiredMessage="报废原因 #{msg.ValidationRequire}"/>
+                        <p:selectOneMenu id="cause" value="#{assetInfoToBeTerminatedListController.terminationCause}"
+                                         style="width:250px">
+                            <f:selectItem itemLabel="请选择..." itemValue=""/>
+                            <f:selectItem itemLabel="使用年限超过国家或厂家规定" itemValue="使用年限超过国家或厂家规定"/>
+                            <f:selectItem itemLabel="主要功能损坏，无法修复或维修成本过高" itemValue="主要功能损坏，无法修复或维修成本过高"/>
+                            <f:selectItem itemLabel="设备有缺陷，国家警示需强制报废" itemValue="设备有缺陷，国家警示需强制报废"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:commandButton validateClient="true"
-                                 actionListener="#{assetInfoToBeTerminatedListController.isChecked}"
-                                 value="#{msg.Save}" icon="ui-icon-check"
+                                 actionListener="#{assetInfoToBeTerminatedListController.saveTerminationCause}"
+                                 value="#{msg.Save}" icon="ui-icon-check" update=":growl :woTab:AssetInfoListForm1:datalist"
                                  oncomplete="handleSubmit(args, 'TerminationCauseEditDlg');"/>
                 &nbsp;&nbsp;
-                <p:commandButton immediate="true" value="#{msg.Cancel}"
-                                 actionListener="#{assetInfoToBeTerminatedListController.isChecked}" update=":growl"
+                <p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl"
                                  icon="ui-icon-cancel" onclick="PF('TerminationCauseEditDlg').hide()"/>
             </h:panelGroup>
         </h:form>
