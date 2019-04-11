@@ -30,6 +30,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Table(name = "table_definition")
 public class TableDefinition implements Serializable {
 
+    public static final int PM_ORDER_RULE = 1;
+    public static final int MEASURE_ORDER_RULE = 2;
+
     public enum TableDefinitionStatus {
         Draft, Released, Expired
     }
@@ -92,6 +95,9 @@ public class TableDefinition implements Serializable {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "type")
+    private Integer type;//类型 1-保养相关 2-计量相关
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -103,6 +109,14 @@ public class TableDefinition implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
     public String getId() {
         return id;

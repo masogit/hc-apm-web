@@ -23,7 +23,7 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select count(o.id) from nurse_site_maintain_item o where o.parent_id=?1",nativeQuery=true)
 	public Integer findCountMaintainItemByParentId(String parentId);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1 order by o.id limit ?2 offset ?3",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id=?1 order by o.id limit ?2 offset ?3*?2",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId,int pageSize,int page);
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
@@ -44,16 +44,16 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.comment!='' and o.comment is not null)",nativeQuery=true)
 	public Boolean findHasComment(String parentId);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)<=o.schedule_date and o.comment is not null and o.comment !='' order by o.id limit ?1 offset ?2",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)<=o.schedule_date and o.comment is not null and o.comment !='' order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError5ByLimit(int limit,int offset,Date date);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)>o.schedule_date and o.comment is not null and o.comment !='' order by o.id limit ?1 offset ?2",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)>o.schedule_date and o.comment is not null and o.comment !='' order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError6ByLimit(int limit,int offset,Date date);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)>o.schedule_date and (o.comment is null or o.comment ='') order by o.id limit ?1 offset ?2",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)>o.schedule_date and (o.comment is null or o.comment ='') order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError7ByLimit(int limit,int offset,Date date);
 	
-	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=3 and date_trunc('day',o.check_date)<=o.schedule_date order by o.id limit ?1 offset ?2",nativeQuery=true)
+	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=3 and date_trunc('day',o.check_date)<=o.schedule_date order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError8ByLimit(int limit,int offset,Date date);
 	
 	@Transactional

@@ -43,8 +43,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
 	private List<String> listClinicalDeptName;
-	private List<String> orgUidList;
-    private UaaService uaaService;
 
 	@Override
 	protected void init() {
@@ -55,8 +53,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
 		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
-		uaaService=WebUtil.getBean(UaaService.class);
-	    orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -71,10 +67,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
         searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         if(pageRequest.getSort().getOrderFor("id")!=null){

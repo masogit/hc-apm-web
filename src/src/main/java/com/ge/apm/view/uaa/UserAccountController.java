@@ -46,8 +46,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -132,7 +132,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         
-        deptList = uaaService.getFullOrgListBySiteId(UserContextService.getSiteId());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -148,17 +147,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void setTenantUid(String tenantUid) {
-        searchFilters.clear();
         this.tenantUid = tenantUid;
-
+        if(selectedTenant!=null && selectedTenant.getUid().equals(tenantUid)) return;
+        
+        searchFilters.clear();
+        selectedOrg = null;
+        
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
+        selectedTenant = tenantDao.findByuid(tenantUid);
+
+        deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
+        
+/*        
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
-            selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
-            selectedTenant = tenantDao.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
             rootOrg.setId(-1);
             rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
@@ -167,14 +171,34 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
             rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
         }
+*/
+        uaaService.getOrgTreeBySite(tenantUid);
+        rebuildOrgTree();
 
-        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
-        if (null != selectedUserOrg) {
-            selectedUserOrg.setSelected(true);
-            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedOrgNode) {
+            selectedOrgNode.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
     }
     
+    // TreeNodeName Filter
+    private String treeNodeNameFilter;
+    public String getTreeNodeNameFilter() {
+        return treeNodeNameFilter;
+    }
+    public void setTreeNodeNameFilter(String treeNodeNameFilter) {
+        this.treeNodeNameFilter = treeNodeNameFilter;
+    }
+    
+    public void rebuildOrgTree() {
+        if (StringUtils.isEmpty(treeNodeNameFilter)) 
+            treeNodeNameFilter = "";
+        
+        orgTree = uaaService.getFilterOrgTreeByYuanQu(tenantUid, treeNodeNameFilter, -1, -1);
+        TreeNodeUtil.expandTreeNode(orgTree);
+    }
+
     public String getOrgFullNameByUid(String orgUid) {
         OrgInfo org = orgInfoDao.getByUid(orgUid);
         return org == null ? "" : getOrgFullName(org);

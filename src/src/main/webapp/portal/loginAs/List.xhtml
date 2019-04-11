@@ -12,9 +12,9 @@
             </div>
 
             <div class="ui-g-12 card">
-                <h:form id="UserAccountListForm" rendered="#{userContextService.isSuperAdmin}">
+                <h:form id="UserAccountListForm">
 
-                    <p:commandButton id="btnSite" value="#{userAccountController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:commandButton id="btnSite" rendered="#{userContextService.isSuperAdmin}" value="#{userAccountController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
                         <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{userAccountController.tenantUid}">
                             <p:ajax process="@this" event="click" update=":UserAccountListForm" listener="#{userAccountController.setTenantUid(userAccountController.tenantUid)}" oncomplete="PF('varPanelSite').hide();"/>
@@ -39,7 +39,7 @@
                     </p:overlayPanel>
 
 
-                    <p:dataTable id="datalist" value="#{userAccountController.lazyModel}" var="item" widgetVar="varDataList"
+                    <p:dataTable id="datalist" class="datalist" value="#{userAccountController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{userAccountController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
