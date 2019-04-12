@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="MeasureOrderRuleViewDlg" widgetVar="MeasureOrderRuleViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{measureOrderRuleController.CRUDActionName} #{msg.MeasureOrderRule}">
+            <h:form id="MeasureOrderRuleViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{measureOrderRuleController.selected != null}">
+                        
+                        <h:outputLabel value="#{msg.name}" for="name" />
+                        <h:outputText value="#{measureOrderRuleController.selected.name}"/>
+                        
+                        <h:outputLabel value="#{msg.assetGroup}" for="assetGroup" />
+                        <h:outputText value="#{measureOrderRuleController.selected.assetGroup}"/>
+
+                        <h:outputLabel value="#{msg.manufacture}" for="manufacture" />
+                        <h:outputText value="#{measureOrderRuleController.selected.manufacture}"/>
+                        
+                        <h:outputLabel value="#{msg.functionType}" for="functionType" />
+                        <h:outputText value="#{measureOrderRuleController.selected.functionType}"/>
+                        
+                        <h:outputLabel value="#{msg.approveUserId}" for="approveUserId" />
+                        <h:outputText value="#{measureOrderRuleController.selected.approveUserId}"/>
+                        
+                        <h:outputLabel value="#{msg.ownerId}" for="creatorId" />
+                        <h:outputText value="#{measureOrderRuleController.selected.creatorId}"/>
+                        
+<!--                        <h:outputLabel value="#{msg.ownerName}" for="ownerName" />
+                        <h:outputText value="#{measureOrderRuleController.selected.ownerName}"/>-->
+                        
+                        <h:outputLabel value="#{msg.createdDate}" for="createdDate" />
+                        <h:outputText value="#{measureOrderRuleController.selected.createdDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        
+                        <h:outputLabel value="#{msg.period}" for="period" />
+                        <h:outputText value="#{measureOrderRuleController.selected.period}"/>
+                        
+                        <h:outputLabel value="#{msg.checkListUID}" for="checkListUID" />
+                        <h:outputText value="#{measureOrderRuleController.selected.checkListUID}"/>
+
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{measureOrderRuleController.deleteAction}" icon="ui-icon-trash" actionListener="#{measureOrderRuleController.delete}" value="#{msg.Delete}" update="display,:MeasureOrderRuleViewDlg, :MeasureOrderRuleListForm:datalist, :growl" oncomplete="handleSubmit(args, 'MeasureOrderRuleViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('MeasureOrderRuleViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

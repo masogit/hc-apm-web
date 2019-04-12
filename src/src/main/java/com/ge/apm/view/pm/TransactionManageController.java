@@ -2,8 +2,10 @@ package com.ge.apm.view.pm;
 
 import com.ge.apm.dao.DeptTransactionLogRepository;
 import com.ge.apm.dao.DeptTransactionCategoryRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.DeptTransactionCategory;
 import com.ge.apm.domain.DeptTransactionLog;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.transaction.TransactionService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -38,7 +40,8 @@ public class TransactionManageController extends JpaCRUDController<DeptTransacti
     private Integer tmCategory;
     @Getter@Setter
     private String remark;
-
+    @Getter@Setter
+    private Double hours;
     @Getter @Setter
     private DeptTransactionCategory deptTransactionCategory;
     private UserAccount user;
@@ -75,6 +78,7 @@ public class TransactionManageController extends JpaCRUDController<DeptTransacti
         }
     }
     HashMap<Integer,String> cateHm;
+    OrgInfoRepository orgInfoRepository;
     public List<DeptTransactionCategory> getTranManList(){
         return  deptTransactionCategoryRepository.find();
     }
@@ -93,6 +97,7 @@ public class TransactionManageController extends JpaCRUDController<DeptTransacti
         deptTransactionCategoryRepository =WebUtil.getBean(DeptTransactionCategoryRepository.class);
         transactionService= WebUtil.getBean(TransactionService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        orgInfoRepository=WebUtil.getBean(OrgInfoRepository.class);
         user = UserContextService.getCurrentUserAccount();
     }
     public String getCateHmByNum(Integer num){
@@ -100,27 +105,35 @@ public class TransactionManageController extends JpaCRUDController<DeptTransacti
     }
 
     public void saveTranMan(){
+        OrgInfo dept = orgInfoRepository.getByUid(userContextService.getLoginUserOrgInfo().getUid());
        /* selected.setCategory(tmCategory);
-       // selected.setName(deptTransactionCategory.getName());
-        selected.setTenantUID(user.getTenantUID());
-        selected.setHospritalUID(user.getHospitalUID());
-        selected.setInstitutionUID(user.getInstitutionUID());
-        selected.setSiteUID(user.getSiteUID());
-        transactionService.createTm(selected);*/
-        TransactionForm tf = new TransactionForm();
+        selected.setTenantUID(dept.getTenantUID());
+        selected.setHospitalUID(dept.getHospitalUID());
+        selected.setInstitutionUID(dept.getInstitutionUID());
+        selected.setSiteUID(dept.getSiteUID());
+        selected.setClinicalDeptUID(dept.getUid());
+        selected.setDate(selected.getStartTime());
+        selected.setRemark(remark);
+        selected.setHours(hours);
+        selected.setClinicalDeptName(UserContextService.getCurrentUserAccount().getDepartName());
+        selected.setAuthorName(UserContextService.getCurrentUserAccount().getLoginName());
+        selected.setAuthorId(UserContextService.getCurrentUserAccount().getId());
+        transactionService.createTm(selected);
+        selected=null;*/
+        /*TransactionForm tf = new TransactionForm();
         tf.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(selected.getStartTime()));
-        tf.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(selected.getEndTime()));
+//        tf.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(selected.getEndTime()));
         tf.setCategory(tmCategory);
         tf.setRemark(remark);
         tf.setAuthorUID(UserContextService.getCurrentUserAccount().getUid());
+        tf.setHours(hours);
         if(selected.getId()==null) {//新增
             transactionService.createTmByLink(tf, UserContextService.getAccessToken());
             remark = null;
         }else{
-            tf.setId(selected.getId());
-            transactionService.updateTransaction(tf, UserContextService.getAccessToken());
+            tf.setAuthorId(selected.getId());
+            transactionService.updateTransaction(tf, UserContextService.getAccessToken());*/
         }
-    }
     @Override
     public void prepareCreate()throws InstantiationException, IllegalAccessException{
         deptTransactionCategory = new DeptTransactionCategory();

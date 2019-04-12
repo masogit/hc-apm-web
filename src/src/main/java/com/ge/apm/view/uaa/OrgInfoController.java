@@ -505,15 +505,16 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         //检查是否有用户选择了该组织作为可见组织。
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("orgUid", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
-
-        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        List<UserOrgInfo> userOrgInfoList = userOrgDao.findBySearchFilter(checkFilters);
-        if (!userOrgInfoList.isEmpty()) {
-            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
-            return false;
-        }
+        //JIRA#4216
+//        checkFilters.clear();
+//        checkFilters.add(new SearchFilter("orgUid", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+//
+//        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+//        List<UserOrgInfo> userOrgInfoList = userOrgDao.findBySearchFilter(checkFilters);
+//        if (!userOrgInfoList.isEmpty()) {
+//            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+//            return false;
+//        }
 
         //检查该组织是否已经有资产属于该组织。
         checkFilters.clear();

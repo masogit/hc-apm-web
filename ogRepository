@@ -1,0 +1,7 @@
+A	src/src/main/java/com/ge/apm/dao/DeptTranLogRepository.java
+M	src/src/main/java/com/ge/apm/domain/DeptTransactionLog.java
+M	src/src/main/java/com/ge/apm/view/pm/TransactionManageController.java
+A	src/src/main/java/com/ge/apm/view/transaction/DepTransactionController.java
+A	src/src/main/java/com/ge/apm/view/transaction/TransactionStatis.java
+A	src/src/main/webapp/portal/transactionManage/deptTransactionManage.xhtml
+M	src/src/main/webapp/portal/transactionManage/transactionManage.xhtml

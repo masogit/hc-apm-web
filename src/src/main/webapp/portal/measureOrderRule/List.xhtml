@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="#{msg.MeasureOrderRule}"/>
+            	</div>
+            <h:form id="MeasureOrderRuleListForm">
+                <p:dataTable id="datalist" value="#{measureOrderRuleController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{measureOrderRuleController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="rowSelect" update="createButton editButton deleteButton approveButton saveAsButton"/>
+                    <p:ajax event="filter" listener="#{measureOrderRuleController.onFilter}" update="createButton editButton deleteButton"/>
+                    
+                     <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:column>
+<!--                     <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                    </p:column> -->
+                    <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                   		<h:outputText value="#{item.manufacture}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                       <h:outputText value="#{item.functionType}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.approveUserId}" sortBy="#{item.approveUserId}" filterBy="#{item.approveUserId}" filterMatchMode="EQ">
+                        <h:outputText value="#{measureOrderRuleController.getUserName(item.approveUserId)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{measureOrderRuleController.getApproveUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{msg.ownerId}" sortBy="#{item.creatorId}" filterBy="#{item.creatorId}" filterMatchMode="EQ">
+                        <h:outputText value="#{measureOrderRuleController.getUserName(item.creatorId)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{measureOrderRuleController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:column>
+                     <p:column headerText="#{msg.createdDate}" >
+                       	<h:outputText value="#{item.createdDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                     </p:column>
+                    <p:column headerText="#{msg.period}(月)" sortBy="#{item.period}" filterBy="#{item.period}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.period}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{msg.status}" sortBy="#{msg.status}" filterBy="#{msg.status}" filterMatchMode="EQ">
+                    	    <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{measureOrderRuleController.filterPmRuleStatus}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmRuleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('pmRuleStatus',item.status)}"/>
+	                 </p:column>
+	                 <p:column headerText="规则级别" sortBy="#{msg.level}" filterBy="#{msg.level}" filterMatchMode="EQ">
+                    	    <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{measureOrderRuleController.filterPmRuleLevel}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',item.level)}"/>
+	                 </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{measureOrderRuleController.prepareCreate}" update=":MeasureOrderRuleEditForm" oncomplete="PF('MeasureOrderRuleEditDialog').show()"/>
+                        <!-- <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{measureOrderRuleController.prepareView}" update=":measureOrderRuleViewDlg" oncomplete="PF('measureOrderRuleViewDialog').show()" disabled="#{empty measureOrderRuleController.selected}"/> -->
+                        <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{measureOrderRuleController.prepareEdit}" update=":MeasureOrderRuleEditForm" oncomplete="PF('MeasureOrderRuleEditDialog').show()" disabled="#{empty measureOrderRuleController.selected}"/>
+                        <p:commandButton id="saveAsButton"  title="另存为"  icon="ui-icon-save" class="btn btn-sm btn-gray"  actionListener="#{measureOrderRuleController.initSaveAs()}" update=":MeasureOrderRuleSaveAsForm" oncomplete="PF('SaveAsDialog').show()" disabled="#{empty measureOrderRuleController.selected}"/>
+                        <p:commandButton id="approveButton"  title="审核"  icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}" actionListener="#{measureOrderRuleController.prepareEdit}" update=":MeasureOrderRuleApproveForm" oncomplete="PF('MeasureOrderRuleApproveDialog').show()" disabled="#{empty measureOrderRuleController.selected}"/>
+                        <p:commandButton id="deleteButton" title="#{msg.Delete}"  icon="ui-icon-close" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}"  actionListener="#{measureOrderRuleController.delete}"  update=":MeasureOrderRuleEditDlg,datalist"  disabled="#{empty measureOrderRuleController.selected}">
+                        	<p:confirm header="#{msg.DeleteConformation}" message="若删除该规则，则已配置的资产规则也会被删除，确定要删除该规则吗？" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="measureOrderRule_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="Edit.xhtml"/>
+            <!--<ui:include src="View.xhtml"/>-->
+            <ui:include src="Approve.xhtml"/>
+            <ui:include src="SaveAs.xhtml"/>
+
+            <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="预览">
+                <h:form id="PmOrderPreviewForm" >
+                    <iframe src="/wx/form/preview/"  width="100%"  height="490"/>
+                </h:form>
+
+            </p:dialog>
+            <script>
+                function preparePreview(index,formName) {
+                    var $jasonText;
+                    if(index == '1'){
+                        $jasonText = $("#"+formName+"\\:safetyReport")[0];
+                    }else if(index == '2'){
+                        $jasonText = $("#"+formName+"\\:performanceReport")[0];
+                    }
+                    if ('localStorage' in window) {
+                        localStorage.setItem("hc-apm-form-preview", $jasonText.innerText || ''); // # for test/dev perpose
+                        localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
+                    }
+
+                }
+
+            </script>
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>
