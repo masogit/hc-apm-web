@@ -30,7 +30,7 @@
                 <p:outputLabel class="pageTitle" value=" #{msg.TerminateAssetInfo}"/>
             </div>
             <div class="ui-g-12 card">
-                <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false">
+                <p:tabView redirect="true" class="ui-g-12" id="woTab" dynamic="true" cache="false">
                     <p:tab class="ui-g-12" title="待报废资产" id="toBeTerminatedAssets">
                         <ui:include src="AssetToBeTerminatedList.xhtml"/>
                     </p:tab>
