@@ -392,13 +392,13 @@ public class TenantInfoConfig {
 				listKey.add("measure.info");
 				listLabel.add("计量信息");
 				listKey.add("nurseSite");
-				listLabel.add("护士站");
+				listLabel.add("临床助手");
 				listKey.add("nurseSite.maintain");
-				listLabel.add("日常维护");
+				listLabel.add("日常检查");
 				listKey.add("nurseSite.config");
-				listLabel.add("日常维护设置");
+				listLabel.add("日常检查设置");
 				listKey.add("nurseSite.report");
-				listLabel.add("日常维护报表");
+				listLabel.add("日常检查报表");
 				listKey.add("nurseSite.optRecord");
 				listLabel.add("开关机检查");
 				listKey.add("knowledge");
