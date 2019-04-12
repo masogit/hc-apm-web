@@ -14,7 +14,6 @@ public interface DeptTransactionLogRepository extends GenericRepository<DeptTran
 
     public List<DeptTransactionLog> getByTenantUID(String tenantUid);
 
-
     @Query(value="select dtl.* from dept_transaction_log dtl where  author_id =?1 and to_char(start_time,'yyyy-mm') =?2 ",nativeQuery = true)
     public List<DeptTransactionLog> getDefByAuthorandMonth(Integer id,String month);
 
@@ -35,4 +34,5 @@ public interface DeptTransactionLogRepository extends GenericRepository<DeptTran
             + "from TubeData td where td.tenantUID = ?1 and td.assetUid in ?2 and seriaNum like concat('%',?3,'%') "
             + "group by td.assetUid,td.seriaNum order by inputDate desc")
     Page<TubeData> findByConditionWithUidsAndSeriaNum(String tenantUid, List<String> queryUids, String queryCondition,Pageable pageable);*/
+
 }

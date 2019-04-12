@@ -12,7 +12,8 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "dept_transaction_log")
-public class DeptTransactionLog{
+public class DeptTransactionLog implements Serializable {
+
     protected LazyDataModel lazyModel;
 
     private static final long serialVersionUID = 1L;
@@ -40,12 +41,14 @@ public class DeptTransactionLog{
     private Double hours;
 
     @Basic(optional = false)
+    @NotNull
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
 
     @Basic(optional = false)
+    @NotNull
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -56,7 +59,6 @@ public class DeptTransactionLog{
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date date;
     @Size(min = 1, max = 64)
-
     @Column(name="transaction_uid")
     private String transactionUID;
 
@@ -75,7 +77,7 @@ public class DeptTransactionLog{
 
     @Column(name="clinical_dept_uid",columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
-
+    
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
 
@@ -120,7 +122,7 @@ public class DeptTransactionLog{
         this.uid = uid;
     }
 
-//    @NotNull
+    @NotNull
     public Date getStartTime() {
         return startTime;
     }
@@ -129,8 +131,11 @@ public class DeptTransactionLog{
         this.startTime = startTime;
     }
 
-//    @NotNull
-
+    @NotNull
+    public Date getEndTime() {
+        return endTime;
+    }
+    
     public void setEndTime(@NotNull Date endTime) {
         this.endTime = endTime;
     }
@@ -232,5 +237,4 @@ public class DeptTransactionLog{
         }
         return true;
     }
-
 }
