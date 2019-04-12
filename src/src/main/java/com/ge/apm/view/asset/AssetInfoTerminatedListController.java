@@ -130,7 +130,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-
         exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
@@ -138,7 +137,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
-
     }
 
     private void loadCustomConfig() {

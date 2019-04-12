@@ -459,6 +459,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TerminateAssetInfo', '报废资产信息', 'terminate Asset Info', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ActiveAsset', '重新启用', 'active asset', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'InactiveAsset', '转入报废', 'inactive asset', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PreInactiveAsset', '转入待报废', 'pre-inactive asset', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BuildAsset', '资产建档', 'build asset', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PwdTips', '密码必须6位以上，首字母大写,尾字母小写,必须包含数字,不可使用3个以上连续的数字或字母,不可使用3个以上相同的数字或字母,必须包含一个特殊字符(!@#$%&)', 'password tips', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DeviceType', '资产类型', 'device type', NULL, '-1');
