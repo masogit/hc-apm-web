@@ -295,7 +295,7 @@
                             <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
                             <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
-                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
+                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="false"/>
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" />
                         </p:selectOneRadio>
