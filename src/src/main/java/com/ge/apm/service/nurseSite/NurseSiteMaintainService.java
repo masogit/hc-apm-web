@@ -116,7 +116,7 @@ public class NurseSiteMaintainService {
 	private static final String STR_SEQUENCE = "班次";
 	private static final String STR_MODIFIED_BY = "负责人";
 	private static final String STR_SIGNATURE = "签名";
-	private static final String STR_NURSESITEREPORT = "护士站日常维护报表";
+	private static final String STR_NURSESITEREPORT = "临床助手日常检查报表";
 	
 	private Map<String,UserAccount> mapUserAccount=new HashMap<String,UserAccount>();
 	private Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
