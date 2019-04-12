@@ -69,7 +69,7 @@
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,SiteAdmin,AssetHead')  and userContextService.versionContains('maintain')}">
                 <p:menuitem value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.versionContains('maintain.workbench')}"/>
-
+                <p:menuitem id="um2400" value="科务管理" outcome="/portal/transactionManage/deptTransactionManage.xhtml"/>
 <!--                <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>-->
                 <!--<p:menuitem id="um261" value="#{msg.PreventiveMaintaincePlanning}" url="/portal/analysis/reports.xhtml#/MaintenanceStats"/>-->

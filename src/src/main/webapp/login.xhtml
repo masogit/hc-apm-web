@@ -74,6 +74,14 @@
                     padding:0px;
                     background-color:#000
                 }
+                .bottom-ctner{
+                    width:98%;
+                    position: absolute;
+                    z-index: 3;
+                    bottom: 12px;
+                    left: 0;
+                    color: #fff;
+                }
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
@@ -123,6 +131,10 @@
             <p:growl id="growl">
                 <p:autoUpdate />
             </p:growl>
+            
+            <div id="bottom_container" class="bottom-ctner">
+                <table align="right"><tr><td><img src="resources/img/ChinaTelecom.png"/></td><td>ICP证号: 沪ICP备05002432号</td></tr></table>
+            </div>
         </h:body>
     </html>
 </f:view>
