@@ -1,5 +1,6 @@
 package com.ge.apm.service.inventory;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -279,14 +280,14 @@ public class InventoryOrderService {
 		}).collect(Collectors.toList());
 	}
 
-	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<String> listAccessClinical) {
+	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<SearchFilter> listSearchFilter, List<String> listAccessClinical) {
 		Page<InventoryOrder> pageRe = null;
 		int page = pageRequest.getPageNumber();
 		int pageSize = pageRequest.getPageSize();
+		List<InventoryOrder> listFilterInventoryOrder = new ArrayList<InventoryOrder>();
 		List<InventoryOrder> listSmallRe = new ArrayList<InventoryOrder>();
-		if(listUserInventoryOrder.size()>0){
-		}
-		else{
+		if (listUserInventoryOrder.size() > 0) {
+		} else {
 			List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(tenantUid);
 			if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
 				for (int i = 0; i < listInventoryOrder.size(); ++i) {
@@ -300,14 +301,78 @@ public class InventoryOrderService {
 				}
 			}
 		}
-		int size = listUserInventoryOrder.size();
+		try {
+			if (listSearchFilter.size() > 0 && listUserInventoryOrder.size() > 0) {
+				for (int i = 0; i < listUserInventoryOrder.size(); ++i) {
+					InventoryOrder tempOrder = listUserInventoryOrder.get(i);
+					boolean match = true;
+					for (SearchFilter filter : listSearchFilter) {
+						String fieldName = filter.fieldName;
+						Object value = filter.value;
+						if (value == null) {
+							continue;
+						}
+						Object tempValue = getFieldValue(tempOrder, fieldName);
+						if (tempValue == null) {
+							match = false;
+						} else if (filter.operator.equals(SearchFilter.Operator.LIKE)) {
+							if (!((String) tempValue).contains((String) value)) {
+								match = false;
+							}
+						} else if (filter.operator.equals(SearchFilter.Operator.EQ)) {
+							if (!((Boolean) tempValue).equals((Boolean) value)) {
+								match = false;
+							}
+						} else if (filter.operator.equals(SearchFilter.Operator.GTE)) {
+							if (((Date) tempValue).compareTo((Date) value) < 0) {
+								match = false;
+							}
+						} else if (filter.operator.equals(SearchFilter.Operator.LTE)) {
+							if (((Date) tempValue).compareTo((Date) value) > 0) {
+								match = false;
+							}
+						} else if (filter.operator.equals(SearchFilter.Operator.GT)) {
+							if (((Date) tempValue).compareTo((Date) value) <= 0) {
+								match = false;
+							}
+						} else if (filter.operator.equals(SearchFilter.Operator.LT)) {
+							if (((Date) tempValue).compareTo((Date) value) >= 0) {
+								match = false;
+							}
+						}
+					}
+					if (match) {
+						listFilterInventoryOrder.add(tempOrder);
+					}
+				}
+			} else {
+				listFilterInventoryOrder = listUserInventoryOrder;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		int size = listFilterInventoryOrder.size();
 		int pre = page * pageSize;
 		int last = (page + 1) * pageSize;
 		for (int i = pre; i < size && i < last; ++i) {
-			listSmallRe.add(listUserInventoryOrder.get(i));
+			listSmallRe.add(listFilterInventoryOrder.get(i));
 		}
 		pageRe = new PageImpl<InventoryOrder>(listSmallRe, pageRequest, size);
 		return pageRe;
+	}
+
+	private Object getFieldValue(InventoryOrder order, String fieldName) {
+		try {
+			Field field = InventoryOrder.class.getDeclaredField(fieldName);
+			boolean access = field.isAccessible();
+			field.setAccessible(true);
+			Object value = field.get(order);
+			field.setAccessible(access);
+			return value;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}
+		return null;
 	}
 
 	// public List<InventoryOrder> getMoreListInventoryOrder(String
