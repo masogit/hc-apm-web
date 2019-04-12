@@ -38,12 +38,13 @@
                 <br/>
                 <p:commandButton id="exportButton" value="#{msg.toBeTerminatedAppraisal}"
                                  actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}"
-                                 update=":growl"
+                                 update=":growl" icon="ui-icon-file-download"
                                  onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                     <p:fileDownload value="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisalFile}"/>
                 </p:commandButton>
-                <p:commandButton immediate="true" value="#{msg.Close}"
-                                 onclick="PF('ExportTemplateEditDialog').hide()"/>
+                &nbsp;&nbsp;
+                <p:commandButton immediate="true" value="#{msg.Cancel}"
+                                 icon="ui-icon-cancel" onclick="PF('ExportTemplateEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
     </p:dialog>
