@@ -127,7 +127,7 @@ public class ExportToBeTerminatedAppraisalService {
             populateUidList(uids, tenantUID);
         }
 
-        WorkOrderExportTemplate template = null;//getPrioritizedTemplate(uids);
+        WorkOrderExportTemplate template = getPrioritizedTemplate(uids);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());

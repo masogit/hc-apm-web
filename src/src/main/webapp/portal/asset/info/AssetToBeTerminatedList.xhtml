@@ -75,9 +75,6 @@
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
-                <p:column  headerText="#{msg.terminationCause}" sortBy="#{item.terminationCause}" filterBy="#{item.terminationCause}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.terminationCause}"/>
-                </p:column>
                 <c:forEach items="#{assetInfoToBeTerminatedListController.customedColumns}" var="columnItem" >
                     <c:if test="#{columnItem eq 'name'}">
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -546,7 +543,9 @@
                         </p:column>
                     </c:if>
                 </c:forEach>
-
+                <p:column  headerText="#{msg.terminationCause}" sortBy="#{item.terminationCause}" filterBy="#{item.terminationCause}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.terminationCause}"/>
+                </p:column>
                 <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoToBeTerminatedListController.needShowAssetApproval}">
                     <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
                     <f:facet name="filter">
