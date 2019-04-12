@@ -27,7 +27,6 @@ public class TransactionService extends MicroServiceInvoker {
     @Autowired
     DeptTransactionLogRepository deptTransactionLogRepository;
 
-
 public HashMap<String,Object> getSummary(String from,String to,String token){
     HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
     String gatewayURL = getGatewayURL(GatewayURL.GET_DEPTRASACTION_LOG_SUMMARY);
@@ -122,4 +121,5 @@ public HashMap<String,Object> getSummary(String from,String to,String token){
     public void localUpdateTransaction(DeptTransactionLog dptlog){
         deptTransactionLogRepository.save(dptlog);
     }
+
 }
