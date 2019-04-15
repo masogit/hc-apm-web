@@ -1105,11 +1105,12 @@ public void repairResultSet(){
         //从配置信息获取当前状态
         String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
-        String requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]").toString();
-        if(requestReason.isEmpty()){
+        newServiceRequest = new V2_ServiceRequest();
+        Object requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+        if(requestReason==null){
             newServiceRequest.setRequestReason("设备故障");
         }else{
-            newServiceRequest.setRequestReason(requestReason);
+            newServiceRequest.setRequestReason(requestReason.toString());
         }
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest = new V2_ServiceRequest();
