@@ -220,11 +220,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setUserSearchFilters();
         selected = null;
 
-        Sort currentSort = pageRequest.getSort();
-        //check if it's default sort JIRA#4065
-        if(currentSort.toString().startsWith("namePyCode")) {
-            pageRequest = new PageRequest(pageRequest.getOffset(), pageRequest.getPageSize(), currentSort.and(new Sort(Sort.Direction.DESC, "id")));
-        }
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
