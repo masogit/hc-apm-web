@@ -70,7 +70,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
 //        	}
 //        }
 //        Page<InventoryOrder> pageRe=dao.findBySearchFilter(searchFilters, pageRequest);
-        Page<InventoryOrder> pageRe=service.getPageData(pageRequest, currentUser.getTenantUID(), listAccessClinical);
+        Page<InventoryOrder> pageRe=service.getPageData(pageRequest, currentUser.getTenantUID(), searchFilters,listAccessClinical);
         return pageRe;
     }
 

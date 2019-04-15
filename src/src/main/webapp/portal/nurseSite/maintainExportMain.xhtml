@@ -9,13 +9,13 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="日常维护报表导出"/>
+                <p:outputLabel class="pageTitle" value="日常检查报表导出"/>
             </div>
 
             <div class="ui-g-12 card ">
 				<p:tabView id="maintainExportTab">
 					<p:ajax event="tabChange" />
-					<p:tab title="日常维护报表导出" id="export">
+					<p:tab title="日常检查报表导出" id="export">
 						<ui:include src="maintainExport.xhtml" />
 					</p:tab>
 				</p:tabView>

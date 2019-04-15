@@ -47,6 +47,7 @@ public class MaintainController implements ServerEventInterface {
 	private DefaultScheduleEvent event;
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
 	private List<NurseSiteMaintainConfig> showListNurseSiteMaintainConfig;
+	private List<NurseSiteMaintainConfig> listCheckedNurseSiteMaintainConfig;
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
 	private List<OrgInfo> listCheckClinicalOrgInfo;
@@ -270,7 +271,7 @@ public class MaintainController implements ServerEventInterface {
 		}
 	}
 
-	private void batchCreateMaintainData(Date date, List<NurseSiteMaintain> listMaintainData, Integer sequence) {
+	private void batchCreateMaintainData(Date date, List<NurseSiteMaintain> listMaintainData,NurseSiteMaintainConfig nurseSiteMaintainConfig, Integer sequence) {
 		NurseSiteMaintain tempNurseSiteMaintain = nurseSiteMaintainService.createMaintainWithoutItem(date, currentUser, nurseSiteMaintainConfig, sequence);
 		listMaintainData.add(tempNurseSiteMaintain);
 	}
@@ -525,20 +526,16 @@ public class MaintainController implements ServerEventInterface {
 	// }
 
 	public String batchSaveMaintainData() {
-		if (nurseSiteMaintainConfig == null) {
+		if (listCheckedNurseSiteMaintainConfig == null || listCheckedNurseSiteMaintainConfig.size()<1) {
 			addMessage("请创建并选择配置模板");
 			return "maintainMain?faces-redirect=false";
 		}
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 		if (startBatchDate == null) {
 			startBatchDate = new Date();
 		}
 		if (endBatchDate == null) {
 			endBatchDate = new Date();
 		}
-		Calendar currentCalendar = Calendar.getInstance();
-		Calendar startCalendar = Calendar.getInstance();
-		startCalendar.setTime(startBatchDate);
 		Calendar endCalendar = Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
 		Calendar maxCalendar = Calendar.getInstance();
@@ -548,7 +545,19 @@ public class MaintainController implements ServerEventInterface {
 			addMessage("请选择一年之内的日期");
 			return "maintainMain?faces-redirect=false";
 		}
-		
+		for(int i=0;i<listCheckedNurseSiteMaintainConfig.size();++i){
+			batchSaveMaintainData(listCheckedNurseSiteMaintainConfig.get(i));
+		}
+		addMessage("工单详情后台生成中，请耐心等待。。。");
+		return "maintainMain?faces-redirect=true";
+	}
+	
+	private void batchSaveMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig){
+		Calendar currentCalendar = Calendar.getInstance();
+		Calendar startCalendar = Calendar.getInstance();
+		startCalendar.setTime(startBatchDate);
+		Calendar endCalendar = Calendar.getInstance();
+		endCalendar.setTime(endBatchDate);
 		Integer type = nurseSiteMaintainConfig.getType();
 		String typeValue = nurseSiteMaintainConfig.getTypeValue();
 		List<NurseSiteMaintain> listMaintainData = new ArrayList<NurseSiteMaintain>();
@@ -566,7 +575,7 @@ public class MaintainController implements ServerEventInterface {
 						} catch (Exception e) {
 							LOGGER.error(e.getMessage());
 						}
-						batchCreateMaintainData(date, listMaintainData, i + 1);
+						batchCreateMaintainData(date, listMaintainData, nurseSiteMaintainConfig,i + 1);
 					}
 					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 					if (listMaintainData.size() > 30) {
@@ -581,7 +590,7 @@ public class MaintainController implements ServerEventInterface {
 						try {
 							if (startCalendar.get(Calendar.DAY_OF_WEEK) == Integer.parseInt(arr[i])) {
 								startCalendar.set(Calendar.HOUR_OF_DAY, currentCalendar.get(Calendar.HOUR_OF_DAY));
-								batchCreateMaintainData(startCalendar.getTime(), listMaintainData, null);
+								batchCreateMaintainData(startCalendar.getTime(), listMaintainData,nurseSiteMaintainConfig, null);
 							}
 						} catch (Exception e) {
 							// TODO: handle exception
@@ -605,7 +614,7 @@ public class MaintainController implements ServerEventInterface {
 							currentValue = Integer.parseInt(arr[i]);
 							if (currentDay == currentValue) {
 								startCalendar.set(Calendar.HOUR_OF_DAY, currentCalendar.get(Calendar.HOUR_OF_DAY));
-								batchCreateMaintainData(startCalendar.getTime(), listMaintainData, null);
+								batchCreateMaintainData(startCalendar.getTime(), listMaintainData,nurseSiteMaintainConfig, null);
 							}
 						} catch (Exception e) {
 							// TODO: handle exception
@@ -618,7 +627,7 @@ public class MaintainController implements ServerEventInterface {
 						if (currentDay < currentValue) {
 							startCalendar.add(Calendar.DAY_OF_YEAR, -1);
 							startCalendar.set(Calendar.HOUR_OF_DAY, currentCalendar.get(Calendar.HOUR_OF_DAY));
-							batchCreateMaintainData(startCalendar.getTime(), listMaintainData, null);
+							batchCreateMaintainData(startCalendar.getTime(), listMaintainData, nurseSiteMaintainConfig,null);
 							startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 						}
 					}
@@ -632,13 +641,7 @@ public class MaintainController implements ServerEventInterface {
 		if (listMaintainData.size() > 0) {
 			nurseSiteMaintainService.save(listMaintainData);
 		}
-		boolean result = nurseSiteMaintainService.addBatchJob("create", nurseSiteMaintainConfig, startBatchDate, endBatchDate, currentUser.getUid(), null);
-		if (result) {
-			addMessage("工单详情后台生成中，请耐心等待。。。");
-		} else {
-			addMessage("已经有相同工单详情后台生成中，请耐心等待。。。");
-		}
-		return "maintainMain?faces-redirect=true";
+		nurseSiteMaintainService.addBatchJob("create", nurseSiteMaintainConfig, startBatchDate, endBatchDate, currentUser.getUid(), null);
 	}
 
 	public String batchCompleteMaintainData() {
@@ -857,6 +860,14 @@ public class MaintainController implements ServerEventInterface {
 
 	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
+	}
+
+	public List<NurseSiteMaintainConfig> getListCheckedNurseSiteMaintainConfig() {
+		return listCheckedNurseSiteMaintainConfig;
+	}
+
+	public void setListCheckedNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> listCheckedNurseSiteMaintainConfig) {
+		this.listCheckedNurseSiteMaintainConfig = listCheckedNurseSiteMaintainConfig;
 	}
 
 	@Override
