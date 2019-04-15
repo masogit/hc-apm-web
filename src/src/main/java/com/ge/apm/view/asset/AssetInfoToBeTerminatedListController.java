@@ -215,13 +215,17 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public void uploadDataFile(FileUploadEvent event) {
-        this.uploadedFile = event.getFile();
-        String fileName = uploadedFile.getFileName();
-        if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
-            throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
+        try {
+            this.uploadedFile = event.getFile();
+            String fileName = uploadedFile.getFileName();
+            if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
+                throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
+            }
+            uploadedFileObject = blobFileService.uploadFile(uploadedFile);
+            logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("文件上传失败!");
         }
-        uploadedFileObject = blobFileService.uploadFile(uploadedFile);
-        logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
