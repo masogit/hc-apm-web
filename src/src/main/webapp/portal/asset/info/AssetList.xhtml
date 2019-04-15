@@ -121,7 +121,7 @@
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -642,9 +642,6 @@
                             <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
-                                </p:commandButton>
-                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray batch-terminated" title="批量报废" actionListener="#{assetInfoListController.batchProcessToTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
-                                    <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
 

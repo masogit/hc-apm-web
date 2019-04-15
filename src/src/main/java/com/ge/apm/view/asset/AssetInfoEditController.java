@@ -140,7 +140,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        nurseSiteMaintainService=WebUtil.getBean(NurseSiteMaintainService.class);
+        nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -197,7 +197,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
             mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
             MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
-            if (found != null ) {
+            if (found != null) {
                 mvsAssetInfo = found;
             }
         }
@@ -450,10 +450,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
         }
-        
+
         //设置质保时间
-        if(null == selected.getFactoryWarrantyDate()){
-            if(selected.getAcceptDate() !=null && selected.getWarrantyMonth() != null){
+        if (null == selected.getFactoryWarrantyDate()) {
+            if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
                 selected.setFactoryWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
             }
         }
@@ -477,7 +477,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                         if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
                             WebUtil.addErrorMessage("二维码不正确");
                             return "";
-                        };
+                        }
+                        ;
                     }
                     qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
                     selected.setQrCode(null);
@@ -504,8 +505,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         this.save();
-        if(this.selected.getStatus()==4){
-        	aimService.updateNurseSiteMaintain(this.selected.getUid());
+        if (this.selected.getStatus() == 4) {
+            aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
         assetDepreciationService.saveAssetDerpeciation(selected);
 
@@ -637,27 +638,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public String setValidButton() {
-        if (terminate) {
-            this.selected.setIsValid(true);
-            this.selected.setTerminateDate(null);
-        } else {
-            int workOrdersNum = dao.fetchCurrentWorkOrders(selected.getId());
-            if (workOrdersNum > 0) {
-                WebUtil.addErrorMessage("当前设备存在未完成工单，不能报废！");
-                return null;
-            } else {
-                this.selected.setIsValid(false);
-                this.selected.setTerminateDate(new Date());
-                updateNurseSiteMaintain(this.selected.getUid());
-            }
-        }
+    public String processToBeTerminated() {
+        this.selected.setStatus(4);
         update();
-        return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+        return "AssetList?faces-redirect=true";
     }
-    
-    public void updateNurseSiteMaintain(String assetUid){
-    	nurseSiteMaintainService.deleteAssetUid(assetUid);
+
+    public String processToBeValid() {
+        this.selected.setStatus(1);
+        this.selected.setIsValid(true);
+        this.selected.setTerminateDate(null);
+        update();
+        return "AssetTerminateEntryList?faces-redirect=true";
+    }
+
+    public void updateNurseSiteMaintain(String assetUid) {
+        nurseSiteMaintainService.deleteAssetUid(assetUid);
     }
 
     public Boolean needAssetApproval(String siteUid) {
@@ -826,7 +822,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public List<UserAccount> completeClinicalOwnerList(String query) {
         if (clinicalOwnerList == null) {
             return Collections.emptyList();
-        };
+        }
+        ;
         List<UserAccount> res = this.clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
@@ -912,7 +909,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return editableFieldsList.contains(fieldKey);
     }
 
-//getter and setter
+    //getter and setter
     public Boolean getTerminate() {
         return terminate;
     }
@@ -1028,17 +1025,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
-        if(newSupplier.getMaintainerT()) {
+        if (newSupplier.getMaintainerT()) {
             supplierController.setMaintainerT(true);
         } else {
             supplierController.setMaintainerT(false);
         }
-        if(newSupplier.getManufacturerT()) {
+        if (newSupplier.getManufacturerT()) {
             supplierController.setManufacturerT(true);
         } else {
             supplierController.setManufacturerT(false);
         }
-        if(newSupplier.getSupplierT()) {
+        if (newSupplier.getSupplierT()) {
             supplierController.setSupplierT(true);
         } else {
             supplierController.setSupplierT(false);
@@ -1046,7 +1043,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
         supplierList.add(newSupplier);
-        if(StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+        if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
             supplierList.add(newSupplier);
         }
     }

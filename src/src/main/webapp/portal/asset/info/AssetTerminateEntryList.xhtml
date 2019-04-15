@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('AssetInfoListForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+
+                PF('varDataList').filter();
+            }
+        </script>
+
+        <style>
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.TerminateAssetInfo}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <p:tabView redirect="true" class="ui-g-12" id="woTab" dynamic="true" cache="false">
+                    <p:tab class="ui-g-12" title="待报废资产" id="toBeTerminatedAssets">
+                        <ui:include src="AssetToBeTerminatedList.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="已报废资产" id="terminatedAssets">
+                        <ui:include src="AssetTerminatedList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+
+        <script>
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+//]]>
+        </script>
+    </ui:define>
+</ui:composition>

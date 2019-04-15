@@ -512,6 +512,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "has_open_alert")
     private Boolean hasOpenAlert;
 
+    @Size(max = 128)
+    @Column(name = "termination_cause")
+    private String terminationCause;
+
     @Transient
     private int lineNum;
 
@@ -1704,6 +1708,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setHasOpenAlert(Boolean hasOpenAlert) {
         this.hasOpenAlert = hasOpenAlert;
+    }
+
+    public String getTerminationCause() {
+        return terminationCause;
+    }
+
+    public void setTerminationCause(String terminationCause) {
+        this.terminationCause = terminationCause;
     }
 
     @Override

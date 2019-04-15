@@ -6,7 +6,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import java.util.Map;
 
 public abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
-    protected String extractValue(Map<String, Object> part, String key) {
+    protected String extractValue(Map part, Object key) {
         Object obj = part.get(key);
         if (obj == null) {
             return "";
@@ -15,7 +15,11 @@ public abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPoli
     }
 
     protected XWPFTableRow addRow(XWPFTable table) {
-        XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows());
+        return addRow(table, table.getNumberOfRows());
+    }
+
+    protected XWPFTableRow addRow(XWPFTable table, int n) {
+        XWPFTableRow row = table.insertNewTableRow(n);
         row.setHeight(300);
         row.setCantSplitRow(false);
         row.setRepeatHeader(true);
