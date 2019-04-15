@@ -64,6 +64,9 @@ public class DepTranSummaryController  implements Serializable{
 
     }
 
+public Integer getCurrentMonth(){
+        return TimeUtils.getCurrentMonth();
+}
 
    /* public List<DeptTransactionLog> refreshLoadData(){
         HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(TimeUtils.getCurrentStartYYMM(),TimeUtils.getCurrentEndYYMM(),authorId, UserContextService.getAccessToken());
@@ -89,6 +92,17 @@ public class DepTranSummaryController  implements Serializable{
             summaryTraList= decomposeSummary(tf,viewByAssetHead);
         }
     }
+
+    public void searchTheMonth(){
+        depTranForTrans= new DepTranForTrans();
+        TimeForm tf = new TimeForm();
+        HashMap<String, Object> viewByAssetHead=null;
+        if(startTime!=null) {
+            viewByAssetHead=transactionService.getSummary(TimeUtils.getInputStartDate(startTime),TimeUtils.getInputEndDate(startTime), UserContextService.getAccessToken());
+        }
+        summaryTraList= decomposeSummary(tf,viewByAssetHead);
+    }
+
 
     public void searchRange(){
         depTranForTrans= new DepTranForTrans();
