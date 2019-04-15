@@ -581,7 +581,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         this.selectedMap.clear();
     }
-    
+
 
     public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);
