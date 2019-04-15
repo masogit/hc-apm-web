@@ -177,27 +177,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void rebuildOrgTree() {
-/*        
-        uaaService.getOrgTreeBySite(tenantUid);
-        
-        if (StringUtils.isEmpty(treeNodeNameFilter)) 
-            treeNodeNameFilter = "";
-        
-        orgTree = uaaService.getFilterOrgTreeByYuanQu(tenantUid, treeNodeNameFilter, -1, -1);
-        TreeNodeUtil.expandTreeNode(orgTree);
-*/
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
-            OrgInfo rootOrg = new OrgInfo();
-            rootOrg.setId(-1);
-            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
-            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-            orgTree = new DefaultTreeNode("root", null, null);
-            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+            orgTree = uaaService.buildOrgTree(tenantUid, "", -1, -1);
         }
+    }
+    
+    public void filterTreeNode(){
+        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
     }
 
     public String getOrgFullNameByUid(String orgUid) {

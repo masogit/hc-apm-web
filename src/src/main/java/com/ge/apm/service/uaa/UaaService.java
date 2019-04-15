@@ -36,7 +36,6 @@ import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.Map.Entry;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -335,7 +334,7 @@ public class UaaService {
         buildOrgTree(fullOrgList, root, selectedOrgId);
         return root;
     }
-    private  Map<String, TreeNode> treeMapG = new HashMap<>();
+
     private void buildOrgTree(List<OrgInfo> orgList, DefaultTreeNode root, Integer selectedOrgId){
         //first create all nodes
         TreeNode selectedNode = null;
@@ -422,135 +421,6 @@ public class UaaService {
         return root;
     }
 
-    private boolean filterNodeByOrgTypeOrgLevel(Entry<String, TreeNode> node, int maxOrgType, int maxOrgLevel){
-        if(maxOrgType<0 && maxOrgLevel<0) return true; // means ignore OrgType & OrgLevel Filter
-        
-        boolean filterOut = false;
-        OrgInfo org = (OrgInfo)node.getValue().getData();
-        if(maxOrgType>=0) filterOut = org.getOrgType()>maxOrgType;
-        if(maxOrgLevel>=0) filterOut = filterOut || org.getOrgLevel()>maxOrgLevel;
-
-        return !filterOut;
-    }
-
-    public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords){
-        return getFilterOrgTreeByYuanQu(siteUID,keywords, -1, -1);
-    }
-    
-    public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords, int maxOrgType, int maxOrgLevel){
-        treeNodeMap = new  LinkedHashMap<>();
-        TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
-        //xTreeMap
-        if(xtreeMap==null) getOrgTreeBySite(siteUID);
-        Map<String, TreeNode> tempTreeMap = xtreeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
-        for(Map.Entry<String, TreeNode> nodeItem: tempTreeMap.entrySet()){
-            TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            //租户必须作为根节点先加入
-            //if(org.getOrgType()==0){
-            if(org.getUid().equals(rootUID)){
-                TreeNode node1 = new DefaultTreeNode("org", org, null);
-                node.setRowKey("org_"+org.getId());
-                treeNodeMap.put(org.getUid(),node1);
-            }
-            buildTreeByKeyYuanqu(node,keywords);
-        }
-        
-        treeNodeMap = treeNodeMap.entrySet().stream().filter(e->filterNodeByOrgTypeOrgLevel(e, maxOrgType, maxOrgLevel)).collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
-        
-        //构建过虑好的树
-        for(Map.Entry<String, TreeNode> nodeItem: treeNodeMap.entrySet()){
-            TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            if(org.getParentUID()!=null){
-                TreeNode parentNode = treeNodeMap.get(org.getParentUID());
-                if(parentNode!=null){
-                    parentNode.getChildren().add(node);
-                }
-            }
-        }
-        if(treeNodeMap.get(siteUID)!=null) {
-            filteredRoot.getChildren().add(treeNodeMap.get(siteUID));
-        }
-        return filteredRoot;
-    }
-
-public void buildTreeByKey(TreeNode treeNode,String keyWords){
-    //如果当前节点是最后一级即科室 则将该科室包括其上的父节点们添加到treeMapG
-    if(treeNode.getChildren().isEmpty()){
-        OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-        if(orgInfo.getName().contains(keyWords)){
-            //将其到orgtype=0的所有父节点装入treeNodeMap
-            treeNodeMap.put(orgInfo.getUid(),treeNode);
-            //一旦找到 设备科 就将其 往上的父节点都加到树枝
-            buidUpFromNode(treeNodeMap,treeNode);
-        }
-    }
-     for (TreeNode child : treeNode.getChildren()) {
-         buildTreeByKey(child,keyWords);
-     }
-}
-
-    public void buildTreeByKeyYuanqu(TreeNode treeNode,String keyWords){
-       // if(treeNode.getParent()!=null) {
-            OrgInfo orgInfo = (OrgInfo) treeNode.getData();
-
-            if (orgInfo.getName().contains(keyWords) || (orgInfo.getNamePyCode() != null && orgInfo.getNamePyCode().contains(keyWords))) {
-                treeNodeMap.put(orgInfo.getUid(), treeNode);
-                //如果找到 xx机构 就将其包括其父节点到到根节点都放到 treeNodeMap中
-                buidUpFromNodeYuanQu(treeNodeMap, treeNode);
-
-                buidUpFromNodeYuanQuDown(treeNodeMap, treeNode);
-
-                if(orgInfo.getOrgType()==4){
-                 buidUpFromNode(treeNodeMap, treeNode);
-                }
-            }
-
-    }
-    //就将该treeNode包括其父节点到到根节点都放到 treeNodeMap中
-    public void buidUpFromNodeYuanQu(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
-        if(treeNode==null){
-            return;
-        }
-        OrgInfo orgInfo = (OrgInfo) treeNode.getData();
-       if( orgInfo != null && orgInfo.getOrgType()>0){
-        /*if(orgInfo.getName().contains("曙光东院")){
-            System.out.println();
-        }*/
-            TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
-                   treeNodeMap.put(orgInfo.getUid(), treeNode1);
-
-           buidUpFromNodeYuanQu(treeNodeMap, treeNode.getParent());
-       }
-
-    }
-    public void buidUpFromNodeYuanQuDown(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
-        ///
-         if( treeNode.getChildren().size()!=0){
-             for( TreeNode trn:treeNode.getChildren()){
-                 OrgInfo orgInfo= (OrgInfo) trn.getData();
-                 treeNodeMap.put(orgInfo.getUid(), trn);
-                 buidUpFromNodeYuanQuDown(treeNodeMap,trn);
-             }
-         }
-    }
-
-    //一旦找到 设备科 就将其包括之上的父节点都加到treeMapG for building the filltered tree.
-    public void buidUpFromNode(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
-        if(treeNode != null){
-            OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-            if(orgInfo.getParentUID()!=null){
-                TreeNode node = new DefaultTreeNode("org", orgInfo, null);
-                node.setRowKey("org_"+orgInfo.getId());
-                treeNodeMap.put(orgInfo.getUid(),node);
-                TreeNode parentNode = (TreeNode)treeMapG.get(orgInfo.getParentUID());
-                buidUpFromNode(treeNodeMap,parentNode);
-            }
-        }
-
-    }
-    public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = null;
@@ -562,7 +432,6 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
             TreeNode node = new DefaultTreeNode("org", org, null);
             node.setRowKey("org_"+org.getId());
             treeMap.put(org.getUid(), node);
-            treeMapG.put(org.getUid(),node);
         }
         for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
@@ -578,7 +447,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         if(treeMap.get(siteUID)!=null){
             root.getChildren().add(treeMap.get(siteUID));
         }
-        xtreeMap = treeMap;
+
         if(!root.getChildren().isEmpty()){
             OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
             rootUID = temp.getUid();
@@ -596,7 +465,6 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
             TreeNode node = new DefaultTreeNode("org", org, null);
             node.setRowKey("org_"+org.getId());
             treeMap.put(org.getUid(), node);
-            treeMapG.put(org.getUid(),node);
         }
         for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
@@ -612,7 +480,6 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         if(treeMap.get(siteUID)!=null){
             root.getChildren().add(treeMap.get(siteUID));
         }
-        xtreeMap = treeMap;
         if(!root.getChildren().isEmpty()){
             OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
             rootUID = temp.getUid();
@@ -620,7 +487,6 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         return root;
     }
 
-    public  Map<String, TreeNode> xtreeMap;
     public String rootUID;
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
         List<OrgInfo> orgList = null;
@@ -1308,5 +1174,45 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     		re=orgInfoDao.findByUidAndSiteUid(setAccessClinical, siteUid);
     	}
     	return re;
+    }
+    
+    public TreeNode buildOrgTree(String tenantUid, String filterKeyword, int maxOrgType, int maxOrgLevel){
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setShortName(WebUtil.getMessage("AllHospitals"));
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            TreeNode orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(getOrgFullTreeByTenant(tenantUid).getChildren());
+            
+            filterTreeNode(orgTree, filterKeyword, maxOrgType, maxOrgLevel);
+            
+            return orgTree;
+    }
+    
+    public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doFilterTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{item.setType("org");});
+    }
+    
+    private void doFilterTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doFilterTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+
+            item.setType("hidden"); 
+            OrgInfo org = (OrgInfo)item.getData();
+            if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
+            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
+           
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
     }
 }
