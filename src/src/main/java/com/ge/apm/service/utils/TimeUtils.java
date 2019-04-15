@@ -72,6 +72,14 @@ public class TimeUtils {
         return strTo;
     }
 
+    public static String getSpecifiedMonthEndDay(Date date){
+        Calendar calendar= TimeUtils.getCalendar();
+        String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(date);
+        Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        strTo=strTo.substring(0,6)+lastDay+"235959";
+        return strTo;
+    }
+
 
 
  /*input:2019-12-30T16:00:00.000+0000
@@ -87,6 +95,16 @@ public class TimeUtils {
      }
      return date;
  }
+
+ public static Integer getCurrentMonth(){
+     Calendar calendar = Calendar.getInstance();
+     calendar.setTime(new Date());
+     int month = calendar.get(Calendar.MONTH) + 1;
+     return month;
+
+ }
+
+
 
     //返回指定月的最后一天的日期 格式为:YYYYMMDDHHMMSS
  public static  Calendar getCalendar(){
@@ -141,7 +159,6 @@ if(day<10) {
 
 
     public static String getDateFormat(String date) {
-
         Pattern pattern = Pattern.compile("(\\d*)([-/])(\\d*)([-/])(\\d*)");
         Matcher matcher = pattern.matcher(date);
         if (!matcher.find()) {
