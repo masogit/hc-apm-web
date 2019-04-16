@@ -8,7 +8,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.WorkOrderExportTemplate;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -29,7 +29,10 @@ import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSE
 @Component
 public class ExportToBeTerminatedAppraisalService {
 
-    protected enum ASSET_DETAIL {financing_num, asset_name, quantity, book_value, function_type, create_time}
+    protected enum ASSET_DETAIL {
+        financing_num, asset_name, function_type, install_date, manufacture, vendor,
+        maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date
+    }
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
@@ -79,8 +82,17 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
             map.put(function_type, assetInfo.getFunctionType());
-            Date createdDate = assetInfo.getCreatedDate();
-            map.put(create_time, createdDate == null ? "" : createdDate.toString());
+            Date installedDate = assetInfo.getInstallDate();
+            map.put(install_date, installedDate == null ? "" : installedDate.toString());
+            map.put(manufacture, assetInfo.getManufacture());
+            map.put(vendor, assetInfo.getVendor());
+            map.put(maintenance, assetInfo.getMaitanance());
+            map.put(national_standard_code, assetInfo.getNationalStandardCode());
+            map.put(serial_num, assetInfo.getSerialNum());
+            map.put(depart_num, assetInfo.getDepartNum());
+            map.put(system_id, assetInfo.getSystemId());
+            map.put(purchase_price, assetInfo.getPurchasePrice());
+            map.put(purchase_date, assetInfo.getPurchaseDate());
             list.add(map);
         }
         datas.put("asset_detail_table", list);
@@ -92,7 +104,7 @@ public class ExportToBeTerminatedAppraisalService {
     public String setValue(String original, String temp, String errorMessage) {
         if (original == null) {
             original = temp;
-        } else if (!org.apache.commons.lang3.StringUtils.equals(original, temp)) {
+        } else if (!StringUtils.equals(original, temp)) {
             throw new IllegalStateException(errorMessage);
         }
         return original;
@@ -109,7 +121,13 @@ public class ExportToBeTerminatedAppraisalService {
                 List<Map<ASSET_DETAIL, Object>> parts = (List) o;
                 for (Map<ASSET_DETAIL, Object> part : parts) {
                     XWPFTableRow row = addRow(table, n++);
-                    values.forEach(i -> addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i))));
+                    values.forEach(i -> {
+                        if (StringUtils.isBlank(i)) {
+                            addCell(row, "");
+                        } else {
+                            addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i)));
+                        }
+                    });
                 }
             }
             table.removeRow(2);
