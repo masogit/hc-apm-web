@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -16,6 +15,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -180,7 +180,36 @@ public class MaintainExportController implements ServerEventInterface{
             LOGGER.error(ex.getMessage());
         }
 	}
-	
+
+	public void exportSelected2Docx() {
+		if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
+			addMessage("未选中的需要导出的记录");
+			return;
+		}
+		exportDocx(selectedListMaintain);
+		return;
+	}
+
+	public void exportAll2Docx() {
+		if (listMaintainData == null || listMaintainData.size() == 0) {
+			addMessage("无数据");
+			return;
+		}
+		exportDocx(listMaintainData);
+	}
+
+	public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
+		try {
+			byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.docx"));
+			byte[] result = nurseSiteMaintainService.writeMaintainDetailToDocx(templateBytes, selectedListMaintain);
+			if (result != null) {
+				exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/vnd.ms-excel", "NurseSiteMaintainDetail.docx");
+			}
+		} catch (IOException ex) {
+			LOGGER.error(ex.getMessage());
+		}
+	}
+
 	private void downloadFile(List<Map<String,Object>> data){
 		try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintain_Template.xlsx");
