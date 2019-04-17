@@ -70,8 +70,8 @@
                         <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header"  >
-                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax listener="#{assetInfoToBeTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader1" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{assetInfoToBeTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
