@@ -21,6 +21,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.criterion.Order;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -220,6 +221,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setUserSearchFilters();
         selected = null;
 
+        //JIRA#4065
+        if(pageRequest.getSort().toString().contains("namePyCode")) {
+            Sort sortWithId = new Sort(Sort.DEFAULT_DIRECTION.ASC, "id");
+            pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
+        }
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
