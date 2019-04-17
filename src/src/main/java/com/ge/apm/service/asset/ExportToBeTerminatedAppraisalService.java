@@ -5,7 +5,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.WorkOrderExportTemplate;
+import com.ge.apm.domain.AssetTerminationReportTemplate;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -145,7 +145,7 @@ public class ExportToBeTerminatedAppraisalService {
             populateUidList(uids, tenantUID);
         }
 
-        WorkOrderExportTemplate template = getPrioritizedTemplate(uids);
+        AssetTerminationReportTemplate template = getPrioritizedTemplate(uids);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
@@ -156,10 +156,10 @@ public class ExportToBeTerminatedAppraisalService {
         return templateBytes;
     }
 
-    private WorkOrderExportTemplate getPrioritizedTemplate(List<String> uids) {
-        List<WorkOrderExportTemplate> templates = templateRepository.findBySiteUIDList(uids);
+    private AssetTerminationReportTemplate getPrioritizedTemplate(List<String> uids) {
+        List<AssetTerminationReportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         for (String uid : uids) {
-            Optional<WorkOrderExportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
+            Optional<AssetTerminationReportTemplate> optional = templates.stream().filter(i -> StringUtils.equals(i.getSiteUID(), uid)).findFirst();
             if (optional.isPresent()) {
                 return optional.get();
             }
