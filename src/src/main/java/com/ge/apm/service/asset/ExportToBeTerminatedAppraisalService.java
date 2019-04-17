@@ -103,7 +103,6 @@ public class ExportToBeTerminatedAppraisalService {
 
     public void setValue(Set<String> original, String input, String errorMessage) {
         String temp = StringUtils.isBlank(input) ? "" : input;
-        System.out.println("--" + temp + "--");
         original.add(temp);
         if (original.size() > 1) {
             throw new IllegalStateException(errorMessage);
