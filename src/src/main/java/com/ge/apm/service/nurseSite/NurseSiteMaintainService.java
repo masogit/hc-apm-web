@@ -1708,7 +1708,17 @@ public class NurseSiteMaintainService {
 		return Boolean.TRUE;
 	}
 
-	public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) throws IOException {
-		return null;
-	}
+	// private void formatExistMaintainDate(){
+	// List<Date> tempList=new ArrayList<Date>();
+	// for(int i=0;i<existMaintainDate.size();++i){
+	// Date date=existMaintainDate.get(i);
+	// try {
+	// date=sdf.parse(sdf.format(date));
+	// tempList.add(date);
+	// } catch (ParseException e) {
+	// LOGGER.error(e.getMessage());
+	// }
+	// }
+	// existMaintainDate=tempList;
+	// }
 }
