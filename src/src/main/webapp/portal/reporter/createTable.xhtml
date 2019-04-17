@@ -34,7 +34,7 @@
                                                     <p:inputText value="#{tableCreateController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}"/>
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Number'}" >
-                                                    <p:inputNumber value="#{tableCreateController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}"/>
+                                                    <p:inputNumber value="#{tableCreateController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}" decimalPlaces="#{fieldItem.decimalLength}" />
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Select'}" >
                                                     <p:selectOneMenu value="#{tableCreateController.tableValue[fieldItem.key]}">
@@ -252,6 +252,8 @@
                             <p:inputText value="#{tableCreateController.editTableItem.ref}" />
                         </h:panelGroup>
                         <h:panelGroup id="ruleSelect">
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup >
                             <label class="label">计算规则</label>
                             <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['rule']}" >
                                 <p:ajax listener="#{tableCreateController.onRuleChange}" update="advanceSetting"  />
@@ -261,6 +263,12 @@
                                 <f:selectItem itemLabel="设定值校验" itemValue="#{'VerifyRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
                                 <f:selectItem itemLabel="偏差校验" itemValue="#{'DeltaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
                             </p:selectOneMenu>
+                            </h:panelGroup >
+                            <h:panelGroup  rendered="#{tableCreateController.editTableItem.component eq 'Number'}">
+                                <label class="label">小数位数</label>
+                                <p:spinner value="#{tableCreateController.editTableItem.decimalLength}" max="4"  min="0"/>
+                            </h:panelGroup>
+                            </p:panelGrid>
                         </h:panelGroup>
 
                     </p:panelGrid>
