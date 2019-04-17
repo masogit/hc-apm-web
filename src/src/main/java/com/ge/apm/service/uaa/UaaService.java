@@ -1196,7 +1196,10 @@ public class UaaService {
         
         ArrayList<TreeNode> nodeList = new ArrayList<>();
         doFilterTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
-        nodeList.forEach(item->{item.setType("org");});
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!"".equals(filterKeyword)) item.setExpanded(true); // Auto expand tree nodes
+        });
     }
     
     private void doFilterTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
