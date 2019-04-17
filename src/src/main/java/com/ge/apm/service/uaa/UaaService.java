@@ -1192,9 +1192,15 @@ public class UaaService {
     
     public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
         // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+        
         ArrayList<TreeNode> nodeList = new ArrayList<>();
         doFilterTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
-        nodeList.forEach(item->{item.setType("org");});
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
     }
     
     private void doFilterTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
