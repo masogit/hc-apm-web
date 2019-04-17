@@ -15,6 +15,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -50,6 +51,7 @@ public class MaintainExportController implements ServerEventInterface{
     private Date endDate;
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
+    private WordReportExportService wordReportExportService;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -61,6 +63,7 @@ public class MaintainExportController implements ServerEventInterface{
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+        wordReportExportService = WebUtil.getBean(WordReportExportService.class);
 		loadUserParentOrgInfo();
 	}
 	
@@ -201,7 +204,7 @@ public class MaintainExportController implements ServerEventInterface{
 	public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
 		try {
 			byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintainDetail_Template.docx"));
-			byte[] result = nurseSiteMaintainService.writeMaintainDetailToDocx(templateBytes, selectedListMaintain);
+			byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, selectedListMaintain);
 			if (result != null) {
 				exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/vnd.ms-excel", "NurseSiteMaintainDetail.docx");
 			}
