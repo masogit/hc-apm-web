@@ -142,8 +142,8 @@ public class TableCreateController extends TieWebSheetBean {
         }
 
         selectedOrg = orgDao.findByUid(selectedTableDefinition.getSiteUID());
-        selectedOrgList =  uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
-        if(!selectedOrgList.contains(selectedOrg)){
+        selectedOrgList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        if (!selectedOrgList.contains(selectedOrg)) {
             selectedOrgList.add(selectedOrg);
             isReadOnly = true;
         }
@@ -296,13 +296,22 @@ public class TableCreateController extends TieWebSheetBean {
         if (null == editGroup.getItems()) {
             editGroup.setItems(new ArrayList<TableItem>());
         }
-        if (templateService.hasDuplicatedKey(table) || !editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
-            WebUtil.addErrorMessage("Key已经被使用");
+
+        if (templateService.hasDuplicatedKey(table)) {
+            if (!editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
+                WebUtil.addErrorMessage("Key已经被使用");
+                editTableItem.setKey(null);
+                return;
+            }
+            if (null != editTableItem.getResKey()) {
+                WebUtil.addErrorMessage("结果Key已经被使用");
+                editTableItem.setResKey(null);
+            }
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
-            editTableItem.setKey(null);
             return;
         }
+
         if (!editGroup.getItems().contains(editTableItem)) {
             editGroup.getItems().add(editTableItem);
         }
@@ -381,9 +390,9 @@ public class TableCreateController extends TieWebSheetBean {
         if (!Strings.isNullOrEmpty(editTableItem.getKey())) {
             editTableItem.setResKey(editTableItem.getKey().concat("_res"));
         }
-        
-        if(editTableItem.getExp() != null ){
-            if(Strings.isNullOrEmpty(editTableItem.getExp().get("rule"))){
+
+        if (editTableItem.getExp() != null) {
+            if (Strings.isNullOrEmpty(editTableItem.getExp().get("rule"))) {
                 editTableItem.getExp().clear();
                 editTableItem.setResKey(null);
             }
@@ -539,14 +548,14 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
-    public void fieldKeyChange(){
+    public void fieldKeyChange() {
         String newKey = editTableItem.getKey();
-        if(!newKey.matches("^[A-Za-z0-9_]+$")){
+        if (!newKey.matches("^[A-Za-z0-9_]+$")) {
             editTableItem.setKey("");
             WebUtil.addErrorMessage("只能包含,英文,数字,下划线");
         }
     }
-    
+
     public String saveSelectedInstrumentData() {
         String result = "";
 
@@ -582,18 +591,16 @@ public class TableCreateController extends TieWebSheetBean {
     public void testSubmit() {
     }
 
-
     public void onSiteChange() {
         selectedTableDefinition.setTenantUID(selectedOrg.getTenantUID());
         selectedTableDefinition.setInstitutionUID(selectedOrg.getInstitutionUID());
         selectedTableDefinition.setHospitalUID(selectedOrg.getHospitalUID());
         selectedTableDefinition.setSiteUID(selectedOrg.getSiteUID());
     }
-    
-    public boolean getIsReadOnly(){
+
+    public boolean getIsReadOnly() {
         return isReadOnly;
     }
-    
 
     //getter and setter
     public TableSchema getTable() {
@@ -677,14 +684,13 @@ public class TableCreateController extends TieWebSheetBean {
     }
 
     public List<String> getInstrumentDataLabels() {
-    	Collection<String> tempCollection=ElectricSafetyData.getLabelAttributeMapping().values();
-    	if(tempCollection!=null){
-    		instrumentDataLabels = new ArrayList<String>(tempCollection);
-    		instrumentDataLabels.sort(new StringComparator());
-    	}
-    	else{
-    		instrumentDataLabels = new ArrayList<String>();
-    	}
+        Collection<String> tempCollection = ElectricSafetyData.getLabelAttributeMapping().values();
+        if (tempCollection != null) {
+            instrumentDataLabels = new ArrayList<String>(tempCollection);
+            instrumentDataLabels.sort(new StringComparator());
+        } else {
+            instrumentDataLabels = new ArrayList<String>();
+        }
         return instrumentDataLabels;
     }
 
@@ -725,13 +731,12 @@ public class TableCreateController extends TieWebSheetBean {
                         mapTemplateKeyValues.put(item.getKey(), item.getLabel() + "(" + item.getKey() + ")");
                     }
                 }
-                Collection<String> tempCollection=mapTemplateKeyValues.values();
-                if(tempCollection!=null){
-                	templateLabels = new ArrayList<String>(tempCollection);
-                	templateLabels.sort(new StringComparator());
-                }
-                else{
-                	templateLabels = new ArrayList<String>();
+                Collection<String> tempCollection = mapTemplateKeyValues.values();
+                if (tempCollection != null) {
+                    templateLabels = new ArrayList<String>(tempCollection);
+                    templateLabels.sort(new StringComparator());
+                } else {
+                    templateLabels = new ArrayList<String>();
                 }
             } catch (Exception e) {
                 // TODO: handle exception
@@ -740,7 +745,6 @@ public class TableCreateController extends TieWebSheetBean {
         }
         return templateLabels;
     }
-    
 
     public void setTemplateLabels(List<String> templateLabels) {
         this.templateLabels = templateLabels;
@@ -757,5 +761,5 @@ public class TableCreateController extends TieWebSheetBean {
     public List<OrgInfo> getSelectedOrgList() {
         return selectedOrgList;
     }
-    
+
 }
