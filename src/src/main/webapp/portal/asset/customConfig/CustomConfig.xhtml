@@ -260,7 +260,7 @@
                                             </h:panelGroup>
                                         </p:panelGrid>
                                         <br/>
-                                        
+
                                         <h:panelGroup >
                                             <label class="label">语音文字必填一项</label>
                                             <p:selectBooleanCheckbox value="#{groupItem.voiceOrReasonRequired}" disabled="#{!groupItem.requestReason.enable or !groupItem.voiceAttachment.enable}" >
@@ -277,6 +277,13 @@
                                         </h:panelGroup>
                                     </p:fieldset>
                                 </p:dataList>
+
+                                <h:panelGroup>
+                                    <label class="label">备件类型默认值</label>
+                                    <p:inputText value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.accessoryDefaultType}" maxlength="200" >
+                                        <p:ajax />
+                                    </p:inputText>
+                                </h:panelGroup>
 
 
                             </p:panelGrid>
