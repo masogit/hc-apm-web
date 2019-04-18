@@ -562,8 +562,8 @@
                     </p:commandButton>
 
                     <p:commandButton id="editButton" icon="ui-icon-pencil"
-                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}"
-                                     actionListener="#{assetInfoToBeTerminatedListController.isChecked}"
+                                     class="btn btn-sm btn-gray batch-terminated" title="报废鉴定"
+                                     actionListener="#{assetInfoToBeTerminatedListController.preEdit()}"
                                      update=":woTab:TerminationCauseEditDlg"
                                      oncomplete="PF('TerminationCauseEditDlg').show()"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"/>
