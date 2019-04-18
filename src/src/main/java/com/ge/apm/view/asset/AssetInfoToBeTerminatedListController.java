@@ -225,8 +225,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             }
             uploadedFileObject = blobFileService.uploadFile(uploadedFile);
 
-            AssetTerminationReportTemplate template = new AssetTerminationReportTemplate();
             OrgInfo selectedUserOrg = orgDao.getByUid(user.getSiteUID());
+            List<AssetTerminationReportTemplate> templates = assetTerminationReportTemplateRepository.findBySiteUID(user.getSiteUID());
+            AssetTerminationReportTemplate template;
+            if(templates.isEmpty()) {
+                template = new AssetTerminationReportTemplate();
+            } else {
+                template = templates.get(0);
+            }
             template.setTenantUID(selectedUserOrg.getTenantUID());
             template.setInstitutionUID(selectedUserOrg.getInstitutionUID());
             template.setHospitalUID(selectedUserOrg.getHospitalUID());
