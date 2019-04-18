@@ -69,6 +69,7 @@ public class TableDefinitionService {
         if (table.getGroups() != null) {
             table.getGroups().forEach(item -> {
                 keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
+                keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().filter(filedItem->filedItem.getResKey()!=null).map(filedItem -> filedItem.getResKey()).collect(Collectors.toList()));
             });
         }
         return keyList;
