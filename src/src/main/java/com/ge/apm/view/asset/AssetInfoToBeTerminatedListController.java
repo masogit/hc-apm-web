@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
@@ -247,6 +248,17 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             WebUtil.addErrorMessage("文件上传失败!");
         }
     }
+
+    public void preEdit() {
+        List<Map.Entry<String, Boolean>> selectedEntries = selectedMap.entrySet().stream().filter(i -> i.getValue()).collect(Collectors.toList());
+        if (selectedEntries.size() == 1) {
+            AssetInfo selectedAsset = selectedEntries.stream().map(i -> dao.getByUid(i.getKey())).findFirst().orElse(null);
+            terminationCause = selectedAsset == null ? "" : selectedAsset.getTerminationCause();
+        } else {
+            terminationCause = "";
+        }
+    }
+
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
