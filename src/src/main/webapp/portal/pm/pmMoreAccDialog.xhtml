@@ -110,6 +110,9 @@
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:accessList  pmTab:pmrepairCompleteDialogForm:cmd1 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                         <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                     </h:panelGroup>
+
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.saveAndadd()}" rendered="#{v2PmOrderController.switchTmp}" value="保存新增" update="@(.pmmoreAccDialogFormCls) pmTab:pmrepairCompleteDialogForm:accessList  :growl" icon="ui-icon-check"/>
+
                 </h:panelGroup>
             </h:form>
         </p:dialog>

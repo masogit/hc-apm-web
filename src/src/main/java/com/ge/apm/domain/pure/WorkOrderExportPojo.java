@@ -137,6 +137,16 @@ public class WorkOrderExportPojo {
     private String signature;
     //
     private String ackSignature;
+    //配置属性
+    private String attributes;
+    //派工信息
+    private String sendStepInfo;
+    //接单信息
+    private String acceptStepInfo;
+    //验收信息
+    private String evaluateStepInfo;
+    //关单信息
+    private String closeStepInfo;
 
     public String getId() {
         return Id;
@@ -656,5 +666,45 @@ public class WorkOrderExportPojo {
 
     public void setAckSignature(String ackSignature) {
         this.ackSignature = ackSignature;
+    }
+
+    public String getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(String attributes) {
+        this.attributes = attributes;
+    }
+
+    public String getSendStepInfo() {
+        return sendStepInfo;
+    }
+
+    public void setSendStepInfo(String sendStepInfo) {
+        this.sendStepInfo = sendStepInfo;
+    }
+
+    public String getAcceptStepInfo() {
+        return acceptStepInfo;
+    }
+
+    public void setAcceptStepInfo(String acceptStepInfo) {
+        this.acceptStepInfo = acceptStepInfo;
+    }
+
+    public String getEvaluateStepInfo() {
+        return evaluateStepInfo;
+    }
+
+    public void setEvaluateStepInfo(String evaluateStepInfo) {
+        this.evaluateStepInfo = evaluateStepInfo;
+    }
+
+    public String getCloseStepInfo() {
+        return closeStepInfo;
+    }
+
+    public void setCloseStepInfo(String closeStepInfo) {
+        this.closeStepInfo = closeStepInfo;
     }
 }
