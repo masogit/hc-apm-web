@@ -1,5 +1,7 @@
 package com.ge.apm.service.wo;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
@@ -11,6 +13,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -143,7 +146,8 @@ public class WorkOrderExportService {
             workOrderMap.put("woId", workOrderExportPojo.getId());
             workOrderMap.put("报修单号", workOrderExportPojo.getSrNum() != null ? workOrderExportPojo.getSrNum() : "");
             workOrderMap.put("设备编号", workOrderExportPojo.getAssetDepartNum());
-            workOrderMap.put("工单状态", workOrderExportPojo.getStatusName());
+            //workOrderMap.put("工单状态", workOrderExportPojo.getStatusName());
+            workOrderMap.put("工单状态", workOrderExportPojo.getStatus() != null ? FieldValueMessageController.fieldValue("status", workOrderExportPojo.getStatus().toString()) : "");
             workOrderMap.put("资产编号", workOrderExportPojo.getAssetFinancingNum());
             workOrderMap.put("设备序列号", workOrderExportPojo.getAssetSerialNum());
             workOrderMap.put("设备名称", workOrderExportPojo.getAssetName());
@@ -152,16 +156,19 @@ public class WorkOrderExportService {
             workOrderMap.put("制造商", workOrderExportPojo.getAssetManufacture());
             workOrderMap.put("品牌", workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put("当前责任人", workOrderExportPojo.getCurrentPersonName());
-            workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
+            //workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
+            workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrderExportPojo.getCurrentStepId().toString()) : "");
             workOrderMap.put("报修人", workOrderExportPojo.getRequestorName());
             workOrderMap.put("报修时间", formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put("故障描述", workOrderExportPojo.getRequestReason());
-            workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
-            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));
-            workOrderMap.put("工单类型", workOrderExportPojo.getIntExtTypeName());
-            workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
-            workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
-            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));
+            /*workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
+            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));*/
+            //workOrderMap.put("工单类型", workOrderExportPojo.getIntExtTypeName());
+            workOrderMap.put("工单类型", workOrderExportPojo.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrderExportPojo.getIntExtType().toString()) : "");
+            //workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
+            workOrderMap.put("维修类型", workOrderExportPojo.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrderExportPojo.getRepairType().toString()) : "");
+            /*workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
+            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));*/
             workOrderMap.put("维修完成时间", formatDate(workOrderExportPojo.getWorkStepEndTime()));
             workOrderMap.put("签到时间", formatDate(workOrderExportPojo.getCheckinTime()));
             workOrderMap.put("维修工程师工时", workOrderExportPojo.getManHours());
@@ -171,10 +178,10 @@ public class WorkOrderExportService {
             workOrderMap.put("其他费用", workOrderExportPojo.getOtherExpense());
             workOrderMap.put("外修费用", workOrderExportPojo.getExternalExpense());
             workOrderMap.put("维修总费用", workOrderExportPojo.getTotalPrice());
-            workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
-            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
-            workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
-            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));
+            /*workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
+            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));*/
+            /*workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
+            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));*/
             workOrderMap.put("协助者", workOrderExportPojo.getCoworker());
             workOrderMap.put("协助者工时", workOrderExportPojo.getCoworkManHour());
             workOrderMap.put("最终评价", workOrderExportPojo.getFeedbackRating());
@@ -184,16 +191,72 @@ public class WorkOrderExportService {
             workOrderMap.put("交付前检测", workOrderExportPojo.getPatTests());
             workOrderMap.put("备注", workOrderExportPojo.getComment());
             workOrderMap.put("二维码", workOrderExportPojo.getAssetInfoQrCode());
-            workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroupName());
-            workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroupName());
-            workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68Name());
+            //workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroupName());
+            workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup", workOrderExportPojo.getAssetGroup().toString()) : "");
+            /*workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroupName());
+            workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68Name());*/
             workOrderMap.put("设备型号", workOrderExportPojo.getAssetFunctionType());
             workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
             workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
             workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
             workOrderMap.put("报修人电话", workOrderExportPojo.getTelephone());
             workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
-            workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
+            //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
+            workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
+
+            if (workOrderExportPojo.getAssetFunctionGroup() != null) {
+                workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
+                workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(workOrderExportPojo.getAssetFunctionGroup().toString(), workOrderExportPojo.getAssetCode68().toString()) : "");
+            } else {
+                workOrderMap.put("医疗器械分类", "");
+                workOrderMap.put("医疗器械子分类", "");
+            }
+
+            String sendStepInfo = workOrderExportPojo.getSendStepInfo();
+            if(sendStepInfo != null){
+                String [] sendStepInfoArray = sendStepInfo.split("\\|:\\|");
+                workOrderMap.put("派工人", sendStepInfoArray.length >= 1 ? sendStepInfoArray[0] : "");
+                workOrderMap.put("派工时间", sendStepInfoArray.length >= 2 ? sendStepInfoArray[1] : "");
+            }else {
+                workOrderMap.put("派工人", "");
+                workOrderMap.put("派工时间", "");
+            }
+            String acceptStepInfo = workOrderExportPojo.getAcceptStepInfo();
+            if(acceptStepInfo != null){
+                String [] acceptStepInfoArray = acceptStepInfo.split("\\|:\\|");
+                workOrderMap.put("接单人", acceptStepInfoArray.length >= 1 ? acceptStepInfoArray[0] : "");
+                workOrderMap.put("接单时间", acceptStepInfoArray.length >= 2 ? acceptStepInfoArray[1] : "");
+            }else {
+                workOrderMap.put("接单人", "");
+                workOrderMap.put("接单时间", "");
+            }
+            String evaluateStepInfo = workOrderExportPojo.getEvaluateStepInfo();
+            if(evaluateStepInfo != null){
+                String [] evaluateStepInfoArray = evaluateStepInfo.split("\\|:\\|");
+                workOrderMap.put("验收人", evaluateStepInfoArray.length >= 1 ? evaluateStepInfoArray[0] : "");
+                workOrderMap.put("验收时间", evaluateStepInfoArray.length >= 2 ? evaluateStepInfoArray[1] : "");
+            }
+            String closeStepInfo = workOrderExportPojo.getCloseStepInfo();
+            if(closeStepInfo != null){
+                String [] closeStepInfoArray = closeStepInfo.split("\\|:\\|");
+                workOrderMap.put("关单人", closeStepInfoArray.length >=1 ? closeStepInfoArray[0] : "");
+                workOrderMap.put("关单时间", closeStepInfoArray.length >=2 ? closeStepInfoArray[1] : "");
+            }else {
+                workOrderMap.put("关单人", "");
+                workOrderMap.put("关单时间", "");
+            }
+
+            String attributesStr = "";
+            if(!StringUtils.isEmpty(workOrderExportPojo.getAttributes())){
+                JSONArray attributesJSONArray = JSONObject.parseArray(workOrderExportPojo.getAttributes());
+                for(int i = 0 ; i < attributesJSONArray.size() ; i++){
+                    JSONObject attributesObject = attributesJSONArray.getJSONObject(i);
+                    Object label = attributesObject.get("label").toString();
+                    Object value = attributesObject.get("value").toString();
+                    attributesStr += label + ":" + value + ";";
+                }
+            }
+            workOrderMap.put("属性", attributesStr);
 
             if(workOrderExportPojo.getSignature() != null){
                 workOrderMap.put("signature", workOrderExportPojo.getSignature());
