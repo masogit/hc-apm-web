@@ -25,7 +25,7 @@
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
-									<p:treeNode type="hidden" rendered="false"/>
+                                    <p:treeNode type="hidden" rendered="false"/>
                                 </p:tree>
                             </p:scrollPanel>
                         </p:overlayPanel>
@@ -280,9 +280,11 @@
 
                                 <h:panelGroup>
                                     <label class="label">备件类型默认值</label>
-                                    <p:inputText value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.accessoryDefaultType}" maxlength="200" >
+                                    <p:selectOneMenu value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.accessoryDefaultType}" >
                                         <p:ajax />
-                                    </p:inputText>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item"
+                                                       itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
                                 </h:panelGroup>
 
 
