@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+    @Setter@Getter
+    Boolean switchTmp=false;
     @Setter@Getter
     private Boolean nochange=false;
     private UserAccount ua1;
@@ -1218,8 +1221,10 @@ public void repairResultSet(){
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
+            switchTmp=true;
 
         } else {
+            switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
             supplierName = itemDetail.getSupplier();
         }
@@ -1283,19 +1288,40 @@ public void repairResultSet(){
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
+    public void saveAndadd(){
+        //照旧原来的添加一个备件
+        saveItem();
+        V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
+        try {
+            BeanUtils.copyProperties(vwd,itemDetail);;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        // clear 备件名称 备件数量  预估价格
+        vwd.setParts(null);
+        vwd.setApartsQuantity(null);
+        vwd.setPartsPrice(null);
+        itemDetail= vwd;
+        accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
-    public void addAcessItem() {
+    }
+
+    public void saveItem(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
-           if(itemDetail.getClosedPrice()==null) {
-               itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-           }
-           itemDetail.setArrivedGood(false);
-           itemDetail.setArrivedGoodReturn(false);
+            if(itemDetail.getClosedPrice()==null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
-           //调用微服务来存附件
+            //调用微服务来存附件
             serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
+    }
+    public void addAcessItem() {
+        saveItem();
         cancelWorkdetail();
     }
     public void updateAccessPrice(){

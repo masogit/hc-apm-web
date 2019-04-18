@@ -18,7 +18,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "v2_work_order_detail")
-public class V2_WorkOrder_Detail implements Serializable {
+public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     private static final long serialVersionUID = 1L;
 
@@ -459,6 +459,11 @@ public class V2_WorkOrder_Detail implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException{
+        return super.clone();
     }
 
 }
