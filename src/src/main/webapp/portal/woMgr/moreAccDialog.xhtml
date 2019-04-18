@@ -95,7 +95,7 @@
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
-                    <p:commandButton actionListener="#{workOrderMgrController.saveAndadd()}" disabled="#{!workOrderMgrController.switchTmp}" value="保存新增" update="woTab:moreAccDialogForm woTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check"/>
+                    <p:commandButton actionListener="#{workOrderMgrController.saveAndadd()}" rendered="#{workOrderMgrController.switchTmp}" value="保存新增" update="woTab:moreAccDialogForm woTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check"/>
                 </h:panelGroup>
             </h:panelGroup>
         </h:form>
