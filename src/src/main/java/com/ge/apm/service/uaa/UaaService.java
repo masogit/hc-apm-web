@@ -1194,7 +1194,7 @@ public class UaaService {
         // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
         if(filterKeyword==null) filterKeyword = "";
         boolean isKeywordEmpty = "".equals(filterKeyword);
-        
+
         ArrayList<TreeNode> nodeList = new ArrayList<>();
         doFilterTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
         nodeList.forEach(item->{

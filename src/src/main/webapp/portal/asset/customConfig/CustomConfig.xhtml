@@ -25,6 +25,7 @@
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
                                 </p:tree>
                             </p:scrollPanel>
                         </p:overlayPanel>
@@ -259,7 +260,7 @@
                                             </h:panelGroup>
                                         </p:panelGrid>
                                         <br/>
-                                        
+
                                         <h:panelGroup >
                                             <label class="label">语音文字必填一项</label>
                                             <p:selectBooleanCheckbox value="#{groupItem.voiceOrReasonRequired}" disabled="#{!groupItem.requestReason.enable or !groupItem.voiceAttachment.enable}" >
@@ -276,6 +277,15 @@
                                         </h:panelGroup>
                                     </p:fieldset>
                                 </p:dataList>
+
+                                <h:panelGroup>
+                                    <label class="label">备件类型默认值</label>
+                                    <p:selectOneMenu value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.accessoryDefaultType}" >
+                                        <p:ajax />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item"
+                                                       itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
 
 
                             </p:panelGrid>
