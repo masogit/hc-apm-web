@@ -82,15 +82,18 @@ public class WordReportExportService {
             List<String> columnHeaders = getColumnHeaders(table);
 
             Map<Integer, AssetInfo> assetInfos = getIdAssetInfoMap(itemMap);
-            List<Integer> rowHeaders = getRowHeaders(assetInfos);
+            List<Integer> assetRowHeaders = assetInfos.keySet().stream().collect(Collectors.toList());
 
             populateAssetInfoColumns(table, assetInfos.values());
-            populateCheckPass(table, columnHeaders, itemMap, rowHeaders);
+            populateCheckPass(table, columnHeaders, itemMap, assetRowHeaders);
 
-        }
+            Map<String, String> checkItems = new TreeMap<>(Comparator.naturalOrder());
+            itemMap.values().forEach(i -> i.forEach(j -> {
+                j.getListData().forEach(k -> checkItems.put(k.getId(), k.getCheckItem()));
+            }));
+            List<String> checkItemRowHeaders = checkItems.keySet().stream().collect(Collectors.toList());
+            populateCheckItemColumns(table, checkItems.values());
 
-        public List<Integer> getRowHeaders(Map<Integer, AssetInfo> assetInfos) {
-            return assetInfos.keySet().stream().collect(Collectors.toList());
         }
 
         public List<String> getColumnHeaders(XWPFTable table) {
@@ -130,6 +133,19 @@ public class WordReportExportService {
                 row.createCell().setText(assetInfo.getName());
                 row.createCell().setText(assetInfo.getDepartNum());
                 for (int i = 2; i < size; i++) {
+                    row.createCell();
+                }
+            }
+        }
+
+
+        public void populateCheckItemColumns(XWPFTable table, Collection<String> checkItems) {
+            XWPFTableRow firstRow = table.getRow(0);
+            int size = firstRow.getTableCells().size();
+            for (String checkItem : checkItems) {
+                XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows() - 1);
+                row.createCell().setText(checkItem);
+                for (int i = 1; i < size; i++) {
                     row.createCell();
                 }
             }

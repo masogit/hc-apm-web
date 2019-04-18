@@ -1,6 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -56,7 +57,18 @@ public class WordReportExportServiceTest {
     public NurseSiteMaintainItem mockNurseSiteMaintainItem(int index) {
         NurseSiteMaintainItem item = new NurseSiteMaintainItem();
         item.setAssetInfo(mockAssetInfo(index));
+        ArrayList<NurseSiteMaintainData> listData = new ArrayList<>();
+        listData.add(mockNurseSiteMaintainData(1));
+        listData.add(mockNurseSiteMaintainData(2));
+        item.setListData(listData);
         return item;
+    }
+
+    public NurseSiteMaintainData mockNurseSiteMaintainData(int index) {
+        NurseSiteMaintainData nurseSiteMaintainData = new NurseSiteMaintainData();
+        nurseSiteMaintainData.setCheckItem("ck" + index);
+        nurseSiteMaintainData.setId("" + index);
+        return nurseSiteMaintainData;
     }
 
     public AssetInfo mockAssetInfo(Integer index) {
