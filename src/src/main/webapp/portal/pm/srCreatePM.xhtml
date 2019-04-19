@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" ><!--去报修转到此界面-->
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修----" ><!--去报修转到此界面-->
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" >
@@ -49,7 +49,6 @@
                         <h:panelGroup>
                             <label class="label">#{msg.requestReason}*</label>
                             <p:inputTextarea id="devfaultId" placeholder="设备故障" required="false" value="#{v2PmOrderController.newServiceRequest.requestReason}" />
-                            <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestReason}" />
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus">
                             <label class="label">#{msg.status}*</label>
@@ -61,8 +60,6 @@
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{v2PmOrderController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.newServiceRequest.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-
-
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picListForRP}" columns="5" layout="grid">
                         <f:facet name="header">附件上传</f:facet>
