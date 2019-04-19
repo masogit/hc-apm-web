@@ -282,6 +282,7 @@
                                     <label class="label">备件类型默认值</label>
                                     <p:selectOneMenu value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.accessoryDefaultType}" >
                                         <p:ajax />
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item"
                                                        itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
