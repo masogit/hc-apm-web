@@ -77,6 +77,20 @@
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
+                <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                    <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin')}">
+                            <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                        </p:link>
+                        <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
+                            <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandLink>
+                    </h:panelGroup>
+                    <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                        <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
                 <c:forEach items="#{assetInfoToBeTerminatedListController.customedColumns}" var="columnItem" >
                     <c:if test="#{columnItem eq 'name'}">
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
