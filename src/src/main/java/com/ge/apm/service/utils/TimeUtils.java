@@ -52,6 +52,7 @@ public class TimeUtils {
 
     public static  String getInputEndDate(Date date){
         Calendar calendar= TimeUtils.getCalendar();
+        calendar.setTime(date);
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(date);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
@@ -65,8 +66,10 @@ public class TimeUtils {
     }
     //按指定格式及字符串返回当月的最后一天日期
     public static String getCurrentEndYYMM(){
+        Date d1 = new Date();
         Calendar calendar= TimeUtils.getCalendar();
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        calendar.setTime(d1);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
         return strTo;
@@ -74,6 +77,7 @@ public class TimeUtils {
 
     public static String getSpecifiedMonthEndDay(Date date){
         Calendar calendar= TimeUtils.getCalendar();
+        calendar.setTime(date);
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(date);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
@@ -128,6 +132,7 @@ public class TimeUtils {
 
     public static Integer getMonthNumber(Date date){
         Calendar calendar = Calendar.getInstance();
+
         if(date ==null){
             calendar.setTime(new Date());
         }else{
