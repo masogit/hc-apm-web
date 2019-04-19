@@ -403,12 +403,12 @@ public void repairResultSet(){
     private Boolean isRating;
 
     public List<String> autoCompleteSupplier(String query) {
+        supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
         List<String> sList = new ArrayList<String>();
         suList.forEach(item -> sList.add(item.getName()));
         return sList;
     }
-
 
     public Boolean needRating() {
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
@@ -1821,6 +1821,7 @@ public void repairResultSet(){
         else
             itemDetail.setSupplier(supplier.getName());
     }
+
 
     public Boolean getNochange() {
         return nochange;

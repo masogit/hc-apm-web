@@ -86,6 +86,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmOrderRuleCheckList pmCheckItem;
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
+    private CustomConfigObject currentCustomConfig;
     @Setter @Getter
     private Boolean nochange = false;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
@@ -932,6 +933,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
         customConfigService=WebUtil.getBean(CustomConfigService.class);
+        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         token = UserContextService.getAccessToken();
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
@@ -1628,12 +1630,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void prepareEditAccDetail(String itemId) throws Exception{
+
         if ("new".equals(itemId)) {
             switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
 
             itemDetail.setWoId(selectedPmOrder.getId());
+
+            Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+            //gaolei
+            if(eval!=null){
+                itemDetail.setPartsType(eval.toString());
+            }
 
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));

@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition><!--维修工单关单对话框-->
-        <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="关单----" height="500">
+        <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="关单" height="500">
             <h:form id="toCloseDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
