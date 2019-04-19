@@ -87,6 +87,16 @@
                              icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                 <p:fileDownload value="#{maintainExportController.exportFile}"/>
             </p:commandButton>
+            <p:commandButton ajax="false" value="Word全部导出"
+                             actionListener="#{maintainExportController.exportAll2Docx()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="Word选择导出"
+                             actionListener="#{maintainExportController.exportSelected2Docx()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{maintainExportController.exportFile}"/>
+            </p:commandButton>
         </f:facet>
     </p:dataTable>
 </h:form>

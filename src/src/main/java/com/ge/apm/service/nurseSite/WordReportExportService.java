@@ -2,47 +2,99 @@ package com.ge.apm.service.nurseSite;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
+import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.utils.ImageUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.util.Units;
+import org.apache.poi.xwpf.usermodel.*;
+import org.primefaces.model.StreamedContent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class WordReportExportService {
+  
+    @Autowired
+    BlobFileService blobFileService;
 
-    public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) throws IOException {
+    public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) {
+
         List<Map<String, Object>> datasList = new ArrayList<>();
         datasList.add(new HashMap<>());
 
         TreeMap<String, List<NurseSiteMaintainItem>> map = new TreeMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            String checkDate = DateFormatUtils.format(maintain.getCheckDate(), "yyyy-MM-dd");
-            map.put(checkDate, maintain.getListNurseSiteMaintainItem());
+            try {
+                Date checkDate1 = maintain.getCheckDate();
+                if (checkDate1 == null) {
+                    continue;
+                }
+                String checkDate = DateFormatUtils.format(checkDate1, "yyyy-MM-dd");
+                String signatureId = maintain.getSignatureId();
+                List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
+                if (StringUtils.isNotBlank(signatureId)) {
+                    items.forEach(i -> {
+                        if (StringUtils.isBlank(i.getSignatureId())) {
+                            i.setSignatureId(signatureId);
+                        }
+                    });
+                }
+                map.put(checkDate, items);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         map.entrySet().stream().forEach(i -> {
             Map<String, Object> datas = datasList.get(datasList.size() - 1);
-            TreeMap<String, List<NurseSiteMaintainItem>> subMap = (TreeMap<String, List<NurseSiteMaintainItem>>) datas.computeIfAbsent("tables", k -> new ArrayList<>());
+            TreeMap<String, List<NurseSiteMaintainItem>> subMap = (TreeMap<String, List<NurseSiteMaintainItem>>) datas.computeIfAbsent("tables", k -> new TreeMap<>());
             subMap.put(i.getKey(), i.getValue());
+
+            //date+i first rowa
+            datas.put("date" + subMap.size(), i.getKey());
+
+            //asset pass area
             if (subMap.size() == 10) {
                 datasList.add(new HashMap<>());
             }
         });
 
+        List<byte[]> reports = new ArrayList<>();
         for (Map<String, Object> datas : datasList) {
-            export(templateBytes, datas);
+            reports.add(export(templateBytes, datas));
         }
 
-        return null;
+        return zip(reports);
     }
 
+    public byte[] zip(List<byte[]> reports) {
+        try (OutputStream out = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(out)) {
+            for (int i = 0; i < reports.size(); i++) {
+                zos.putNextEntry(new ZipEntry("report" + (i + 1) + ".docx"));
+                IOUtils.write(reports.get(i), zos);
+            }
+            zos.closeEntry();
+            zos.close();
+            return ((ByteArrayOutputStream) out).toByteArray();
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
+        return null;
+    }
 
     public byte[] export(byte[] templateBytes, Map<String, Object> datas) {
         XWPFTemplate template = null;
@@ -69,7 +121,153 @@ public class WordReportExportService {
     private class AssetCheckTableRenderPolicy extends DynamicTableRenderPolicy {
         @Override
         public void render(XWPFTable table, Object data) {
-            table.getRow(1);
+            Map<String, List<NurseSiteMaintainItem>> itemMap = (TreeMap<String, List<NurseSiteMaintainItem>>) data;
+
+            Map<String, AssetInfo> assetInfos = getIdAssetInfoMap(itemMap);
+            Map<String, String> checkItems = getCheckItemsMap(itemMap);
+
+            List<String> columnHeaders = getColumnHeaders(table);
+            List<String> rowHeaders = new ArrayList<>();
+            rowHeaders.add("place_holder_for_first_row");
+
+            rowHeaders.addAll(assetInfos.keySet().stream().collect(Collectors.toList()));
+            populateAssetInfoColumns(table, assetInfos.values());
+            populateCheckPass(table, columnHeaders, itemMap, rowHeaders);
+
+            populateEmptyRows(table, rowHeaders);
+
+            rowHeaders.addAll(checkItems.keySet().stream().collect(Collectors.toList()));
+            populateCheckItemColumns(table, checkItems.values());
+            populateSignatures(table, columnHeaders, itemMap, rowHeaders);
+
+            table.removeRow(table.getNumberOfRows() - 1);
+
+        }
+
+        public Map<String, String> getCheckItemsMap(Map<String, List<NurseSiteMaintainItem>> itemMap) {
+            Map<String, String> checkItems = new TreeMap<>(Comparator.naturalOrder());
+            itemMap.values().forEach(i -> i.forEach(j -> {
+                j.getListData().forEach(k -> checkItems.put(k.getCheckItem(), k.getCheckItem()));
+            }));
+            return checkItems;
+        }
+
+        public List<String> getColumnHeaders(XWPFTable table) {
+            List<XWPFTableCell> tableCells = table.getRow(0).getTableCells();
+            List<String> columnHeaders = new ArrayList<>();
+            for (int i = 0; i < tableCells.size(); i++) {
+                XWPFTableCell cell = tableCells.get(i);
+                columnHeaders.add(cell.getText());
+            }
+            return columnHeaders;
+        }
+
+        public Map<String, AssetInfo> getIdAssetInfoMap(Map<String, List<NurseSiteMaintainItem>> itemMap) {
+            Map<String, AssetInfo> assetInfos = new TreeMap<>();
+            itemMap.values().forEach(i -> i.forEach(j -> {
+                assetInfos.put(j.getAssetInfo().getUid(), j.getAssetInfo());
+            }));
+            return assetInfos;
+        }
+
+        public void populateCheckPass(XWPFTable table, List<String> columnHeaders, Map<String, List<NurseSiteMaintainItem>> itemMap, List<String> rowHeaders) {
+            itemMap.entrySet().forEach(i -> {
+                int columnIndex = columnHeaders.indexOf(i.getKey());
+                List<NurseSiteMaintainItem> items = i.getValue();
+                for (int j = 0; j < items.size(); j++) {
+                    NurseSiteMaintainItem item = items.get(j);
+                    String assetUid = item.getAssetInfo().getUid();
+                    int rowIndex = rowHeaders.indexOf(assetUid);
+                    table.getRow(rowIndex).getCell(columnIndex).setText("√");
+                }
+            });
+        }
+
+        public void populateAssetInfoColumns(XWPFTable table, Collection<AssetInfo> assetInfos) {
+            XWPFTableRow firstRow = table.getRow(0);
+            int size = firstRow.getTableCells().size();
+            for (AssetInfo assetInfo : assetInfos) {
+                XWPFTableRow row = table.insertNewTableRow(1);
+                row.createCell().setText(assetInfo.getName());
+                row.createCell().setText(assetInfo.getDepartNum());
+                for (int i = 2; i < size; i++) {
+                    row.createCell();
+                }
+            }
+        }
+
+        public void populateSignatures(XWPFTable table, List<String> columnHeaders, Map<String, List<NurseSiteMaintainItem>> itemMap, List<String> rowHeaders) {
+
+            int[][] mirror = new int[columnHeaders.size()][rowHeaders.size()];
+
+            for (int i = 0; i < mirror.length; i++) {
+                for (int j = 0; j < mirror[0].length; j++) {
+                    mirror[i][j] = 0;
+                }
+            }
+
+            itemMap.entrySet().forEach(i -> {
+                int columnIndex = columnHeaders.indexOf(i.getKey());
+                List<NurseSiteMaintainItem> items = i.getValue();
+                for (int j = 0; j < items.size(); j++) {
+                    NurseSiteMaintainItem item = items.get(j);
+                    String signatureId = item.getSignatureId();
+                    if (StringUtils.isNotBlank(signatureId)) {
+                        StreamedContent signature = blobFileService.getBlobObjectByStorageId(signatureId);
+                        if (signature != null) {
+                            for (NurseSiteMaintainData data : item.getListData()) {
+                                int rowIndex = rowHeaders.indexOf(data.getCheckItem());
+                                if (mirror[columnIndex][rowIndex] == 0) {
+                                    XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
+                                    insertSignature(cell, signature);
+                                    mirror[columnIndex][rowIndex] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        public void populateCheckItemColumns(XWPFTable table, Collection<String> checkItems) {
+            XWPFTableRow firstRow = table.getRow(0);
+            int size = firstRow.getTableCells().size();
+            for (String checkItem : checkItems) {
+                XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows() - 1);
+                row.createCell().setText(checkItem);
+                for (int i = 1; i < size; i++) {
+                    row.createCell();
+                }
+            }
+        }
+
+        public void populateEmptyRows(XWPFTable table, List<String> rowHeaders) {
+            XWPFTableRow firstRow = table.getRow(0);
+            int size = firstRow.getTableCells().size();
+            for (int i = 0; i < 3; i++) {
+                XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows() - 1);
+                for (int j = 0; j < size; j++) {
+                    row.createCell();
+                }
+                rowHeaders.add("place_holder_for_empty");
+            }
+        }
+
+        public void insertSignature(XWPFTableCell cell, StreamedContent content) {
+            XWPFParagraph paragraph = cell.addParagraph();
+            XWPFRun run = paragraph.createRun();
+            if (content != null) {
+                try {
+                    String result = IOUtils.toString(content.getStream());
+                    if (StringUtils.isNotBlank(result)) {
+                        run.addPicture(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(result)), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
+                    }
+                } catch (InvalidFormatException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

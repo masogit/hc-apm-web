@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -16,6 +15,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.service.nurseSite.WordReportExportService;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -43,13 +44,14 @@ public class MaintainExportController implements ServerEventInterface{
 	private List<NurseSiteMaintain> selectedListMaintain;
 	private OrgInfo selectedParentOrgInfo;
     //show
-    private List<OrgInfo> listOrgInfo; 
+    private List<OrgInfo> listOrgInfo;
     private List<String> orgUidList;
     private StreamedContent exportFile;
     private Date startDate;
     private Date endDate;
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
+    private WordReportExportService wordReportExportService;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -61,13 +63,14 @@ public class MaintainExportController implements ServerEventInterface{
 		searchController.setCallingController(this);
 		currentUser = UserContextService.getCurrentUserAccount();
 		orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
+        wordReportExportService = WebUtil.getBean(WordReportExportService.class);
 		loadUserParentOrgInfo();
 	}
-	
+
 	private void initValue(){
 		this.selectedListMaintain=new ArrayList<NurseSiteMaintain>();
 	}
-	
+
 	private void searchMaintainData(Date start,Date end){
 		Calendar ca=Calendar.getInstance();
 		if(start==null){
@@ -92,13 +95,13 @@ public class MaintainExportController implements ServerEventInterface{
 			nurseSiteMaintainService.supplementMaintainWithoutItem(listMaintainData);
 		}
 	}
-	
+
 	private List<NurseSiteMaintain> findDefaultMaintain(Date startDate,Date endDate){
 		List<NurseSiteMaintain> listResult=null;
 		listResult=nurseSiteMaintainService.getDefaultMaintainData(orgUidList, startDate, endDate);
 		return listResult;
 	}
-	
+
 	private void loadUserParentOrgInfo(){
 		if(orgUidList.size()>0){
 			checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
@@ -106,7 +109,7 @@ public class MaintainExportController implements ServerEventInterface{
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
-	
+
 	private void loadUserOrgInfo(){
 		if(orgUidList.size()>0){
 //			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
@@ -114,21 +117,21 @@ public class MaintainExportController implements ServerEventInterface{
 			listCheckClinicalOrgInfo=new ArrayList<OrgInfo>();
 		}
 	}
-	
+
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
+
 	public void onParentOrgInfoChange(){
 		loadUserOrgInfo();
 	}
-	
+
 	public void previewData(){
 		searchMaintainData(startDate, endDate);
 		initValue();
 	}
-	
+
 	public void exportAll(){
 		if(listMaintainData==null || listMaintainData.size()==0){
 			addMessage("无数据");
@@ -137,7 +140,7 @@ public class MaintainExportController implements ServerEventInterface{
 		nurseSiteMaintainService.supplementMaintainWithoutItem(listMaintainData);
 		downloadFile(nurseSiteMaintainService.parseMaintainToMap(listMaintainData));
 	}
-	
+
 	public void exportSelected(){
 		if(selectedListMaintain==null || selectedListMaintain.size()==0){
 			addMessage("未选中的需要导出的记录");
@@ -146,7 +149,7 @@ public class MaintainExportController implements ServerEventInterface{
 		nurseSiteMaintainService.supplementMaintainWithoutItem(selectedListMaintain);
 		downloadFile(nurseSiteMaintainService.parseMaintainToMap(selectedListMaintain));
 	}
-	
+
 	public void exportAllDetail(){
 		if(listMaintainData==null || listMaintainData.size()==0){
 			addMessage("无数据");
@@ -163,7 +166,7 @@ public class MaintainExportController implements ServerEventInterface{
             LOGGER.error(ex.getMessage());
         }
 	}
-	
+
 	public void exportSelectedDetail(){
 		if(selectedListMaintain==null || selectedListMaintain.size()==0){
 			addMessage("未选中的需要导出的记录");
@@ -180,7 +183,37 @@ public class MaintainExportController implements ServerEventInterface{
             LOGGER.error(ex.getMessage());
         }
 	}
-	
+
+    public void exportSelected2Docx() {
+        if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
+            addMessage("未选中的需要导出的记录");
+            return;
+        }
+        exportDocx(selectedListMaintain);
+        return;
+    }
+
+    public void exportAll2Docx() {
+        if (listMaintainData == null || listMaintainData.size() == 0) {
+            addMessage("无数据");
+            return;
+        }
+        exportDocx(listMaintainData);
+    }
+
+    public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
+        selectedListMaintain.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
+        try {
+            byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/template.docx"));
+            byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, selectedListMaintain);
+            if (result != null) {
+                exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "Report.zip");
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+
 	private void downloadFile(List<Map<String,Object>> data){
 		try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/APM_NurseSiteMaintain_Template.xlsx");
@@ -301,5 +334,5 @@ public class MaintainExportController implements ServerEventInterface{
 			LOGGER.error(e.getMessage());
 		}
 	}
-	
+
 }
