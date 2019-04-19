@@ -21,11 +21,12 @@ import static org.mockito.Mockito.mock;
 @RunWith(MockitoJUnitRunner.class)
 public class WordReportExportServiceTest {
 
+    WordReportExportService service = new WordReportExportService();
 
     @Test
     public void testExport() throws IOException {
 
-        WordReportExportService service = new WordReportExportService();
+
         HashMap<String, Object> datas = new HashMap<>();
         Map<Object, Object> tables = new TreeMap<>();
 
@@ -73,10 +74,22 @@ public class WordReportExportServiceTest {
 
     public AssetInfo mockAssetInfo(Integer index) {
         AssetInfo assetInfo = mock(AssetInfo.class);
-        doReturn(index).when(assetInfo).getId();
+        doReturn("" + index).when(assetInfo).getUid();
         doReturn("name" + index).when(assetInfo).getName();
         doReturn("departNum" + index).when(assetInfo).getDepartNum();
         return assetInfo;
+    }
+
+    @Test
+    public void testZip() throws IOException {
+        File file1 = new File("d:\\template.docx");
+        File file2 = new File("d:\\result.docx");
+        List<byte[]> bytes = new ArrayList<>();
+        bytes.add(FileUtils.readFileToByteArray(file1));
+        bytes.add(FileUtils.readFileToByteArray(file2));
+
+        byte[] zip = service.zip(bytes);
+        FileUtils.writeByteArrayToFile(new File("d:\\myzip.zip"), zip);
     }
 
 
