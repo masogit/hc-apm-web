@@ -115,7 +115,9 @@ public class ExportToBeTerminatedAppraisalService {
             List<XWPFTableCell> tableCells = labelRow.getTableCells();
             List<String> values = tableCells.stream().map(i -> i.getText()).collect(Collectors.toList());
 
-            int n = 3;
+            table.removeRow(1);
+
+            int n = 2;
             if (o instanceof List) {
                 List<Map<ASSET_DETAIL, Object>> parts = (List) o;
                 for (Map<ASSET_DETAIL, Object> part : parts) {
@@ -129,7 +131,6 @@ public class ExportToBeTerminatedAppraisalService {
                     });
                 }
             }
-            table.removeRow(2);
             table.removeRow(1);
         }
     }
