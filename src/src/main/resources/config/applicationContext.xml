@@ -190,7 +190,6 @@
 
                 <!--# query plan cache -->
                 <prop key="hibernate.query.plan_cache_max_size">256</prop>
-                <prop key="hibernate.query.plan_parameter_metadata_max_size">32</prop>
 
                 <!--# logging debug information-->
                 <prop key="hibernate.show_sql">false</prop>
