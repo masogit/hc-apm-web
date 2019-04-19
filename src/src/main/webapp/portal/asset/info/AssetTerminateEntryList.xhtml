@@ -43,17 +43,6 @@
 
         <script>
             //<![CDATA[
-            afterPageLoad = function () {
-                $("#searchForm\\:searchText").keypress(function (e) {
-                    if (e.keyCode == 13) {
-                        e.preventDefault();
-                    }
-                })
-                var isActive = "#{userContextService.isActive()}";
-                if (isActive == '1') {
-                    PF('ActiveDlg').show();
-                }
-            }
             var newWin;
             function prepareAssetViewWindow() {
                 newWin = window.open('about:blank', '_blank');
@@ -76,7 +65,7 @@
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
-//]]>
+            //]]>
         </script>
     </ui:define>
 </ui:composition>

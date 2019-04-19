@@ -58,7 +58,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
 
-                    <p:fieldset legend="#{msg.expensedetail}" >
+                    <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细 维修工单:关单 -->
 
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -84,7 +84,7 @@
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
                                     <p:column headerText="合同价格(元)">
-                                        <h:outputText value="#{item.partsPrice}">
+                                        <h:outputText value="#{item.closedPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>

@@ -1,9 +1,6 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -28,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -43,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
@@ -123,6 +122,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private UploadedFile uploadedFile;
     private BlobFileService blobFileService;
     private V2_BlobObject uploadedFileObject;
+    private AssetTerminationReportTemplateRepository assetTerminationReportTemplateRepository;
 
     private String terminationCause;
 
@@ -149,6 +149,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
+        assetTerminationReportTemplateRepository = WebUtil.getBean(AssetTerminationReportTemplateRepository.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -214,6 +215,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         terminationCause = null;
     }
 
+    @Transactional
     public void uploadDataFile(FileUploadEvent event) {
         try {
             this.uploadedFile = event.getFile();
@@ -222,11 +224,47 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
             }
             uploadedFileObject = blobFileService.uploadFile(uploadedFile);
+
+            OrgInfo selectedUserOrg = orgDao.getByUid(user.getSiteUID());
+            List<AssetTerminationReportTemplate> templates = assetTerminationReportTemplateRepository.findBySiteUID(user.getSiteUID());
+            AssetTerminationReportTemplate template;
+            if(templates.isEmpty()) {
+                template = new AssetTerminationReportTemplate();
+            } else {
+                template = templates.get(0);
+            }
+            template.setTenantUID(selectedUserOrg.getTenantUID());
+            template.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+            template.setHospitalUID(selectedUserOrg.getHospitalUID());
+            template.setSiteUID(selectedUserOrg.getSiteUID());
+            template.setCreateTime(new Date());
+            template.setCreatorId(user.getUid());
+            template.setCreatorName(user.getName());
+            template.setFileName(uploadedFile.getFileName());
+            template.setStorageId(uploadedFileObject.getObjectStorageId());
+            assetTerminationReportTemplateRepository.save(template);
+
+            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
+            uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
+            uploadedFileObject.setBoUuid(template.getId());
+            blobFileService.saveBlobObject(uploadedFileObject);
+
             logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
     }
+
+    public void preEdit() {
+        List<Map.Entry<String, Boolean>> selectedEntries = selectedMap.entrySet().stream().filter(i -> i.getValue()).collect(Collectors.toList());
+        if (selectedEntries.size() == 1) {
+            AssetInfo selectedAsset = selectedEntries.stream().map(i -> dao.getByUid(i.getKey())).findFirst().orElse(null);
+            terminationCause = selectedAsset == null ? "" : selectedAsset.getTerminationCause();
+        } else {
+            terminationCause = "";
+        }
+    }
+
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
@@ -365,7 +403,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
-        if (oneSearchStr.isEmpty()) {
+        if (StringUtils.isBlank(oneSearchStr)) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("namePyCode");
             this.removeFilterOnField("departNum");

@@ -65,7 +65,7 @@ public class DepTranSummaryController  implements Serializable{
     }
 
 public Integer getCurrentMonth(){
-        return TimeUtils.getCurrentMonth();
+    return  TimeUtils.getMonthNumber(startTime);
 }
 
    /* public List<DeptTransactionLog> refreshLoadData(){

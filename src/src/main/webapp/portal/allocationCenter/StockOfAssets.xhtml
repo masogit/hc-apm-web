@@ -113,12 +113,12 @@
                         </p:column>
 
                         <p:column headerText="#{msg.Actions}" width="16%">
-                            <p:commandButton value="强制调拨"
+                            <p:commandButton value="借出"
                                              rendered="#{asset.canBorrow}"
                                              update="forceLeaseAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
                                              oncomplete="openForceLeaseDialog(xhr, status, args)"/>
-                            <p:commandButton value="强制归还"
+                            <p:commandButton value="归还"
                                              rendered="#{asset.canReturn}"
                                              update="forceReturnAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
