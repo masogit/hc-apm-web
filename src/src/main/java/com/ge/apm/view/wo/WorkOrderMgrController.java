@@ -58,6 +58,9 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+
+    @Setter @Getter
+    private Supplier newSupplier;
     @Setter@Getter
     Boolean switchTmp=false;
     @Setter@Getter
@@ -1843,6 +1846,10 @@ public void repairResultSet(){
         }
     }
 
+    public void prepareCreateSupplier() {
+        newSupplier = new Supplier();
+    }
+
     public String getFaultReason() {
         return faultReason;
     }
@@ -1853,6 +1860,14 @@ public void repairResultSet(){
 
     public void setAcker(List<UserAccount> acker) {
         this.acker = acker;
+    }
+
+    public Supplier getNewSupplier() {
+        return newSupplier;
+    }
+
+    public void setNewSupplier(Supplier newSupplier) {
+        this.newSupplier = newSupplier;
     }
 }
 

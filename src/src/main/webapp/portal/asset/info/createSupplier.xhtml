@@ -5,8 +5,8 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
-              draggable="true" appendTo="@this" header="#{msg.Supplier}">
+    <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@this" header="#{msg.Supplier}----">
         <h:form id="SupplierEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
@@ -72,8 +72,14 @@
                                  actionListener="#{assetInfoEditController.saveNewSupplier}"
                                  value="#{msg.Save}"
                                  icon="ui-icon-check"
-                                 update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) :growl"
+                                 update=":growl"
                                  oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
+               <!-- <p:commandButton validateClient="true"
+                                 actionListener="#{assetInfoEditController.saveNewSupplier}"
+                                 value="#{msg.Save}"
+                                 icon="ui-icon-check"
+                                 update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) :growl"
+                                 oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>-->
                 <p:commandButton immediate="true"
                                  value="#{msg.Cancel}"
                                  icon="ui-icon-cancel"
