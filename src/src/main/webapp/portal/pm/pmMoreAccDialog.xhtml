@@ -47,6 +47,7 @@
                             <label class="label">开票时间</label>
                             <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">供应商</label>
                             <p:autoComplete id="vendor" dropdown="true" value="#{v2PmOrderController.supplierName}" scrollHeight="300"
