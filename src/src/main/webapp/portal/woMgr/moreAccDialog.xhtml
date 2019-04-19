@@ -55,12 +55,12 @@
                        <p:commandButton id="createSupplierButton1" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{workOrderMgrController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                    </h:panelGroup>-->
                     <h:panelGroup>
-                        <label class="label">供应商--</label>
+                        <label class="label">供应商</label>
                         <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300" forceSelection="true"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
                         </p:autoComplete>
-                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  oncomplete="PF('SupplierEditDialog').show()"/>
+                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
                     </h:panelGroup>
                    <!-- <h:panelGroup>
                         <label class="label">供应商&#45;&#45;</label>
