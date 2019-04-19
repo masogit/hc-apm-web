@@ -52,21 +52,24 @@ public class TimeUtils {
 
     public static  String getInputEndDate(Date date){
         Calendar calendar= TimeUtils.getCalendar();
+        calendar.setTime(date);
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(date);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
         return strTo;
     }
     //获取当月的第一个天的日期
- public static String getCurrentStartYYMM(){
-     String sdf = new SimpleDateFormat("YYYYMMDDHHMMSS").format(new Date());
-     sdf=sdf.substring(0,6)+"01000000";
-     return sdf;
- }
+    public static String getCurrentStartYYMM(){
+        String sdf = new SimpleDateFormat("YYYYMMDDHHMMSS").format(new Date());
+        sdf=sdf.substring(0,6)+"01000000";
+        return sdf;
+    }
     //按指定格式及字符串返回当月的最后一天日期
     public static String getCurrentEndYYMM(){
+        Date d1 = new Date();
         Calendar calendar= TimeUtils.getCalendar();
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        calendar.setTime(d1);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
         return strTo;
@@ -74,6 +77,7 @@ public class TimeUtils {
 
     public static String getSpecifiedMonthEndDay(Date date){
         Calendar calendar= TimeUtils.getCalendar();
+        calendar.setTime(date);
         String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(date);
         Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         strTo=strTo.substring(0,6)+lastDay+"235959";
@@ -82,42 +86,36 @@ public class TimeUtils {
 
 
 
- /*input:2019-12-30T16:00:00.000+0000
- output Date format: 2019-12-30*/
- public static Date convertStrToDate(String strDate){
-     strDate=strDate.replace(".000+0000","");
-     strDate=strDate.replace("T"," ");
-     Date date=null;
-     try {
-         date = new SimpleDateFormat("yyyy-MM-dd").parse(strDate);
-     } catch (ParseException e) {
-         e.printStackTrace();
-     }
-     return date;
- }
+    /*input:2019-12-30T16:00:00.000+0000
+    output Date format: 2019-12-30*/
+    public static Date convertStrToDate(String strDate){
+        strDate=strDate.replace(".000+0000","");
+        strDate=strDate.replace("T"," ");
+        Date date=null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(strDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 
- public static Integer getCurrentMonth(){
-     Calendar calendar = Calendar.getInstance();
-     calendar.setTime(new Date());
-     int month = calendar.get(Calendar.MONTH) + 1;
-     return month;
 
- }
 
 
 
     //返回指定月的最后一天的日期 格式为:YYYYMMDDHHMMSS
- public static  Calendar getCalendar(){
-     Calendar calendar = Calendar.getInstance();
-     calendar.set(Calendar.DAY_OF_MONTH, 1);
-     calendar.set(Calendar.HOUR_OF_DAY, 0);
-     calendar.set(Calendar.MINUTE, 0);
-     calendar.set(Calendar.SECOND,0);
-     calendar.set(Calendar.MILLISECOND, 0);
-     calendar.add(Calendar.MONTH, 1);
-     calendar.add(Calendar.MILLISECOND, -1);
-     return calendar;
- }
+    public static  Calendar getCalendar(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.MILLISECOND, -1);
+        return calendar;
+    }
     //按字符串格式返回指定日期 格式为:YYYYMMDDHHMMSS
     public static String getStrYHMS(Date date, String format) {
         Calendar calendar = TimeUtils.getCalendar();
@@ -125,11 +123,25 @@ public class TimeUtils {
         Integer day = calendar.get(Calendar.DAY_OF_MONTH);
         DateTime dt = new DateTime(date);
         String result = dt.toString(format);
-if(day<10) {
-    result= result.substring(0, 6) + "0"+day.toString()+"000000";
-}else
-    result= result.substring(0, 6) +day.toString()+"000000";
+        if(day<10) {
+            result= result.substring(0, 6) + "0"+day.toString()+"000000";
+        }else
+            result= result.substring(0, 6) +day.toString()+"000000";
         return result;
+    }
+
+    public static Integer getMonthNumber(Date date){
+        Calendar calendar = Calendar.getInstance();
+
+        if(date ==null){
+            calendar.setTime(new Date());
+        }else{
+            calendar.setTime(date);
+        }
+
+        Integer month = calendar.get(Calendar.MONTH) + 1;
+        return month;
+
     }
 
 

@@ -279,40 +279,41 @@ public class WorkOrderReportProvider {
         StringBuilder sb = new StringBuilder();
 
         sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
-            "(select im.value_zh from i18n_message im where concat(wo.status,'') = im.msg_key and im.msg_type='status') as statusName, " +
+            "wo.status as status, " +
             "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
             "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
-            "(select oi.short_name from org_info oi where ai.clinical_dept_uid = oi.uid) as assetClinicalDeptName, " +
-            "(select im.value_zh from i18n_message im where concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
-            "(select im.value_zh from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType') as assetFunctionGroupName, " +
-            "(select im.value_zh from i18n_message im where concat(ai.asset_code68,'') = im.msg_key and im.msg_type=(select im.msg_key from i18n_message im where concat(ai.function_group,'') = im.msg_key and im.msg_type='assetFunctionType')) as assetCode68Name, " +
+            "oi.short_name as assetClinicalDeptName, " +
+            "ai.asset_group as assetGroup, " +
+            "ai.function_group as assetFunctionGroup, " +
+            "ai.asset_code68 as assetCode68, " +
             "ai.function_type as assetFunctionType,wo.current_person_name as currentPersonName, " +
-            "(select im.value_zh from i18n_message im where concat(wo.current_step_id,'') = im.msg_key and im.msg_type='woSteps') as currentStepName, " +
+            "wo.current_step_id as currentStepId, " +
             "sr.requestor_name as requestorName,sr.request_time as requestTime,sr.request_reason as requestReason, " +
-            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepOwnerName, " +
-            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepStartTime, " +
-            "(select im.value_zh from i18n_message im where concat(wo.int_ext_type,'') = im.msg_key and im.msg_type='intExtType') as intExtTypeName, " +
-            "(select im.value_zh from i18n_message im where concat(wo.repair_type,'') = im.msg_key and im.msg_type='repairType') as repairTypeName, " +
-            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepOwnerName, " +
-            "(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepStartTime, " +
+            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepInfo, " +
+            "wo.int_ext_type as intExtType, " +
+            "wo.repair_type as repairType, " +
+            "(select concat(wos.owner_name,concat('|:|',to_char(wos.start_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepInfo, " +
             "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1) as workStepEndTime, " +
             "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
             "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
             "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
             "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
-            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepOwnerName, " +
-            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepEndTime, " +
-            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepOwnerName, " +
-            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepEndTime, " +
+            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepInfo, " +
+            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepInfo, " +
             "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
             "(select string_agg(concat(woc.man_hours),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
             "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, " +
-            "(select ua.telephone from user_account ua where ua.id = sr.requestor_id) as telephone," +
-            "(select aft.fault_name from asset_fault_type aft where aft.id=wo.case_type) as caseTypeName, " +
-            "(select im.value_zh from i18n_message im where concat(ai.status,'') = im.msg_key and im.msg_type='assetStatus') as assetStatusName," +
-            "wo.signature as signature,wo.ack_signature as ackSignature,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment " +
-            "from v2_work_order wo, v2_service_request sr, asset_info ai " +
-            "where wo.sr_id = sr.id and ai.id = wo.asset_id "
+            "ua.telephone as telephone," +
+            "aft.fault_name as caseTypeName, " +
+            "ai.status as assetStatus," +
+            "wo.signature as signature,wo.ack_signature as ackSignature,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes " +
+            "from v2_work_order wo " +
+            "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
+            "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
+            "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
+            "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
+            "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
+            "WHERE 1=1 "
         );
 
         String filter = buildFilter(searchFilterList);

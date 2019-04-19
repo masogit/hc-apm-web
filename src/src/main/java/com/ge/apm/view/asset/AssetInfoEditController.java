@@ -173,6 +173,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             prepareEdit();
             beforeEdit();
         }
+        if(selected ==null){
+            try {
+                prepareCreate();
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         ownerList = ucService.getWorkerList(selected.getId(), "");
         config = configService.findConfigBySite(selected.getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());

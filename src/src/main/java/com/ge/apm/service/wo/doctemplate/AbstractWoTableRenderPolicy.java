@@ -14,6 +14,14 @@ public abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPoli
         return String.valueOf(obj);
     }
 
+    protected String extractValue(Map part, String key) {
+        Object obj = part.get(key);
+        if (obj == null) {
+            return "";
+        }
+        return String.valueOf(obj);
+    }
+
     protected XWPFTableRow addRow(XWPFTable table) {
         return addRow(table, table.getNumberOfRows());
     }

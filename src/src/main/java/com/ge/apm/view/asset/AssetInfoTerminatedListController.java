@@ -297,7 +297,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
-        if (oneSearchStr.isEmpty()) {
+        if (StringUtils.isBlank(oneSearchStr)) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("namePyCode");
             this.removeFilterOnField("departNum");

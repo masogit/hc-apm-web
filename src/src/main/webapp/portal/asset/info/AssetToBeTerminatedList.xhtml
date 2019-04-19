@@ -14,15 +14,16 @@
                     <p:commandButton id="btnOrg" value="#{empty assetInfoToBeTerminatedListController.selectSite? msg.AllHospitals:assetInfoToBeTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                         <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
-                        <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm1:treeNodeNameFilter @this" update="searchForm1:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+                        <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":woTab:searchForm1:treeNodeNameFilter @this" update="searchForm1:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                <p:ajax process="@this" event="select" listener="#{assetInfoToBeTerminatedListController.onSelectSiteTreeNode}" update=":AssetInfoListForm1 :searchForm1 #{assetInfoToBeTerminatedListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:ajax process="@this" event="select" listener="#{assetInfoToBeTerminatedListController.onSelectSiteTreeNode}" update=":woTab:AssetInfoListForm1 :woTab:searchForm1 #{assetInfoToBeTerminatedListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                 <p:ajax process="@this" event="expand"/>
                                 <p:ajax process="@this" event="collapse"/>
                                 <p:treeNode type="org">
                                     <h:outputText value="#{node.name}"/>
                                 </p:treeNode>
+								<p:treeNode type="hidden" rendered="false"/>
                             </p:tree>
                         </p:scrollPanel>
                     </p:overlayPanel>
@@ -38,6 +39,7 @@
                                 <p:treeNode type="org">
                                     <h:outputText value="#{node.name}"/>
                                 </p:treeNode>
+								<p:treeNode type="hidden" rendered="false"/>
                             </p:tree>
                         </p:scrollPanel>
                     </p:overlayPanel>
@@ -70,24 +72,10 @@
                         <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header"  >
-                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax listener="#{assetInfoToBeTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader1" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{assetInfoToBeTerminatedListController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
-                </p:column>
-                <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
-                    <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin')}">
-                            <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
-                        </p:link>
-                        <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
-                            <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
-                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                        </p:commandLink>
-                    </h:panelGroup>
-                    <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
-                        <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
-                    </p:commandButton>
                 </p:column>
                 <c:forEach items="#{assetInfoToBeTerminatedListController.customedColumns}" var="columnItem" >
                     <c:if test="#{columnItem eq 'name'}">
@@ -576,8 +564,8 @@
                     </p:commandButton>
 
                     <p:commandButton id="editButton" icon="ui-icon-pencil"
-                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}"
-                                     actionListener="#{assetInfoToBeTerminatedListController.isChecked}"
+                                     class="btn btn-sm btn-gray batch-terminated" title="报废鉴定"
+                                     actionListener="#{assetInfoToBeTerminatedListController.preEdit()}"
                                      update=":woTab:TerminationCauseEditDlg"
                                      oncomplete="PF('TerminationCauseEditDlg').show()"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"/>

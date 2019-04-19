@@ -28,7 +28,7 @@
                             <label class="label">月份查询*</label>
                             <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd" value="#{depTranSummaryController.startTime}"  showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"></p:calendar>
                         </h:panelGroup>
-                        <p:commandButton value="查询"  update="datalist" actionListener="#{depTranSummaryController.searchTheMonth()}" />
+                        <p:commandButton value="查询"  update="@(.dt)" actionListener="#{depTranSummaryController.searchTheMonth()}" />
                     </p:panelGrid>
 
                     <h:panelGroup rendered="#{userContextService.hasRole('AssetHead')}" >
@@ -38,6 +38,7 @@
                                  rows="20"  emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500"-->
                     <p:dataTable id="datalist"
+                                 class="dt"
                                  var="item"
                                  selectionMode="single"  value="#{depTranSummaryController.summaryTraList}"
                                  selection="#{depTranSummaryController.transactionStatis}" rowKey="#{item.authorName}-#{item.hours}-#{item.startYear}-#{item.startMonth}" >
