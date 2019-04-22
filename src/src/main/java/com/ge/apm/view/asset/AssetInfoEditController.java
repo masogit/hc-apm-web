@@ -531,7 +531,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getListPageLink() {
-        return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+        if (!selected.getIsValid() || 4 == selected.getStatus()) {
+            return "AssetTerminateEntryList?faces-redirect=true";
+        }
+        return "AssetList?faces-redirect=true";
     }
 
     //三码合一设置
