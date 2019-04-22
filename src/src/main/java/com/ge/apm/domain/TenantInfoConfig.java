@@ -391,10 +391,10 @@ public class TenantInfoConfig {
 				listLabel.add("计量类别设置");
 				listKey.add("measure.info");
 				listLabel.add("计量信息");
-				listKey.add("measure.rule");
+/*				listKey.add("measure.rule");
 				listLabel.add("计量规则");
 				listKey.add("measure.manager");
-				listLabel.add("计量规则管理");
+				listLabel.add("计量规则管理");*/
 				listKey.add("nurseSite");
 				listLabel.add("临床助手");
 				listKey.add("nurseSite.maintain");
