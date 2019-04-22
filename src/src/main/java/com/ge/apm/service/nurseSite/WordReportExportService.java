@@ -26,40 +26,47 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class WordReportExportService {
-  
+
     @Autowired
     BlobFileService blobFileService;
 
-    public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) {
+    public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) throws IOException {
 
         List<Map<String, Object>> datasList = new ArrayList<>();
         datasList.add(new HashMap<>());
 
+        String deptUid = null;
+        String deptName = null;
+
         TreeMap<String, List<NurseSiteMaintainItem>> map = new TreeMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            try {
-                Date checkDate1 = maintain.getCheckDate();
-                if (checkDate1 == null) {
-                    continue;
-                }
-                String checkDate = DateFormatUtils.format(checkDate1, "yyyy-MM-dd");
-                String signatureId = maintain.getSignatureId();
-                List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
-                if (StringUtils.isNotBlank(signatureId)) {
-                    items.forEach(i -> {
-                        if (StringUtils.isBlank(i.getSignatureId())) {
-                            i.setSignatureId(signatureId);
-                        }
-                    });
-                }
-                map.put(checkDate, items);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (deptUid == null) {
+                deptUid = maintain.getClinicalDeptUID();
+                deptName = maintain.getClinicalDeptName();
+            } else if (!StringUtils.equals(deptUid, maintain.getClinicalDeptUID())) {
+                throw new IllegalStateException("所属科室不唯一");
             }
+
+            Date checkDate1 = maintain.getCheckDate();
+            if (checkDate1 == null) {
+                continue;
+            }
+            String checkDate = DateFormatUtils.format(checkDate1, "yyyy-MM-dd");
+            String signatureId = maintain.getSignatureId();
+            List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
+            if (StringUtils.isNotBlank(signatureId)) {
+                items.forEach(i -> {
+                    if (StringUtils.isBlank(i.getSignatureId())) {
+                        i.setSignatureId(signatureId);
+                    }
+                });
+            }
+            map.put(checkDate, items);
         }
 
-        map.entrySet().stream().forEach(i -> {
+        for (Map.Entry<String, List<NurseSiteMaintainItem>> i : map.entrySet()) {
             Map<String, Object> datas = datasList.get(datasList.size() - 1);
+            datas.put("dept", deptName);
             TreeMap<String, List<NurseSiteMaintainItem>> subMap = (TreeMap<String, List<NurseSiteMaintainItem>>) datas.computeIfAbsent("tables", k -> new TreeMap<>());
             subMap.put(i.getKey(), i.getValue());
 
@@ -70,7 +77,7 @@ public class WordReportExportService {
             if (subMap.size() == 10) {
                 datasList.add(new HashMap<>());
             }
-        });
+        }
 
         List<byte[]> reports = new ArrayList<>();
         for (Map<String, Object> datas : datasList) {
@@ -80,7 +87,7 @@ public class WordReportExportService {
         return zip(reports);
     }
 
-    public byte[] zip(List<byte[]> reports) {
+    public byte[] zip(List<byte[]> reports) throws IOException {
         try (OutputStream out = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(out)) {
             for (int i = 0; i < reports.size(); i++) {
@@ -90,10 +97,7 @@ public class WordReportExportService {
             zos.closeEntry();
             zos.close();
             return ((ByteArrayOutputStream) out).toByteArray();
-        } catch (Exception ignore) {
-            ignore.printStackTrace();
         }
-        return null;
     }
 
     public byte[] export(byte[] templateBytes, Map<String, Object> datas) {
@@ -219,6 +223,7 @@ public class WordReportExportService {
                                 int rowIndex = rowHeaders.indexOf(data.getCheckItem());
                                 if (mirror[columnIndex][rowIndex] == 0) {
                                     XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
+                                    System.out.println("insert signature: " + signature);
                                     insertSignature(cell, signature);
                                     mirror[columnIndex][rowIndex] = 1;
                                 }

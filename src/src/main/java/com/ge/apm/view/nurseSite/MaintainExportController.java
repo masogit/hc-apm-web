@@ -209,8 +209,9 @@ public class MaintainExportController implements ServerEventInterface{
             if (result != null) {
                 exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "Report.zip");
             }
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
+        } catch (Exception ex) {
+			addMessage("报告导出失败：" + ex.getMessage());
+            LOGGER.error("Fail to export word document", ex);
         }
     }
 
