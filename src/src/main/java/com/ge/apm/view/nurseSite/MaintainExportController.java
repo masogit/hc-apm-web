@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -202,13 +203,20 @@ public class MaintainExportController implements ServerEventInterface {
     }
 
     public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
-        selectedListMaintain.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
+        long t1 = System.currentTimeMillis();
+        List<NurseSiteMaintain> checkedMaintainList = selectedListMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
+        checkedMaintainList.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
+        long t2 = System.currentTimeMillis();
+        LOGGER.info("Export docx: loading data: {}", t2 - t1);
         try {
             byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/template.docx"));
-            byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, selectedListMaintain);
+            byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, checkedMaintainList);
             if (result != null) {
                 exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "Report.zip");
             }
+            long t3 = System.currentTimeMillis();
+            LOGGER.info("Export docx: convert data: {}", t3 - t2);
+            LOGGER.info("Export docx: {}", t3 - t1);
         } catch (Exception ex) {
             addMessage("报告导出失败：" + ex.getMessage());
             exportFile = null;

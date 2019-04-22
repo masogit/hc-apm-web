@@ -35,8 +35,7 @@ public class WordReportExportService {
 
     public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) throws IOException {
 
-        List<NurseSiteMaintain> checkedMaintainList = listMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
-        if (checkedMaintainList.isEmpty()) {
+        if (listMaintain.isEmpty()) {
             throw new IllegalStateException("所选检查没有完成");
         }
 
@@ -47,7 +46,7 @@ public class WordReportExportService {
         String deptName = null;
 
         TreeMap<String, List<NurseSiteMaintainItem>> map = new TreeMap<>();
-        for (NurseSiteMaintain maintain : checkedMaintainList) {
+        for (NurseSiteMaintain maintain : listMaintain) {
             if (deptUid == null) {
                 deptUid = maintain.getClinicalDeptUID();
                 deptName = maintain.getClinicalDeptName();
