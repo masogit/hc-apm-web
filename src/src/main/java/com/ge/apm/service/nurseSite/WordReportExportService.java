@@ -180,9 +180,18 @@ public class WordReportExportService {
                 List<NurseSiteMaintainItem> items = i.getValue();
                 for (int j = 0; j < items.size(); j++) {
                     NurseSiteMaintainItem item = items.get(j);
-                    String assetUid = item.getAssetInfo().getUid();
-                    int rowIndex = rowHeaders.indexOf(assetUid);
-                    table.getRow(rowIndex).getCell(columnIndex).setText("√");
+                    Integer status = item.getStatus();
+                    String text = null;
+                    if (status == 2) {
+                        text = "√";
+                    } else if (status == 3) {
+                        text = "x";
+                    }
+                    if (text != null) {
+                        String assetUid = item.getAssetInfo().getUid();
+                        int rowIndex = rowHeaders.indexOf(assetUid);
+                        table.getRow(rowIndex).getCell(columnIndex).setText(text);
+                    }
                 }
             });
         }
