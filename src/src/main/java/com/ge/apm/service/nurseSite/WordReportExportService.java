@@ -30,10 +30,13 @@ public class WordReportExportService {
     @Autowired
     BlobFileService blobFileService;
 
+    private final static List<Integer> PASS_STATUS = Arrays.asList(2, 5, 6, 7);
+    private final static List<Integer> FAILURE_STATUS = Arrays.asList(3, 8);
+
     public byte[] writeMaintainDetailToDocx(byte[] templateBytes, List<NurseSiteMaintain> listMaintain) throws IOException {
 
         List<NurseSiteMaintain> checkedMaintainList = listMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
-        if(checkedMaintainList.isEmpty()){
+        if (checkedMaintainList.isEmpty()) {
             throw new IllegalStateException("所选检查没有完成");
         }
 
@@ -190,9 +193,9 @@ public class WordReportExportService {
                     NurseSiteMaintainItem item = items.get(j);
                     Integer status = item.getStatus();
                     String text = null;
-                    if (status == 2) {
+                    if (PASS_STATUS.contains(status)) {
                         text = "√";
-                    } else if (status == 3) {
+                    } else if (FAILURE_STATUS.contains(status)) {
                         text = "x";
                     }
                     if (text != null) {
