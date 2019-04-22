@@ -61,6 +61,9 @@ public class WordReportExportService {
                     }
                 });
             }
+            if (map.containsKey(checkDate)) {
+                items.addAll(map.get(checkDate));
+            }
             map.put(checkDate, items);
         }
 
@@ -190,7 +193,13 @@ public class WordReportExportService {
                     if (text != null) {
                         String assetUid = item.getAssetInfo().getUid();
                         int rowIndex = rowHeaders.indexOf(assetUid);
-                        table.getRow(rowIndex).getCell(columnIndex).setText(text);
+                        XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
+                        String originalText = cell.getText();
+                        if (StringUtils.isBlank(originalText) || (!StringUtils.equals(originalText, text) && "x".equalsIgnoreCase(text))) {
+                            XWPFParagraph xwpfParagraph = cell.getParagraphs().get(0);
+                            XWPFRun run = xwpfParagraph.createRun();
+                            run.setText(text);
+                        }
                     }
                 }
             });
@@ -232,7 +241,6 @@ public class WordReportExportService {
                                 int rowIndex = rowHeaders.indexOf(data.getCheckItem());
                                 if (mirror[columnIndex][rowIndex] == 0) {
                                     XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
-                                    System.out.println("insert signature: " + signature);
                                     insertSignature(cell, signature);
                                     mirror[columnIndex][rowIndex] = 1;
                                 }
