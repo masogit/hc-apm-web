@@ -154,8 +154,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public CustomConfigService customConfigService;
     private CustomConfigObject currentCustomConfig;
 
-
+    private CustomConfigService ccService;
+    private CustomConfig customConfig;
     protected void init() {
+        ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -177,6 +179,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -1116,15 +1121,18 @@ public void repairResultSet(){
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
         newServiceRequest = new V2_ServiceRequest();
         Object requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+
+
         if(requestReason==null){
             newServiceRequest.setRequestReason("设备故障");
         }else{
             newServiceRequest.setRequestReason(requestReason.toString());
         }
-        currentStatus= Integer.valueOf(strAssetStatus);
+
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
+        currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest.setStatus(currentStatus);
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
@@ -1180,10 +1188,18 @@ public void repairResultSet(){
         onSelectedAsset(asset);
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
-            currentStatus = 3;
+
+        if(customConfig ==null){
+            if (currentStatus == 1) {
+                currentStatus = 3;
+            }
+            needConfirmTime = false;
+        }else{ //如果有自定义配置
+            String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+            currentStatus= Integer.valueOf(strAssetStatus);
+            needConfirmTime=true;
         }
-        needConfirmTime = false;
+
 
         if (this.newServiceRequest == null) {
             return;
