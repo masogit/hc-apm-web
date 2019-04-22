@@ -61,11 +61,13 @@ public class WordReportExportService {
             }
             String checkDate = DateFormatUtils.format(checkDate1, "yyyy-MM-dd");
             String signatureId = maintain.getSignatureId();
+            int signatureType = maintain.getSignatureSourceType();
             List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
             if (StringUtils.isNotBlank(signatureId)) {
                 items.forEach(i -> {
                     if (StringUtils.isBlank(i.getSignatureId())) {
                         i.setSignatureId(signatureId);
+                        i.setSignatureSourceType(signatureType);
                     }
                 });
             }
@@ -249,7 +251,7 @@ public class WordReportExportService {
                                 int rowIndex = rowHeaders.indexOf(data.getCheckItem());
                                 if (mirror[columnIndex][rowIndex] == 0) {
                                     XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
-                                    insertSignature(cell, signature);
+                                    insertSignature(cell, signature, item.getSignatureSourceType());
                                     mirror[columnIndex][rowIndex] = 1;
                                 }
                             }
@@ -283,14 +285,18 @@ public class WordReportExportService {
             }
         }
 
-        public void insertSignature(XWPFTableCell cell, StreamedContent content) {
+        public void insertSignature(XWPFTableCell cell, StreamedContent content, Integer signatureType) {
             XWPFParagraph paragraph = cell.addParagraph();
             XWPFRun run = paragraph.createRun();
             if (content != null) {
                 try {
-                    String result = IOUtils.toString(content.getStream());
-                    if (StringUtils.isNotBlank(result)) {
-                        run.addPicture(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(result)), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
+                    byte[] bytes = IOUtils.toByteArray(content.getStream());
+                    if (bytes.length > 0) {
+                        if (signatureType == 0) {
+                            run.addPicture(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(new String(bytes))), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
+                        } else {
+                            run.addPicture(new ByteArrayInputStream(bytes), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
+                        }
                     }
                 } catch (InvalidFormatException e) {
                     e.printStackTrace();
