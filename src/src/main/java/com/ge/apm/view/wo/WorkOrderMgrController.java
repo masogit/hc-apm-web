@@ -152,9 +152,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public String faultReason;
     public CustomConfigService customConfigService;
+    private CustomConfigObject currentCustomConfig;
+
 
     protected void init() {
         customConfigService=WebUtil.getBean(CustomConfigService.class);
+        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
@@ -1225,6 +1228,13 @@ public void repairResultSet(){
             itemDetail.setApplyTime(new Date());
             supplierName = null;
             switchTmp=true;
+
+            Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+            //gaolei
+            if(eval!=null){
+                itemDetail.setPartsType(eval.toString());
+            }
+
 
         } else {
             switchTmp=false;
