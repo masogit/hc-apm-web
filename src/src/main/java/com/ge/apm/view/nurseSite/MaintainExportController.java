@@ -144,7 +144,7 @@ public class MaintainExportController implements ServerEventInterface {
 
     public void exportSelected() {
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
-            addMessage("未选中的需要导出的记录");
+            addMessage("未选中需要导出的记录");
             return;
         }
         nurseSiteMaintainService.supplementMaintainWithoutItem(selectedListMaintain);
@@ -170,7 +170,7 @@ public class MaintainExportController implements ServerEventInterface {
 
     public void exportSelectedDetail() {
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
-            addMessage("未选中的需要导出的记录");
+            addMessage("未选中需要导出的记录");
             return;
         }
         try {
@@ -187,7 +187,7 @@ public class MaintainExportController implements ServerEventInterface {
 
     public void exportSelected2Docx() {
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
-            addMessage("未选中的需要导出的记录");
+            addMessage("未选中需要导出的记录");
             return;
         }
         exportDocx(selectedListMaintain);
