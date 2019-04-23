@@ -195,8 +195,15 @@ public Integer getCurrentMonth(){
 
     public void onSelectSummary(ServerEventInterface callingController){
         this.callingController=callingController;
-        transactionStatis.setStartTime(TimeUtils.getInputStartDate(startTime));
-        transactionStatis.setEndTime(TimeUtils.getInputEndDate(startTime));
+        if(startTime!=null){
+            transactionStatis.setStartTime(TimeUtils.getInputStartDate(startTime));
+            transactionStatis.setEndTime(TimeUtils.getInputEndDate(startTime));
+        }else{
+            Integer month = getCurrentMonth();
+            transactionStatis.setStartTime(TimeUtils.getStartDateOnMonth(month));
+            transactionStatis.setEndTime(TimeUtils.getEndDateOnMonth(month));
+        }
+
         callingController.onServerEvent("callingFromDepTranSummaryController", this.transactionStatis);
 
     }
