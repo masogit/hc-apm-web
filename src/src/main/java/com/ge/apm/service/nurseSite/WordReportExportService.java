@@ -54,11 +54,11 @@ public class WordReportExportService {
                 throw new IllegalStateException("所属科室不唯一");
             }
 
-            Date checkDate1 = maintain.getCheckDate();
-            if (checkDate1 == null) {
+            Date scheduleDate = maintain.getScheduleDate();
+            if (scheduleDate == null) {
                 continue;
             }
-            String checkDate = DateFormatUtils.format(checkDate1, "yyyy-MM-dd");
+            String dateStr = DateFormatUtils.format(scheduleDate, "yyyy-MM-dd");
             String signatureId = maintain.getSignatureId();
             int signatureType = maintain.getSignatureSourceType();
             List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
@@ -70,10 +70,10 @@ public class WordReportExportService {
                     }
                 });
             }
-            if (map.containsKey(checkDate)) {
-                items.addAll(map.get(checkDate));
+            if (map.containsKey(dateStr)) {
+                items.addAll(map.get(dateStr));
             }
-            map.put(checkDate, items);
+            map.put(dateStr, items);
         }
 
         for (Map.Entry<String, List<NurseSiteMaintainItem>> i : map.entrySet()) {
