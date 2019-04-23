@@ -204,6 +204,7 @@ public class MaintainExportController implements ServerEventInterface {
 
     public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
         long t1 = System.currentTimeMillis();
+        LOGGER.info("Export docx: start");
         List<NurseSiteMaintain> checkedMaintainList = selectedListMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
         checkedMaintainList.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
         long t2 = System.currentTimeMillis();
