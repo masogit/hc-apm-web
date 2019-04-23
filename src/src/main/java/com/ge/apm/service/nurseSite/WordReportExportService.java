@@ -42,16 +42,11 @@ public class WordReportExportService {
         List<Map<String, Object>> datasList = new ArrayList<>();
         datasList.add(new HashMap<>());
 
-        String deptUid = null;
         String deptName = null;
-
         TreeMap<String, List<NurseSiteMaintainItem>> map = new TreeMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            if (deptUid == null) {
-                deptUid = maintain.getClinicalDeptUID();
+            if (deptName == null) {
                 deptName = maintain.getClinicalDeptName();
-            } else if (!StringUtils.equals(deptUid, maintain.getClinicalDeptUID())) {
-                throw new IllegalStateException("所属科室不唯一");
             }
 
             Date scheduleDate = maintain.getScheduleDate();
@@ -100,7 +95,7 @@ public class WordReportExportService {
     }
 
     public byte[] zip(List<byte[]> reports) throws IOException {
-        try (OutputStream out = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(out)) {
             for (int i = 0; i < reports.size(); i++) {
                 zos.putNextEntry(new ZipEntry("report" + (i + 1) + ".docx"));
@@ -108,7 +103,7 @@ public class WordReportExportService {
             }
             zos.closeEntry();
             zos.close();
-            return ((ByteArrayOutputStream) out).toByteArray();
+            return out.toByteArray();
         }
     }
 
