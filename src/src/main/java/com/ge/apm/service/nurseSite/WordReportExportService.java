@@ -205,7 +205,8 @@ public class WordReportExportService {
                         XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
                         String originalText = cell.getText();
                         if (StringUtils.isBlank(originalText) || (!StringUtils.equals(originalText, text) && "x".equalsIgnoreCase(text))) {
-                            XWPFParagraph xwpfParagraph = cell.getParagraphs().get(0);
+                            cell.removeParagraph(0);
+                            XWPFParagraph xwpfParagraph = cell.addParagraph();
                             XWPFRun run = xwpfParagraph.createRun();
                             run.setText(text);
                         }
