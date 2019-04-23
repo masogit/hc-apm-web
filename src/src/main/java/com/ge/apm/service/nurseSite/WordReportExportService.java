@@ -147,13 +147,13 @@ public class WordReportExportService {
             rowHeaders.add("place_holder_for_first_row");
 
             rowHeaders.addAll(assetInfos.keySet().stream().collect(Collectors.toList()));
-            populateAssetInfoColumns(table, assetInfos.values());
+            populateAssetInfoColumns(table, assetInfos.keySet().stream().map(i -> assetInfos.get(i)).collect(Collectors.toList()));
             populateCheckPass(table, columnHeaders, itemMap, rowHeaders);
 
             populateEmptyRows(table, rowHeaders);
 
             rowHeaders.addAll(checkItems.keySet().stream().collect(Collectors.toList()));
-            populateCheckItemColumns(table, checkItems.values());
+            populateCheckItemColumns(table, checkItems.keySet().stream().map(i -> checkItems.get(i)).collect(Collectors.toList()));
             populateSignatures(table, columnHeaders, itemMap, rowHeaders);
 
             table.removeRow(table.getNumberOfRows() - 1);
@@ -218,7 +218,7 @@ public class WordReportExportService {
             XWPFTableRow firstRow = table.getRow(0);
             int size = firstRow.getTableCells().size();
             for (AssetInfo assetInfo : assetInfos) {
-                XWPFTableRow row = table.insertNewTableRow(1);
+                XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows() - 1);
                 row.createCell().setText(assetInfo.getName());
                 row.createCell().setText(assetInfo.getDepartNum());
                 for (int i = 2; i < size; i++) {
