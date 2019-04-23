@@ -18,6 +18,7 @@ import javax.faces.context.FacesContext;
 
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -203,13 +204,22 @@ public class MaintainExportController implements ServerEventInterface {
     }
 
     public void exportDocx(List<NurseSiteMaintain> selectedListMaintain) {
-        long t1 = System.currentTimeMillis();
-        LOGGER.info("Export docx: start");
-        List<NurseSiteMaintain> checkedMaintainList = selectedListMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
-        checkedMaintainList.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
-        long t2 = System.currentTimeMillis();
-        LOGGER.info("Export docx: loading data: {}", t2 - t1);
         try {
+            long t1 = System.currentTimeMillis();
+            LOGGER.info("Export docx: start");
+            List<NurseSiteMaintain> checkedMaintainList = selectedListMaintain.stream().filter(i -> i.getCheckDate() != null).collect(Collectors.toList());
+            String deptUid = null;
+            for (NurseSiteMaintain maintain : checkedMaintainList) {
+                if (deptUid == null) {
+                    deptUid = maintain.getClinicalDeptUID();
+                } else if (!StringUtils.equals(deptUid, maintain.getClinicalDeptUID())) {
+                    throw new IllegalStateException("所属科室不唯一");
+                }
+            }
+            checkedMaintainList.forEach(i -> nurseSiteMaintainService.supplementMaintain(i, 0, 0, true));
+            long t2 = System.currentTimeMillis();
+            LOGGER.info("Export docx: loading data: {}", t2 - t1);
+
             byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/template.docx"));
             byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, checkedMaintainList);
             if (result != null) {
