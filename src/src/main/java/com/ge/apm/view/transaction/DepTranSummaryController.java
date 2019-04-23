@@ -10,6 +10,7 @@ import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.tabview.TabView;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -194,6 +195,8 @@ public Integer getCurrentMonth(){
 
     public void onSelectSummary(ServerEventInterface callingController){
         this.callingController=callingController;
+        transactionStatis.setStartTime(TimeUtils.getInputStartDate(startTime));
+        transactionStatis.setEndTime(TimeUtils.getInputEndDate(startTime));
         callingController.onServerEvent("callingFromDepTranSummaryController", this.transactionStatis);
 
     }
