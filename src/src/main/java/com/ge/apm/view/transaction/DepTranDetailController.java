@@ -91,11 +91,14 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
         if(isSummarySelected){
             depTranForTrans.setUserId(transactionStatis.getAuthorId());
-        }else{
+            depTranForTrans.setStartTime(transactionStatis.getStartTime());
+            depTranForTrans.setEndTime(transactionStatis.getEndTime());
+            deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
 
+        }else{
             depTranForTrans.setUserId(userContextService.getLoginUserId());
+            deptTranLogList=refreshLoadData(depTranForTrans);
         }
-        deptTranLogList=refreshLoadData(depTranForTrans);
         page = new PageImpl(deptTranLogList,pageRequest,totalSize);
         return page;
     }
@@ -133,6 +136,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         return deptTranLogList;
     }
 
+
+    public List<DeptTransactionLog> refreshLoadDataForSelectedItem(DepTranForTrans dep){
+        HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(dep,UserContextService.getAccessToken());
+        totalSize = (Integer)trListByPerson.get("rowCount");
+        deptTranLogList= decomposeTransactionLog(trListByPerson);
+        return deptTranLogList;
+    }
 
     public void onselectDetailItem(){
         //    System.out.println(selected);
