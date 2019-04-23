@@ -30,37 +30,39 @@ public class WordReportExportServiceTest {
         HashMap<String, Object> datas = new HashMap<>();
         Map<Object, Object> tables = new TreeMap<>();
 
-        tables.put("2019-01-01", mockItemList(new int[]{1, 2, 3}));
-        tables.put("2019-01-02", mockItemList(new int[]{1, 2, 3, 4}));
-        tables.put("2019-01-03", mockItemList(new int[]{}));
-        tables.put("2019-01-04", mockItemList(new int[]{3, 4}));
-        tables.put("2019-01-05", mockItemList(new int[]{2, 3, 4}));
+        tables.put("2019-01-01", mockItemList(new int[]{1, 2, 3}, 2));
+        tables.put("2019-01-01", mockItemList(new int[]{1, 2, 3}, 3));
+        tables.put("2019-01-02", mockItemList(new int[]{1, 2, 3, 4}, 3));
+        tables.put("2019-01-03", mockItemList(new int[]{}, 3));
+        tables.put("2019-01-04", mockItemList(new int[]{3, 4}, 3));
+        tables.put("2019-01-05", mockItemList(new int[]{2, 3, 4}, 3));
         datas.put("tables", tables);
         datas.put("date1", "2019-01-01");
         datas.put("date2", "2019-01-02");
         datas.put("date3", "2019-01-03");
         datas.put("date4", "2019-01-04");
         datas.put("date5", "2019-01-05");
-        byte[] export = service.export(IOUtils.toByteArray(new FileInputStream("D:\\template.docx")), datas);
+        byte[] export = service.export(IOUtils.toByteArray(new FileInputStream("src\\main\\webapp\\portal\\nurseSite\\template.docx")), datas);
 
         FileUtils.writeByteArrayToFile(new File("D:\\result.docx"), export);
         assertEquals(1, 1);
     }
 
-    public List<NurseSiteMaintainItem> mockItemList(int[] index) {
+    public List<NurseSiteMaintainItem> mockItemList(int[] index, int status) {
         List<NurseSiteMaintainItem> list = new ArrayList<>();
         for (int i : index) {
-            list.add(mockNurseSiteMaintainItem(i));
+            list.add(mockNurseSiteMaintainItem(i, status));
         }
         return list;
     }
 
-    public NurseSiteMaintainItem mockNurseSiteMaintainItem(int index) {
+    public NurseSiteMaintainItem mockNurseSiteMaintainItem(int index, int status) {
         NurseSiteMaintainItem item = new NurseSiteMaintainItem();
         item.setAssetInfo(mockAssetInfo(index));
         ArrayList<NurseSiteMaintainData> listData = new ArrayList<>();
         listData.add(mockNurseSiteMaintainData(1));
         listData.add(mockNurseSiteMaintainData(2));
+        item.setStatus(status);
         item.setListData(listData);
         return item;
     }
