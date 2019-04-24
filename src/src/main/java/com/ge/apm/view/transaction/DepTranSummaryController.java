@@ -130,7 +130,7 @@ public Integer getCurrentMonth(){
             HashMap<String,Object> hm1 = (HashMap<String,Object>)al1.get(i);
             TransactionStatis ts = new TransactionStatis();
             ts.setAuthorName(hm1.get("authorName").toString());
-
+            ts.setAuthorId((Integer)hm1.get("authorId"));
             if(hm1.get("count")!=null)
                 ts.setHours(Double.valueOf(hm1.get("count").toString()));
             else
@@ -209,9 +209,9 @@ public Integer getCurrentMonth(){
     }
     public String titleNameSummary(){
         if(userContextService.isOnlyAssetStaff()){
-            return "课务记录";
+            return "科务记录";
         }else{
-            return "课务详情";
+            return "科务详情";
         }
     }
 

@@ -75,10 +75,12 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             return "详情";
         }
     }
+    private boolean search=false;
     public void searchRanageSet(){
         depTranForTrans= new DepTranForTrans();
         depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
         depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
+        search=true;
 
     }
     public void prepareEdit() {
@@ -103,8 +105,15 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
             isSummarySelected=false;
         }else{
-            depTranForTrans.setUserId(userContextService.getLoginUserId());
-            deptTranLogList=refreshLoadData(depTranForTrans);
+            if(search){
+                depTranForTrans.setUserId(transactionStatis.getAuthorId());
+                deptTranLogList=refreshLoadData(depTranForTrans);
+                search=false;
+            }else{
+                depTranForTrans.setUserId(userContextService.getLoginUserId());
+                deptTranLogList=refreshLoadData(depTranForTrans);
+            }
+
         }
         page = new PageImpl(deptTranLogList,pageRequest,totalSize);
         return page;
@@ -227,9 +236,9 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
     public void locUpdateTransactionbyLink(){
         TransactionForm tf = new TransactionForm();
-        tf.setCategory(selected.getCategory());
-        tf.setRemark(selected.getRemark());
-        tf.setHours(selected.getHours());
+        tf.setCategory(tmCategory);
+        tf.setRemark(remark);
+        tf.setHours(hours);
         tf.setDate(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
         transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
     }
