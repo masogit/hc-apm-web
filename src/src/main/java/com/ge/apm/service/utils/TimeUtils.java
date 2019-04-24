@@ -58,6 +58,35 @@ public class TimeUtils {
         strTo=strTo.substring(0,6)+lastDay+"235959";
         return strTo;
     }
+    public static  String getEndDateOnMonth(Integer month){
+        Calendar calendar= TimeUtils.getCalendar();
+        Date d1 = new Date();
+        calendar.setTime(d1);
+        String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(d1);
+        Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if(month<10){
+            strTo=strTo.substring(0,4)+"0"+month.toString()+lastDay+"235959";
+        }else{
+            strTo=strTo.substring(0,4)+month.toString()+lastDay+"235959";
+        }
+
+        return strTo;
+    }
+    public static  String getStartDateOnMonth(Integer month){
+        Calendar calendar= TimeUtils.getCalendar();
+        Date d1 = new Date();
+        calendar.setTime(d1);
+        String strTo =new SimpleDateFormat("yyyyMMddHHmmss").format(d1);
+        Integer lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if(month<10){
+            strTo=strTo.substring(0,4)+"0"+month.toString()+"01000000";
+        }else{
+            strTo=strTo.substring(0,4)+month.toString()+"01000000";
+        }
+
+        return strTo;
+    }
+
     //获取当月的第一个天的日期
     public static String getCurrentStartYYMM(){
         String sdf = new SimpleDateFormat("YYYYMMDDHHMMSS").format(new Date());

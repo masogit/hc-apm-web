@@ -94,7 +94,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             depTranForTrans.setStartTime(transactionStatis.getStartTime());
             depTranForTrans.setEndTime(transactionStatis.getEndTime());
             deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
-
+            isSummarySelected=false;
         }else{
             depTranForTrans.setUserId(userContextService.getLoginUserId());
             deptTranLogList=refreshLoadData(depTranForTrans);
