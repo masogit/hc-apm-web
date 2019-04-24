@@ -126,9 +126,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     public List<DeptTransactionLog> refreshLoadData(DepTranForTrans dep){
         if(startTime==null){
             dep.setStartTime(TimeUtils.getCurrentStartYYMM());
+        }else{
+            dep.setStartTime(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
         }
         if(endTime==null){
             dep.setEndTime(TimeUtils.getCurrentEndYYMM());
+        }else{
+            dep.setEndTime(TimeUtils.getStrYHMS(endTime,"YYYYMMDDHHMMSS"));
         }
         HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(dep,UserContextService.getAccessToken());
         totalSize = (Integer)trListByPerson.get("rowCount");
