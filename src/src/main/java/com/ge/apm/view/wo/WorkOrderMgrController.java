@@ -1261,7 +1261,6 @@ public void repairResultSet(){
                                 }
                             }
                         }
-                        itemDetail.setPartsType(eval.toString());
                     }else{
                         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
                         eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
