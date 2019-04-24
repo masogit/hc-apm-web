@@ -1652,8 +1652,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                         if(eval==null){
                             currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
                             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                            if(eval!=null){
+                                itemDetail.setPartsType(eval.toString());
+                            }
+
+                        }else{
+                            itemDetail.setPartsType(eval.toString());
                         }
+                    }else{
+                        itemDetail.setPartsType(eval.toString());
                     }
+                }else{
+                    itemDetail.setPartsType(eval.toString());
                 }
             }else{
                 currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());

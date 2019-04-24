@@ -1258,10 +1258,20 @@ public void repairResultSet(){
                                 if(eval==null){
                                     currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
                                     eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                                    if(eval!=null){
+                                        itemDetail.setPartsType(eval.toString());
+                                    }
+
+                                }else{
+                                    itemDetail.setPartsType(eval.toString());
                                 }
+                            }else{
+                                itemDetail.setPartsType(eval.toString());
                             }
+                        }else{
+                            itemDetail.setPartsType(eval.toString());
                         }
-                    }else{
+                    }else{//不是隔离
                         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
                         eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
                         itemDetail.setPartsType(eval.toString());
