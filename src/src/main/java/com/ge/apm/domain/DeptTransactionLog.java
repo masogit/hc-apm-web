@@ -8,7 +8,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Entity
 @Data
@@ -221,6 +223,15 @@ public class DeptTransactionLog implements Serializable {
         this.hours = hours;
     }
 
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -237,5 +248,10 @@ public class DeptTransactionLog implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.ge.apm.domain.DeptTransactionLog[ id=" + id + " ]";
     }
 }

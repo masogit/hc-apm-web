@@ -22,10 +22,9 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 @ManagedBean
 @ViewScoped
 public class DepTranDetailController extends JpaCRUDController<DeptTransactionLog> implements ServerEventInterface{
@@ -63,6 +62,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         depTranForTrans= new DepTranForTrans();
         depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
         depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
+
     }
     @Override
     protected void init(){
@@ -178,8 +178,15 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                 ts.setHours(Double.valueOf(hm1.get("hours").toString()));
             }
             if(hm1.get("date")!=null) {
-                String strDate=hm1.get("date").toString();
-                Date date= TimeUtils.convertStrToDate(strDate);
+                Date date=null;
+                String strDate=(String)hm1.get("date");
+               if( strDate.length()>11)
+                 date = TimeUtils.getTimeOnGMT(strDate);
+               else{
+                   date= TimeUtils.convertStrToDate(strDate);
+               }
+
+
                 ts.setDate(date);
             }
             if(hm1.get("remark")!=null) {
@@ -205,6 +212,15 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         selected.setCategory(tmCategory);
         transactionService.localUpdateTransaction(selected);
         WebUtil.addSuccessMessage("更新成功");
+    }
+
+    public void locUpdateTransactionbyLink(){
+        TransactionForm tf = new TransactionForm();
+        tf.setCategory(selected.getCategory());
+        tf.setRemark(selected.getRemark());
+        tf.setHours(selected.getHours());
+        tf.setDate(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
+        transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
     }
 
     public void createTransaction(){
