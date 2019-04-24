@@ -15,7 +15,7 @@
 
                     <h:panelGroup >
                         <label class="label">事务名称*</label>
-                        <p:selectOneMenu  value="#{depTranDetailController.tmCategory}"  autoWidth="false" style="max-width: 150px;" height="200">
+                        <p:selectOneMenu  value="#{depTranDetailController.tmCategory}" required="true"  autoWidth="false" style="max-width: 150px;" height="200">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('transaction')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
