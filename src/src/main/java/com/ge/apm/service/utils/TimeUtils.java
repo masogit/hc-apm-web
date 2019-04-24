@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,7 +114,18 @@ public class TimeUtils {
         return strTo;
     }
 
+    public static Date getTimeOnGMT(String strDate){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        strDate=sdf.format(TimeUtils.convertStrToDateOnHHMM(strDate));
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+:08:00")); // 设置北京时区
+        Date date=null;
+        try {
+            date = sdf.parse(strDate);
+        }catch(Exception ex){
 
+        }
+        return date;
+    }
 
     /*input:2019-12-30T16:00:00.000+0000
     output Date format: 2019-12-30*/
@@ -128,9 +140,17 @@ public class TimeUtils {
         }
         return date;
     }
-
-
-
+    public static Date convertStrToDateOnHHMM(String strDate){
+        strDate=strDate.replace(".000+0000","");
+        strDate=strDate.replace("T"," ");
+        Date date=null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(strDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 
 
     //返回指定月的最后一天的日期 格式为:YYYYMMDDHHMMSS
