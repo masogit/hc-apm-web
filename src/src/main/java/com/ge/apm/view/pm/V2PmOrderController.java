@@ -1631,29 +1631,40 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void prepareEditAccDetail(String itemId) throws Exception{
-
+        Object eval;
         if ("new".equals(itemId)) {
             switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-
             itemDetail.setWoId(selectedPmOrder.getId());
-
-            Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-            //gaolei
-            if(eval!=null){
-                itemDetail.setPartsType(eval.toString());
-            }
-
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             supplierName = null;
+            if(!UserContextService.isInsulate()){
+                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                if(eval==null){
+                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
+                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                    if(eval==null){
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        if(eval==null){
+                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
+                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        }
+                    }
+                }
+            }else{
+                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                itemDetail.setPartsType(eval.toString());
+            }
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
             supplierName = itemDetail.getSupplier();
         }
-
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
         nochange=false;
     }
