@@ -58,22 +58,29 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     DepTranForTrans depTranForTrans;
 
 
+
+    @Override
+    protected void init(){
+        depTranForTrans= new DepTranForTrans();
+        transactionService = WebUtil.getBean(TransactionService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        authorId=userContextService.getLoginUser().getId();
+        deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
+
+    }
+    public String titleNameDetail(){
+        if(userContextService.isOnlyAssetStaff()){
+            return "科务详情";
+        }else{
+            return "详情";
+        }
+    }
     public void searchRanageSet(){
         depTranForTrans= new DepTranForTrans();
         depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
         depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
 
     }
-    @Override
-    protected void init(){
-        depTranForTrans= new DepTranForTrans();
-    transactionService = WebUtil.getBean(TransactionService.class);
-    userContextService = WebUtil.getBean(UserContextService.class);
-    authorId=userContextService.getLoginUser().getId();
-        deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
-
-}
-
     public void prepareEdit() {
         tmCategory=selected.getCategory();
         startTime=selected.getDate();
@@ -184,11 +191,11 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             if(hm1.get("date")!=null) {
                 Date date=null;
                 String strDate=(String)hm1.get("date");
-               if( strDate.length()>11)
-                 date = TimeUtils.getTimeOnGMT(strDate);
-               else{
-                   date= TimeUtils.convertStrToDate(strDate);
-               }
+                if( strDate.length()>11)
+                    date = TimeUtils.getTimeOnGMT(strDate);
+                else{
+                    date= TimeUtils.convertStrToDate(strDate);
+                }
 
 
                 ts.setDate(date);
@@ -236,7 +243,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setDate(date);
         transactionService.createTmByLink(tf, UserContextService.getAccessToken());
         WebUtil.addSuccessMessage("成功创建科务记录");
-      // refreshLoadData(userContextService.getLoginUserId());
+        // refreshLoadData(userContextService.getLoginUserId());
         cancel();
         deptTransactionLog= new DeptTransactionLog();
     }
