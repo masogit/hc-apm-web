@@ -47,7 +47,7 @@ public class ExportToBeTerminatedAppraisalServiceTest {
 
         doReturn(datas).when(service).getData(any());
 
-        StreamedContent export = service.export(new ArrayList<>(), IOUtils.toByteArray(new FileInputStream("C:\\Users\\212688574\\Documents\\My Received Files\\1.docx")));
+        StreamedContent export = service.export(new ArrayList<>(), IOUtils.toByteArray(new FileInputStream("d:\\1.docx")));
         FileUtils.writeByteArrayToFile(new File("d:\\test.docx"), IOUtils.toByteArray(export.getStream()));
     }
 
