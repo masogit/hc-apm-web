@@ -5,12 +5,15 @@
  */
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -25,6 +28,7 @@ import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -60,6 +64,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+    public CustomConfigService customConfigService;
     //选定科室过滤
     @Setter @Getter
     private String filterClinicalDeptOrg;
@@ -81,10 +86,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmOrderRuleCheckList pmCheckItem;
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
+    private CustomConfigObject currentCustomConfig;
     @Setter @Getter
     private Boolean nochange = false;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
+    @Getter @Setter
+    Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
     @Getter @Setter
@@ -183,14 +191,52 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
-
         supplierName = itemDetail.getSupplier();
         nochange = true;
 
     }
 
+    public void saveItem(){
+        if (!accessoryList.contains(itemDetail)) {
+            //合同价格"默认等于"预估单价
+            if(itemDetail.getClosedPrice()==null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
+            accessoryList.add(itemDetail);
+            //调用微服务来存附件
+            serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
+        }
+    }
+
+    public String xx2(String itemId){
+       if("new".equals(itemId)){
+           return "is";
+
+       }else{
+           return "no";
+       }
+    }
+    public void saveAndadd(){
+        //照旧原来的添加一个备件
+        saveItem();
+        V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
+        try {
+            BeanUtils.copyProperties(vwd,itemDetail);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        // clear 备件名称 备件数量  预估价格
+        vwd.setParts(null);
+        vwd.setApartsQuantity(null);
+        vwd.setPartsPrice(null);
+        itemDetail= vwd;
+        accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
+
+    }
     public void prepareCancel(String itemId) {
         cancelReason = null;
         selected = dao.findById(itemId);
@@ -800,9 +846,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
         //保存保养清单中的数据
         saveCheckItemData();
-
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
+
+        String strPriority = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+        String requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]").toString();
+        currentStatus= Integer.valueOf(strAssetStatus);
+        newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
+        newServiceRequest.setStatus(currentStatus);
+        if(requestReason.isEmpty()){
+            newServiceRequest.setRequestReason("设备故障");
+        }else{
+            newServiceRequest.setRequestReason(requestReason);
+        }
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -875,6 +932,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
+        customConfigService=WebUtil.getBean(CustomConfigService.class);
+        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+
         token = UserContextService.getAccessToken();
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
@@ -1569,21 +1629,52 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
     }
 
+
     public void prepareEditAccDetail(String itemId) throws Exception{
+        Object eval;
         if ("new".equals(itemId)) {
+            switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-
             itemDetail.setWoId(selectedPmOrder.getId());
-
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             supplierName = null;
+            if(!UserContextService.isInsulate()){
+                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                if(eval==null){
+                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
+                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                    if(eval==null){
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        if(eval==null){
+                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
+                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                            if(eval!=null){
+                                itemDetail.setPartsType(eval.toString());
+                            }
+
+                        }else{
+                            itemDetail.setPartsType(eval.toString());
+                        }
+                    }else{
+                        itemDetail.setPartsType(eval.toString());
+                    }
+                }else{
+                    itemDetail.setPartsType(eval.toString());
+                }
+            }else{
+                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                itemDetail.setPartsType(eval.toString());
+            }
         } else {
+            switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
             supplierName = itemDetail.getSupplier();
         }
-
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
         nochange=false;
     }
@@ -1615,19 +1706,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void addAcessItem() {
-        if (!accessoryList.contains(itemDetail)) {
-            //合同价格"默认等于"预估单价
-            if(itemDetail.getClosedPrice()==null) {
-                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-            }
-
-            itemDetail.setArrivedGoodReturn(false);
-            itemDetail.setArrivedGood(false);
-            accessoryList.add(itemDetail);
-        }
-        //调用微服务来添加备件
-        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetUid(),itemDetail);
-
+        saveItem();
     }
 
     public List<TableDefinition> getTablesName(V2_PmOrder v2) {

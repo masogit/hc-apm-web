@@ -71,6 +71,7 @@
                                         <p:treeNode type="org">
                                             <h:outputText value="#{node.name}"/>
                                         </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
                                     </p:tree>
                                 </p:scrollPanel>
                             </p:overlayPanel>
@@ -86,6 +87,7 @@
                                         <p:treeNode type="org">
                                             <h:outputText value="#{node.name}"/>
                                         </p:treeNode>
+										<p:treeNode type="hidden" rendered="false"/>
                                     </p:tree>
                                 </p:scrollPanel>
                             </p:overlayPanel>
@@ -105,7 +107,7 @@
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
                                  rowStyleClass="#{item.warrantyAlertStatus}"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"  
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -120,7 +122,7 @@
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -642,9 +644,6 @@
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
-                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray batch-terminated" title="批量报废" actionListener="#{assetInfoListController.batchProcessToTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
-                                    <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
-                                </p:commandButton>
                             </ui:fragment>
 
                         </f:facet>
@@ -769,6 +768,7 @@
                                     <p:treeNode type="org">
                                             <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
                             </p:tree>
                     </p:scrollPanel>
             </p:overlayPanel>

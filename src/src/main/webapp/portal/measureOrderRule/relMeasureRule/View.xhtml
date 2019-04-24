@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="RelRuleAssetViewDlg" widgetVar="RelRuleAssetViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{relRuleAssetManagerController.CRUDActionName} #{msg.RelRuleAsset}">
+            <h:form id="RelRuleAssetViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{relRuleAssetManagerController.selected != null}">
+                        <h:outputLabel value="#{msg.id}" for="id" />
+                        <h:outputText value="#{relRuleAssetManagerController.selected.id}"/>
+                        <h:outputLabel value="#{msg.ruleUID}" for="ruleUID" />
+                        <h:outputText value="#{relRuleAssetManagerController.selected.ruleUID}"/>
+                        <h:outputLabel value="#{msg.assetUID}" for="assetUID" />
+                        <h:outputText value="#{relRuleAssetManagerController.selected.assetUID}"/>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{relRuleAssetManagerController.deleteAction}" icon="ui-icon-trash" actionListener="#{relRuleAssetManagerController.delete}" value="#{msg.Delete}" update="display,:RelRuleAssetViewDlg, :RelRuleAssetListForm:datalist, :growl" oncomplete="handleSubmit(args, 'RelRuleAssetViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('RelRuleAssetViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

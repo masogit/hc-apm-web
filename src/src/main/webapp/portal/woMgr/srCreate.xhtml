@@ -52,7 +52,7 @@
                             <p:inputTextarea placeholder="设备故障" value="#{workOrderMgrController.faultReason}" maxlength="256" />
                             <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestReason}" />
                         </h:panelGroup>
-                        <h:panelGroup id="assetstatus">
+                        <h:panelGroup id="assetstatus"><!--当前状态-->
                             <label class="label">#{msg.status}</label>
                             <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />

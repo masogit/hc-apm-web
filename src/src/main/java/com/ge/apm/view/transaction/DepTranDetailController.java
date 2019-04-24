@@ -22,10 +22,9 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 @ManagedBean
 @ViewScoped
 public class DepTranDetailController extends JpaCRUDController<DeptTransactionLog> implements ServerEventInterface{
@@ -59,21 +58,31 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     DepTranForTrans depTranForTrans;
 
 
+
+    @Override
+    protected void init(){
+        depTranForTrans= new DepTranForTrans();
+        transactionService = WebUtil.getBean(TransactionService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        authorId=userContextService.getLoginUser().getId();
+        deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
+
+    }
+    public String titleNameDetail(){
+        if(userContextService.isOnlyAssetStaff()){
+            return "科务详情";
+        }else{
+            return "详情";
+        }
+    }
+    private boolean search=false;
     public void searchRanageSet(){
         depTranForTrans= new DepTranForTrans();
         depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
         depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
+        search=true;
+
     }
-    @Override
-    protected void init(){
-        depTranForTrans= new DepTranForTrans();
-    transactionService = WebUtil.getBean(TransactionService.class);
-    userContextService = WebUtil.getBean(UserContextService.class);
-    authorId=userContextService.getLoginUser().getId();
-        deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
-
-}
-
     public void prepareEdit() {
         tmCategory=selected.getCategory();
         startTime=selected.getDate();
@@ -91,11 +100,21 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
         if(isSummarySelected){
             depTranForTrans.setUserId(transactionStatis.getAuthorId());
+            depTranForTrans.setStartTime(transactionStatis.getStartTime());
+            depTranForTrans.setEndTime(transactionStatis.getEndTime());
+            deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
+            isSummarySelected=false;
         }else{
+            if(search){
+                depTranForTrans.setUserId(transactionStatis.getAuthorId());
+                deptTranLogList=refreshLoadData(depTranForTrans);
+                search=false;
+            }else{
+                depTranForTrans.setUserId(userContextService.getLoginUserId());
+                deptTranLogList=refreshLoadData(depTranForTrans);
+            }
 
-            depTranForTrans.setUserId(userContextService.getLoginUserId());
         }
-        deptTranLogList=refreshLoadData(depTranForTrans);
         page = new PageImpl(deptTranLogList,pageRequest,totalSize);
         return page;
     }
@@ -123,9 +142,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     public List<DeptTransactionLog> refreshLoadData(DepTranForTrans dep){
         if(startTime==null){
             dep.setStartTime(TimeUtils.getCurrentStartYYMM());
+        }else{
+            dep.setStartTime(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
         }
         if(endTime==null){
             dep.setEndTime(TimeUtils.getCurrentEndYYMM());
+        }else{
+            dep.setEndTime(TimeUtils.getStrYHMS(endTime,"YYYYMMDDHHMMSS"));
         }
         HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(dep,UserContextService.getAccessToken());
         totalSize = (Integer)trListByPerson.get("rowCount");
@@ -133,6 +156,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         return deptTranLogList;
     }
 
+
+    public List<DeptTransactionLog> refreshLoadDataForSelectedItem(DepTranForTrans dep){
+        HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(dep,UserContextService.getAccessToken());
+        totalSize = (Integer)trListByPerson.get("rowCount");
+        deptTranLogList= decomposeTransactionLog(trListByPerson);
+        return deptTranLogList;
+    }
 
     public void onselectDetailItem(){
         //    System.out.println(selected);
@@ -168,8 +198,15 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                 ts.setHours(Double.valueOf(hm1.get("hours").toString()));
             }
             if(hm1.get("date")!=null) {
-                String strDate=hm1.get("date").toString();
-                Date date= TimeUtils.convertStrToDate(strDate);
+                Date date=null;
+                String strDate=(String)hm1.get("date");
+                if( strDate.length()>11)
+                    date = TimeUtils.getTimeOnGMT(strDate);
+                else{
+                    date= TimeUtils.convertStrToDate(strDate);
+                }
+
+
                 ts.setDate(date);
             }
             if(hm1.get("remark")!=null) {
@@ -197,6 +234,15 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         WebUtil.addSuccessMessage("更新成功");
     }
 
+    public void locUpdateTransactionbyLink(){
+        TransactionForm tf = new TransactionForm();
+        tf.setCategory(tmCategory);
+        tf.setRemark(remark);
+        tf.setHours(hours);
+        tf.setDate(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
+        transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
+    }
+
     public void createTransaction(){
         TransactionForm tf = new TransactionForm();
         tf.setCategory(tmCategory);
@@ -206,7 +252,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setDate(date);
         transactionService.createTmByLink(tf, UserContextService.getAccessToken());
         WebUtil.addSuccessMessage("成功创建科务记录");
-      // refreshLoadData(userContextService.getLoginUserId());
+        // refreshLoadData(userContextService.getLoginUserId());
         cancel();
         deptTransactionLog= new DeptTransactionLog();
     }

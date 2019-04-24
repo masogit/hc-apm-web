@@ -188,6 +188,9 @@
                 <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
                 <prop key="hibernate.jdbc.fetch_size">300</prop>
 
+                <!--# query plan cache -->
+                <prop key="hibernate.query.plan_cache_max_size">256</prop>
+
                 <!--# logging debug information-->
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">true</prop>

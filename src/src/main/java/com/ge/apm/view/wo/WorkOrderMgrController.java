@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+
+    @Setter @Getter
+    private Supplier newSupplier;
+    @Setter@Getter
+    Boolean switchTmp=false;
     @Setter@Getter
     private Boolean nochange=false;
     private UserAccount ua1;
@@ -146,9 +152,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public String faultReason;
     public CustomConfigService customConfigService;
-
+    private CustomConfigObject currentCustomConfig;
+    private CustomConfigService ccService;
+    private CustomConfig customConfig;
+    private TenantInfo tenantInfo;
     protected void init() {
+
+        ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
+        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
@@ -168,6 +180,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        tenantInfo= userContextService.getTenantInfo();
+        customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -397,12 +412,12 @@ public void repairResultSet(){
     private Boolean isRating;
 
     public List<String> autoCompleteSupplier(String query) {
+        supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
         List<String> sList = new ArrayList<String>();
         suList.forEach(item -> sList.add(item.getName()));
         return sList;
     }
-
 
     public Boolean needRating() {
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
@@ -1105,10 +1120,21 @@ public void repairResultSet(){
         //从配置信息获取当前状态
         String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
-        currentStatus= Integer.valueOf(strAssetStatus);
+        newServiceRequest = new V2_ServiceRequest();
+        Object requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+
+
+        if(requestReason==null){
+            newServiceRequest.setRequestReason("设备故障");
+        }else{
+            newServiceRequest.setRequestReason(requestReason.toString());
+        }
+
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
+        currentStatus= Integer.valueOf(strAssetStatus);
+        newServiceRequest.setStatus(currentStatus);
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -1163,10 +1189,21 @@ public void repairResultSet(){
         onSelectedAsset(asset);
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
-            currentStatus = 3;
+
+        if(customConfig ==null){
+            if (currentStatus == 1) {
+                currentStatus = 3;
+            }
+            needConfirmTime = false;
+        }else{ //如果有自定义配置
+            String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+            currentStatus= Integer.valueOf(strAssetStatus);
+            if(currentStatus==3) //限制功能使用
+                 needConfirmTime=false;
+            if(currentStatus==2)//停机
+                needConfirmTime=true;
         }
-        needConfirmTime = false;
+
 
         if (this.newServiceRequest == null) {
             return;
@@ -1182,11 +1219,18 @@ public void repairResultSet(){
         if (selectedAsset == null && selected == null) {
             return;
         }
-        if (null != selectedAsset) {//new sr
+        if(currentStatus==2){ //选择停机状态
+             needConfirmTime=true;
+        }
+        if(currentStatus==3){//选择 限制功能使用
+            needConfirmTime=false;
+        }
+
+        /*if (null != selectedAsset) {//by hai bin gan
             needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
         } else {//update sr
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
-        }
+        }*/
     }
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
@@ -1204,21 +1248,52 @@ public void repairResultSet(){
     }
 
     public void prepareEditAccDetail(String itemId) {
+        Object eval;
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
+            switchTmp=true;
+                    if(!UserContextService.isInsulate()){
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        if(eval==null){
+                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
+                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                            if(eval==null){
+                                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
+                                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                                if(eval==null){
+                                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
+                                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                                    if(eval!=null){
+                                        itemDetail.setPartsType(eval.toString());
+                                    }
 
+                                }else{
+                                    itemDetail.setPartsType(eval.toString());
+                                }
+                            }else{
+                                itemDetail.setPartsType(eval.toString());
+                            }
+                        }else{
+                            itemDetail.setPartsType(eval.toString());
+                        }
+                    }else{//不是隔离
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        itemDetail.setPartsType(eval.toString());
+                    }
         } else {
+            switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
             supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;
     }
-
 
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
@@ -1275,19 +1350,40 @@ public void repairResultSet(){
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
+    public void saveAndadd(){
+        //照旧原来的添加一个备件
+        saveItem();
+        V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
+        try {
+            BeanUtils.copyProperties(vwd,itemDetail);;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        // clear 备件名称 备件数量  预估价格
+        vwd.setParts(null);
+        vwd.setApartsQuantity(null);
+        vwd.setPartsPrice(null);
+        itemDetail= vwd;
+        accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
-    public void addAcessItem() {
+    }
+
+    public void saveItem(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
-           if(itemDetail.getClosedPrice()==null) {
-               itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-           }
-           itemDetail.setArrivedGood(false);
-           itemDetail.setArrivedGoodReturn(false);
+            if(itemDetail.getClosedPrice()==null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
-           //调用微服务来存附件
+            //调用微服务来存附件
             serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
+    }
+    public void addAcessItem() {
+        saveItem();
         cancelWorkdetail();
     }
     public void updateAccessPrice(){
@@ -1785,6 +1881,7 @@ public void repairResultSet(){
             itemDetail.setSupplier(supplier.getName());
     }
 
+
     public Boolean getNochange() {
         return nochange;
     }
@@ -1809,6 +1906,10 @@ public void repairResultSet(){
         }
     }
 
+    public void prepareCreateSupplier() {
+        newSupplier = new Supplier();
+    }
+
     public String getFaultReason() {
         return faultReason;
     }
@@ -1819,6 +1920,14 @@ public void repairResultSet(){
 
     public void setAcker(List<UserAccount> acker) {
         this.acker = acker;
+    }
+
+    public Supplier getNewSupplier() {
+        return newSupplier;
+    }
+
+    public void setNewSupplier(Supplier newSupplier) {
+        this.newSupplier = newSupplier;
     }
 }
 

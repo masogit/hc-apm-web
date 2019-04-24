@@ -7,7 +7,10 @@ import org.primefaces.model.LazyDataModel;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Entity
 @Data
@@ -41,14 +44,12 @@ public class DeptTransactionLog implements Serializable {
     private Double hours;
 
     @Basic(optional = false)
-    @NotNull
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
 
     @Basic(optional = false)
-    @NotNull
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -122,21 +123,19 @@ public class DeptTransactionLog implements Serializable {
         this.uid = uid;
     }
 
-    @NotNull
     public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(@NotNull Date startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    @NotNull
     public Date getEndTime() {
         return endTime;
     }
     
-    public void setEndTime(@NotNull Date endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
@@ -220,6 +219,15 @@ public class DeptTransactionLog implements Serializable {
         this.hours = hours;
     }
 
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -236,5 +244,10 @@ public class DeptTransactionLog implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.ge.apm.domain.DeptTransactionLog[ id=" + id + " ]";
     }
 }
