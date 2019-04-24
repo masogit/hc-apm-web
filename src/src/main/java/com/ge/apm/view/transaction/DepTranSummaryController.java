@@ -207,5 +207,12 @@ public Integer getCurrentMonth(){
         callingController.onServerEvent("callingFromDepTranSummaryController", this.transactionStatis);
 
     }
+    public String titleNameSummary(){
+        if(userContextService.isOnlyAssetStaff()){
+            return "课务记录";
+        }else{
+            return "课务详情";
+        }
+    }
 
 }

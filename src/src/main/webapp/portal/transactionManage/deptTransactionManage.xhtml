@@ -65,7 +65,7 @@
                     <h:panelGroup id="x1id" class="x1" rendered="true">
                         <div class="ui-g-12">
                             <p:tabView rendered="true" class="ui-g-12 x2" id="tranTabView" dynamic="false" cache="false" activeIndex="#{depTranSummaryController.queryTab}" binding="#{depTranSummaryController.tabView}">
-                                <p:tab    class="ui-g-12" title="科务详情">
+                                <p:tab    class="ui-g-12" title="#{depTranSummaryController.titleNameSummary()}">
                                     <ui:include src="depTranlogDetailList.xhtml"/>
                                 </p:tab>
 
