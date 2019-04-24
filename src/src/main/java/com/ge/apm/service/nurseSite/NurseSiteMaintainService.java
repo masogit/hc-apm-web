@@ -116,12 +116,12 @@ public class NurseSiteMaintainService {
 	private static final String STR_SEQUENCE = "班次";
 	private static final String STR_MODIFIED_BY = "负责人";
 	private static final String STR_SIGNATURE = "签名";
-	private static final String STR_NURSESITEREPORT = "护士站日常维护报表";
-	
+	private static final String STR_NURSESITEREPORT = "临床助手日常检查报表";
+
 	private Map<String,UserAccount> mapUserAccount=new HashMap<String,UserAccount>();
 	private Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
-	
-	
+
+
 	public void init(){
 		mapUserAccount.clear();
 		mapAssetInfo.clear();
@@ -190,11 +190,11 @@ public class NurseSiteMaintainService {
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId) {
 		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId);
 	}
-	
+
 	public List<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId,int pageSize, int page) {
 		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId,pageSize,page);
 	}
-	
+
 	public int findCountMaintainItemByParentId(String parentId) {
 		Integer result=nurseSiteMaintainItemRepository.findCountMaintainItemByParentId(parentId);
 		if(result==null){
@@ -227,7 +227,7 @@ public class NurseSiteMaintainService {
 			nurseSiteMaintainItemRepository.save(listItem);
 		}
 	}
-	
+
 	public void saveMaintainItem(List<NurseSiteMaintainItem> obj) {
 		nurseSiteMaintainItemRepository.save(obj);
 	}
@@ -340,7 +340,7 @@ public class NurseSiteMaintainService {
 		}
 		return false;
 	}
-	
+
 	public void deleteAssetUid(String assetUid){
 		if(StringUtils.isNotEmpty(assetUid)){
 			Boolean result=nurseSiteMaintainConfigItemRepository.findExistsAssetUid(assetUid);
@@ -508,7 +508,7 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
-	
+
 	private void supplementMaintainItemWithOut(List<NurseSiteMaintainItem> listItem) {
 		Set<String> setItemIds = new HashSet<String>();
 		Map<String, List<NurseSiteMaintainData>> mapData = new HashMap<String, List<NurseSiteMaintainData>>();
@@ -561,7 +561,7 @@ public class NurseSiteMaintainService {
 		}
 		return null;
 	}
-	
+
 	private UserAccount getUserAccount(String uid){
 		UserAccount tempUser=null;
 		tempUser=mapUserAccount.get(uid);
@@ -1021,7 +1021,7 @@ public class NurseSiteMaintainService {
 		save(tempNurseSiteMaintain);
 		return true;
 	}
-	
+
 	public boolean completeMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
@@ -1049,7 +1049,7 @@ public class NurseSiteMaintainService {
 		save(tempNurseSiteMaintain);
 		return true;
 	}
-	
+
 	@Transactional
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain) {
 		save(tempNurseSiteMaintain);

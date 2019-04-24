@@ -193,6 +193,8 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "approver_name")
     private String approverName;
 
+    @Column(name="attributes")
+    private String attributes;
     @Column(name = "signature")
     private String signature;
 
@@ -560,6 +562,14 @@ public class V2_WorkOrder implements Serializable {
 
     public void setApproverName(String approverName) {
         this.approverName = approverName;
+    }
+
+    public String getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(String attributes) {
+        this.attributes = attributes;
     }
 
     public String getSignature() {

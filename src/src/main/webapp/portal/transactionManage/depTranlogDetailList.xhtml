@@ -11,7 +11,7 @@
     <div class="ui-g-12 card" >
 
         <h:form id="trDetailFormNew">
-            <p:fieldset legend="详情">
+            <p:fieldset legend="#{depTranDetailController.titleNameDetail()}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">开始时间*</label>
@@ -31,7 +31,7 @@
                               rowKey="#{item2.id}"
                                paginatorPosition="both" sortBy="#{item2.id}" paginatorAlwaysVisible="true" paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,30,40">
                      <p:ajax event="rowSelect" update="@(.delBtn) @(.btnEdit)" listener="#{depTranDetailController.onselectDetailItem()}"/>
-                    <p:column headerText="创建人">
+                    <p:column headerText="姓名">
                         <h:outputText value="#{item2.authorName}"/>
                     </p:column>
                      <p:column headerText="日期">
@@ -45,7 +45,7 @@
                      </p:column>
                      <p:column headerText="工时">
                          <h:outputText value="#{item2.hours}">
-                             <f:convertNumber pattern="0.00" minFractionDigits="2"></f:convertNumber>
+                             <f:convertNumber pattern="0.0" minFractionDigits="1"></f:convertNumber>
                          </h:outputText>
                      </p:column>
                      <p:column headerText="备注">

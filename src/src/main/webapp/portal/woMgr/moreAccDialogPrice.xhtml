@@ -42,12 +42,14 @@
                         <label class="label">开票时间</label>
                         <p:calendar timeZone="GMT+8" label="开票时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">供应商</label>
                         <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300" forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
                         </p:autoComplete>
+
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">合同价格(元)*</label>
@@ -97,6 +99,7 @@
                 </h:panelGroup>
             </h:panelGroup>
         </h:form>
+
     </p:dialog>
     
     <p:dialog id="moreAccDialogViewDlg" class="moreAccDialogViewDlg" widgetVar="moreAccDialogViewDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件查看">

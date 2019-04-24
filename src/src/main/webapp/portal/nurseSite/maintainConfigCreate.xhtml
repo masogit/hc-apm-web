@@ -5,7 +5,7 @@
 
 
 <ui:composition>
-	<p:dialog id="maintainConfigCreateDlg" widgetVar="maintainConfigCreateDialog" header="日常维护设置" height="600" width="1000" appendTo="@(body)">
+	<p:dialog id="maintainConfigCreateDlg" widgetVar="maintainConfigCreateDialog" header="日常检查设置" height="600" width="1000" appendTo="@(body)">
 		<h:form id="maintainConfigCreateForm" rendered="#{maintainConfigController.selected!=null}">
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 				<h:panelGroup>
@@ -39,7 +39,7 @@
 			</p:panelGrid>
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" id="idTypeGroup">
 				<h:panelGroup>
-					<label class="label">维护类型*</label>
+					<label class="label">检查类型*</label>
 					<p:selectOneRadio value="#{maintainConfigController.selected.type}" required="true" requiredMessage="保养报告类型不能为空" layout="responsive" columns="1">
 						<p:ajax event="change" update=":maintainConfigCreateForm:idTypeGroup" process="@this"></p:ajax>
 						<f:selectItem itemLabel="每天" itemValue="1" />
@@ -48,12 +48,12 @@
 					</p:selectOneRadio>
 				</h:panelGroup>
 				<h:panelGroup id="typeValueId1" rendered="#{maintainConfigController.selected.type==1}">
-					<label class="label">维护频率(次)</label>
-					<p:inputText value="#{maintainConfigController.perDayCount}" required="true" requiredMessage="维护频率(次)不能为空"></p:inputText>
+					<label class="label">检查频率(次)</label>
+					<p:inputText value="#{maintainConfigController.perDayCount}" required="true" requiredMessage="检查频率(次)不能为空"></p:inputText>
 				</h:panelGroup>
 				<h:panelGroup id="typeValueId2" rendered="#{maintainConfigController.selected.type==2}">
-					<label class="label">维护频率</label>
-					<p:selectManyMenu value="#{maintainConfigController.listWeekDay}" var="t" required="true" requiredMessage="维护频率不能为空" showCheckbox="true">
+					<label class="label">检查频率</label>
+					<p:selectManyMenu value="#{maintainConfigController.listWeekDay}" var="t" required="true" requiredMessage="检查频率不能为空" showCheckbox="true">
 						<f:selectItems value="#{maintainConfigController.checkListWeekDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 						<p:column>
 							<h:outputText value="#{t==2?'星期一':t==3?'星期二':t==4?'星期三':t==5?'星期四':t==6?'星期五':t==7?'星期六':t==1?'星期日':''}" />
@@ -61,8 +61,8 @@
 					</p:selectManyMenu>
 				</h:panelGroup>
 				<h:panelGroup id="typeValueId3" rendered="#{maintainConfigController.selected.type==3}">
-					<label class="label">维护频率</label>
-					<p:selectManyMenu value="#{maintainConfigController.listMonthDay}" var="t" required="true" requiredMessage="维护频率不能为空" filter="true"
+					<label class="label">检查频率</label>
+					<p:selectManyMenu value="#{maintainConfigController.listMonthDay}" var="t" required="true" requiredMessage="检查频率不能为空" filter="true"
 						filterMatchMode="contains" showCheckbox="true">
 						<f:selectItems value="#{maintainConfigController.checkListMonthDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 						<p:column>

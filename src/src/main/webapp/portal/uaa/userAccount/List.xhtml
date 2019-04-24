@@ -9,6 +9,8 @@
 			icon="fa fa-angle-down" iconPos="right" />
 		<p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false" appendTo="@form">
 			<p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:inputText class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree) @(.treeNodeNameFilter)" actionListener="#{userAccountController.filterTreeNode()}" value="检索"/>
 				<p:tree id="orgTree" class="orgTree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}"
 					var="node" selectionMode="single">
 					<p:ajax process="@this" event="select" update=":userAccountTab:UserAccountListForm" listener="#{userAccountController.onSelectTreeNode}"
@@ -19,6 +21,7 @@
 					<p:treeNode type="org">
 						<h:outputText value="#{node.shortName}" />
 					</p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
 				</p:tree>
 			</p:scrollPanel>
 		</p:overlayPanel>
@@ -82,23 +85,23 @@
 				<p:commandButton id="viewButton" rendered="false" icon="ui-icon-remove-red-eye" title="#{msg.View}" actionListener="#{userAccountController.prepareView}"
 					update=":userAccountTab:UserAccountViewDlg" oncomplete="PF('UserAccountViewDialog').show()" disabled="#{empty userAccountController.selected}" />
 				<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{userAccountController.prepareEdit}"
-					update=":userAccountTab:UserAccountEditDlg" process="@this" oncomplete="PF('UserAccountEditDialog').show()"
+					update=":userAccountTab:UserAccountEditDlg" oncomplete="PF('UserAccountEditDialog').show()"
 					disabled="#{empty userAccountController.selected}" />
-				<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{userAccountController.deleteSelectedUser}"
+				<p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{userAccountController.deleteSelectedUser}"
 					update="datalist" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 				</p:commandButton>
-				<p:commandButton id="roleButton" icon="ui-icon-people" process="@this" title="#{msg.AssignRole}" actionListener="#{userAccountController.prepareRoleData}"
+				<p:commandButton id="roleButton" icon="ui-icon-people" title="#{msg.AssignRole}" actionListener="#{userAccountController.prepareRoleData}"
 					update=":userAccountTab:RoleEditDlg" oncomplete="PF('RoleEditDialog').show()" disabled="#{empty userAccountController.selected}" />
-				<p:commandButton id="resetPassButton" icon="ui-icon-repeat" process="@this" title="#{msg.resetPassword}"
+				<p:commandButton id="resetPassButton" icon="ui-icon-repeat" title="#{msg.resetPassword}"
 					actionListener="#{userAccountController.resetPassword}" update="datalist :growl" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert" />
 				</p:commandButton>
-				<p:commandButton rendered="false" id="lockButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.lockAccount}"
+				<p:commandButton rendered="false" id="lockButton" icon="ui-icon-lock-outline" title="#{msg.lockAccount}"
 					actionListener="#{userAccountController.lockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.lockAccount}" message="#{msg.lockAccountConfirm}" icon="ui-icon-alert" />
 				</p:commandButton>
-				<p:commandButton rendered="false" id="unlockButton" icon="ui-icon-lock-open" process="@this" title="#{msg.unlockAccount}"
+				<p:commandButton rendered="false" id="unlockButton" icon="ui-icon-lock-open" title="#{msg.unlockAccount}"
 					actionListener="#{userAccountController.unlockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.unlockAccount}" message="#{msg.unlockAccountConfirm}" icon="ui-icon-alert" />
 				</p:commandButton>

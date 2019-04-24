@@ -52,7 +52,7 @@
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
-            select count(assets.uid) from (
+            select count(distinct assets.uid) from (
                 select ai.id as asset_id,
                 ai.uid,
                 ai.asset_dept_uid,

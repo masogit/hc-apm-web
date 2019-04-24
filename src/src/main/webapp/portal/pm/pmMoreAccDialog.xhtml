@@ -47,6 +47,7 @@
                             <label class="label">开票时间</label>
                             <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">供应商</label>
                             <p:autoComplete id="vendor" dropdown="true" value="#{v2PmOrderController.supplierName}" scrollHeight="300"
@@ -55,6 +56,8 @@
                                 <p:ajax event="itemSelect" listener="#{v2PmOrderController.onSupplierChange()}"/>
                                 <p:ajax listener="#{v2PmOrderController.onSupplierChange()}" />
                             </p:autoComplete>
+                            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this" update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">合同号</label>
@@ -82,9 +85,6 @@
                             <label class="label">预计到达时间</label>
                             <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
-
-
-
                         <h:panelGroup>
                             <label class="label">申请时间</label>
                             <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
@@ -110,8 +110,13 @@
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:accessList  pmTab:pmrepairCompleteDialogForm:cmd1 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                         <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                     </h:panelGroup>
+
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.saveAndadd()}" rendered="#{v2PmOrderController.switchTmp}" value="保存新增" update="@(.pmmoreAccDialogFormCls) pmTab:pmrepairCompleteDialogForm:accessList  :growl" icon="ui-icon-check"/>
+
                 </h:panelGroup>
             </h:form>
+            <ui:include src="../woMgr/createSupplierAcc.xhtml" />
+
         </p:dialog>
 
     </ui:composition>

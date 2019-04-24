@@ -27,6 +27,7 @@ public class TableItem{
     private Map<String, String> props;
     private List<TableOption> options;
     private Map<String, String> exp;
+    private Integer decimalLength =3;
 
     public String getKey() {
         return key;
@@ -91,5 +92,14 @@ public class TableItem{
     public void setExp(Map<String, String> exp) {
         this.exp = exp;
     }
+
+    public Integer getDecimalLength() {
+        return decimalLength;
+    }
+
+    public void setDecimalLength(Integer decimalLength) {
+        this.decimalLength = decimalLength;
+    }
+    
     
 }

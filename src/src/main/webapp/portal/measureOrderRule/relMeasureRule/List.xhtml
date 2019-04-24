@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="#{msg.assetRuleManager}"/>
+            	</div>
+            	
+            <div class="ui-g-12 card">
+         	<h:form id="searchForm">
+                <h:panelGrid id="searchPanel" columns="2" >
+                    <p:inputText id="searchText" value="#{measureRuleConfigController.queryCondition}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
+                        <p:ajax  update=":RelRuleAssetListForm :searchForm" />
+                    </p:inputText>
+
+                    <h:panelGroup id='searchButtons'>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":RelRuleAssetListForm :searchForm"  rendered="#{empty measureRuleConfigController.queryCondition}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":RelRuleAssetListForm :searchForm" actionListener="#{measureRuleConfigController.setOneSearchStr()}" rendered="#{not empty measureRuleConfigController.queryCondition}"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
+            	
+            <h:form id="RelRuleAssetListForm">
+                <p:dataTable id="datalist" value="#{measureRuleConfigController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{measureRuleConfigController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,50,100,500">
+
+                     <p:ajax event="rowSelect" update="editButton"/>
+                    <!--  <p:ajax event="filter" listener="#{measureRuleConfigController.onFilter}" update="createButton editButton viewButton deleteButton"/>
+                 <p:column headerText="规则名称" sortBy="" filterBy="" filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getRuleName(item.id)}"/>
+                    </p:column> -->
+                    <p:column headerText="资产名称"  filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getAssetName(item.assetUID)}"/>
+                    </p:column>
+                    <!-- <p:column headerText="一级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    		<h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID1))}"/>
+                    		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID1)}"/>
+                    </p:column> -->
+                    <p:column headerText="二级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID2)}"/>
+                    		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID2))}"/> -->
+                    </p:column>
+                    <p:column headerText="三级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID)}"/>
+                    		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID))}"/> -->
+                    </p:column>
+                    <p:column headerText="#{msg.departNum}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getDepartNum(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetGroup}"  filterMatchMode="LIKE">
+                    	<h:outputText value="#{fieldMsg.fieldValue('assetGroup',measureRuleConfigController.getAssetGroup(item.assetUID))}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.clinicalDeptName}" filterMatchMode="EQ">
+                        <h:outputText value="#{measureRuleConfigController.getClinicalDeptName(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.nationalStandardCode}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getNationalStandardCode(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.makerShortName}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getBrand(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.manufacture}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{measureRuleConfigController.getManufacture(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="配置日期"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                     </p:column>
+                     <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterMatchMode="LIKE">
+                     	<h:outputText value="#{measureRuleConfigController.getQrCode(item.assetUID)}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                    	<!-- <p:link href="./../pmOrderRule/RelRuleAsset.xhtml"  title="批量设置规则" style="color:black;">批量设置规则</p:link>
+                    	<a href="./../pmOrderRule/RelRuleAsset.xhtml"  target="_Blank" title="批量设置规则">批量设置规则</a> -->
+                    	<p:commandButton id="batch" action="/portal/measureOrderRule/RelMeasureRule.xhtml?faces-redirect=true" icon="ui-icon-settings"
+                    	class="btn btn-sm btn-gray"  title="批量设置计量规则" rendered="true"/>
+                    	<p:commandButton id="generatePmOrders" action="/portal/measureOrderRule/GenerateMeasureOrders.xhtml?faces-redirect=true" icon="ui-icon-collections"
+                    	class="btn btn-sm btn-gray"  title="批量生成计量工单" rendered="false"/>
+                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
+                        </p:commandButton>
+
+                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
+
+                        <!--<p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
+                        <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
+                        <p:commandButton render="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
+                        <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>-->
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+				</div>
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>
