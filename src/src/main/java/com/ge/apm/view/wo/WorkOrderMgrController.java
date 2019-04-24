@@ -1198,7 +1198,10 @@ public void repairResultSet(){
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            needConfirmTime=true;
+            if(currentStatus==3) //限制功能使用
+                 needConfirmTime=false;
+            if(currentStatus==2)//停机
+                needConfirmTime=true;
         }
 
 
@@ -1216,11 +1219,18 @@ public void repairResultSet(){
         if (selectedAsset == null && selected == null) {
             return;
         }
-        if (null != selectedAsset) {//new sr
+        if(currentStatus==2){ //选择停机状态
+             needConfirmTime=true;
+        }
+        if(currentStatus==3){//选择 限制功能使用
+            needConfirmTime=false;
+        }
+
+        /*if (null != selectedAsset) {//by hai bin gan
             needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
         } else {//update sr
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
-        }
+        }*/
     }
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
