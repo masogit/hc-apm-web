@@ -1639,6 +1639,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setWoId(selectedPmOrder.getId());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
+            selectedObjectMap  = new HashMap();
             supplierName = null;
             if(!UserContextService.isInsulate()){
                 currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
