@@ -1255,6 +1255,7 @@ public void repairResultSet(){
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
+            selectedObjectMap = new HashMap();
             switchTmp=true;
                     if(!UserContextService.isInsulate()){
                         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
