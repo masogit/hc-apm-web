@@ -652,8 +652,17 @@ public class MaintainController implements ServerEventInterface {
 			endBatchDate = new Date();
 		}
 		Date currentDate = new Date();
-		List<NurseSiteMaintain> listNewNurseSiteMaintain = new ArrayList<NurseSiteMaintain>();
-		if (listMaintainData != null && listMaintainData.size() > 0) {
+		List<NurseSiteMaintain> listNewNurseSiteMaintain = null;
+		if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
+			listNewNurseSiteMaintain = findDefaultMaintain(startBatchDate, endBatchDate);
+		} else {
+			List<String> listUidTemp = new ArrayList<String>();
+			for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
+				listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
+			}
+			listNewNurseSiteMaintain = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, startBatchDate, endBatchDate);
+		}
+		if (listNewNurseSiteMaintain != null && listNewNurseSiteMaintain.size() > 0) {
 			String signatureId = null;
 			if (StringUtils.isNotEmpty(signatureContent)) {
 				signatureId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
@@ -661,22 +670,13 @@ public class MaintainController implements ServerEventInterface {
 			if (signatureId == null) {
 				signatureId = "";
 			}
-			for (int i = 0; i < listMaintainData.size(); ++i) {
-				NurseSiteMaintain tempMaintain = listMaintainData.get(i);
-				Date tempDate = tempMaintain.getScheduleDate();
-				if (tempDate.getTime() >= startBatchDate.getTime() && tempDate.getTime() <= endBatchDate.getTime() && tempMaintain.getStatus() == 0) {
-					listNewNurseSiteMaintain.add(tempMaintain);
-				}
-			}
-			if (listNewNurseSiteMaintain.size() > 0) {
-				nurseSiteMaintainService.completeMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
-				if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
-					nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(), signatureId + ",");
-				} else {
-					for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-						nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
-								signatureId + "," + listCheckClinicalOrgInfo.get(i).getUid());
-					}
+			nurseSiteMaintainService.completeMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
+				nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(), signatureId + ",");
+			} else {
+				for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
+					nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
+							signatureId + "," + listCheckClinicalOrgInfo.get(i).getUid());
 				}
 			}
 			addMessage("工单后台完成中，请稍候刷新页面查看。");
