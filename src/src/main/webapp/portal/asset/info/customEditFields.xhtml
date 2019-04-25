@@ -238,7 +238,7 @@
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'vendor')}" >
-        <h:panelGroup>
+        <h:panelGroup><!--供应商 下拉-->
             <label class="label">#{msg.vendor}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['vendor'].required? '*':''}</span></label>
 
             <p:autoComplete id="vendor" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
