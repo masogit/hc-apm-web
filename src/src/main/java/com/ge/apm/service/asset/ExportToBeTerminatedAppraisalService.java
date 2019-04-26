@@ -173,4 +173,9 @@ public class ExportToBeTerminatedAppraisalService {
         }
     }
 
+    public boolean existsSiteTemplate(String siteUid) {
+        List list = templateRepository.findBySiteUID(siteUid);
+        return list != null && !list.isEmpty();
+    }
+
 }
