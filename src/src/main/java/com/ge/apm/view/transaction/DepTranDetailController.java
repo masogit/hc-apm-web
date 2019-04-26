@@ -28,6 +28,9 @@ import java.util.*;
 @ManagedBean
 @ViewScoped
 public class DepTranDetailController extends JpaCRUDController<DeptTransactionLog> implements ServerEventInterface{
+
+    @Getter @Setter
+    private Date upStartTime;
     @Getter @Setter
     Double hours;
     @Getter @Setter
@@ -85,7 +88,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     }
     public void prepareEdit() {
         tmCategory=selected.getCategory();
-        startTime=selected.getDate();
+        upStartTime=selected.getDate();
         hours= selected.getHours();
         remark=selected.getRemark();
 
@@ -105,13 +108,30 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
             isSummarySelected=false;
         }else{
-            if(search){
-                depTranForTrans.setUserId(transactionStatis.getAuthorId());
-                deptTranLogList=refreshLoadData(depTranForTrans);
-                search=false;
-            }else{
-                depTranForTrans.setUserId(userContextService.getLoginUserId());
-                deptTranLogList=refreshLoadData(depTranForTrans);
+            if(search && transactionStatis!=null){
+                if(transactionStatis!=null){
+                    depTranForTrans.setUserId(transactionStatis.getAuthorId());
+                    deptTranLogList=refreshLoadData(depTranForTrans);
+                    search=false;
+                }else{ //根据指定时间来查询
+                    depTranForTrans.setUserId(userContextService.getLoginUserId());
+                    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
+                    depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
+                }
+
+            }else{  //修改数据后保刷新 分有搜寻时间 和无搜寻时间
+if(startTime ==null){
+    depTranForTrans.setUserId(userContextService.getLoginUserId());
+    depTranForTrans.setStartTime(TimeUtils.getCurrentStartYYMM());
+    depTranForTrans.setStartTime(TimeUtils.getCurrentEndYYMM());
+    deptTranLogList=refreshLoadData(depTranForTrans);
+}else{
+    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
+    depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
+    depTranForTrans.setUserId(userContextService.getLoginUserId());
+    deptTranLogList=refreshLoadData(depTranForTrans);
+}
+
             }
 
         }
@@ -221,6 +241,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     public void prepareCreate(){
         remark=null;
         startTime=null;
+        upStartTime=null;
         hours=null;
         tmCategory=null;
 
@@ -239,7 +260,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setCategory(tmCategory);
         tf.setRemark(remark);
         tf.setHours(hours);
-        tf.setDate(TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS"));
+        tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
         transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
     }
 
@@ -248,7 +269,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setCategory(tmCategory);
         tf.setRemark(remark);
         tf.setHours(hours);
-        String date= TimeUtils.getStrYHMS(startTime,"YYYYMMDDHHMMSS");
+        String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
         transactionService.createTmByLink(tf, UserContextService.getAccessToken());
         WebUtil.addSuccessMessage("成功创建科务记录");

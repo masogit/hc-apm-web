@@ -98,7 +98,6 @@ public class StaffApi {
           .build())
 
         .build());
-
   }
 
   public Observable<Tuple11<Integer, String, Integer, Double, Integer, Integer, Integer, Integer, Integer, Integer, Integer>> mergeQueryData(
