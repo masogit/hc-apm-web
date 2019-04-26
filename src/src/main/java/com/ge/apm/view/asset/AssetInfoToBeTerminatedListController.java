@@ -1,7 +1,13 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -33,7 +39,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -41,7 +46,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
@@ -120,11 +124,10 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private Boolean isInsulate;
 
     private UploadedFile uploadedFile;
-    private BlobFileService blobFileService;
-    private V2_BlobObject uploadedFileObject;
-    private AssetTerminationReportTemplateRepository assetTerminationReportTemplateRepository;
 
     private String terminationCause;
+
+    private List<Map<String, Object>> batchUpdateAssets;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -137,7 +140,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
-        blobFileService = WebUtil.getBean(BlobFileService.class);
 
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -149,11 +151,10 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
-        assetTerminationReportTemplateRepository = WebUtil.getBean(AssetTerminationReportTemplateRepository.class);
 
         this.filterBySite = false;
-        this.selectedMap = new HashMap();
-        this.selectedObject = new HashMap();
+        this.selectedMap = new HashMap<>();
+        this.selectedObject = new HashMap<>();
         loadCustomConfig();
         loadClinicalDeptList();
 
@@ -176,20 +177,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
-        addMisingClinicalDeptOrg(currentPageAssets);
+        addMissingClinicalDeptOrg(currentPageAssets);
 
         return res;
-    }
-
-
-    public StreamedContent getActiveTemplate() {
-        try {
-            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
-            return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
-        } catch (IOException e) {
-            WebUtil.addErrorMessage("Fail to download template");
-        }
-        return null;
     }
 
     public void exportToBeTerminatedAppraisalFile() {
@@ -221,40 +211,18 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         try {
             this.uploadedFile = event.getFile();
             String fileName = uploadedFile.getFileName();
-            if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
-                throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
+            if (!StringUtils.endsWithIgnoreCase(fileName, ".xlsx")) {
+                uploadedFile = null;
+                throw new IllegalStateException("Invalid file type: " + fileName);
             }
-            uploadedFileObject = blobFileService.uploadFile(uploadedFile);
 
-            OrgInfo selectedUserOrg = orgDao.getByUid(user.getSiteUID());
-            List<AssetTerminationReportTemplate> templates = assetTerminationReportTemplateRepository.findBySiteUID(user.getSiteUID());
-            AssetTerminationReportTemplate template;
-            if(templates.isEmpty()) {
-                template = new AssetTerminationReportTemplate();
-            } else {
-                template = templates.get(0);
-            }
-            template.setTenantUID(selectedUserOrg.getTenantUID());
-            template.setInstitutionUID(selectedUserOrg.getInstitutionUID());
-            template.setHospitalUID(selectedUserOrg.getHospitalUID());
-            template.setSiteUID(selectedUserOrg.getSiteUID());
-            template.setCreateTime(new Date());
-            template.setCreatorId(user.getUid());
-            template.setCreatorName(user.getName());
-            template.setFileName(uploadedFile.getFileName());
-            template.setStorageId(uploadedFileObject.getObjectStorageId());
-            assetTerminationReportTemplateRepository.save(template);
+            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream());
 
-            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
-            uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
-            uploadedFileObject.setBoUuid(template.getId());
-            blobFileService.saveBlobObject(uploadedFileObject);
-
-            logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
     }
+
 
     public void preEdit() {
         List<Map.Entry<String, Boolean>> selectedEntries = selectedMap.entrySet().stream().filter(i -> i.getValue()).collect(Collectors.toList());
@@ -267,7 +235,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
 
-    private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
+    private void addMissingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
@@ -416,7 +384,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         }
     }
 
-    public void onSelectAsset() throws IOException {
+    public void onSelectAsset() {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
                 + "&asset_name=" + selected.getName();
