@@ -241,6 +241,7 @@ if(startTime ==null){
     public void prepareCreate(){
         remark=null;
         startTime=null;
+        upStartTime=null;
         hours=null;
         tmCategory=null;
 
