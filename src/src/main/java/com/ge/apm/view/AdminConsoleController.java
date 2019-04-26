@@ -10,8 +10,8 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ge.apm.domain.TenantInfoConfig;
 import com.ge.apm.service.uaa.AdminConsoleService;
+import com.ge.apm.service.uaa.TenantInfoConfigService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ public class AdminConsoleController {
     private String versionName;
 	@Getter
 	@Setter
-	private TenantInfoConfig tenantConfig;
+	private TenantInfoConfigService tenantConfigService;
 	@Getter
 	@Setter
 	private List<String> versionLabelKey;
@@ -42,7 +42,8 @@ public class AdminConsoleController {
 	@PostConstruct
 	public void init() {
 		// TODO Auto-generated method stub
-		tenantConfig=TenantInfoConfig.build();
+		tenantConfigService=WebUtil.getBean(TenantInfoConfigService.class);
+		tenantConfigService.init();
 		formatVersionInfo();
 		adminConsoleService=WebUtil.getBean(AdminConsoleService.class);
 	}
@@ -102,8 +103,8 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 	private void formatVersionInfo(){
-		List<String> listKey=tenantConfig.getListKey();
-		List<String> listLabel=tenantConfig.getListLabel();
+		List<String> listKey=tenantConfigService.getListKey();
+		List<String> listLabel=tenantConfigService.getListLabel();
 		versionLabelKey=new ArrayList<String>();
 		for(int i=0;i<listKey.size();++i){
 			versionLabelKey.add(listLabel.get(i)+","+listKey.get(i));
