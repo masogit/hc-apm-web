@@ -4,7 +4,6 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-
 	<p:dialog id="SiteInfoEditVersionDlg" widgetVar="SiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息"
 		width="700px" height="600px;">
 		<p:ajax event="close" update=":SiteInfoListForm:datalist" />
@@ -12,16 +11,16 @@
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 				<h:panelGroup>
 					<label class="label">版本</label>
-					<p:selectOneMenu value="#{tenantInfoController.tenantConfig.edition}">
+					<p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}">
 						<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
 						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 					</p:selectOneMenu>
 				</h:panelGroup>
 			</p:panelGrid>
 			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
-				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfig.root}" selection="#{tenantInfoController.tenantConfig.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
-					<p:ajax event="select" listener="#{tenantInfoController.tenantConfig.onSelectTenantConfig}" process="@this"/>
-                    <p:ajax event="unselect" listener="#{tenantInfoController.tenantConfig.onUnSelectTenantConfig}" process="@this"/>
+				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfigService.root}" selection="#{tenantInfoController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
+					<p:ajax event="select" listener="#{tenantInfoController.tenantConfigService.onSelectTenantConfig}" process="@this"/>
+                    <p:ajax event="unselect" listener="#{tenantInfoController.tenantConfigService.onUnSelectTenantConfig}" process="@this"/>
 					<p:treeNode type="tenantConfigTree">
                         <h:outputText value="#{item.label}"/>
                     </p:treeNode>

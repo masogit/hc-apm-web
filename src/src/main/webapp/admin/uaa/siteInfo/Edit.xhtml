@@ -75,7 +75,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">版本</label>
-                            <p:selectOneMenu value="#{tenantInfoController.tenantConfig.edition}" >
+                            <p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}" >
                                 <p:ajax listener="#{tenantInfoController.onVersionChange}" update="idCreateTemplateBt"></p:ajax>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
