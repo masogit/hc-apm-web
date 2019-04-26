@@ -8,9 +8,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.primefaces.model.StreamedContent;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
@@ -49,6 +47,12 @@ public class ExportToBeTerminatedAppraisalServiceTest {
 
         StreamedContent export = service.export(new ArrayList<>(), IOUtils.toByteArray(new FileInputStream("d:\\1.docx")));
         FileUtils.writeByteArrayToFile(new File("d:\\test.docx"), IOUtils.toByteArray(export.getStream()));
+    }
+
+
+    @Test
+    public void testGetAssets() throws Exception {
+        service.getAssetInfo(new FileInputStream("d:\\APM_Asset_Template.xlsx"));
     }
 
 }
