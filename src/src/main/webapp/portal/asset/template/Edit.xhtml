@@ -7,7 +7,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="WoExportTemplateEditDlg" widgetVar="WoExportTemplateEditDialog"
+    <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDialog"
               onHide="#{toBeTerminatedTemplateController.onSelect()}" width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
               header="#{toBeTerminatedTemplateController.CRUDActionName} #{msg.AssetTerminationReportTemplate}配置">
@@ -38,11 +38,11 @@
                 <br/>
                 <p:commandButton validateClient="false"
                                  actionListener="#{toBeTerminatedTemplateController.applyChange()}" value="#{msg.Save}"
-                                 update="display,:WoExportTemplateEditDlg, :WoExportTemplateListForm:datalist, :growl"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'WoExportTemplateEditDialog');"/>
+                                 update="display,:TemplateEditDlg, :TemplateListForm:datalist, :growl"
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'TemplateEditDialog');"/>
                 &nbsp;&nbsp;
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                 onclick="PF('WoExportTemplateEditDialog').hide()"/>
+                                 onclick="PF('TemplateEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
     </p:dialog>
