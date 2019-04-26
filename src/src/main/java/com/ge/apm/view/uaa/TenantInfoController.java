@@ -13,11 +13,8 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -32,8 +29,8 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.TenantInfoConfig;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import lombok.Getter;
@@ -48,12 +45,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	TenantInfoRepository dao = null;
 	UserAccountRepository userAccountRepository;
 	UserAccount loginUser;
-	TenantInfoConfig tenantConfig;
+	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
 	TableDefinitionRepository tbDao;
 	boolean tempAlready = false;
 	String type = "";
-
 	@Getter
 	@Setter
 	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版'
@@ -69,11 +65,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	protected void init() {
-
 		filterBySite = false;
 		loginUser = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(TenantInfoRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		tenantConfigService = WebUtil.getBean(TenantInfoConfigService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
 	}
@@ -135,7 +131,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		super.prepareCreate();
-		tenantConfig = TenantInfoConfig.build();
+		tenantConfigService.init();
 		this.type = type;
 	}
 
@@ -152,7 +148,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type = type;
-		if (this.tenantConfig.getEdition().equalsIgnoreCase(TenantInfoConfig.VERSION_COMMON)) {
+		if (tenantConfigService.getEdition().equalsIgnoreCase(TenantInfoConfigService.VERSION_COMMON)) {
 			isGeneralVersion = true;
 			tempAlready = true;
 		} else {
@@ -173,7 +169,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				return;
 			}
 		}
-		this.selected.setTenantConfig(tenantConfig.getJSONStr());
+		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		super.save();
 	}
 
@@ -186,7 +182,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
 			return;
 		} else {
-			if (this.tenantConfig.getEdition().contains(TenantInfoConfig.VERSION_COMMON)) {
+			if (tenantConfigService.getEdition().contains(TenantInfoConfigService.VERSION_COMMON)) {
 				// 加载模版文件
 				loadTemplateFile();
 				// 将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be
@@ -282,10 +278,10 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 		orgDao.save(org);
 
-		String config = tenantConfig.getJSONStr();
+		String config = tenantConfigService.getJSONStr();
 		// 如果是通用版 则要增加模版配置
 
-		if (config.contains(TenantInfoConfig.VERSION_COMMON)) {
+		if (config.contains(TenantInfoConfigService.VERSION_COMMON)) {
 			List<TableDefinition> tbList = new ArrayList<TableDefinition>();
 			// 加载模版文件
 			loadTemplateFile();
@@ -370,7 +366,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public boolean isGeneralVersion;
 
 	public void onVersionChange() {
-		if (this.tenantConfig.getEdition().equalsIgnoreCase(TenantInfoConfig.VERSION_COMMON)) {
+		if (tenantConfigService.getEdition().equalsIgnoreCase(TenantInfoConfigService.VERSION_COMMON)) {
 			disableCreateTemplateBt = false;
 		} else {
 			disableCreateTemplateBt = true;
@@ -379,17 +375,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void parseTenantConfig() {
 		String configJsonStr = this.selected.getTenantConfig();
-		tenantConfig = TenantInfoConfig.parseStr(configJsonStr);
+		tenantConfigService.parseStr(configJsonStr);
 	}
-
-	public TenantInfoConfig getTenantConfig() {
-		return tenantConfig;
-	}
-
-	public void setTenantConfig(TenantInfoConfig tenantConfig) {
-		this.tenantConfig = tenantConfig;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -397,4 +384,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void setType(String type) {
 		this.type = type;
 	}
+
+	public TenantInfoConfigService getTenantConfigService() {
+		return tenantConfigService;
+	}
+
+	public void setTenantConfigService(TenantInfoConfigService tenantConfigService) {
+		this.tenantConfigService = tenantConfigService;
+	}
+
+	
 }
