@@ -1365,6 +1365,8 @@ public void repairResultSet(){
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
+        vwd.setClosedPrice(null);
+
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
