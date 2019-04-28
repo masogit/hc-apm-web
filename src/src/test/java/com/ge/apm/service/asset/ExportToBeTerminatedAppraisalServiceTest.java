@@ -52,7 +52,7 @@ public class ExportToBeTerminatedAppraisalServiceTest {
 
     @Test
     public void testGetAssets() throws Exception {
-        service.getAssetInfo(new FileInputStream("d:\\APM_Asset_Template.xlsx"));
+        service.getAssetInfo(new FileInputStream("d:\\APM_Asset_Template.xlsx"), null);
     }
 
 }

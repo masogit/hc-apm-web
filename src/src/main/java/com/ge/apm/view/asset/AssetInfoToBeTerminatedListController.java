@@ -127,7 +127,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private String terminationCause;
 
-    private List<Map<String, Object>> batchUpdateAssets;
+    private List<AssetInfo> batchUpdateAssets;
+
+    private UaaService uuaService;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -151,6 +153,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
+        uuaService = WebUtil.getBean(UaaService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
@@ -216,11 +219,25 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 throw new IllegalStateException("Invalid file type: " + fileName);
             }
 
-            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream());
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String tenantUid = currentUserAccount.getTenantUID();
+            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid);
 
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
+    }
+
+    public void batchUpdate() {
+        List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
+        Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
+
+        batchUpdateAssets.removeIf(i -> !(siteUids.contains(i.getSiteUID()) && i.getStatus() == 4));
+
+        batchUpdateAssets.forEach(i -> terminateAsset(i));
+
+        batchUpdateAssets.clear();
+        uploadedFile = null;
     }
 
 
@@ -471,28 +488,33 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
             String assetUid = entry.getKey();
             AssetInfo assetInfo = dao.getByUid(assetUid);
-            if (assetInfo == null) {
-                continue;
-            }
-
-            int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
-            if (workOrdersNum > 0) {
-                WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
-                continue;
-            }
-
-            if (aiMgrService.isInDispenceCenter(assetInfo)) {
-                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
-                continue;
-            }
-
-            assetInfo.setStatus(4);
-            assetInfo.setIsValid(false);
-            assetInfo.setTerminateDate(new Date());
-            dao.save(assetInfo);
-            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+            terminateAsset(assetInfo);
         }
         this.selectedMap.clear();
+    }
+
+    public void terminateAsset(AssetInfo assetInfo) {
+        logger.info("Terminate: " + assetInfo.getUid());
+        if (assetInfo == null) {
+            return;
+        }
+
+        int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
+        if (workOrdersNum > 0) {
+            WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
+            return;
+        }
+
+        if (aiMgrService.isInDispenceCenter(assetInfo)) {
+            WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+            return;
+        }
+
+        assetInfo.setStatus(4);
+        assetInfo.setIsValid(false);
+        assetInfo.setTerminateDate(new Date());
+        dao.save(assetInfo);
+        aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
     }
 
 
