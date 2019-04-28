@@ -30,8 +30,8 @@
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
-                                 actionListener="#{assetInfoToBeTerminatedListController.applyChange()}" value="#{msg.Save}"
-                                 update="display,:woTab:TerminationByFileDlg, :growl"
+                                 actionListener="#{assetInfoToBeTerminatedListController.batchUpdate()}" value="#{msg.Save}"
+                                 update="display,:woTab:AssetInfoListForm1, :woTab:TerminationByFileDlg, :growl"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'TerminationByFileDlg');"/>
                 &nbsp;&nbsp;
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"

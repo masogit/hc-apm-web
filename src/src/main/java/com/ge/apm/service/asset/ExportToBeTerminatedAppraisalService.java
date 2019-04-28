@@ -31,46 +31,6 @@ import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSE
 @Component
 public class ExportToBeTerminatedAppraisalService {
 
-    public List<Map<String, Object>> getAssetInfo(InputStream inputstream) throws Exception {
-        ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
-        return getAssetMapFromTemplate(reader);
-    }
-
-
-    public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc) throws Exception {
-        List<Map<String, Object>> result = new ArrayList<>();
-        int dataRow = 1;
-
-        try {
-            for (Map<String, ExcelDocument.ValueWrapper> rowMap : doc) {
-                Map<String, Object> map = new LinkedHashMap<>();
-
-                AssetInfo asset = new AssetInfo();
-                asset.setLineNum(dataRow++);
-
-                String funNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-                if (org.springframework.util.StringUtils.isEmpty(funNum)) {
-                    break; //return if go beyond the valid cell range
-                }
-
-                AssetRow assetRow = new AssetRow(asset, rowMap);
-                assetRow.setFieldStringValue("设备名称", "setName", false);
-                assetRow.setFieldStringValue("资产编号", "setFinancingNum", true);
-                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName", true);
-                assetRow.setFieldStringValue("制造商序列号", "setSerialNum", true);
-
-                map.put("asset", asset);
-                map.put("status", AssetFileImportBaseService.ImportStatus.Exist);
-                map.put("rowData", rowMap);
-
-                result.add(map);
-            }
-        } catch (Exception e) {
-            throw new Exception("第" + dataRow + "行数据错误:" + e.getMessage());
-        }
-        return result;
-    }
-
     protected enum ASSET_DETAIL {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
         maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date
@@ -84,6 +44,35 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private BlobFileService blobService;
+
+    public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid) throws Exception {
+        ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
+        return getAssetMapFromTemplate(reader, tenantUid);
+    }
+
+    public List<AssetInfo> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc, String tenantUid) throws Exception {
+        List<AssetInfo> result = new ArrayList<>();
+        int dataRow = 1;
+
+        try {
+            for (Map<String, ExcelDocument.ValueWrapper> rowMap : doc) {
+                AssetInfo asset = new AssetInfo();
+                asset.setLineNum(dataRow++);
+
+                String funNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+                if (org.springframework.util.StringUtils.isEmpty(funNum)) {
+                    //end of file
+                    break;
+                }
+
+                result.addAll(assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid));
+            }
+
+        } catch (Exception e) {
+            throw new Exception("第" + dataRow + "行数据错误:" + e.getMessage());
+        }
+        return result;
+    }
 
     public StreamedContent export(List<String> selectedIds, byte[] templateBytes) {
         Map<String, Object> datas = getData(selectedIds);
