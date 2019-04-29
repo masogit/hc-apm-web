@@ -233,6 +233,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
+        vwd.setClosedPrice(null);
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
 
