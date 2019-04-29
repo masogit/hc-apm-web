@@ -211,14 +211,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    public String xx2(String itemId){
-       if("new".equals(itemId)){
-           return "is";
-
-       }else{
-           return "no";
-       }
-    }
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
@@ -233,6 +225,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
+        vwd.setClosedPrice(null);
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
 
@@ -1175,7 +1168,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*4+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
