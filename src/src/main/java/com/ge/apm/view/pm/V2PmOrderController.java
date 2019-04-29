@@ -211,14 +211,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    public String xx2(String itemId){
-       if("new".equals(itemId)){
-           return "is";
-
-       }else{
-           return "no";
-       }
-    }
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
