@@ -3,30 +3,51 @@ package com.ge.apm.service.nurseSite;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.service.asset.BlobFileService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WordReportExportServiceTest {
 
+    @Spy
     WordReportExportService service = new WordReportExportService();
+
+//    @Mock
+//    BlobFileService blobFileService;
+
+    @Before
+    public void setup() throws IOException {
+        FileInputStream inputStream = new FileInputStream("d:\\test.png");
+        StreamedContent content = new DefaultStreamedContent(inputStream);
+        byte[] bytes = IOUtils.toByteArray(content.getStream());
+        doReturn(bytes).when(service).getSignature(anyString());
+    }
+
 
     @Test
     public void testExport() throws IOException {
-
-
         HashMap<String, Object> datas = new HashMap<>();
         Map<Object, Object> tables = new TreeMap<>();
 
@@ -62,6 +83,8 @@ public class WordReportExportServiceTest {
         ArrayList<NurseSiteMaintainData> listData = new ArrayList<>();
         listData.add(mockNurseSiteMaintainData(1));
         listData.add(mockNurseSiteMaintainData(2));
+        item.setSignatureId("111");
+        item.setSignatureSourceType(1);
         item.setStatus(status);
         item.setListData(listData);
         return item;
