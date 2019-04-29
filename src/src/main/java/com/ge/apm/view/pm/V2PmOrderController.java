@@ -1175,7 +1175,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*4+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
