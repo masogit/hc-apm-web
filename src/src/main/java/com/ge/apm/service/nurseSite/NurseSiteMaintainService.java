@@ -35,6 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BatchJobRepository;
+import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainDataRepository;
@@ -45,6 +46,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.BatchJob;
+import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
@@ -104,6 +106,9 @@ public class NurseSiteMaintainService {
 
 	@Autowired
 	private UaaService uaaService;
+	
+	@Autowired
+	private CustomRoleRepository customRoleRepository;
 
 	private static final String STR_ASSET_NAME = "设备名";
 	private static final String STR_ASSET_DEPTNUM = "设备编号";
@@ -125,6 +130,10 @@ public class NurseSiteMaintainService {
 	public void init(){
 		mapUserAccount.clear();
 		mapAssetInfo.clear();
+	}
+	
+	public List<CustomRole> getCustomRole(Integer userId){
+		return customRoleRepository.findCustomRolesByUserId(userId);
 	}
 
 	public List<NurseSiteMaintainConfig> getMaintainConfigByOrgUids(List<String> orgUids) {

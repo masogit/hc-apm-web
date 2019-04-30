@@ -1816,3 +1816,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'examineMgt.pcc', '探头检测', 'examineMgt.pcc', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'examineMgt.pccConfig', '探头检测配置', 'examineMgt.pccConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'examineMgt.ssoImp', 'SSO用户导入', 'examineMgt.ssoImp', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintain', '日常检查', 'nurseSiteMaintain', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainConfig', '日常检查设置', 'nurseSiteMaintainConfig', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainExport', '日常检查报表', 'nurseSiteMaintainExport', NULL, '-1');

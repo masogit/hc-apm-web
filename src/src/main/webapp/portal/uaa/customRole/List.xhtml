@@ -36,10 +36,12 @@
                     <p:column headerText="权限" sortBy="#{item.authoritiesCH}" filterBy="#{item.authoritiesCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.authoritiesCH}"/>
                     </p:column>
+                    <p:column headerText="菜单项" sortBy="#{item.menusCH}" filterBy="#{item.menusCH}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.menusCH}"/>
+                    </p:column>
                     <p:column headerText="卡片" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.cardsCH}"/>
                     </p:column>
-
                     <f:facet name="{Toolbar}">
                        <!-- <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="CustomRole_export"/>
