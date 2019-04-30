@@ -16,27 +16,29 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
-import com.ge.apm.service.nurseSite.WordReportExportService;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.IAuthCtrl;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainExportController implements ServerEventInterface {
+public class MaintainExportController implements ServerEventInterface,IAuthCtrl {
     private static final Logger LOGGER = LoggerFactory.getLogger(MaintainExportController.class);
     private NurseSiteMaintainService nurseSiteMaintainService;
     private UserAccount currentUser;
@@ -53,7 +55,7 @@ public class MaintainExportController implements ServerEventInterface {
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
     private WordReportExportService wordReportExportService;
-
+    private List<CustomRole> listCustomRole;
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -67,6 +69,7 @@ public class MaintainExportController implements ServerEventInterface {
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
         loadUserParentOrgInfo();
+        listCustomRole=nurseSiteMaintainService.getCustomRole(currentUser.getId());
     }
 
     private void initValue() {
@@ -344,5 +347,17 @@ public class MaintainExportController implements ServerEventInterface {
             LOGGER.error(e.getMessage());
         }
     }
+
+	@Override
+	public List<CustomRole> getCustomRole() {
+		// TODO Auto-generated method stub
+		return listCustomRole;
+	}
+
+	@Override
+	public String getAuthKey() {
+		// TODO Auto-generated method stub
+		return "nurseSiteMaintainExport";
+	}
 
 }

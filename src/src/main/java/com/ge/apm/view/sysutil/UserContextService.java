@@ -36,7 +36,6 @@ public class UserContextService implements Serializable {
 //    private static final String MVS_FE="MVSFE";
 
     private TenantInfo tenant = null;
-
     private UserAccount userAccount = null;
 
     public static void setLoginUser(UserAccount user) {
@@ -156,11 +155,11 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
+    
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
     }
-    
     public TenantInfo getTenantInfo(){
         if(tenant!=null) return tenant;
         
@@ -169,21 +168,48 @@ public class UserContextService implements Serializable {
         return tenant;
     }
     
-    public boolean versionContains(String menuNameList){
+    public boolean accessContains(String menuName){
+    	return authContains(menuName)&&versionContains(menuName);
+    }
+    
+    private boolean authContains(String menuName){
     	UserAccount user = getLoginUser();
+    	CustomRoleRepository customRoleRepository=WebUtil.getBean(CustomRoleRepository.class);
+    	List<CustomRole> listCustomRole=customRoleRepository.findCustomRolesByUserId(user.getId());
+    	if(listCustomRole!=null && listCustomRole.size()>0){
+    		for(int i=0;i<listCustomRole.size();++i){
+    			CustomRole tempRole=listCustomRole.get(i);
+    			String menus=tempRole.getMenus();
+    			if(StringUtils.isNotEmpty(menus)){
+    				String [] menuArr=menus.split(",");
+    				for(int j=0;j<menuArr.length;++j){
+    					if(menuArr[j].equals(menuName)){
+    						return true;
+    					}
+    				}
+    			}
+    			else{
+    				return true;
+    			}
+    		}
+    	}
+    	else{
+    		return true;
+    	}
+    	return false;
+    }
+    
+    private boolean versionContains(String menuName){
     	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
     	if(StringUtils.isNotEmpty(configStr)){
     		try {
 				JSONObject jsonObj=JSONObject.parseObject(configStr);
 				JSONArray jsonArray=jsonObj.getJSONArray("menuList");
-				String[] menus=menuNameList.split(",");
-				for(String menuName:menus){
-					menuName=menuName.trim();
-					for(int i=0;i<jsonArray.size();++i){
-						if(jsonArray.getString(i).equals(menuName)){
-							return true;
-						}
+				menuName=menuName.trim();
+				for(int i=0;i<jsonArray.size();++i){
+					if(jsonArray.getString(i).equals(menuName)){
+						return true;
 					}
 				}
 				return false;
