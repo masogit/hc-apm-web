@@ -1816,6 +1816,18 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'examineMgt.pccConfig', '探头检测配置', 'examineMgt.pccConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'examineMgt.ssoImp', 'SSO用户导入', 'examineMgt.ssoImp', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'assetSearch', '设备查询', 'assetSearch', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'assetAlert', '设备报警', 'assetAlert', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'myRepair', '我的报修', 'myRepair', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'maintainPart', '保养备件审查', 'maintainPart', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'nurse', '临床助手', 'nurse', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'repair', '我的维修工单', 'repair', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'maintain', '我的保养工单', 'maintain', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'assetAdjust', '设备调剂', 'assetAdjust', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'deptMgt', '科务管理', 'deptMgt', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'mgr_inv', '盘点工单', 'mgr_inv', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCard', 'deptRepair', '科室报修', 'deptRepair', NULL, '-1');
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintain', '日常检查', 'nurseSiteMaintain', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainConfig', '日常检查设置', 'nurseSiteMaintainConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainExport', '日常检查报表', 'nurseSiteMaintainExport', NULL, '-1');

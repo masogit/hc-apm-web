@@ -93,6 +93,7 @@ public class CustomRoleService {
 	
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
 	private static final String MSG_TYPE_AUTH = "customRoleAuth";
+	private static final String MSG_TYPE_CARD = "wechatCard";
 	public List<I18nMessage> getMenusByTenant(String tenantUid){
 		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_VERSION);
 		TenantInfo tenant=tenantInfoRepository.findByuid(tenantUid);
@@ -110,6 +111,10 @@ public class CustomRoleService {
 		}
 		return listNew;
 	}
+	public List<I18nMessage> getCardsByTenant(String tenantUid){
+		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_CARD);
+		return list18;
+	}
 	
 	public JSONArray getAuth(){
 		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_AUTH);
@@ -118,7 +123,7 @@ public class CustomRoleService {
 			for(int i=0;i<list18.size();++i){
 				JSONObject auth=new JSONObject();
 				auth.put("k", list18.get(i).getMsgKey());
-				auth.put("t", list18.get(i).getMsgType());
+//				auth.put("t", list18.get(i).getMsgType());
 				auth.put("v", list18.get(i).getValue());
 				auth.put("a", false);
 				auth.put("m", false);
