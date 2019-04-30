@@ -47,6 +47,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	public static List<String> keyRoles = new ArrayList<>();
 	private CustomRoleService service;
 	private List<I18nMessage> listI18nMenus;
+	private List<I18nMessage> listI18nCards;
 	private JSONArray authJSONArr;
 	static {
 		keyRoles.add("院长");
@@ -72,6 +73,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		service = WebUtil.getBean(CustomRoleService.class);
 		listI18nMenus = service.getMenusByTenant(user.getTenantUID());
+		listI18nCards=service.getCardsByTenant(user.getTenantUID());
 		authJSONArr = service.getAuth();
 	}
 
@@ -124,6 +126,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			}
 			if (StringUtils.isNotEmpty(selected.getCards())) {
 				cards = selected.getCards().split(",");
+			}
+			else{
+				for (int i = 0; i < listI18nCards.size(); ++i) {
+					cards[i] = listI18nCards.get(i).getMsgKey();
+				}
 			}
 			if(StringUtils.isNotEmpty(selected.getJsonAuthorities())){
 				authJSONArr=JSONArray.parseArray(selected.getJsonAuthorities());
@@ -253,6 +260,9 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		for (int i = 0; i < listI18nMenus.size(); ++i) {
 			menus[i] = listI18nMenus.get(i).getMsgKey();
 		}
+		for (int i = 0; i < listI18nCards.size(); ++i) {
+			cards[i] = listI18nCards.get(i).getMsgKey();
+		}
 		authJSONArr=service.getAuth();
 	}
 
@@ -308,6 +318,14 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 
 	public void setAuthJSONArr(JSONArray authJSONArr) {
 		this.authJSONArr = authJSONArr;
+	}
+
+	public List<I18nMessage> getListI18nCards() {
+		return listI18nCards;
+	}
+
+	public void setListI18nCards(List<I18nMessage> listI18nCards) {
+		this.listI18nCards = listI18nCards;
 	}
 
 }

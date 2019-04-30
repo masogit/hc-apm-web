@@ -51,6 +51,15 @@
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
+				<p:fieldset id="cardConfig" legend="卡片配置">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4">
+								<f:selectItems value="#{customRoleController.listI18nCards}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							</p:selectManyCheckbox>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:fieldset>
 				<p:fieldset id="assetInventory" legend="盘点权限配置">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
@@ -59,12 +68,12 @@
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetInventoryAuthority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
-						<h:panelGroup>
+						<!-- <h:panelGroup>
 							<label class="label">卡片*</label>
 							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4">
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetInventoryCard')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
-						</h:panelGroup>
+						</h:panelGroup> -->
 					</p:panelGrid>
 
 				</p:fieldset>
