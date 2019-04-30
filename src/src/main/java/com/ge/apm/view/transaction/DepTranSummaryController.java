@@ -10,6 +10,7 @@ import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.tabview.TabView;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -129,7 +130,7 @@ public Integer getCurrentMonth(){
             HashMap<String,Object> hm1 = (HashMap<String,Object>)al1.get(i);
             TransactionStatis ts = new TransactionStatis();
             ts.setAuthorName(hm1.get("authorName").toString());
-
+            ts.setAuthorId((Integer)hm1.get("authorId"));
             if(hm1.get("count")!=null)
                 ts.setHours(Double.valueOf(hm1.get("count").toString()));
             else
@@ -194,8 +195,24 @@ public Integer getCurrentMonth(){
 
     public void onSelectSummary(ServerEventInterface callingController){
         this.callingController=callingController;
+        if(startTime!=null){
+            transactionStatis.setStartTime(TimeUtils.getInputStartDate(startTime));
+            transactionStatis.setEndTime(TimeUtils.getInputEndDate(startTime));
+        }else{
+            Integer month = getCurrentMonth();
+            transactionStatis.setStartTime(TimeUtils.getStartDateOnMonth(month));
+            transactionStatis.setEndTime(TimeUtils.getEndDateOnMonth(month));
+        }
+
         callingController.onServerEvent("callingFromDepTranSummaryController", this.transactionStatis);
 
+    }
+    public String titleNameSummary(){
+        if(userContextService.isOnlyAssetStaff()){
+            return "科务记录";
+        }else{
+            return "科务详情";
+        }
     }
 
 }
