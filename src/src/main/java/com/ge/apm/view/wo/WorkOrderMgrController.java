@@ -153,10 +153,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public String faultReason;
     public CustomConfigService customConfigService;
     private CustomConfigObject currentCustomConfig;
-
     private CustomConfigService ccService;
     private CustomConfig customConfig;
+    private TenantInfo tenantInfo;
     protected void init() {
+
         ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -180,7 +181,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-
+        tenantInfo= userContextService.getTenantInfo();
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1197,7 +1198,10 @@ public void repairResultSet(){
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            needConfirmTime=true;
+            if(currentStatus==3) //限制功能使用
+                 needConfirmTime=false;
+            if(currentStatus==2)//停机
+                needConfirmTime=true;
         }
 
 
@@ -1215,11 +1219,18 @@ public void repairResultSet(){
         if (selectedAsset == null && selected == null) {
             return;
         }
-        if (null != selectedAsset) {//new sr
+        if(currentStatus==2){ //选择停机状态
+             needConfirmTime=true;
+        }
+        if(currentStatus==3){//选择 限制功能使用
+            needConfirmTime=false;
+        }
+
+        /*if (null != selectedAsset) {//by hai bin gan
             needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
         } else {//update sr
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
-        }
+        }*/
     }
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
@@ -1237,21 +1248,45 @@ public void repairResultSet(){
     }
 
     public void prepareEditAccDetail(String itemId) {
+        Object eval;
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
+            selectedObjectMap = new HashMap();
             switchTmp=true;
+                    if(!UserContextService.isInsulate()){
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        if(eval==null){
+                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
+                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                            if(eval==null){
+                                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
+                                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                                if(eval==null){
+                                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
+                                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                                    if(eval!=null){
+                                        itemDetail.setPartsType(eval.toString());
+                                    }
 
-            Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-            //gaolei
-            if(eval!=null){
-                itemDetail.setPartsType(eval.toString());
-            }
-
-
+                                }else{
+                                    itemDetail.setPartsType(eval.toString());
+                                }
+                            }else{
+                                itemDetail.setPartsType(eval.toString());
+                            }
+                        }else{
+                            itemDetail.setPartsType(eval.toString());
+                        }
+                    }else{//不是隔离
+                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+                        itemDetail.setPartsType(eval.toString());
+                    }
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
@@ -1260,7 +1295,6 @@ public void repairResultSet(){
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;
     }
-
 
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
@@ -1331,6 +1365,8 @@ public void repairResultSet(){
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
+        vwd.setClosedPrice(null);
+
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
