@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainItem;
@@ -35,11 +36,12 @@ import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.IAuthCtrl;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainController implements ServerEventInterface {
+public class MaintainController implements ServerEventInterface,IAuthCtrl {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -78,7 +80,7 @@ public class MaintainController implements ServerEventInterface {
 	private List<String> orgUidList;
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
-
+	private List<CustomRole> listCustomRole;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -98,6 +100,7 @@ public class MaintainController implements ServerEventInterface {
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
+		listCustomRole=nurseSiteMaintainService.getCustomRole(currentUser.getId());
 	}
 
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
@@ -883,6 +886,18 @@ public class MaintainController implements ServerEventInterface {
 			listCheckClinicalOrgInfo.add(tempOrg);
 		}
 		onClinicalOrgInfoChange();
+	}
+
+	@Override
+	public List<CustomRole> getCustomRole() {
+		// TODO Auto-generated method stub
+		return listCustomRole;
+	}
+
+	@Override
+	public String getAuthKey() {
+		// TODO Auto-generated method stub
+		return "nurseSiteMaintain";
 	}
 
 }

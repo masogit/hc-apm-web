@@ -334,8 +334,7 @@ update sys_role set authorities = 'assetInventory.close,assetInventory.create,as
 --v19.4.1
 update asset_info set system_id = null where system_id is not null and trim(system_id) = '';
 
---v 19.4.1 hotfix
-ALTER TABLE public.nurse_site_maintain
-    ALTER COLUMN schedule_date TYPE date ;
-ALTER TABLE public.nurse_site_maintain_item
-    ALTER COLUMN schedule_date TYPE date ;
+--v 19.5.1
+ALTER TABLE public.custom_role ALTER COLUMN cards TYPE text;
+ALTER TABLE public.custom_role ALTER COLUMN authorities TYPE text;
+

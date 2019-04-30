@@ -33,7 +33,7 @@ public class TenantInfoConfigService {
 	public static final String VERSION_COMMON = "common";
 	public static final String VERSION_ULTRASOUND = "ultrasound";
 	public static final String TREE_TYPE = "tenantConfigTree";
-	public static final String MSG_TYPE = "tenantVersionMenu";
+	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
 	private List<TenantInfoConfigItem> menuList;
 	private TreeNode root;
