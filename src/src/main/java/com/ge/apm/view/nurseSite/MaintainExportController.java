@@ -22,7 +22,8 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ge.apm.domain.CustomRole;
+import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -33,12 +34,11 @@ import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.IAuthCtrl;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainExportController implements ServerEventInterface,IAuthCtrl {
+public class MaintainExportController implements ServerEventInterface{
     private static final Logger LOGGER = LoggerFactory.getLogger(MaintainExportController.class);
     private NurseSiteMaintainService nurseSiteMaintainService;
     private UserAccount currentUser;
@@ -55,7 +55,7 @@ public class MaintainExportController implements ServerEventInterface,IAuthCtrl 
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
     private WordReportExportService wordReportExportService;
-    private List<CustomRole> listCustomRole;
+    private CustomRoleAuth customRoleAuth;
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -69,7 +69,7 @@ public class MaintainExportController implements ServerEventInterface,IAuthCtrl 
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
         loadUserParentOrgInfo();
-        listCustomRole=nurseSiteMaintainService.getCustomRole(currentUser.getId());
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
     }
 
     private void initValue() {
@@ -330,7 +330,15 @@ public class MaintainExportController implements ServerEventInterface,IAuthCtrl 
         this.checkListParentOrgInfo = checkListParentOrgInfo;
     }
 
-    @Override
+    public CustomRoleAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
+	}
+
+	@Override
     public void onServerEvent(String eventName, Object eventObject) {
         // TODO Auto-generated method stub
         try {
@@ -347,17 +355,4 @@ public class MaintainExportController implements ServerEventInterface,IAuthCtrl 
             LOGGER.error(e.getMessage());
         }
     }
-
-	@Override
-	public List<CustomRole> getCustomRole() {
-		// TODO Auto-generated method stub
-		return listCustomRole;
-	}
-
-	@Override
-	public String getAuthKey() {
-		// TODO Auto-generated method stub
-		return "nurseSiteMaintainExport";
-	}
-
 }
