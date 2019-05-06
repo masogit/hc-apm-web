@@ -27,7 +27,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
@@ -86,7 +86,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private boolean isCreate=false;
   	private SearchController searchController;
   	private AssetSelectController assetSelectController;
-  	private CustomRoleAuth customRoleAuth;
+  	private UserAuth customRoleAuth;
 
     @Override
     protected void init() {
@@ -729,11 +729,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
 
-	public CustomRoleAuth getCustomRoleAuth() {
+	public UserAuth getCustomRoleAuth() {
 		return customRoleAuth;
 	}
 
-	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
 		this.customRoleAuth = customRoleAuth;
 	}
 
