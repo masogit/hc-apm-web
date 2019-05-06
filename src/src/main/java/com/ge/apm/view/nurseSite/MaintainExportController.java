@@ -22,7 +22,7 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.OrgInfo;
@@ -55,7 +55,7 @@ public class MaintainExportController implements ServerEventInterface{
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
     private WordReportExportService wordReportExportService;
-    private CustomRoleAuth customRoleAuth;
+    private UserAuth customRoleAuth;
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -330,11 +330,11 @@ public class MaintainExportController implements ServerEventInterface{
         this.checkListParentOrgInfo = checkListParentOrgInfo;
     }
 
-    public CustomRoleAuth getCustomRoleAuth() {
+    public UserAuth getCustomRoleAuth() {
 		return customRoleAuth;
 	}
 
-	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
 		this.customRoleAuth = customRoleAuth;
 	}
 

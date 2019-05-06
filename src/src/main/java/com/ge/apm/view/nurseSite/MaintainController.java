@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
@@ -80,7 +80,7 @@ public class MaintainController implements ServerEventInterface{
 	private List<String> orgUidList;
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
-	private CustomRoleAuth customRoleAuth;
+	private UserAuth customRoleAuth;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -873,11 +873,11 @@ public class MaintainController implements ServerEventInterface{
 		this.listCheckedNurseSiteMaintainConfig = listCheckedNurseSiteMaintainConfig;
 	}
 
-	public CustomRoleAuth getCustomRoleAuth() {
+	public UserAuth getCustomRoleAuth() {
 		return customRoleAuth;
 	}
 
-	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
 		this.customRoleAuth = customRoleAuth;
 	}
 

@@ -4,7 +4,7 @@ package com.ge.apm.domain;
  *
  * @author 503035627
  */
-public class CustomRoleAuth {
+public class UserAuth {
 	private String authKey;
 	private boolean authCreate=false;
 	private boolean authModify=false;

@@ -403,8 +403,8 @@ public class UserContextService implements Serializable {
     	return userContextService.getListCustomRole(userId);
     }
     
-    public static CustomRoleAuth getCustomRoleAuth(Integer userId,String authKey){
-    	CustomRoleAuth customRoleAuth=new CustomRoleAuth();
+    public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
+    	UserAuth customRoleAuth=new UserAuth();
     	customRoleAuth.setAuthKey(authKey);
     	List<CustomRole> listCustomRole=getCustomRole(userId);
 		if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
