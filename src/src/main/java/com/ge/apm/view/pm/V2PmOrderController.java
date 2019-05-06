@@ -841,18 +841,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         saveCheckItemData();
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
+       // String requestReason=null;
 
         String strPriority = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
-        String requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]").toString();
+        Object requestReason = JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+        if(requestReason==null){
+            newServiceRequest.setRequestReason("设备故障");
+        }else{
+            newServiceRequest.setRequestReason(requestReason.toString());
+        }
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         newServiceRequest.setStatus(currentStatus);
-        if(requestReason.isEmpty()){
-            newServiceRequest.setRequestReason("设备故障");
-        }else{
-            newServiceRequest.setRequestReason(requestReason);
-        }
+
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
