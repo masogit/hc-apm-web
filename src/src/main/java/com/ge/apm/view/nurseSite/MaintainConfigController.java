@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,7 +27,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomRole;
+import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
@@ -42,12 +42,11 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.IAuthCtrl;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface,IAuthCtrl {
+public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
@@ -87,7 +86,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private boolean isCreate=false;
   	private SearchController searchController;
   	private AssetSelectController assetSelectController;
-  	private List<CustomRole> listCustomRole;
+  	private CustomRoleAuth customRoleAuth;
 
     @Override
     protected void init() {
@@ -104,7 +103,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         	listOrgUid=new ArrayList<String>();
         	listOrgUid.addAll(setOrgUid);
         }
-        listCustomRole=nurseSiteMaintainService.getCustomRole(currentUser.getId());
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_CONFIG);
         //test
     }
 
@@ -730,16 +729,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
 
-	@Override
-	public List<CustomRole> getCustomRole() {
-		// TODO Auto-generated method stub
-		return listCustomRole;
+	public CustomRoleAuth getCustomRoleAuth() {
+		return customRoleAuth;
 	}
 
-	@Override
-	public String getAuthKey() {
-		// TODO Auto-generated method stub
-		return "nurseSiteMaintainConfig";
+	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
 	}
+
 	
 }

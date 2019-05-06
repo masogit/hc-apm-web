@@ -25,7 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomRole;
+import com.ge.apm.domain.CustomRoleAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainItem;
@@ -36,12 +37,11 @@ import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.IAuthCtrl;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainController implements ServerEventInterface,IAuthCtrl {
+public class MaintainController implements ServerEventInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -80,7 +80,7 @@ public class MaintainController implements ServerEventInterface,IAuthCtrl {
 	private List<String> orgUidList;
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
-	private List<CustomRole> listCustomRole;
+	private CustomRoleAuth customRoleAuth;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -100,7 +100,7 @@ public class MaintainController implements ServerEventInterface,IAuthCtrl {
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
-		listCustomRole=nurseSiteMaintainService.getCustomRole(currentUser.getId());
+		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
 	}
 
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
@@ -873,6 +873,14 @@ public class MaintainController implements ServerEventInterface,IAuthCtrl {
 		this.listCheckedNurseSiteMaintainConfig = listCheckedNurseSiteMaintainConfig;
 	}
 
+	public CustomRoleAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(CustomRoleAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
+	}
+
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 		// TODO Auto-generated method stub
@@ -886,18 +894,6 @@ public class MaintainController implements ServerEventInterface,IAuthCtrl {
 			listCheckClinicalOrgInfo.add(tempOrg);
 		}
 		onClinicalOrgInfoChange();
-	}
-
-	@Override
-	public List<CustomRole> getCustomRole() {
-		// TODO Auto-generated method stub
-		return listCustomRole;
-	}
-
-	@Override
-	public String getAuthKey() {
-		// TODO Auto-generated method stub
-		return "nurseSiteMaintain";
 	}
 
 }
