@@ -52,6 +52,9 @@ public class SysRole implements Serializable {
 
     @Column(name = "cards_ch")
     private String cardsCH;
+    
+    @Column(name = "menus",columnDefinition="text")
+    private String menus;
 
     public String getCards() {
         return cards;
@@ -124,7 +127,15 @@ public class SysRole implements Serializable {
         this.homePage = homePage;
     }
 
-    @Override
+    public String getMenus() {
+		return menus;
+	}
+
+	public void setMenus(String menus) {
+		this.menus = menus;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
