@@ -223,6 +223,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             String tenantUid = currentUserAccount.getTenantUID();
             batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid);
 
+            batchUpdateAssets.removeIf(i -> validateTermination(i));
+
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
@@ -499,22 +501,27 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             return;
         }
 
-        int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
-        if (workOrdersNum > 0) {
-            WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
-            return;
-        }
-
-        if (aiMgrService.isInDispenceCenter(assetInfo)) {
-            WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
-            return;
-        }
+        if (validateTermination(assetInfo)) return;
 
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
         dao.save(assetInfo);
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+    }
+
+    public boolean validateTermination(AssetInfo assetInfo) {
+        int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
+        if (workOrdersNum > 0) {
+            WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
+            return true;
+        }
+
+        if (aiMgrService.isInDispenceCenter(assetInfo)) {
+            WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+            return true;
+        }
+        return false;
     }
 
 

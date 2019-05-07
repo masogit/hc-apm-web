@@ -17,6 +17,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
@@ -65,7 +66,12 @@ public class ExportToBeTerminatedAppraisalService {
                     break;
                 }
 
-                result.addAll(assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid));
+                List<AssetInfo> byFinancingNumAndTenantUID = assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid);
+                if (byFinancingNumAndTenantUID.isEmpty()) {
+                    WebUtil.addErrorMessage(String.format("资产编号[%s]对应的设备不存在，不能报废！", funNum));
+                } else {
+                    result.addAll(byFinancingNumAndTenantUID);
+                }
             }
 
         } catch (Exception e) {
