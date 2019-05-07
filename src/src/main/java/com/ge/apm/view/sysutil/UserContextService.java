@@ -205,7 +205,7 @@ public class UserContextService implements Serializable {
     	return authContains(menuName)&&versionContains(menuName);
     }
     
-    private boolean authContains(String menuName){
+    public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
     		return true;
     	}
@@ -242,7 +242,7 @@ public class UserContextService implements Serializable {
     	return false;
     }
     
-    private boolean versionContains(String menuName){
+    public boolean versionContains(String menuName){
     	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
     	if(StringUtils.isNotEmpty(configStr)){
