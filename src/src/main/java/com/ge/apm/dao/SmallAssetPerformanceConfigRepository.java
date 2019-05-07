@@ -1,16 +1,12 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.SmallAssetPerformanceConfig;
-import webapp.framework.dao.GenericRepositoryUUID;
-import com.ge.apm.domain.AssetFileAttachment;
-import com.ge.apm.domain.AssetInfo;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.SearchFilter;
+
+import com.ge.apm.domain.SmallAssetPerformanceConfig;
+
+import webapp.framework.dao.GenericRepositoryUUID;
 /**
  * Created by 212605082 on 2018/3/7.
  */
