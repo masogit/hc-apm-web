@@ -79,9 +79,14 @@
                         <p:column headerText="#{msg.Locked}?" sortBy="#{item.isLocked}">
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
-                        <p:column headerText="#{msg.roleId}">
+                        <p:column headerText="#{msg.roleId}" filterBy="#{item.userRoleList.roleId}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{userAccountController.userRoleType}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                    <f:selectItems value="#{userAccountController.roles}" var="item" itemLabel="#{item.roleDesc}" itemValue="#{item.id}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
-                            <!--<h:outputText value="#{item.userRoleNames}"/>-->
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="loginAsButton" icon="ui-icon-transfer-within-a-station" title="#{msg.LoginAs}" actionListener="#{userAccountController.loginAs}" ajax="false" rendered="#{userContextService.isSuperAdmin}" disabled="#{empty userAccountController.selected}"/>

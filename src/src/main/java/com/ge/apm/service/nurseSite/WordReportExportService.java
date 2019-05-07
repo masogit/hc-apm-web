@@ -2,10 +2,7 @@ package com.ge.apm.service.nurseSite;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainData;
-import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
 import org.apache.commons.io.IOUtils;
@@ -42,16 +39,11 @@ public class WordReportExportService {
         List<Map<String, Object>> datasList = new ArrayList<>();
         datasList.add(new HashMap<>());
 
-        String deptUid = null;
         String deptName = null;
-
         TreeMap<String, List<NurseSiteMaintainItem>> map = new TreeMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            if (deptUid == null) {
-                deptUid = maintain.getClinicalDeptUID();
+            if (deptName == null) {
                 deptName = maintain.getClinicalDeptName();
-            } else if (!StringUtils.equals(deptUid, maintain.getClinicalDeptUID())) {
-                throw new IllegalStateException("所属科室不唯一");
             }
 
             Date scheduleDate = maintain.getScheduleDate();
@@ -100,7 +92,7 @@ public class WordReportExportService {
     }
 
     public byte[] zip(List<byte[]> reports) throws IOException {
-        try (OutputStream out = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(out)) {
             for (int i = 0; i < reports.size(); i++) {
                 zos.putNextEntry(new ZipEntry("report" + (i + 1) + ".docx"));
@@ -108,7 +100,7 @@ public class WordReportExportService {
             }
             zos.closeEntry();
             zos.close();
-            return ((ByteArrayOutputStream) out).toByteArray();
+            return out.toByteArray();
         }
     }
 
@@ -205,7 +197,8 @@ public class WordReportExportService {
                         XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
                         String originalText = cell.getText();
                         if (StringUtils.isBlank(originalText) || (!StringUtils.equals(originalText, text) && "x".equalsIgnoreCase(text))) {
-                            XWPFParagraph xwpfParagraph = cell.getParagraphs().get(0);
+                            cell.removeParagraph(0);
+                            XWPFParagraph xwpfParagraph = cell.addParagraph();
                             XWPFRun run = xwpfParagraph.createRun();
                             run.setText(text);
                         }
@@ -229,7 +222,7 @@ public class WordReportExportService {
 
         public void populateSignatures(XWPFTable table, List<String> columnHeaders, Map<String, List<NurseSiteMaintainItem>> itemMap, List<String> rowHeaders) {
 
-            int[][] mirror = new int[columnHeaders.size()][rowHeaders.size()];
+            int[][] mirror = new int[rowHeaders.size()][columnHeaders.size()];
 
             for (int i = 0; i < mirror.length; i++) {
                 for (int j = 0; j < mirror[0].length; j++) {
@@ -244,14 +237,15 @@ public class WordReportExportService {
                     NurseSiteMaintainItem item = items.get(j);
                     String signatureId = item.getSignatureId();
                     if (StringUtils.isNotBlank(signatureId)) {
-                        StreamedContent signature = blobFileService.getBlobObjectByStorageId(signatureId);
-                        if (signature != null) {
+                        byte[] bytes = getSignature(signatureId);
+                        if (bytes != null && bytes.length > 0) {
                             for (NurseSiteMaintainData data : item.getListData()) {
-                                int rowIndex = rowHeaders.indexOf(data.getCheckItem());
-                                if (mirror[columnIndex][rowIndex] == 0) {
+                                String checkItem = data.getCheckItem();
+                                int rowIndex = rowHeaders.indexOf(checkItem);
+                                if (mirror[rowIndex][columnIndex] == 0) {
                                     XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
-                                    insertSignature(cell, signature, item.getSignatureSourceType());
-                                    mirror[columnIndex][rowIndex] = 1;
+                                    insertSignature(cell, bytes, item.getSignatureSourceType());
+                                    mirror[rowIndex][columnIndex] = 1;
                                 }
                             }
                         }
@@ -284,25 +278,31 @@ public class WordReportExportService {
             }
         }
 
-        public void insertSignature(XWPFTableCell cell, StreamedContent content, Integer signatureType) {
+        public void insertSignature(XWPFTableCell cell, byte[] bytes, Integer signatureType) {
+            cell.removeParagraph(0);
             XWPFParagraph paragraph = cell.addParagraph();
             XWPFRun run = paragraph.createRun();
-            if (content != null) {
-                try {
-                    byte[] bytes = IOUtils.toByteArray(content.getStream());
-                    if (bytes.length > 0) {
-                        if (signatureType == 0) {
-                            run.addPicture(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(new String(bytes))), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
-                        } else {
-                            run.addPicture(new ByteArrayInputStream(bytes), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
-                        }
-                    }
-                } catch (InvalidFormatException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                if (signatureType == 0) {
+                    run.addPicture(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(new String(bytes))), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
+                } else {
+                    run.addPicture(new ByteArrayInputStream(bytes), XWPFDocument.PICTURE_TYPE_PNG, "dummy", Units.toEMU(40), Units.toEMU(40));
                 }
+            } catch (InvalidFormatException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    public byte[] getSignature(String signatureId) {
+        StreamedContent content = blobFileService.getBlobObjectByStorageId(signatureId);
+        try {
+            return IOUtils.toByteArray(content.getStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

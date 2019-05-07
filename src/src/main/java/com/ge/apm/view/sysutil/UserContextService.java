@@ -113,6 +113,21 @@ public class UserContextService implements Serializable {
         return user.getRoleNames();
     }
 
+    public boolean isOnlyAssetStaff(){
+        List<String> roles = getRoles();
+        if(roles.size()==1){
+            if(roles.get(0).toString().equalsIgnoreCase("AssetStaff")){
+                return true;
+            }else{
+                return false;
+            }
+
+        }else{
+            return false;
+        }
+
+    }
+
     public boolean hasRole(String role) {
         return UserContextService.checkRole(role);
     }

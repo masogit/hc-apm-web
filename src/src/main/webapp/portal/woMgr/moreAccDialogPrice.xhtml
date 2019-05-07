@@ -21,9 +21,9 @@
 
                     <h:panelGroup>
                         <label class="label">预估单价(元)*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice" disabled="true"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice" disabled="true"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}">
                             <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
-                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)" >
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)">
                             </p:ajax>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -117,7 +117,7 @@
                     <h:panelGroup>
                         <label class="label">预估单价(元)*</label>
                         <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPriceView"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
-                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.xx1)"/>
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -148,7 +148,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">合同价格(元)</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPriceView" class="xx1"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPriceView" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
                         </p:inputNumber>

@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -111,15 +112,28 @@ public HashMap<String,Object> getSummary(String from,String to,String token){
             return null;
         }
     }
-    @Transactional
     public void deleteTm(DeptTransactionLog tm)
     {
         deptTransactionLogRepository.delete(tm);
     }
 
-    @Transactional
+
     public void localUpdateTransaction(DeptTransactionLog dptlog){
-        deptTransactionLogRepository.save(dptlog);
+        DeptTransactionLog deptlogTmp = new DeptTransactionLog();
+        BeanUtils.copyProperties(dptlog,deptlogTmp);
+        DeptTransactionLog save = deptTransactionLogRepository.save(deptlogTmp);
+        System.out.println();
     }
+   /* public void localUpdateTransactionByLink(DeptTransactionLog dptlog){
+        HttpEntity<TransactionForm> requestEntity = new HttpEntity<TransactionForm>(formData, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.CREATE_DEPTTRANSACTION_LOG);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("bizStatusCode");
+        } else {
+            return null;
+        }
+    }*/
 
 }
