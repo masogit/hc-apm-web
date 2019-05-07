@@ -209,6 +209,8 @@ public class UserContextService implements Serializable {
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
     		return true;
     	}
+    	List<CustomRole> listCustomRole=getListCustomRole(userAccount.getId());
+    	List<SysRole> listSysRole=getListSysRole(userAccount.getId());
     	if(listCustomRole!=null && listCustomRole.size()>0){
     		for(int i=0;i<listCustomRole.size();++i){
     			CustomRole tempRole=listCustomRole.get(i);
@@ -224,7 +226,7 @@ public class UserContextService implements Serializable {
     			}
     		}
     	}
-    	else if(listSysRole!=null && listSysRole.size()>0){
+    	if(listSysRole!=null && listSysRole.size()>0){
     		for(int i=0;i<listSysRole.size();++i){
     			SysRole tempRole=listSysRole.get(i);
     			String menus=tempRole.getMenus();
