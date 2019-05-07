@@ -219,6 +219,17 @@ public class WorkflowConfig implements Serializable {
     @Column(name="close_without_parts")
     private Boolean closeWithoutParts;  // 没有备件费用直接关单
 
+    @Column(name="share_auto_confirm")
+    private Integer shareAutoConfirm = 20;//设备调剂系统确认系统确认时间
+
+    public Integer getShareAutoConfirm() {
+        return shareAutoConfirm;
+    }
+
+    public void setShareAutoConfirm(Integer shareAutoConfirm) {
+        this.shareAutoConfirm = shareAutoConfirm;
+    }
+
     public Boolean getPartsNeedSign() {
         return partsNeedSign;
     }
