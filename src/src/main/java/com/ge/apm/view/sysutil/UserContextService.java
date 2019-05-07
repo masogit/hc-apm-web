@@ -38,6 +38,7 @@ public class UserContextService implements Serializable {
     private TenantInfo tenant = null;
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
+    private List<SysRole> listSysRole=null;
 
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -57,6 +58,7 @@ public class UserContextService implements Serializable {
         userContextService.tenant = null;
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
+        userContextService.getListSysRole(user.getId());
     }
 
     public void processAfterLogin() {
@@ -176,15 +178,22 @@ public class UserContextService implements Serializable {
     	}
     	return listCustomRole;
     }
+    public List<SysRole> getListSysRole(Integer userId){
+    	if(listSysRole==null){
+    		SysRoleRepository customRoleRepository=WebUtil.getBean(SysRoleRepository.class);
+    		listSysRole=customRoleRepository.getSysRoles(userId);
+    	}
+    	return listSysRole;
+    }
     
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
     }
     
     private boolean authContains(String menuName){
-    	UserAccount user = getLoginUser();
-    	CustomRoleRepository customRoleRepository=WebUtil.getBean(CustomRoleRepository.class);
-    	List<CustomRole> listCustomRole=customRoleRepository.findCustomRolesByUserId(user.getId());
+    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
+    		return true;
+    	}
     	if(listCustomRole!=null && listCustomRole.size()>0){
     		for(int i=0;i<listCustomRole.size();++i){
     			CustomRole tempRole=listCustomRole.get(i);
@@ -192,18 +201,28 @@ public class UserContextService implements Serializable {
     			if(StringUtils.isNotEmpty(menus)){
     				String [] menuArr=menus.split(",");
     				for(int j=0;j<menuArr.length;++j){
-    					if(menuArr[j].equals(menuName)){
+    					String tempStr=menuArr[j].trim();
+    					if(tempStr.equals(menuName)){
     						return true;
     					}
     				}
     			}
-    			else{
-    				return true;
-    			}
     		}
     	}
-    	else{
-    		return true;
+    	else if(listSysRole!=null && listSysRole.size()>0){
+    		for(int i=0;i<listSysRole.size();++i){
+    			SysRole tempRole=listSysRole.get(i);
+    			String menus=tempRole.getMenus();
+    			if(StringUtils.isNotEmpty(menus)){
+    				String [] menuArr=menus.split(",");
+    				for(int j=0;j<menuArr.length;++j){
+    					String tempStr=menuArr[j].trim();
+    					if(tempStr.equals(menuName)){
+    						return true;
+    					}
+    				}
+    			}
+    		}
     	}
     	return false;
     }
