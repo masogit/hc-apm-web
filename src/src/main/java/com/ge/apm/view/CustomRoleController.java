@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	private List<I18nMessage> listI18nMenus;
 	private List<I18nMessage> listI18nCards;
 	private JSONArray authJSONArr;
+	private Map<String,String[]> mapAuthCard=new HashMap<String,String[]>();
 	static {
 		keyRoles.add("院长");
 		keyRoles.add("医学工程处主任");
@@ -123,6 +125,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		if (selected.getId() != null) {
 			if (StringUtils.isNotEmpty(selected.getAuthorities())) {
 				authorities = selected.getAuthorities().split(",");
+				generateAuthMap(authorities);
 			}
 			if (StringUtils.isNotEmpty(selected.getCards())) {
 				cards = selected.getCards().split(",");
@@ -144,9 +147,51 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			}
 		}
 	}
+	
+	private void generateAuthMap(String[] auths){
+		Map<String,List<String>> tempMap=new HashMap<String,List<String>>();
+		for(int i=0;i<auths.length;++i){
+			String temp=auths[i];
+			if(StringUtils.isNotEmpty(temp)){
+				String[] arr=temp.split("\\.");
+				String key=arr[0];
+				if(tempMap.containsKey(key)){
+					tempMap.get(key).add(temp);
+				}
+				else{
+					List<String> list=new ArrayList<String>();
+					list.add(temp);
+					tempMap.put(key, list);
+				}
+			}
+		}
+		if(tempMap.size()>0){
+			Iterator<String> it=tempMap.keySet().iterator();
+			while(it.hasNext()){
+				String key=it.next();
+				String[] strArr=new String[1];
+				mapAuthCard.put(key, tempMap.get(key).toArray(strArr));
+			}
+		}
+	}
+	
+	private String[] parseAuthMap(){
+		List<String> listAll=new ArrayList<String>();
+		Iterator<String> it=mapAuthCard.keySet().iterator();
+		while(it.hasNext()){
+			String key=it.next();
+			String[]  list=mapAuthCard.get(key);
+			for(int i=0;i<list.length;++i){
+				listAll.add(list[i]);
+			}
+		}
+		String[] strArr=new String[1];
+		return listAll.toArray(strArr);
+	}
 
 	@Transactional
 	public void save() {
+		authorities=parseAuthMap();
 		if (keyRoles.contains(selected.getName())) {
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
@@ -254,6 +299,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		}
 	}
 	public void clear() {
+		mapAuthCard.clear();
 		authorities = new String[200];
 		cards = new String[100];
 		menus=new String[100];
@@ -289,7 +335,18 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	}
 
 	public void setAuthorities(String[] authorities) {
-		this.authorities = authorities;
+		if(this.authorities!=null && this.authorities.length>0){
+			List<String> list=Arrays.asList(this.authorities);
+			for(int j=0;j<authorities.length;++j){
+				if(!list.contains(authorities[j])){
+					list.add(authorities[j]);
+				}
+			}
+			this.authorities=(String[]) list.toArray();
+		}
+		else{
+			this.authorities = authorities;
+		}
 	}
 
 	public void setCards(String[] cards) {
@@ -327,5 +384,14 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	public void setListI18nCards(List<I18nMessage> listI18nCards) {
 		this.listI18nCards = listI18nCards;
 	}
+
+	public Map<String, String[]> getMapAuthCard() {
+		return mapAuthCard;
+	}
+
+	public void setMapAuthCard(Map<String, String[]> mapAuthCard) {
+		this.mapAuthCard = mapAuthCard;
+	}
+
 
 }
