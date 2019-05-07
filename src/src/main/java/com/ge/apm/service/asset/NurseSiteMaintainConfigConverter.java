@@ -5,19 +5,17 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.google.common.base.Strings;
 import java.util.LinkedHashMap;
-import javax.faces.application.FacesMessage;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
+
+import com.ge.apm.domain.NurseSiteMaintainConfig;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.google.common.base.Strings;
+
 import webapp.framework.web.WebUtil;
 
 /**

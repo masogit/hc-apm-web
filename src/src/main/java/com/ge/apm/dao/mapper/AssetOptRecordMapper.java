@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.Update;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.dao.mapper.provider.AssetOptRecordProvider;

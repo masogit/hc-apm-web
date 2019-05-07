@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 
-import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.SmallAssetPerformanceReport;
+
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**

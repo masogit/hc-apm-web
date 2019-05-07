@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 
-import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 
 import webapp.framework.dao.GenericRepositoryUUID;
