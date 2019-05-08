@@ -289,17 +289,21 @@ public class WorkOrderReportProvider {
             "ai.function_type as assetFunctionType,wo.current_person_name as currentPersonName, " +
             "wo.current_step_id as currentStepId, " +
             "sr.requestor_name as requestorName,sr.request_time as requestTime,sr.request_reason as requestReason, " +
-            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepInfo, " +
+            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepOwnerName, " +
+            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1) as sendStepStartTime, " +
             "wo.int_ext_type as intExtType, " +
             "wo.repair_type as repairType, " +
-            "(select concat(wos.owner_name,concat('|:|',to_char(wos.start_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepInfo, " +
+            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepOwnerName, " +
+            "(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1) as acceptStepStartTime, " +
             "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1) as workStepEndTime, " +
             "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
             "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
             "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
             "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
-            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepInfo, " +
-            "(select concat(wos.owner_name,concat('|:|',to_char(wos.end_time,'YYYY-mm-ss HH:mm:ss'))) from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepInfo, " +
+            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepOwnerName, " +
+            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1) as evaluateStepEndTime, " +
+            "(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepOwnerName, " +
+            "(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1) as closeStepEndTime, " +
             "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
             "(select string_agg(concat(woc.man_hours),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
             "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, " +
