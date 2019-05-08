@@ -128,16 +128,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser = UserContextService.getCurrentUserAccount();
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
-        setTenantUid(loginUser.getTenantUID());
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
-        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        setTenantUid(loginUser.getTenantUID());
 
+    }
+
+    private void updateRoleList() {
         roles = Lists.newArrayList(sysRoleRepository.findAll());
-
+        roles.sort(Comparator.comparingInt(i -> i.getId()));
+        if (selectedTenant != null) {
+            if (selectedTenant.getInsulate() == null || !selectedTenant.getInsulate()) {
+                roles.removeIf(i -> "LocalITAdmin".equals(i.getName()));
+            }
+        }
     }
 
     public String getTenantUid() {
@@ -151,8 +159,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         searchFilters.clear();
         selectedOrg = null;
         
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedTenant = tenantDao.findByuid(tenantUid);
+        selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         
@@ -163,6 +170,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedOrgNode.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
+        updateRoleList();
     }
     
     // TreeNodeName Filter
