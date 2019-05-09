@@ -115,6 +115,10 @@
                             <h:outputText value="设备接收人："/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>
+                        <h:panelGroup render="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableLeaseManHour}">
+                            <h:outputText value="工时"/>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selected.effort}"/>
+                        </h:panelGroup>
                         <h:panelGroup >
                             <p:messages id="messages" closable="true" style="width: 900px" />
                             <p:inputText id="applyAssetInfo" placeholder="资产编号/设备编号/二维码" maxlength="100" style="width: 200px" value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />

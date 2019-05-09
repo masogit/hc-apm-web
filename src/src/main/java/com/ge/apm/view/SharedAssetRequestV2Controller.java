@@ -73,6 +73,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     @Getter
     @Setter
+    private WorkflowConfig currentWorkflowConfig;
+
+    @Getter
+    @Setter
     private SharedAssetReqDetail preSelectReqDetail;
 
      public String getFilterApplyTime() {
@@ -264,7 +268,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else {
             searchFilters.add(new SearchFilter("state", SearchFilter.Operator.EQ,queryIndex.toString()));
         }
-       
+
+        currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
@@ -404,6 +410,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setMsgEndTime(new Date());
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
+            if(currentWorkflowConfig.getEnableReturnManHour()) {
+                if(selected.getEffort() == null) {
+                    selected.setEffort(currentWorkflowConfig.getDefaultReturnManHour());
+                }
+            }
             this.save();
 
         }else if(sta == 7 || sta == 11){
@@ -434,6 +445,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //            selected.setMsgBeginTime(this.getTime("借用"));
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
+            if(currentWorkflowConfig.getEnableLeaseManHour()) {
+                if(selected.getEffort() == null) {
+                    selected.setEffort(currentWorkflowConfig.getDefaultLeaseManHour());
+                }
+            }
             this.save();
 
         }else if(sta == 1||sta == 5){
