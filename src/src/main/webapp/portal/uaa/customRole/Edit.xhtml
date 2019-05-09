@@ -37,17 +37,17 @@
 				<p:fieldset id="authConfig" legend="网页端权限配置">
 					<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
 						<label class="label">#{domainAuth['v']}</label>
-						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="查看" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
 						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['a']}" label="新增" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['a']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'a')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'a')}">
 						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['m']}" label="修改" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['m']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'm')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'm')}">
 						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['d']}" label="删除" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['d']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'd')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'd')}">
 						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['i']}" label="导入" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['i']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'i')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'i')}">
 						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['o']}" label="导出" style="display:inline;">
+						<p:selectBooleanCheckbox value="#{domainAuth['o']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'o')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'o')}">
 						</p:selectBooleanCheckbox>
 					</p:repeat>
 				</p:fieldset>
