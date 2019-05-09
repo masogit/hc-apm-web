@@ -136,6 +136,9 @@ public class SharedAssetRequest implements Serializable{
     @Column(name = "behavior")//借用归还状态 1借用 2归还
     private Integer behavior;
 
+    @Column(name = "effort")//工时
+    private Double effort;
+
     public String getId() {
         return id;
     }
@@ -512,5 +515,13 @@ public class SharedAssetRequest implements Serializable{
 
     public void setApplicantName(String applicantName) {
         this.applicantName = applicantName;
+    }
+
+    public Double getEffort() {
+        return effort;
+    }
+
+    public void setEffort(Double effort) {
+        this.effort = effort;
     }
 }

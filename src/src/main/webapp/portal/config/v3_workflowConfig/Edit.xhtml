@@ -250,6 +250,31 @@
                         </p:panelGrid>
                     </p:fieldset>
 
+                    <p:fieldset id="ac" legend="设备调剂配置">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
+                            <h:panelGroup rendered="true">
+                                <label class = "label">是否计算借用工时</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.enableLeaseManHour}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class="label">借用工时默认值</label>
+                                <p:inputNumber id="defaultLeaseManHour" value="#{v2_WorkflowConfigController.selected.defaultLeaseManHour}" minValue="0.0" decimalPlaces="1"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="true">
+                                <label class = "label">是否计算归还工时</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.enableReturnManHour}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class="label">归还工时默认值</label>
+                                <p:inputNumber id="defaultReturnManHour" value="#{v2_WorkflowConfigController.selected.defaultReturnManHour}" minValue="0.0" decimalPlaces="1"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
                     <p:fieldset id="other" legend="其他配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
