@@ -115,7 +115,7 @@
                             <h:outputText value="设备接收人："/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>
-                        <h:panelGroup render="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableLeaseManHour}">
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableLeaseManHour}">
                             <h:outputText value="工时"/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.effort}"/>
                         </h:panelGroup>
