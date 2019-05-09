@@ -137,6 +137,22 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			}
 			if(StringUtils.isNotEmpty(selected.getJsonAuthorities())){
 				authJSONArr=JSONArray.parseArray(selected.getJsonAuthorities());
+				JSONArray initArr=service.getAuth();
+				for(int i=0;i<initArr.size();++i){
+					JSONObject tempObj=initArr.getJSONObject(i);
+					String tempKey=tempObj.getString("k");
+					boolean contains=false;
+					for(int j=0;j<authJSONArr.size();++j){
+						JSONObject userObj=authJSONArr.getJSONObject(j);
+						if(tempKey.equals(userObj.getString("k"))){
+							contains=true;
+							break;
+						}
+					}
+					if(!contains){
+						authJSONArr.add(tempObj);
+					}
+				}
 			}
 			if (StringUtils.isNotEmpty(selected.getMenus())) {
 				menus = selected.getMenus().split(",");
@@ -197,11 +213,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
 			return;
 		}
-		if (cards.length == 0 && menus.length == 0) {
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage(WebUtil.getMessage("cardsIsBlank"));
-			return;
-		}
+//		if (cards.length == 0 && menus.length == 0) {
+//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//			WebUtil.addErrorMessage(WebUtil.getMessage("cardsIsBlank"));
+//			return;
+//		}
 		selected.setTenantUID(user.getTenantUID());
 		selected.setInstitutionUID(user.getInstitutionUID());
 		selected.setHospitalUID(user.getHospitalUID());
@@ -278,11 +294,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setMenusCH("");
 			selected.setMenus("");
 		}
-		if (StringUtils.isEmpty(selected.getAuthorities()) && StringUtils.isEmpty(selected.getJsonAuthorities())) {
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage(WebUtil.getMessage("authoritiesIsBlank"));
-			return;
-		}
+//		if (StringUtils.isEmpty(selected.getAuthorities()) && StringUtils.isEmpty(selected.getJsonAuthorities())) {
+//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//			WebUtil.addErrorMessage(WebUtil.getMessage("authoritiesIsBlank"));
+//			return;
+//		}
 		dao.save(selected);
 		authorities = new String[200];
 		cards = new String[100];
