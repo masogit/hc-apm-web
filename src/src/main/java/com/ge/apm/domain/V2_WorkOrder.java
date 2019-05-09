@@ -219,6 +219,42 @@ public class V2_WorkOrder implements Serializable {
 //    @NotFound(action= NotFoundAction.IGNORE)
     @Transient
     private UserAccount FEOwner;
+
+    //派工信息
+    @Column(name="send_step_owner_Id")
+    private Integer sendStepOwnerId;
+    @Column(name="send_step_owner_name")
+    private String sendStepOwnerName;
+    @Column(name="send_step_start_time")
+    private Date sendStepStartTime;
+
+    //接单信息
+    @Column(name="accept_step_owner_Id")
+    private Integer acceptStepOwnerId;
+    @Column(name="accept_step_owner_name")
+    private String acceptStepOwnerName;
+    @Column(name="accept_step_start_time")
+    private Date acceptStepStartTime;
+
+    //维修完成时间
+    @Column(name="work_step_end_time")
+    private Date workStepEndTime;
+
+    //验收信息
+    @Column(name="evaluate_step_owner_Id")
+    private Integer evaluateStepOwnerId;
+    @Column(name="evaluate_step_owner_name")
+    private String evaluateStepOwnerName;
+    @Column(name="evaluate_Step_End_Time")
+    private Date evaluateStepEndTime;
+
+    //关单信息
+    @Column(name="close_step_owner_Id")
+    private Integer closeStepOwnerId;
+    @Column(name="close_step_owner_name")
+    private String closeStepOwnerName;
+    @Column(name="close_Step_End_Time")
+    private Date closeStepEndTime;
     
     public Integer getDispatchMode() {
         return dispatchMode;
@@ -626,7 +662,112 @@ public class V2_WorkOrder implements Serializable {
     public void setAckName(String ackName) {
         this.ackName = ackName;
     }
-	@Override
+
+    public Integer getSendStepOwnerId() {
+        return sendStepOwnerId;
+    }
+
+    public void setSendStepOwnerId(Integer sendStepOwnerId) {
+        this.sendStepOwnerId = sendStepOwnerId;
+    }
+
+    public String getSendStepOwnerName() {
+        return sendStepOwnerName;
+    }
+
+    public void setSendStepOwnerName(String sendStepOwnerName) {
+        this.sendStepOwnerName = sendStepOwnerName;
+    }
+
+    public Date getSendStepStartTime() {
+        return sendStepStartTime;
+    }
+
+    public void setSendStepStartTime(Date sendStepStartTime) {
+        this.sendStepStartTime = sendStepStartTime;
+    }
+
+    public Integer getAcceptStepOwnerId() {
+        return acceptStepOwnerId;
+    }
+
+    public void setAcceptStepOwnerId(Integer acceptStepOwnerId) {
+        this.acceptStepOwnerId = acceptStepOwnerId;
+    }
+
+    public String getAcceptStepOwnerName() {
+        return acceptStepOwnerName;
+    }
+
+    public void setAcceptStepOwnerName(String acceptStepOwnerName) {
+        this.acceptStepOwnerName = acceptStepOwnerName;
+    }
+
+    public Date getAcceptStepStartTime() {
+        return acceptStepStartTime;
+    }
+
+    public void setAcceptStepStartTime(Date acceptStepStartTime) {
+        this.acceptStepStartTime = acceptStepStartTime;
+    }
+
+    public Date getWorkStepEndTime() {
+        return workStepEndTime;
+    }
+
+    public void setWorkStepEndTime(Date workStepEndTime) {
+        this.workStepEndTime = workStepEndTime;
+    }
+
+    public Integer getEvaluateStepOwnerId() {
+        return evaluateStepOwnerId;
+    }
+
+    public void setEvaluateStepOwnerId(Integer evaluateStepOwnerId) {
+        this.evaluateStepOwnerId = evaluateStepOwnerId;
+    }
+
+    public String getEvaluateStepOwnerName() {
+        return evaluateStepOwnerName;
+    }
+
+    public void setEvaluateStepOwnerName(String evaluateStepOwnerName) {
+        this.evaluateStepOwnerName = evaluateStepOwnerName;
+    }
+
+    public Date getEvaluateStepEndTime() {
+        return evaluateStepEndTime;
+    }
+
+    public void setEvaluateStepEndTime(Date evaluateStepEndTime) {
+        this.evaluateStepEndTime = evaluateStepEndTime;
+    }
+
+    public Integer getCloseStepOwnerId() {
+        return closeStepOwnerId;
+    }
+
+    public void setCloseStepOwnerId(Integer closeStepOwnerId) {
+        this.closeStepOwnerId = closeStepOwnerId;
+    }
+
+    public String getCloseStepOwnerName() {
+        return closeStepOwnerName;
+    }
+
+    public void setCloseStepOwnerName(String closeStepOwnerName) {
+        this.closeStepOwnerName = closeStepOwnerName;
+    }
+
+    public Date getCloseStepEndTime() {
+        return closeStepEndTime;
+    }
+
+    public void setCloseStepEndTime(Date closeStepEndTime) {
+        this.closeStepEndTime = closeStepEndTime;
+    }
+
+    @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
