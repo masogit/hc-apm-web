@@ -126,7 +126,7 @@
                             <!--<p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="      归还结束时间" value="#{sharedAssetRequestV2Controller.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>-->
                             <p:calendar  pattern="yyyy/MM/dd HH:mm" placeholder="      归还结束时间" value="#{sharedAssetRequestV2Controller.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                         </h:panelGroup>
-                        <h:panelGroup render="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableReturnManHour}">
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableReturnManHour}">
                             <h:outputText value="工时"/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.effort}"/>
                         </h:panelGroup>

@@ -410,7 +410,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setMsgEndTime(new Date());
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
-            if(currentWorkflowConfig.getEnableReturnManHour()) {
+            if(currentWorkflowConfig.getEnableReturnManHour() != null && currentWorkflowConfig.getEnableReturnManHour()) {
                 if(selected.getEffort() == null) {
                     selected.setEffort(currentWorkflowConfig.getDefaultReturnManHour());
                 }
@@ -445,7 +445,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //            selected.setMsgBeginTime(this.getTime("借用"));
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
-            if(currentWorkflowConfig.getEnableLeaseManHour()) {
+            if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
                 if(selected.getEffort() == null) {
                     selected.setEffort(currentWorkflowConfig.getDefaultLeaseManHour());
                 }
