@@ -1832,6 +1832,24 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCardNurse', 'nurse.pass', '30天内通过', 'nurse.pass', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('wechatCardNurse', 'nurse.open', '未关机列表', 'nurse.open', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintain', '日常检查', 'nurseSiteMaintain', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainConfig', '日常检查设置', 'nurseSiteMaintainConfig', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainExport', '日常检查报表', 'nurseSiteMaintainExport', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainAuth', '日常检查', 'nurseSiteMaintain', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainConfigAuth', '日常检查设置', 'nurseSiteMaintainConfig', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteMaintainExportAuth', '日常检查报表', 'nurseSiteMaintainExport', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customRoleAuth', 'nurseSiteOptRecordAuth', '开关机登记', 'nurseSiteOptRecordAuth', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainAuth', 'a', '创建日常检查工单', 'a', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainAuth', 'd', '删除日常检查工单', 'd', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainAuth', 'm', '处理日常检查工单', 'm', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainAuth', 's', '查看日常检查工单', 's', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainConfigAuth', 'a', '创建日常检查配置', 'a', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainConfigAuth', 'd', '删除日常检查配置', 'd', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainConfigAuth', 'm', '修改日常检查配置', 'm', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainConfigAuth', 's', '查看日常检查配置', 's', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainExportAuth', 'o', '导出日常检查报表', 'o', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteMaintainExportAuth', 's', '查看日常检查报表', 's', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteOptRecordAuth', 'o', '导出开关机记录', 'o', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('nurseSiteOptRecordAuth', 's', '查看开关机记录', 's', NULL, '-1');

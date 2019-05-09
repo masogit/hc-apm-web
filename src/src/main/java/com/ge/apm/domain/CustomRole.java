@@ -236,7 +236,7 @@ public class CustomRole implements Serializable {
 	}
 	
 	public void setMenusCH(String menusCH) {
-		if(menusCH!=null){
+		if(menusCH!=null && menusCH.length()>60){
 			menusCH=menusCH.substring(0, 60);
 			menusCH+="...";
 		}

@@ -109,6 +109,22 @@ public class CustomRoleService {
 				}
 			}
 		}
+		//temp delete some menus
+		return removeNoNeedI18nMenus(listNew);
+	}
+	//v5.1
+	private List<I18nMessage> removeNoNeedI18nMenus(List<I18nMessage> list18){
+		List<I18nMessage> listNew=new ArrayList<I18nMessage>();
+		for(int i=0;i<list18.size();++i){
+			I18nMessage i18n=list18.get(i);
+			String key=i18n.getMsgKey();
+			if(key.contains("nurseSite.")||key.equals("nurseSite")){
+				listNew.add(i18n);
+			}
+			else if(key.equals("asset.inventory") || key.equals("asset")){
+				listNew.add(i18n);
+			}
+		}
 		return listNew;
 	}
 	public List<I18nMessage> getCardsByTenant(String tenantUid){
@@ -123,7 +139,6 @@ public class CustomRoleService {
 			for(int i=0;i<list18.size();++i){
 				JSONObject auth=new JSONObject();
 				auth.put("k", list18.get(i).getMsgKey());
-//				auth.put("t", list18.get(i).getMsgType());
 				auth.put("v", list18.get(i).getValue());
 				auth.put("a", false);
 				auth.put("m", false);
