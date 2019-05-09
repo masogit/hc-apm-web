@@ -22,9 +22,11 @@ import com.ge.apm.dao.AssetOptRecordRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.mapper.AssetOptRecordMapper;
 import com.ge.apm.domain.AssetOptRecord;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.service.nurseSite.AssetOptRecordService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -50,7 +52,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 	private SearchController searchController;
 	private OrgInfo selectOrgInfo;
 	private List<String> setUserUids;
-
+	private UserAuth customRoleAuth;
 	@Override
 	protected void init() {
 		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -69,6 +71,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 			listOrgUid.addAll(setOrgUid);
 		}
 		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
+		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
 		// test
 	}
 
@@ -185,6 +188,14 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 
 	public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
 		this.selectOrgInfo = selectOrgInfo;
+	}
+
+	public UserAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
 	}
 
 }
