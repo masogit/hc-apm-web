@@ -1749,6 +1749,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.mgt', '合同管理', 'asset.mgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.supplierMgt', '供应商管理', 'asset.supplierMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.scrap', '报废资产', 'asset.scrap', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.scrapTempMgt', '报损模板管理', 'asset.scrapTempMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.create', '新增资产建档', 'asset.create', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.audit', '资产审核', 'asset.audit', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'asset.batchImportData', '批量导入资产数据', 'asset.batchImportData', NULL, '-1');
@@ -1785,6 +1786,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure', '计量管理', 'measure', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.categoryConfig', '计量类别设置', 'measure.categoryConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.info', '计量信息', 'measure.info', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.rule', '计量规则', 'measure.rule', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.ruleMgt', '计量规则管理', 'measure.ruleMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'nurseSite', '临床助手', 'nurseSite', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'nurseSite.maintain', '日常检查', 'nurseSite.maintain', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'nurseSite.config', '日常检查设置', 'nurseSite.config', NULL, '-1');
