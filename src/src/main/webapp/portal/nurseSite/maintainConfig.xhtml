@@ -49,7 +49,7 @@
                                 oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authCreate}"/>
                             <p:commandButton id="editButton" actionListener="#{maintainConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
                                 update=":maintainConfigEditDlg" oncomplete="PF('maintainConfigEditDialog').show()"
-                                disabled="#{empty maintainConfigController.selected.id}" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authModify}"/>
+                                disabled="#{empty maintainConfigController.selected.id}" onclick="NurseSiteMaintain.on()"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                 actionListener="#{maintainConfigController.delete}" update=":maintainConfigListForm:datalist"
                                 disabled="#{empty maintainConfigController.selected.id}" rendered="#{maintainConfigController.customRoleAuth.authDelete}">
