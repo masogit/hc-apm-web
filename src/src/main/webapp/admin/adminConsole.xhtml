@@ -49,13 +49,18 @@
 								<f:selectItems value="#{adminConsoleController.listSysRoleName}" var="item" itemLabel="#{item}" itemValue="#{item}" />
 							</p:selectOneMenu>
 						</h:panelGroup>
-						<h:panelGroup>
-							<label class="label">菜单项</label>
-							<p:selectManyCheckbox id="menuId" value="#{adminConsoleController.selectedMenus}" layout="responsive" columns="4" converter="i18nMessageConverter">
-								<f:selectItems value="#{adminConsoleController.listI18nMenus}" var="item" itemLabel="#{item.value}#{item.msgKey}" itemValue="#{item}" />
-							</p:selectManyCheckbox>
-						</h:panelGroup>
 					</p:panelGrid>
+					<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+						<p:tree id="menuId" class="tree" value="#{adminConsoleController.tenantConfigService.root}"
+							selection="#{adminConsoleController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox"
+							highlight="true">
+							<p:ajax event="select" listener="#{adminConsoleController.tenantConfigService.onSelectTenantConfig}" process="@this" />
+							<p:ajax event="unselect" listener="#{adminConsoleController.tenantConfigService.onUnSelectTenantConfig}" process="@this" />
+							<p:treeNode type="tenantConfigTree">
+								<h:outputText value="#{item.label}" />
+							</p:treeNode>
+						</p:tree>
+					</p:scrollPanel>
 					<p:commandButton actionListener="#{adminConsoleController.updateSysMenu()}" value="更新系统角色默认菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
 			</h:panelGroup>

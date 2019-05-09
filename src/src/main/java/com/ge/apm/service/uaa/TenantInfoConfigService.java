@@ -62,6 +62,20 @@ public class TenantInfoConfigService {
 			return "{\"edition\":\"" + edition + "\",\"menuList\":[" + result + "]}";
 		}
 	}
+	
+	public String toMenusStr(){
+		if (root == null) {
+			return null;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			readTreeNodeN(root, sb);
+			String result = sb.toString();
+			if (result.length() > 0) {
+				result = result.substring(0, result.length() - 1);
+			}
+			return result;
+		}
+	}
 
 	private void readTreeNode(TreeNode root, StringBuilder sb) {
 		if (root.isSelected()) {
@@ -72,6 +86,17 @@ public class TenantInfoConfigService {
 		}
 		for (TreeNode node : root.getChildren()) {
 			readTreeNode(node, sb);
+		}
+	}
+	private void readTreeNodeN(TreeNode root, StringBuilder sb) {
+		if (root.isSelected()) {
+			TenantInfoConfigItem tempItem = (TenantInfoConfigItem) root.getData();
+			if (tempItem != null) {
+				sb.append(tempItem.getKey() + ",");
+			}
+		}
+		for (TreeNode node : root.getChildren()) {
+			readTreeNodeN(node, sb);
 		}
 	}
 
@@ -205,6 +230,45 @@ public class TenantInfoConfigService {
 	// tempConfig.setEdition(VERSION_FUNCTION);
 	// tempConfig=TenantInfoConfig.parseStr(tempConfig.getJSONStr());
 	// }
+	
+	public void parseMenuList(String str){
+		initKeyLabel();
+		if (StringUtils.isEmpty(str)) {
+			menuList.clear();
+		}
+		else{
+			String [] arr=str.split(",");
+			List<TenantInfoConfigItem> tempListVersionItem = new ArrayList<TenantInfoConfigItem>();
+			Set<String> setItemKey = new HashSet<String>();
+			try {
+				for (int i = 0; i < arr.length; ++i) {
+					String key = arr[i];
+					if (!listKey.contains(key)) {
+						continue;
+					}
+					setItemKey.add(key);
+				}
+				for (int i = 0; i < listKey.size(); ++i) {
+					String key = listKey.get(i);
+					String label = listLabel.get(i);
+					if (!setItemKey.contains(key)) {
+						TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, false);
+						tempListVersionItem.add(tempItem);
+					} else {
+						TenantInfoConfigItem tempItem = new TenantInfoConfigItem(label, key, true);
+						tempListVersionItem.add(tempItem);
+					}
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				tempListVersionItem = getListVersions();
+			}
+			menuList = tempListVersionItem;
+		}
+		if (root != null) {
+			buildRoot();
+		}
+	}
 	public void parseStr(String str) {
 		initKeyLabel();
 		if (StringUtils.isEmpty(str)) {
