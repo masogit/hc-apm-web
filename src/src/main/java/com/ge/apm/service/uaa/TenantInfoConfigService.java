@@ -304,6 +304,9 @@ public class TenantInfoConfigService {
 			tempListVersionItem = getListVersions();
 		}
 		menuList = tempListVersionItem;
+		if (root != null) {
+			buildRoot();
+		}
 	}
 
 	public String getJSONStr() {
