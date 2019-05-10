@@ -153,7 +153,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.getSartList().remove(selectedSart);
         selectedSart = null;
     }
-    
+
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
@@ -191,6 +191,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         } 
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
+        }
+
+        if(currentWorkflowConfig == null) {
+            currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         }
     }
 
@@ -269,7 +273,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             searchFilters.add(new SearchFilter("state", SearchFilter.Operator.EQ,queryIndex.toString()));
         }
 
-        currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+//        currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
