@@ -37,6 +37,9 @@ public class AdminConsoleController {
 	private String labelKey;
 	@Getter
 	@Setter
+	private String containsLabelKey;
+	@Getter
+	@Setter
 	private Integer opType;//0:add,1:delete
 	@Getter
 	@Setter
@@ -84,16 +87,18 @@ public class AdminConsoleController {
 	public void updateVersion(){
 		String tempVersion="";
 		String tempKey="";
+		String tempContainsKey="";
 		if(StringUtils.isNotEmpty(versionName)){
 			if(opType!=null){
 				if(StringUtils.isNotEmpty(labelKey)){
 					tempKey=labelKey.split(",")[1];
+					tempContainsKey=containsLabelKey.split(",")[1];
 					tempVersion=versionName;
 					if(opType==0){
-						adminConsoleService.addVersion(tempVersion, tempKey);
+						adminConsoleService.addVersion(tempVersion,tempContainsKey, tempKey);
 					}
 					else if(opType==1){
-						adminConsoleService.deleteVersion(tempVersion, tempKey);
+						adminConsoleService.deleteVersion(tempVersion,tempContainsKey, tempKey);
 					}
 					WebUtil.addSuccessMessage("已完成更新操作！");
 				}
