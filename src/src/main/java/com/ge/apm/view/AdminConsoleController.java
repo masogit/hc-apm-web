@@ -62,7 +62,7 @@ public class AdminConsoleController {
 			SysRole tempRole=listSysRole.get(i);
 			listSysRoleName.add(tempRole.getName()+"_"+tempRole.getRoleDesc()+"_"+tempRole.getId());
 		}
-		sysRoleName=listSysRoleName.get(0);
+		sysRoleName=currentSysRole.getName()+"_"+currentSysRole.getRoleDesc()+"_"+currentSysRole.getId();
 		sysRoleChange();
 	}
 	public void sysRoleChange(){
