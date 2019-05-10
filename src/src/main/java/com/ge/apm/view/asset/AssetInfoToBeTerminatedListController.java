@@ -506,11 +506,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public void terminateAsset(AssetInfo assetInfo) {
-        logger.info("Terminate: " + assetInfo.getUid());
         if (assetInfo == null) {
             return;
         }
 
+        logger.info("Terminate: " + assetInfo.getUid());
         if (validateTermination(assetInfo)) return;
 
         assetInfo.setStatus(4);
@@ -521,6 +521,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {
+        if (assetInfo.getStatus() != 4) {
+            WebUtil.addErrorMessage(String.format("设备[%s]未处于待报废状态，不能报废！", assetInfo.getName()));
+            return true;
+        }
+
         int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
         if (workOrdersNum > 0) {
             WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
