@@ -105,7 +105,7 @@ public class AdminConsoleService {
 		return list18;
 	}
 	
-	public void addVersion(String version,String key) {
+	public void addVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
 			Iterator<TenantInfo> it=listTenantInfo.iterator();
@@ -124,7 +124,7 @@ public class AdminConsoleService {
 						if(tempVersion.equals(version)){
 							JSONArray tempArr=jsonObj.getJSONArray("menuList");
 							if(tempArr!=null){
-								if(!tempArr.contains(key)){
+								if((!tempArr.contains(key)) && tempArr.contains(containsLabelKey)){
 									tempArr.add(key);
 									String result=jsonObj.toString();
 									tempInfo.setTenantConfig(result);
@@ -137,7 +137,7 @@ public class AdminConsoleService {
 			}
 		}
 	}
-	public void deleteVersion(String version,String key) {
+	public void deleteVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
 			Iterator<TenantInfo> it=listTenantInfo.iterator();
@@ -156,7 +156,7 @@ public class AdminConsoleService {
 						if(tempVersion.equals(version)){
 							JSONArray tempArr=jsonObj.getJSONArray("menuList");
 							if(tempArr!=null){
-								if(tempArr.contains(key)){
+								if(tempArr.contains(key) && tempArr.contains(containsLabelKey)){
 									tempArr.remove(key);
 									String result=jsonObj.toString();
 									tempInfo.setTenantConfig(result);
