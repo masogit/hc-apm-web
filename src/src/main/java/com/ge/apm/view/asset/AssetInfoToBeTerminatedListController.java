@@ -38,8 +38,10 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,6 +132,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private List<AssetInfo> batchUpdateAssets;
 
     private UaaService uuaService;
+
+    private StreamedContent assetTemplateFile;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -228,6 +232,12 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
+    }
+
+
+    public void exportAssetExcelTemplate() {
+        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
+        assetTemplateFile = new DefaultStreamedContent(resourceAsStream, "application/vnd.ms-excel", "template.xlsx");
     }
 
     public void batchUpdate() {
@@ -827,5 +837,13 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setTerminationCause(String terminationCause) {
         this.terminationCause = terminationCause;
+    }
+
+    public StreamedContent getAssetTemplateFile() {
+        return assetTemplateFile;
+    }
+
+    public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
+        this.assetTemplateFile = assetTemplateFile;
     }
 }
