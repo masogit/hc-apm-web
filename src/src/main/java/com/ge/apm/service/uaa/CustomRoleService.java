@@ -94,6 +94,14 @@ public class CustomRoleService {
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
 	private static final String MSG_TYPE_AUTH = "customRoleAuth";
 	private static final String MSG_TYPE_CARD = "wechatCard";
+	
+	private List<I18nMessage> listI18Card=null;
+	private List<I18nMessage> listI18Auth=null;
+	public void init(){
+		listI18Card=null;
+		listI18Auth=null;
+	}
+	
 	public List<I18nMessage> getMenusByTenant(String tenantUid){
 		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_VERSION);
 		TenantInfo tenant=tenantInfoRepository.findByuid(tenantUid);
@@ -127,19 +135,28 @@ public class CustomRoleService {
 		}
 		return listNew;
 	}
-	public List<I18nMessage> getCardsByTenant(String tenantUid){
-		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_CARD);
-		return list18;
+	public List<I18nMessage> getCardI18n(){
+		if(listI18Card==null){
+			listI18Card = i18nRepository.findI18nByType(MSG_TYPE_CARD);
+		}
+		return listI18Card;
+	}
+	
+	public List<I18nMessage> getAuthI18n(){
+		if(listI18Auth==null){
+			listI18Auth = i18nRepository.findI18nByType(MSG_TYPE_AUTH);
+		}
+		return listI18Auth;
 	}
 	
 	public JSONArray getAuth(){
-		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_AUTH);
+		getAuthI18n();
 		JSONArray arr=new JSONArray();
-		if(list18!=null && list18.size()>0){
-			for(int i=0;i<list18.size();++i){
+		if(listI18Auth!=null && listI18Auth.size()>0){
+			for(int i=0;i<listI18Auth.size();++i){
 				JSONObject auth=new JSONObject();
-				auth.put("k", list18.get(i).getMsgKey());
-				auth.put("v", list18.get(i).getValue());
+				auth.put("k", listI18Auth.get(i).getMsgKey());
+				auth.put("v", listI18Auth.get(i).getValue());
 				auth.put("a", false);
 				auth.put("m", false);
 				auth.put("d", false);
@@ -150,5 +167,27 @@ public class CustomRoleService {
 			}
 		}
 		return arr;
+	}
+	
+	public String parseAuthArray(JSONArray authArr){
+		StringBuilder sb=new StringBuilder();
+		for(int i=0;i<authArr.size();++i){
+			JSONObject tempObj=authArr.getJSONObject(i);
+			String key=tempObj.getString("k");
+			List<I18nMessage> listI18=i18nRepository.findI18nByType(key);
+			if(listI18!=null && listI18.size()>0){
+				for(int j=0;j<listI18.size();++j){
+					I18nMessage tempMessage=listI18.get(j);
+					String tempKey=tempMessage.getMsgKey();
+					if(tempObj.getBooleanValue(tempKey)){
+						sb.append(tempMessage.getValue());
+						sb.append(",");
+					}
+				}
+			}
+		}
+		String str=sb.toString();
+		str=str.substring(0, str.length()-1);
+		return str;
 	}
 }
