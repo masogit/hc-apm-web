@@ -130,11 +130,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			if (StringUtils.isNotEmpty(selected.getCards())) {
 				cards = selected.getCards().split(",");
 			}
-			else{
-				for (int i = 0; i < listI18nCards.size(); ++i) {
-					cards[i] = listI18nCards.get(i).getMsgKey();
-				}
-			}
 			if(StringUtils.isNotEmpty(selected.getJsonAuthorities())){
 				authJSONArr=JSONArray.parseArray(selected.getJsonAuthorities());
 				JSONArray initArr=service.getAuth();
@@ -156,10 +151,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			}
 			if (StringUtils.isNotEmpty(selected.getMenus())) {
 				menus = selected.getMenus().split(",");
-			} else {
-				for (int i = 0; i < listI18nMenus.size(); ++i) {
-					menus[i] = listI18nMenus.get(i).getMsgKey();
-				}
 			}
 		}
 	}
@@ -201,7 +192,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				listAll.add(list[i]);
 			}
 		}
-		String[] strArr=new String[1];
+		String[] strArr=new String[0];
 		return listAll.toArray(strArr);
 	}
 	
