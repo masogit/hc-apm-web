@@ -32,8 +32,8 @@ public class CustomRole implements Serializable {
     @Column(name = "authorities",columnDefinition="text")
     private String authorities;
     
-    @Column(name = "json_authorities",columnDefinition="text")
-    private String jsonAuthorities;
+    @Column(name = "web_authorities",columnDefinition="text")
+    private String webAuthorities;
     
     @Column(name = "cards",columnDefinition="text")
     private String cards;
@@ -49,6 +49,9 @@ public class CustomRole implements Serializable {
 
     @Column(name = "cards_ch")
     private String cardsCH;
+    
+    @Column(name = "web_authorities_ch")
+    private String webAuthoritiesCH;
 
     @Column(name = "groups")
     private String groups;
@@ -243,12 +246,24 @@ public class CustomRole implements Serializable {
 		this.menusCH = menusCH;
 	}
 
-	public String getJsonAuthorities() {
-		return jsonAuthorities;
+	public String getWebAuthorities() {
+		return webAuthorities;
 	}
 
-	public void setJsonAuthorities(String jsonAuthorities) {
-		this.jsonAuthorities = jsonAuthorities;
+	public void setWebAuthorities(String webAuthorities) {
+		this.webAuthorities = webAuthorities;
+	}
+
+	public String getWebAuthoritiesCH() {
+		return webAuthoritiesCH;
+	}
+
+	public void setWebAuthoritiesCH(String webAuthoritiesCH) {
+		if(webAuthoritiesCH!=null && webAuthoritiesCH.length()>60){
+			webAuthoritiesCH=webAuthoritiesCH.substring(0, 60);
+			webAuthoritiesCH+="...";
+		}
+		this.webAuthoritiesCH = webAuthoritiesCH;
 	}
 
 	@Override
