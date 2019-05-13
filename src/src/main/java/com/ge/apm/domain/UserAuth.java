@@ -62,7 +62,13 @@ public class UserAuth {
 	public void setAuthExport(Boolean authExport) {
 		this.authExport = authExport;
 	}
-	
-	
-	
+	public void setAllAuth(String authKey,boolean value){
+		this.setAuthKey(authKey);
+		this.setAuthCreate(value);
+		this.setAuthDelete(value);
+		this.setAuthModify(value);
+		this.setAuthSearch(value);
+		this.setAuthImport(value);
+		this.setAuthExport(value);
+	}
 }
