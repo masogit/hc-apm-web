@@ -225,7 +225,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             String tenantUid = currentUserAccount.getTenantUID();
-            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid);
+            List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
+            Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
+            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid, siteUids);
 
             batchUpdateAssets.removeIf(i -> validateTermination(i));
 
@@ -241,13 +243,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public void batchUpdate() {
-        List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
-        Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
-
-        batchUpdateAssets.removeIf(i -> !(siteUids.contains(i.getSiteUID()) && i.getStatus() == 4));
-
         batchUpdateAssets.forEach(i -> terminateAsset(i));
-
         batchUpdateAssets.clear();
         uploadedFile = null;
     }

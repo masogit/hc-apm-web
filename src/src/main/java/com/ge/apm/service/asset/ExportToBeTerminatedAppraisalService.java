@@ -46,12 +46,12 @@ public class ExportToBeTerminatedAppraisalService {
     @Autowired
     private BlobFileService blobService;
 
-    public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid) throws Exception {
+    public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
         ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
-        return getAssetMapFromTemplate(reader, tenantUid);
+        return getAssetMapFromTemplate(reader, tenantUid, siteIds);
     }
 
-    public List<AssetInfo> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc, String tenantUid) throws Exception {
+    public List<AssetInfo> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc, String tenantUid, Set<String> siteIds) throws Exception {
         List<AssetInfo> result = new ArrayList<>();
         int dataRow = 1;
 
@@ -67,6 +67,7 @@ public class ExportToBeTerminatedAppraisalService {
                 }
 
                 List<AssetInfo> byFinancingNumAndTenantUID = assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid);
+                byFinancingNumAndTenantUID.removeIf(i -> !siteIds.contains(i.getSiteUID()));
                 if (byFinancingNumAndTenantUID.isEmpty()) {
                     WebUtil.addErrorMessage(String.format("资产编号[%s]对应的设备不存在，不能报废！", funNum));
                 } else {
