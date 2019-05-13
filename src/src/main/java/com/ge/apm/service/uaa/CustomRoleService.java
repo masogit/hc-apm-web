@@ -118,10 +118,10 @@ public class CustomRoleService {
 		for(int i=0;i<list18.size();++i){
 			I18nMessage i18n=list18.get(i);
 			String key=i18n.getMsgKey();
-			if(key.contains("nurseSite.")||key.equals("nurseSite")){
+			if(key.contains("nurseSite.")){
 				listNew.add(i18n);
 			}
-			else if(key.equals("asset.inventory") || key.equals("asset")){
+			else if(key.equals("asset.inventory")){
 				listNew.add(i18n);
 			}
 		}
