@@ -1,48 +1,29 @@
 package com.ge.apm.view.sysutil;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.spi.http.HttpHandler;
 
 import com.ge.apm.web.cboard.CBoardController;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpRequestResponseHolder;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.jsf.FacesContextUtils;
-import webapp.framework.context.WrappedRequest;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.LoginService;
-import webapp.framework.web.service.MessageUtil;
-import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @RequestScoped
@@ -114,6 +95,30 @@ public class LoginController extends LoginService {
         }
         
         return plainPassword;        
+    }
+
+    private boolean checkPassword(String plainPassword){
+        String saltedPassword = null;
+        try {
+            byte[] salt = Digests.decodeHex(user.getPwdSalt());
+            byte[] hashPassword = Digests.sha1(plainPassword.getBytes(), salt, UserAccount.HASH_INTERATIONS);
+            saltedPassword = Digests.encodeHex(hashPassword);
+        } catch (Exception ex) {
+                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return user.getPassword().equals(saltedPassword);
+    }
+    
+    @Override
+    protected boolean beforeLogin(String plainPassword) {
+        if(!StringUtils.isEmpty(PasswordUtil.checkPwd(plainPassword))){
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+            addErrorMessage(response, 205, "Resetpassword");
+            return false;
+        }
+        return true;
     }
     
     @Override
@@ -294,4 +299,62 @@ public class LoginController extends LoginService {
     public void setItems(List<String> items) {
         this.items = items;
     }
+    
+
+    private String username;
+    private String password;
+    private String newPassword;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public void resetPassword(){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        user = userAccountDao.getByLoginName(username);
+        if(user==null){
+            WebUtil.addErrorMessage("用户名或密码错误!");
+            return;
+        }
+
+        if(PasswordUtil.DEFAULT_PWD.equals(newPassword))
+            WebUtil.addErrorMessage("请不要使用系统默认密码作为个人密码!");
+        else if(!checkPassword(password))
+            WebUtil.addErrorMessage("用户名或密码错误!");
+        else{
+            String checkResult = PasswordUtil.checkPwd(newPassword);
+            if(!StringUtils.isEmpty(checkResult))
+                WebUtil.addErrorMessage(checkResult);
+            else{
+                user.setPassword(this.onPasswordEncrypted(username, newPassword));
+                userAccountDao.save(user);
+
+                this.doSpringSecuritylogin(request, response, user.getLoginName(), user.getPassword());
+            }
+        }
+    }
+    
 }

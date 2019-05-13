@@ -1,8 +1,16 @@
 package com.ge.apm.service.utils;
 
 public class PasswordUtil {
-	public static final String DEFAULT_PWD = "G125@e";
-	public static String checkPwd(String str){
+	public static final String DEFAULT_PWD2 = "G125@e";
+	public static final String DEFAULT_PWD = "Apm@Cloud189ge";
+        
+	public static boolean isDefaultPassword(String str){
+            return DEFAULT_PWD.equals(str) || DEFAULT_PWD2.equals(str);
+        }
+
+        public static String checkPwd(String str){
+                if(isDefaultPassword(str)) return "请不要使用系统默认密码作为个人密码!";
+                
 		StringBuilder sb = new StringBuilder();
 		
 		if(str == null){
@@ -40,7 +48,7 @@ public class PasswordUtil {
 		}
 		char[] cc = str.toCharArray();
 
-		for(int i = 0; i< cc.length - 3; i++){
+		for(int i = 0; i< cc.length - 2; i++){
 			if(Math.abs(cc[i] - cc[i+1]) == 1 && (cc[i] - cc[i+1]) == (cc[i+1] - cc[i+2])){
 				sb.append("不能有三个连续的字符!");
 				return sb.toString();

@@ -63,16 +63,12 @@
                     top:5%;
                     position: absolute;
                 }
-                .ui-widget, .fa{
+                .ui-g-12> .ui-widget, .fa{
                     color: white;
                 }
                 .card{
                     margin-left: -175px!important;
                     margin-right: 0px!important;
-                }
-                .ui-dialog .ui-dialog-content{
-                    padding:0px;
-                    background-color:#000
                 }
                 .bottom-ctner{
                     width:98%;
@@ -82,15 +78,38 @@
                     left: 0;
                     color: #fff;
                 }
+                .ui-growl > .ui-growl-item-container {
+                    background-color: #5180ce!important;
+                }
+                
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
                 // clear local storage when logged out
                 var match = location.search.match(/uid=(\d+)/);
                 if(match) {
-                lscache.setBucket(+match[1]);
-                // only removes cache entries for this logged out user
-                lscache.flush();
+                    lscache.setBucket(+match[1]);
+                    // only removes cache entries for this logged out user
+                    lscache.flush();
+                }
+                
+                function handleLoginError(xhr, status, exception) {
+                    if(xhr.status===401){
+                        PF("dlgLoginError").show();
+                    }
+
+                    if(xhr.status===403){
+                        PF("dlgAccountLocked").show();
+                    }
+                }
+
+                function handleSuccess(data, status, xhr) {
+                    if(xhr.status===205){
+                        document.getElementById("hiddenPwd").value = document.getElementById("j_password").value;
+                        document.getElementById("hiddenUname").value = document.getElementById("j_username").value;
+                    
+                        PF("dlgResetPassword").show();
+                    }
                 }
             </h:outputScript>
         </h:head>
@@ -118,19 +137,61 @@
                             <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                         </div>
                         <div class="ui-g-12" style="margin-bottom: 0px;">
-                            <p:commandButton styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
+                            <p:commandButton onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
                         </div>
                     </div>
                 </div>
 
             </h:form>
-            <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+            <p:ajaxStatus onstart="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide()" />
             <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false" style="border:0">
                 <p:graphicImage name="/img/ajaxloader2.gif"  height="40" width="60"  />
             </p:dialog>
-            <p:growl id="growl">
-                <p:autoUpdate />
-            </p:growl>
+            <p:growl id="growl"/>
+
+            <p:dialog modal="true" widgetVar="dlgLoginError" header="登录失败" appendTo="@(body)">
+                <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
+                <h:outputText value="用户名或密码错误。请重新输入用户名和密码！"/>
+                <br/><br/>
+                <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgLoginError').hide()"/>
+            </p:dialog>
+
+            <p:dialog modal="true" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">
+                <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
+                <h:outputText value="帐号被锁定，请24小时后再试！"/>
+                <br/><br/>
+                <p:commandButton value="#{msg.Confirm}" type="button" onclick="PF('dlgAccountLocked').hide()"/>
+            </p:dialog>
+
+            <p:dialog modal="true" header="请修改密码" widgetVar="dlgResetPassword" minHeight="40" closable="false" appendTo="@(body)">
+                <h:form prependId="false">
+                    <p:fieldset>
+                        <label>根据中国电信专有云平台最新安全规范要求，为保障用户权益和信息安全， </label><br/>
+                        <label>请将密码至更高安全级别，密码设置规则如下:</label><br/>
+                        <label>1.密码长度至少8位，不能包含空格，制表符或换页符</label><br/>
+                        <label>2.必须以大写英文字母开头，小写英文字母结尾</label><br/>
+                        <label>3.密码必需包含4种字符：大写字母，小写字母，特殊字符(如: ! @ # $ % &amp;)和数字</label><br/>
+                        <label>4.密码不能有3个连续相同字符或3个连续字符 (如： 111, aaa, 123, abc...)</label><br/><br/>
+                        
+                        <h:inputHidden id="hiddenPwd" value="#{loginController.password}"/>
+                        <h:inputHidden id="hiddenUname" value="#{loginController.username}"/>
+
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="color:black;">
+                            <h:panelGroup>
+                                <label class="label">#{msg.NewPassword}</label>
+                                <p:password validatorMessage="${msg.PasswordNotMatch}" weakLabel=" " goodLabel=" " strongLabel=" " promptLabel=" " id="password1" match="password2" maxlength="20" value="#{loginController.newPassword}" feedback="true"  required="true" requiredMessage="#{msg.password} #{msg.ValidationRequire}" style="color:black;"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">请重输新密码</label>
+                                <p:password id="password2" feedback="false" required="true" style="color:black;" validatorMessage="${msg.PasswordNotMatch}" requiredMessage="#{msg.password} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <br/>
+                    <p:commandButton value="#{msg.Confirm}" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl"/>
+                    <p:commandButton value="#{msg.Cancel}" immediate="true" process="@this" type="button" onclick="PF('dlgResetPassword').hide()"/>
+                </h:form>
+            </p:dialog>
             
             <div id="bottom_container" class="bottom-ctner">
                 <table align="right"><tr><td><img src="resources/img/ChinaTelecom.png"/></td><td>ICP证号: 沪ICP备05002432号</td></tr></table>
