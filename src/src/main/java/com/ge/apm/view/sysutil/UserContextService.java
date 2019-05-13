@@ -449,7 +449,10 @@ public class UserContextService implements Serializable {
     	customRoleAuth.setAuthKey(authKey);
     	List<CustomRole> listCustomRole=getCustomRole(userId);
     	List<SysRole> listSysRole=getSysRole(userId);
-		if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
+    	if(listSysRole!=null && listSysRole.size()>0){
+    		customRoleAuth.setAllAuth(authKey,true);
+    	}
+    	else if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
 			for(int i=0;i<listCustomRole.size();++i){
 				CustomRole customRole=listCustomRole.get(i);
 				String jsonStr=customRole.getWebAuthorities();
@@ -473,13 +476,7 @@ public class UserContextService implements Serializable {
 			}
 		}
 		else{
-			customRoleAuth.setAuthKey(authKey);
-			customRoleAuth.setAuthCreate(true);
-			customRoleAuth.setAuthDelete(true);
-			customRoleAuth.setAuthModify(true);
-			customRoleAuth.setAuthSearch(true);
-			customRoleAuth.setAuthImport(true);
-			customRoleAuth.setAuthExport(true);
+			customRoleAuth.setAllAuth(authKey,true);
 		}
 		return customRoleAuth;
     }
