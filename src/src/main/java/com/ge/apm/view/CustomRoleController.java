@@ -75,8 +75,9 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		service = WebUtil.getBean(CustomRoleService.class);
 		listI18nMenus = service.getMenusByTenant(user.getTenantUID());
-		listI18nCards=service.getCardsByTenant(user.getTenantUID());
+		listI18nCards=service.getCardI18n();
 		authJSONArr = service.getAuth();
+		service.init();
 	}
 
 	@Override
@@ -130,8 +131,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			if (StringUtils.isNotEmpty(selected.getCards())) {
 				cards = selected.getCards().split(",");
 			}
-			if(StringUtils.isNotEmpty(selected.getJsonAuthorities())){
-				authJSONArr=JSONArray.parseArray(selected.getJsonAuthorities());
+			if(StringUtils.isNotEmpty(selected.getWebAuthorities())){
+				authJSONArr=JSONArray.parseArray(selected.getWebAuthorities());
 				JSONArray initArr=service.getAuth();
 				for(int i=0;i<initArr.size();++i){
 					JSONObject tempObj=initArr.getJSONObject(i);
@@ -277,7 +278,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setAuthorities("");
 		}
 		authChange();
-		selected.setJsonAuthorities(authJSONArr.toString());
+		selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
+		selected.setWebAuthorities(authJSONArr.toString());
 		if (cards.length > 0) {
 			StringBuilder sb2 = new StringBuilder();
 			for (String card : cards) {
@@ -306,11 +308,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setMenusCH("");
 			selected.setMenus("");
 		}
-//		if (StringUtils.isEmpty(selected.getAuthorities()) && StringUtils.isEmpty(selected.getJsonAuthorities())) {
-//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-//			WebUtil.addErrorMessage(WebUtil.getMessage("authoritiesIsBlank"));
-//			return;
-//		}
 		dao.save(selected);
 		authorities = new String[200];
 		cards = new String[100];
