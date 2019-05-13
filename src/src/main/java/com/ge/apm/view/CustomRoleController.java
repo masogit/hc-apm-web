@@ -204,6 +204,27 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		String[] strArr=new String[1];
 		return listAll.toArray(strArr);
 	}
+	
+	private String parseMenus(String[] menus){
+		StringBuilder sb=new StringBuilder();
+		Set<String> set=new HashSet<String>();
+		for(int i=0;i<menus.length;++i){
+			set.add(menus[i]);
+			int index=menus[i].indexOf(".");
+			if(index>0){
+				set.add(menus[i].substring(0, index));
+			}
+		}
+		for(String str:set){
+			sb.append(str);
+			sb.append(",");
+		}
+		String str=sb.toString();
+		if(str.length()>0){
+			str=str.substring(0,str.length()-1);
+		}
+		return str;
+	}
 
 	@Transactional
 	public void save() {
@@ -288,7 +309,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				}
 			}
 			selected.setMenusCH(removeComma(sb2));
-			selected.setMenus(StringUtils.join(menus, ","));
+			selected.setMenus(parseMenus(menus));
 		}
 		else{
 			selected.setMenusCH("");
