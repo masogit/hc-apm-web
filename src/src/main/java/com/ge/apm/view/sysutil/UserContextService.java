@@ -439,14 +439,20 @@ public class UserContextService implements Serializable {
     	return userContextService.getListCustomRole(userId);
     }
     
+    public static List<SysRole> getSysRole(Integer userId){
+    	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+    	return userContextService.getListSysRole(userId);
+    }
+    
     public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
     	UserAuth customRoleAuth=new UserAuth();
     	customRoleAuth.setAuthKey(authKey);
     	List<CustomRole> listCustomRole=getCustomRole(userId);
+    	List<SysRole> listSysRole=getSysRole(userId);
 		if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
 			for(int i=0;i<listCustomRole.size();++i){
 				CustomRole customRole=listCustomRole.get(i);
-				String jsonStr=customRole.getJsonAuthorities();
+				String jsonStr=customRole.getWebAuthorities();
 				if(StringUtils.isNotEmpty(jsonStr)){
 					JSONArray jsonArr=JSONArray.parseArray(jsonStr);
 					for(int j=0;j<jsonArr.size();++j){
