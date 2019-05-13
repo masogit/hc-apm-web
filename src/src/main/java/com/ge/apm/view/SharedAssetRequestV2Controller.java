@@ -195,7 +195,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
         if(currentWorkflowConfig == null) {
             currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
-            if(selected != null) {
+            if(selected != null && selected.getBehavior() != null) {
                 if(selected.getBehavior().intValue() == 1) {
                     //借用
                     if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
