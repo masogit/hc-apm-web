@@ -54,6 +54,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.MicroServiceUtil;
 
 import webapp.framework.context.WrappedRequest;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
 public class LoginService implements Serializable, ApplicationEventPublisherAware {
@@ -65,10 +66,12 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private SecurityContextRepository securityContextRepository;
     private MessageUtil messageUtil;
-    private UserAccountRepository userAccountDao;
+    protected UserAccountRepository userAccountDao;
     private ApplicationEventPublisher applicationEventPublisher;
     private MicroServiceUtil msUtil;
     private GeSsoService geSsoService;
+    
+    protected UserAccount user;
 
     static {
         IdFuzzyResolver.registerResolver();
@@ -167,9 +170,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         return "";
     }
 
+    public void addErrorMessage(HttpServletResponse response, int errorCode, String msgKey){
+        response.setStatus(errorCode);
+        messageUtil.error(msgKey);
+    }
+    
     public Authentication authenticate(HttpServletRequest request, HttpServletResponse response) {
         String userName = request.getParameter("j_username");
         if (userName == null) {
+            addErrorMessage(response, 401, "security_username_not_found");
             logger.error("userName can't be null !");
             return null;
         }
@@ -181,23 +190,23 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             }
             return authResult;
         } catch (UsernameNotFoundException e) {
-            messageUtil.error("security_username_not_found");
+            addErrorMessage(response, 401, "security_username_not_found");
         } catch (DisabledException e) {
-            messageUtil.error("security_account_disabled");
+            addErrorMessage(response, 401, "security_account_disabled");
         } catch (LockedException e) {
-            messageUtil.error("AccountLocked");
+            addErrorMessage(response, 403, "AccountLocked");
         } catch (AccountExpiredException e) {
-            messageUtil.error("security_account_expired");
+            addErrorMessage(response, 401, "security_account_expired");
         } catch (CredentialsExpiredException e) {
-            messageUtil.error("security_account_credentials_expired");
+            addErrorMessage(response, 401, "security_account_credentials_expired");
         } catch (AccountStatusException e) {
-            messageUtil.error("security_account_status_invalid");
+            addErrorMessage(response, 401, "security_account_status_invalid");
         } catch (BadCredentialsException e) {
+            addErrorMessage(response, 401, "security_account_status_invalid");
             updateLoginStatus(userName, false);
-            //messageUtil.error("security_bad_credentials");
         } catch (AuthenticationException e) {
+            addErrorMessage(response, 401, "login_error");
             updateLoginStatus(userName, false);
-            //messageUtil.error("security_error");
         }
         return null;
     }
@@ -222,66 +231,79 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         }
     }
 
+    protected boolean beforeLogin(String password) {
+        return true;
+    }
+    
     public void doLogin() {
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        String userName = request.getParameter("j_username");
+        String passwordPlain = request.getParameter("j_password");
+
+        if ("".equals(userName) || userName == null) {
+            userName = request.getParameter("input_j_username");
+            passwordPlain = request.getParameter("input_j_password");
+        }
+        if (passwordPlain == null){
+            addErrorMessage(response, 401, "login_error");
+            return;
+        }
+
+        user = userAccountDao.getByLoginName(userName);
+        if(user==null){
+            addErrorMessage(response, 401, "login_error");
+            return;
+        }
+
+        if(user.getIsLocked()!=null && user.getIsLocked()==true){
+            if(TimeUtil.timeNow().minusHours(24).isBefore(TimeUtil.toJodaDate(user.getLockTime()))){
+                addErrorMessage(response, 403, "AccountLocked");
+                return;
+            }
+            user.setIsLocked(false);
+            user.setPasswordErrorCount(0);
+        }
+
+        String passwordEncrypted = onPasswordEncrypted(userName, passwordPlain);
+        if(!user.getPassword().equals(passwordEncrypted)){
+            updateLoginStatus(userName, false);
+            addErrorMessage(response, 401, "login_error");
+            return;
+        }
+
+        if(!beforeLogin(passwordPlain)) return;
+
+        doSpringSecuritylogin(request, response, userName, passwordEncrypted);
+    }
+
+    public void doSpringSecuritylogin(HttpServletRequest request, HttpServletResponse response, String userName, String password) {
         HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
         SecurityContext securityContext = securityContextRepository.loadContext(holder);
         SecurityContextHolder.setContext(securityContext);
-        String userName = "";
-        String password;
+        Map<String, String[]> extraParams = new TreeMap<>();
+
         try {
-            Map<String, String[]> extraParams = new TreeMap<>();
-            userName = request.getParameter("j_username");
-            password = request.getParameter("j_password");
-            String originPwd = password;
-            String originUserName = userName;
+            extraParams.put("j_username", new String[] { userName });
+            extraParams.put("j_password", new String[] { password });
 
-            if ("".equals(userName) || userName == null) {
-                userName = request.getParameter("input_j_username");
-                password = request.getParameter("input_j_password");
-                extraParams.put("j_username", new String[]{userName});
-                extraParams.put("j_password", new String[]{password});
-                request = new WrappedRequest(request, extraParams);
-            }
-            if (password == null)
-                password = "";
-
-            password = onPasswordEncrypted(userName, password);
-
-            try {
-                UserAccount user = userAccountDao.getByLoginName(userName);
-                if (user == null) {
-                    String geLoginName = "ge" + userName;
-                    UserAccount geUser = userAccountDao.getByLoginName(geLoginName);
-                    if (geUser != null) {
-                        boolean geSsoAuthPass = geSsoService.authenticate(userName, password);
-                        if (geSsoAuthPass) {
-                            userName = geLoginName;
-                            password = geUser.getPassword();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                logger.warn("Fail to valid by ge sso " + e.getMessage());
-            }
-
-            extraParams.put("j_username", new String[]{userName});
-            extraParams.put("j_password", new String[]{password});
-            request = new WrappedRequest(request, extraParams);
+            HttpServletRequest wrappedRequest = new WrappedRequest(request, extraParams);
+            request = wrappedRequest;
 
             Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
             if (authResult == null) {
-                updateLoginStatus(userName, false);
-                messageUtil.error("security_error");
-                return;
+                    updateLoginStatus(userName, false);
+                    messageUtil.error("security_error");
+                    return;
             }
-            try {
-                sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
-            } catch (Exception ex) {
+            try{
+                    sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+            }
+            catch(Exception ex){
+            }
 
-            }
             // below : do the same thing as in
             // AbstractAuthenticationProcessingFilter.successfulAuthentication(),
             // except for the redirection to the login success URL that is
@@ -296,7 +318,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(originUserName, originPwd);
+            afterLogin(userName,password);
             updateLoginStatus(userName, true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
@@ -308,21 +330,19 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
              * context.getApplication().getNavigationHandler();
              * handler.performNavigation("/home.xhtml?faces-redirect=true");
              */
-        } catch (UsernameNotFoundException e) {
-            messageUtil.error("security_username_not_found");
+        } catch (UsernameNotFoundException | BadCredentialsException e) {
+            addErrorMessage(response, 401, "login_error");
         } catch (DisabledException e) {
-            messageUtil.error("security_account_disabled");
+            addErrorMessage(response, 401, "security_account_disabled");
         } catch (LockedException e) {
-            messageUtil.error("AccountLocked");
-        } catch (AccountExpiredException e) {
-            messageUtil.error("security_account_expired");
-        } catch (CredentialsExpiredException e) {
-            messageUtil.error("security_account_credentials_expired");
+            addErrorMessage(response, 403, "AccountLocked");
+        } catch (AccountExpiredException | CredentialsExpiredException e) {
+            addErrorMessage(response, 401, "security_account_expired");
         } catch (AccountStatusException e) {
-            messageUtil.error("security_account_status_invalid");
+            addErrorMessage(response, 401, "AccountLocked");
         } catch (AuthenticationException e) {
+            addErrorMessage(response, 401, "login_error");
             updateLoginStatus(userName, false);
-            //messageUtil.error("security_error");
         } finally {
             securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
         }
@@ -334,7 +354,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             messageUtil.error("security_bad_credentials");
             return;
         }
-        UserAccount user = userAccountDao.getByLoginName(userName);
+        if (user == null) user = userAccountDao.getByLoginName(userName);
+
         if (user == null) {
             messageUtil.error("security_bad_credentials");
             logger.error("can't find user by loginName:{}", userName);
