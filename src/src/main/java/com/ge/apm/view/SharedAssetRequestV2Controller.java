@@ -195,6 +195,24 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
         if(currentWorkflowConfig == null) {
             currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            if(selected != null) {
+                if(selected.getBehavior().intValue() == 1) {
+                    //借用
+                    if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
+                        if(selected.getEffort() == null) {
+                            selected.setEffort(currentWorkflowConfig.getDefaultLeaseManHour());
+                        }
+                    }
+                }
+                if(selected.getBehavior().intValue() == 2) {
+                    //归还
+                    if(currentWorkflowConfig.getEnableReturnManHour() != null && currentWorkflowConfig.getEnableReturnManHour()) {
+                        if(selected.getEffort() == null) {
+                            selected.setEffort(currentWorkflowConfig.getDefaultReturnManHour());
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -414,13 +432,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setMsgEndTime(new Date());
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
-            if(currentWorkflowConfig.getEnableReturnManHour() != null && currentWorkflowConfig.getEnableReturnManHour()) {
-                if(selected.getEffort() == null) {
-                    selected.setEffort(currentWorkflowConfig.getDefaultReturnManHour());
-                }
-            }
             this.save();
-
         }else if(sta == 7 || sta == 11){
             pageName = "Edit";
         }else if(sta == 12 || sta == 9 || sta == 10 || sta == 13){
@@ -449,13 +461,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //            selected.setMsgBeginTime(this.getTime("借用"));
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
-            if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
-                if(selected.getEffort() == null) {
-                    selected.setEffort(currentWorkflowConfig.getDefaultLeaseManHour());
-                }
-            }
             this.save();
-
         }else if(sta == 1||sta == 5){
             pageName = "Edit";
         }else if(sta == 6 || sta == 3 || sta == 4 || sta == 0){
