@@ -22,6 +22,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.LoginService;
 
@@ -350,6 +351,8 @@ public class LoginController extends LoginService {
                 WebUtil.addErrorMessage(checkResult);
             else{
                 user.setPassword(this.onPasswordEncrypted(username, newPassword));
+                user.setLastModifiedDate(TimeUtil.now());
+                user.setLastModifiedBy(user.getLoginName());
                 userAccountDao.save(user);
 
                 doSpringSecuritylogin(request, response, user.getLoginName(), newPassword, user.getPassword());
