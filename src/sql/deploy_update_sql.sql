@@ -352,3 +352,4 @@ update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.an
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.orgSys';
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.userSys';
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.qrCodeSys';
+alter table shared_asset_request alter column modify_date type timestamp using modify_date::timestamp;
