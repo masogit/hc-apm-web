@@ -1339,6 +1339,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                return;
            } else {
                 selected.setState(state);
+                selected.setModifyDate(new Date());
                 dao.save(selected);
                 asiDao.save(selected.getInfoList());
 
