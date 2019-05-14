@@ -352,7 +352,7 @@ public class LoginController extends LoginService {
                 user.setPassword(this.onPasswordEncrypted(username, newPassword));
                 userAccountDao.save(user);
 
-                this.doSpringSecuritylogin(request, response, user.getLoginName(), user.getPassword());
+                doSpringSecuritylogin(request, response, user.getLoginName(), newPassword, user.getPassword());
             }
         }
     }
