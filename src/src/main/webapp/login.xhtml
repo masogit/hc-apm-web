@@ -81,7 +81,10 @@
                 .ui-growl > .ui-growl-item-container {
                     background-color: #5180ce!important;
                 }
-                
+                #ajaxStatus{
+                    padding:0px;
+                    background-color:#121212;
+                }
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
@@ -144,8 +147,8 @@
 
             </h:form>
             <p:ajaxStatus onstart="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide()" />
-            <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false" style="border:0">
-                <p:graphicImage name="/img/ajaxloader2.gif"  height="40" width="60"  />
+            <p:dialog id="ajaxStatus" widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false" style="border:0">
+                <p:graphicImage name="/img/ajaxloader2.gif"  height="60" width="60"  />
             </p:dialog>
             <p:growl id="growl"/>
 
