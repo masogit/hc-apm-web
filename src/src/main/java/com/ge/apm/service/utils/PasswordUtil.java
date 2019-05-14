@@ -18,8 +18,8 @@ public class PasswordUtil {
 			return sb.toString();
 		}
 		str = str.trim();
-		if(!str.matches("^.{6,}$")){
-			sb.append("密码长度不能少于6位!");
+		if(!str.matches("^.{8,}$")){
+			sb.append("密码长度不能少于8位!");
 			return sb.toString();
 		}
 		Character first = str.charAt(0);
