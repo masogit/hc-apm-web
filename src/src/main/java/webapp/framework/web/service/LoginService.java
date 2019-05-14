@@ -276,10 +276,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 
         if(!beforeLogin(passwordPlain)) return;
 
-        doSpringSecuritylogin(request, response, userName, passwordEncrypted);
+        doSpringSecuritylogin(request, response, userName, passwordPlain, passwordEncrypted);
     }
 
-    public void doSpringSecuritylogin(HttpServletRequest request, HttpServletResponse response, String userName, String password) {
+    public void doSpringSecuritylogin(HttpServletRequest request, HttpServletResponse response, String userName,String passwordPlain, String passwordEncrypted) {
         HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
         SecurityContext securityContext = securityContextRepository.loadContext(holder);
         SecurityContextHolder.setContext(securityContext);
@@ -287,7 +287,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 
         try {
             extraParams.put("j_username", new String[] { userName });
-            extraParams.put("j_password", new String[] { password });
+            extraParams.put("j_password", new String[] { passwordEncrypted });
 
             HttpServletRequest wrappedRequest = new WrappedRequest(request, extraParams);
             request = wrappedRequest;
@@ -318,7 +318,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(userName,password);
+            afterLogin(userName,passwordPlain);
             updateLoginStatus(userName, true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
