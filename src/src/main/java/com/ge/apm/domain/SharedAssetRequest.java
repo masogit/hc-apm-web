@@ -123,11 +123,11 @@ public class SharedAssetRequest implements Serializable{
     private String modifyBy;//修改人
     
     @Column(name = "create_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;//创建日期
     
     @Column(name = "modify_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date modifyDate;//修改日期
     
     @Transient//设备信息（临时）
