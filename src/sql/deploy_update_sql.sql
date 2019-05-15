@@ -338,7 +338,7 @@ update asset_info set system_id = null where system_id is not null and trim(syst
 ALTER TABLE public.custom_role ALTER COLUMN cards TYPE text;
 ALTER TABLE public.custom_role ALTER COLUMN authorities TYPE text;
 update sys_role set authorities = 'nurse.delay,nurse.error,nurse.open,nurse.pass,nurse.today,assetInventory.scan,assetInventory.view',authorities_ch = '逾期检查,有问题,未关机列表,30天内通过,当日检查,扫码盘点,查看盘点工单',cards = 'mgr_inv,nurse',menus='homePage,asset,asset.info,asset.inventory,nurseSite,nurseSite.maintain,nurseSite.config,nurseSite.report,nurseSite.optRecord,examineMgt,examineMgt.pcc' where name = 'NursingStaff';
-update sys_role set menus='homePage,repair,repair.reportMgt,config,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.pcc,examineMgt.ssoImp' where name = 'ITAdmin'; 
+update sys_role set menus='homePage,repair,repair.reportMgt,config,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.pcc,examineMgt.ssoImp' where name = 'ITAdmin';
 update sys_role set menus='homePage,examineMgt,examineMgt.pcc' where name = 'ExternalStaff';
 update sys_role set menus='homePage,examineMgt,examineMgt.pcc' where name = 'ActivationPerson';
 update sys_role set menus='homePage,examineMgt,examineMgt.pcc' where name = 'Guest';
@@ -353,3 +353,14 @@ delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.userSys';
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.qrCodeSys';
 alter table shared_asset_request alter column modify_date type timestamp using modify_date::timestamp;
+
+--v 19.6.1
+update v2_work_order wo set send_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1);
+update v2_work_order wo set send_step_start_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1);
+update v2_work_order wo set accept_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1);
+update v2_work_order wo set accept_step_start_time=(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1);
+update v2_work_order wo set work_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1);
+update v2_work_order wo set evaluate_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1);
+update v2_work_order wo set evaluate_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1);
+update v2_work_order wo set close_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1);
+update v2_work_order wo set close_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1);
