@@ -353,14 +353,3 @@ delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.userSys';
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.qrCodeSys';
 alter table shared_asset_request alter column modify_date type timestamp using modify_date::timestamp;
-
---v 19.6.1
-update v2_work_order wo set send_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1);
-update v2_work_order wo set send_step_start_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 2 order by wos.start_time desc limit 1);
-update v2_work_order wo set accept_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1);
-update v2_work_order wo set accept_step_start_time=(select wos.start_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time asc limit 1);
-update v2_work_order wo set work_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 4 order by wos.start_time desc limit 1);
-update v2_work_order wo set evaluate_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1);
-update v2_work_order wo set evaluate_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 5 order by wos.start_time desc limit 1);
-update v2_work_order wo set close_step_owner_name=(select wos.owner_name from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1);
-update v2_work_order wo set close_step_end_time=(select wos.end_time from v2_work_order_step wos where wos.wo_id = wo.id and wos.step_id = 6 order by wos.start_time desc limit 1);
