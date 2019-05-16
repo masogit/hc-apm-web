@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -43,6 +42,8 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.comment!='' and o.comment is not null)",nativeQuery=true)
 	public Boolean findHasComment(String parentId);
+	
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=2 and date_trunc('day',o.check_date)<=o.schedule_date and o.comment is not null and o.comment !='' order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError5ByLimit(int limit,int offset,Date date);

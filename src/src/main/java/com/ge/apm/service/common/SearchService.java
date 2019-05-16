@@ -1,8 +1,6 @@
 package com.ge.apm.service.common;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,6 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.uaa.UaaService;
 
 import webapp.framework.dao.SearchFilter;

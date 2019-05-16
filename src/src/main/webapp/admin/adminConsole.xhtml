@@ -3,42 +3,75 @@
 
 	<ui:define name="content">
 		<h1>超级管理员控制台</h1>
-		<h:form>
-			<p:fieldset legend="批量添加或者删除版本（针对所有租户，第一行是筛选条件，第二行是进行的操作）">
-				<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-					<h:panelGroup>
-						<label class="label">版本（针对所有租户）</label>
-						<p:selectOneMenu value="#{adminConsoleController.versionName}" required="true">
-							<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-						</p:selectOneMenu>
-					</h:panelGroup>
-					<h:panelGroup>
-						<label class="label">菜单项</label>
-						<p:selectOneMenu value="#{adminConsoleController.labelKey}" required="true">
-							<f:selectItems value="#{adminConsoleController.versionLabelKey}" var="item" itemLabel="#{item}" itemValue="#{item}" />
-						</p:selectOneMenu>
-					</h:panelGroup>
-				</p:panelGrid>
-				<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-					<h:panelGroup>
-						<label class="label"></label>
-						<p:selectOneMenu value="#{adminConsoleController.opType}" rendered="true">
-							<f:selectItem itemLabel="批量添加新菜单项" itemValue="0" />
-							<f:selectItem itemLabel="批量删除菜单项" itemValue="1" />
-						</p:selectOneMenu>
-					</h:panelGroup>
-				</p:panelGrid>
-				<p:commandButton actionListener="#{adminConsoleController.updateVersion()}" value="批量更新所有租户" update=":growl"></p:commandButton>
-			</p:fieldset>
-			<p:fieldset legend="批量矫正护士站SiteUid，从跟随创建人变为跟随设备（只用点击一次即可，请勿重复点击）">
-				<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteUID()}" value="批量更新所有租户护士站UID" update=":growl"></p:commandButton>
-			</p:fieldset>
-			<p:fieldset legend="批量删除护士站中报废，待报废，已删除的设备（只用点击一次即可，请勿重复点击）">
-				<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteDeleteAsset()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
-			</p:fieldset>
-			<p:fieldset legend="批量更新护士站状态（只用点击一次即可，请勿重复点击）">
-				<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteStatus()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
-			</p:fieldset>
+		<h:form id="adminConsoleFormId">
+			<h:panelGroup>
+				<p:fieldset legend="批量添加或者删除版本（针对所有租户，第一行是筛选条件，第二行是目标对象，第三行是操作）">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">版本（针对所有租户）</label>
+							<p:selectOneMenu value="#{adminConsoleController.versionName}" required="true">
+								<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<label class="label">包含该菜单项</label>
+							<p:selectOneMenu value="#{adminConsoleController.containsLabelKey}" required="true">
+								<f:selectItems value="#{adminConsoleController.versionLabelKey}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">菜单项</label>
+							<p:selectOneMenu value="#{adminConsoleController.labelKey}" required="true">
+								<f:selectItems value="#{adminConsoleController.versionLabelKey}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label"></label>
+							<p:selectOneMenu value="#{adminConsoleController.opType}" rendered="true">
+								<f:selectItem itemLabel="批量添加新菜单项" itemValue="0" />
+								<f:selectItem itemLabel="批量删除菜单项" itemValue="1" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:commandButton actionListener="#{adminConsoleController.updateVersion()}" value="批量更新所有租户" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="批量矫正护士站SiteUid，从跟随创建人变为跟随设备（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteUID()}" value="批量更新所有租户护士站UID" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="批量删除护士站中报废，待报废，已删除的设备（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteDeleteAsset()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="批量更新护士站状态（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteStatus()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="为系统角色配置菜单">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">系统角色</label>
+							<p:selectOneMenu value="#{adminConsoleController.sysRoleName}">
+								<p:ajax listener="#{adminConsoleController.sysRoleChange}" update="@parent:menuId"></p:ajax>
+								<f:selectItems value="#{adminConsoleController.listSysRoleName}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+						<p:tree id="menuId" class="tree" value="#{adminConsoleController.tenantConfigService.root}"
+							selection="#{adminConsoleController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox"
+							highlight="true">
+							<p:ajax event="select" listener="#{adminConsoleController.tenantConfigService.onSelectTenantConfig}" process="@this" />
+							<p:ajax event="unselect" listener="#{adminConsoleController.tenantConfigService.onUnSelectTenantConfig}" process="@this" />
+							<p:treeNode type="tenantConfigTree">
+								<h:outputText value="#{item.label}" />
+							</p:treeNode>
+						</p:tree>
+					</p:scrollPanel>
+					<p:commandButton actionListener="#{adminConsoleController.updateSysMenu()}" value="更新系统角色默认菜单" update=":growl"></p:commandButton>
+				</p:fieldset>
+			</h:panelGroup>
 		</h:form>
 	</ui:define>
 

@@ -16,7 +16,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
-import com.ge.apm.service.nurseSite.WordReportExportService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -24,10 +23,13 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ge.apm.domain.UserAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -37,7 +39,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainExportController implements ServerEventInterface {
+public class MaintainExportController implements ServerEventInterface{
     private static final Logger LOGGER = LoggerFactory.getLogger(MaintainExportController.class);
     private NurseSiteMaintainService nurseSiteMaintainService;
     private UserAccount currentUser;
@@ -54,7 +56,7 @@ public class MaintainExportController implements ServerEventInterface {
     private List<OrgInfo> checkListParentOrgInfo;
     private SearchController searchController;
     private WordReportExportService wordReportExportService;
-
+    private UserAuth customRoleAuth;
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -68,6 +70,7 @@ public class MaintainExportController implements ServerEventInterface {
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
         loadUserParentOrgInfo();
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
     }
 
     private void initValue() {
@@ -337,7 +340,15 @@ public class MaintainExportController implements ServerEventInterface {
         this.checkListParentOrgInfo = checkListParentOrgInfo;
     }
 
-    @Override
+    public UserAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
+	}
+
+	@Override
     public void onServerEvent(String eventName, Object eventObject) {
         // TODO Auto-generated method stub
         try {
@@ -354,5 +365,4 @@ public class MaintainExportController implements ServerEventInterface {
             LOGGER.error(e.getMessage());
         }
     }
-
 }

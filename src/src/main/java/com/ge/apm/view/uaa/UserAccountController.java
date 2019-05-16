@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -47,7 +48,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -109,9 +109,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private UserRoleRepository userRoleRepository;
     private List<OrgInfo> deptList;
 
+    private String userRoleType;
+
+    private List<SysRole> roles;
+
     @Override
     protected void init() {
-        this.searchFilters = new ArrayList<SearchFilter>();
+        this.searchFilters = new ArrayList<>();
         filterBySite = false;
 
         uaaService = WebUtil.getBean(UaaService.class);
@@ -124,22 +128,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser = UserContextService.getCurrentUserAccount();
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
-        setTenantUid(loginUser.getTenantUID());
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
-        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-        
-        /*
-        orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
-        try{
-            DefaultTreeNode selectedNode = (DefaultTreeNode)orgTree.getData();
-            this.selectedOrg = (OrgInfo) selectedNode.getData();
+        setTenantUid(loginUser.getTenantUID());
+
+    }
+
+    private void updateRoleList() {
+        roles = Lists.newArrayList(sysRoleRepository.findAll());
+        roles.sort(Comparator.comparingInt(i -> i.getId()));
+        if (selectedTenant != null) {
+            if (selectedTenant.getInsulate() == null || !selectedTenant.getInsulate()) {
+                roles.removeIf(i -> "LocalITAdmin".equals(i.getName()));
+            }
         }
-        catch(Exception ex){
-        }*/
     }
 
     public String getTenantUid() {
@@ -153,8 +159,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         searchFilters.clear();
         selectedOrg = null;
         
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedTenant = tenantDao.findByuid(tenantUid);
+        selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         
@@ -165,6 +170,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedOrgNode.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
+        updateRoleList();
     }
     
     // TreeNodeName Filter
@@ -995,5 +1001,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     
     public void setSelectedOrgName(String orgName){
         //ignore the input orgName, just provide a Setter for UI input Component
+    }
+
+    public String getUserRoleType() {
+        return userRoleType;
+    }
+
+    public void setUserRoleType(String userRoleType) {
+        this.userRoleType = userRoleType;
+    }
+
+    public List<SysRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<SysRole> roles) {
+        this.roles = roles;
     }
 }

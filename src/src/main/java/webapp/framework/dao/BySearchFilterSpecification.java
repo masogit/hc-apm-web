@@ -1,20 +1,17 @@
 package webapp.framework.dao;
 
+import javaslang.Tuple2;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.ejb.criteria.path.PluralAttributePath;
+import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javaslang.Tuple2;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
 
 /**
- *
  * @author wujianb
  */
 public class BySearchFilterSpecification {
@@ -25,12 +22,15 @@ public class BySearchFilterSpecification {
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
                 if (!filters.isEmpty()) {
 
-                    List<Tuple2<String, Predicate>> predicates = new ArrayList();
+                    List<Tuple2<String, Predicate>> predicates = new ArrayList<>();
                     for (SearchFilter filter : filters) {
                         // nested path translate, eg, task's "user.name" to Task.user.name
                         String[] names = StringUtils.split(filter.fieldName, ".");
                         Path expression = root.get(names[0]);
                         for (int i = 1; i < names.length; i++) {
+                            if (i == 1 && expression instanceof PluralAttributePath) {
+                                expression = root.join(names[0]);
+                            }
                             expression = expression.get(names[i]);
                         }
 
@@ -43,7 +43,7 @@ public class BySearchFilterSpecification {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.notEqual(expression, filter.value)));
                                 break;
                             case LIKE:
-                                if(filter.value!=null){
+                                if (filter.value != null) {
                                     predicates.add(new Tuple2(filter.conditionPath, builder.like(builder.lower(expression), "%" + filter.value.toString().toLowerCase() + "%")));
                                 }
                                 break;
@@ -96,7 +96,7 @@ public class BySearchFilterSpecification {
             }
 
             private Predicate buildConditions(List<Tuple2<String, Predicate>> conditionList, String currentConditions, CriteriaBuilder builder) {
-                List<Tuple2<String, Predicate>> currentList = new ArrayList();
+                List<Tuple2<String, Predicate>> currentList = new ArrayList<>();
                 for (Tuple2<String, Predicate> item : conditionList) {
                     if (item._1.startsWith(currentConditions)) {
                         if (item._1.equals(currentConditions)) {

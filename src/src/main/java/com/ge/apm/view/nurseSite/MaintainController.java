@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.UserAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainItem;
@@ -39,7 +41,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainController implements ServerEventInterface {
+public class MaintainController implements ServerEventInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
@@ -78,7 +80,7 @@ public class MaintainController implements ServerEventInterface {
 	private List<String> orgUidList;
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
-
+	private UserAuth customRoleAuth;
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -98,6 +100,7 @@ public class MaintainController implements ServerEventInterface {
 		showListNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		loadUserParentOrgInfo();
 		setDefaultParentOrgInfo();
+		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
 	}
 
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
@@ -868,6 +871,14 @@ public class MaintainController implements ServerEventInterface {
 
 	public void setListCheckedNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> listCheckedNurseSiteMaintainConfig) {
 		this.listCheckedNurseSiteMaintainConfig = listCheckedNurseSiteMaintainConfig;
+	}
+
+	public UserAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
 	}
 
 	@Override
