@@ -1,5 +1,8 @@
 package com.ge.apm.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
@@ -218,6 +221,41 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name="close_without_parts")
     private Boolean closeWithoutParts;  // 没有备件费用直接关单
+
+    @Column(name="share_auto_confirm")
+    private Integer shareAutoConfirm;//设备调剂系统确认系统确认时间
+
+    /***
+     * 调剂中心配置
+     */
+    // 是否开启调剂中心工时计算(aa = allocation asset)
+    @Getter
+    @Setter
+    @Column(name = "aa_enable_lease_man_hour")
+    private Boolean enableLeaseManHour = Boolean.FALSE;
+
+    @Getter
+    @Setter
+    @Column(name = "aa_default_lease_man_hour")
+    private Double defaultLeaseManHour = 0.0D;
+
+    @Getter
+    @Setter
+    @Column(name = "aa_enable_return_man_hour")
+    private Boolean enableReturnManHour = Boolean.FALSE;
+
+    @Getter
+    @Setter
+    @Column(name = "aa_default_return_man_hour")
+    private Double defaultReturnManHour = 0.0D;
+
+    public Integer getShareAutoConfirm() {
+        return shareAutoConfirm;
+    }
+
+    public void setShareAutoConfirm(Integer shareAutoConfirm) {
+        this.shareAutoConfirm = shareAutoConfirm;
+    }
 
     public Boolean getPartsNeedSign() {
         return partsNeedSign;

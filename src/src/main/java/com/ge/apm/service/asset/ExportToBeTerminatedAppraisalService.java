@@ -6,6 +6,8 @@ import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetTerminationReportTemplate;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +17,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
@@ -42,6 +45,41 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private BlobFileService blobService;
+
+    public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
+        ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
+        return getAssetMapFromTemplate(reader, tenantUid, siteIds);
+    }
+
+    public List<AssetInfo> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc, String tenantUid, Set<String> siteIds) throws Exception {
+        List<AssetInfo> result = new ArrayList<>();
+        int dataRow = 1;
+
+        try {
+            for (Map<String, ExcelDocument.ValueWrapper> rowMap : doc) {
+                AssetInfo asset = new AssetInfo();
+                asset.setLineNum(dataRow++);
+
+                String funNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+                if (org.springframework.util.StringUtils.isEmpty(funNum)) {
+                    //end of file
+                    break;
+                }
+
+                List<AssetInfo> byFinancingNumAndTenantUID = assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid);
+                byFinancingNumAndTenantUID.removeIf(i -> !siteIds.contains(i.getSiteUID()));
+                if (byFinancingNumAndTenantUID.isEmpty()) {
+                    WebUtil.addErrorMessage(String.format("资产编号[%s]对应的设备不存在，不能报废！", funNum));
+                } else {
+                    result.addAll(byFinancingNumAndTenantUID);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new Exception("第" + dataRow + "行数据错误:" + e.getMessage());
+        }
+        return result;
+    }
 
     public StreamedContent export(List<String> selectedIds, byte[] templateBytes) {
         Map<String, Object> datas = getData(selectedIds);
@@ -133,6 +171,7 @@ public class ExportToBeTerminatedAppraisalService {
             }
             table.removeRow(1);
         }
+
     }
 
     public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
@@ -171,6 +210,11 @@ public class ExportToBeTerminatedAppraisalService {
         if (StringUtils.isNotEmpty(siteUID)) {
             uids.add(siteUID);
         }
+    }
+
+    public boolean existsSiteTemplate(String siteUid) {
+        List list = templateRepository.findBySiteUID(siteUid);
+        return list != null && !list.isEmpty();
     }
 
 }

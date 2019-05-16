@@ -36,8 +36,9 @@ public class UserContextService implements Serializable {
 //    private static final String MVS_FE="MVSFE";
 
     private TenantInfo tenant = null;
-
     private UserAccount userAccount = null;
+    private List<CustomRole> listCustomRole=null;
+    private List<SysRole> listSysRole=null;
 
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -56,6 +57,8 @@ public class UserContextService implements Serializable {
 
         userContextService.tenant = null;
         userContextService.getTenantInfo();
+        userContextService.getListCustomRole(user.getId());
+        userContextService.getListSysRole(user.getId());
     }
 
     public void processAfterLogin() {
@@ -171,11 +174,11 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
+    
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
     }
-    
     public TenantInfo getTenantInfo(){
         if(tenant!=null) return tenant;
         
@@ -183,22 +186,75 @@ public class UserContextService implements Serializable {
     	tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
         return tenant;
     }
+    public List<CustomRole> getListCustomRole(Integer userId){
+    	if(listCustomRole==null){
+    		CustomRoleRepository customRoleRepository=WebUtil.getBean(CustomRoleRepository.class);
+    		listCustomRole=customRoleRepository.findCustomRolesByUserId(userId);
+    	}
+    	return listCustomRole;
+    }
+    public List<SysRole> getListSysRole(Integer userId){
+    	if(listSysRole==null){
+    		SysRoleRepository customRoleRepository=WebUtil.getBean(SysRoleRepository.class);
+    		listSysRole=customRoleRepository.getSysRoles(userId);
+    	}
+    	return listSysRole;
+    }
     
-    public boolean versionContains(String menuNameList){
-    	UserAccount user = getLoginUser();
+    public boolean accessContains(String menuName){
+    	return authContains(menuName)&&versionContains(menuName);
+    }
+    
+    public boolean authContains(String menuName){
+    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
+    		return true;
+    	}
+    	List<CustomRole> listCustomRole=getListCustomRole(userAccount.getId());
+    	List<SysRole> listSysRole=getListSysRole(userAccount.getId());
+    	if(listCustomRole!=null && listCustomRole.size()>0){
+    		for(int i=0;i<listCustomRole.size();++i){
+    			CustomRole tempRole=listCustomRole.get(i);
+    			String menus=tempRole.getMenus();
+    			if(StringUtils.isNotEmpty(menus)){
+    				String [] menuArr=menus.split(",");
+    				for(int j=0;j<menuArr.length;++j){
+    					String tempStr=menuArr[j].trim();
+    					if(tempStr.equals(menuName)){
+    						return true;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	if(listSysRole!=null && listSysRole.size()>0){
+    		for(int i=0;i<listSysRole.size();++i){
+    			SysRole tempRole=listSysRole.get(i);
+    			String menus=tempRole.getMenus();
+    			if(StringUtils.isNotEmpty(menus)){
+    				String [] menuArr=menus.split(",");
+    				for(int j=0;j<menuArr.length;++j){
+    					String tempStr=menuArr[j].trim();
+    					if(tempStr.equals(menuName)){
+    						return true;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    public boolean versionContains(String menuName){
     	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
     	if(StringUtils.isNotEmpty(configStr)){
     		try {
 				JSONObject jsonObj=JSONObject.parseObject(configStr);
 				JSONArray jsonArray=jsonObj.getJSONArray("menuList");
-				String[] menus=menuNameList.split(",");
-				for(String menuName:menus){
-					menuName=menuName.trim();
-					for(int i=0;i<jsonArray.size();++i){
-						if(jsonArray.getString(i).equals(menuName)){
-							return true;
-						}
+				menuName=menuName.trim();
+				for(int i=0;i<jsonArray.size();++i){
+					if(jsonArray.getString(i).equals(menuName)){
+						return true;
 					}
 				}
 				return false;
@@ -376,6 +432,53 @@ public class UserContextService implements Serializable {
     public static UserAccount getCurrentUserAccount() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.getLoginUser();
+    }
+    
+    public static List<CustomRole> getCustomRole(Integer userId){
+    	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+    	return userContextService.getListCustomRole(userId);
+    }
+    
+    public static List<SysRole> getSysRole(Integer userId){
+    	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+    	return userContextService.getListSysRole(userId);
+    }
+    
+    public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
+    	UserAuth customRoleAuth=new UserAuth();
+    	customRoleAuth.setAuthKey(authKey);
+    	List<CustomRole> listCustomRole=getCustomRole(userId);
+    	List<SysRole> listSysRole=getSysRole(userId);
+    	if(listSysRole!=null && listSysRole.size()>0){
+    		customRoleAuth.setAllAuth(authKey,true);
+    	}
+    	else if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
+			for(int i=0;i<listCustomRole.size();++i){
+				CustomRole customRole=listCustomRole.get(i);
+				String jsonStr=customRole.getWebAuthorities();
+				if(StringUtils.isNotEmpty(jsonStr)){
+					JSONArray jsonArr=JSONArray.parseArray(jsonStr);
+					for(int j=0;j<jsonArr.size();++j){
+						JSONObject jsonObj=jsonArr.getJSONObject(j);
+						String key=jsonObj.getString("k");
+						if(authKey.equals(key)){
+							customRoleAuth.setAuthCreate(jsonObj.getBooleanValue("a"));
+							customRoleAuth.setAuthDelete(jsonObj.getBooleanValue("d"));
+							customRoleAuth.setAuthModify(jsonObj.getBooleanValue("m"));
+							customRoleAuth.setAuthSearch(jsonObj.getBooleanValue("s"));
+							customRoleAuth.setAuthExport(jsonObj.getBooleanValue("o"));
+							customRoleAuth.setAuthImport(jsonObj.getBooleanValue("i"));
+							return customRoleAuth;
+						}
+					}
+				}
+				
+			}
+		}
+		else{
+			customRoleAuth.setAllAuth(authKey,true);
+		}
+		return customRoleAuth;
     }
 
     public static boolean isSuperAdmin() {

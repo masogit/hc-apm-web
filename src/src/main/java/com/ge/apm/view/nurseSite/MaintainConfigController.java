@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,6 +27,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.UserAuth;
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
@@ -45,7 +46,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface {
+public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
@@ -85,6 +86,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private boolean isCreate=false;
   	private SearchController searchController;
   	private AssetSelectController assetSelectController;
+  	private UserAuth customRoleAuth;
 
     @Override
     protected void init() {
@@ -101,12 +103,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         	listOrgUid=new ArrayList<String>();
         	listOrgUid.addAll(setOrgUid);
         }
-        
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_CONFIG);
         //test
     }
 
     @Override
-    protected GenericRepositoryUUID<NurseSiteMaintainConfig> getDAO() {
+    protected GenericRepositoryUUID<NurseSiteMaintainConfig> getDAO(){
         return dao;
     }
 
@@ -726,5 +728,14 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void setCheckListParentOrgInfo(List<OrgInfo> checkListParentOrgInfo) {
 		this.checkListParentOrgInfo = checkListParentOrgInfo;
 	}
+
+	public UserAuth getCustomRoleAuth() {
+		return customRoleAuth;
+	}
+
+	public void setCustomRoleAuth(UserAuth customRoleAuth) {
+		this.customRoleAuth = customRoleAuth;
+	}
+
 	
 }

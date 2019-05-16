@@ -80,10 +80,12 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}else{
 			searchFilters = new ArrayList<>();
 		}
-		List<SearchFilter> userFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
-		searchFilters.addAll(userFilters);
+/*		List<SearchFilter> userFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
+		searchFilters.addAll(userFilters);*/
 		if(StringUtils.isNotEmpty(queryCondition)){
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoByFilter()));
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
+		}else {
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,findAssetUidBySearchFilter(getFilter(user.getSiteUID()))));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
@@ -92,7 +94,14 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		return result;
 	}
 
-
+	public List<String> findAssetUidBySearchFilter(List<SearchFilter> searchAssetFilters){
+		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
+		List<String> uids = new ArrayList<String>();
+		if(CollectionUtils.isNotEmpty(assetInfos)) {
+			assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+		}
+		return uids;
+	}
 
 	public void initMap(Page<RelRuleAsset> result) {
 		if (result.hasContent()) {
@@ -223,24 +232,36 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		return null;
 	}
 	
-	public List<String> getAssetInfoByFilter() {
+/*	public List<String> getAssetInfoByFilter() {
+		List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
 		if(StringUtils.isNotEmpty(queryCondition)) {
-			List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
 			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
-			List<String> uids = new ArrayList<String>();
-			if(CollectionUtils.isNotEmpty(assetInfos)) {
-				assetInfos.forEach((asset) -> uids.add(asset.getUid()));
-			}
-			return uids;
 		}
-		return null;
+		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
+		List<String> uids = new ArrayList<String>();
+		if(CollectionUtils.isNotEmpty(assetInfos)) {
+			assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+		}
+		return uids;
+	}*/
+
+public List<SearchFilter> getAssetInfoByFilter(){
+	List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
+	if(StringUtils.isNotEmpty(queryCondition)) {
+		searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 	}
+	return searchAssetFilters;
+}
 	
 	public List<SearchFilter> getFilter(String siteUID) {
 		List<SearchFilter> filter = new ArrayList<SearchFilter>();

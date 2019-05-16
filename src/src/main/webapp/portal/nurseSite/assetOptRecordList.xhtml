@@ -7,13 +7,13 @@
 				<p:outputLabel class="pageTitle" value="设备开关机记录" />
 			</div>
 			<div class="ui-g-12 card ">
-				<h:form id="optRecordListForm" rendered="#{not empty assetOptRecordController}">
+				<h:form id="optRecordListForm" rendered="#{(not empty assetOptRecordController)}">
 					<ui:include src="/portal/asset/searchDiv.xhtml"/>
 					<p:dataTable id="datalist" value="#{assetOptRecordController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{assetOptRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
 						sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOptRecordController.customRoleAuth.authSearch}">
 
 						<!-- <p:ajax event="rowSelect" update="createButton editButton deleteButton" /> -->
 						<p:ajax event="filter" listener="#{assetOptRecordController.onFilter}" />
@@ -73,7 +73,7 @@
 							</h:outputText>
 						</p:column>
 						<f:facet name="{Toolbar}">
-							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel">
+							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{assetOptRecordController.customRoleAuth.authExport}">
 								<p:dataExporter type="xlsx" target="datalist" fileName="assetOptRecord"/>
 							</p:commandButton>
 				            <!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"

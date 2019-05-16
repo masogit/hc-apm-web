@@ -18,6 +18,7 @@ import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import webapp.framework.util.TimeUtil;
 
 import webapp.framework.web.WebUtil;
 
@@ -89,6 +90,8 @@ public class ProfileController implements Serializable {
     	}
         myAccount.setPlainPassword(newPassword);
         myAccount.entryptPassword();
+        myAccount.setLastModifiedDate(TimeUtil.now());
+        myAccount.setLastModifiedBy(myAccount.getLoginName());
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         userAccountDao.save(myAccount);
         

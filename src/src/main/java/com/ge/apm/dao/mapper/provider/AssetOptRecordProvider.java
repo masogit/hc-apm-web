@@ -10,7 +10,6 @@ import webapp.framework.dao.SearchFilter;
 public class AssetOptRecordProvider {
 	private static final String selectStr = "select a.id as id,a.create_date as createDate,a.modify_date as modifyDate,a.start_date as startDate,a.end_date as endDate,a.tenant_uid as tenantUID,a.institution_uid as institutionUID,a.hospital_uid as hospitalUID,a.site_uid as siteUID,a.create_by as createByUid,a.modify_by as modifyByUid,a.status as status,a.clinical_dept_uid as clinicalDeptUID,a.clinical_dept_name as clinicalDeptName,a.asset_uid as assetUid,a.comment as comment,b.name as assetInfoname,b.depart_num as assetInfodepartNum,b.function_type as assetInfofunctionType,b.clinical_dept_name as assetInfoclinicalDeptName,b.asset_group as assetInfoassetGroup,c.name as assetInfoSiteName,d.name as createByName,e.name as modifyByName";
 	private static final String tableStr = " from ((((asset_opt_record a join asset_info b on a.asset_uid= b.uid and b.is_deleted='f' and b.is_valid='t' and b.status!=4) join org_info c on b.site_uid=c.uid) join user_account d on a.create_by=d.uid) join user_account e on a.modify_by=e.uid) where 1=1";
-	private boolean lastAndOr=true;
 	public String getAll(Map<String, Object> param) {
 		StringBuilder sb = new StringBuilder();
 		@SuppressWarnings("unchecked")
@@ -100,21 +99,16 @@ public class AssetOptRecordProvider {
 			String strValue = getSetValue(value);
 			if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
 				sb.append("b.clinical_dept_uid in " + strValue + " and ");
-				lastAndOr=true;
 			}
 		} else {
 			if (tempColumn.equals("assetInfo.siteUID")) {
 				sb.append("b.site_uid='" + value + "' and ");
-				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.hospitalUID")) {
 				sb.append("b.hospital_uid='" + value + "' and ");
-				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.institutionUID")) {
 				sb.append("b.institution_uid='" + value + "' and ");
-				lastAndOr=false;
 			} else if (tempColumn.equals("assetInfo.tenantUID")) {
 				sb.append("b.tenant_uid='" + value + "' and ");
-				lastAndOr=false;
 			}
 		}
 	}
