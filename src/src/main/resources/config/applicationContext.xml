@@ -187,6 +187,8 @@
                 <prop key="hibernate.jdbc.use_scrollable_resultset">false</prop>
                 <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
                 <prop key="hibernate.jdbc.fetch_size">300</prop>
+                <prop key="hibernate.batch_fetch_style">PADDED</prop>
+                <prop key="hibernate.default_batch_fetch_size">100</prop>
 
                 <!--# query plan cache -->
                 <prop key="hibernate.query.plan_cache_max_size">256</prop>
