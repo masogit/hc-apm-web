@@ -67,6 +67,9 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "parent_uid", columnDefinition = "CHAR(32)")
     private String parentUID;
 
+    @Column(name = "parent_id")
+    private Integer parentID;
+    
     @Column(name = "org_level")
     private Integer orgLevel;
 
@@ -90,7 +93,7 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "short_name_py_code")
     private String shortNamePyCode;
 
-    @JoinColumn(name = "parent_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo parentOrg;
@@ -122,6 +125,9 @@ public class OrgInfo implements Serializable, ChineseName {
     public void initializeUid() {
         if (uid == null)
             uid = UUID.randomUUID().toString().replace("-", "");
+        
+        if(this.parentOrg!=null) 
+            this.parentID = parentOrg.getId();
     }
 
     @Column(name = "asset_owner_id")
@@ -181,6 +187,14 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setParentUID(String parentUID) {
         this.parentUID = parentUID;
+    }
+
+    public Integer getParentID() {
+        return parentID;
+    }
+
+    public void setParentID(Integer parentID) {
+        this.parentID = parentID;
     }
 
     public Integer getOrgLevel() {
