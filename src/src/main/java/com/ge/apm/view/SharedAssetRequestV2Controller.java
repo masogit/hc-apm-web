@@ -73,6 +73,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     @Getter
     @Setter
+    private WorkflowConfig currentWorkflowConfig;
+
+    @Getter
+    @Setter
     private SharedAssetReqDetail preSelectReqDetail;
 
      public String getFilterApplyTime() {
@@ -149,7 +153,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.getSartList().remove(selectedSart);
         selectedSart = null;
     }
-    
+
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
@@ -187,6 +191,28 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         } 
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
+        }
+
+        if(currentWorkflowConfig == null) {
+            currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            if(selected != null && selected.getBehavior() != null) {
+                if(selected.getBehavior().intValue() == 1) {
+                    //借用
+                    if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
+                        if(selected.getEffort() == null) {
+                            selected.setEffort(currentWorkflowConfig.getDefaultLeaseManHour());
+                        }
+                    }
+                }
+                if(selected.getBehavior().intValue() == 2) {
+                    //归还
+                    if(currentWorkflowConfig.getEnableReturnManHour() != null && currentWorkflowConfig.getEnableReturnManHour()) {
+                        if(selected.getEffort() == null) {
+                            selected.setEffort(currentWorkflowConfig.getDefaultReturnManHour());
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -264,7 +290,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else {
             searchFilters.add(new SearchFilter("state", SearchFilter.Operator.EQ,queryIndex.toString()));
         }
-       
+
+//        currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
@@ -405,7 +433,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
             this.save();
-
         }else if(sta == 7 || sta == 11){
             pageName = "Edit";
         }else if(sta == 12 || sta == 9 || sta == 10 || sta == 13){
@@ -435,7 +462,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
             this.save();
-
         }else if(sta == 1||sta == 5){
             pageName = "Edit";
         }else if(sta == 6 || sta == 3 || sta == 4 || sta == 0){
@@ -1313,6 +1339,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                return;
            } else {
                 selected.setState(state);
+                selected.setModifyDate(new Date());
                 dao.save(selected);
                 asiDao.save(selected.getInfoList());
 

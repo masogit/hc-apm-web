@@ -161,14 +161,14 @@ public class WorkOrderExportService {
             workOrderMap.put("报修人", workOrderExportPojo.getRequestorName());
             workOrderMap.put("报修时间", formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put("故障描述", workOrderExportPojo.getRequestReason());
-            /*workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
-            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));*/
+            workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
+            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));
             //workOrderMap.put("工单类型", workOrderExportPojo.getIntExtTypeName());
             workOrderMap.put("工单类型", workOrderExportPojo.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrderExportPojo.getIntExtType().toString()) : "");
             //workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
             workOrderMap.put("维修类型", workOrderExportPojo.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrderExportPojo.getRepairType().toString()) : "");
-            /*workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
-            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));*/
+            workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
+            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));
             workOrderMap.put("维修完成时间", formatDate(workOrderExportPojo.getWorkStepEndTime()));
             workOrderMap.put("签到时间", formatDate(workOrderExportPojo.getCheckinTime()));
             workOrderMap.put("维修工程师工时", workOrderExportPojo.getManHours());
@@ -178,10 +178,10 @@ public class WorkOrderExportService {
             workOrderMap.put("其他费用", workOrderExportPojo.getOtherExpense());
             workOrderMap.put("外修费用", workOrderExportPojo.getExternalExpense());
             workOrderMap.put("维修总费用", workOrderExportPojo.getTotalPrice());
-            /*workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
-            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));*/
-            /*workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
-            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));*/
+            workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
+            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
+            workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
+            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));
             workOrderMap.put("协助者", workOrderExportPojo.getCoworker());
             workOrderMap.put("协助者工时", workOrderExportPojo.getCoworkManHour());
             workOrderMap.put("最终评价", workOrderExportPojo.getFeedbackRating());
@@ -212,7 +212,7 @@ public class WorkOrderExportService {
                 workOrderMap.put("医疗器械子分类", "");
             }
 
-            String sendStepInfo = workOrderExportPojo.getSendStepInfo();
+            /*String sendStepInfo = workOrderExportPojo.getSendStepInfo();
             if(sendStepInfo != null){
                 String [] sendStepInfoArray = sendStepInfo.split("\\|:\\|");
                 workOrderMap.put("派工人", sendStepInfoArray.length >= 1 ? sendStepInfoArray[0] : "");
@@ -244,7 +244,7 @@ public class WorkOrderExportService {
             }else {
                 workOrderMap.put("关单人", "");
                 workOrderMap.put("关单时间", "");
-            }
+            }*/
 
             String attributesStr = "";
             if(!StringUtils.isEmpty(workOrderExportPojo.getAttributes())){

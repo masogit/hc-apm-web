@@ -8,10 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -54,8 +52,6 @@ public class SmallAssetPerformanceService {
     private final String HEADER_AMOUNT = "金额";
     private final String HEADER_HAPPENDATE = "日期";
 
-    @Autowired
-    private AssetInfoRepository assetInfoDao;
 
     @Autowired
     private SmallAssetPerformanceRepository smallAssetPerformanceDao;

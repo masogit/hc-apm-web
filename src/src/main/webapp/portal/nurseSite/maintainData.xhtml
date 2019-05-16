@@ -60,9 +60,9 @@
 				<!-- <p:commandButton id="checkAllRightButton" value="全部通过(保存)" actionListener="#{maintainItemController.completeMaintain()}" update=":messages"
 					oncomplete="PF('maintain').update();PF('maintainDialog').hide();" /> -->
 				<p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
-					oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
+					oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{maintainController.customRoleAuth.authModify}"/>
 				<p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages"
-					disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();">
+					disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{maintainController.customRoleAuth.authDelete}">
 					<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 				</p:commandButton>
 				<p:commandButton id="openSignature"
@@ -78,7 +78,7 @@
 					<p:selectBooleanCheckbox value="#{maintainItemController.mapCheckData[item]}" label="#{item}"></p:selectBooleanCheckbox>
 				</p:repeat>
 			</p:panelGrid>
-			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" />
+			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" rendered="#{maintainController.customRoleAuth.authModify}"/>
 			<p:commandButton value="全选" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
 			<p:commandButton value="全不选" actionListener="#{maintainItemController.resetCheckData2()}" update=":checkDataForm"  />
 		</h:form>

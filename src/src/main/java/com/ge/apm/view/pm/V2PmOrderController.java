@@ -211,14 +211,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    public String xx2(String itemId){
-       if("new".equals(itemId)){
-           return "is";
-
-       }else{
-           return "no";
-       }
-    }
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
@@ -233,6 +225,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
+        vwd.setClosedPrice(null);
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
 
@@ -848,18 +841,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         saveCheckItemData();
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
+       // String requestReason=null;
 
         String strPriority = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
         String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
-        String requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]").toString();
+        Object requestReason = JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+        if(requestReason==null){
+            newServiceRequest.setRequestReason("设备故障");
+        }else{
+            newServiceRequest.setRequestReason(requestReason.toString());
+        }
         currentStatus= Integer.valueOf(strAssetStatus);
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
         newServiceRequest.setStatus(currentStatus);
-        if(requestReason.isEmpty()){
-            newServiceRequest.setRequestReason("设备故障");
-        }else{
-            newServiceRequest.setRequestReason(requestReason);
-        }
+
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -1175,7 +1170,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -1191,6 +1186,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 //如果选择除计划完成时间的其它列 进行排序
                 orders =  acqListSortOrder(pageRequest);
             }
+
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -1641,36 +1637,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             selectedObjectMap  = new HashMap();
             supplierName = null;
-            if(!UserContextService.isInsulate()){
-                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                if(eval==null){
-                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
-                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                    if(eval==null){
-                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
-                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                        if(eval==null){
-                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
-                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                            if(eval!=null){
-                                itemDetail.setPartsType(eval.toString());
-                            }
-
-                        }else{
-                            itemDetail.setPartsType(eval.toString());
-                        }
-                    }else{
-                        itemDetail.setPartsType(eval.toString());
-                    }
-                }else{
-                    itemDetail.setPartsType(eval.toString());
-                }
-            }else{
-                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                itemDetail.setPartsType(eval.toString());
-            }
+            currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedPmOrder.getSiteUID());
+            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+            itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();

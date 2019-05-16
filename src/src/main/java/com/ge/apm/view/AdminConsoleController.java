@@ -10,8 +10,10 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ge.apm.domain.TenantInfoConfig;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.SysRole;
 import com.ge.apm.service.uaa.AdminConsoleService;
+import com.ge.apm.service.uaa.TenantInfoConfigService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +28,7 @@ public class AdminConsoleController {
     private String versionName;
 	@Getter
 	@Setter
-	private TenantInfoConfig tenantConfig;
+	private TenantInfoConfigService tenantConfigService;
 	@Getter
 	@Setter
 	private List<String> versionLabelKey;
@@ -35,30 +37,68 @@ public class AdminConsoleController {
 	private String labelKey;
 	@Getter
 	@Setter
+	private String containsLabelKey;
+	@Getter
+	@Setter
 	private Integer opType;//0:add,1:delete
-	
+	@Getter
+	@Setter
+	private String sysRoleName;
+	@Getter
+	@Setter
+	private List<String> listSysRoleName;
 	@Autowired
 	private AdminConsoleService adminConsoleService;
+	private SysRole currentSysRole;
+	private List<SysRole> listSysRole;
 	@PostConstruct
 	public void init() {
 		// TODO Auto-generated method stub
-		tenantConfig=TenantInfoConfig.build();
+		tenantConfigService=WebUtil.getBean(TenantInfoConfigService.class);
+		tenantConfigService.init();
 		formatVersionInfo();
 		adminConsoleService=WebUtil.getBean(AdminConsoleService.class);
+		listSysRole=adminConsoleService.getSysRole();
+		currentSysRole=listSysRole.get(0);
+		listSysRoleName=new ArrayList<String>();
+		for(int i=0;i<listSysRole.size();++i){
+			SysRole tempRole=listSysRole.get(i);
+			listSysRoleName.add(tempRole.getName()+"_"+tempRole.getRoleDesc()+"_"+tempRole.getId());
+		}
+		sysRoleName=currentSysRole.getName()+"_"+currentSysRole.getRoleDesc()+"_"+currentSysRole.getId();
+		sysRoleChange();
+	}
+	public void sysRoleChange(){
+		String [] tempArr=sysRoleName.split("_");
+		String tempName=tempArr[0];
+		for(int i=0;i<listSysRole.size();++i){
+			if(tempName.equals(listSysRole.get(i).getName())){
+				currentSysRole=listSysRole.get(i);
+				break;
+			}
+		}
+		String menu=currentSysRole.getMenus();
+		tenantConfigService.parseMenuList(menu);
+	}
+	public void updateSysMenu(){
+		currentSysRole.setMenus(tenantConfigService.toMenusStr());
+		adminConsoleService.saveSysRole(currentSysRole);
 	}
 	public void updateVersion(){
 		String tempVersion="";
 		String tempKey="";
+		String tempContainsKey="";
 		if(StringUtils.isNotEmpty(versionName)){
 			if(opType!=null){
 				if(StringUtils.isNotEmpty(labelKey)){
 					tempKey=labelKey.split(",")[1];
+					tempContainsKey=containsLabelKey.split(",")[1];
 					tempVersion=versionName;
 					if(opType==0){
-						adminConsoleService.addVersion(tempVersion, tempKey);
+						adminConsoleService.addVersion(tempVersion,tempContainsKey, tempKey);
 					}
 					else if(opType==1){
-						adminConsoleService.deleteVersion(tempVersion, tempKey);
+						adminConsoleService.deleteVersion(tempVersion,tempContainsKey, tempKey);
 					}
 					WebUtil.addSuccessMessage("已完成更新操作！");
 				}
@@ -102,11 +142,13 @@ public class AdminConsoleController {
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 	private void formatVersionInfo(){
-		List<String> listKey=tenantConfig.getListKey();
-		List<String> listLabel=tenantConfig.getListLabel();
+		List<String> listKey=tenantConfigService.getListKey();
+		List<String> listLabel=tenantConfigService.getListLabel();
 		versionLabelKey=new ArrayList<String>();
 		for(int i=0;i<listKey.size();++i){
 			versionLabelKey.add(listLabel.get(i)+","+listKey.get(i));
 		}
 	}
+	
+	
 }
