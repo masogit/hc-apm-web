@@ -1,7 +1,6 @@
 package com.ge.apm.service.uaa;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
@@ -33,10 +33,12 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 
@@ -86,7 +88,24 @@ public class AdminConsoleService {
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
 	
-	public void addVersion(String version,String key) {
+	@Autowired
+	I18nMessageRepository i18nRepository;
+	
+	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
+	
+	public List<SysRole> getSysRole(){
+		return sysRoleRepository.find();
+	}
+	public void saveSysRole(SysRole s){
+		sysRoleRepository.save(s);
+	}
+	
+	public List<I18nMessage> getI18Menus(){
+		List<I18nMessage> list18 = i18nRepository.findI18nByType(MSG_TYPE_VERSION);
+		return list18;
+	}
+	
+	public void addVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
 			Iterator<TenantInfo> it=listTenantInfo.iterator();
@@ -105,7 +124,7 @@ public class AdminConsoleService {
 						if(tempVersion.equals(version)){
 							JSONArray tempArr=jsonObj.getJSONArray("menuList");
 							if(tempArr!=null){
-								if(!tempArr.contains(key)){
+								if((!tempArr.contains(key)) && tempArr.contains(containsLabelKey)){
 									tempArr.add(key);
 									String result=jsonObj.toString();
 									tempInfo.setTenantConfig(result);
@@ -118,7 +137,7 @@ public class AdminConsoleService {
 			}
 		}
 	}
-	public void deleteVersion(String version,String key) {
+	public void deleteVersion(String version,String containsLabelKey,String key) {
 		Iterable<TenantInfo> listTenantInfo=tenantInfoRepository.findAll();
 		if(listTenantInfo!=null){
 			Iterator<TenantInfo> it=listTenantInfo.iterator();
@@ -137,7 +156,7 @@ public class AdminConsoleService {
 						if(tempVersion.equals(version)){
 							JSONArray tempArr=jsonObj.getJSONArray("menuList");
 							if(tempArr!=null){
-								if(tempArr.contains(key)){
+								if(tempArr.contains(key) && tempArr.contains(containsLabelKey)){
 									tempArr.remove(key);
 									String result=jsonObj.toString();
 									tempInfo.setTenantConfig(result);

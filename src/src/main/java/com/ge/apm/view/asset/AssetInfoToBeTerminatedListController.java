@@ -1,7 +1,13 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -32,16 +38,16 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ManagedBean
 @ViewScoped
@@ -120,11 +126,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private Boolean isInsulate;
 
     private UploadedFile uploadedFile;
-    private BlobFileService blobFileService;
-    private V2_BlobObject uploadedFileObject;
-    private AssetTerminationReportTemplateRepository assetTerminationReportTemplateRepository;
 
     private String terminationCause;
+
+    private List<AssetInfo> batchUpdateAssets;
+
+    private UaaService uuaService;
+
+    private StreamedContent assetTemplateFile;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -137,7 +146,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
-        blobFileService = WebUtil.getBean(BlobFileService.class);
 
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -149,11 +157,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
-        assetTerminationReportTemplateRepository = WebUtil.getBean(AssetTerminationReportTemplateRepository.class);
+        uuaService = WebUtil.getBean(UaaService.class);
 
         this.filterBySite = false;
-        this.selectedMap = new HashMap();
-        this.selectedObject = new HashMap();
+        this.selectedMap = new HashMap<>();
+        this.selectedObject = new HashMap<>();
         loadCustomConfig();
         loadClinicalDeptList();
 
@@ -176,24 +184,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
-        addMisingClinicalDeptOrg(currentPageAssets);
+        addMissingClinicalDeptOrg(currentPageAssets);
 
         return res;
     }
 
-
-    public StreamedContent getActiveTemplate() {
-        try {
-            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
-            return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
-        } catch (IOException e) {
-            WebUtil.addErrorMessage("Fail to download template");
-        }
-        return null;
-    }
-
     public void exportToBeTerminatedAppraisalFile() {
         try {
+            toBeTerminatedAppraisalFile = null;
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
             byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
             toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
@@ -220,40 +218,36 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         try {
             this.uploadedFile = event.getFile();
             String fileName = uploadedFile.getFileName();
-            if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
-                throw new IllegalStateException("Invalid file type: " + uploadedFile.getFileName());
+            if (!StringUtils.endsWithIgnoreCase(fileName, ".xlsx")) {
+                uploadedFile = null;
+                throw new IllegalStateException("Invalid file type: " + fileName);
             }
-            uploadedFileObject = blobFileService.uploadFile(uploadedFile);
 
-            OrgInfo selectedUserOrg = orgDao.getByUid(user.getSiteUID());
-            List<AssetTerminationReportTemplate> templates = assetTerminationReportTemplateRepository.findBySiteUID(user.getSiteUID());
-            AssetTerminationReportTemplate template;
-            if(templates.isEmpty()) {
-                template = new AssetTerminationReportTemplate();
-            } else {
-                template = templates.get(0);
-            }
-            template.setTenantUID(selectedUserOrg.getTenantUID());
-            template.setInstitutionUID(selectedUserOrg.getInstitutionUID());
-            template.setHospitalUID(selectedUserOrg.getHospitalUID());
-            template.setSiteUID(selectedUserOrg.getSiteUID());
-            template.setCreateTime(new Date());
-            template.setCreatorId(user.getUid());
-            template.setCreatorName(user.getName());
-            template.setFileName(uploadedFile.getFileName());
-            template.setStorageId(uploadedFileObject.getObjectStorageId());
-            assetTerminationReportTemplateRepository.save(template);
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String tenantUid = currentUserAccount.getTenantUID();
+            List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
+            Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
+            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid, siteUids);
 
-            uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
-            uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
-            uploadedFileObject.setBoUuid(template.getId());
-            blobFileService.saveBlobObject(uploadedFileObject);
+            batchUpdateAssets.removeIf(i -> validateTermination(i));
 
-            logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
         } catch (Exception e) {
             WebUtil.addErrorMessage("文件上传失败!");
         }
     }
+
+
+    public void exportAssetExcelTemplate() {
+        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
+        assetTemplateFile = new DefaultStreamedContent(resourceAsStream, "application/vnd.ms-excel", "template.xlsx");
+    }
+
+    public void batchUpdate() {
+        batchUpdateAssets.forEach(i -> terminateAsset(i));
+        batchUpdateAssets.clear();
+        uploadedFile = null;
+    }
+
 
     public void preEdit() {
         List<Map.Entry<String, Boolean>> selectedEntries = selectedMap.entrySet().stream().filter(i -> i.getValue()).collect(Collectors.toList());
@@ -266,7 +260,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
 
-    private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
+    private void addMissingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
@@ -415,7 +409,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         }
     }
 
-    public void onSelectAsset() throws IOException {
+    public void onSelectAsset() {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
                 + "&asset_name=" + selected.getName();
@@ -502,28 +496,43 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
             String assetUid = entry.getKey();
             AssetInfo assetInfo = dao.getByUid(assetUid);
-            if (assetInfo == null) {
-                continue;
-            }
-
-            int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
-            if (workOrdersNum > 0) {
-                WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
-                continue;
-            }
-
-            if (aiMgrService.isInDispenceCenter(assetInfo)) {
-                WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
-                continue;
-            }
-
-            assetInfo.setStatus(4);
-            assetInfo.setIsValid(false);
-            assetInfo.setTerminateDate(new Date());
-            dao.save(assetInfo);
-            aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+            terminateAsset(assetInfo);
         }
         this.selectedMap.clear();
+    }
+
+    public void terminateAsset(AssetInfo assetInfo) {
+        if (assetInfo == null) {
+            return;
+        }
+
+        logger.info("Terminate: " + assetInfo.getUid());
+        if (validateTermination(assetInfo)) return;
+
+        assetInfo.setStatus(4);
+        assetInfo.setIsValid(false);
+        assetInfo.setTerminateDate(new Date());
+        dao.save(assetInfo);
+        aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+    }
+
+    public boolean validateTermination(AssetInfo assetInfo) {
+        if (assetInfo.getStatus() != 4) {
+            WebUtil.addErrorMessage(String.format("设备[%s]未处于待报废状态，不能报废！", assetInfo.getName()));
+            return true;
+        }
+
+        int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
+        if (workOrdersNum > 0) {
+            WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
+            return true;
+        }
+
+        if (aiMgrService.isInDispenceCenter(assetInfo)) {
+            WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+            return true;
+        }
+        return false;
     }
 
 
@@ -829,5 +838,13 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setTerminationCause(String terminationCause) {
         this.terminationCause = terminationCause;
+    }
+
+    public StreamedContent getAssetTemplateFile() {
+        return assetTemplateFile;
+    }
+
+    public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
+        this.assetTemplateFile = assetTemplateFile;
     }
 }

@@ -16,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 /**
  *
@@ -46,6 +48,7 @@ public class UserRole implements Serializable {
     private UserAccount userAccount;
     @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @NotFound(action=NotFoundAction.IGNORE)
     private SysRole role;
     
     public UserRole() {

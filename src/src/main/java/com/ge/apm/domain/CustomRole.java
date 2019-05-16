@@ -29,17 +29,29 @@ public class CustomRole implements Serializable {
     @Column(name = "role_desc")
     private String roleDesc;
 
-    @Column(name = "authorities")
+    @Column(name = "authorities",columnDefinition="text")
     private String authorities;
-
-    @Column(name = "cards")
+    
+    @Column(name = "web_authorities",columnDefinition="text")
+    private String webAuthorities;
+    
+    @Column(name = "cards",columnDefinition="text")
     private String cards;
+    
+    @Column(name = "menus",columnDefinition="text")
+    private String menus;
+    
+    @Column(name = "menus_ch")
+    private String menusCH;
 
     @Column(name = "authorities_ch")
     private String authoritiesCH;
 
     @Column(name = "cards_ch")
     private String cardsCH;
+    
+    @Column(name = "web_authorities_ch")
+    private String webAuthoritiesCH;
 
     @Column(name = "groups")
     private String groups;
@@ -214,7 +226,47 @@ public class CustomRole implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    @Override
+    public String getMenus() {
+		return menus;
+	}
+
+	public void setMenus(String menus) {
+		this.menus = menus;
+	}
+
+	public String getMenusCH() {
+		return menusCH;
+	}
+	
+	public void setMenusCH(String menusCH) {
+		if(menusCH!=null && menusCH.length()>60){
+			menusCH=menusCH.substring(0, 60);
+			menusCH+="...";
+		}
+		this.menusCH = menusCH;
+	}
+
+	public String getWebAuthorities() {
+		return webAuthorities;
+	}
+
+	public void setWebAuthorities(String webAuthorities) {
+		this.webAuthorities = webAuthorities;
+	}
+
+	public String getWebAuthoritiesCH() {
+		return webAuthoritiesCH;
+	}
+
+	public void setWebAuthoritiesCH(String webAuthoritiesCH) {
+		if(webAuthoritiesCH!=null && webAuthoritiesCH.length()>60){
+			webAuthoritiesCH=webAuthoritiesCH.substring(0, 60);
+			webAuthoritiesCH+="...";
+		}
+		this.webAuthoritiesCH = webAuthoritiesCH;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
