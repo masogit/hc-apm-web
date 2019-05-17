@@ -244,7 +244,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
      */
     private void buildAdvancedSearchFilters() {
         if(StringUtils.isNotBlank(this.getDepartNum())) {
-            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, this.getDepartNum(), "1*"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, this.getDepartNum(), "1*"));
         } else {
             if(StringUtils.isNotBlank(this.getAssetName())) {
                 searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
