@@ -97,6 +97,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         assetSelectController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+        nurseSiteMaintainService.init();
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         setOrgUid = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         if(setOrgUid!=null){
