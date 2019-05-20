@@ -114,7 +114,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
         OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
         this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
-        this.selectedDeptName = selectedDept.getName();
+        this.selectedDeptName = selectedDept.getShortName();
 
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
@@ -130,7 +130,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         TreeNode node = event.getTreeNode();
         selectedOrg = (OrgInfo) node.getData();
         if (selectedOrg != null) {
-            log.info("selectedOrg: {}", selectedOrg.getName());
+            log.info("selectedOrg: {}", selectedOrg.getShortName());
             this.deptList = assetSelectService.loadDeptListByOrg(selectedOrg);
         }
     }
@@ -182,7 +182,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         if (event instanceof SelectEvent) {
             this.selectedDeptName = (String) ((SelectEvent) event).getObject();
         } else {
-            if (!Strings.isNullOrEmpty(selectedDeptName) && !deptList.stream().anyMatch(item -> selectedDeptName.equals(item.getName()))) {
+            if (!Strings.isNullOrEmpty(selectedDeptName) && !deptList.stream().anyMatch(item -> selectedDeptName.equals(item.getShortName()))) {
                 selectedDeptName = "";
             }
         }
@@ -190,11 +190,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     public List<String> autoCompleteDeptName(String query) {
         List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
-                || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                || item.getShortName().contains(query)
+                || (item.getShortNamePyCode() == null ? false : item.getShortNamePyCode().contains(query.toLowerCase())))
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
-        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+        return res.stream().map(item -> item.getShortName()).distinct().collect(Collectors.toList());
     }
 
     private List<AssetInfo> loadAssets4EditView() {
@@ -257,7 +257,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
             }
             if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
-                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
+                String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
                 searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
                 searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
             }
