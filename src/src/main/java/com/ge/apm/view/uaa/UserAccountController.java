@@ -435,15 +435,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public void onAfterUpdateObject(UserAccount object, boolean isOk) {
         if (isOk && this.crudActionName.equals("Edit")) {
-            uaaService.clearUserScope(object.getUid());
-
+            //YHAAO-4354 keep user scope on edit
             //if org change, delete old user org
             if (!object.getOrgInfoUID().equals(previousOrgUid) ) {
+                uaaService.clearUserScope(object.getUid());
                 uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
+                uaaService.setDefaultScope(object);
             }
-
-            uaaService.setDefaultScope(object);
-
         }
     }
 
