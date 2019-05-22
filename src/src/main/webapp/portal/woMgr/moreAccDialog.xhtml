@@ -59,7 +59,7 @@
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
                         </p:autoComplete>
-                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{workOrderMgrController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
                     </h:panelGroup>
                    <!-- <h:panelGroup>
                         <label class="label">供应商&#45;&#45;</label>

@@ -18,6 +18,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -58,6 +59,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+    private SupplierController supplierController;
 
     @Setter @Getter
     private Supplier newSupplier;
@@ -157,7 +159,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private CustomConfig customConfig;
     private TenantInfo tenantInfo;
     protected void init() {
-
+        supplierController = WebUtil.getBean(SupplierController .class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -1656,6 +1658,31 @@ public void repairResultSet(){
         }
         return coWorkerList;
     }
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        if (newSupplier.getMaintainerT()) {
+            supplierController.setMaintainerT(true);
+        } else {
+            supplierController.setMaintainerT(false);
+        }
+        if (newSupplier.getManufacturerT()) {
+            supplierController.setManufacturerT(true);
+        } else {
+            supplierController.setManufacturerT(false);
+        }
+        if (newSupplier.getSupplierT()) {
+            supplierController.setSupplierT(true);
+        } else {
+            supplierController.setSupplierT(false);
+        }
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
+        }
+    }
 
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
@@ -1850,11 +1877,11 @@ public void repairResultSet(){
         this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
     }
     public void onSupplierChange() {
-        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+        String supplier = (String) selectedObjectMap.get("supplier");
         if (supplier == null)
             itemDetail.setSupplier(supplierName);
         else
-            itemDetail.setSupplier(supplier.getName());
+            itemDetail.setSupplier(supplier);
     }
 
 
