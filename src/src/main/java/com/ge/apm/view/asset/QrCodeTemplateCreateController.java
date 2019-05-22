@@ -42,6 +42,8 @@ public class QrCodeTemplateCreateController {
     UaaService uaaService;
     
     String importJsonString;
+
+    Map<String, String> qrCodeEncodingMethods = QrcodeConfigConstant.getQrCodeEncodingMethod();
     
     @PostConstruct
     protected void init() {
@@ -190,5 +192,12 @@ public class QrCodeTemplateCreateController {
     public void setImportJsonString(String importJsonString) {
         this.importJsonString = importJsonString;
     }
-    
+
+    public Map<String, String> getQrCodeEncodingMethods() {
+        return qrCodeEncodingMethods;
+    }
+
+    public void setQrCodeEncodingMethods(Map<String, String> qrCodeEncodingMethods) {
+        this.qrCodeEncodingMethods = qrCodeEncodingMethods;
+    }
 }
