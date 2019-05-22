@@ -35,7 +35,7 @@
 					style="width:100%;">
 					<p:ajax listener="#{searchController.onOrgDeptChange()}"
 						update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
-					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
 				</p:selectOneMenu>
 			</h:panelGroup>
 			<h:panelGroup rendered="#{searchController.blnAssetName}">
