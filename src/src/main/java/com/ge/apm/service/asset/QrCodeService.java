@@ -222,7 +222,7 @@ public class QrCodeService {
         BufferedImage img = null;
         try {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
-            img = qrCodeDrawService.createQrCodeTag(qrCodeObject);
+            img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
         } catch (Exception ex) {
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -381,7 +381,7 @@ public class QrCodeService {
                     fileName = Optional.ofNullable(orgNamesMap.get(codeItem.getSiteUID())).orElse("").concat("_").concat(codeItem.getQrCode());
                 } else if (item instanceof AssetInfo) {
                     AssetInfo asset = (AssetInfo) item;
-                    image = getQrCodeImage(template == null ? getTemplateBySiteUid(asset.getSiteUID()) : template, asset, null, null);
+                    image = getQrCodeImage(template == null ? getTemplateBySiteUid(asset.getSiteUID()) : template, asset, null, asset.getSiteUID());
                     fileName = Optional.ofNullable(orgNamesMap.get(asset.getSiteUID())).orElse("").concat("_")
                             .concat(Optional.ofNullable(asset.getClinicalDeptName()).orElse("")).concat("_").concat(asset.getName()).concat("_").concat(asset.getQrCode());
                 }

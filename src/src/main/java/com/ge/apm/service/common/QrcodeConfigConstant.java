@@ -5,8 +5,8 @@
  */
 package com.ge.apm.service.common;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -20,6 +20,14 @@ public class QrcodeConfigConstant {
     private static Map<String, String> FieldsMap;
     
     private static Map<String, String> FontNameMap;
+
+    private static Map<String, String> qrCodeEncodingMethods;
+
+    static {
+        qrCodeEncodingMethods = new LinkedHashMap<>();
+        qrCodeEncodingMethods.put("redirect2Wechat", WebUtil.getMessage("redirect2Wechat"));
+        qrCodeEncodingMethods.put("redirect2FuncPage", WebUtil.getMessage("redirect2FuncPage"));
+    }
     
     public static Map<String, String> getFieldsMap() {
         if (null == FieldsMap) {
@@ -56,6 +64,8 @@ public class QrcodeConfigConstant {
         return FontNameMap;
     }
 
-    
+    public static Map<String, String> getQrCodeEncodingMethod() {
+        return qrCodeEncodingMethods;
+    }
     
 }
