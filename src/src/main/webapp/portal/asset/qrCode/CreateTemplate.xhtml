@@ -65,7 +65,14 @@
                                     <p:ajax  update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
-                            <p:spacer/>
+                            <h:panelGroup>
+                                <label class="label">二维码编码模式</label>
+                                <p:selectOneMenu id="qrCodeEncodingMethods" value="#{qrCodeTemplateCreateController.templateJsonObject.QrCodeElements.EncodingMethod}" style="max-width: 200px;">
+                                    <p:ajax update="qrCodeEditForm:preView"/>
+                                    <f:selectItems value="#{qrCodeTemplateCreateController.qrCodeEncodingMethods.entrySet()}" var="item" itemLabel="#{item.value}" itemValue="#{item.key}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">#{msg.font}#{msg.name}</label>
                                 <p:selectOneMenu value="#{qrCodeTemplateCreateController.templateJsonObject.QrCodeElements.FontName}" >
