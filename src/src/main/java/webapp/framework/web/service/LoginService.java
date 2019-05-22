@@ -253,6 +253,25 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         }
 
         user = userAccountDao.getByLoginName(userName);
+
+        String passwordEncrypted = null;
+        boolean isGeSSO = false;
+        if(user==null){
+            String geLoginName = "ge" + userName;
+            user = userAccountDao.getByLoginName(geLoginName);
+            if (user != null) {
+                try {
+                    isGeSSO = geSsoService.authenticate(userName, passwordPlain);
+                    if (isGeSSO) {
+                        userName = geLoginName;
+                        passwordEncrypted = user.getPassword();
+                    }
+                } catch (Exception e) {
+                    logger.warn("Fail to valid by ge sso " + e.getMessage());
+                }
+            }
+        }
+        
         if(user==null){
             addErrorMessage(response, 401, "login_error");
             return;
@@ -267,14 +286,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             user.setPasswordErrorCount(0);
         }
 
-        String passwordEncrypted = onPasswordEncrypted(userName, passwordPlain);
+        if(!isGeSSO) passwordEncrypted = onPasswordEncrypted(userName, passwordPlain);
+        
         if(!user.getPassword().equals(passwordEncrypted)){
             updateLoginStatus(userName, false);
             addErrorMessage(response, 401, "login_error");
             return;
         }
 
-        if(!beforeLogin(passwordPlain)) return;
+        if(!isGeSSO && !beforeLogin(passwordPlain)) return;
 
         doSpringSecuritylogin(request, response, userName, passwordPlain, passwordEncrypted);
     }
