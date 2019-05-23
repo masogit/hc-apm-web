@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRule> {
     private static final long serialVersionUID = -1L;
+    public static final int RULE_STATE_CREATED = 0;
+    public static final int RULE_STATE_ARRPOVED = 1;
     private MeasureOrderRuleRepository dao = null;
     private UserAccount user;
     private UserAccountRepository userAccountRepository;
@@ -71,6 +73,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
     private RelRuleAssetRepository relRuleAssetRepository;
     private SupplierService supplierService;
     private List<String> deletedCheckListIds = new ArrayList<>();
+    private RelMeasureRuleRepository relMeasureRuleRepository;
 
     @Override
     protected void init() {
@@ -89,7 +92,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        relMeasureRuleRepository = WebUtil.getBean(RelMeasureRuleRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
@@ -431,8 +434,17 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
     @Transactional
     public void delete() {
         String uid = selected.getUid();
-        //int level = selected.getLevel();
-        measureOrderRuleCheckListRepository.deleteExistsRecord(uid);
+        List<RelMeasureRule> rules = relMeasureRuleRepository.findRelRuleAssets(uid);
+        if(CollectionUtils.isNotEmpty(rules)){
+            WebUtil.addErrorMessage(WebUtil.getMessage("ExistsRelMeasureRule"));
+            return;
+        }
+        if(selected.getStatus() == RULE_STATE_CREATED){
+            measureOrderRuleCheckListRepository.deleteExistsRecord(uid);
+            super.delete();
+            return;
+        }
+/*        measureOrderRuleCheckListRepository.deleteExistsRecord(uid);
         List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findRelRuleAssets(uid);
         List<RelRuleAsset> updateList = new ArrayList<>(relRuleAssets.size());
         List<RelRuleAsset> deleteList = new ArrayList<>(relRuleAssets.size());
@@ -457,7 +469,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         }
         relRuleAssetRepository.save(updateList);
         relRuleAssetRepository.delete(deleteList);
-        super.delete();
+        super.delete();*/
     }
 
     @Transactional

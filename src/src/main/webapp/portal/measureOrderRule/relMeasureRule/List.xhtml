@@ -47,11 +47,10 @@
                     <!-- <p:column headerText="一级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID1))}"/>
                     		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID1)}"/>
-                    </p:column> -->
+                    </p:column>
                     <p:column headerText="二级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID2)}"/>
-                    		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID2))}"/> -->
-                    </p:column>
+                    </p:column>-->
                     <p:column headerText="三级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{measureRuleConfigController.getRuleName(item.ruleUID)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',measureRuleConfigController.getRuleName(item.ruleUID))}"/> -->
@@ -93,9 +92,12 @@
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
                         </p:commandButton>
 
-                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
+                        <p:commandButton id="editButton" title="#{msg.Delete}"  icon="ui-icon-close" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.delete()}"  update=":RelRuleAssetEditDlg,datalist"  disabled="#{empty measureRuleConfigController.selected}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="若删除该规则，则已配置的计量规则也会被删除，确定要删除该规则吗？" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                        <!--<p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
 
-                        <!--<p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
+                        <p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
                         <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
                         <p:commandButton render="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{measureRuleConfigController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>
                         <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{measureRuleConfigController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty measureRuleConfigController.selected}"/>-->

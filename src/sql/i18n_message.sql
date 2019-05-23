@@ -1854,3 +1854,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name','redirect2Wechat','跳转至微信公众号',NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name','redirect2FuncPage','跳转至功能页面',NULL, NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasureOrderRuleItem', '计量检查项', 'measure item', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ExistsRelMeasureRule', '该规则已绑定资产，无法删除！', 'Please choose assets first!', NULL, '-1');
