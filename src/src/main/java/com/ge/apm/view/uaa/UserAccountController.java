@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.ge.apm.view.sysutil.UserInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -66,7 +67,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     //public static final int ACTIVATION_ROLE = 10;
     public static final String ACTIVATION_ROLE = "ActivationPerson";
-
+    UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
 
@@ -117,7 +118,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected void init() {
         this.searchFilters = new ArrayList<>();
         filterBySite = false;
-
+        userOrgInfoRepository= WebUtil.getBean(UserOrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -424,6 +425,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             role.add(DEFAULT_USER_ROLE);
             uaaService.setUserRoles(selected, role);
             uaaService.setDefaultScope(selected);
+
+            //绑定新建用户和该用户所在层级的以下层级
+            userOrgInfoList=new ArrayList<UserOrgInfo>();
+            accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+            List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+            setSelectedOrgTree(accessOrgTree, orgList);
+            prePareForScopeForNewUser(selected,accessOrgTree);
+            userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+            userOrgInfoRepository.save(userOrgInfoList);
         }
     }
 
@@ -547,6 +557,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
+
     @Override
     public void save() {
         if (selectedUserOrg != null) {
@@ -627,6 +638,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
     }
+    List<UserOrgInfo> userOrgInfoList;
+
+    public void prePareForScopeForNewUser(UserAccount ua,TreeNode node){
+        if(node.getChildren().size()==0){
+            return;
+        }
+        for (TreeNode item : node.getChildren()) {
+            if(item.isSelected()){
+                OrgInfo orgInfo =(OrgInfo)item.getData();
+                UserOrgInfo userOrgInfo = new UserOrgInfo();
+                userOrgInfo.setOrgUid(orgInfo.getUid());
+                userOrgInfo.setUserUid(ua.getUid());
+                userOrgInfo.setOrgType(orgInfo.getOrgType());
+                userOrgInfoList.add(userOrgInfo);
+            }
+            prePareForScopeForNewUser(ua,item);
+        }
+    }
 
     private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
         OrgInfo org = (OrgInfo) node.getData();
@@ -655,15 +684,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void updateUserScope() {
+
         List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(loginUser.getSiteUID());
-        Set<OrgInfo> selectedOrgList = new HashSet<>(orgList);
+        Set<OrgInfo> selectedOrgList = new HashSet<>();
         //only add parent if all children is selected
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
 
         //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
         addMissingChildClinical(accessOrgTree, selectedOrgList);
-        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList);
-
     }
 
 
