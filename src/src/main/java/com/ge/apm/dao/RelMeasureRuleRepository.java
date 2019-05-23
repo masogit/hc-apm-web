@@ -29,6 +29,7 @@ public interface RelMeasureRuleRepository extends GenericRepositoryUUID<RelMeasu
 	public List<String> findRuleUid3ByLevelAndTenantUID(String tenantUID);
 
 
-	@Query(value = "select r.* from rel_measure_rule r where (r.rule_uid = ?1 or r.rule_uid2 = ?1)",nativeQuery = true)
+	//@Query(value = "select r.* from rel_measure_rule r where (r.rule_uid = ?1 or r.rule_uid2 = ?1)",nativeQuery = true)
+	@Query("select r from RelMeasureRule r where ruleUID = ?1")
     List<RelMeasureRule> findRelRuleAssets(String uid);
 }
