@@ -85,7 +85,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		if(StringUtils.isNotEmpty(queryCondition)){
 			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
 		}else {
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,findAssetUidBySearchFilter(getFilter(user.getSiteUID()))));
+			//searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,findAssetUidBySearchFilter(getFilter(user.getSiteUID()))));
+			searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
@@ -93,6 +94,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		initMap(result);
 		return result;
 	}
+
+
 
 	public List<String> findAssetUidBySearchFilter(List<SearchFilter> searchAssetFilters){
 		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
@@ -264,6 +267,26 @@ public List<SearchFilter> getAssetInfoByFilter(){
 }
 	
 	public List<SearchFilter> getFilter(String siteUID) {
+		List<SearchFilter> filter = getOrgFilter(siteUID);
+/*		List<SearchFilter> filter = new ArrayList<SearchFilter>();
+		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
+		if (orgInfo.getOrgType() == 3) {// 院区
+			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 2) {// 医院
+			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 1) {// 集团
+			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else {// 租户
+			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		}*/
+		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
+		return filter;
+	}
+
+	public List<SearchFilter> getOrgFilter(String siteUID){
 		List<SearchFilter> filter = new ArrayList<SearchFilter>();
 		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
 		if (orgInfo.getOrgType() == 3) {// 院区
@@ -275,10 +298,6 @@ public List<SearchFilter> getAssetInfoByFilter(){
 		} else {// 租户
 			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
 		}
-		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
-		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1,2,3)));
 		return filter;
 	}
 	

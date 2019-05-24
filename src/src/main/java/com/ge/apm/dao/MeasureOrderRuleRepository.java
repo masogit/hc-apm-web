@@ -23,7 +23,7 @@ public interface MeasureOrderRuleRepository extends GenericRepository<MeasureOrd
     MeasureOrderRule findPmOrderRuleLevel2(String uid);
 
     @Query(value= "select * from measure_order_rule where uid = (select rule_uid from rel_rule_asset where asset_uid = ?1)" ,nativeQuery = true)
-    MeasureOrderRule findPmOrderRuleLevel3(String uid);
+    MeasureOrderRule findMeasureOrderRuleByAssetUid(String uid);
 
     @Query(value= "select por.uid from measure_order_rule por,rel_rule_asset rra where rra.asset_uid in ?1 and por.uid = rra.rule_uid2" ,nativeQuery = true)
     List<String> findPmRuleForBatch(Set<String> uidList);
