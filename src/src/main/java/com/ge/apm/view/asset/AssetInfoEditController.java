@@ -249,7 +249,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
-        parentAssetList = aimService.getParentsAssetsList(this.selected);
+        //parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
         if (selected.getSupplierId() != null) {
@@ -346,7 +346,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         onAssetDeptChange("clinicalDept");
         selectedObjectMap.put("assetDept", null);
         onAssetDeptChange("assetDept");
-        parentAssetList.clear();
+        if(parentAssetList != null){
+            parentAssetList.clear();
+        }
     }
 
     private void updateClinicalDeptOnSiteChange() {
@@ -806,6 +808,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetInfo> completeParentAssetId(String query) {
+        parentAssetList = aimService.getParentsAssetsList(this.selected);
         return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
 
@@ -854,7 +857,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
                 selectedObjectMap.put("clinicalOwner", null);
                 onOwnerChange("clinicalOwner");
-                parentAssetList = aimService.getParentsAssetsList(this.selected);
+                //parentAssetList = aimService.getParentsAssetsList(this.selected);
                 getClinicalOwnerList();
                 break;
             case "assetDept":
