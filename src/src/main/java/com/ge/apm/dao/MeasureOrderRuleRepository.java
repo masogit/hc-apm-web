@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface MeasureOrderRuleRepository extends GenericRepository<MeasureOrderRule> {
-
     List<MeasureOrderRule> findByTenantUIDAndStatus(String tenantUID, Integer status);
 
     @Query(value = "select content from default_report_template where type = ?1",nativeQuery = true)
