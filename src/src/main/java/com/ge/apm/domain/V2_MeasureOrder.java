@@ -394,7 +394,7 @@ public class V2_MeasureOrder implements Serializable {
         this.strFinishTime = strFinishTime;
     }
 
-    public String getCurrentStepId() {
+	public String getCurrentStepId() {
         return currentStepId;
     }
 
