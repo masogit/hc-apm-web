@@ -353,3 +353,7 @@ delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.userSys';
 delete from i18n_message where msg_type='tenantVersionMenu' and msg_key='config.qrCodeSys';
 alter table shared_asset_request alter column modify_date type timestamp using modify_date::timestamp;
+
+
+--v19.6.1
+update table_definition set type = 1 where type is null;

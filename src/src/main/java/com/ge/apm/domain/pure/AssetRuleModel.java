@@ -8,6 +8,15 @@ public class AssetRuleModel {
 	private Integer period;
 	private Date planTime;
 	private Integer pmType;
+	private Integer measuringType;
+
+	public Integer getMeasuringType() {
+		return measuringType;
+	}
+
+	public void setMeasuringType(Integer measuringType) {
+		this.measuringType = measuringType;
+	}
 
 	public Integer getPmType() {
 		return pmType;
