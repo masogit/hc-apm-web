@@ -154,12 +154,12 @@ public class V2_MeasureService extends MicroServiceInvoker {
     }
 
 
-    public void invokePmOerCancel(String desc, V2_MeasureOrder selectedPmOrder,String cancelInt){
+    public void invokeMeasureOrderCancel(String desc, V2_MeasureOrder selectedMeasureOrder,String cancelInt){
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         //如果是工单是周期性的
         /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
-        if(selectedPmOrder.getMeasureType()==1){ //周期性
+        if(selectedMeasureOrder.getMeasureType()==1){ //周期性
              if(cancelInt.equalsIgnoreCase("1")){
                  formData.setQualityChecking("1");
              }else{
@@ -171,7 +171,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
 
         formData.setDesc(desc);
 
-        String res = srApi.invokeMeasureOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
+        String res = srApi.invokeMeasureOrderCancel(token,formData,"cancel",selectedMeasureOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }else{
@@ -213,7 +213,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         }
         //一次性
-        formData.setMeasureType(2);
+        formData.setMeasuringType(2);
         createMeasureRequestApi(assetUID, formData);
     }
 

@@ -251,7 +251,7 @@
     </h:panelGroup>
             <br></br>
     <h:panelGroup>
-        <p:commandButton validateClient="true" update="measureTab:measureOrderListForm:datalist :growl" actionListener="#{v2MeasureController.cancelPMorder()}" value="确认" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureCancelDialog');"/>
+        <p:commandButton validateClient="true" update="measureTab:measureOrderListForm:datalist :growl" actionListener="#{v2MeasureController.cancelMeasureOrder()}" value="确认" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureCancelDialog');"/>
         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('measureCancelDialog').hide()"/>
     </h:panelGroup>
         </h:form>
