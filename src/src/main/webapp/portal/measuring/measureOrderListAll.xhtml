@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+    	<h:outputScript name="js/commonUtils.js"/>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="计量工单"/>
+            </div>
+
+            <div class="ui-g-12 ">
+                <p:tabView class="ui-g-12" id="measureTab" dynamic="false" cache="false" activeIndex="#{measureOrderTabController.queryTab}" binding="#{measureOrderTabController.tabView}">
+                   <!-- <p:ajax event="tabChange"/>-->
+                 <!--   <p:ajax event="tabChange" listener="#{v2MeasureController.onChange}" update="@(.pmOrderListFormRemote)"></p:ajax>-->
+<!---->
+                    <p:tab   class="ui-g-12" title="内部计量" id="measureOrderList" rendered="#{not userContextService.isIBorUltraSoundIBEndUser() and not userContextService.isIBTenant()}">
+                        <ui:include src="measureOrderList.xhtml"/>
+                    </p:tab>
+                    <!--<p:tab class="ui-g-12" title="现场计量" id="measureOrderListOut" rendered="#{not userContextService.isAccountEndUser()}">
+                        <ui:include src="measureOrderListOut.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="远程保养"  id="measureOrderListRemote" rendered="#{not userContextService.isAccountEndUser()}">
+                        <ui:include src="measureOrderListRemote"/>
+                    </p:tab>-->
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

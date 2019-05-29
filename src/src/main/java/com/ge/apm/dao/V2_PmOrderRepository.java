@@ -12,12 +12,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 
 public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> {
 
-	/*@Query(value="select id from AssetInfo a where (a.tenantUID in ?1 or a.institutionUID in ?1 or a.hospitalUID in ?1 or a.siteUID in ?1 or a.clinicalDeptUID in ?1) and "
-			+ " id not in (select tr.assetId from AssetTagRule tr, AssetTagBiomedGroup tg, BiomedGroupUser tu where tr.tagId=tg.tagId and tg.biomedGroupId=tu.groupId)")
-	public List<Integer> getAssetsByNoTagGroup(Collection<String> c);*/
-	/*@Query(value="select id from Asset_Info a where (a.tenant_UID in ?1 or a.institution_UID in ?1 or a.hospital_UID in ?1 or a.site_UID in ?1 or a.clinical_Dept_UID in ?1) and id not in (select tr.asset_Id from Asset_Tag_Rule tr, Asset_Tag_Biomed_Group tg, Biomed_Group_User tu where tr.tag_Id=tg.tag_Id and tg.biomed_Group_Id=tu.group_Id)",nativeQuery = true)
-	public List<Integer> getAssetsByNoTagGroup(Collection<String> c);*/
-
 	@Query(value="select id from Asset_Info a where (a.tenant_UID in (?1) or a.institution_UID in (?1) or a.hospital_UID in (?1) or a.site_UID in (?1) or a.clinical_Dept_UID in (?1)) and id not in (select tr.asset_Id from Asset_Tag_Rule tr, Asset_Tag_Biomed_Group tg, Biomed_Group_User tu where tr.tag_Id=tg.tag_Id and tg.biomed_Group_Id=tu.group_Id)",nativeQuery = true)
 	public List<Integer> getAssetsByNoTagGroup(List<String> c);
 
