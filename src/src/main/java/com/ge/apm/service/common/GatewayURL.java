@@ -61,8 +61,7 @@ public enum GatewayURL {
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
-    //measure Batch Operation
-    MEASURE_BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
+
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
     ACCESSDEL("/hcapmassetservice/api/apm/asset/workOrderDetails/{id}"),
