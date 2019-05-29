@@ -25,7 +25,7 @@ public class MeasureOrderActionForm {
     String desc;
     String comments;
     String measureOrderId;
-    Integer measureType;
+    Integer measuringType;
     String applyTime;
 
 
@@ -37,12 +37,12 @@ public class MeasureOrderActionForm {
         this.measureOrderId = measureOrderId;
     }
 
-    public Integer getMeasureType() {
-        return measureType;
+    public Integer getMeasuringType() {
+        return measuringType;
     }
 
-    public void setMeasureType(Integer measureType) {
-        this.measureType = measureType;
+    public void setMeasuringType(Integer measuringType) {
+        this.measuringType = measuringType;
     }
 
     public String getComments() {

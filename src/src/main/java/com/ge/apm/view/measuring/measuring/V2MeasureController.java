@@ -244,8 +244,8 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         }
     }
 
-    public void cancelPMorder() {
-        measureOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
+    public void cancelMeasureOrder() {
+        measureOrderService.invokeMeasureOrderCancel(cancelReason, selected, cancelInt);
     }
 
     public boolean allowChanged() {
@@ -695,7 +695,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
             }
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
-            formData.setMeasureType(measureType);
+            formData.setMeasuringType(measureType);
             Map<String, Object> res = measureOrderService.createMeasureRequestApi(selectedAsset.getUid(), formData);
             if (res != null && res.get("bizStatusCode") != null) {
                 if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
