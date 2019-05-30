@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<div class="ui-g-12 card">
+		<!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+
+		<h:form id="pmOrderListFormOut">
+
+			<p:dataTable id="datalist2" value="#{assetLifecycleEvent4Controller.lazyModel}" var="item" widgetVar="varDataList2"
+				selection="#{assetLifecycleEvent4Controller.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+				rowKey="#{item.id}" selectionMode="single"
+				paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+				rowsPerPageTemplate="20,50,100,500">
+				<p:ajax event="filter" listener="#{assetLifecycleEvent4Controller.onFilter}"/>
+				<p:ajax event="page" oncomplete="CommonUtilsJS.checkAllSelect('measureTab:pmOrderListFormOut,selectCheckBoxHeaderPmOut,selectCheckBoxItemPmOut');"></p:ajax>
+				<p:column style="width:36px;text-align:center" id="checkBoxColumn" exportable="false">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="selectCheckBoxHeaderPmOut" class="selectCheckBoxHeader" value="#{assetLifecycleEvent4Controller.blnAllSelected}"
+							onchange="CommonUtilsJS.multipleSelect('measureTab:pmOrderListFormOut,selectCheckBoxHeaderPmOut,selectCheckBoxItemPmOut');">
+							<p:ajax listener="#{assetLifecycleEvent4Controller.onSelectAllItemsEvent()}">
+							</p:ajax>
+						</p:selectBooleanCheckbox>
+					</f:facet>
+					<p:selectBooleanCheckbox value="#{item.blnSelected}" id="selectCheckBoxItemPmOut">
+						<p:ajax listener="#{assetLifecycleEvent4Controller.onItemSelect(item)}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</p:column>
+				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetName}" />
+				</p:column>
+				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.eventUid}" />
+				</p:column>
+				<p:column headerText="更新时间" sortBy="#{item.createTime}">
+					<h:outputText value="#{item.createTime}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.systemId}" />
+				</p:column>
+				<p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+					filterMatchMode="LIKE">
+					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+				</p:column>
+				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('varDataList2').filter()" value="#{assetLifecycleEvent4Controller.descriptionStatusFilter}">
+							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItem itemLabel="Open" itemValue="Open" />
+							<f:selectItem itemLabel="Closed" itemValue="Closed" />
+							<f:selectItem itemLabel="Cancelled" itemValue="Cancelled" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{assetLifecycleEvent4Controller.getMsStatus(item)}" />
+				</p:column>
+				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
+					<h:outputText value="#{item.scheduleDate}">
+						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="报告下载" exportable="false">
+					<p:repeat value="#{item.reports}" var="report">
+						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
+							<h:outputText value="#{report.displayName}" />
+						</p:link>
+						<br />
+					</p:repeat>
+				</p:column>
+				<f:facet name="{Toolbar}">
+					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent4Controller.exportSelected}" update=":growl" ajax="false">
+						<p:fileDownload value="#{assetLifecycleEvent4Controller.exportFile}" />
+					</p:commandButton>
+					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+						actionListener="#{assetLifecycleEvent4Controller.downloadSelectedReport()}" process="datalist2" update=":growl">
+						<p:fileDownload value="#{assetLifecycleEvent4Controller.exportFile}" />
+					</p:commandButton>
+				</f:facet>
+			</p:dataTable>
+		</h:form>
+	</div>
+</ui:composition>
+</html>

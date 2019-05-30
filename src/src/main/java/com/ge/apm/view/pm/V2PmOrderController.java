@@ -72,8 +72,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //选定科室过滤
     @Setter @Getter
     private String filterClinicalDeptOrg;
-    @Setter @Getter
+
     private String filterAssetDeptOrg;
+    @Setter @Getter
+    List<UnstructuredDataCollection> reportList;
     //搜索字串
     private String oneSearchStr;
     //选定的院区
@@ -82,6 +84,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private OrgInfoTreeService orgInfoTreeService;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSet;
+    @Setter @Getter
+    List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
     private String token;
@@ -324,7 +328,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         FacesContext.getCurrentInstance().addMessage(null, msg);*/
     }
     ArrayList<String> orderNumList = new ArrayList<String>();
-    public void preparePmOrderBatchComplete() {
+   /* public void preparePmOrderBatchComplete() {
         orderNumList = new ArrayList<String>();
         List<Map.Entry<String, Boolean>> collect =
                 sameOpHashmap.entrySet().stream().filter(item -> item.getValue()).collect(Collectors.toList());
@@ -341,7 +345,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     unData.setKey(item.getUid());
                     hmCheck.put(item.getUid(), unData);
                 });
-    }
+    }*/
 
 
     public boolean sameType(){
@@ -410,7 +414,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return tableDao.getBySiteUIDIn(orgUids);
     }
 
-    List<UnstructuredDataCollection> reportList;
+
 
     public boolean hasRepairReport() {
         List<TableDefinition> tdList;
@@ -503,18 +507,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public boolean isBatchTakePm() {
         // System.out.println(result);
         boolean mark = true;
-        List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
+        List<V2_PmOrder> pmOrderList = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
                 if (item.getId().equalsIgnoreCase(k) && v == true){
-                    x3.add(item);
+                    pmOrderList.add(item);
                 }
             });
         });
         //x3存放的是所选中pm工单
-        if (x3.size() > 0)
-            mark = x3.stream().anyMatch(item -> item.getSimplify().equals(true));
+        if (pmOrderList.size() > 0)
+            mark = pmOrderList.stream().anyMatch(item -> item.getSimplify().equals(true));
         return mark;//==false?true:false;
     }
 
@@ -562,7 +566,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return true;
     }
-
+    //此方法暂时没用到
     public void saveCheckItemDataBatch(List<String> pmOrderNumList){
         List<V2_PmOrder> batchPmOrderList = dao.getBatchPmOrderList(pmOrderNumList);
         //循环处理每一条工单，将其保养规则对应的保养检查项目存到undatastructCollection和undatastruct中
@@ -1776,7 +1780,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    List<PmOrderRuleCheckList> pmOrderRuleCheckList;
+
 
     //map : item.uid(pmorderrulecheck.uid) value: unstrundata
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
@@ -2236,21 +2240,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.reportUid = reportUid;
     }
 
-    public List<UnstructuredDataCollection> getReportList() {
-        return reportList;
-    }
 
-    public void setReportList(List<UnstructuredDataCollection> reportList) {
-        this.reportList = reportList;
-    }
 
-    public List<PmOrderRuleCheckList> getPmOrderRuleCheckList() {
-        return pmOrderRuleCheckList;
-    }
-
-    public void setPmOrderRuleCheckList(List<PmOrderRuleCheckList> pmOrderRuleCheckList) {
-        this.pmOrderRuleCheckList = pmOrderRuleCheckList;
-    }
 
     public Date getApplyTime() {
         return applyTime;

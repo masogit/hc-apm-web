@@ -148,6 +148,19 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
         		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
         }
     }
+
+    @Async
+    public void createMeasureOrdersByBatch(String token,String requestBody){
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.CREATE_MEASURE_ORDER_BY_BATCH);
+        ResponseEntity<String> response = template.postForEntity(gatewayURL, requestEntity, String.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            String result = (String) response.getBody();
+            logger.info("invoke createMeasureOrdersByBatch over,result is {}",result);
+        }else {
+            logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
+        }
+    }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	public String autoGenerateFinacingNum(LinkedHashMap<String,Object> requestBody){

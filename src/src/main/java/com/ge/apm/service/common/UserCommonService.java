@@ -12,6 +12,8 @@ import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.UserAgentController;
+import com.ge.apm.view.measuring.measuring.MeasureOrderSteps;
+import com.ge.apm.view.measuring.measuring.MeasureRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.sysutil.V2_WorkflowConfigController;
 import com.google.common.base.Strings;
@@ -44,6 +46,9 @@ public class UserCommonService {
 
     @Autowired
     private PmOrderRequestApiService pmApi;
+
+    @Autowired
+    private MeasureRequestApiService measureRequestApiService;
 
     @Autowired
     private TenantInfoRepository tenantInfoRepository;
@@ -103,6 +108,24 @@ public class UserCommonService {
             }).collect(Collectors.toList());
 
             return pmOrderStepsList;
+        }
+        return null;
+    }
+
+    public List<MeasureOrderSteps> getMeasureOrderStepsList(String measureOrderId) {
+        Map<String, Object> res = measureRequestApiService.getMeasuareOrderSteps(UserContextService.getAccessToken(), measureOrderId == null ? "" : measureOrderId);
+        if (null != res) {
+            List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
+            List<MeasureOrderSteps> meaOrderStepsList = mapList.stream().map(item -> {
+                MeasureOrderSteps ps = new MeasureOrderSteps();
+                ps.setComments(Optional.ofNullable(item.get("comment")).orElse("").toString());
+                ps.setEndTime(Optional.ofNullable(item.get("endTime")).orElse("").toString());
+                ps.setStartTime(Optional.ofNullable(item.get("startTime")).orElse("").toString());
+                ps.setOwnerName(Optional.ofNullable(item.get("ownerName")).orElse("").toString());
+                ps.setStepName(Optional.ofNullable(item.get("stepName")).orElse("").toString());
+                return ps;
+            }).collect(Collectors.toList());
+            return meaOrderStepsList;
         }
         return null;
     }

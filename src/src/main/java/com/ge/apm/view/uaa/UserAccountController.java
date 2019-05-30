@@ -685,13 +685,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void updateUserScope() {
 
-        List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(loginUser.getSiteUID());
         Set<OrgInfo> selectedOrgList = new HashSet<>();
+
         //only add parent if all children is selected
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
 
         //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
         addMissingChildClinical(accessOrgTree, selectedOrgList);
+
+        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList);
+
     }
 
 
