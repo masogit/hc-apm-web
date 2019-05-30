@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrder> implements Serializable, ServerEventInterface {
+public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrder> implements Serializable, ServerEventInterface {
     public CustomConfigService customConfigService;
     UnstructuredData untest;
     //选定科室过滤
@@ -107,7 +107,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     private UserAccountRepository userDao;
     private V2_MeasureService measureOrderService;
     @Getter @Setter
-    private V2_MeasureOrder selectedMeasureOrder;
+    private MeasuringOrder selectedMeasureOrder;
     private String assetName;
     private Integer ruleLevel;
     private Date startTime;
@@ -121,7 +121,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     private UaaService uaaService;
     private UserContextService userContextService;
     private BlobFileService blobService;
-    private List<V2_MeasureOrder> selectedMeasureOrderList;
+    private List<MeasuringOrder> selectedMeasureOrderList;
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -133,11 +133,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     private String repairType;
     private Integer repairTypeInt;
     //for details form
-    private List<V2_WorkOrder_Detail> approvedDetails;
-    private List<V2_WorkOrder_Detail> accessoryList;
-    private List<V2_WorkOrderCoworker> coWorkerList;
-    private V2_WorkOrder_Detail itemDetail;
-    private V2_WorkOrderCoworker coWorkerDetail;
+    private List<MeasuringOrderDetail> approvedDetails;
+    private List<MeasuringOrderDetail> accessoryList;
+    private List<MeasuringOrderCoworker> coWorkerList;
+    private MeasuringOrderDetail itemDetail;
+    private MeasuringOrderCoworker coWorkerDetail;
     private Date esTime;
     private String comments;
     private Date confirmedUpDate;
@@ -162,7 +162,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     private MeasureOrderRuleCheckListRepository measureCkLstDao;
     HashMap<String, UnstructuredData> hmCheck;
     private Boolean isSelectedCurrentPage = false;
-    private List<V2_MeasureOrder> currentPagePmOrders;
+    private List<MeasuringOrder> currentPagePmOrders;
     private Integer measureType;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
@@ -187,7 +187,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
-        accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
+        accessoryList = woService.getWorkOrderMeasuringDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
@@ -206,14 +206,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
             //调用微服务来存附件
-            serviceRequestApiService.addAccess(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
+            serviceRequestApiService.addAccessMeasuring(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
         }
     }
 
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
-        V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
+        MeasuringOrderDetail vwd= new MeasuringOrderDetail();
         try {
             BeanUtils.copyProperties(vwd,itemDetail);
         } catch (Exception e) {
@@ -232,7 +232,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     public void prepareCancel(String itemId) {
         cancelReason = null;
         selected = dao.findById(itemId);
-        int type = selected.getMeasureType();
+        int type = selected.getMeasuringType();
         if (type == 1) {
             cancelInt = "2";
         }
@@ -391,8 +391,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         reportList = measureOrderService.getReportList(selectedMeasureOrder.getId());
         if (reportList != null) {
             for (int i = 0; i < reportList.size(); i++) {
-                tdList = tableDao.getByBaseId(tableDao.findById(reportList.get(i).getSchemaId()).getBaseId());
-                tdListTotal.addAll(tdList);
+                if(reportList.get(i).getSchemaId()!=null) {
+                    tdList = tableDao.getByBaseId(tableDao.findById(reportList.get(i).getSchemaId()).getBaseId());
+                    tdListTotal.addAll(tdList);
+                }
             }
         }
         return tdListTotal.stream().anyMatch(item -> item.getId().equalsIgnoreCase(reportUid));//reportUId: tableDefinition-id
@@ -443,7 +445,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     //是否全是批量完成
     public boolean isBatchComplete() {
         boolean mark = false;
-        List<V2_MeasureOrder> meaList = new ArrayList<V2_MeasureOrder>();
+        List<MeasuringOrder> meaList = new ArrayList<MeasuringOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
@@ -459,7 +461,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
     public boolean isBatchRob() {
         boolean mark = false;
-        List<V2_MeasureOrder> meaList = new ArrayList<V2_MeasureOrder>();
+        List<MeasuringOrder> meaList = new ArrayList<MeasuringOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
@@ -474,7 +476,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
     public boolean isBatchTakePm() {
         boolean mark = true;
-        List<V2_MeasureOrder> measureOrderList = new ArrayList<V2_MeasureOrder>();
+        List<MeasuringOrder> measureOrderList = new ArrayList<MeasuringOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k, v) -> {
             result.getContent().stream().forEach(item -> {
@@ -620,7 +622,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     }
 
     public List<UserAccount> findRepairPersonBatch() {
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List<MeasuringOrder> pmListTmp = new ArrayList<MeasuringOrder>();
         currentPagePmOrders.stream().forEach(item -> {
             if (selectedMap.containsKey(item.getId()) && selectedMap.get(item.getId()) == true) {
                 //pmListTmp保存了所要提交的批量pmOrder
@@ -751,7 +753,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         return true;
     }
 
-    public void createServiceRequest(V2_MeasureOrder selectedMeasureOrder, int from) {
+    public void createServiceRequest(MeasuringOrder selectedMeasureOrder, int from) {
         //如果from 是1 表示是从保养对话框来的报修命令，就要校验一些必填项
         if (from == 1) {
             if (!requiredCheck()) {
@@ -958,7 +960,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     }
 
     public List<UserAccount> getWorkerListBatch() {
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List<MeasuringOrder> pmListTmp = new ArrayList<MeasuringOrder>();
         currentPagePmOrders.stream().forEach(item -> {
             if (selectedMap.containsKey(item.getId()) && selectedMap.get(item.getId()) == true) {
                 //pmListTmp保存了所要提交的批量pmOrder
@@ -984,7 +986,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     private List<Integer> tagGroupAssets;
 
     @Override
-    protected GenericRepositoryUUID<V2_MeasureOrder> getDAO() {
+    protected GenericRepositoryUUID<MeasuringOrder> getDAO() {
         return dao;
     }
         //type =1 是接单 ,type =2 是抢单
@@ -1000,7 +1002,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
                 if (v == true)
                     assetIdList.add(k);
             });
-            List<V2_MeasureOrder> meaList = dao.checkSimplify(assetIdList);
+            List<MeasuringOrder> meaList = dao.checkSimplify(assetIdList);
             if (meaList.size() > 0) {
                 WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
                 return;
@@ -1033,10 +1035,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
     /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
-    Page<V2_MeasureOrder> result;
+    Page<MeasuringOrder> result;
 
     @Override
-    protected Page<V2_MeasureOrder> loadData(PageRequest pageRequest) {
+    protected Page<MeasuringOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
         removeFilterOnField("currentStepId");
         removeFilterOnField("currentPersonId");
@@ -1062,14 +1064,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
-            orders.add(new Sort.Order(Sort.Direction.DESC,"measureNum"));
+            orders.add(new Sort.Order(Sort.Direction.DESC,"measuringNum"));
             Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
             //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
             if(orderFor!=null) {
                 if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
                     orders = new ArrayList<Sort.Order>();
                     orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
-                    orders.add(new Sort.Order(Sort.Direction.ASC, "measureNum"));
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "measuringNum"));
                 }
             }else{
                 //如果选择除计划完成时间的其它列 进行排序
@@ -1078,7 +1080,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
 
-            Page<V2_MeasureOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+            Page<MeasuringOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
         }
@@ -1090,14 +1092,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*4+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
-            orders.add(new Sort.Order(Sort.Direction.DESC,"measureNum"));
+            orders.add(new Sort.Order(Sort.Direction.DESC,"measuringNum"));
             Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
             //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
             if(orderFor!=null) {
                 if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
                     orders = new ArrayList<Sort.Order>();
                     orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
-                    orders.add(new Sort.Order(Sort.Direction.ASC, "measureNum"));
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "measuringNum"));
                 }
             }else{
                 //如果选择除计划完成时间的其它列 进行排序
@@ -1105,7 +1107,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
             }
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-            Page<V2_MeasureOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            Page<MeasuringOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             return result;
         }
@@ -1196,14 +1198,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.ASC,"planTime"));
-        orders.add(new Sort.Order(Sort.Direction.ASC,"measureNum"));
+        orders.add(new Sort.Order(Sort.Direction.ASC,"measuringNum"));
         Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
         //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
        if(orderFor!=null) {
            if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
                orders = new ArrayList<Sort.Order>();
                orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
-               orders.add(new Sort.Order(Sort.Direction.ASC, "measureNum"));
+               orders.add(new Sort.Order(Sort.Direction.ASC, "measuringNum"));
            }
        }else{
       //如果选择除计划完成时间的其它列 进行排序
@@ -1236,7 +1238,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         }
      return orders;
     }
-
+    public List<UnstructuredDataCollection> findByBoUuidNoMeasureCheckList(String boUid) {
+        return reportDao.findByBoUuidNoMeasureCheckList(boUid);
+    }
     public void onSelectPmOrder() {
         accessoryList = getWorkOrderDetail(selected.getId());
         coWorkerList = getWorkOrderCoworker(selected.getId());
@@ -1247,22 +1251,22 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         loadHmCheck(selected);
     }
 
-    public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
-        return measureOrderService.getWorkOrderDetails(woId);
+    public List<MeasuringOrderDetail> getWorkOrderDetail(String woId) {
+        return measureOrderService.getWorkOrderMeasuringDetails(woId);
     }
 
-    public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
+    public List<MeasuringOrderCoworker> getWorkOrderCoworker(String woId) {
         return measureOrderService.getWorkOrderCoworker(woId);
     }
 
-    public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
+    public List<MeasuringOrderDetail> getWorkOrderDetailON() {
  if(selected!=null)
-        return measureOrderService.getWorkOrderDetails(selected.getId());
+        return measureOrderService.getWorkOrderMeasuringDetails(selected.getId());
  else
      return null;
     }
 
-    public List<V2_WorkOrderCoworker> getWorkOrderCoworkerON(String woId) {
+    public List<MeasuringOrderCoworker> getWorkOrderCoworkerON(String woId) {
         if(selected!=null)
             return measureOrderService.getWorkOrderCoworker(selected.getId());
         else
@@ -1270,7 +1274,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     }
 
 
-    public void closePM(V2_MeasureOrder selectedMeasureOrder) {
+    public void closePM(MeasuringOrder selectedMeasureOrder) {
         if (isChecked() == false) {
             measureOrderService.closePM(selectedMeasureOrder, picList);
         } else {
@@ -1352,7 +1356,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
     //
     /*public void onSelectAllOfPage_bak() {
-        for (V2_MeasureOrder item : currentPagePmOrders) {
+        for (MeasuringOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), this.isSelectedCurrentPage);
         }
         isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
@@ -1360,7 +1364,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     }*/
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-        for (V2_MeasureOrder item : currentPagePmOrders) {
+        for (MeasuringOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), !isSelectedAll);
         }
     }
@@ -1546,9 +1550,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         Object eval;
         if ("new".equals(itemId)) {
             switchTmp=true;
-            itemDetail = new V2_WorkOrder_Detail();
+            itemDetail = new MeasuringOrderDetail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-            itemDetail.setWoId(selectedMeasureOrder.getId());
+            itemDetail.setOrderId(selectedMeasureOrder.getId());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
             selectedObjectMap  = new HashMap();
@@ -1610,7 +1614,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
-            coWorkerDetail = new V2_WorkOrderCoworker();
+            coWorkerDetail = new MeasuringOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setWoId(selectedMeasureOrder.getId());
         } else {
@@ -1622,11 +1626,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         saveItem();
     }
 
-    public List<TableDefinition> getTablesName(V2_MeasureOrder v2) {
-        List<TableDefinition> tDefinitions = measureOrderService.getTablesName(v2);
+    public List<TableDefinition> getTablesName(MeasuringOrder v2) {
+            List<TableDefinition> tDefinitions = measureOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public  List<MeasureOrderRuleCheckList> getMeasureRuleCLclosed(V2_MeasureOrder v2PmOrder,String ruleUid){
+    public  List<MeasureOrderRuleCheckList> getMeasureRuleCLclosed(MeasuringOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<MeasureOrderRuleCheckList> pmcl =new ArrayList<MeasureOrderRuleCheckList>();
@@ -1644,7 +1648,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         return pmcl;
     }
 
-    public List<MeasureOrderRuleCheckList> acMeasureOrderUleCheckList(V2_MeasureOrder v2MeasureOrder) {
+    public List<MeasureOrderRuleCheckList> acMeasureOrderUleCheckList(MeasuringOrder v2MeasureOrder) {
         if (v2MeasureOrder == null)
             return null;
         MeasureOrderRule measureOrderRule = measureOrderService.acqMeasureOrderRule(v2MeasureOrder);
@@ -1662,11 +1666,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
 
 
     //hmCheck 的key是每一个检查项的uid, value是unstructrued_data的key
-    public void loadHmCheck(V2_MeasureOrder v2_measureOrder) {
+    public void loadHmCheck(MeasuringOrder MeasuringOrder) {
         hmCheck = new   HashMap<String, UnstructuredData>();
         //measureCheckItemList:检查项
-        measureCheckItemList = acMeasureOrderUleCheckList(v2_measureOrder);
-        unDataCollection = reportDao.findCKByBoUuid(v2_measureOrder.getId(), "measure-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
+        measureCheckItemList = acMeasureOrderUleCheckList(MeasuringOrder);
+        unDataCollection = reportDao.findCKByBoUuid(MeasuringOrder.getId(), "measure-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
         if (measureCheckItemList == null) return ;
         //The below guys seems to exist no reason.
         for (int i = 0; i < measureCheckItemList.size(); i++) {
@@ -1689,7 +1693,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
     List<MeasureOrderRuleCheckList> pmOrderRuleCheckList;
 
     //map : item.uid(pmorderrulecheck.uid) value: unstrundata
-    public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
+    public List<MeasuringOrderDetail> getNeedApprovalDetails() {
         return approvedDetails == null ? null : approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
     }
 
@@ -1731,11 +1735,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         suList.forEach(item -> sList.add(item.getName()));
         return sList;
     }
-    public List<V2_WorkOrder_Detail> getAccessoryList() {
+    public List<MeasuringOrderDetail> getAccessoryList() {
         if (accessoryList == null) {
             return null;
         }
-        V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
+        MeasuringOrderDetail emptyDetail = new MeasuringOrderDetail();
         emptyDetail.setId("000");
         if (!accessoryList.contains(emptyDetail)) {
             accessoryList.add(emptyDetail);
@@ -1746,11 +1750,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         return accessoryList;
     }
 
-    public List<V2_WorkOrderCoworker> getCoWorkerList() {
+    public List<MeasuringOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
             return null;
         }
-        V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
+        MeasuringOrderCoworker emptyDetail = new MeasuringOrderCoworker();
         emptyDetail.setId("000");
         if (!coWorkerList.contains(emptyDetail)) {
             coWorkerList.add(emptyDetail);
@@ -1761,19 +1765,19 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         return coWorkerList;
     }
 
-    public V2_WorkOrder_Detail getItemDetail() {
+    public MeasuringOrderDetail getItemDetail() {
         return itemDetail;
     }
 
-    public void setItemDetail(V2_WorkOrder_Detail itemDetail) {
+    public void setItemDetail(MeasuringOrderDetail itemDetail) {
         this.itemDetail = itemDetail;
     }
 
-    public V2_WorkOrderCoworker getCoWorkerDetail() {
+    public MeasuringOrderCoworker getCoWorkerDetail() {
         return coWorkerDetail;
     }
 
-    public void setCoWorkerDetail(V2_WorkOrderCoworker coWorkerDetail) {
+    public void setCoWorkerDetail(MeasuringOrderCoworker coWorkerDetail) {
         this.coWorkerDetail = coWorkerDetail;
     }
 
@@ -1801,11 +1805,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         this.confirmedDownTime = confirmedDownTime;
     }
 
-    public List<V2_MeasureOrder> getselectedMeasureOrderList() {
+    public List<MeasuringOrder> getselectedMeasureOrderList() {
         return selectedMeasureOrderList;
     }
 
-    public void setselectedMeasureOrderList(List<V2_MeasureOrder> selectedMeasureOrderList) {
+    public void setselectedMeasureOrderList(List<MeasuringOrder> selectedMeasureOrderList) {
         this.selectedMeasureOrderList = selectedMeasureOrderList;
     }
 
@@ -1865,7 +1869,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         this.endTime = endTime;
     }
 
-    public void setCoWorkerList(List<V2_WorkOrderCoworker> coWorkerList) {
+    public void setCoWorkerList(List<MeasuringOrderCoworker> coWorkerList) {
         this.coWorkerList = coWorkerList;
     }
 
@@ -1927,15 +1931,15 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         this.selectedMap = selectedMap;
     }
 
-    public void setAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {
+    public void setAccessoryList(List<MeasuringOrderDetail> accessoryList) {
         this.accessoryList = accessoryList;
     }
 
-    public List<V2_WorkOrder_Detail> getApprovedDetails() {
+    public List<MeasuringOrderDetail> getApprovedDetails() {
         return approvedDetails;
     }
 
-    public void setApprovedDetails(List<V2_WorkOrder_Detail> approvedDetails) {
+    public void setApprovedDetails(List<MeasuringOrderDetail> approvedDetails) {
         this.approvedDetails = approvedDetails;
     }
 
@@ -2140,11 +2144,11 @@ public class V2MeasureController extends GenericCRUDUUIDController<V2_MeasureOrd
         this.applyTime = applyTime;
     }
 
-    public List<V2_MeasureOrder> getCurrentPagePmOrders() {
+    public List<MeasuringOrder> getCurrentPagePmOrders() {
         return currentPagePmOrders;
     }
 
-    public void setCurrentPagePmOrders(List<V2_MeasureOrder> currentPagePmOrders) {
+    public void setCurrentPagePmOrders(List<MeasuringOrder> currentPagePmOrders) {
         this.currentPagePmOrders = currentPagePmOrders;
     }
 

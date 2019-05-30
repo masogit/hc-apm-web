@@ -15,15 +15,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Entity
 @Data
-@Table(name = "v2_measure")
-public class V2_MeasureOrder implements Serializable {
+@Table(name = "measuring_order")
+public class MeasuringOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -44,7 +42,7 @@ public class V2_MeasureOrder implements Serializable {
     @NotNull
     @Column(name = "create_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     @Column(name = "owner_id")
     private String ownerId;
@@ -66,8 +64,7 @@ public class V2_MeasureOrder implements Serializable {
     @Size(max = 256)
     @Column(name = "comments")
     private String comments;
-    @Column(name="measure_type")
-    private Integer measureType;
+
     @Column(name = "asset_id")
     @Basic(optional = false)
     @NotNull
@@ -93,49 +90,40 @@ public class V2_MeasureOrder implements Serializable {
     @Column(name = "man_hours")
     private Double manHours;
 
-    @Column(name="simplify")
-    private Boolean simplify;
-
-    @Column(name="signature")
-    private String signature;
-
-    @Column(name="int_ext_type")
-    private Integer intExtType;
-
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;  //计划时间
 
-    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private AssetInfo assetInfo;
+    @Column(name = "origin_plan_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date originPlanTime;  //原计划时间
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    @Where(clause = "bo_type = 'MeasureOrder'")
-    @org.hibernate.annotations.ForeignKey(name = "none")
-    private List<V2_BlobObject> attachments = new ArrayList<>();
+    @Where(clause = "bo_type = 'PmOrder'")
+    private Set<V2_BlobObject> attachments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @org.hibernate.annotations.ForeignKey(name = "none")
-    private List<V2_WorkOrder_Detail> details;
+    private Set<MeasuringOrderDetail> details = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @org.hibernate.annotations.ForeignKey(name = "none")
-    private List<V2_WorkOrderCoworker> coworkers;
+    private Set<MeasuringOrderCoworker> coworkers = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name="asset_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), insertable=false, updatable=false)
+    private AssetInfo assetInfo;
 
     @Column(name = "nearest_sr_days")
     private Integer nearestSrDays;//此次保养后，最近的报修距此保养天数
     @Column(name = "nearest_sr_id")
     private String nearestSrId;//此次保养后，最近的报修SR ID
 
-    @Column(name="measure_num")
-    private String measureNum;
+    @Column(name = "measuring_num")
+    private String measuringNum;
 
     @Column(name="inst_id")
     private String instId;
@@ -169,9 +157,25 @@ public class V2_MeasureOrder implements Serializable {
     @Column(name="clinical_dept_id")
     private String clinicalDeptId;
     @Column(name="quality_checking")
-    private String qualityChecking; //默认是合格
+    private String qualityChecking;
+
     @Column(name="approval_status")
     private String approvalStatus;
+
+    @Column(name="finish_on_time")
+    private String finishOnTime;
+
+    @Column(name="simplify")
+    private Boolean simplify;
+
+    @Column(name="measuringtype")
+    private Integer measuringType;
+
+    @Column(name="int_ext_type")
+    private Integer intExtType;
+
+    @Column(name = "signature")
+    private String signature;
 
     @Column(name = "cancel_person")
     private String cancelPerson;
@@ -179,15 +183,7 @@ public class V2_MeasureOrder implements Serializable {
     @Column(name = "cancel_reason")
     private String cancelReason;
 
-    @Transient
-    @JsonIgnore
-    private String strPlanTime;
-
-    @Transient
-    @JsonIgnore
-    private String strFinishTime;
-
-    public V2_MeasureOrder() {
+    public MeasuringOrder() {
     }
 
     public Integer getNearestSrDays() {
@@ -206,15 +202,15 @@ public class V2_MeasureOrder implements Serializable {
         this.nearestSrId = nearestSrId;
     }
 
-    public List<V2_BlobObject> getAttachments() {
+    public Set<V2_BlobObject> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<V2_BlobObject> attachments) {
+    public void setAttachments(Set<V2_BlobObject> attachments) {
         this.attachments = attachments;
     }
 
-    public V2_MeasureOrder(String id, String creatorId, String creatorName, Date createTime, boolean isFinished) {
+    public MeasuringOrder(String id, String creatorId, String creatorName, Date createTime, boolean isFinished) {
         this.id = id;
         this.creatorId = creatorId;
         this.creatorName = creatorName;
@@ -354,12 +350,20 @@ public class V2_MeasureOrder implements Serializable {
         this.planTime = planTime;
     }
 
-    public String getMeasureNum() {
-        return measureNum;
+    public String getMeasuringNum() {
+        return measuringNum;
     }
 
-    public void setMeasureNum(String measureNum) {
-        this.measureNum = measureNum;
+    public void setMeasuringNum(String measuringNum) {
+        this.measuringNum = measuringNum;
+    }
+
+    public Integer getMeasuringType() {
+        return measuringType;
+    }
+
+    public void setMeasuringType(Integer measuringType) {
+        this.measuringType = measuringType;
     }
 
     public String getInstId() {
@@ -370,31 +374,23 @@ public class V2_MeasureOrder implements Serializable {
         this.instId = instId;
     }
 
-    public String getStrPlanTime() {
-        if(this.planTime!=null){
-            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-            strPlanTime=sdf.format(this.planTime);
-        }
-        return strPlanTime;
-    }
+//    public Integer getFeedbackRating() {
+//        return feedbackRating;
+//    }
 
-    public void setStrPlanTime(String strPlanTime) {
-        this.strPlanTime = strPlanTime;
-    }
+//    public void setFeedbackRating(Integer feedbackRating) {
+//        this.feedbackRating = feedbackRating;
+//    }
 
-    public String getStrFinishTime() {
-        if(this.endTime!=null){
-            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-            strFinishTime=sdf.format(this.endTime);
-        }
-        return strFinishTime;
-    }
+//    public String getFeedbackComment() {
+//        return feedbackComment;
+//    }
 
-    public void setStrFinishTime(String strFinishTime) {
-        this.strFinishTime = strFinishTime;
-    }
+//    public void setFeedbackComment(String feedbackComment) {
+//        this.feedbackComment = feedbackComment;
+//    }
 
-	public String getCurrentStepId() {
+    public String getCurrentStepId() {
         return currentStepId;
     }
 
@@ -410,19 +406,19 @@ public class V2_MeasureOrder implements Serializable {
         this.currentStepName = currentStepName;
     }
 
-    public List<V2_WorkOrder_Detail> getDetails() {
+    public Set<MeasuringOrderDetail> getDetails() {
         return details;
     }
 
-    public void setDetails(List<V2_WorkOrder_Detail> details) {
+    public void setDetails(Set<MeasuringOrderDetail> details) {
         this.details = details;
     }
 
-    public List<V2_WorkOrderCoworker> getCoworkers() {
+    public Set<MeasuringOrderCoworker> getCoworkers() {
         return coworkers;
     }
 
-    public void setCoworkers(List<V2_WorkOrderCoworker> coworkers) {
+    public void setCoworkers(Set<MeasuringOrderCoworker> coworkers) {
         this.coworkers = coworkers;
     }
 
@@ -482,29 +478,6 @@ public class V2_MeasureOrder implements Serializable {
         this.approvalStatus = approvalStatus;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    public String getTenantUID() {
-        return tenantUID;
-    }
-
-    public void setTenantUID(String tenantUID) {
-        this.tenantUID = tenantUID;
-    }
-
-    public String getInstitutionUID() {
-        return institutionUID;
-    }
-
-    public void setInstitutionUID(String institutionUID) {
-        this.institutionUID = institutionUID;
-    }
-
     public String getHospitalUID() {
         return hospitalUID;
     }
@@ -521,17 +494,8 @@ public class V2_MeasureOrder implements Serializable {
         this.siteUID = siteUID;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof V2_MeasureOrder)) {
-            return false;
-        }
-        V2_MeasureOrder other = (V2_MeasureOrder) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
     }
 
     public Integer getRuleLevel() {
@@ -542,12 +506,12 @@ public class V2_MeasureOrder implements Serializable {
         this.ruleLevel = ruleLevel;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
+    public Date getOriginPlanTime() {
+        return originPlanTime;
     }
 
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
+    public void setOriginPlanTime(Date originPlanTime) {
+        this.originPlanTime = originPlanTime;
     }
 
     public Boolean getSimplify() {
@@ -558,28 +522,20 @@ public class V2_MeasureOrder implements Serializable {
         this.simplify = simplify;
     }
 
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public Integer getMeasureType() {
-        return measureType;
-    }
-
-    public void setMeasureType(Integer measureType) {
-        this.measureType = measureType;
-    }
-
     public Integer getIntExtType() {
         return intExtType;
     }
 
     public void setIntExtType(Integer intExtType) {
         this.intExtType = intExtType;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     public String getCancelPerson() {
@@ -596,5 +552,25 @@ public class V2_MeasureOrder implements Serializable {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof MeasuringOrder)) {
+            return false;
+        }
+        MeasuringOrder other = (MeasuringOrder) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
 }

@@ -64,14 +64,14 @@
                         <p:column headerText="计量等级" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
                             <h:outputText value="#{item.ruleLevel}"/>
                         </p:column>
-                        <p:column headerText="计量类型" sortBy="#{item.measureType}" filterBy="#{item.measureType}" filterMatchMode="EQ">
+                        <p:column headerText="计量类型" sortBy="#{item.measuringType}" filterBy="#{item.measuringType}" filterMatchMode="EQ">
                             <f:facet name="filter" >
                                 <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2MeasureController.repairTypeInt}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('measureType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('measureType',item.measureType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('measureType',item.measuringType)}"/>
                         </p:column>
                         <!--所属科室-->
                         <p:column headerText="#{msg.clinicalDeptName}"  width="100">
@@ -95,8 +95,8 @@
                         </p:column>
 
 
-                        <p:column headerText="计量编号" sortBy="#{item.measureNum}" filterBy="#{item.measureNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.measureNum}"/>
+                        <p:column headerText="计量编号" sortBy="#{item.measuringNum}" filterBy="#{item.measuringNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.measuringNum}"/>
                         </p:column>
                         <p:column headerText="当前处理步骤"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                             <f:facet name="filter" >
@@ -301,14 +301,14 @@
                             <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2MeasureController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                      <!--  <h:panelGroup>
                             <label class="label">计量级别*</label>
                             <p:selectOneMenu  value="#{v2MeasureController.ruleLevel}" required="true" requiredMessage="计量级别#{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="2级规则" itemValue="2" />
                                 <f:selectItem itemLabel="3级规则" itemValue="3" />
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">计量类型*</label>
                             <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2MeasureController.measureType}" required="true" requiredMessage="计量类型#{msg.ValidationRequire}">

@@ -49,7 +49,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     private WorkOrderStepRepository stepDao;
 
     @Autowired
-    private WorkOrderDetailRepository detailDao;
+    private WorkOrderDetailMeasuringRepository detailMeasuringDao;
 
     @Autowired
     private BlobObjectRepository blobDao;
@@ -62,7 +62,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     @Autowired
     UserAccountRepository userAccountRepository;
     @Autowired
-    private WorkOrderCoworkerRepository workOrderCoworkerRepository;
+    private WorkOrderCoworkerMeasuringRepository workOrderCoworkerMeaRepository;
     @Autowired
     private UserCommonService ucService;
     @Autowired
@@ -82,8 +82,8 @@ public class V2_MeasureService extends MicroServiceInvoker {
     @Autowired
     private MeasureOrderRuleCheckListRepository pmckLstDao;
 
-    public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
-        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+    public String updateWorkOrderDetailPrice(String token, MeasuringOrderDetail workOrderDetail) {
+        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(workOrderDetail, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -96,16 +96,16 @@ public class V2_MeasureService extends MicroServiceInvoker {
 
 
 
-    public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
+    public void updateAccessPrice(MeasuringOrderDetail workOrderDetail){
         String token = UserContextService.getAccessToken();
-        String res = srApi.updateWorkOrderDetailPrice(token,workOrderDetail);
+        String res = srApi.updateWorkOrderMeasuringDetailPrice(token,workOrderDetail);
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
         }
     }
 
 
-    public MeasureOrderRule acqMeasureOrderRule(V2_MeasureOrder v2MeasureOrder){
+    public MeasureOrderRule acqMeasureOrderRule( MeasuringOrder v2MeasureOrder){
         MeasureOrderRule measureOrderRule= meaOrderRuleRepository.findMeasureOrderRuleLevel3(v2MeasureOrder.getAssetUid());
         /* int level =  v2MeasureOrder.getRuleLevel();
         switch (level){
@@ -118,19 +118,19 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }*/
         return measureOrderRule;
     }
-    public List<TableDefinition> getTablesName(V2_MeasureOrder v2MeasureOrder){
+    public List<TableDefinition> getTablesName( MeasuringOrder v2MeasureOrder){
         MeasureOrderRule measureOrderRule=acqMeasureOrderRule(v2MeasureOrder);
         if(measureOrderRule==null){
             return null;
         }
-        List<TableDefinition> tableDefinitions = tableDao.findTableName(measureOrderRule.getUid());
+        List<TableDefinition> tableDefinitions = tableDao.findTableNameForMeasure(measureOrderRule.getUid());
         return tableDefinitions;
     }
 
-    public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
-        return workOrderCoworkerRepository.findByWoId(woId);
+    public List<MeasuringOrderCoworker> getWorkOrderCoworker(String woId) {
+        return workOrderCoworkerMeaRepository.findByWoId(woId);
     }
-    public void closePM(V2_MeasureOrder selectedPmOrder,List<V2_BlobObject> picList ){
+    public void closePM( MeasuringOrder selectedPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         formData.setAttachments(picList);
@@ -154,12 +154,12 @@ public class V2_MeasureService extends MicroServiceInvoker {
     }
 
 
-    public void invokeMeasureOrderCancel(String desc, V2_MeasureOrder selectedMeasureOrder,String cancelInt){
+    public void invokeMeasureOrderCancel(String desc,  MeasuringOrder selectedMeasureOrder,String cancelInt){
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         //如果是工单是周期性的
         /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
-        if(selectedMeasureOrder.getMeasureType()==1){ //周期性
+        if(selectedMeasureOrder.getMeasuringType()==1){ //周期性
              if(cancelInt.equalsIgnoreCase("1")){
                  formData.setQualityChecking("1");
              }else{
@@ -184,7 +184,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     	reportDao.save(listReport);
     }
     
-    public void submitWorkOrder(V2_MeasureOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
+    public void submitWorkOrder( MeasuringOrder selectedPmOrder,List<MeasuringOrderDetail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         formData.setActionType("approval");
@@ -217,11 +217,11 @@ public class V2_MeasureService extends MicroServiceInvoker {
         createMeasureRequestApi(assetUID, formData);
     }
 
-    public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
-        return detailDao.findByWoId(woId);
+    public List<MeasuringOrderDetail> getWorkOrderMeasuringDetails(String woId) {
+        return detailMeasuringDao.findByOrderId(woId);
     }
-    public void rateWorkOrder(V2_MeasureOrder selectedPmOrder, Integer rating, String comments) {
-        V2_MeasureOrder tmpwo=woDao.findById(selectedPmOrder.getId());
+    public void rateWorkOrder( MeasuringOrder selectedPmOrder, Integer rating, String comments) {
+         MeasuringOrder tmpwo=woDao.findById(selectedPmOrder.getId());
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         // formData.setStepId("rate");
@@ -235,8 +235,8 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("操作成功");
         }
     }
-    public void rejectWorkOrder(V2_MeasureOrder selectedPmOrder,String reason, Integer status, Date confirmedDowntime) {
-        V2_MeasureOrder tmpwo=woDao.findById(selectedPmOrder.getId());
+    public void rejectWorkOrder( MeasuringOrder selectedPmOrder,String reason, Integer status, Date confirmedDowntime) {
+         MeasuringOrder tmpwo=woDao.findById(selectedPmOrder.getId());
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         //formData.setStepId("Ack");
@@ -251,9 +251,9 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
 
     }
-    public void dispatchWorkOrderBatch(List<V2_MeasureOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,Date planTimeBatch){
+    public void dispatchWorkOrderBatch(List< MeasuringOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,Date planTimeBatch){
         String token = UserContextService.getAccessToken();
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List< MeasuringOrder> pmListTmp = new ArrayList< MeasuringOrder>();
         ArrayList<MeasureOrderActionForm> formDataList = new ArrayList<MeasureOrderActionForm>();
 
        //批量派工时 来自不同page的选择的  参考 acceptWorkOrderBatch 可以替换上面两端代码
@@ -275,9 +275,9 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("批量派单成功");
         }
     }
-    public void closePMBatch(List<V2_MeasureOrder> pmList,Map<String,Boolean> hmPmOrder,List<V2_BlobObject> picList ){
+    public void closePMBatch(List< MeasuringOrder> pmList,Map<String,Boolean> hmPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List< MeasuringOrder> pmListTmp = new ArrayList< MeasuringOrder>();
         pmList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 //确保批量接单后，批量接单按钮是灰色
@@ -304,7 +304,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("批量关单成功");
         }
     }
-    public void dispatchWorkOrder(V2_MeasureOrder selectedPmOrder,Date planTime) {
+    public void dispatchWorkOrder( MeasuringOrder selectedPmOrder,Date planTime) {
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         formData.setActionType("assign");
@@ -320,9 +320,9 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
         selectedPmOrder.setCurrentStepId("accept");
     }
-    public void reassignWorkOrderBatch(List<V2_MeasureOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,String comments){
+    public void reassignWorkOrderBatch(List< MeasuringOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,String comments){
         String token = UserContextService.getAccessToken();
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List< MeasuringOrder> pmListTmp = new ArrayList< MeasuringOrder>();
         ArrayList<MeasureOrderActionForm> formDataList = new ArrayList<MeasureOrderActionForm>();
        /* pmList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
@@ -367,7 +367,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         return pmOrderSteps == null ? new ArrayList<>() : pmOrderSteps;
     }
 
-    public void approvePMorder(V2_MeasureOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){
+    public void approvePMorder( MeasuringOrder selectedPmOrder,List<MeasuringOrderDetail> accessList,String comments){
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         String actionType =null;
@@ -388,7 +388,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("审批成功");
         }
     }
-    public void repairWorkOrder(V2_MeasureOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
+    public void repairWorkOrder( MeasuringOrder selectedPmOrder,List<MeasuringOrderDetail> accDetails, List<MeasuringOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
@@ -421,12 +421,12 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("操作成功");
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_MeasureOrder> pmList,Map<String, Boolean> hmPmOrder) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,List< MeasuringOrder> pmList,Map<String, Boolean> hmPmOrder) {
         String token = UserContextService.getAccessToken();
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List< MeasuringOrder> pmListTmp = new ArrayList< MeasuringOrder>();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
-        List<V2_MeasureOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        List< MeasuringOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
         batchPmOrderList.stream().forEach(item->{
             if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
                 hmPmOrder.put(item.getId(),false);
@@ -460,7 +460,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("批量完成成功");
         }
     }
-    public void reassignWorkOrder(V2_MeasureOrder selectedPmOrder, String assigneeId,String comments) {
+    public void reassignWorkOrder( MeasuringOrder selectedPmOrder, String assigneeId,String comments) {
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         formData.setActionType("reAssign");
@@ -475,7 +475,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
     }
 
-    public void stagingPmrder(V2_MeasureOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
+    public void stagingPmrder( MeasuringOrder selectedPmOrder,List<MeasuringOrderDetail> accDetails, List<MeasuringOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
         formData.setAttachments(attachment);
@@ -499,7 +499,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {
         return srDao.findByAssetId(id);
     }
-    public void acceptWorkOrder(V2_MeasureOrder selectedPmOrder,Date planTime) {
+    public void acceptWorkOrder( MeasuringOrder selectedPmOrder,Date planTime) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
@@ -514,12 +514,12 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
         selectedPmOrder.setCurrentStepId("repair");
     }
-    public void acceptWorkOrderBatch(List<V2_MeasureOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch,int type) {
+    public void acceptWorkOrderBatch(List< MeasuringOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch,int type) {
         String token = UserContextService.getAccessToken();
-        List<V2_MeasureOrder> pmListTmp = new ArrayList<V2_MeasureOrder>();
+        List< MeasuringOrder> pmListTmp = new ArrayList< MeasuringOrder>();
         ArrayList<MeasureOrderActionForm> formDataList = new ArrayList<MeasureOrderActionForm>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->{
-            V2_MeasureOrder v2 = woDao.findById(item.getKey());
+             MeasuringOrder v2 = woDao.findById(item.getKey());
 
             MeasureOrderActionForm formData = new MeasureOrderActionForm();
             formData.setActionType("accept");
@@ -542,7 +542,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             else
                 WebUtil.addSuccessMessage("批量抢单成功");
 
-            for(V2_MeasureOrder item:pmListTmp){
+            for( MeasuringOrder item:pmListTmp){
                 item.setCurrentStepId("repair");
             }
         }
@@ -566,11 +566,11 @@ public class V2_MeasureService extends MicroServiceInvoker {
         return msgDao.findBySrIdOrderBySendTime(id);
     }
     
-    public V2_MeasureOrder findById(String id){
+    public  MeasuringOrder findById(String id){
     	return woDao.findById(id);
     }
 
-    private List<MeasureOrderRuleCheckList> getPmRuleCLClosed(V2_MeasureOrder v2MeasureOrder, String ruleUid){
+    private List<MeasureOrderRuleCheckList> getPmRuleCLClosed( MeasuringOrder v2MeasureOrder, String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
         List<MeasureOrderRuleCheckList> pmcl =new ArrayList<MeasureOrderRuleCheckList>();
@@ -588,7 +588,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         return pmcl;
     }
 
-    public List<MeasureOrderRuleCheckList> getPmOrderRuleCheckLists(V2_MeasureOrder v2MeasureOrder, MeasureOrderRule pmOrderRule) {
+    public List<MeasureOrderRuleCheckList> getPmOrderRuleCheckLists( MeasuringOrder v2MeasureOrder, MeasureOrderRule pmOrderRule) {
         if (v2MeasureOrder.isFinished()) {
             return getPmRuleCLClosed(v2MeasureOrder, pmOrderRule.getUid());
         } else {
@@ -596,7 +596,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
     }
 
-    public Map<String, UnstructuredData> fetchHmCheck(List<MeasureOrderRuleCheckList> pmCheckItemList, V2_MeasureOrder v2MeasureOrder) {
+    public Map<String, UnstructuredData> fetchHmCheck(List<MeasureOrderRuleCheckList> pmCheckItemList,  MeasuringOrder v2MeasureOrder) {
         Map<String, UnstructuredData> hmCheck = new HashMap<>();
         if (pmCheckItemList != null && !pmCheckItemList.isEmpty()) {
             List<UnstructuredDataCollection> unDataCollection = reportDao.findCKByBoUuid(v2MeasureOrder.getId(), "pm-checklist-report");
