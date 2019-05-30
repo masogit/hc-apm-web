@@ -165,6 +165,12 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				listStreamedContent.add(pictureTail);
 			}
 			result=service.savePccReport(this.selected, listStreamedContent);
+			if(result){
+				addMessage("PCC 探头检测报告保存成功！");
+			}
+			else{
+				addMessage("PCC 探头检测报告保存失败！");
+			}
 		}
 		else{
 			result=service.savePccReport(this.selected, null);
