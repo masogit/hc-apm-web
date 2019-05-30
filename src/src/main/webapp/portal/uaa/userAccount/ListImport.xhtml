@@ -6,7 +6,7 @@
 <div class="ui-g">
 	<div class="ui-g-12 card">
 		<h:form enctype="multipart/form-data">
-			<p:fieldset legend="批量导入 用户账号信息" id="uploaderContainer">
+			<p:fieldset legend="批量导入 #{msg.UserAccount}" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<p:fileUpload fileUploadListener="#{userAccountImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
 						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update=":userAccountTab:dataListForm, :userAccountTab:UserAccountListForm"

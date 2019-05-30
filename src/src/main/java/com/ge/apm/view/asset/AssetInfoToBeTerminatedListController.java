@@ -38,8 +38,10 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -131,6 +133,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private UaaService uuaService;
 
+    private StreamedContent assetTemplateFile;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -221,7 +225,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             String tenantUid = currentUserAccount.getTenantUID();
-            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid);
+            List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
+            Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
+            batchUpdateAssets = exportToBeTerminatedAppraisalService.getAssetInfo(uploadedFile.getInputstream(), tenantUid, siteUids);
 
             batchUpdateAssets.removeIf(i -> validateTermination(i));
 
@@ -230,14 +236,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         }
     }
 
+
+    public void exportAssetExcelTemplate() {
+        InputStream resourceAsStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Termination_Template.xlsx");
+        assetTemplateFile = new DefaultStreamedContent(resourceAsStream, "application/vnd.ms-excel", "template.xlsx");
+    }
+
     public void batchUpdate() {
-        List<OrgInfo> allAccessibleClinicalDeptList = uuaService.getAllAccessibleClinicalDeptList();
-        Set<String> siteUids = allAccessibleClinicalDeptList.stream().map(i -> i.getSiteUID()).collect(Collectors.toSet());
-
-        batchUpdateAssets.removeIf(i -> !(siteUids.contains(i.getSiteUID()) && i.getStatus() == 4));
-
         batchUpdateAssets.forEach(i -> terminateAsset(i));
-
         batchUpdateAssets.clear();
         uploadedFile = null;
     }
@@ -496,11 +502,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public void terminateAsset(AssetInfo assetInfo) {
-        logger.info("Terminate: " + assetInfo.getUid());
         if (assetInfo == null) {
             return;
         }
 
+        logger.info("Terminate: " + assetInfo.getUid());
         if (validateTermination(assetInfo)) return;
 
         assetInfo.setStatus(4);
@@ -511,6 +517,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {
+        if (assetInfo.getStatus() != 4) {
+            WebUtil.addErrorMessage(String.format("设备[%s]未处于待报废状态，不能报废！", assetInfo.getName()));
+            return true;
+        }
+
         int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
         if (workOrdersNum > 0) {
             WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
@@ -827,5 +838,13 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setTerminationCause(String terminationCause) {
         this.terminationCause = terminationCause;
+    }
+
+    public StreamedContent getAssetTemplateFile() {
+        return assetTemplateFile;
+    }
+
+    public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
+        this.assetTemplateFile = assetTemplateFile;
     }
 }

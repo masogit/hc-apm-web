@@ -29,10 +29,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Entity
 @Table(name = "table_definition")
 public class TableDefinition implements Serializable {
-
     public static final int PM_ORDER_RULE = 1;
     public static final int MEASURE_ORDER_RULE = 2;
-
     public enum TableDefinitionStatus {
         Draft, Released, Expired
     }

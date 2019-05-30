@@ -22,11 +22,12 @@
 
                         <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
                             <label class="label">MVS合同起始日</label>
-                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractStartDate}" />
+                            <p:outputLabel value="#{workOrderMgrController.getMvsContract(workOrderMgrController.selected.assetInfo.id).contractStartDate}" />
+
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
                             <label class="label">MVS合同截止日</label>
-                            <p:outputLabel value="#{workOrderMgrController.selected.assetInfo.mvsAssetInfo.contractEndDate}" />
+                            <p:outputLabel value="#{workOrderMgrController.getMvsContract(workOrderMgrController.selected.assetInfo.id).contractEndDate}" />
                         </h:panelGroup>
 
 

@@ -27,10 +27,27 @@
                                           allowTypes="/(\.|\/)(xlsx)$/" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <h:panelGroup>
+                        <p>说明</p>
+                        <p>
+                            1.
+                            <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}"
+                                             icon="ui-icon-arrowstop-1-s" class="btn btn-sm"
+                                             actionListener="#{assetInfoToBeTerminatedListController.exportAssetExcelTemplate}"
+                                             update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
+                                             style="background-color: #5180ce;">
+                                <p:fileDownload value="#{assetInfoToBeTerminatedListController.assetTemplateFile}"/>
+                            </p:commandButton>
+                        </p>
+                        <p>2. 文件中填入要批量报废的资产数据，资产编号必填</p>
+                        <p>3. 上传文件进行导入</p>
+                    </h:panelGroup>
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="false"
-                                 actionListener="#{assetInfoToBeTerminatedListController.batchUpdate()}" value="#{msg.Save}"
+                                 actionListener="#{assetInfoToBeTerminatedListController.batchUpdate()}"
+                                 value="#{msg.Save}"
                                  update="display,:woTab:AssetInfoListForm1, :woTab:TerminationByFileDlg, :growl"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'TerminationByFileDlg');"/>
                 &nbsp;&nbsp;

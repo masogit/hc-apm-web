@@ -253,7 +253,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
         }*/
         //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
-        //tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
+        tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
         tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNull, null));
@@ -267,7 +267,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public List<TableDefinition> getTableDefinition() {
         List<SearchFilter> tempFilter = new ArrayList<>();
         //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
-        //tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
+        tempFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ, TableDefinition.PM_ORDER_RULE));
         tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         if (this.selected != null && this.selected.getAssetGroup() != null) {

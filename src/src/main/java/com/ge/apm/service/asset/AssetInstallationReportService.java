@@ -60,6 +60,8 @@ public class AssetInstallationReportService {
         reportData.put("contract_qua", arrivalListItem.getArrivalList().getQuantity());//数量
         reportData.put("manufacture", arrivalListItem.getArrivalList().getManufacture());//生产厂家
 
+        reportData.put("purchase_price", arrivalListItem.getPurchasePrice());
+
         //技术验收
         reportData.put("technical_third_party_name", "");//第三方检查单位
         reportData.put("technical_check_date", "");//检测日期

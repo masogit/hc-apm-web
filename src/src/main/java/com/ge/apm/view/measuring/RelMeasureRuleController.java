@@ -292,10 +292,19 @@ public class RelMeasureRuleController extends GenericCRUDUUIDController<RelMeasu
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
         } else {
-            List<RelMeasureRule> rels = new ArrayList<>(targetAssets.size());
+            List<RelMeasureRule> rmrs = new ArrayList<>(targetAssets.size());
             targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
             for (AssetInfo ai : targetAssets) {
-                RelMeasureRule rel = relMeasureRuleRepository.findByAssetUID(ai.getUid());
+                RelMeasureRule rmr = new RelMeasureRule();
+                rmr.setAssetUID(ai.getUid());
+                rmr.setCreatedDate(new Date());
+                rmr.setTenantUID(ai.getTenantUID());
+                rmr.setInstitutionUID(ai.getInstitutionUID());
+                rmr.setHospitalUID(ai.getHospitalUID());
+                rmr.setSiteUID(ai.getSiteUID());
+                rmr.setRuleUID(measureOrderRule.getUid());
+                rmrs.add(rmr);
+/*                RelMeasureRule rel = relMeasureRuleRepository.findByAssetUID(ai.getUid());
                 if (rel == null) {
                     rel = new RelMeasureRule();
                     rel.setAssetUID(ai.getUid());
@@ -315,8 +324,9 @@ public class RelMeasureRuleController extends GenericCRUDUUIDController<RelMeasu
                     }
                     rels.add(rel);
                 }
-                relMeasureRuleRepository.save(rels);
+                relMeasureRuleRepository.save(rels);*/
             }
+            relMeasureRuleRepository.save(rmrs);
             this.level = null;
             this.ruleUid = null;
             this.measureOrderRule = null;

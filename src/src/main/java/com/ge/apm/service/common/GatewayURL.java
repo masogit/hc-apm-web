@@ -10,7 +10,7 @@ public enum GatewayURL {
     UPDATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
     GET_DEPTRASACTION_LOG_SUMMARY("/hcapmassetservice/api/apm/asset/deptTransaction/summary?from={from}&to={to}"),
 
-    CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
+
     // Security
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
@@ -45,11 +45,23 @@ public enum GatewayURL {
     GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/pmOrders/{assetUid}/approver"),
     PM_ORDER_STEPS("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/pmOrderSteps"),
     CREATE_PM_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     AUTO_GENERATE_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/finacing_num"),
+    CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
+
+    // MEASURE Order URL
+    MEASURE_ORDER_ACTION("/hcapmworkflowservice/api/apm/Orders/{OrderId}/action"),
+    MEASURE_REQUEST_CREATE("/hcapmworkflowservice/api/apm/measuringOrders"),
+    MEASURE_GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/measuringOrders/{assetUid}/approver"),
+    MEASURE_ORDER_STEPS("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/OrderSteps"),
+    MEASURE_CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
+    MEASURE_CANCEL_MEASURE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/cancel"),
+    MEASURE_BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     // User Schedule
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
     ACCESSDEL("/hcapmassetservice/api/apm/asset/workOrderDetails/{id}"),

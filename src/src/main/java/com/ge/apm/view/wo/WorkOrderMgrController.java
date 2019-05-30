@@ -18,6 +18,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -58,7 +59,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
-
+    private SupplierController supplierController;
+    MvsAssetInfo mvsAssetInfo;
     @Setter @Getter
     private Supplier newSupplier;
     @Setter@Getter
@@ -91,7 +93,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Set<String> assetDeptOrgUidSet;
     private  UserOrgInfoRepository userOrgInfoRepository;
     private V2_ServiceRequest newServiceRequest;
-
+private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
 
@@ -157,11 +159,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private CustomConfig customConfig;
     private TenantInfo tenantInfo;
     protected void init() {
-
+        supplierController = WebUtil.getBean(SupplierController .class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        mvsAssetInfoRepository = WebUtil.getBean(MvsAssetInfoRepository.class);
+
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -207,6 +211,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
 
+    public void setSelected(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
+    }
 public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
@@ -1257,36 +1264,9 @@ public void repairResultSet(){
             supplierName = null;
             selectedObjectMap = new HashMap();
             switchTmp=true;
-                    if(!UserContextService.isInsulate()){
-                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                        if(eval==null){
-                            currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getHospitalUID());
-                            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                            if(eval==null){
-                                currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getInstitutionUID());
-                                eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                                if(eval==null){
-                                    currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getTenantUID());
-                                    eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                                    if(eval!=null){
-                                        itemDetail.setPartsType(eval.toString());
-                                    }
-
-                                }else{
-                                    itemDetail.setPartsType(eval.toString());
-                                }
-                            }else{
-                                itemDetail.setPartsType(eval.toString());
-                            }
-                        }else{
-                            itemDetail.setPartsType(eval.toString());
-                        }
-                    }else{//不是隔离
-                        currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-                        eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
-                        itemDetail.setPartsType(eval.toString());
-                    }
+            currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
+            eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+            itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
@@ -1683,6 +1663,31 @@ public void repairResultSet(){
         }
         return coWorkerList;
     }
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        if (newSupplier.getMaintainerT()) {
+            supplierController.setMaintainerT(true);
+        } else {
+            supplierController.setMaintainerT(false);
+        }
+        if (newSupplier.getManufacturerT()) {
+            supplierController.setManufacturerT(true);
+        } else {
+            supplierController.setManufacturerT(false);
+        }
+        if (newSupplier.getSupplierT()) {
+            supplierController.setSupplierT(true);
+        } else {
+            supplierController.setSupplierT(false);
+        }
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
+        }
+    }
 
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
@@ -1877,11 +1882,11 @@ public void repairResultSet(){
         this.fileterAssetDeptOrgName = fileterAssetDeptOrgName;
     }
     public void onSupplierChange() {
-        Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
+        String supplier = (String) selectedObjectMap.get("supplier");
         if (supplier == null)
             itemDetail.setSupplier(supplierName);
         else
-            itemDetail.setSupplier(supplier.getName());
+            itemDetail.setSupplier(supplier);
     }
 
 
@@ -1931,6 +1936,15 @@ public void repairResultSet(){
 
     public void setNewSupplier(Supplier newSupplier) {
         this.newSupplier = newSupplier;
+    }
+
+    public MvsAssetInfo getMvsContract(String assetUid){
+        MvsAssetInfo mvsAssetInfo = mvsAssetInfoRepository.findById(assetUid);
+        if(mvsAssetInfo==null){
+            return new MvsAssetInfo();
+        }else{
+            return mvsAssetInfo;
+        }
     }
 }
 
