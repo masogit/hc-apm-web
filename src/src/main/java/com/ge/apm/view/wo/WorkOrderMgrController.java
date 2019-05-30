@@ -60,7 +60,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
     private SupplierController supplierController;
-
+    MvsAssetInfo mvsAssetInfo;
     @Setter @Getter
     private Supplier newSupplier;
     @Setter@Getter
@@ -93,7 +93,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Set<String> assetDeptOrgUidSet;
     private  UserOrgInfoRepository userOrgInfoRepository;
     private V2_ServiceRequest newServiceRequest;
-
+private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
 
@@ -164,6 +164,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        mvsAssetInfoRepository = WebUtil.getBean(MvsAssetInfoRepository.class);
+
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -209,6 +211,9 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     }
 
 
+    public void setSelected(MvsAssetInfo mvsAssetInfo) {
+        this.mvsAssetInfo = mvsAssetInfo;
+    }
 public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
@@ -1931,6 +1936,15 @@ public void repairResultSet(){
 
     public void setNewSupplier(Supplier newSupplier) {
         this.newSupplier = newSupplier;
+    }
+
+    public MvsAssetInfo getMvsContract(String assetUid){
+        MvsAssetInfo mvsAssetInfo = mvsAssetInfoRepository.findById(assetUid);
+        if(mvsAssetInfo==null){
+            return new MvsAssetInfo();
+        }else{
+            return mvsAssetInfo;
+        }
     }
 }
 

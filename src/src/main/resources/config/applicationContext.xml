@@ -69,7 +69,7 @@
       <property name="password" value="#{systemEnvironment['PG_PASSWORD'] ?: cloudCfg.jdbcPassword}"/>
     </bean>
 
-    <!--<bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+   <!-- <bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <property name="url" value="#{cloudCfg.jdbcUrl}"/>
         <property name="username" value="#{cloudCfg.jdbcUserName}"/>
         <property name="password" value="#{cloudCfg.jdbcPassword}"/>
@@ -86,7 +86,7 @@
         <property name="removeAbandoned" value="true"/>
         <property name="removeAbandonedTimeout" value="10"/>
         <property name="logAbandoned" value="true"/>
-        <property name="poolPreparedStatements" value="true"/>
+        <property name="poolPreparedState、ments" value="true"/>
         <property name="maxPoolPreparedStatementPerConnectionSize" value="5000"/>
         <property name="proxyFilters">
             <list>

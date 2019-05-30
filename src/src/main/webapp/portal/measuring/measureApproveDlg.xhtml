@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog class="measureApproveDialogCls" id="measureApproveDlg" widgetVar="measureApproveDlg" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
+        <h:form id="pmapproveDialogForm" class="pmapproveDialogFormCls">
+            <h:panelGroup id="display3" rendered="#{not empty v2MeasureController.selectedMeasureOrder}">
+                <p:fieldset legend="备件审批" >
+                    <p:dataTable  id="accessList123" value="#{v2MeasureController.getNeedApprovalDetails()}" var="item" paginator="false"
+                                  rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:column >
+                            <p:selectBooleanCheckbox value="#{v2MeasureController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
+                                <p:ajax process="@this" listener="#{v2MeasureController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
+                            </p:selectBooleanCheckbox>
+                            <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox  id="selectCheckBoxHeader" value="#{v2MeasureController.selectedMap['All']}" class="selectCheckBoxHeader">
+                                    <p:ajax process="@this" listener="#{v2MeasureController.onApprovedDetailsSelected('All')}" update="@this @(.selectCheckBox)"/>
+                                </p:selectBooleanCheckbox>
+                                <!--<h:outputText value="勾选审批" />-->
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="备件名称">
+                            <h:outputText value="#{item.parts}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.accessoryQuantity}">
+                            <h:outputText value="#{item.apartsQuantity}"/>
+                        </p:column>
+                        <p:column headerText="预估单价(元)">
+                            <h:outputText value="#{item.partsPrice}">
+                                <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="合同价格(元)">
+                            <h:outputText value="#{item.closedPrice}">
+                                <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="备件类别">
+                            <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                        </p:column>
+                        <p:column headerText="序列号">
+                            <h:outputText value="#{item.serialNum}" />
+                        </p:column>
+                        <p:column headerText="发票号">
+                        <h:outputText value="#{item.invoiceNum}" />
+                    </p:column>
+
+                        <p:column headerText="质保期">
+                            <h:outputText value="#{item.warrantyDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="预计到达时间">
+                            <h:outputText value="#{item.estimatedArriveTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                       <!-- <p:column headerText="到货">
+                            <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
+                        </p:column>-->
+                    </p:dataTable>
+
+                </p:fieldset>
+                <h:panelGroup>
+                    <label class="label">备注</label>
+                    <p:inputTextarea id="comment" class="beizhuClass" value="#{v2MeasureController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100" requiredMessage="审核不通过原因必须填写"/>
+                </h:panelGroup>
+                <br/>
+                <h:panelGroup>
+                   <p:commandButton validateClient="true" actionListener="#{v2MeasureController.approvePMorder()}" value="审批" update="measureTab:measureOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                   <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('measureApproveDlg').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+        <script>
+            function handleComplete(xhr, status, args){
+                if (args.needComents) {
+                     $('#measureTab\\:pmapproveDialogForm\\:comment').addClass("ui-state-error");
+                } else {
+                    handleSubmit(args, 'measureApproveDlg');
+                }
+            }
+        </script>
+
+    </p:dialog>
+</ui:composition>
+</html>

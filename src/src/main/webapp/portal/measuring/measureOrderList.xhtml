@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition>
+            <div class="ui-g-12 card">
+                <h:form id="measureOrderListForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+
+                        <p:commandButton value="全部"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=10" disabled="#{v2MeasureController.queryIndex==10}" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+
+                        <p:commandButton value="待办"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=-1" disabled="#{v2MeasureController.queryIndex==-1}" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                        <p:commandButton value="创建计量" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}" actionListener="#{v2MeasureController.createPMRequest()}" process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm measureTab:measureRequestCreateForm"  oncomplete="PF('createMeasureDialog').show()" />
+                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=2" disabled="#{v2MeasureController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead')}"/>
+                        <p:commandButton value="待接单"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=3" disabled="#{v2MeasureController.queryIndex==3}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
+
+                        <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=31" disabled="#{v2MeasureController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff')}"  />
+
+                        <p:commandButton value="已计划"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=0" disabled="#{v2MeasureController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
+                        <p:commandButton value="待审核"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=8" disabled="#{v2MeasureController.queryIndex==8}" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')}"/>
+                        <p:commandButton value="已关单"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" actionListener="#{v2MeasureController.searchList(7)}" disabled="#{v2MeasureController.queryIndex==7}"  rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"  />
+                        <p:commandButton value="已取消"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" actionListener="#{v2MeasureController.searchList(20)}" disabled="#{v2MeasureController.queryIndex==20}"  rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"  />
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{v2MeasureController.lazyModel}" var="item" widgetVar="varDataListgl"
+                                 selectionMode="single" selection="#{v2MeasureController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.planTime}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" listener="#{v2MeasureController.onSelectPmOrder()}" update="measureTab:measureOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                        <p:ajax event="filter" listener="#{v2MeasureController.onFilter}" update="datalist measureTab:measureOrderDetailForm" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36" visible="#{v2MeasureController.queryIndex==2 or v2MeasureController.queryIndex==3 or v2MeasureController.queryIndex==0 or v2MeasureController.queryIndex==6 or v2MeasureController.queryIndex == 31 or v2MeasureController.queryIndex == 7}" exportable="false">
+                            <p:selectBooleanCheckbox value="#{v2MeasureController.selectedMap[item.id]}" class="selectCheckBox">
+                                <p:ajax process="@this"  update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report)" oncomplete="updateSelectAllCheckBox();" />
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                                    <p:ajax  listener="#{v2MeasureController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report)" oncomplete="updateSelectAllCheckBox();"/>
+
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+
+
+                        <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+
+                        <p:column headerText="制造商序列号" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+
+                        <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        </p:column>
+                        <p:column headerText="计量等级" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
+                            <h:outputText value="#{item.ruleLevel}"/>
+                        </p:column>
+                        <p:column headerText="计量类型" sortBy="#{item.measureType}" filterBy="#{item.measureType}" filterMatchMode="EQ">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2MeasureController.repairTypeInt}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('measureType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('measureType',item.measureType)}"/>
+                        </p:column>
+                        <!--所属科室-->
+                        <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{v2MeasureController.fileterOrgName}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{v2MeasureController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{v2MeasureController.onClinicalDeptNameFilterChange}" process="@this"  update="measureTab:measureOrderListForm:datalist"/>
+                                    <p:ajax listener="#{v2MeasureController.onClinicalDeptNameFilterChange}" process="@this"  update="measureTab:measureOrderListForm:datalist"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{v2MeasureController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
+                        </p:column>
+
+                        <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.creatorName}"/>
+                        </p:column>
+
+                        <p:column headerText="负责人" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.getCurrentPersonName()}"/>
+                        </p:column>
+
+
+                        <p:column headerText="计量编号" sortBy="#{item.measureNum}" filterBy="#{item.measureNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.measureNum}"/>
+                        </p:column>
+                        <p:column headerText="当前处理步骤"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2MeasureController.stepFileter}"  rendered="#{v2MeasureController.queryIndex==-1}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('measureSteps').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+
+                            <h:outputText value="#{item.currentStepName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.intExtType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                        </p:column>
+                        <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
+                            <h:outputText value="#{item.planTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="实际完成时间" rendered="#{v2MeasureController.queryIndex==7}" sortBy="#{item.endTime}">
+                            <h:outputText value="#{item.endTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <!--待派工 2-->
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
+                            <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
+                        </p:column>
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
+                            <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2MeasureController.isChecked()}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureDispatchDialogForm" oncomplete="PF('measureDispatchDialog').show()"/>
+
+                            <p:commandButton value="取消" update="measureTab:measureCancelForm" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
+                        </p:column>
+                        <!--待接单 3-->
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==3 ||v2MeasureController.queryIndex==3}" exportable="false">
+
+                            <p:commandButton  class="completeButton" value="完成" disabled="#{v2MeasureController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2MeasureController.prepareCompleteOrder(item.id)}" update="@(.measureRepairCompleteDialogFormcls)" oncomplete="PF('measureRepairCompleteDialog').show()"/>
+   <!--v2MeasureController.isChecked()加了后 一选中了checkbox 接单按钮就会灰掉 保证不能即批量又单个接单-->
+                            <p:commandButton class="takeOrderbutton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" rendered="#{item.simplify ne true}" value="接单" actionListener="#{v2MeasureController.prepareActTakeGrap(item.id,'接单对话框')}" update="@(.t1)" oncomplete="PF('takeMeasureOrderDialog').show()"/>
+
+                            <!--医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色-->
+                            <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
+                        </p:column>
+
+                        <!--待抢单tab 31-->
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==31}" exportable="false">
+                            <p:commandButton  class="finishButton" value="完成" disabled="#{v2MeasureController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2MeasureController.prepareCompleteOrder(item.id)}" update="@(.measureRepairCompleteDialogFormcls)" oncomplete="PF('measureRepairCompleteDialog').show()"/>
+
+                            <p:commandButton  class="competeButton" disabled="#{v2MeasureController.isChecked()}" value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareActTakeGrap(item.id,'抢单对话框')}" update="@(.t1)" oncomplete="PF('takeMeasureOrderDialog').show()"/>
+                            <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
+                        </p:column>
+
+                        <!--已计划 0-->
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==0}" exportable="false">
+                            <p:commandButton value="计量" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" update="@(.measureRepairCompleteDialogFormcls)" oncomplete="PF('measureRepairCompleteDialog').show()"/>
+
+
+                            <p:commandButton value="转单" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" update="@(.transferMeasureOrderDialogClass)"   oncomplete="PF('transferMeasureOrderDialog').show()"/>
+                            <p:commandButton  class="planedCompleteButton" value="完成"  disabled="#{item.approvalStatus eq '1' or v2MeasureController.isChecked()}"  rendered="#{item.simplify}" actionListener="#{v2MeasureController.prepareCompleteOrder(item.id)}" update="@(.measureRepairCompleteDialogFormcls)" oncomplete="PF('measureRepairCompleteDialog').show()"/>
+
+                            <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
+                        </p:column>
+
+
+                        <!--待审核 8-->
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==8}" exportable="false">
+                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDialog').show()"/>
+                        </p:column>
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==6}" exportable="false">
+                            <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureOrderListForm @(.closeMeasureDialogClass)" oncomplete="PF('closeMeasureDialog').show()" />
+                        </p:column>
+
+                        <f:facet name="{Toolbar}" >
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="PmOrder_export"/>
+                            </p:commandButton>
+
+                            <ui:fragment rendered="true">
+
+                                <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="批量派工"  update="@(.disClass)" rendered="#{v2MeasureController.queryIndex==2}" disabled="#{not v2MeasureController.isChecked()}" oncomplete="PF('measureDispatchDialog').show()">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="批量接单"  update="@(.t1)" rendered="#{v2MeasureController.queryIndex==3}" disabled="#{v2MeasureController.isBatchTakePm()}" oncomplete="PF('takeMeasureOrderDialog').show()">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferMeasureOrderCls)" rendered="#{v2MeasureController.queryIndex==0}" disabled="#{not v2MeasureController.isChecked()}"  actionListener="#{v2MeasureController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.measureRepairCompleteDialogBatch)" actionListener="#{v2MeasureController.sameType()}" rendered="#{v2MeasureController.queryIndex==0}" disabled="#{not v2MeasureController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2MeasureController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="measureTab:measureOrderListForm @(.measureCompleteDialogBatch)" rendered="#{v2MeasureController.queryIndex==31 or v2MeasureController.queryIndex==3}" disabled="#{not v2MeasureController.isBatchComplete()}" oncomplete="PF('measureCompleteDialogBatch').show()">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2MeasureController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量抢单"  rendered="#{v2MeasureController.queryIndex==31}" disabled="#{not v2MeasureController.isBatchRob()}" oncomplete="PF('robMeasureOrderDialog').show()">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2MeasureController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="批量关单"  rendered="#{v2MeasureController.queryIndex==6}" update="@(.closeMeasureDialogClsBatch)" disabled="#{not v2MeasureController.isChecked()}" oncomplete="PF('closeMeasureDialogBatch').show()">
+                                </p:commandButton>
+
+                                <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2MeasureController.doExportMaintenanceReport()}" class="btn btn-sm btn-gray btn-export-maintenance-report" title="导出计量单" rendered="#{v2MeasureController.queryIndex==7}" disabled="#{not v2MeasureController.isTargetSelected()}" ajax="false">
+                                    <p:fileDownload value="#{v2MeasureController.maintenanceReport}" />
+                                </p:commandButton>
+                            </ui:fragment>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="measureOrderView.xhtml"/>
+                <ui:include src="measureRepairCompleteDlg.xhtml"/>
+                <ui:include src="measureApproveDlg.xhtml"/>
+                <ui:include src="measureMoreAccDialogPrice.xhtml"/>
+
+            </div>
+       <!-- </div>-->
+    <!--批量计量完成对话框-->
+    <p:dialog class ="measureRepairCompleteDialogBatch" id="measureRepairCompleteDialogBatch" widgetVar="measureRepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
+        <h:form id="measureRepairCompleteDialogFormBatch" class="measureRepairCompleteDialogFormclsBatch" >
+
+            <h:panelGroup rendered="#{v2MeasureController.sameType() eq false}" id="display5" style="height:500px">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">结束计量时间*</label>
+                        <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{v2MeasureController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">总工时*</label>
+                        <p:inputText value="#{v2MeasureController.totalManHours}" required="true"  requiredMessage="总工时(小时)#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true"  actionListener="#{v2MeasureController.repairPmOrderBatch()}" value="完成" update="measureTab:measureOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureRepairCompleteDialogBatch');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('measureRepairCompleteDialogBatch').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+
+    <!--取消对话框 -->
+    <p:dialog id="measureCancelDialog" widgetVar="measureCancelDialog" modal="true" width="400"  resizable="true" draggable="true" header="取消对话框">
+    <h:panelGroup>
+        <h:form id="measureCancelForm" class="measureCancelFormCls" >
+        <p:selectOneRadio id="cancelRadio" value="#{v2MeasureController.cancelInt}">
+            <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
+            <f:selectItem itemDisabled="#{v2MeasureController.selected.measureType eq 2 or v2MeasureController.selected.measureType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+        </p:selectOneRadio>
+    <h:panelGroup>
+        <label class="label">取消原因</label>
+        <p:inputTextarea  value="#{v2MeasureController.cancelReason}" maxlength="256" />
+    </h:panelGroup>
+            <br></br>
+    <h:panelGroup>
+        <p:commandButton validateClient="true" update="measureTab:measureOrderListForm:datalist :growl" actionListener="#{v2MeasureController.cancelMeasureOrder()}" value="确认" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureCancelDialog');"/>
+        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('measureCancelDialog').hide()"/>
+    </h:panelGroup>
+        </h:form>
+</h:panelGroup>
+
+    </p:dialog >
+    <!--批量完成2级计量工单对话框-->
+    <p:dialog class ="measureCompleteDialogBatch" id="measureCompleteDialogBatch" widgetVar="measureCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
+        <h:form id="measureCompleteDialogFormBatch" class="measureCompleteDialogFormclsBatch" >
+            <h:panelGroup  id="display6" style="height:500px">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">结束计量时间*</label>
+                        <p:calendar timeZone="GMT+8" id="fillDate6" pattern="yyyy/MM/dd"  value="#{v2MeasureController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">总工时*</label>
+                        <p:inputText value="#{v2MeasureController.totalManHours}" required="true"  requiredMessage="总工时(小时)#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true"  actionListener="#{v2MeasureController.repairPmOrderBatch()}" value="完成" update="measureTab:measureOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureCompleteDialogBatch');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('measureCompleteDialogBatch').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+
+
+        <p:dialog id="createMeasureDialog" widgetVar="createMeasureDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增计量">
+            <h:form id="measureRequestCreateForm">
+                <p:fieldset legend="#{msg.Create}计量">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetName}*</label>
+                            <p:inputText  id="assetName" readonly="true" value="#{v2MeasureController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2MeasureController, 'measureTab:measureRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="measureTab:selectAssetDlgMeasure dptName :growl" oncomplete="PF('varselectAssetDlgMeasure').show();"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">资产#{msg.clinicalDeptName}</label>
+                            <p:outputLabel id="dptName"  value="#{v2MeasureController.dptName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计划完成时间*</label>
+                            <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2MeasureController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">计量级别*</label>
+                            <p:selectOneMenu  value="#{v2MeasureController.ruleLevel}" required="true" requiredMessage="计量级别#{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="2级规则" itemValue="2" />
+                                <f:selectItem itemLabel="3级规则" itemValue="3" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计量类型*</label>
+                            <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2MeasureController.measureType}" required="true" requiredMessage="计量类型#{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('measureTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <h:panelGroup >
+                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2MeasureController.saveMeasure()}" validateClient="true" update="measureTab:measureOrderListForm measureTab:measureRequestCreateForm :growl" style="float:left" oncomplete="handleToAddMaintain(xhr, status, args);"/>
+                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2MeasureController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createMeasureDialog');"/>
+                </h:panelGroup>
+            </h:form>
+            <ui:include src="/portal/asset/selectAssetDialogMeasure.xhtml"/>
+
+            <script>
+                function handleToAddMaintain(xhr, status, args) {
+                    if(args.invalidParam){
+                        $('#measureTab\\:measureRequestCreateForm\\:assetName').addClass("ui-state-error");
+                    }
+                    else{
+                        handleSubmit(args, 'createMeasureDialog');
+                    }
+                }
+
+            </script>
+        </p:dialog>
+
+        <!--关单对话框-->
+        <p:dialog id="closeMeasureDialog" class="closeMeasureDialogClass" widgetVar="closeMeasureDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@this" header="关单框">
+            <h:form id="closeMeasureDialogForm" >
+                <h:panelGroup id="display4" >
+                    <p:selectOneRadio id="console"  value="#{v2MeasureController.qaStatus}" >
+                        <p:ajax  update="@(.toRepairButton)" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                    </p:selectOneRadio>
+                    <br/>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2MeasureController.picList}" columns="5" layout="grid">
+                        <f:facet name="header">附件上传</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                <p:commandButton actionListener="#{v2MeasureController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <p:fileUpload id="type" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialog');"/>
+
+                        <p:commandButton immediate="true" class="toRepairButton" value="去报修" actionListener="#{v2MeasureController.createServiceRequest(v2MeasureController.selectedMeasureOrder,2)}" rendered="#{v2MeasureController.selectedMeasureOrder.assetInfo.status ne 4}" disabled="#{v2MeasureController.qaStatus.equals('0')}" update="measureTab:ServiceRequestCreateMeasureForm measureTab:measureOrderListForm:datalist :growl"  oncomplete="toRepair(xhr, status, args)"/>
+
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('closeMeasureDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+            <ui:include src="srCreateMeasure.xhtml"/>
+        </p:dialog>
+
+    <p:dialog id="closeMeasureDialogBatch" class="closeMeasureDialogClsBatch" widgetVar="closeMeasureDialogBatch" modal="true" width="400"  resizable="true" draggable="true" appendTo="@this" header="批量关单">
+        <h:form id="closeMeasureDialogFormBatch" >
+            <h:panelGroup id="display31" >
+                <br/>
+                <p:dataGrid id="pictureListBatch" var="fileitem" value="#{v2MeasureController.picList}" columns="5" layout="grid">
+                    <f:facet name="header">附件上传</f:facet>
+                    <p:panel  style="text-align:center">
+                        <h:panelGrid columns="1" style="width:100%" >
+                            <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                            <p:commandButton actionListener="#{v2MeasureController.removeAttachmentById(fileitem.id)}" update="pictureListBatch" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:dataGrid>
+                <p:fileUpload id="type" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                <h:panelGroup>
+                    <p:commandButton rendered="true" validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认批量关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialogBatch');"/>
+                    <p:commandButton immediate="true" value="取消" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('closeMeasureDialogBatch').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+
+    </p:dialog>
+
+        <!--派工对话框-->
+        <p:dialog id="measureDispatchDialog" class="disClass" widgetVar="measureDispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="派工对话框">
+            <h:form id="measureDispatchDialogForm" >
+                <h:panelGroup id="display7" rendered="#{v2MeasureController.isChecked() eq true}">
+                    <p:panelGrid  columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class="label">批量计量人*</label>
+                            <p:selectOneMenu  value="#{v2MeasureController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                                <f:selectItems value="#{v2MeasureController.getWorkerListBatch()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">批量计划完成时间*</label>
+                            <p:calendar timeZone="GMT+8" id="fillDate4" pattern="yyyy/MM/dd"  value="#{v2MeasureController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:panelGroup>
+
+                <!--非批量-->
+                <h:panelGroup id="display8" rendered="#{not empty v2MeasureController.selectedMeasureOrder and  v2MeasureController.isChecked() eq false}">
+                    <p:panelGrid  columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">计量人*</label>
+                            <p:selectOneMenu  value="#{v2MeasureController.selectedMeasureOrder.currentPersonId}" required="true" requiredMessage="计量人 #{msg.ValidationRequire}">
+                                <f:selectItems value="#{v2MeasureController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计划完成时间*</label>
+                            <p:calendar timeZone="GMT+8" id="fillDate2" pattern="yyyy/MM/dd"  value="#{v2MeasureController.selectedMeasureOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 必须输入}"></p:calendar>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{v2MeasureController.dispatchWorkOrder()}" value="#{msg.dispatchWorkOrder}" update="measureTab:measureOrderListForm :growl measureTab:measureOrderDetailForm " icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureDispatchDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('measureDispatchDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+<!--接单对话框-->
+        <p:dialog class ="t1" id="takeMeasureOrderDialog"  widgetVar="takeMeasureOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框">
+            <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
+            <h:form id="takeMeasureOrderDialogForm" >
+                <h:panelGroup id="display1" rendered="#{not empty v2MeasureController.selectedMeasureOrder or v2MeasureController.isChecked()}">
+                    <h:panelGroup rendered="#{not empty v2MeasureController.selectedMeasureOrder and  v2MeasureController.isChecked() eq false}" >
+                        <label class="label">计划完成时间*</label>
+                        <p:calendar timeZone="GMT+8" id="fillDate3" pattern="yyyy/MM/dd"  value="#{v2MeasureController.selectedMeasureOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{v2MeasureController.isChecked() eq true}">
+                        <label class="label">批量计划完成时间*</label>
+                        <p:calendar timeZone="GMT+8" id="fillDate5" pattern="yyyy/MM/dd"  value="#{v2MeasureController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+                    <br/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{v2MeasureController.acceptWorkOrder(1)}" value="确认" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist @(.this)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeMeasureOrderDialog')"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeMeasureOrderDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    <!--抢单对话框-->
+    <p:dialog class ="t1" id="robMeasureOrderDialog"  widgetVar="robMeasureOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="批量抢单对话框">
+        <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
+        <h:form id="robOrderDialogForm" >
+            <h:panelGroup id="display22">
+                <h:panelGroup>
+                    <label class="label">批量计划完成时间*</label>
+                    <p:calendar timeZone="GMT+8" id="fillDate51" pattern="yyyy/MM/dd"  value="#{v2MeasureController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                </h:panelGroup>
+                <br/>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{v2MeasureController.acceptWorkOrder(2)}" value="确认" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist @(.this)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'robMeasureOrderDialog')"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('robMeasureOrderDialog').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+<!--转单-->
+        <p:dialog class ="transferMeasureOrderCls" id="transferMeasureOrderDialog" widgetVar="transferMeasureOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单框"><!--转单对话框-->
+            <h:form class ="transferMeasureOrderDialogClass" id="transferMeasureDialogForm" >
+                <h:panelGroup id="display2" rendered="#{not empty v2MeasureController.selectedMeasureOrder or v2MeasureController.isChecked()}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{not empty v2MeasureController.selectedMeasureOrder and  v2MeasureController.isChecked() eq false}">
+                            <label class="label">计量人</label>
+                            <p:selectOneMenu  value="#{v2MeasureController.selectedMeasureOrder.currentPersonId}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{v2MeasureController.findRepairPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <!--展现批量转单对话框的内容-->
+                        <h:panelGroup rendered="#{v2MeasureController.isChecked() eq true}">
+                            <label class="label">计量人</label>
+                            <p:selectOneMenu  value="#{v2MeasureController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{v2MeasureController.findRepairPersonBatch()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">备注</label>
+                            <p:inputTextarea id="comment" placeholder="工作需要" value="#{v2MeasureController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <br/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{v2MeasureController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update="@(.transferMeasureOrderDialogClass) :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferMeasureOrderDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferMeasureOrderDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+
+            </h:form>
+
+            <script>
+                //<![CDATA[
+                function toRepair(xhr, status, args) {
+                    handleSubmit(args, 'closeMeasureDialog');
+                    PF('createSRMeasureDialog').show()
+                }
+
+                function forbidBatchComplete(xhr, status, args) {
+                     if(args.batchForbidForApproval){
+
+                      }
+                     else if(args.batchForbidForMaintanLevel){
+
+                     }else{
+                    PF('measureRepairCompleteDialogBatch').show()
+                     }
+                }
+                function forbidTransfer(xhr,status,args){
+                    if(args.batchForbidForTransfer){
+
+                    }else{
+                        PF('transferMeasureOrderDialog').show()
+                    }
+                }
+                function updateSelectAllCheckBox() {
+                    var checkboxlist = $(".selectCheckBox");
+                    var selectAllstatus = true;
+                    checkboxlist.each(function () {
+                        selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                    });
+                    $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                    if (selectAllstatus) {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                    } else {
+                        $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                    }
+                }
+                //]]>
+            </script>
+        </p:dialog>
+
+   <!-- </ui:define>-->
+
+</ui:composition>
+</html>
