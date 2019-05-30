@@ -201,8 +201,13 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	public void save() {
 		// TODO Auto-generated method stub
 		// super.save();
-		service.savePccReport(this.selected, listStreamedContent);
-		addMessage("PCC 探头检测报告保存成功！");
+		boolean result=service.savePccReport(this.selected, listStreamedContent);
+		if(result){
+			addMessage("PCC 探头检测报告保存成功！");
+		}
+		else{
+			addMessage("PCC 探头检测报告保存失败！");
+		}
 	}
 
 	@Override
