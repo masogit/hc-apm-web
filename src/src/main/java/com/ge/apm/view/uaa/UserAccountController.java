@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.ge.apm.view.sysutil.UserInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -66,7 +67,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     //public static final int ACTIVATION_ROLE = 10;
     public static final String ACTIVATION_ROLE = "ActivationPerson";
-
+    UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
 
@@ -117,7 +118,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected void init() {
         this.searchFilters = new ArrayList<>();
         filterBySite = false;
-
+        userOrgInfoRepository= WebUtil.getBean(UserOrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -128,16 +129,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser = UserContextService.getCurrentUserAccount();
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
-        setTenantUid(loginUser.getTenantUID());
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
-        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        setTenantUid(loginUser.getTenantUID());
 
+    }
+
+    private void updateRoleList() {
         roles = Lists.newArrayList(sysRoleRepository.findAll());
-
+        roles.sort(Comparator.comparingInt(i -> i.getId()));
+        if (selectedTenant != null) {
+            if (selectedTenant.getInsulate() == null || !selectedTenant.getInsulate()) {
+                roles.removeIf(i -> "LocalITAdmin".equals(i.getName()));
+            }
+        }
     }
 
     public String getTenantUid() {
@@ -151,8 +160,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         searchFilters.clear();
         selectedOrg = null;
         
-        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedTenant = tenantDao.findByuid(tenantUid);
+        selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
         
@@ -163,6 +171,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedOrgNode.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
+        updateRoleList();
     }
     
     // TreeNodeName Filter
@@ -416,6 +425,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             role.add(DEFAULT_USER_ROLE);
             uaaService.setUserRoles(selected, role);
             uaaService.setDefaultScope(selected);
+
+            //绑定新建用户和该用户所在层级的以下层级
+            userOrgInfoList=new ArrayList<UserOrgInfo>();
+            accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+            List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+            setSelectedOrgTree(accessOrgTree, orgList);
+            prePareForScopeForNewUser(selected,accessOrgTree);
+            userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+            userOrgInfoRepository.save(userOrgInfoList);
         }
     }
 
@@ -427,15 +445,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public void onAfterUpdateObject(UserAccount object, boolean isOk) {
         if (isOk && this.crudActionName.equals("Edit")) {
-            uaaService.clearUserScope(object.getUid());
-
+            //YHAAO-4354 keep user scope on edit
             //if org change, delete old user org
             if (!object.getOrgInfoUID().equals(previousOrgUid) ) {
+                uaaService.clearUserScope(object.getUid());
                 uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
+                uaaService.setDefaultScope(object);
             }
-
-            uaaService.setDefaultScope(object);
-
         }
     }
 
@@ -541,6 +557,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
+
     @Override
     public void save() {
         if (selectedUserOrg != null) {
@@ -620,6 +637,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
+    }
+    List<UserOrgInfo> userOrgInfoList;
+
+    public void prePareForScopeForNewUser(UserAccount ua,TreeNode node){
+        if(node.getChildren().size()==0){
+            return;
+        }
+        for (TreeNode item : node.getChildren()) {
+            if(item.isSelected()){
+                OrgInfo orgInfo =(OrgInfo)item.getData();
+                UserOrgInfo userOrgInfo = new UserOrgInfo();
+                userOrgInfo.setOrgUid(orgInfo.getUid());
+                userOrgInfo.setUserUid(ua.getUid());
+                userOrgInfo.setOrgType(orgInfo.getOrgType());
+                userOrgInfoList.add(userOrgInfo);
+            }
+            prePareForScopeForNewUser(ua,item);
+        }
     }
 
     private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {

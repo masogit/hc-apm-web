@@ -12,31 +12,31 @@
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                     <h:panelGroup>
                         <label class="label">#{msg.name}*</label>
-                        <p:inputText id="name" value="#{assetInfoEditController.newSupplier.name}"
+                        <p:inputText id="name" value="#{workOrderMgrController.newSupplier.name}"
                                      required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.city}</label>
-                        <p:inputText id="city" value="#{assetInfoEditController.newSupplier.city}"/>
+                        <p:inputText id="city" value="#{workOrderMgrController.newSupplier.city}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.address}</label>
                         <p:inputText id="address"
-                                     value="#{assetInfoEditController.newSupplier.address}"/>
+                                     value="#{workOrderMgrController.newSupplier.address}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zipcode}</label>
                         <p:inputText id="zipcode"
-                                     value="#{assetInfoEditController.newSupplier.zipcode}"/>
+                                     value="#{workOrderMgrController.newSupplier.zipcode}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.contactor}</label>
                         <p:inputText id="contactor"
-                                     value="#{assetInfoEditController.newSupplier.contactor}"/>
+                                     value="#{workOrderMgrController.newSupplier.contactor}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.tel}</label>
-                        <p:inputText id="tel" value="#{assetInfoEditController.newSupplier.tel}"/>
+                        <p:inputText id="tel" value="#{workOrderMgrController.newSupplier.tel}"/>
                     </h:panelGroup>
                     <h:panelGroup class="test1">
                         <label class="label">类型*</label>
@@ -44,21 +44,21 @@
                             <h:panelGrid columns="3">
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
-                                        <p:selectBooleanCheckbox id="wxs" value="#{assetInfoEditController.newSupplier.maintainerT}"/>
+                                        <p:selectBooleanCheckbox id="wxs" value="#{workOrderMgrController.newSupplier.maintainerT}"/>
                                         <p:outputLabel value="维修商 "/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox
-                                                value="#{assetInfoEditController.newSupplier.manufacturerT}"/>
+                                                value="#{workOrderMgrController.newSupplier.manufacturerT}"/>
                                         <p:outputLabel value="制造商 "/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox
-                                                value="#{assetInfoEditController.newSupplier.supplierT}"/>
+                                                value="#{workOrderMgrController.newSupplier.supplierT}"/>
                                         <p:outputLabel value="供应商 "/>
                                     </h:panelGrid>
                                 </h:panelGroup>
@@ -69,7 +69,7 @@
 
                 <br/>
                 <p:commandButton validateClient="true"
-                                 actionListener="#{assetInfoEditController.saveNewSupplier}"
+                                 actionListener="#{workOrderMgrController.saveNewSupplier}"
                                  value="#{msg.Save}"
                                  icon="ui-icon-check"
                                  update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) :growl"
