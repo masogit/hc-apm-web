@@ -94,8 +94,13 @@ public class PccExamineReportConfigController  implements Serializable{
 		if (file != null) {
 			try {
 				ApmStreamedContent e = new ApmStreamedContent(file.getInputstream(), file.getContentType(), file.getFileName());
-				service.saveFile(e, "0",V2_BlobObject.BO_TYPE_PCCReport,V2_BlobObject.BO_SUB_TYPE_DOCS);
-				addMessage(file.getFileName() + " 上传成功.");
+				boolean result=service.saveFile(e, "0",V2_BlobObject.BO_TYPE_PCCReport,V2_BlobObject.BO_SUB_TYPE_DOCS);
+				if(result){
+					addMessage(file.getFileName() + " 上传成功.");
+				}
+				else{
+					addMessage(file.getFileName() + " 上传失败.");
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				LOGGER.error(e.getMessage());
@@ -113,8 +118,13 @@ public class PccExamineReportConfigController  implements Serializable{
 			try {
 				ApmStreamedContent e = new ApmStreamedContent(tempFile.getInputstream(), tempFile.getContentType(), tempFile.getFileName());
 				service.deleteFile("0", V2_BlobObject.BO_TYPE_PCCReport, V2_BlobObject.BO_SUB_TYPE_DOCS);
-				service.saveFile(e, "0",V2_BlobObject.BO_TYPE_PCCReport,V2_BlobObject.BO_SUB_TYPE_DOCS);
-				addMessage(tempFile.getFileName() + " 上传成功！");
+				boolean result=service.saveFile(e, "0",V2_BlobObject.BO_TYPE_PCCReport,V2_BlobObject.BO_SUB_TYPE_DOCS);
+				if(result){
+					addMessage(tempFile.getFileName() + " 上传成功！");
+				}
+				else{
+					addMessage(tempFile.getFileName() + " 上传失败！");
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				LOGGER.error(e.getMessage());
