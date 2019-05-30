@@ -5,10 +5,7 @@
  */
 package com.ge.apm.service.wo;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 import java.util.LinkedHashMap;
@@ -60,6 +57,19 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+    public String addAccessMeasuring(String token, String assetUid, MeasuringOrderDetail workOrderDetail){
+        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
+        String url = gatewayURL.replace("{assetUid}",assetUid);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
     public Map<String, Object> getReponserByAsset(String token, Integer assetId,String orgUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);

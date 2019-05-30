@@ -10,7 +10,7 @@
 
     <ui:composition>
 
-        <p:dialog class ="measureRepairCompleteDialog" id="measureRepairCompleteDialog" widgetVar="measureRepairCompleteDialog" modal="true" height="550" width="1000"  resizable="true" draggable="true" appendTo="@this" header="保养完成">
+        <p:dialog class ="measureRepairCompleteDialog" id="measureRepairCompleteDialog" widgetVar="measureRepairCompleteDialog" modal="true" height="550" width="1000"  resizable="true" draggable="true" appendTo="@this" header="计量完成">
             <h:form id="measureRepairCompleteDialogForm" class="measureRepairCompleteDialogFormcls" >
                 <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty v2MeasureController.selectedMeasureOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -185,9 +185,9 @@
                         <f:selectItems value="#{fieldMsg.getFieldValueList('qualityChecking')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
                     </p:selectOneRadio>
 
-                    <!--维修完成 转单 新建工单-->
+                    <!--计量完成 转单 新建工单-->
                     <h:panelGroup class="buttonG">
-                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2MeasureController.qaStatus eq '2'}" actionListener="#{v2MeasureController.repairPmOrder()}" value="保养完成" update="measureTab:measureOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
+                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2MeasureController.qaStatus eq '2'}" actionListener="#{v2MeasureController.repairPmOrder()}" value="计量完成" update="measureTab:measureOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
                         <p:commandButton class="rpt" disabled="#{v2MeasureController.qaStatus eq '1'}" actionListener="#{v2MeasureController.createServiceRequest(v2MeasureController.selectedMeasureOrder,1)}" value="去报修" update="measureTab:ServiceRequestCreateMeasureForm measureTab:measureOrderListForm measureTab:measureOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
 
                         <p:commandButton validateClient="false"  actionListener="#{v2MeasureController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'measureRepairCompleteDialog');"/>

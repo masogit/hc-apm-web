@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.measuring.measuring;
 
+import com.ge.apm.domain.MeasuringOrderDetail;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -42,8 +43,8 @@ public class MeasureRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
-    String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
-        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+    String updateWorkOrderMeasuringDetailPrice(String token, MeasuringOrderDetail workOrderDetail) {
+        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(workOrderDetail, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -86,7 +87,7 @@ public String invokeMeasureOrderCancel(String token, MeasureOrderActionForm form
     public String invokePmOrderAction(String token, MeasureOrderActionForm formData, String actionName, String woId) {
         HttpEntity<MeasureOrderActionForm> requestEntity = new HttpEntity<MeasureOrderActionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.MEASURE_ORDER_ACTION);
-        String url = gatewayURL.replace("{measureOrderId}", woId);
+        String url = gatewayURL.replace("{orderId}", woId);
 
         ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
         if (isOkay(response)) {

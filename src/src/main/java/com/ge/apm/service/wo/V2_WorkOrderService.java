@@ -47,7 +47,8 @@ public class V2_WorkOrderService {
 
     @Autowired
     private WorkOrderDetailRepository detailDao;
-
+    @Autowired
+    private WorkOrderDetailMeasuringRepository detailMeasuringDao;
     @Autowired
     private UserAccountRepository userDao;
 
@@ -89,6 +90,10 @@ public class V2_WorkOrderService {
         return detailDao.findByWoId(woId);
     }
 
+    public List<MeasuringOrderDetail> getWorkOrderMeasuringDetails(String woId) {
+        return detailMeasuringDao.findByOrderId(woId);
+    }
+
     public List<String> getSRListByStatus(List<Integer> status) {
         List<SearchFilter> srSearchFilters = new ArrayList();
         srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, status));
@@ -109,7 +114,6 @@ public class V2_WorkOrderService {
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
         Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList);
-        System.out.println("-------test--------------");
     }
 
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {
