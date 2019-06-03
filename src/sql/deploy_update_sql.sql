@@ -355,17 +355,6 @@ alter table shared_asset_request alter column modify_date type timestamp using m
 
 --v19.6.1
 update table_definition set type = 1 where type is null;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '34', '普通压力表', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '35', '精密压力表', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '36', '安全阀', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '37', '压力容器', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '38', '高压氧舱', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '39', '血压计（电子）', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '40', '血压计（水银）', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '41', '流量计', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '42', '超声诊断设备', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '43', '数字心电图', '', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '44', '放射类', '', NULL, '-1');
 
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.batchImportData,asset.inventory,repair,repair.workbench,repair.count,repair.message,maintain,maintain.workbench,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,performance.scan,performance.CT,performance.config,performance.import,performance.BI,examineMgt,examineMgt.pcc' where name = 'HospitalHead';
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.categoryConfig,measure.info,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig' where name = 'AssetStaff';
