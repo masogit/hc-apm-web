@@ -205,4 +205,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select distinct asset_dept_uid from asset_info where status <> 4 and is_valid = true and is_deleted = false and site_uid = ?1", nativeQuery = true)
     List<String> findDistinctAssetDeptUids(String siteUid);
 
+    @Query(value = "select uid from asset_info where tenant_uid = ?1 and status in ?2",nativeQuery = true)
+    List<String> getInvalidAssets(String tenantUID,List<Integer> status);
 }
