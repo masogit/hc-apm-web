@@ -341,7 +341,9 @@ public class LoginController extends LoginService {
             return;
         }
 
-        if(PasswordUtil.DEFAULT_PWD.equals(newPassword))
+        if(!checkPassword(password))
+            WebUtil.addErrorMessage("用户名或密码错误!");
+        else if(PasswordUtil.DEFAULT_PWD.equals(newPassword))
             WebUtil.addErrorMessage("请不要使用系统默认密码作为个人密码!");
         else if(!checkPassword(password))
             WebUtil.addErrorMessage("用户名或密码错误!");
