@@ -45,6 +45,20 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
+    public String delAccessMeasuring(String token,String accId){
+        HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSDEL_MEASURING);
+        String url = gatewayURL.replace("{id}", accId.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
     public String addAccess(String token,String assetUid,V2_WorkOrder_Detail workOrderDetail){
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
@@ -57,9 +71,9 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
-    public String addAccessMeasuring(String token, String assetUid, MeasuringOrderDetail workOrderDetail){
-        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(workOrderDetail, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
+    public String addAccessMeasuring(String token, String assetUid, MeasuringOrderDetail measuringOrderDetail){
+        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(measuringOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSAD_MEASURING);
         String url = gatewayURL.replace("{assetUid}",assetUid);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
