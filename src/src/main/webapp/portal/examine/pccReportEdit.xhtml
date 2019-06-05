@@ -243,9 +243,9 @@
 						</p:panelGrid>
 					</p:fieldset>
 					<p:commandButton id="saveButtonId" validateClient="true" immediate="false" partialSubmit="true" value="暂存" process="@parent" update=":growl" icon="ui-icon-check"
-						actionListener="#{pccExamineReportEditController.save}" disabled="#{pccExamineReportEditController.selected.status==2}" />
+						actionListener="#{pccExamineReportEditController.save}" disabled="#{pccExamineReportEditController.selected.status==2}" timeout="30000"/>
 					<p:commandButton id="submitButtonId" validateClient="true" immediate="false" partialSubmit="true" value="提交" process="@parent" update=":growl,saveButtonId,submitButtonId"
-						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.submit}" disabled="#{pccExamineReportEditController.selected.status==2}" oncomplete="validFields(xhr, status, args)" />
+						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.submit}" disabled="#{pccExamineReportEditController.selected.status==2}" oncomplete="validFields(xhr, status, args)" timeout="30000"/>
 					<!-- <p:commandButton id="generateButtonId" validateClient="true" partialSubmit=":idFormPcc" value="生成报告" process="@parent" update=":growl,downloadButtonId"
 						icon="ui-icon-check" actionListener="#{pccExamineReportEditController.generateReport}" disabled="#{empty pccExamineReportEditController.selected.id}" /> -->
 					<!-- <p:commandButton id="downloadButtonId" validateClient="true" value="下载报告" update=":growl" icon="ui-icon-check" ajax="false"
