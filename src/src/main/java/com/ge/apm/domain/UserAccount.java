@@ -1033,6 +1033,9 @@ public class UserAccount implements ChineseName, Serializable {
 	}
 
     public Boolean getIsGeOp() {
+    	if(isGeOp==null){
+    		isGeOp=false;
+    	}
         return isGeOp;
     }
 
