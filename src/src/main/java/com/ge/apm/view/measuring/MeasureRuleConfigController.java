@@ -93,12 +93,12 @@ public class MeasureRuleConfigController extends GenericCRUDUUIDController<RelMe
 				if(relRuleAsset.getAssetUID() != null) {
 					assetUids.add(relRuleAsset.getAssetUID());
 				}
-				if(relRuleAsset.getRuleUID1() != null) {
+/*				if(relRuleAsset.getRuleUID1() != null) {
 					ruleUids.add(relRuleAsset.getRuleUID1());
 				}
 				if(relRuleAsset.getRuleUID2() != null) {
 					ruleUids.add(relRuleAsset.getRuleUID2());
-				}
+				}*/
 				if(relRuleAsset.getRuleUID() != null) {
 					ruleUids.add(relRuleAsset.getRuleUID());
 				}
@@ -283,7 +283,8 @@ public class MeasureRuleConfigController extends GenericCRUDUUIDController<RelMe
 
 	//@Transactional
 	public void deleteRule(){
-		if((!deleteRule2) && (!deleteRule3)){
+		super.delete();
+/*		if((!deleteRule2) && (!deleteRule3)){
 			return;
 		}
 		String alert = null;
@@ -309,10 +310,10 @@ public class MeasureRuleConfigController extends GenericCRUDUUIDController<RelMe
 		dao.save(selected);
 		deleteRule3 = false;
 		deleteRule2 = false;
-		WebUtil.addSuccessMessage(alert);
+		WebUtil.addSuccessMessage(alert);*/
 	}
 
-	public void deleteRule2(){
+/*	public void deleteRule2(){
 		this.selected.setRuleUID2(null);
 		this.deleteRule2 = true;
 	}
@@ -320,7 +321,7 @@ public class MeasureRuleConfigController extends GenericCRUDUUIDController<RelMe
 	public void deleteRule3(){
 		this.selected.setRuleUID(null);
 		this.deleteRule3 = true;
-	}
+	}*/
 
 	public boolean getDeleteRule2() {
 		return deleteRule2;

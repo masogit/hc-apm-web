@@ -139,13 +139,11 @@ public class UserContextService implements Serializable {
         UserAccount user = getLoginUser();
         Integer userId = user.getId();
         if(user.getIsSuperAdmin()){
-            return true;
+            return roleList.contains("SuperAdmin");
         }
-        
         if(user.getIsSiteAdmin()){
             return roleList.contains("SiteAdmin");
         }
-        
         List<String> userRoles = user.getRoleNames();
         String[] roles = roleList.split(",");
         for (String role : roles) {
@@ -206,7 +204,7 @@ public class UserContextService implements Serializable {
     }
     
     public boolean authContains(String menuName){
-    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
+    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
     	}
     	List<CustomRole> listCustomRole=getListCustomRole(userAccount.getId());

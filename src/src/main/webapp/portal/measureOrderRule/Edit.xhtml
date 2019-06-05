@@ -83,13 +83,13 @@
                             <label class ="label">#{msg.feedbackComment}</label>
                             <p:inputText id="remark" value="#{measureOrderRuleController.selected.remark}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup >
+<!--                        <h:panelGroup >
                             <label class ="label">#{msg.ruleLevel}*</label>
                             <p:selectOneMenu value="#{measureOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                     </p:panelGrid>
                     
                    <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{measureOrderRuleController.selected != null}">

@@ -13,15 +13,15 @@ import java.util.List;
 
 public interface OpsSrReportMapper extends BaseMapper {
     String SELECT_START = "select * from(";
-    String SELECT_COLUMNS_FROM_SR = "select distinct sr.id as srId, sr.asset_name as assetName, " +
-            "sr.event_uid as srNumber, sr.create_time as updateTime, asset.system_id as systemId, " +
-            "sieble.modality as modality, sieble.sr_type as srType, sieble.sr_open_time as srOpenDate, " +
-            "sieble.sr_scheduled_date as srScheduleDate, sieble.sr_owner_sso as feSso from asset_lifecycle_event sr ";
+    String SELECT_COLUMNS_FROM_SR = "select max(sr.id) as srId, max(sr.asset_name) as assetName, " +
+            "sr.event_uid as srNumber, max(sr.create_time) as updateTime, max(asset.system_id) as systemId, " +
+            "max(sieble.modality) as modality, max(sieble.sr_type) as srType, max(sieble.sr_open_time) as srOpenDate, " +
+            "max(sieble.sr_scheduled_date) as srScheduleDate, max(sieble.sr_owner_sso) as feSso from asset_lifecycle_event sr ";
     String LEFT_JOIN_SR_REPORT = "left join service_request_report report on sr.id = report.alce_id ";
     String INNER_JOIN_ASSET = "inner join asset_info asset on asset.uid = sr.asset_uid ";
     String INNER_JOIN_SIEBLE = "inner join sieble_sr_data sieble on sr.event_uid = sieble.sr_number ";
     String WHERE_CONDITIONS = "where sr.event_type in (3, 4, 5) and sr.status = 2 and report.alce_id is null and asset.ib_status = 1 " +
-            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.is_valid = true and asset.status in (1,2,3)";
+            "and asset.ge_device_type is not null and asset.is_deleted = false and asset.is_valid = true and asset.status in (1,2,3) group by sr.event_uid";
     String SELECT_END = ") as resultgroup WHERE 1 = 1 ${ew.sqlSegment}";
 
     @Select(SELECT_START +

@@ -73,11 +73,13 @@
         <p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
-            <p:submenu id="um5024" label="#{msg.计量管理}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('measure')}">
-                <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.accessContains('measure.categoryConfig')}"/>
-                <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml" rendered="#{userContextService.accessContains('measure.info')}"/>
-                <p:menuitem id="um402" value="#{msg.MeasureOrderRule}" outcome="/portal/measureOrderRule/List.xhtml" rendered="#{userContextService.accessContains('measure.rule') and false}"/>
-                <p:menuitem id="um403" value="#{msg.MeasureRuleManager}" outcome="/portal/measureOrderRule/relMeasureRule/List.xhtml" rendered="#{userContextService.accessContains('measure.ruleMgt') and false}"/>
+            <p:submenu id="um5024" label="#{msg.计量管理}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.versionContains('measure')}">
+
+                <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.versionContains('measure.config')}"/>
+                <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.versionContains('measure.categoryConfig')}"/>
+                <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml" rendered="#{userContextService.versionContains('measure.info')}"/>
+                <p:menuitem id="um402" value="#{msg.MeasureOrderRule}" outcome="/portal/measureOrderRule/List.xhtml" rendered="#{userContextService.versionContains('measure.rule')}"/>
+                <p:menuitem id="um403" value="#{msg.MeasureRuleManager}" outcome="/portal/measureOrderRule/relMeasureRule/List.xhtml" rendered="#{userContextService.versionContains('measure.ruleMgt')}"/>
             </p:submenu>
             <p:submenu id="um70" label="临床助手" icon="fa fa-file-excel-o" rendered="#{userContextService.accessContains('nurseSite')}">
                        <p:menuitem id="um701" value="日常检查" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.maintain')}"/>
@@ -94,6 +96,7 @@
                 <p:menuitem id="um37" value="#{msg.AdvancedDeviceInfoTracking}" rendered="false" style="color: orange;" outcome="/empty"/>
             </p:submenu>
             <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('performance')}">
+                <p:menuitem id="um381" value="设备管理大屏" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContains('performance.bigScreen')}" />
                 <p:menuitem id="um240" value="科务管理" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContains('performance.deptMgt')}"/>
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContains('performance.scan')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>

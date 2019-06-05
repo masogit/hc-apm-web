@@ -136,7 +136,8 @@ public class PccExamineReportService {
 		pccExamineReportRepository.save(report);
 		String id = report.getId();
 		if (StringUtils.isNotEmpty(id)) {
-			saveFile(listContent, id, V2_BlobObject.BO_TYPE_PCCReport);
+			boolean result=saveFile(listContent, id, V2_BlobObject.BO_TYPE_PCCReport);
+			return result;
 		}
 		return true;
 	}
@@ -192,10 +193,15 @@ public class PccExamineReportService {
 		if (content != null) {
 			String name = content.getName();
 			V2_BlobObject blobObj = blobFileService.uploadFile(content.getStream(), name.toLowerCase());
-			blobObj.setBoType(boType);
-			blobObj.setBoSubType(boSubType);
-			blobObj.setBoUuid(boUuid);
-			blobFileService.saveBlobObject(blobObj);
+			if(blobObj!=null){
+				blobObj.setBoType(boType);
+				blobObj.setBoSubType(boSubType);
+				blobObj.setBoUuid(boUuid);
+				blobFileService.saveBlobObject(blobObj);
+			}
+			else{
+				return false;
+			}
 		}
 		return true;
 	}

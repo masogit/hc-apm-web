@@ -124,11 +124,12 @@ public class NurseSiteMaintainService {
 
 	private Map<String,UserAccount> mapUserAccount=new HashMap<String,UserAccount>();
 	private Map<String,AssetInfo> mapAssetInfo=new HashMap<String,AssetInfo>();
-
+	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 
 	public void init(){
 		mapUserAccount.clear();
 		mapAssetInfo.clear();
+		mapOrgInfo.clear();
 	}
 	
 	public List<CustomRole> getCustomRole(Integer userId){
@@ -581,6 +582,17 @@ public class NurseSiteMaintainService {
 			mapUserAccount.put(uid, tempUser);
 		}
 		return tempUser;
+	}
+	private OrgInfo getOrgInfo(String uid){
+		OrgInfo orgInfo=null;
+		orgInfo=mapOrgInfo.get(uid);
+		if(orgInfo==null){
+			orgInfo=orgInfoRepository.findSimpleByUid(uid);
+			if(orgInfo!=null){
+				mapOrgInfo.put(uid, orgInfo);
+			}
+		}
+		return orgInfo;
 	}
 	private void getAssetInfo(Set<String> setAssetUids){
 		List<AssetInfo> listAssetInfo=null;
@@ -1141,7 +1153,7 @@ public class NurseSiteMaintainService {
 				if (assetInfo != null) {
 					if (StringUtils.isEmpty(clinicalUid)) {
 						clinicalUid = assetInfo.getClinicalDeptUID();
-						clinicalName = assetInfo.getClinicalDeptName();
+						clinicalName = getOrgInfo(clinicalUid).getShortName();
 						tenantUID = assetInfo.getTenantUID();
 						institutionUID = assetInfo.getInstitutionUID();
 						hospitalUID = assetInfo.getHospitalUID();
@@ -1497,7 +1509,7 @@ public class NurseSiteMaintainService {
 		int sequenceRow = keyRow + 4;
 		int modifyByRow = keyRow + 5;
 		int rowIndex = 7;
-		int dataColumnIndex = 6;
+		int dataColumnIndex = 5;
 		if (mapAssetUidMaintainItem.size() > 0) {
 			Iterator<List<NurseSiteMaintainItem>> it = mapAssetUidMaintainItem.values().iterator();
 			while (it.hasNext()) {

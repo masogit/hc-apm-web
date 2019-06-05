@@ -121,7 +121,9 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
             if (filterValue == null) {
                 continue;
             }
-
+            if(isDangerValue(filterValue)){
+            	filterValue="";
+            }
             if (isDateTimeField(fieldName)) {
                 // support lte & gte for datetime field
                 String[] values = filterValue.toString().split("~");
@@ -145,6 +147,15 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
             String matchMode = filterMatchModes.get(fieldName);
             addFilter(fieldName, matchMode, filterValue);
         }
+    }
+    
+    private boolean isDangerValue(Object filterValue){
+    	String str=filterValue.toString();
+    	if(str.contains("'")|| str.contains(";")||str.length()>255){
+    		logger.info("error input:"+str);
+    		return true;
+    	}
+    	return false;
     }
 
     protected void wrapSearchFilter(Wrapper ew){
