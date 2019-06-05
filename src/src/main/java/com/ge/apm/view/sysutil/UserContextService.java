@@ -204,7 +204,7 @@ public class UserContextService implements Serializable {
     }
     
     public boolean authContains(String menuName){
-    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()){
+    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
     	}
     	List<CustomRole> listCustomRole=getListCustomRole(userAccount.getId());
