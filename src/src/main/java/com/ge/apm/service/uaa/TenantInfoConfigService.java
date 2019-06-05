@@ -165,6 +165,9 @@ public class TenantInfoConfigService {
 			} else if (key.contains("examineMgt.")) {
 				tempItem.setValue(false);
 			}
+			if(key.equals("performance.bigScreen")){
+				tempItem.setValue(false);
+			}
 		}
 		if (root != null) {
 			buildRoot();

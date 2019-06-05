@@ -25,7 +25,7 @@
                    <p:panelGrid id="param" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					   <h:panelGroup>
 						   <label class="label">#{msg.ruleLevel}*</label>
-						   <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
+						   <p:selectOneMenu id="level" value="#{generateMeasureOrdersController.level}" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
 							   <!--<p:ajax listener="#{generatePmOrdersController.addFilter()}" update="GeneratePmOrderForm" process="@this" />-->
 							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 							   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
@@ -34,12 +34,12 @@
 
 					   <h:panelGroup>
 						   <label class="label">#{msg.hospitalId}*</label>
-						   <p:inputText id="selectedUserOrgName" value="#{generatePmOrdersController.getOrgFullName(generatePmOrdersController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+						   <p:inputText id="selectedUserOrgName" value="#{generateMeasureOrdersController.getOrgFullName(generateMeasureOrdersController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
 						   <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
 						   <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
 							   <p:scrollPanel style="height:300px;border: 0" mode="native">
-								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="single">
-									   <p:ajax process="@this" event="select" update="GeneratePmOrderForm" listener="#{generatePmOrdersController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generateMeasureOrdersController.orgTree}" selection="#{generateMeasureOrdersController.selectedNode}" var="node" selectionMode="single">
+									   <p:ajax process="@this" event="select" update="GeneratePmOrderForm" listener="#{generateMeasureOrdersController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
 									   <p:ajax process="@this" event="expand"/>
 									   <p:ajax process="@this" event="collapse"/>
 									   <p:treeNode type="org">
@@ -53,9 +53,9 @@
 
 					   <h:panelGroup >
 						   <label class ="label">#{msg.clinicalDeptName}</label>
-						   <p:autoComplete id="clinicalDeptName" value="#{generatePmOrdersController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
-										   forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
-										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
+						   <p:autoComplete id="clinicalDeptName" value="#{generateMeasureOrdersController.clinicalOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                           forceSelection="true" completeMethod="#{generateMeasureOrdersController.getClinicalDeptList}"
+                                           var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
 							   <!--<p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>
 							   <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList"/>-->
 						   </p:autoComplete>
@@ -63,14 +63,14 @@
 
 						  <h:panelGroup >
 							 <label class ="label">#{msg.assetName}</label>
-							 <p:inputText  value="#{generatePmOrdersController.queryAsset.name}">
+							 <p:inputText  value="#{generateMeasureOrdersController.queryAsset.name}">
 									<!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />-->
 							 </p:inputText>
 						 </h:panelGroup>
 
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
-		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}">
+		                     <p:selectOneMenu value="#{generateMeasureOrdersController.queryAsset.assetGroup}">
 		                             <!-- <p:ajax listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -79,9 +79,9 @@
 
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-							 <p:autoComplete id="manufacture" value="#{generatePmOrdersController.queryAsset.manufacture}" dropdown="true" scrollHeight="300" style="max-width: 200px"
-											 forceSelection="true" completeMethod="#{generatePmOrdersController.getSupplier}"
-											 var="t" itemLabel="#{t}" itemValue="#{t}">
+							 <p:autoComplete id="manufacture" value="#{generateMeasureOrdersController.queryAsset.manufacture}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                             forceSelection="true" completeMethod="#{generateMeasureOrdersController.getSupplier}"
+                                             var="t" itemLabel="#{t}" itemValue="#{t}">
 								 <!--<p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"/>
 								 <p:ajax process="@this" listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"/>-->
 							 </p:autoComplete>
@@ -89,44 +89,44 @@
 
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>
-		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}">
+		                      <p:inputText  value="#{generateMeasureOrdersController.queryAsset.functionType}">
 	                                    <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />-->
 	                          </p:inputText>
 		                 </h:panelGroup>
 
 						   <h:panelGroup >
 							   <label class ="label">#{msg.brand}</label>
-							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}">
+							   <p:inputText  value="#{generateMeasureOrdersController.queryAsset.brand}">
 								   <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />-->
 							   </p:inputText>
 						   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
-                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update=":GeneratePmOrderForm:dataTable"/>
+                       <p:commandButton validateClient="true" actionListener="#{generateMeasureOrdersController.addFilter()}" value="查询" update=":GeneratePmOrderForm:dataTable"/>
 				   </p:panelGrid>
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
-			<p:fieldset id="dataTable" legend="共有#{generatePmOrdersController.total}个资产，下拉查看更多" >
-				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
+			<p:fieldset id="dataTable" legend="共有#{generateMeasureOrdersController.total}个资产，下拉查看更多" >
+				<p:dataTable id="dataScroller" var="item" value="#{generateMeasureOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
 					<p:column headerText="资产名称">
-						<h:outputText value="#{generatePmOrdersController.getName(item)}" />
+						<h:outputText value="#{generateMeasureOrdersController.getName(item)}" />
 					</p:column>
 					<p:column headerText="设备编号" >
-						<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
+						<h:outputText value="#{generateMeasureOrdersController.getDepartNum(item)}" />
 					</p:column>
 					<p:column headerText="所属科室" >
-						<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
+						<h:outputText value="#{generateMeasureOrdersController.getClinicalDeptName(item)}" />
 					</p:column>
 					<p:column headerText="设备型号" >
-						<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
+						<h:outputText value="#{generateMeasureOrdersController.getFunctionType(item)}" />
 					</p:column>
 					<p:column headerText="制造商序列号" >
-						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
+						<h:outputText value="#{generateMeasureOrdersController.getSeriaNum(item)}" />
 					</p:column>
 					<p:column headerText="操作" >
-						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
-										 icon="ui-icon-close" style="zoom: 0.7"/>
+						<p:commandButton actionListener="#{generateMeasureOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
+                                         icon="ui-icon-close" style="zoom: 0.7"/>
 					</p:column>
 
 				</p:dataTable>
@@ -187,12 +187,12 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">预计完成时间</label>
-                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}"
+                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generateMeasureOrdersController.planTime}"
                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">工单类型 *</label>
-                                <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
+                                <p:selectOneMenu value="#{generateMeasureOrdersController.pmType}" >
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -202,7 +202,7 @@
                     <br/> <br/>
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
-						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="生成" icon="ui-icon-check" update=":growl" />
+						<p:commandButton validateClient="true" action="#{generateMeasureOrdersController.generatePmOrders()}" value="生成" icon="ui-icon-check" update=":growl" />
 						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">

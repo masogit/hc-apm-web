@@ -345,10 +345,10 @@ public class AssetInfo implements ChineseName,Serializable {
     private Brand brand;//品牌
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+   /* @ManyToOne(fetch = FetchType.EAGER)
     @NotFound(action= NotFoundAction.IGNORE)
-    @JoinColumn(insertable = false, nullable = true,updatable = false,name = "uid")
-    private MvsAssetInfo mvsAssetInfo;
+    @JoinColumn(insertable = false, nullable = false,updatable = false,name = "uid",referencedColumnName = "id")
+    private MvsAssetInfo mvsAssetInfo;*/
 
     @Column(name = "hospital_id")
     @Basic(optional = false)
@@ -1796,13 +1796,13 @@ public class AssetInfo implements ChineseName,Serializable {
         return reqDetail;
     }
 
-    public MvsAssetInfo getMvsAssetInfo() {
+    /*public MvsAssetInfo getMvsAssetInfo() {
         return mvsAssetInfo;
     }
 
     public void setMvsAssetInfo(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
-    }
+    }*/
     
     @Transient
     private String warrantyAlertStatus = null;

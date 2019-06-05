@@ -5,6 +5,8 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplateElement;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -30,6 +32,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
@@ -41,6 +45,9 @@ import org.apache.logging.log4j.util.Strings;
  */
 @Service
 public class QrCodeDrawService {
+
+    @Autowired
+    private QrCodeLibRepository qrCodeLibRepository;
 
     private static final String CHARSET = "utf-8";
     private static final String FORMAT_NAME = "JPG";
@@ -58,6 +65,9 @@ public class QrCodeDrawService {
 
     @Value("#{wxProperties.suscribeLink}")
     private String suscribeLink;
+
+    @Value("#{wxProperties.web_context_url}")
+    private String webContextUrl;
 
     private BufferedImage createBitMatrixImage(String content, Integer size) throws Exception {
         Map<EncodeHintType, Object> hints = new HashMap();
@@ -93,12 +103,17 @@ public class QrCodeDrawService {
         return res;
     }
 
-    private BufferedImage drawQrcodeWithText(String prifix, String code, int fontSize, int textPositionX, String fontName) throws Exception {
+    private BufferedImage drawQrcodeWithText(JSONObject qrcodeElement, String siteUid) throws Exception{
+        String code = qrcodeElement.getString("TextValue");
+        Integer fontSize = qrcodeElement.getInteger("FontSize");
+        Integer textPositionX = qrcodeElement.getInteger("FontPositionX");
+        String fontName = qrcodeElement.getString("FontName");
+
         BufferedImage image = new BufferedImage(QRCODE_SIZE, QRCODE_SIZE * 11 / 10, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.createGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g.drawImage(createBitMatrixImage(prifix.concat("?").concat(code), QRCODE_SIZE), 0, 0, null);
+        g.drawImage(createBitMatrixImage(this.buildQrCodeUrl(qrcodeElement, siteUid), QRCODE_SIZE), 0, 0, null);
 
         StringBuffer textSB = new StringBuffer(code);
         if (code != null && code.length() == 16 && PATTERN_DIGITAL.matcher(code).matches()) {
@@ -119,7 +134,7 @@ public class QrCodeDrawService {
         return image;
     }
 
-    public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate) throws Exception {
+    public BufferedImage createQrCodeTag(JSONObject qrcodeTemplate, String siteUid) throws Exception {
         Integer width = qrcodeTemplate.getInteger("Width");
         Integer height = qrcodeTemplate.getInteger("Height");
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -128,7 +143,7 @@ public class QrCodeDrawService {
         g.fillRect(0, 0, width, height);
 
         JSONObject qrcodeElement = qrcodeTemplate.getJSONObject("QrCodeElements");
-        BufferedImage imageQrcode = drawQrcodeWithText(suscribeLink, qrcodeElement.getString("TextValue"), qrcodeElement.getInteger("FontSize"), qrcodeElement.getInteger("FontPositionX"), qrcodeElement.getString("FontName"));
+        BufferedImage imageQrcode = drawQrcodeWithText(qrcodeElement, siteUid);
         g.drawImage(
                 imageQrcode.getScaledInstance(qrcodeElement.getInteger("Size"), imageQrcode.getHeight()*qrcodeElement.getInteger("Size") / QRCODE_SIZE, Image.SCALE_SMOOTH),
                 qrcodeElement.getInteger("PositionX"),
@@ -148,6 +163,23 @@ public class QrCodeDrawService {
 
         g.dispose();
         return image;
+    }
+
+    private String buildQrCodeUrl(JSONObject qrcodeElement, String siteUid) {
+        String url = suscribeLink;
+        String encodingMethod = qrcodeElement.getString("EncodingMethod");
+        String code = qrcodeElement.getString("TextValue");
+        if(StringUtils.isNotBlank(encodingMethod) && encodingMethod.contains("FuncPage")) {
+            String qrCodeId = code;
+            if(StringUtils.isNotBlank(siteUid) && StringUtils.isNotBlank(code)) {
+                QrCodeLib qrCodeLib = qrCodeLibRepository.findByQrCode(code, siteUid);
+                qrCodeId = qrCodeLib.getId().toString();
+            }
+            url = webContextUrl.concat("/q/").concat(qrCodeId);
+        } else {
+            url = url.concat("?").concat(code);
+        }
+        return url;
     }
 
     public static void main(String[] args) throws Exception {

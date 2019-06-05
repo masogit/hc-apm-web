@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition>
+        <div class="ui-g-12 card" >
+
+            <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">
+                <p:fieldset legend="保养单" rendered="#{not empty v2MeasureController.selected}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">资产名</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.assetName}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备编号</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.assetInfo.departNum}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养等级</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.ruleLevel}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('meaureType',v2MeasureController.selected.meaureType)}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养编号</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.measuringNum}" ></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">创建人</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.creatorName}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">当前处理步骤</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.currentStepName}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">工时(小时)</label>
+                            <h:outputText value="#{v2MeasureController.selected.manHours}">
+                                <f:convertNumber pattern="0.00" minFractionDigits="2"></f:convertNumber>
+                            </h:outputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计划完成时间</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.planTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际完成时间</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.endTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">保养结果</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('qualityChecking',v2MeasureController.selected.qualityChecking)}"></p:outputLabel>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">取消人</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.cancelPerson}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">取消原因</label>
+                            <p:outputLabel value="#{v2MeasureController.selected.cancelReason}"></p:outputLabel>
+                        </h:panelGroup>
+
+
+                    </p:panelGrid>
+
+                    <p:dataTable value="#{v2MeasureController.aquirePmOrderStep()}" var="stepItem">
+                        <p:column headerText="#{msg.stepName}">
+                            <h:outputText value="#{stepItem.stepName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.ownerName}">
+                            <h:outputText value="#{stepItem.ownerName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.startTime}">
+                            <h:outputText value="#{stepItem.startTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.endTime}">
+                            <h:outputText value="#{stepItem.endTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                        <h:panelGroup rendered="#{not empty v2MeasureController.getWorkOrderDetailON()}">
+                        <label class="label">使用的备件</label><!--增加备件-->
+                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2MeasureController.getWorkOrderDetailON()}" var="detailItem" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{detailItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="备件名称">
+                                <h:outputText value="#{detailItem.parts}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg.accessoryQuantity}">
+                                <h:outputText value="#{detailItem.apartsQuantity}"/>
+                            </p:column>
+                            <p:column headerText="预估单价(元)">
+                                <h:outputText value="#{detailItem.partsPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="合同价格(元)">
+                                <h:outputText value="#{detailItem.closedPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+
+                            </p:column>
+                            <p:column headerText="审核状态">
+                                <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
+                            </p:column>
+                            <p:column headerText="备件类别">
+                                <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
+                            </p:column>
+                            <p:column headerText="发票号">
+                                <h:outputText value="#{detailItem.invoiceNum}" />
+                            </p:column>
+                            <p:column headerText="序列号">
+                                <h:outputText value="#{detailItem.serialNum}" />
+                            </p:column>
+                            <p:column headerText="质保期">
+                                <h:outputText value="#{detailItem.warrantyDate}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="申请时间">
+                                <h:outputText value="#{detailItem.applyTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="预计到达时间">
+                                <h:outputText value="#{detailItem.estimatedArriveTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="到达确认时间">
+                                <h:outputText value="#{detailItem.arrivedTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="到货">
+                                <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" rendered="#{detailItem.id ne '000'}"/>
+                            </p:column>
+                            <p:column headerText="操作">
+
+                                <p:commandButton rendered="#{v2MeasureController.allowChanged()}" process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{v2MeasureController.allowChangedForDisable() or detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2MeasureController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.measureMoreAccDialogPriceDlg)" oncomplete="PF('measureMoreAccDialogPriceDlg').show()"/>
+
+                                <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{v2MeasureController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.measureMoreAccDialogViewDlg)" oncomplete="PF('measureMoreAccDialogViewDlg').show()"/>
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{not empty v2MeasureController.getWorkOrderCoworkerON(null)}">
+                        <label class="label">协作人信息</label>
+                        <p:dataTable id="measureCoWorkerList" class="uiTransparent coworkcls" value="#{v2MeasureController.getWorkOrderCoworkerON(null)}"  var="item" widgetVar="measureCoWorkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.coworker}">
+                                <h:outputText value="#{item.cowokerUserName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.manHours}">
+                                <h:outputText value="#{item.manHours}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+
+
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2MeasureController.picList}" columns="5" layout="grid">
+                        <f:facet name="header">附件上传</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > 下载文件
+                                </p:link>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:fieldset legend="保养清单">
+                        <p:fieldset legend="保养报告">
+                            <p:dataList class="rpClass"  value="#{v2MeasureController.reportList}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                                #{v2MeasureController.getTableDefName(reportItem.schemaId)}
+                                <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                                <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                            </p:dataList>
+
+                        </p:fieldset>
+                        <p:fieldset legend="检查项" id="chkItem"   rendered="#{not empty v2MeasureController.selected}">
+                            <c:forEach  items="#{v2MeasureController.measureCheckItemList}" var="item">
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <label class="label" style="word-wrap: break-word">#{item.name}</label>
+                                        <p:selectOneMenu disabled="true" value="#{v2MeasureController.hmCheck[item.uid].value}">
+                                            <p:ajax listener="#{v2MeasureController.hmCheckSet(item.uid)}"></p:ajax>
+                                            <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
+                                        </p:selectOneMenu>
+                                        <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </c:forEach>
+                        </p:fieldset>
+                    </p:fieldset>
+
+                    <h:panelGroup >
+                        <label class="label">保养工单消息</label>
+                        <p:dataList value="#{v2MeasureController.getServiceRequestMessageList(v2MeasureController.selected.id)}" var="msgItem" rendered="#{not empty v2MeasureController.getServiceRequestMessageList(v2MeasureController.selected.id)}">
+                            <h:outputText value="#{msgItem.sendTime}" >
+                                <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
+                            </h:outputText>
+                            <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
+                            <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
+                        </p:dataList>
+                    </h:panelGroup>
+
+                </p:fieldset>
+            </h:form>
+        </div>
+    </ui:composition>
+</html>

@@ -87,7 +87,6 @@ public class PmOrderRule implements Serializable{
     
     @Column(name = "remark")
     private String remark;//备注
-    
     @Column(name = "asset_name")
     private String assetName;//设备名称
     

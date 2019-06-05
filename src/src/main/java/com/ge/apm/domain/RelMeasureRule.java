@@ -17,12 +17,12 @@ public class RelMeasureRule {
 	
 	@Column(name = "rule_uid")
 	private String ruleUID;
-	
+/*
 	@Column(name = "rule_uid2")
 	private String ruleUID2;
 	
 	@Column(name = "rule_uid1")
-	private String ruleUID1;
+	private String ruleUID1;*/
 	
 	 @Column(name = "asset_uid")
 	private String assetUID;
@@ -49,7 +49,7 @@ public class RelMeasureRule {
 		return tenantUID;
 	}
 
-	public String getRuleUID2() {
+/*	public String getRuleUID2() {
 		return ruleUID2;
 	}
 
@@ -63,7 +63,7 @@ public class RelMeasureRule {
 
 	public void setRuleUID1(String ruleUID1) {
 		this.ruleUID1 = ruleUID1;
-	}
+	}*/
 
 	public void setTenantUID(String tenantUID) {
 		this.tenantUID = tenantUID;

@@ -142,9 +142,12 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	@Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo", nativeQuery = false)
 	public Set<OrgInfo> findSimpleAllAsList();
-
-	@Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo where siteUID in ?1 ", nativeQuery = false)
+	
+	@Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,shortName,shortNamePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo where siteUID in ?1 ", nativeQuery = false)
 	public Set<OrgInfo> findSimpleAllBySiteUid(Set<String> siteUid);
+	
+	@Query(value = "select new com.ge.apm.domain.OrgInfo(id,uid,name,namePyCode,shortName,shortNamePyCode,tenantUID,institutionUID,hospitalUID,siteUID,parentUID,orgLevel,orgType) from OrgInfo where uid = ?1 ", nativeQuery = false)
+	public OrgInfo findSimpleByUid(String uid);
 
 	@Query(value = "select o.* from org_info o where o.hospital_uid=?1 and o.org_type=3", nativeQuery = true)
 	public List<OrgInfo> getSiteListByHospitalUid(String hospitalUid);
