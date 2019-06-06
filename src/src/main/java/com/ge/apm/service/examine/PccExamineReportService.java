@@ -141,7 +141,6 @@ public class PccExamineReportService {
 		if (StringUtils.isNotEmpty(id)) {
 			boolean result=saveFile(listContent, id, V2_BlobObject.BO_TYPE_PCCReport);
 			if(result){
-				report.setStatus(2);
 				pccExamineReportRepository.save(report);
 			}
 			return result;
