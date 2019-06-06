@@ -167,14 +167,15 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			result=service.savePccReport(this.selected, listStreamedContent);
 		}
 		else{
+			this.selected.setStatus(2);
 			result=service.savePccReport(this.selected, null);
 		}
 		if(result){
-			addMessage("PCC 探头检测报告保存成功！");
+			addMessage("PCC 探头检测报告上传成功！");
 			return true;
 		}
 		else{
-			addMessage("PCC 探头检测报告保存失败！");
+			addMessage("PCC 探头检测报告上传失败！");
 			return false;
 		}
 	}
@@ -271,10 +272,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if(!passValid){
 			return;
 		}
-		boolean result=save();
-		if(result){
-			this.selected.setStatus(2);
-		}
+		save();
 	}
 	public void delete() {
 		// TODO Auto-generated method stub
