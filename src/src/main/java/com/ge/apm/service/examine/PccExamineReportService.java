@@ -139,11 +139,7 @@ public class PccExamineReportService {
 			return true;
 		}
 		if (StringUtils.isNotEmpty(id)) {
-			boolean result=saveFile(listContent, id, V2_BlobObject.BO_TYPE_PCCReport);
-			if(result){
-				pccExamineReportRepository.save(report);
-			}
-			return result;
+			return saveFile(listContent, id, V2_BlobObject.BO_TYPE_PCCReport);
 		}
 		else{
 			return false;
