@@ -167,7 +167,6 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 			result=service.savePccReport(this.selected, listStreamedContent);
 		}
 		else{
-			this.selected.setStatus(2);
 			result=service.savePccReport(this.selected, null);
 		}
 		if(result){
@@ -272,7 +271,11 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 		if(!passValid){
 			return;
 		}
-		save();
+		boolean result=save();
+		if(result){
+			this.selected.setStatus(2);
+			service.savePccReport(this.selected);
+		}
 	}
 	public void delete() {
 		// TODO Auto-generated method stub
