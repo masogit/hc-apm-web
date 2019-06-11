@@ -253,8 +253,6 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         }
 
         user = userAccountDao.getByLoginName(userName);
-        user.setPlainPassword(passwordPlain);
-        
         if(user==null){
             String geLoginName = "ge" + userName;
             user = userAccountDao.getByLoginName(geLoginName);
@@ -267,7 +265,9 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
                 }
             }
         }
-        
+        else{
+        	user.setPlainPassword(passwordPlain);
+        }
         if(user==null){
             addErrorMessage(response, 401, "login_error");
             return;
