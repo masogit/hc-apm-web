@@ -83,7 +83,7 @@
                         <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
                             <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">
@@ -170,20 +170,20 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
                             <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoController.excelFile}" />
                             </p:commandButton>
-                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
 <!--                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoController.zipFile}" />
                             </p:commandButton>-->
 
-                            <ui:fragment rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
+                            <ui:fragment rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}">
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
