@@ -279,6 +279,9 @@ public class UserAccount implements ChineseName, Serializable {
 	
 	@Transient
 	private List<UserOrgInfo> listImportUserOrgInfo;
+	
+	@Transient
+	private boolean isGeSSO=false;
 
 	@PrePersist
 	public void initializeUid() {
@@ -1058,4 +1061,13 @@ public class UserAccount implements ChineseName, Serializable {
 	public void setLineNum(int lineNum) {
 		this.lineNum = lineNum;
 	}
+
+	public boolean isGeSSO() {
+		return isGeSSO;
+	}
+
+	public void setGeSSO(boolean isGeSSO) {
+		this.isGeSSO = isGeSSO;
+	}
+	
 }
