@@ -129,8 +129,14 @@ public class LoginController extends LoginService {
         userContextService.processAfterLogin();
         isSuccess = true;
         UserAccount user = userContextService.getLoginUser();
-        user.setGeSSO(originUser.isGeSSO());
-        user.setPlainPassword(originUser.getPlainPassword());
+        if(user!=null){
+        	user.setGeSSO(originUser.isGeSSO());
+            user.setPlainPassword(originUser.getPlainPassword());
+        }
+        else{
+        	UserContextService.setLoginUser(originUser);
+        	user=originUser;
+        }
         //in order to get token for deactive user
         saveSession(user);
 
