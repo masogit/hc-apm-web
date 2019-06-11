@@ -119,7 +119,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         return plainPassword;
     }
 
-    protected void afterLogin(String userName, String password) {
+    protected void afterLogin(UserAccount originUser) {
 
     }
 
@@ -253,19 +253,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         }
 
         user = userAccountDao.getByLoginName(userName);
-
-        String passwordEncrypted = null;
-        boolean isGeSSO = false;
+        user.setPlainPassword(passwordPlain);
+        
         if(user==null){
             String geLoginName = "ge" + userName;
             user = userAccountDao.getByLoginName(geLoginName);
             if (user != null) {
                 try {
-                    isGeSSO = geSsoService.authenticate(userName, passwordPlain);
-                    if (isGeSSO) {
-                        userName = geLoginName;
-                        passwordEncrypted = user.getPassword();
-                    }
+                	user.setGeSSO(geSsoService.authenticate(userName, passwordPlain));
+                	user.setPlainPassword(passwordPlain);
                 } catch (Exception e) {
                     logger.warn("Fail to valid by ge sso " + e.getMessage());
                 }
@@ -285,36 +281,37 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             user.setIsLocked(false);
             user.setPasswordErrorCount(0);
         }
-
-        if(!isGeSSO) passwordEncrypted = onPasswordEncrypted(userName, passwordPlain);
-        
-        if(!user.getPassword().equals(passwordEncrypted)){
-            updateLoginStatus(userName, false);
-            addErrorMessage(response, 401, "login_error");
-            return;
+        String passwordEncrypted = null;
+        if(!user.isGeSSO()){
+        	passwordEncrypted = onPasswordEncrypted(userName, passwordPlain);
+        	if(!user.getPassword().equals(passwordEncrypted)){
+                updateLoginStatus(userName, false);
+                addErrorMessage(response, 401, "login_error");
+                return;
+            }
+        	if(!beforeLogin(passwordPlain)){
+        		return;
+        	}
         }
-
-        if(!isGeSSO && !beforeLogin(passwordPlain)) return;
-
-        doSpringSecuritylogin(request, response, userName, passwordPlain, passwordEncrypted);
+        doSpringSecuritylogin(request, response, user);
     }
 
-    public void doSpringSecuritylogin(HttpServletRequest request, HttpServletResponse response, String userName,String passwordPlain, String passwordEncrypted) {
+    public void doSpringSecuritylogin(HttpServletRequest request, HttpServletResponse response, UserAccount user) {
         HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
         SecurityContext securityContext = securityContextRepository.loadContext(holder);
         SecurityContextHolder.setContext(securityContext);
         Map<String, String[]> extraParams = new TreeMap<>();
 
         try {
-            extraParams.put("j_username", new String[] { userName });
-            extraParams.put("j_password", new String[] { passwordEncrypted });
+            extraParams.put("j_username", new String[] { user.getLoginName() });
+            extraParams.put("j_password", new String[] { user.getPassword() });
 
             HttpServletRequest wrappedRequest = new WrappedRequest(request, extraParams);
             request = wrappedRequest;
 
             Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
             if (authResult == null) {
-                    updateLoginStatus(userName, false);
+                    updateLoginStatus(user.getLoginName(), false);
                     messageUtil.error("security_error");
                     return;
             }
@@ -338,8 +335,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(userName,passwordPlain);
-            updateLoginStatus(userName, true);
+            afterLogin(user);
+            updateLoginStatus(user.getLoginName(), true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
             // redirects to the home page
@@ -362,7 +359,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             addErrorMessage(response, 401, "AccountLocked");
         } catch (AuthenticationException e) {
             addErrorMessage(response, 401, "login_error");
-            updateLoginStatus(userName, false);
+            updateLoginStatus(user.getLoginName(), false);
         } finally {
             securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
         }

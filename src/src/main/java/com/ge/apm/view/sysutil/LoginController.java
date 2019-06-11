@@ -123,15 +123,16 @@ public class LoginController extends LoginService {
     }
     
     @Override
-    protected void afterLogin(String userName,String password) {
+    protected void afterLogin(UserAccount originUser) {
         // called after user logined.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.processAfterLogin();
         isSuccess = true;
         UserAccount user = userContextService.getLoginUser();
-
+        user.setGeSSO(originUser.isGeSSO());
+        user.setPlainPassword(originUser.getPlainPassword());
         //in order to get token for deactive user
-        saveSession(user,userName,password);
+        saveSession(user);
 
         String saltedPassword = null;
         try {
@@ -153,14 +154,20 @@ public class LoginController extends LoginService {
     }
 
     @Transactional
-    public void saveSession(UserAccount user,String userName,String password){
+    public void saveSession(UserAccount user){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
         UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
         if(user.getIsActive()){
             try{
-                String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
+                String accessToken = null;
+                if(user.isGeSSO()){
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword());
+                }
+                else{
+                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword());
+                }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){
                 e.printStackTrace();
@@ -170,7 +177,13 @@ public class LoginController extends LoginService {
             user.setIsActive(true);
             dao.save(user);
             try{
-                String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
+            	String accessToken = null;
+                if(user.isGeSSO()){
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword());
+                }
+                else{
+                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword());
+                }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){
                 e.printStackTrace();
@@ -180,7 +193,7 @@ public class LoginController extends LoginService {
             dao.save(user);
         }
 
-        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userName);
+        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, user.getLoginName());
     }
     
     public String getHomePage() {
@@ -354,8 +367,8 @@ public class LoginController extends LoginService {
                 user.setLastModifiedDate(TimeUtil.now());
                 user.setLastModifiedBy(user.getLoginName());
                 userAccountDao.save(user);
-
-                doSpringSecuritylogin(request, response, user.getLoginName(), newPassword, user.getPassword());
+                user.setPlainPassword(newPassword);
+                doSpringSecuritylogin(request, response, user);
             }
         }
     }
