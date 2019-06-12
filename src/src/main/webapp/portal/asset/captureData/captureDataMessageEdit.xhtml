@@ -58,7 +58,7 @@
 					<h:panelGroup>
 						<div class="ui-g">
 							<button type="button" onclick="CaptureDataMessageJS.triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
-							<p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false" style="display:none"
+							<p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false" style="display:none"
 								multiple="false" auto="true" update="@this:imageTextTempContent,@this:insertImageButton,@this:imageName" label="上传图片" />
 							<p:commandButton id="insertImageButton" value="插入图片" onclick="CaptureDataMessageJS.setImageTextTempContent()"
 								disabled="#{empty captureDataMessagesController.tempImageContent}" />

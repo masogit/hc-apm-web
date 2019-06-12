@@ -169,7 +169,7 @@
         <p:fieldset legend="上传附件">
             <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
              <h:panelGroup >
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{assetPurchaseListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetPurchaseListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                                   multiple="false" sizeLimit="10000000"  auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
                                     <p:growl id="messages" showDetail="true" />
                                 </h:panelGroup>
