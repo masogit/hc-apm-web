@@ -330,7 +330,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
@@ -358,7 +358,7 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 <h:panelGroup>
                     <p:commandButton rendered="true" validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认批量关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialogBatch');"/>
                     <p:commandButton immediate="true" value="取消" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialogBatch').hide()"/>

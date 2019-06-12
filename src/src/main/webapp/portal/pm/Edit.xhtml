@@ -112,7 +112,7 @@
                               update=":PmOrderEditForm:panel1" style="zoom:0.7;"  icon="ui-icon-clear" title="#{msg.Delete}" disabled="#{pmOrderController.selected.isFinished}" />
                             </p:dataList>
 
-                            <p:fileUpload fileUploadListener="#{pmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{pmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                 uploadLabel="#{msg.Upload}" cancelLabel="#{msg.Cancel}"  rendered="#{pmOrderController.attachements.size() lt 1}"
                                 multiple="false"  sizeLimit="10000000" fileLimit="1"  update=":PmOrderEditForm:panel1" disabled="#{pmOrderController.selected.isFinished}" 
                                 auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" fileLimitMessage="#{msg.fileLimitMessage}1"  label="#{msg.Add}"/>

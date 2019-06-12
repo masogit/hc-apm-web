@@ -73,7 +73,7 @@
                         </p:panel>
 
                     </p:dataGrid>
-                    <p:fileUpload id="type1" fileUploadListener="#{v2MeasureController.handleFileUploadForRP}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{v2MeasureController.handleFileUploadForRP}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
                         <p:commandButton value="保存" validateClient="false" icon="ui-icon-check" actionListener="#{v2MeasureController.saveServiceRequest()}" immediate="true" update="measureTab:measureOrderListForm" disabled="#{!v2MeasureController.canCreateSr()}"  style="float:left" oncomplete="screateHandle(xhr, status, args)"/>

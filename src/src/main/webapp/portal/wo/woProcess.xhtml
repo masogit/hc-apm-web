@@ -207,7 +207,7 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>  
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload id="type1" fileUploadListener="#{workOrderStepController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{workOrderStepController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="false"  sizeLimit="10000000" update="pictureList,WorkOrderStepListForm:stepDataList" auto="true" fileLimit="1" fileLimitMessage="#{msg.fileLimitMessage}1"
                                               invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
