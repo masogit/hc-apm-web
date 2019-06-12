@@ -532,7 +532,7 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
-                            <p:fileUpload  fileUploadListener="#{contractInfoEditController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{contractInfoEditController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                            multiple="true" sizeLimit="10000000" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
                         </h:panelGroup>
 
