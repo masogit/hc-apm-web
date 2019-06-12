@@ -99,6 +99,7 @@ public class ContractExportService {
             contractInfoMap.put("合同UID", contractInfo.getId());
             contractInfoMap.put("名称", contractInfo.getName());
             contractInfoMap.put("合同编号", contractInfo.getContractNum());
+            contractInfoMap.put("报告号", contractInfo.getReportNum());
             contractInfoMap.put("外贸合同号", contractInfo.getForeignTradeNum());
             contractInfoMap.put("发票号", contractInfo.getInvoiceNum());
             contractInfoMap.put("合同类型", contractInfo.getContractType() != null ? FieldValueMessageController.fieldValue("contractInfoType", contractInfo.getContractType()) : "");
