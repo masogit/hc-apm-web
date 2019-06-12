@@ -36,4 +36,13 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 	public List<V2_BlobObject> findSomeTestRecords();
 
     public List<V2_BlobObject> findByBoUuidAndBoSubType(String boUuid, String boSubType);
+    
+    @Query(value="select o.* from v2_blob_object o where o.id in ?1",nativeQuery=true)
+	public List<V2_BlobObject> fetchListByIds(Set<String> ids);
+	
+	@Query(value="select o.* from v2_blob_object o where o.bo_id in ?1",nativeQuery=true)
+	public List<V2_BlobObject> fetchListByBoIds(Set<Integer> ids);
+	
+	@Query(value="select o.* from v2_blob_object o where o.bo_uuid in ?1",nativeQuery=true)
+	public List<V2_BlobObject> fetchListByBoUUIds(Set<String> ids);
 }
