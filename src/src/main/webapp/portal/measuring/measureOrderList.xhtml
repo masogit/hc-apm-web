@@ -358,7 +358,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialog');"/>
 
@@ -386,7 +386,7 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 <h:panelGroup>
                     <p:commandButton rendered="true" validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认批量关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialogBatch');"/>
                     <p:commandButton immediate="true" value="取消" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('closeMeasureDialogBatch').hide()"/>
