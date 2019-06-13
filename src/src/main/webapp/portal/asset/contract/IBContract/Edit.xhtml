@@ -65,7 +65,7 @@
                     <p:panel  id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
                         <h:panelGroup  style="max-width:50px;" rendered="#{iBAssetConstractController.isCreatAction() and iBAssetConstractController.selected.objectId==null}">
                             <label class="label">合同附件*</label>
-                            <p:fileUpload required="true" fileUploadListener="#{iBAssetConstractController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:40%" process="@this" multiple="false" sizeLimit="10000000" update=":AssetContractEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" required="true" fileUploadListener="#{iBAssetConstractController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:40%" process="@this" multiple="false" sizeLimit="10000000" update=":AssetContractEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
                             <p:growl id="messages" showDetail="true" />
                         </h:panelGroup>
                         <h:panelGroup id="namepanel" rendered="#{iBAssetConstractController.selected.objectId!=null}">
