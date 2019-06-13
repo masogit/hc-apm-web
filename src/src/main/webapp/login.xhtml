@@ -88,6 +88,10 @@
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
+                function handleUpdateFormValue() {
+                    var tempPwd = document.getElementById("j_password").value;
+                    document.getElementById("j_password").value = window.btoa(tempPwd);
+                }
                 // clear local storage when logged out
                 var match = location.search.match(/uid=(\d+)/);
                 if(match) {
@@ -114,6 +118,7 @@
                         PF("dlgResetPassword").show();
                     }
                 }
+
             </h:outputScript>
         </h:head>
 
@@ -121,7 +126,7 @@
             <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
             <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
 
-            <h:form prependId="false">
+            <h:form prependId="false" id="testForm">
 
                 <p:focus/>
                 <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>
@@ -140,7 +145,7 @@
                             <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                         </div>
                         <div class="ui-g-12" style="margin-bottom: 0px;">
-                            <p:commandButton onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
+                            <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
                         </div>
                     </div>
                 </div>
@@ -191,7 +196,7 @@
                         </p:panelGrid>
                     </p:fieldset>
                     <br/>
-                    <p:commandButton value="#{msg.Confirm}" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl"/>
+                    <p:commandButton value="#{msg.Confirm}" partialSubmit="true" process="hiddenUname" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl"/>
                     <p:commandButton value="#{msg.Cancel}" immediate="true" process="@this" type="button" onclick="PF('dlgResetPassword').hide()"/>
                 </h:form>
             </p:dialog>
