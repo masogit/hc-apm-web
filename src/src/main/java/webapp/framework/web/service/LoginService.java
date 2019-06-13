@@ -25,6 +25,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.util.B64Code;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,7 +242,9 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
         String userName = request.getParameter("j_username");
-        String passwordPlain = request.getParameter("j_password");
+        //String passwordPlain = request.getParameter("j_password");
+        String tempPasswordPlain = request.getParameter("j_password");
+        String passwordPlain = B64Code.decode(tempPasswordPlain, "utf-8");
 
         if ("".equals(userName) || userName == null) {
             userName = request.getParameter("input_j_username");
