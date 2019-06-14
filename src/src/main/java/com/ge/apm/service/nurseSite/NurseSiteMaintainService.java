@@ -35,6 +35,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BatchJobRepository;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
@@ -108,6 +109,9 @@ public class NurseSiteMaintainService {
 	
 	@Autowired
 	private CustomRoleRepository customRoleRepository;
+	
+	@Autowired
+	BlobObjectRepository blobObjectRepository;
 
 	private static final String STR_ASSET_NAME = "设备名";
 	private static final String STR_ASSET_DEPTNUM = "设备编号";
@@ -254,45 +258,46 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
+		Set<String> setItemIds=new HashSet<String>();
+		List<NurseSiteMaintainItem> listItem=maintain.getListNurseSiteMaintainItem();
+		for(int i=0;i<listItem.size();++i){
+			setItemIds.add(listItem.get(i).getId());
+		}
+		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
+		blobFileService.deleteBlobFile(listV2Obj);
 		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
 	}
 
-	@Transactional
-	public boolean deleteMaintain(List<NurseSiteMaintain> listMaintain) {
-		if (listMaintain != null && listMaintain.size() > 0) {
-			// Set<String> setParentId=new HashSet<String>();
-			Set<String> setSignatureId = new HashSet<String>();
-			for (int i = 0; i < listMaintain.size(); ++i) {
-				NurseSiteMaintain tempMaintain = listMaintain.get(i);
-				// setParentId.add(tempMaintain.getId());
-				// tempMaintain.setListNurseSiteMaintainItem(null);
-				if (StringUtils.isNotEmpty(tempMaintain.getSignatureId())) {
-					setSignatureId.add(tempMaintain.getSignatureId());
-				}
-			}
-			// Set<NurseSiteMaintainItem>
-			// listItem=nurseSiteMaintainItemRepository.findMaintainItemByParentId(setParentId);
-			if (setSignatureId.size() > 0) {
-				blobFileService.deleteBlobFilesByStorageId(setSignatureId);
-			}
-			// nurseSiteMaintainItemRepository.delete(listItem);
-			if (listMaintain != null && listMaintain.size() > 0) {
-				nativeDeleteMaintain(listMaintain);
-			}
-		}
-		return true;
-	}
+//	@Transactional
+//	public boolean deleteMaintain(List<NurseSiteMaintain> listMaintain) {
+//		if (listMaintain != null && listMaintain.size() > 0) {
+//			Set<String> setSignatureId = new HashSet<String>();
+//			for (int i = 0; i < listMaintain.size(); ++i) {
+//				NurseSiteMaintain tempMaintain = listMaintain.get(i);
+//				if (StringUtils.isNotEmpty(tempMaintain.getSignatureId())) {
+//					setSignatureId.add(tempMaintain.getSignatureId());
+//				}
+//			}
+//			if (setSignatureId.size() > 0) {
+//				blobFileService.deleteBlobFilesByStorageId(setSignatureId);
+//			}
+//			if (listMaintain != null && listMaintain.size() > 0) {
+//				nativeDeleteMaintain(listMaintain);
+//			}
+//		}
+//		return true;
+//	}
 
-	@Transactional
-	public void saveAndDelete(List<NurseSiteMaintain> obj, List<NurseSiteMaintain> obj2) {
-		if (obj != null && obj.size() > 0) {
-			nurseSiteMaintainRepository.save(obj);
-		}
-		if (obj2 != null && obj2.size() > 0) {
-			deleteMaintain(obj2);
-		}
-	}
+//	@Transactional
+//	public void saveAndDelete(List<NurseSiteMaintain> obj, List<NurseSiteMaintain> obj2) {
+//		if (obj != null && obj.size() > 0) {
+//			nurseSiteMaintainRepository.save(obj);
+//		}
+//		if (obj2 != null && obj2.size() > 0) {
+//			deleteMaintain(obj2);
+//		}
+//	}
 
 	public void save(NurseSiteMaintainConfig obj) {
 		nurseSiteMaintainConfigRepository.save(obj);
@@ -300,10 +305,6 @@ public class NurseSiteMaintainService {
 
 	public void deleteNurseSiteMaintainConfigItem(List<NurseSiteMaintainConfigItem> list) {
 		nurseSiteMaintainConfigItemRepository.delete(list);
-	}
-
-	public void deleteMaintainItem(List<NurseSiteMaintainItem> list) {
-		nurseSiteMaintainItemRepository.delete(list);
 	}
 
 	public void delete(NurseSiteMaintainConfig obj) {
@@ -913,31 +914,31 @@ public class NurseSiteMaintainService {
 	}
 
 
-	public void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
-		Set<String> setMaintainIds = new HashSet<String>();
-		Set<String> setMaintainItemIds = new HashSet<String>();
-		Set<String> setMaintainDataIds = new HashSet<String>();
-		if (listMaintain != null && listMaintain.size() > 0) {
-			for (int i = 0; i < listMaintain.size(); ++i) {
-				setMaintainIds.add(listMaintain.get(i).getId());
-			}
-		}
-		if (setMaintainIds.size() > 0) {
-			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
-		}
-		if (setMaintainItemIds.size() > 0) {
-			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
-		}
-		if (setMaintainDataIds.size() > 0) {
-			nurseSiteMaintainDataRepository.deleteMaintainData(setMaintainDataIds);
-		}
-		if (setMaintainItemIds.size() > 0) {
-			nurseSiteMaintainItemRepository.deleteMaintainItem(setMaintainItemIds);
-		}
-		if (setMaintainIds.size() > 0) {
-			nurseSiteMaintainRepository.deleteMaintain(setMaintainIds);
-		}
-	}
+//	public void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
+//		Set<String> setMaintainIds = new HashSet<String>();
+//		Set<String> setMaintainItemIds = new HashSet<String>();
+//		Set<String> setMaintainDataIds = new HashSet<String>();
+//		if (listMaintain != null && listMaintain.size() > 0) {
+//			for (int i = 0; i < listMaintain.size(); ++i) {
+//				setMaintainIds.add(listMaintain.get(i).getId());
+//			}
+//		}
+//		if (setMaintainIds.size() > 0) {
+//			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+//		}
+//		if (setMaintainItemIds.size() > 0) {
+//			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
+//		}
+//		if (setMaintainDataIds.size() > 0) {
+//			nurseSiteMaintainDataRepository.deleteMaintainData(setMaintainDataIds);
+//		}
+//		if (setMaintainItemIds.size() > 0) {
+//			nurseSiteMaintainItemRepository.deleteMaintainItem(setMaintainItemIds);
+//		}
+//		if (setMaintainIds.size() > 0) {
+//			nurseSiteMaintainRepository.deleteMaintain(setMaintainIds);
+//		}
+//	}
 
 	public boolean updateMaintain(NurseSiteMaintain obj, boolean batchUpdate, UserAccount currentUser) {
 		Date currentDate = new Date();
@@ -1252,26 +1253,26 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
-	@Transactional
-	public void updateUnCheckedMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig, UserAccount currentUser, Integer status, List<AssetInfo> listCheckAssets) {
-		Integer[] arrInt=new Integer[4];
-		arrInt[0]=2;
-		arrInt[0]=5;
-		arrInt[0]=6;
-		arrInt[0]=7;
-		List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findByConfigAndStatus(nurseSiteMaintainConfig.getId(), Arrays.asList(arrInt));
-		List<NurseSiteMaintain> listNewMaintain = new ArrayList<NurseSiteMaintain>();
-		if (listMaintain != null && listMaintain.size() > 0) {
-			for (int i = 0; i < listMaintain.size(); ++i) {
-				listNewMaintain
-						.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
-			}
-		}
-		if (listNewMaintain.size() > 0) {
-			nurseSiteMaintainRepository.save(listNewMaintain);
-		}
-		nativeDeleteMaintain(listMaintain);
-	}
+//	@Transactional
+//	public void updateUnCheckedMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig, UserAccount currentUser, Integer status, List<AssetInfo> listCheckAssets) {
+//		Integer[] arrInt=new Integer[4];
+//		arrInt[0]=2;
+//		arrInt[0]=5;
+//		arrInt[0]=6;
+//		arrInt[0]=7;
+//		List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findByConfigAndStatus(nurseSiteMaintainConfig.getId(), Arrays.asList(arrInt));
+//		List<NurseSiteMaintain> listNewMaintain = new ArrayList<NurseSiteMaintain>();
+//		if (listMaintain != null && listMaintain.size() > 0) {
+//			for (int i = 0; i < listMaintain.size(); ++i) {
+//				listNewMaintain
+//						.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets, listMaintain.get(i).getSequence()));
+//			}
+//		}
+//		if (listNewMaintain.size() > 0) {
+//			nurseSiteMaintainRepository.save(listNewMaintain);
+//		}
+//		nativeDeleteMaintain(listMaintain);
+//	}
 
 	public List<String> findAccessOrgUidListByUserUid(String userUid) {
 		return uaaService.findAccessClinicalUidByUserUid(userUid);

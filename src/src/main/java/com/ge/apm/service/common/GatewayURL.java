@@ -65,6 +65,10 @@ public enum GatewayURL {
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
     ACCESSDEL("/hcapmassetservice/api/apm/asset/workOrderDetails/{id}"),
+
+    ACCESSAD_MEASURING("/hcapmassetservice/api/apm/asset/MeasuringOrderDetails/{assetUid}"),
+    ACCESSDEL_MEASURING("/hcapmassetservice/api/apm/asset/MeasuringOrderDetails/{id}"),
+
     // Allocation Center URLs
     SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
     ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList?requestId={requestId}"),

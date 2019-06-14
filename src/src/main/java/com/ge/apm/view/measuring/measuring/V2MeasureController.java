@@ -1603,7 +1603,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
         //调用微服务删除备件
-        serviceRequestApiService.delAccess(token,itemId);
+        serviceRequestApiService.delAccessMeasuring(token,itemId);
     }
 
     public void prepareBatchComplete() {
