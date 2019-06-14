@@ -92,6 +92,27 @@
                     var tempPwd = document.getElementById("j_password").value;
                     document.getElementById("j_password").value = window.btoa(tempPwd);
                 }
+
+                function updatePwd_r() {
+                    var pwd1 = document.getElementById("password1").value;
+                    var pwd2 = document.getElementById("password2").value;
+
+                    document.getElementById("password1").value = window.btoa(pwd1);
+                    document.getElementById("password2").value = window.btoa(pwd2);
+                }
+
+                function handleComplete() {
+                    document.getElementById("j_password").value = "";
+                    document.getElementById("j_password").html = "";
+                }
+
+                function handleComplete_r() {
+                    document.getElementById("password1").value = "";
+                    document.getElementById("password2").value = "";
+
+                    document.getElementById("password1").html = "";
+                    document.getElementById("password2").html = "";
+                }
                 // clear local storage when logged out
                 var match = location.search.match(/uid=(\d+)/);
                 if(match) {
@@ -145,7 +166,7 @@
                             <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                         </div>
                         <div class="ui-g-12" style="margin-bottom: 0px;">
-                            <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
+                            <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
                         </div>
                     </div>
                 </div>
@@ -196,7 +217,7 @@
                         </p:panelGrid>
                     </p:fieldset>
                     <br/>
-                    <p:commandButton value="#{msg.Confirm}" partialSubmit="true" process="hiddenUname" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl"/>
+                    <p:commandButton value="#{msg.Confirm}" onclick="updatePwd_r();" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl" oncomplete="handleComplete_r();"/>
                     <p:commandButton value="#{msg.Cancel}" immediate="true" process="@this" type="button" onclick="PF('dlgResetPassword').hide()"/>
                 </h:form>
             </p:dialog>
