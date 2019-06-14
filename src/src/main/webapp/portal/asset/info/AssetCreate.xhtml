@@ -81,7 +81,7 @@
                                     </p:commandButton>
                                 </p:dataList>
                                 <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
