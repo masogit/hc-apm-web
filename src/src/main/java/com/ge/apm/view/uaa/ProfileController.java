@@ -9,6 +9,7 @@ import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.B64Code;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,16 +80,18 @@ public class ProfileController implements Serializable {
     }
     
     public void resetPassword() throws NoSuchAlgorithmException{
-    	String result = PasswordUtil.checkPwd(newPassword);
+        String tempNewPassword = B64Code.decode(newPassword, "utf-8");
+
+    	String result = PasswordUtil.checkPwd(tempNewPassword);
     	if(!StringUtils.isEmpty(result)){
     		WebUtil.addSuccessMessage(result);
     		return;
     	}
-    	if(samePwd(newPassword)){
+    	if(samePwd(tempNewPassword)){
     		WebUtil.addSuccessMessage(WebUtil.getMessage("SamePwd"));
     		return;
     	}
-        myAccount.setPlainPassword(newPassword);
+        myAccount.setPlainPassword(tempNewPassword);
         myAccount.entryptPassword();
         myAccount.setLastModifiedDate(TimeUtil.now());
         myAccount.setLastModifiedBy(myAccount.getLoginName());
