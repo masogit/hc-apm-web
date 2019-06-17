@@ -214,6 +214,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
         //一次性
         formData.setMeasuringType(2);
+        formData.setRuleLevel(3);
         createMeasureRequestApi(assetUID, formData);
     }
 
