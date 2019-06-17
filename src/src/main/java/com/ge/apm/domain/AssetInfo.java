@@ -1831,4 +1831,18 @@ public class AssetInfo implements ChineseName,Serializable {
                 warrantyAlertStatus = "warrantyExpireSoon";
         }
     }
+
+    public String getParentAssetDisplayName() {
+
+        return makeEmptyStringIfNull(this.getName()) + "/" + makeEmptyStringIfNull(this.getQrCode()) + "/" + makeEmptyStringIfNull(this.getSerialNum());
+
+    }
+
+    private String makeEmptyStringIfNull(String input) {
+        if (input == null) {
+            return "";
+        } else {
+            return input;
+        }
+    }
 }
