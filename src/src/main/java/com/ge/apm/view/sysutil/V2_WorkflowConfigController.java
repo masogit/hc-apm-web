@@ -378,6 +378,24 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			selected.setPmDispatchUserName2(null);
 		}
 
+		//measure
+		if (selected.getMeasureDispatchUserId() != null) {
+			UserAccount measureDispatcher1 = uaDao.getById(config.getMeasureDispatchUserId());
+			if (measureDispatcher1 != null) {
+				selected.setMeasureDispatchUserName(measureDispatcher1.getName());
+			}
+		}else{
+			selected.setMeasureDispatchUserName(null);
+		}
+		if (selected.getMeasureDispatchUserId2() != null) {
+			UserAccount measureDispatcher2 = uaDao.getById(config.getMeasureDispatchUserId2());
+			if (measureDispatcher2 != null) {
+				selected.setMeasureDispatchUserName2(measureDispatcher2.getName());
+			}
+		}else{
+			selected.setMeasureDispatchUserName2(null);
+		}
+
 		if (this.telRepStart != null) {
 			selected.setTelReportStart(new DateTime(telRepStart).toString("HH:mm:ss"));
 		}
@@ -397,6 +415,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
 		Boolean isPmManual = selected.getIsPmManualEnabled();
 		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
+		Boolean isMeasureManual = selected.getIsMeasureManualEnabled();
+		Boolean isMeasureTakeOrder = selected.getIsMeasureTakeOrderEnabled();
+
 
     	if(isManual != null && isManual){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
@@ -412,6 +433,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				return;
 			}
 		}
+		if(isMeasureManual != null && isMeasureManual){
+			if(selected.getMeasureDispatchUserId() == null && selected.getMeasureDispatchUserId2() == null){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("MeasureNeedDispather"));
+				return;
+			}
+		}
 
 
     	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
@@ -423,6 +451,12 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
+			return;
+		}
+
+		if(isMeasureManual != null && isMeasureTakeOrder != null && !isMeasureManual && !isMeasureTakeOrder){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("MeasureManualAndGrapMsg"));
 			return;
 		}
 

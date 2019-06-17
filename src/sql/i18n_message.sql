@@ -1502,10 +1502,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('executable', '2', '不可执行', 'cannot execute', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoNeedDispather', '维修配置中允许派工时派工人不能为空!', 'Dispather should not be null when wo dispath-mode is manul', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmNeedDispather', '保养配置总允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmNeedDispather', '保养配置中允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MeasureNeedDispather', '计量配置中允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoManualAndGrapMsg', '维修配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for wo manual or grap mode! ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmManualAndGrapMsg', '保养配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MeasureManualAndGrapMsg', '计量配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
 
 insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','1','自有资金','capitalSource21','-1');
 insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','2','合资公司资金','capitalSource22','-1');
