@@ -202,50 +202,88 @@
                     </p:fieldset>
 
                     <p:fieldset id="pm" legend="保养配置">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
+                        <h:panelGroup >
+                            <label class="label">保养#{msg.dispatchUserName}</label>
+                            <p:selectOneMenu id="pmDispatchUserId" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId}"
+                                             required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">保养#{msg.dispatchUserName}2</label>
+                            <p:selectOneMenu id="pmDispatchUserId2" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId2}"
+                                             required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="true">
+                            <label class = "label">二级简化保养?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.pmSimplify}"/>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">是否自动派工?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmAutoEnabled}"/>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">是否允许抢单?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmTakeOrderEnabled}"/>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">是否人工派工?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmManualEnabled}"/>
+                        </h:panelGroup >
+                        <h:panelGroup>
+                            <label class="label">保养提醒提前天数</label>
+                            <p:inputNumber id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养提醒次数</label>
+                            <p:inputNumber id="pmReminderTimes" value="#{v2_WorkflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养工单人工费用(元/小时)</label>
+                            <p:inputNumber id="pmManHourPrice" value="#{v2_WorkflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                    <p:fieldset id="measure" legend="计量配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">保养#{msg.dispatchUserName}</label>
-                                <p:selectOneMenu id="pmDispatchUserId" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId}"
+                                <label class="label">计量#{msg.dispatchUserName}</label>
+                                <p:selectOneMenu id="measureDispatchUserId" value="#{v2_WorkflowConfigController.selected.measureDispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">保养#{msg.dispatchUserName}2</label>
-                                <p:selectOneMenu id="pmDispatchUserId2" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId2}"
+                                <label class="label">计量#{msg.dispatchUserName}2</label>
+                                <p:selectOneMenu id="measureDispatchUserId2" value="#{v2_WorkflowConfigController.selected.measureDispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            <h:panelGroup rendered="true">
-                                <label class = "label">二级简化保养?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.pmSimplify}"/>
-                            </h:panelGroup >
+
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否自动派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmAutoEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isMeasureAutoEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否允许抢单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmTakeOrderEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isMeasureTakeOrderEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否人工派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmManualEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isMeasureManualEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class="label">保养提醒提前天数</label>
-                                <p:inputNumber id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">保养提醒次数</label>
-                                <p:inputNumber id="pmReminderTimes" value="#{v2_WorkflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">保养工单人工费用(元/小时)</label>
-                                <p:inputNumber id="pmManHourPrice" value="#{v2_WorkflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
+                                <label class="label">计量工单人工费用(元/小时)</label>
+                                <p:inputNumber id="measureManHourPrice" value="#{v2_WorkflowConfigController.selected.measureManhourPrice}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>

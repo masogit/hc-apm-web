@@ -13,7 +13,7 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="MeasureOrderRuleApproveDlg" widgetVar="MeasureOrderRuleApproveDialog" width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.MeasureOrderRule} 审核">
+        <p:dialog id="MeasureOrderRuleApproveDlg" widgetVar="MeasureOrderRuleApproveDialog" width="1000" height="380" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.MeasureOrderRule} 审核">
             <h:form id="MeasureOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{measureOrderRuleController.selected != null}">
@@ -84,7 +84,7 @@
                         </h:panelGroup>-->
                     </p:panelGrid>
                     
-                     <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                     <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="false">
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{measureOrderRuleController.selected.safetyReport}"  >
