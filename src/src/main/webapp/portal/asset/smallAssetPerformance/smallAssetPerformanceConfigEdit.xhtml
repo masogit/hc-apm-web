@@ -28,12 +28,18 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">设备名称*</label>
-					<p:selectOneMenu id="idAssetName" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" converter="assetInfoConverter"
-						style="width:100%;" rendered="true" requiredMessage="设备名称不能为空">
+					<!-- <p:selectOneMenu id="idAssetName" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" converter="assetInfoConverter"
+						style="width:100%;" rendered="true" requiredMessage="设备名称不能为空" filter="true" filterMatchMode="startsWith">
 						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" update="idEditSave"/>
 						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 						<f:selectItems value="#{smallAssetPerformanceConfigController.assetInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-					</p:selectOneMenu>
+					</p:selectOneMenu> -->
+					<p:autoComplete id="idAssetName" dropdown="true" value="#{smallAssetPerformanceConfigController.selectedObjectMap['asset']}" scrollHeight="300"
+						forceSelection="true" requiredMessage="设备名称不能为空" completeMethod="#{smallAssetPerformanceConfigController.autoCompleteAssetName}" var="t"
+						itemLabel="#{t.name}" itemValue="#{t}" converter="assetInfoConverter" update="idEditSave">
+						<p:ajax event="itemSelect" listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
+						<p:ajax listener="#{smallAssetPerformanceConfigController.onAssetChange('asset')}" />
+					</p:autoComplete>
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">占比*</label>
