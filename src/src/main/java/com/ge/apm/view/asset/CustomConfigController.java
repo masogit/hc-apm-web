@@ -167,6 +167,10 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
+            case "WebMaintainFieldsList":
+                addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
+                break;
             case "RemoveMobileWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;

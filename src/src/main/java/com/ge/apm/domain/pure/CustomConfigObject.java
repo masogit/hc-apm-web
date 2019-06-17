@@ -34,6 +34,7 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    List<String> assetsWebMaintainDetailFields;
     
     JSONObject mobilePage; 
     
@@ -175,6 +176,14 @@ public class CustomConfigObject {
             assetsMobilepageDetailFields = CustomConfigConstant.getAssetsMobilepageDetailFields();
         }
         return assetsMobilepageDetailFields;
+    }
+
+    public List<String> getAssetsWebMaintainDetailFields() {
+        return assetsWebMaintainDetailFields;
+    }
+
+    public void setAssetsWebMaintainDetailFields(List<String> assetsWebMaintainDetailFields) {
+        this.assetsWebMaintainDetailFields = assetsWebMaintainDetailFields;
     }
 
     public void setAssetsMobilepageDetailFields(List<String> assetsMobilepageDetailFields) {
