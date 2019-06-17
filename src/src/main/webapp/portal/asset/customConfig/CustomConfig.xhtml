@@ -152,11 +152,10 @@
                             </p:panelGrid>
                         </p:tab>
                         <p:tab title="xxx">
-                            <p:fieldset legend="资产信息显示字段组" rendered="#{groupItem.type eq 'assetInfo'}">
-                                <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
-                                <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
-
+                            <p:fieldset legend="维修信息字段组">
+                                <p:orderList id="WebMaintainFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageHeaderFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileHeaderFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileHeaderFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                             </p:fieldset>
 
                         </p:tab>
