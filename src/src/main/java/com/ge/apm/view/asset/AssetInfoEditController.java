@@ -240,6 +240,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("assetOwner2", selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2()));
         selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
+
+        selectedObjectMap.put("measuringOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
+
+
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
         selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
@@ -384,12 +388,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setClinicalOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setClinicalOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
                 break;
-
+            case "measuringOwner":
+                selected.setMeasuringOwnerId(null == selectedUser ? null : selectedUser.getId());
+                selected.setMeasuringOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setMeasuringOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
             case "pmOwner":
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
         }
+
+
+
     }
 
     public void onSupplierChange(String idx) {
