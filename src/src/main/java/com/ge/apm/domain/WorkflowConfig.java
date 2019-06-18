@@ -111,6 +111,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_manhour_price")
     private Double woManhourPrice;
 
+    @Column(name = "not_send_msg_in_take_order_mode")
+    private Boolean notSendMsgInTakeOrderMode;//抢单模式下不发消息 true:不发 false：发
+
     /****for pm *****/
     @Column(name = "pm_manhour_price")
     private Double pmManhourPrice;
@@ -190,6 +193,14 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "measure_dispatch_user_name2")
     private String measureDispatchUserName2;
+
+    public Boolean isNotSendMsgInTakeOrderMode() {
+        return notSendMsgInTakeOrderMode;
+    }
+
+    public void setNotSendMsgInTakeOrderMode(Boolean notSendMsgInTakeOrderMode) {
+        this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
+    }
 
     public Double getMeasureManhourPrice() {
         return measureManhourPrice;
