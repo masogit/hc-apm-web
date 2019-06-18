@@ -26,7 +26,7 @@
                          requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" />
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
             <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}">
@@ -48,7 +48,7 @@
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetOwnerName')}" >
-        <h:panelGroup >
+        <h:panelGroup ><!--新增资产信息中的 维修负责人 -->
             <label class="label">#{msg.assetOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="assetOwnerName" value="#{assetInfoEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required}" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
@@ -120,6 +120,7 @@
                          requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
         </h:panelGroup>
     </c:if>
+    <!--保养负责人-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerName')}" >
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
@@ -138,6 +139,26 @@
 
         </h:panelGroup>
     </c:if>
+   <!--计量负责人-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerName')}" >
+        <h:panelGroup >计量负责人
+            <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
+            <p:autoComplete id="measuringOwnerName" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerTel')}" >
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required? '*':''}</span></label>
