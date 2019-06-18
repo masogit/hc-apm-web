@@ -695,7 +695,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             if (null != planTime) {
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
-            formData.setRuleLevel(ruleLevel);
+            if(ruleLevel==null)
+                formData.setRuleLevel(3);
+            else
+                formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setMeasuringType(measureType);
             Map<String, Object> res = measureOrderService.createMeasureRequestApi(selectedAsset.getUid(), formData);
