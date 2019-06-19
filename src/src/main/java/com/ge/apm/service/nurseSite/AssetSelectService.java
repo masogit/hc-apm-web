@@ -1,5 +1,16 @@
 package com.ge.apm.service.nurseSite;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
@@ -8,16 +19,8 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import webapp.framework.dao.SearchFilter;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import webapp.framework.dao.SearchFilter;
 
 /**
  * @author nick.liu
@@ -67,9 +70,16 @@ public class AssetSelectService {
 
     public List<OrgInfo> loadValidDeptList(OrgInfo selectedOrg) {
         List<OrgInfo> accessibleDeptList = uaaService.getAllAccessibleClinicalDeptList();
-        List<OrgInfo> validDeptList = accessibleDeptList.stream()
-                .filter(t -> this.getDeptsWithAsset(selectedOrg).contains(t.getUid()))
-                .collect(Collectors.toList());
+        List<OrgInfo> validDeptList=new ArrayList<OrgInfo>();
+        List<String> listDepts=getDeptsWithAsset(selectedOrg);
+        if(listDepts!=null && listDepts.size()>0){
+        	for(int i=0;i<accessibleDeptList.size();++i){
+            	OrgInfo tempOrg=accessibleDeptList.get(i);
+            	if(listDepts.contains(tempOrg.getUid())){
+            		validDeptList.add(tempOrg);
+            	}
+            }
+        }
         return validDeptList;
     }
 
