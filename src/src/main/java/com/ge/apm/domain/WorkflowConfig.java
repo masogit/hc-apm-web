@@ -194,13 +194,15 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "measure_dispatch_user_name2")
     private String measureDispatchUserName2;
 
-    public Boolean isNotSendMsgInTakeOrderMode() {
+    public Boolean getNotSendMsgInTakeOrderMode() {
         return notSendMsgInTakeOrderMode;
     }
 
     public void setNotSendMsgInTakeOrderMode(Boolean notSendMsgInTakeOrderMode) {
         this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
     }
+
+
 
     public Double getMeasureManhourPrice() {
         return measureManhourPrice;
