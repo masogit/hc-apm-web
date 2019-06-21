@@ -165,7 +165,7 @@
 
                         <!--待审核 8-->
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==8}" exportable="false">
-                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDlgCls)" oncomplete="PF('measureApproveDialog').show()"/>
+                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDlg').show()"/>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==6}" exportable="false">
                             <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureOrderListForm @(.closeMeasureDialogClass)" oncomplete="PF('closeMeasureDialog').show()" />
