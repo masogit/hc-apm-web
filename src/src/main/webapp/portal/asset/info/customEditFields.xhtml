@@ -139,14 +139,14 @@
 
         </h:panelGroup>
     </c:if>
-   <!--计量负责人-->
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerName')}" >
+   <!--负责人-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'measuringOwnerName')}" >
         <h:panelGroup >
-            <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
-            <p:autoComplete id="measuringOwnerName" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerName')}"
-                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+            <label class="label">#{msg.measuringOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required? '*':''}</span></label>
+            <p:autoComplete id="measuringOwnerName" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required}" requiredMessage="#{msg.measuringOwnerId} #{msg.ValidationRequire}"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this"/>
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" />
                 <p:column>
                     <h:outputText value="#{t.name}"/>
