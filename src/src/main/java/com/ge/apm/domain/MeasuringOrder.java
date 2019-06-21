@@ -168,7 +168,7 @@ public class MeasuringOrder implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
-    @Column(name="measuringtype")
+    @Column(name="measuring_type")
     private Integer measuringType;
 
     @Column(name="int_ext_type")

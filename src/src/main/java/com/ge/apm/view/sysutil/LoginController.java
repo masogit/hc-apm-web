@@ -124,7 +124,7 @@ public class LoginController extends LoginService {
     }
     
     @Override
-    protected void afterLogin(UserAccount originUser) {
+    protected void afterLogin(UserAccount originUser,String userAgent) {
         // called after user logined.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.processAfterLogin();
@@ -139,7 +139,7 @@ public class LoginController extends LoginService {
         	user=originUser;
         }
         //in order to get token for deactive user
-        saveSession(user);
+        saveSession(user,userAgent);
 
         String saltedPassword = null;
         try {
@@ -161,7 +161,7 @@ public class LoginController extends LoginService {
     }
 
     @Transactional
-    public void saveSession(UserAccount user){
+    public void saveSession(UserAccount user,String userAgent){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
@@ -170,10 +170,10 @@ public class LoginController extends LoginService {
             try{
                 String accessToken = null;
                 if(user.isGeSSO()){
-                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword());
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword(),userAgent);
                 }
                 else{
-                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword());
+                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword(),userAgent);
                 }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){
@@ -186,10 +186,10 @@ public class LoginController extends LoginService {
             try{
             	String accessToken = null;
                 if(user.isGeSSO()){
-                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword());
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword(),userAgent);
                 }
                 else{
-                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword());
+                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword(),userAgent);
                 }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){

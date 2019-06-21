@@ -120,7 +120,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         return plainPassword;
     }
 
-    protected void afterLogin(UserAccount originUser) {
+    protected void afterLogin(UserAccount originUser,String userAgent) {
 
     }
 
@@ -338,7 +338,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(user);
+            String userAgent = request.getHeader("User-Agent");
+            afterLogin(user,userAgent);
             updateLoginStatus(user.getLoginName(), true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
