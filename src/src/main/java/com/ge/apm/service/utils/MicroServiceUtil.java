@@ -162,7 +162,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
         headers.add("User-Agent",userAgent);
-        headers.add("request-source","1");
+        headers.add("request-source","legacy");
         Map<String, String> postParameters = new HashMap<String, String>();
         postParameters.put("loginName", userName);
         postParameters.put("password", password);
