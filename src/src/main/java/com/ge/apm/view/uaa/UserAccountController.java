@@ -927,7 +927,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
             MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
 
-            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword());
+            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(),request.getHeader("User-Agent"));
             request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
         }catch(Exception e){
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
