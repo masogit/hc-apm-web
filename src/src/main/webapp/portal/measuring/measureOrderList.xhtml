@@ -165,7 +165,7 @@
 
                         <!--待审核 8-->
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==8}" exportable="false">
-                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDialog').show()"/>
+                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDlg').show()"/>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==6}" exportable="false">
                             <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureOrderListForm @(.closeMeasureDialogClass)" oncomplete="PF('closeMeasureDialog').show()" />
@@ -243,7 +243,7 @@
         <h:form id="measureCancelForm" class="measureCancelFormCls" >
         <p:selectOneRadio id="cancelRadio" value="#{v2MeasureController.cancelInt}">
             <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
-            <f:selectItem itemDisabled="#{v2MeasureController.selected.measureType eq 2 or v2MeasureController.selected.measureType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+            <f:selectItem itemDisabled="#{v2MeasureController.selected.measuringType eq 2 or v2MeasureController.selected.measuringType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
         </p:selectOneRadio>
     <h:panelGroup>
         <label class="label">取消原因</label>

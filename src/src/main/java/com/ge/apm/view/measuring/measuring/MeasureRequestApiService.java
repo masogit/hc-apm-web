@@ -72,7 +72,7 @@ public class MeasureRequestApiService extends MicroServiceInvoker {
 public String invokeMeasureOrderCancel(String token, MeasureOrderActionForm formData, String actionName, String measureOrderId){
     HttpEntity<MeasureOrderActionForm> requestEntity = new HttpEntity<MeasureOrderActionForm>(formData, createHttpHeaders(token));
     String gatewayURL = getGatewayURL(GatewayURL.MEASURE_CANCEL_MEASURE_ORDER);
-    String url = gatewayURL.replace("{measureOrderId}", measureOrderId);
+    String url = gatewayURL.replace("{OrderId}", measureOrderId);
 
     ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.DELETE,requestEntity,LinkedHashMap.class);
     if (isOkay(response)) {

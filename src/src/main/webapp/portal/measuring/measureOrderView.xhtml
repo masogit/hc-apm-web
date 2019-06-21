@@ -190,7 +190,7 @@
                     </p:dataGrid>
                     <p:growl id="msgs" showDetail="true" />
                     <p:fieldset legend="计量清单">
-                        <p:fieldset legend="计量报告">
+                        <!--<p:fieldset legen">
                             <p:dataList class="rpClass"  value="#{v2MeasureController.reportList}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                                 #{v2MeasureController.getTableDefName(reportItem.schemaId)}
                                 <h:outputText id="installDate" value="#{reportItem.createdDate}" >
@@ -199,7 +199,7 @@
                                 <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                             </p:dataList>
 
-                        </p:fieldset>
+                        </p:fieldset>-->
                         <p:fieldset legend="检查项" id="chkItem"   rendered="#{not empty v2MeasureController.selected}">
                             <c:forEach  items="#{v2MeasureController.measureCheckItemList}" var="item">
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
