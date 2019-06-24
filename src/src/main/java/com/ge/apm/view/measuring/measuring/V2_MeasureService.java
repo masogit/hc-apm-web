@@ -128,7 +128,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     }
 
     public List<MeasuringOrderCoworker> getWorkOrderCoworker(String woId) {
-        return workOrderCoworkerMeaRepository.findByWoId(woId);
+        return workOrderCoworkerMeaRepository.findByOrderId(woId);
     }
     public void closePM( MeasuringOrder selectedPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();

@@ -1619,7 +1619,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         if ("new".equals(itemId)) {
             coWorkerDetail = new MeasuringOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-            coWorkerDetail.setWoId(selectedMeasureOrder.getId());
+            coWorkerDetail.setOrderId(selectedMeasureOrder.getId());
         } else {
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
