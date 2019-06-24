@@ -79,6 +79,7 @@ public class AutoCompleteService {
                 || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) 
                 || item.getQrCode() != null && item.getQrCode().contains(query)
                 || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || item.getSerialNum() != null && item.getSerialNum().contains(query)
                 || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
     	res.sort(new PinYinComparatorByName());
     	return res;
