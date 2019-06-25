@@ -80,7 +80,7 @@ public class ProfileController implements Serializable {
     }
     
     public void resetPassword() throws NoSuchAlgorithmException{
-        String tempNewPassword = B64Code.decode(newPassword, "utf-8");
+        String tempNewPassword = UserContextService.decryptData(newPassword);
 
     	String result = PasswordUtil.checkPwd(tempNewPassword);
     	if(!StringUtils.isEmpty(result)){

@@ -355,8 +355,8 @@ public class LoginController extends LoginService {
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
-        String tempPassword = B64Code.decode(password, "utf-8");
-        String tempNewPassword = B64Code.decode(newPassword, "utf-8");
+        String tempPassword = UserContextService.decryptData(password);
+        String tempNewPassword = UserContextService.decryptData(newPassword);
 
         user = userAccountDao.getByLoginName(username);
         if(user==null){
