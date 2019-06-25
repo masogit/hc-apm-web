@@ -26,6 +26,7 @@
             <h:outputStylesheet name="css/main2.css" />
             <h:outputScript name="js/ripple.js" library="ultima-layout" />
             <h:outputScript name="js/layout.js" library="ultima-layout" />
+            <script type="text/javascript" src="resources/js/main.js"></script>
             <f:metadata>
                 <f:viewParam name="session_expired" value="#{loginController.sessionExpired}" />
             </f:metadata>
@@ -88,18 +89,9 @@
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
-                function handleUpdateFormValue() {
-                    var tempPwd = document.getElementById("j_password").value;
-                    document.getElementById("j_password").value = window.btoa(tempPwd);
-                }
 
-                function updatePwd_r() {
-                    var pwd1 = document.getElementById("password1").value;
-                    var pwd2 = document.getElementById("password2").value;
-
-                    document.getElementById("password1").value = window.btoa(pwd1);
-                    document.getElementById("password2").value = window.btoa(pwd2);
-                }
+                var __encode =_0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox4402c=["\x76\x61\x6C\x75\x65","\x6A\x5F\x70\x61\x73\x73\x77\x6F\x72\x64","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64"];function handleUpdateFormValue(){var _0x2864x2=document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]];document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]]= encryptAES(_0x2864x2)}
+                var __encode =_0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox44034=["\x76\x61\x6C\x75\x65","\x70\x61\x73\x73\x77\x6F\x72\x64\x31","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x70\x61\x73\x73\x77\x6F\x72\x64\x32"];function updatePwd_r(){var _0xfca9x2=document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]];var _0xfca9x3=document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]];document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]]= encryptAES(_0xfca9x2);document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]]= encryptAES(_0xfca9x3)}
 
                 function handleComplete() {
                     document.getElementById("j_password").value = "";
@@ -113,6 +105,7 @@
                     document.getElementById("password1").html = "";
                     document.getElementById("password2").html = "";
                 }
+
                 // clear local storage when logged out
                 var match = location.search.match(/uid=(\d+)/);
                 if(match) {
@@ -147,7 +140,7 @@
             <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
             <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
 
-            <h:form prependId="false" id="testForm">
+            <h:form prependId="false">
 
                 <p:focus/>
                 <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>

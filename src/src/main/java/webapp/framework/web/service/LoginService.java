@@ -16,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -244,7 +245,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         String userName = request.getParameter("j_username");
         //String passwordPlain = request.getParameter("j_password");
         String tempPasswordPlain = request.getParameter("j_password");
-        String passwordPlain = B64Code.decode(tempPasswordPlain, "utf-8");
+        //String passwordPlain = B64Code.decode(tempPasswordPlain, "utf-8");
+        String passwordPlain = UserContextService.decryptData(tempPasswordPlain);
 
         if ("".equals(userName) || userName == null) {
             userName = request.getParameter("input_j_username");
