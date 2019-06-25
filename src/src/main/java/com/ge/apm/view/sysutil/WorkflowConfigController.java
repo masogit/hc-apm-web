@@ -454,11 +454,11 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			return;
 		}
 
-		if(isMeasureManual != null && isMeasureTakeOrder != null && !isMeasureManual && !isMeasureTakeOrder){
+/*		if(isMeasureManual != null && isMeasureTakeOrder != null && !isMeasureManual && !isMeasureTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("MeasureManualAndGrapMsg"));
 			return;
-		}
+		}*/
 
 /*		if(selected.getId() != null){
     		if(selected.getFormat() != null && newFormat != null){
