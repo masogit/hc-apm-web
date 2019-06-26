@@ -127,7 +127,7 @@
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
                             <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
                         </p:column>
-                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==2 and (userContextService.isMeasuringDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2MeasureController.isChecked()}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureDispatchDialogForm" oncomplete="PF('measureDispatchDialog').show()"/>
 
                             <p:commandButton value="取消" update="measureTab:measureCancelForm" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
