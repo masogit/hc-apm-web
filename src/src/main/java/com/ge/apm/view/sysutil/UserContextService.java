@@ -48,6 +48,7 @@ public class UserContextService implements Serializable {
         // reset previous cached data
         userContextService.isDispatcher = null;
         userContextService.isPmDispatcher = null;
+        userContextService.isMeasuringDispatcher = null;
         userContextService.isAssetApprover = null;
         userContextService.needAssetApproval = null;
         userContextService.needInstorageCheck = null;
@@ -583,6 +584,7 @@ public class UserContextService implements Serializable {
 
     private Boolean isDispatcher = null;
     private Boolean isPmDispatcher = null;
+    private Boolean isMeasuringDispatcher = null;
 
     private Boolean isAssetApprover = null;
     
@@ -619,6 +621,13 @@ public class UserContextService implements Serializable {
         return isPmDispatcher;
 
     }
+    public Boolean isMeasuringDispatcher(){
+        if (isMeasuringDispatcher == null) {
+            getUserPrivilege();
+        }
+        return isMeasuringDispatcher;
+
+    }
 
     public Boolean isAssetApprover() {
         if (isAssetApprover == null) {
@@ -634,6 +643,9 @@ public class UserContextService implements Serializable {
 
         isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
                 || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
+        isMeasuringDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getMeasureDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getMeasureDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
         
