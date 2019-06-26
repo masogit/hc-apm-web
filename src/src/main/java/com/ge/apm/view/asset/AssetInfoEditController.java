@@ -241,7 +241,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
 
-        selectedObjectMap.put("measuringOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
+        selectedObjectMap.put("measuringOwner", selected.getMeasuringOwnerId() == null ? null : userDao.findById(selected.getMeasuringOwnerId()));
 
 
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
