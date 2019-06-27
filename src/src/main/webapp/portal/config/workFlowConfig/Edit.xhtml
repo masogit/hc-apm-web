@@ -316,6 +316,12 @@
                                 <label class="label">归还工时默认值</label>
                                 <p:inputNumber id="defaultReturnManHour" value="#{workflowConfigController.selected.defaultReturnManHour}" minValue="0.0" decimalPlaces="1"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class = "label">是否录入患者号和床号</label>
+                                <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableLogPatientInfo}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
 
