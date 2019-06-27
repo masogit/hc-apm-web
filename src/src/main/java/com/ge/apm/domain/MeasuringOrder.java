@@ -106,11 +106,11 @@ public class MeasuringOrder implements Serializable {
     private Set<V2_BlobObject> attachments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "order_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Set<MeasuringOrderDetail> details = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "order_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Set<MeasuringOrderCoworker> coworkers = new HashSet<>();
 
     @ManyToOne
@@ -168,7 +168,7 @@ public class MeasuringOrder implements Serializable {
     @Column(name="simplify")
     private Boolean simplify;
 
-    @Column(name="measuringtype")
+    @Column(name="measuring_type")
     private Integer measuringType;
 
     @Column(name="int_ext_type")

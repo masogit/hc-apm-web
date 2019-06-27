@@ -194,7 +194,7 @@
                                 <label class="label">工单类型 *</label>
                                 <p:selectOneMenu value="#{generateMeasureOrdersController.pmType}" >
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('measureType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>
