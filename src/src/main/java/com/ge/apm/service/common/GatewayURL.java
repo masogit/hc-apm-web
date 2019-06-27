@@ -53,7 +53,7 @@ public enum GatewayURL {
     MEASURE_ORDER_ACTION("/hcapmworkflowservice/api/apm/measuringOrders/{orderId}/action"),
     MEASURE_REQUEST_CREATE("/hcapmworkflowservice/api/apm/measuringOrders"),
     MEASURE_GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/measuringOrders/{assetUid}/approver"),
-    MEASURE_ORDER_STEPS("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/OrderSteps"),
+    MEASURE_ORDER_STEPS("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/orderSteps"),
     MEASURE_CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     MEASURE_CANCEL_MEASURE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/cancel"),
     MEASURE_BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
