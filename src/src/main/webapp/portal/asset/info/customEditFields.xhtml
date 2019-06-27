@@ -26,7 +26,7 @@
                          requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" />
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetGroup}<span style="color:red">*</span></label>
             <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}">
@@ -48,7 +48,7 @@
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetOwnerName')}" >
-        <h:panelGroup >
+        <h:panelGroup ><!--新增资产信息中的 维修负责人 -->
             <label class="label">#{msg.assetOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="assetOwnerName" value="#{assetInfoEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required}" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
@@ -120,6 +120,7 @@
                          requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
         </h:panelGroup>
     </c:if>
+    <!--保养负责人-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerName')}" >
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
@@ -138,6 +139,48 @@
 
         </h:panelGroup>
     </c:if>
+
+
+<!--计量负责人-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'measuringOwner')}" >
+        <h:panelGroup >
+            <label class="label">计量负责人<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required? '*':''}</span></label>
+            <p:autoComplete id="measuringOwner" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwner')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+   <!--负责人-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'measuringOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.measuringOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required? '*':''}</span></label>
+            <p:autoComplete id="measuringOwnerName" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required}" requiredMessage="#{msg.measuringOwnerId} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this"/>
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'pmOwnerTel')}" >
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerTel'].required? '*':''}</span></label>
@@ -302,7 +345,7 @@
             <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</span></label>
             <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoEditController.completeParentAssetId}" required="#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required}" 
                          requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" forceSelection="true" readonly="#{!assetInfoEditController.needEdit('parentAssetId')}" class="SiteUIDChange clinicalDeptNameChange"
-                         var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
+                         var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}" converter="assetInfoConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onParentAssetChange()}"/>
                 <p:ajax listener="#{assetInfoEditController.onParentAssetChange()}" />
             </p:autoComplete>

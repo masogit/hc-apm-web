@@ -163,6 +163,14 @@ public class BlobFileService {
 
         return deleteBlobFile(token,blobObject);
     }
+    
+    public void deleteBlobFile(List<V2_BlobObject> listBlobObject){
+    	if(listBlobObject!=null && listBlobObject.size()>0){
+    		for(int i=0;i<listBlobObject.size();++i){
+    			deleteBlobFile(listBlobObject.get(i));
+    		}
+    	}
+    }
 
 
     public List<V2_BlobObject> getBlobObjectsByStorageId(String storagedId) {

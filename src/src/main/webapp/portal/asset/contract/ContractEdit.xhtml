@@ -106,6 +106,12 @@
                                     </p:inputText>
                                 </h:panelGroup>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">报告号</label>
+                                <p:inputText value="#{contractInfoEditController.selected.reportNum}" >
+                                    <p:ajax process="@this" />
+                                </p:inputText>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
                             <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">

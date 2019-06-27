@@ -29,6 +29,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -61,6 +62,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
     private SmallAssetPerformanceConfig editConfig;
     private AssetInfoService assetInfoService;
     private boolean blnSaveable=false;
+    private AutoCompleteService autoCompleteService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(SmallAssetPerformanceConfigRepository.class);
@@ -71,6 +73,7 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(currentUser.getSiteUID());
         assetInfoList=service.getAccessAssetInfo(currentUser.getSiteUID(),true);
+        autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
     }
 
     @Override
@@ -348,6 +351,10 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
         }
         checkSaveable();
     }
+	
+	public List<AssetInfo> autoCompleteAssetName(String query){
+		return autoCompleteService.completeAssetInfoList(query, assetInfoList);
+	}
 	@Override
 	protected String getActionMessage(String actionName) {
 		// TODO Auto-generated method stub

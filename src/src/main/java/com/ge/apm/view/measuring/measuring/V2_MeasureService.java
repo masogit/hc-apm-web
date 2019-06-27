@@ -128,7 +128,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
     }
 
     public List<MeasuringOrderCoworker> getWorkOrderCoworker(String woId) {
-        return workOrderCoworkerMeaRepository.findByWoId(woId);
+        return workOrderCoworkerMeaRepository.findByOrderId(woId);
     }
     public void closePM( MeasuringOrder selectedPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();
@@ -170,7 +170,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
 
         formData.setDesc(desc);
-
+        formData.setOrderId(selectedMeasureOrder.getId());
         String res = srApi.invokeMeasureOrderCancel(token,formData,"cancel",selectedMeasureOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
@@ -214,6 +214,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         }
         //一次性
         formData.setMeasuringType(2);
+        formData.setRuleLevel(3);
         createMeasureRequestApi(assetUID, formData);
     }
 
@@ -263,7 +264,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
             formData.setStepId("Assign");
             formData.setAssignee(currentPersonIdBatch);
-            formData.setMeasureOrderId(item.getKey());
+            formData.setOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原
         });
@@ -290,7 +291,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         pmListTmp.stream().forEach(item->{
             MeasureOrderActionForm formData = new MeasureOrderActionForm();
             formData.setAttachments(picList);
-            formData.setMeasureOrderId(item.getId());
+            formData.setOrderId(item.getId());
             formData.setActionType("close");
             formData.setStepId(item.getCurrentStepId());
             //批量关单的都是合格pm，所以设置为1
@@ -349,7 +350,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             formData.setActionType("reAssign");
             formData.setStepId("Maintain");
             formData.setAssignee(currentPersonIdBatch);
-            formData.setMeasureOrderId(item.getKey());
+            formData.setOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原
         });
@@ -437,7 +438,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
         ArrayList<MeasureOrderActionForm> formDataList = new ArrayList<MeasureOrderActionForm>();
         batchPmOrderList.stream().forEach(item->{
             MeasureOrderActionForm formData = new MeasureOrderActionForm();
-            formData.setMeasureOrderId(item.getId());
+            formData.setOrderId(item.getId());
             if(item.getSimplify()!=null && item.getSimplify()==true){
                 formData.setActionType("simplify");
             }else{
@@ -525,7 +526,7 @@ public class V2_MeasureService extends MicroServiceInvoker {
             formData.setActionType("accept");
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
             formData.setStepId(v2.getCurrentStepId());
-            formData.setMeasureOrderId(item.getKey());
+            formData.setOrderId(item.getKey());
             formDataList.add(formData);
             item.setValue(false);//将选中的true 设置为false 还原
         });

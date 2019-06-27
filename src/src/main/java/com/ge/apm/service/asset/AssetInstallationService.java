@@ -287,7 +287,8 @@ public class AssetInstallationService {
     }
 
     public List<Supplier> getSupplierListBySiteUid(String siteUID) {
-        return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        return supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
+        //return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 //        if(Strings.isNullOrEmpty(siteUID)){
 //            return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 //        }else{
