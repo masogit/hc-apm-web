@@ -360,6 +360,11 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "aa_default_return_man_hour")
     private Double defaultReturnManHour = 0.0D;
 
+    @Getter
+    @Setter
+    @Column(name = "aa_enable_log_patient_info")
+    private Boolean enableLogPatientInfo = Boolean.FALSE;
+
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;
     }

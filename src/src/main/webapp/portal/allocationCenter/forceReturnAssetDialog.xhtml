@@ -74,6 +74,16 @@
                         <p:inputNumber value="#{sharedAssetStockController.selected.sharedAssetReqDetail.compensationAmount}" decimalPlaces="2" emptyValue="0" minValue="0">
                         </p:inputNumber>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
+                        <label class="label">病人号*</label>
+                        <p:inputText value="#{sharedAssetStockController.selected.sharedAssetReqDetail.patientNum}"
+                                     required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
+                        <label class="label">床号*</label>
+                        <p:inputText value="#{sharedAssetStockController.selected.sharedAssetReqDetail.patientBedNum}"
+                                     required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>
                         <p:inputTextarea rows="3" cols="30" value="#{sharedAssetStockController.selected.sharedAssetReqDetail.reqComment}" />
