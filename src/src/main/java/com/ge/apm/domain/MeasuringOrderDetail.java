@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Entity
@@ -141,7 +145,12 @@ public class MeasuringOrderDetail implements Serializable, Cloneable{
     
     @Column(name = "mvs_price")
 	private Double mvsPrice;
-    
+
+
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50, updatable = false)
+    @JsonIgnore
+    private String createdBy = "system";
 //    @Transient
    /* @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
@@ -149,12 +158,38 @@ public class MeasuringOrderDetail implements Serializable, Cloneable{
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action= NotFoundAction.IGNORE)
     private V2_WorkOrder v2WorkOrder;*/
-    
+
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", length = 50)
+    private String lastModifiedBy;
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @Column(name = "last_modified_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModifiedDate;
+
+
+
+    @Column(name="mvs_application")
+    private Boolean mvsApplication;
+
+
     @Transient
     private OrgInfo hospitalOrg;
     
     @Transient
     private OrgInfo siteOrg;
+
+
+    public Boolean getMvsApplication() {
+        return mvsApplication;
+    }
+
+    public void setMvsApplication(Boolean mvsApplication) {
+        this.mvsApplication = mvsApplication;
+    }
 
     public String getInvoiceNum() {
         return invoiceNum;
@@ -445,7 +480,16 @@ public class MeasuringOrderDetail implements Serializable, Cloneable{
 		this.siteOrg = siteOrg;
 	}
 
-	@Override
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof MeasuringOrderDetail)) {
@@ -463,4 +507,19 @@ public class MeasuringOrderDetail implements Serializable, Cloneable{
         return super.clone();
     }
 
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 }
