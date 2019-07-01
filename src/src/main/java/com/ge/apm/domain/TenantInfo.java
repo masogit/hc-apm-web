@@ -107,6 +107,9 @@ public class TenantInfo implements Serializable {
     
     @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
+    
+    @Transient
+    private String cpmURL;
 
     public Integer getType() {
 		return type;
@@ -325,6 +328,14 @@ public class TenantInfo implements Serializable {
 
 	public void setTenantConfig(String tenantConfig) {
 		this.tenantConfig = tenantConfig;
+	}
+
+	public String getCpmURL() {
+		return cpmURL;
+	}
+
+	public void setCpmURL(String cpmURL) {
+		this.cpmURL = cpmURL;
 	}
 
 	@Override
