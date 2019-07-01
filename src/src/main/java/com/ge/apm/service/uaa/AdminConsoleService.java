@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +21,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BatchJobRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
@@ -33,6 +35,7 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.BatchJob;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
@@ -90,6 +93,9 @@ public class AdminConsoleService {
 	
 	@Autowired
 	I18nMessageRepository i18nRepository;
+	
+	@Autowired
+	BatchJobRepository batchJobRepository;
 	
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
 	
@@ -352,5 +358,15 @@ public class AdminConsoleService {
 				logger.info("update nurseSiteMaintain size:"+listMaintain.size());
 			}
 		}
+	}
+	
+	public void dailyUpdateNurseSiteJob(Date date){
+		BatchJob batchJob = new BatchJob();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+		batchJob.setContent(sdf.format(date));
+		batchJob.setSubName("dailyUpdate");
+		batchJob.setCreateTime(new Date());
+		batchJob.setName(BatchJob.NAME_NURSESITE);
+		batchJobRepository.save(batchJob);
 	}
 }

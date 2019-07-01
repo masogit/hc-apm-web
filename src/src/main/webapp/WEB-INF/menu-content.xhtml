@@ -97,6 +97,7 @@
             </p:submenu>
             <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('performance')}">
                 <p:menuitem id="um381" value="设备管理大屏" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContains('performance.bigScreen')}" />
+                <p:menuitem id="um382" value="设备运营管理" outcome="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('performance.CPM')}" />
                 <p:menuitem id="um240" value="科务管理" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContains('performance.deptMgt')}"/>
                 <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContains('performance.scan')}"/>
                 <p:menuitem id="um17" value="#{msg.DeviceDowntimeAnalysis}" outcome="/empty" rendered="false"/>

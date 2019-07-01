@@ -16,6 +16,10 @@
 						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 					</p:selectOneMenu>
 				</h:panelGroup>
+				<h:panelGroup rendered="#{tenantInfoController.tenantConfigService.assetMgt}">
+					<label class="label">设备运营管理链接</label>
+					<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
+				</h:panelGroup>
 			</p:panelGrid>
 			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
 				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfigService.root}" selection="#{tenantInfoController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
