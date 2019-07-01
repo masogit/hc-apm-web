@@ -180,6 +180,15 @@ public class TenantInfoConfigService {
 			if(key.equals("performance.bigScreen")){
 				tempItem.setValue(false);
 			}
+			if(key.equals("measure.console")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("measure.rule")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("measure.ruleMgt")){
+				tempItem.setValue(false);
+			}
 		}
 		if (root != null) {
 			buildRoot();
