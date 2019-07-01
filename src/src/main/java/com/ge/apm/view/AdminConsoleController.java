@@ -1,6 +1,8 @@
 package com.ge.apm.view;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -10,7 +12,7 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.BatchJob;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
@@ -47,6 +49,9 @@ public class AdminConsoleController {
 	@Getter
 	@Setter
 	private List<String> listSysRoleName;
+	@Getter
+	@Setter
+	private Date selectDate;
 	@Autowired
 	private AdminConsoleService adminConsoleService;
 	private SysRole currentSysRole;
@@ -149,6 +154,13 @@ public class AdminConsoleController {
 			versionLabelKey.add(listLabel.get(i)+","+listKey.get(i));
 		}
 	}
-	
+	public void dailyUpdateNurseSiteJob(){
+		if(selectDate==null){
+			Calendar ca=Calendar.getInstance();
+			selectDate=ca.getTime();
+		}
+		adminConsoleService.dailyUpdateNurseSiteJob(selectDate);
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 	
 }
