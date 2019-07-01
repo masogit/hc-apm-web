@@ -1694,6 +1694,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'common', '通用版', 'Common Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'business', '业务版', 'Business Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'ultrasound', '超声科室版', 'Ultrasound Dept', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'assetMgt', '设备运营管理', 'Asset Management', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Open', 'Open', 'Open', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Assigned', 'Assigned', 'Assigned', NULL, '-1');
@@ -1798,6 +1799,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'knowledge.mgt', '文档管理', 'knowledge.mgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance', '绩效分析', 'performance', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.bigScreen', '设备管理大屏', 'performance.bigScreen', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.CPM', '设备运营管理', 'performance.CPM', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.deptMgt', '科务管理', 'performance.deptMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.scan', '状态监控', 'performance.scan', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.CT', 'CT球管预测', 'performance.CT', NULL, '-1');
