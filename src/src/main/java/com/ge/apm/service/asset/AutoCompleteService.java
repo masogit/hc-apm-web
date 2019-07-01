@@ -27,7 +27,7 @@ public class AutoCompleteService {
 
     
     public List<Supplier> autoCompleteVendor(String query,List<Supplier> supplierList) {
-        List<Supplier> res = supplierList.stream().filter(item -> item.getSupplierT() != null && item.getSupplierT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> (item.getSupplierT() != null)||(item.getManufacturerT() != null)||(item.getMaintainerT() != null)).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -79,6 +79,7 @@ public class AutoCompleteService {
                 || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) 
                 || item.getQrCode() != null && item.getQrCode().contains(query)
                 || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                || item.getSerialNum() != null && item.getSerialNum().contains(query)
                 || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
     	res.sort(new PinYinComparatorByName());
     	return res;

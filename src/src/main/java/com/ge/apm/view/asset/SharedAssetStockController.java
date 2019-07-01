@@ -236,6 +236,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             .distinct()
             .collect(Collectors.toList());
     }
+
+    public Boolean isLogPatientInfoEnabled() {
+        return sharedAssetStockService.isLogPatientInfoEnabled();
+    }
     
     private Boolean isValid301 = null;
             

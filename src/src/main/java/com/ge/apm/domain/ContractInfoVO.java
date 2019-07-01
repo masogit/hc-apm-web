@@ -18,8 +18,8 @@ public class ContractInfoVO extends ContractInfo {
     public boolean isNull() {
         boolean flag = false;
 
-        if(this.getName() == null && this.getName() == null && this.getAmount() == null && this.getContractNum() == null && this.getStartDate() == null
-                && this.getEndDate() == null && this.getEndMonths() == null && this.getSupplierName() == null && this.getForeignTradeNum() == null && this.getInvoiceNum() == null){
+        if(this.getName() == null && this.getAmount() == null && this.getContractNum() == null && this.getStartDate() == null && this.getEndDate() == null
+                && this.getEndMonths() == null && this.getSupplierName() == null && this.getForeignTradeNum() == null && this.getInvoiceNum() == null && this.getReportNum() == null){
             flag = true;
         }
 
@@ -39,6 +39,7 @@ public class ContractInfoVO extends ContractInfo {
         str += (this.getSupplierName() != null ? this.getSupplierName().toString() : "");
         str += (this.getForeignTradeNum() != null ? this.getForeignTradeNum().toString() : "");
         str += (this.getInvoiceNum() != null ? this.getInvoiceNum().toString() : "");
+        str += (this.getReportNum() != null ? this.getReportNum().toString() : "");
 
         return str.hashCode();
     }

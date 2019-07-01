@@ -80,13 +80,12 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}else{
 			searchFilters = new ArrayList<>();
 		}
-/*		List<SearchFilter> userFilters = userCommonService.getUserLogicFilters(loginUserOrgType,user);
-		searchFilters.addAll(userFilters);*/
 		if(StringUtils.isNotEmpty(queryCondition)){
 			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
 		}else {
 			//searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,findAssetUidBySearchFilter(getFilter(user.getSiteUID()))));
 			searchFilters.addAll(getOrgFilter(user.getSiteUID()));
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, getInvalidAssets(user.getTenantUID())));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
@@ -95,6 +94,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		return result;
 	}
 
+	private List<String> getInvalidAssets(String tenantUID) {
+		List<String> invalidAssetUids = assetInfoRepository.getInvalidAssets(tenantUID,Lists.newArrayList(4,5,6));
+		if(CollectionUtils.isEmpty(invalidAssetUids)){
+			return new ArrayList<>();
+		}
+		return invalidAssetUids;
+	}
 
 
 	public List<String> findAssetUidBySearchFilter(List<SearchFilter> searchAssetFilters){
