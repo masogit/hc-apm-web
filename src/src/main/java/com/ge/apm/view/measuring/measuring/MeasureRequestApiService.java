@@ -58,7 +58,7 @@ public class MeasureRequestApiService extends MicroServiceInvoker {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         String gatewayURL = getGatewayURL(GatewayURL.MEASURE_ORDER_STEPS);
-        String url = gatewayURL.replace("{measureOrderId}",measureOrderId);
+        String url = gatewayURL.replace("{OrderId}",measureOrderId);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
