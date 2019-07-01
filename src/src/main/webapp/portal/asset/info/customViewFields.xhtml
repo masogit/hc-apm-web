@@ -153,6 +153,14 @@
             <p:inputText id="nationalStandardCode" value="#{assetInfoDetailController.selected.nationalStandardCode}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <!--计量负责人-->
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'measuringOwner')}" >
+        <h:panelGroup >
+            <label class="label">计量负责人</label>
+            <p:inputText id="measuringOwnerId" value="#{assetInfoDetailController.selected.measuringOwnerName}" readonly="true"/>
+
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'parentAssetId')}">
         <h:panelGroup >
             <label class="label">#{msg.parentAsset}</label>

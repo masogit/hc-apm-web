@@ -105,6 +105,22 @@
                 </p:dataTable>
                 </p:fieldset>
 
+                <p:fieldset legend="患者信息" style="margin-bottom:20px">
+                    <p:dataTable id="patientInfo" value="#{sharedAssetRequestV2Controller.selected.sartList}"
+                                 var="item" widgetVar="varDataListDetail"
+                                 selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
+                                 paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 lazy="true" rowKey="#{item.swapName.hashCode()}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+
+                    </p:dataTable>
+                </p:fieldset>
+
                 <h:panelGroup id="display">
                     <br/>
                    

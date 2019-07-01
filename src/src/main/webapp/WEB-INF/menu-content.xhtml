@@ -75,11 +75,12 @@
             </p:submenu>
             <p:submenu id="um5024" label="#{msg.计量管理}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.accessContains('measure')}">
 
-                <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.config')}"/>
+              <!--  <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.config')}"/>-->
+                <p:menuitem id="um404" value="计量工作台" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.console')}"/>
                 <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.accessContains('measure.categoryConfig')}"/>
                 <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml" rendered="#{userContextService.accessContains('measure.info')}"/>
                 <p:menuitem id="um402" value="#{msg.MeasureOrderRule}" outcome="/portal/measureOrderRule/List.xhtml" rendered="#{userContextService.accessContains('measure.rule')}"/>
-                <p:menuitem id="um403" value="#{msg.MeasureRuleManager}" outcome="/portal/measureOrderRule/relMeasureRule/List.xhtml" rendered="#{userContextService.accessContains('measure.ruleMgt')}"/>
+                <p:menuitem id="um403" value="资产规则管理" outcome="/portal/measureOrderRule/relMeasureRule/List.xhtml" rendered="#{userContextService.accessContains('measure.ruleMgt')}"/>
             </p:submenu>
             <p:submenu id="um70" label="临床助手" icon="fa fa-file-excel-o" rendered="#{userContextService.accessContains('nurseSite')}">
                        <p:menuitem id="um701" value="日常检查" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.maintain')}"/>
@@ -136,7 +137,7 @@
                 <p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/ownerConfigMain.xhtml" rendered="#{userContextService.accessContains('config.repairOwner')}"/>
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.accessContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
-                <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
+                <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
                 <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
                 <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
                 <p:menuitem id="um506" value="维修消息配置" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
@@ -151,7 +152,7 @@
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="采购管理" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.hasNotAnyRole('MVSFE')}"/>
             </p:submenu>
-            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('examineMgt')}">
+            <p:submenu id="um5000" label="检测管理" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('examineMgt') and (userContextService.isUltraSoundIBEndUser())}">
                     <p:menuitem id="um5001" value="探头检测" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.accessContains('examineMgt.pcc')}"/>
                     <p:menuitem id="um5002" value="探头检测配置" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.accessContains('examineMgt.pccConfig')}"/>
                     <p:menuitem id="um5003" value="SSO用户导入" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.accessContains('examineMgt.ssoImp')}"/>
