@@ -136,7 +136,7 @@ public class TenantInfoConfigService {
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
-				if (key.equals("performance.CPM")) {
+				if (key.equals("config.CPM")) {
 					tempItem.setValue(false);
 				}
 			} else if (edition.equals(VERSION_ULTRASOUND)) {
@@ -150,7 +150,7 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				} else if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
-				}else if (key.equals("performance.CPM")) {
+				}else if (key.equals("config.CPM")) {
 					tempItem.setValue(false);
 				}
 			} else if (edition.equals(VERSION_FUNCTION)) {
@@ -168,7 +168,7 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				} else if (key.equals("maintain.electricDataImport")) {
 					tempItem.setValue(false);
-				}else if (key.equals("performance.CPM")) {
+				}else if (key.equals("config.CPM")) {
 					tempItem.setValue(false);
 				}
 			}
