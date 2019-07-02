@@ -1805,7 +1805,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.import', '设备绩效导入', 'performance.import', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.BI', 'BI绩效分析平台', 'performance.BI', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config', '系统配置', 'config', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.CPM', '设备运营管理', 'performance.CPM', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.CPM', '设备运营管理', 'config.CPM', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.org', '组织机构管理', 'config.org', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.user', '用户管理', 'config.user', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.customRole', '自定义角色', 'config.customRole', NULL, '-1');
