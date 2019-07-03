@@ -44,7 +44,6 @@ public class TenantInfoConfigService {
 	private List<String> listLabel;
 	private TreeNode[] selectedNodes;
 	private String cpmURL;
-	private boolean isAssetMgt=false;
 	
 
 	@Autowired
@@ -136,9 +135,6 @@ public class TenantInfoConfigService {
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
-				if (key.equals("config.CPM")) {
-					tempItem.setValue(false);
-				}
 			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
@@ -149,8 +145,6 @@ public class TenantInfoConfigService {
 				} else if (key.equals("nurseSite")) {
 					tempItem.setValue(false);
 				} else if (key.contains("nurseSite.")) {
-					tempItem.setValue(false);
-				}else if (key.equals("config.CPM")) {
 					tempItem.setValue(false);
 				}
 			} else if (edition.equals(VERSION_FUNCTION)) {
@@ -167,8 +161,6 @@ public class TenantInfoConfigService {
 				} else if (key.equals("repair.vacationMgt")) {
 					tempItem.setValue(false);
 				} else if (key.equals("maintain.electricDataImport")) {
-					tempItem.setValue(false);
-				}else if (key.equals("config.CPM")) {
 					tempItem.setValue(false);
 				}
 			}
@@ -188,6 +180,20 @@ public class TenantInfoConfigService {
 			}
 			if(key.equals("measure.ruleMgt")){
 				tempItem.setValue(false);
+			}
+			if(key.equals("link")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("link.CPM")){
+				tempItem.setValue(false);
+			}
+			if (edition.equals(VERSION_ASSETMGT)) {
+				if(key.equals("link")){
+					tempItem.setValue(true);
+				}
+				if(key.equals("link.CPM")){
+					tempItem.setValue(true);
+				}
 			}
 		}
 		if (root != null) {
@@ -301,12 +307,6 @@ public class TenantInfoConfigService {
 		}
 		JSONObject jsonObj = JSONObject.parseObject(str);
 		edition = jsonObj.getString("edition");
-		if(edition.equals(VERSION_ASSETMGT)){
-			this.isAssetMgt=true;
-		}
-		else{
-			this.isAssetMgt=false;
-		}
 		this.cpmURL=jsonObj.getString("cpmURL");
 		JSONArray arr = jsonObj.getJSONArray("menuList");
 		List<TenantInfoConfigItem> tempListVersionItem = new ArrayList<TenantInfoConfigItem>();
@@ -414,12 +414,6 @@ public class TenantInfoConfigService {
 	public void setEdition(String edition) {
 		if (!edition.equals(this.edition)) {
 			this.edition = edition;
-			if(edition.equals(VERSION_ASSETMGT)){
-				this.isAssetMgt=true;
-			}
-			else{
-				this.isAssetMgt=false;
-			}
 			resetVersion();
 		}
 	}
@@ -457,14 +451,6 @@ public class TenantInfoConfigService {
 
 	public void setCpmURL(String cpmURL) {
 		this.cpmURL = cpmURL;
-	}
-
-	public boolean isAssetMgt() {
-		return isAssetMgt;
-	}
-
-	public void setAssetMgt(boolean isAssetMgt) {
-		this.isAssetMgt = isAssetMgt;
 	}
 	
 }

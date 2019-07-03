@@ -16,7 +16,7 @@
 						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 					</p:selectOneMenu>
 				</h:panelGroup>
-				<h:panelGroup rendered="#{tenantInfoController.tenantConfigService.assetMgt}">
+				<h:panelGroup>
 					<label class="label">设备运营管理链接</label>
 					<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
 				</h:panelGroup>
