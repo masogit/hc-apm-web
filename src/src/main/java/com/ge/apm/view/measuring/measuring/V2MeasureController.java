@@ -332,13 +332,6 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForApproval", true);
                  return result;
              }
-
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
-             if(result){
-                 WebUtil.addErrorMessage("jiliang不能批量完成");
-                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
-                 return result;
-             }
          }
          return result;
     }
