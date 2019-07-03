@@ -496,11 +496,20 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "pm_owner_id")
     private Integer pmOwnerId;//保养负责人
 
+    @Column(name = "measuring_owner_id")
+    private Integer measuringOwnerId;//计量负责人
+
     @Column(name = "pm_owner_name")
     private String pmOwnerName;
 
+    @Column(name = "measuring_owner_name")
+    private String measuringOwnerName;
+
     @Column(name = "pm_owner_tel")
     private String pmOwnerTel;
+
+    @Column(name = "measuring_owner_tel")
+    private String measuringOwnerTel;
 
     @Column(name = "mvs_equip")
     private Integer mvsEquip;
@@ -1772,6 +1781,8 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("assetInfoUID", this.getUid());
         reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
         reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
+        reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
+        reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
         return reqDetail;
     }
 
@@ -1793,7 +1804,17 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("isIntact", this.getSharedAssetReqDetail().getIntact());
         reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
         reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
+        reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
+        reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
         return reqDetail;
+    }
+
+    public Integer getMeasuringOwnerId() {
+        return measuringOwnerId;
+    }
+
+    public void setMeasuringOwnerId(Integer measuringOwnerId) {
+        this.measuringOwnerId = measuringOwnerId;
     }
 
     /*public MvsAssetInfo getMvsAssetInfo() {
@@ -1829,6 +1850,36 @@ public class AssetInfo implements ChineseName,Serializable {
                 warrantyAlertStatus = "warrantyExpired";
             else if(dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
+        }
+    }
+
+    public String getMeasuringOwnerName() {
+        return measuringOwnerName;
+    }
+
+    public void setMeasuringOwnerName(String measuringOwnerName) {
+        this.measuringOwnerName = measuringOwnerName;
+    }
+
+    public String getMeasuringOwnerTel() {
+        return measuringOwnerTel;
+    }
+
+    public void setMeasuringOwnerTel(String measuringOwnerTel) {
+        this.measuringOwnerTel = measuringOwnerTel;
+    }
+
+    public String getParentAssetDisplayName() {
+
+        return makeEmptyStringIfNull(this.getName()) + "/" + makeEmptyStringIfNull(this.getQrCode()) + "/" + makeEmptyStringIfNull(this.getSerialNum());
+
+    }
+
+    private String makeEmptyStringIfNull(String input) {
+        if (input == null) {
+            return "";
+        } else {
+            return input;
         }
     }
 }

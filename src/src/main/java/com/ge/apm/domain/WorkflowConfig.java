@@ -111,6 +111,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_manhour_price")
     private Double woManhourPrice;
 
+    @Column(name = "not_send_msg_in_take_order_mode")
+    private Boolean notSendMsgInTakeOrderMode;//抢单模式下不发消息 true:不发 false：发
+
     /****for pm *****/
     @Column(name = "pm_manhour_price")
     private Double pmManhourPrice;
@@ -161,6 +164,114 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "hour_required")
     private Boolean hourRequired = true;// 工时必填
+
+
+    /***
+     * for measure
+     * begin
+     */
+    @Column(name = "measure_manhour_price")
+    private Double measureManhourPrice;
+
+    @Column(name = "is_measure_take_order_enabled")
+    private Boolean isMeasureTakeOrderEnabled; //是否允许抢单
+
+    @Column(name = "is_measure_manual_enabled")
+    private Boolean isMeasureManualEnabled; //是否人工派工
+
+    @Column(name = "is_measure_auto_enabled")
+    private Boolean isMeasureAutoEnabled; //是否自动派工
+
+    @Column(name = "measure_dispatch_user_id")
+    private Integer measureDispatchUserId;
+
+    @Column(name = "measure_dispatch_user_name")
+    private String measureDispatchUserName;
+
+    @Column(name = "measure_dispatch_user_id2")
+    private Integer measureDispatchUserId2;
+
+    @Column(name = "measure_dispatch_user_name2")
+    private String measureDispatchUserName2;
+
+    public Boolean getNotSendMsgInTakeOrderMode() {
+        return notSendMsgInTakeOrderMode;
+    }
+
+    public void setNotSendMsgInTakeOrderMode(Boolean notSendMsgInTakeOrderMode) {
+        this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
+    }
+
+
+
+    public Double getMeasureManhourPrice() {
+        return measureManhourPrice;
+    }
+
+    public void setMeasureManhourPrice(Double measureManhourPrice) {
+        this.measureManhourPrice = measureManhourPrice;
+    }
+
+    public Boolean getIsMeasureTakeOrderEnabled() {
+        return isMeasureTakeOrderEnabled;
+    }
+
+    public void setIsMeasureTakeOrderEnabled(Boolean measureTakeOrderEnabled) {
+        isMeasureTakeOrderEnabled = measureTakeOrderEnabled;
+    }
+
+    public Boolean getIsMeasureManualEnabled() {
+        return isMeasureManualEnabled;
+    }
+
+    public void setIsMeasureManualEnabled(Boolean measureManualEnabled) {
+        isMeasureManualEnabled = measureManualEnabled;
+    }
+
+    public Boolean getIsMeasureAutoEnabled() {
+        return isMeasureAutoEnabled;
+    }
+
+    public void setIsMeasureAutoEnabled(Boolean measureAutoEnabled) {
+        isMeasureAutoEnabled = measureAutoEnabled;
+    }
+
+    public Integer getMeasureDispatchUserId() {
+        return measureDispatchUserId;
+    }
+
+    public void setMeasureDispatchUserId(Integer measureDispatchUserId) {
+        this.measureDispatchUserId = measureDispatchUserId;
+    }
+
+    public String getMeasureDispatchUserName() {
+        return measureDispatchUserName;
+    }
+
+    public void setMeasureDispatchUserName(String measureDispatchUserName) {
+        this.measureDispatchUserName = measureDispatchUserName;
+    }
+
+    public Integer getMeasureDispatchUserId2() {
+        return measureDispatchUserId2;
+    }
+
+    public void setMeasureDispatchUserId2(Integer measureDispatchUserId2) {
+        this.measureDispatchUserId2 = measureDispatchUserId2;
+    }
+
+    public String getMeasureDispatchUserName2() {
+        return measureDispatchUserName2;
+    }
+
+    public void setMeasureDispatchUserName2(String measureDispatchUserName2) {
+        this.measureDispatchUserName2 = measureDispatchUserName2;
+    }
+
+    /***
+     * for measure
+     * end
+     */
 
 
 
@@ -248,6 +359,11 @@ public class WorkflowConfig implements Serializable {
     @Setter
     @Column(name = "aa_default_return_man_hour")
     private Double defaultReturnManHour = 0.0D;
+
+    @Getter
+    @Setter
+    @Column(name = "aa_enable_log_patient_info")
+    private Boolean enableLogPatientInfo = Boolean.FALSE;
 
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;
