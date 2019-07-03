@@ -88,6 +88,14 @@
                             </h:outputText>
                         </p:column>
 
+                        <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
+                        </p:column>
+
+                        <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}" />
+                        </p:column>
+
                         <p:column headerText="单价" sortBy="#{asset.req_unit_price}">
                             <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                         </p:column>
@@ -110,14 +118,6 @@
                             <h:outputText value="#{asset.sharedAssetReqDetail.totalAmount}">
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputText>
-                        </p:column>
-
-                        <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
-                            <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
-                        </p:column>
-
-                        <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}">
-                            <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}" />
                         </p:column>
 
                         <p:column headerText="#{msg.Actions}" width="16%">

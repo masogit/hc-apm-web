@@ -108,17 +108,17 @@
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="单价">
-                                        <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
-                                    </p:column>
-                                    <p:column headerText="计价方式">
-                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
-                                    </p:column>
                                     <p:column headerText="病人号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
                                     </p:column>
                                     <p:column headerText="床号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
+                                    </p:column>
+                                    <p:column headerText="单价">
+                                        <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
+                                    </p:column>
+                                    <p:column headerText="计价方式">
+                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
                                     </p:column>
                                     <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableLeasePrintCol()}">
 										<p:commandButton value="打印" ajax="false"
@@ -264,6 +264,12 @@
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="病人号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
+                                    </p:column>
+                                    <p:column headerText="床号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
+                                    </p:column>
                                     <p:column headerText="单价">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                                     </p:column>
@@ -274,23 +280,15 @@
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getFormattedRentalTime()}"/>
                                     </p:column>
                                     <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableReturnPrintCol()}">
-										<p:commandButton value="打印" ajax="false"
-											actionListener="#{sharedAssetStockController.printVoucher(asset)}"
-											rendered="true">
-											<p:fileDownload
-												value="#{sharedAssetStockController.exportPdf}" />
-										</p:commandButton>
+                                        <p:commandButton value="打印" ajax="false"
+                                          actionListener="#{sharedAssetStockController.printVoucher(asset)}"
+                                          rendered="true">
+                                          <p:fileDownload
+                                            value="#{sharedAssetStockController.exportPdf}" />
+                                        </p:commandButton>
                                     </p:column>
-                                    
                                     <p:column headerText="当前费用" visible="false">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getRentalAmount()}"/>
-                                    </p:column>
-
-                                    <p:column headerText="病人号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
-                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
-                                    </p:column>
-                                    <p:column headerText="床号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
-                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
                                     </p:column>
 
                                     <f:facet name="{Toolbar}">
