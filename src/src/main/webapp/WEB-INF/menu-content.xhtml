@@ -119,9 +119,10 @@
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
+            <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContains('link')}">
+            	<p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('link.CPM')}" ></p:menuitem>
+            </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
-            	<p:menuitem id="um382" value="设备运营管理" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('config.CPM')}" >
-                </p:menuitem>
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
@@ -146,7 +147,6 @@
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.qrCode')}"/>
                 <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin')}"/>
                 <p:menuitem id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.accessContains('config.customRole')}"/>
-                
             </p:submenu>
             <p:submenu id="um3000" label="MVS设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="基本信息" outcome="/portal/asset/info/AssetList"/>
