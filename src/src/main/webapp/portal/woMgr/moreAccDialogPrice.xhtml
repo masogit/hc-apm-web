@@ -44,7 +44,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">供应商</label>
+                        <label class="label">发票提供方</label>
                         <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300" forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
@@ -136,7 +136,7 @@
                         <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">供应商</label>
+                        <label class="label">发票提供方</label>
                         <p:autoComplete id="vendorView" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300" forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />

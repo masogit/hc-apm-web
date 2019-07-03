@@ -167,6 +167,10 @@ public class CustomConfigController {
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
+            case "WebMaintainFieldsList":
+                addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
+                break;
             case "RemoveMobileWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
@@ -332,6 +336,12 @@ public class CustomConfigController {
                         ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
+            case "MobileWorkOrderFieldsListWeb":
+                JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                                .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
+                break;
+
             case "RemoveMobileWorkOrderFieldsList":
                 JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
                         ((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))

@@ -84,7 +84,7 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('pmRuleStatus',item.status)}"/>
 	                 </p:column>
-	                 <p:column headerText="规则级别" sortBy="#{msg.level}" filterBy="#{msg.level}" filterMatchMode="EQ">
+	                 <!--<p:column headerText="规则级别" sortBy="#{msg.level}" filterBy="#{msg.level}" filterMatchMode="EQ">
                     	    <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{measureOrderRuleController.filterPmRuleLevel}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -92,7 +92,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',item.level)}"/>
-	                 </p:column>
+	                 </p:column>-->
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{measureOrderRuleController.prepareCreate}" update=":MeasureOrderRuleEditForm" oncomplete="PF('MeasureOrderRuleEditDialog').show()"/>
                         <!-- <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{measureOrderRuleController.prepareView}" update=":measureOrderRuleViewDlg" oncomplete="PF('measureOrderRuleViewDialog').show()" disabled="#{empty measureOrderRuleController.selected}"/> -->

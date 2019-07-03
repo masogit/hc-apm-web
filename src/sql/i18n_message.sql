@@ -687,6 +687,17 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '31', '测试仪', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '32', '移液器', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '33', '婴儿培养箱', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '34', '普通压力表', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '35', '精密压力表', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '36', '安全阀', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '37', '压力容器', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '38', '高压氧舱', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '39', '血压计（电子）', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '40', '血压计（水银）', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '41', '流量计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '42', '超声诊断设备', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '43', '数字心电图', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '44', '放射类', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringStatus', '1', '合格', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringStatus', '2', '不合格', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringStatus', '3', '无结果', '', NULL, '-1');
@@ -1491,10 +1502,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('executable', '2', '不可执行', 'cannot execute', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoNeedDispather', '维修配置中允许派工时派工人不能为空!', 'Dispather should not be null when wo dispath-mode is manul', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmNeedDispather', '保养配置总允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmNeedDispather', '保养配置中允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MeasureNeedDispather', '计量配置中允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoManualAndGrapMsg', '维修配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for wo manual or grap mode! ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmManualAndGrapMsg', '保养配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MeasureManualAndGrapMsg', '计量配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
 
 insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','1','自有资金','capitalSource21','-1');
 insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','2','合资公司资金','capitalSource22','-1');
@@ -1641,7 +1653,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'hasUsers', '租户下有关联用户，不能删除！', 'tenant cannot be deleted if having users !', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerName', '保养负责人', 'PM Owner Name', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringOwnerName', '计量负责人', 'Measuring Owner Name', NULL, '-1');
+
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'pmOwnerTel', '保养负责人电话', 'PM Owner Tel', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringOwnerTel', '计量负责人电话', 'measuring Owner Tel', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'acceptDate', '验收日期', 'Accept Date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'warrantyMonth', '质保时间（月）', 'Warranty Time(Month)', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'invoiceNum', '发票号', 'Invoice No.', NULL, '-1');
@@ -1785,6 +1801,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'maintain.reportMgt', '报告模版管理', 'maintain.reportMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'maintain.reportFormMgt', '报表模版管理', 'maintain.reportFormMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure', '计量管理', 'measure', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.console', '计量工作台', 'measure.console', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.categoryConfig', '计量类别设置', 'measure.categoryConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.info', '计量信息', 'measure.info', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.rule', '计量规则', 'measure.rule', NULL, '-1');
@@ -1873,3 +1890,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measureTypeWeb', '2', '一次性', 'Disposable', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measureTypeWeb', '3', '重测', 'ReSurvey', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measureTypeWeb', '1', '周期性', 'period', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringOwner', '计量负责人', 'measuring owner', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.console', '计量工作台', 'measure.console', NULL, '-1');

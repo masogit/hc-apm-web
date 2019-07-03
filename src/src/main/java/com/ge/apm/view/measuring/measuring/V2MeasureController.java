@@ -335,7 +335,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
 
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
              if(result){
-                 WebUtil.addErrorMessage("3级保养工单不能批量完成");
+                 WebUtil.addErrorMessage("jiliang不能批量完成");
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
@@ -695,7 +695,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             if (null != planTime) {
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
-            formData.setRuleLevel(ruleLevel);
+            if(ruleLevel==null)
+                formData.setRuleLevel(3);
+            else
+                formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setMeasuringType(measureType);
             Map<String, Object> res = measureOrderService.createMeasureRequestApi(selectedAsset.getUid(), formData);
@@ -1089,7 +1092,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         }
         if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*4+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"measuringNum"));
@@ -1603,7 +1606,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
         //调用微服务删除备件
-        serviceRequestApiService.delAccess(token,itemId);
+        serviceRequestApiService.delAccessMeasuring(token,itemId);
     }
 
     public void prepareBatchComplete() {
@@ -1616,7 +1619,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         if ("new".equals(itemId)) {
             coWorkerDetail = new MeasuringOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-            coWorkerDetail.setWoId(selectedMeasureOrder.getId());
+            coWorkerDetail.setOrderId(selectedMeasureOrder.getId());
         } else {
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }

@@ -98,7 +98,7 @@
                                     </p:commandButton>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{qualityCtrlOrderController.selected.paperUrl == null}">
-                                    <p:fileUpload id="type1" fileUploadListener="#{qualityCtrlOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                    <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{qualityCtrlOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                   multiple="false"  sizeLimit="10000000"  update=":InspectionOrderEditForm:attchmentFile" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </h:panelGroup>

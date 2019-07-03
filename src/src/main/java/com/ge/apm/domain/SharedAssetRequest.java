@@ -6,6 +6,8 @@
 package com.ge.apm.domain;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
@@ -22,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Formula;
 import webapp.framework.web.WebUtil;
 
@@ -138,6 +141,9 @@ public class SharedAssetRequest implements Serializable{
 
     @Column(name = "effort")//工时
     private Double effort;
+
+    @Column(name = "req_patients_info")//申请调剂设备时记录对应患者
+    private String req4PatientsInfo;
 
     public String getId() {
         return id;
@@ -524,4 +530,21 @@ public class SharedAssetRequest implements Serializable{
     public void setEffort(Double effort) {
         this.effort = effort;
     }
+
+    public String getReq4PatientsInfo() {
+        return req4PatientsInfo;
+    }
+
+    public void setReq4PatientsInfo(String req4PatientsInfo) {
+        this.req4PatientsInfo = req4PatientsInfo;
+    }
+
+    public List<PatientInfo> getPatientList() {
+        List patientInfoList = null;
+        if(StringUtils.isNotBlank(req4PatientsInfo)) {
+            patientInfoList = JSONArray.parseArray(req4PatientsInfo, PatientInfo.class);
+        }
+        return patientInfoList;
+    }
+
 }

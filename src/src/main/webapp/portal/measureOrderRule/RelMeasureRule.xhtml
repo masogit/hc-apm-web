@@ -104,13 +104,13 @@
                            </p:inputText>
                        </h:panelGroup>
 
-                      <h:panelGroup >
+                      <!--<h:panelGroup >
                             <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
                             <p:selectOneRadio id="deviceStatus" value="#{relMeasureRuleController.queryAsset.ruleStatus}" >
                                     <p:ajax listener="#{relMeasureRuleController.addFilter()}" update="queryCondition AssetsPickList" process="@this"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneRadio>
-                      </h:panelGroup>
+                      </h:panelGroup>-->
 
 <!--                       <h:panelGroup id="queryLevel" rendered="#{relMeasureRuleController.queryAsset.ruleStatus != null}">
                            <label class="label">规则等级</label>
