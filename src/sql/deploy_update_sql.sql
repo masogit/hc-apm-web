@@ -365,3 +365,7 @@ update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.an
 
 alter table user_login_info alter user_agent type character(500);
 insert into ole_alert_config (id, error_code, message) values ('0ba6a478745d4151897d711188bc4966', 'mrquench', '设备严重故障，请立即联系GE工程师');
+
+--v19.7.1
+update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,repair,repair.reportMgt,maintain,maintain.reportFormMgt,maintain.reportMgt,config,config.CPM,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.ssoImp' where name = 'LocalITAdmin';
+update sys_role set menus='homePage,repair,repair.reportMgt,config,config.CPM,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.pcc,examineMgt.ssoImp' where name = 'ITAdmin';
