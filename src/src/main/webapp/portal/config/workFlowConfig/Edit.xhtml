@@ -297,6 +297,14 @@
                     <p:fieldset id="ac" legend="设备调剂配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup rendered="true">
+                                <label class="label">调剂中心</label>
+                                <p:selectOneMenu id="deptForSharedAsset" value="#{workflowConfigController.selected.deptForSharedAsset}">
+                                    <p:ajax process="@this" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workflowConfigController.dispatherClinical}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="true">
                                 <label class = "label">是否计算借用工时</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableLeaseManHour}">
                                     <p:ajax process="@this" />
@@ -322,6 +330,38 @@
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
+
+                            <h:panelGroup>
+                                <label class = "label">自动确认时间（分钟）</label>
+                                <p:inputNumber id="shareAutoConfirm" value="#{workflowConfigController.selected.shareAutoConfirm}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">开始时间</label>
+                                <p:inputText id="periodStart" value="#{workflowConfigController.selected.periodStart}" placeholder="08:00"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">结束时间</label>
+                                <p:inputText id="periodEnd" value="#{workflowConfigController.selected.periodEnd}" placeholder="20:00"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup >
+                                <label class = "label">是否开启调剂服务?</label>
+                                <p:selectBooleanCheckbox value="#{workflowConfigController.selected.openService}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class = "label">是否开启弹窗?</label>
+                                <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableHint}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">弹窗内容</label>
+                                <p:inputTextarea id="hintText" value="#{workflowConfigController.selected.hintText}" placeholder="20:00 - 08:00不受理调剂申请， 紧急情况请拨打021-66666666。"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -365,21 +405,6 @@
                                 	<p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
-                            <h:panelGroup rendered="true">
-                                <label class="label">调剂中心</label>
-                                <p:selectOneMenu id="deptForSharedAsset" value="#{workflowConfigController.selected.deptForSharedAsset}">
-                                    <p:ajax process="@this" />
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{workflowConfigController.dispatherClinical}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <label class = "label">调剂自动确认时间（分钟）</label>
-                                <p:inputNumber id="shareAutoConfirm" value="#{workflowConfigController.selected.shareAutoConfirm}" minValue="0" decimalPlaces="0">
-                                    <p:ajax process="@this" />
-                                </p:inputNumber>
-                            </h:panelGroup>
 
                             <h:panelGroup>
                                 <label class="label">三码配置</label>
