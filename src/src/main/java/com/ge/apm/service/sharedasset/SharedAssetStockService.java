@@ -64,7 +64,7 @@ public class SharedAssetStockService {
     private OrgInfoRepository orgInfoRepository;
     
     @Autowired
-	AssetInfoRepository assetInfoRepository;
+	  AssetInfoRepository assetInfoRepository;
 
     @Autowired
     private WorkflowConfigRepository wfCfigDao;

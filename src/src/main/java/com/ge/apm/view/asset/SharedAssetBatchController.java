@@ -223,8 +223,8 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                     SharedAssetReqDetail reqDetail = sharedAssetBatchService.findReqDetailByAsset(assetInfo);
                     if(reqDetail != null) {
                         reqDetail.setChargingEndTime(this.batchChargingEndDate);
-                        reqDetail.setPatientNum(this.patientNum);
-                        reqDetail.setPatientBedNum(this.patientBedNum);
+//                        reqDetail.setPatientNum(this.patientNum);
+//                        reqDetail.setPatientBedNum(this.patientBedNum);
                         assetInfo.setSharedAssetReqDetail(reqDetail);
                         OrgInfo assetDept = orgInfoMap.get(assetInfo.getAssetDeptUID());
                         assetInfo.setAssetDeptOrg(assetDept);

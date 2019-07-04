@@ -1,5 +1,7 @@
 
 package com.ge.apm.view;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
@@ -11,6 +13,8 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
@@ -79,7 +83,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     @Setter
     private SharedAssetReqDetail preSelectReqDetail;
 
-     public String getFilterApplyTime() {
+    @Getter
+    @Setter
+    private String notificationContent;
+
+    private String workflowConfigJson;
+
+    public String getFilterApplyTime() {
         return filterApplyTime;
     }
 
@@ -213,6 +223,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     }
                 }
             }
+            //JIRA#4576
+            workflowConfigJson = currentWorkflowConfig.getSwapCenterConfig();
+            notificationContent = JSON.parseObject(workflowConfigJson).getString("hintText");
         }
     }
 
@@ -1777,20 +1790,38 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     	String retrunUrl = "";
     	RequestContext requestContext = RequestContext.getCurrentInstance();
     	requestContext.addCallbackParam("showNotification", true);
-    	
-    	boolean onDuty = true;
-    	try {
-    		onDuty = sharedAssetService.onDuty();
-    	} catch(Exception ex) {
-    		ex.printStackTrace();
-    	}
-    	
-    	if(onDuty) {
-    		requestContext.addCallbackParam("showNotification", false);
-            requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
-            retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
-    	}
-    	
+
+      JSONObject scObject = JSON.parseObject(workflowConfigJson);
+    	String startTime = scObject.getString("periodStart");
+    	String endTime = scObject.getString("periodEnd");
+
+    	Boolean enableAllocateOperation = Boolean.TRUE;
+    	Boolean willShowNotification = Boolean.FALSE;
+    	String notificationContent = "";
+    	// process to check if operations in allocation center is enabled
+    	if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+          DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+          // catch parse exception
+          try {
+              LocalTime startLocalTime = LocalTime.parse(startTime);
+              LocalTime endLocalTime = LocalTime.parse(endTime);
+              LocalTime currentTime = LocalTime.now();
+              if(currentTime.isBefore(startLocalTime) || currentTime.isAfter(endLocalTime)) {
+                  // operations in allocation center may not be enabled
+                  enableAllocateOperation = scObject.getBoolean("openService");
+                  willShowNotification = scObject.getBoolean("enableHint");
+              }
+          } catch (Exception ex) {
+              logger.info("Configuration regarding to allocation center may be wrong: " + workflowConfigJson);
+          }
+      }
+
+    	requestContext.addCallbackParam("showNotification", willShowNotification);
+    	if(enableAllocateOperation) {
+          requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+          retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+      }
+
     	return retrunUrl;
     }
     
