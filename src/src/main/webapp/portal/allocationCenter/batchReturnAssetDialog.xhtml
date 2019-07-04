@@ -65,11 +65,11 @@
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
-                        <label class="label">病人号</label>
+                        <label class="label">病人号*</label>
                         <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.patientNum}"/>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
-                        <label class="label">床号</label>
+                        <label class="label">床号*</label>
                         <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.patientBedNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
