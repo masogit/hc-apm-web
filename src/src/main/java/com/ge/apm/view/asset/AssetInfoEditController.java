@@ -42,6 +42,16 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetDepreciationService;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -92,7 +102,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
+    @Getter
+    @Setter
     private List<Supplier> supplierList = Collections.emptyList();
+    @Getter
+    @Setter
+    private List<Supplier> manuList = Collections.emptyList();
+    @Getter
+    @Setter
+    private List<Supplier> mantainList = Collections.emptyList();
     private List<UserAccount> clinicalOwnerList;
     private List<V2_BlobObject> attachements;
     private ConfigService configService;
@@ -188,7 +206,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
+        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
+        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
 
         initGbTree();
         initOrgTree();
