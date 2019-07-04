@@ -9,11 +9,11 @@
     <ui:composition>
 
         <p:dialog class="repairCompleteDialog" id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
-            <h:form id="repairCompleteDialogForm" >
+            <h:form id="repairCompleteDialogForm" class="tform">
                 <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
 
 
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.recoveryTime}*</label>
                             <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true" value="#{workOrderMgrController.confirmedUpDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="恢复时间 #{msg.ValidationRequire}"></p:calendar>
@@ -23,6 +23,7 @@
                             <label class="label">#{msg.caseType}*</label>
                             <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                <!-- <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -31,10 +32,31 @@
                             <label class="label">维修结果*</label>
                             <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="维修结果 #{msg.ValidationRequire}">
                                 <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0)"/>
-                                <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
+
+                        <h:panelGroup>
+                            <label class="label">维修子状态*</label>
+                            <p:selectOneMenu id="subStatus"  value="#{workOrderMgrController.selectedWorkOrder.subStatus}" required="false" requiredMessage="维修子状态 #{msg.ValidationRequire}">
+                                <p:ajax   listener="#{workOrderMgrController.selectSubstatus()}" update="@(.tform)"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('subStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+
+
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
+                            <label class="label">开始时间</label>
+                            <p:calendar timeZone="GMT+8" label="开始时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
+                            <label class="label">结束时间</label>
+                            <p:calendar timeZone="GMT+8" label="结束时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup id="assetstatus">
