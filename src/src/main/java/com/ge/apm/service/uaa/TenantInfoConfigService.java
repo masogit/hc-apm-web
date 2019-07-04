@@ -249,8 +249,10 @@ public class TenantInfoConfigService {
 		}
 	}
 
+	//init method
 	public void init() {
 		initKeyLabel();
+		this.cpmURL="";
 		menuList = getListVersions();
 		setEdition(VERSION_COMMON);
 	}
@@ -299,6 +301,7 @@ public class TenantInfoConfigService {
 			buildRoot();
 		}
 	}
+	//init method
 	public void parseStr(String str) {
 		initKeyLabel();
 		if (StringUtils.isEmpty(str)) {
