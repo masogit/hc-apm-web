@@ -20,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import com.ge.apm.service.asset.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Order;
 import org.primefaces.context.RequestContext;
@@ -45,14 +46,6 @@ import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.asset.AssetFileDynamicTemplate;
-import com.ge.apm.service.asset.AssetFileExportService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.QrCodeExportStream;
-import com.ge.apm.service.asset.QrCodeService;
-import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -141,9 +134,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String filterWarrantyDate = null;
     private Integer assetId;
 
+
     private Integer warrantyAlertDays = null;
 
     private Map<String, Object> selectedObject;
+    private AssetLifecyleService assetLifecyleService;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -166,7 +161,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
         exportService = WebUtil.getBean(AssetFileExportService.class);
-
+        assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -440,7 +435,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void deleteAsset(AssetInfo asset) {
+        int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
+        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
     public void cancleWarranty(String assetUid) {
@@ -480,10 +477,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
-
-
-
-
             }
             String assetUid = entry.getKey();
             AssetInfo assetInfo = dao.getByUid(assetUid);
@@ -495,9 +488,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
                 continue;
             }
+            int originStatus = assetInfo.getStatus();
             assetInfo.setStatus(4);
             dao.save(assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
         this.selectedMap.clear();
     }

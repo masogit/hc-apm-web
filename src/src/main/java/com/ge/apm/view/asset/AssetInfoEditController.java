@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.asset.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -41,16 +42,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AssetInfoService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.GbCodeService;
-import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -127,6 +118,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Setter
     private Supplier newSupplier;
 
+    @Getter
+    @Setter
+    private int assetLifecyleStatus;// 0、初始状态，其他对应资产status
+
+    AssetLifecyleService assetLifecyleService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -153,7 +150,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
-
+        assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
 
@@ -162,6 +159,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+                assetLifecyleStatus = 0;
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -172,6 +170,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
             prepareEdit();
             beforeEdit();
+            assetLifecyleStatus = selected.getStatus();
         }
         if(selected ==null){
             try {
@@ -527,8 +526,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-
+        int status = selected.getStatus();
         this.save();
+        if(status != assetLifecyleStatus){
+            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,UserContextService.getCurrentUserAccount());
+        }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
@@ -665,17 +667,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    //转入待报废
     public String processToBeTerminated() {
+        int originStatus = selected.getStatus();
         this.selected.setStatus(4);
         update();
+        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetList?faces-redirect=true";
     }
 
+    //重新启用
     public String processToBeValid() {
+        int originStatus = selected.getStatus();
         this.selected.setStatus(1);
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
         update();
+        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 

@@ -500,6 +500,7 @@
         <h:panelGroup >
             <label class="label">#{msg.status}<span style="color:red">*</span></label>
             <p:selectOneRadio id="status" value="#{assetInfoEditController.selected.status}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('status')}" >
+                <!--<p:ajax process="@this" listener="#{assetInfoEditController.initLifecycleStatus}"/>-->
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneRadio>
         </h:panelGroup>
@@ -509,6 +510,7 @@
             <label class="label">#{msg.deviceStatus}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required? '*':''}</span></label>
             <p:selectOneRadio id="deviceStatus" value="#{assetInfoEditController.selected.deviceStatus}" required="#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required}" requiredMessage="#{msg.deviceStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('deviceStatus')}" >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
