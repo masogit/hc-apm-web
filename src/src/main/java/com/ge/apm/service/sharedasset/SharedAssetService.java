@@ -77,6 +77,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
     }
 
+    @Deprecated
     public boolean onDuty() {
         String url = getGatewayURL(GatewayURL.ALLOCATION_ON_DUTY);
         String token = UserContextService.getAccessToken();
