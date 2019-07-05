@@ -190,7 +190,7 @@ public class UserContextService implements Serializable {
     				JSONObject jsonObj=JSONObject.parseObject(configStr);
     				String cpmURL=jsonObj.getString("cpmURL");
     				if(StringUtils.isEmpty(cpmURL)){
-    					tenant.setCpmURL("/portal/asset/assetMgtNone.xhtml");
+    					tenant.setCpmURL("asset/assetMgtNone.xhtml");
     				}
     				else{
     					tenant.setCpmURL(cpmURL);
@@ -568,8 +568,8 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserDefaultHomePage() {
+//    	return "/portal/profile.xhtml";
         this.getLoginUser();
-
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
