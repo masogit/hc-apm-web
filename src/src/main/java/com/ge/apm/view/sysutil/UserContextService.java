@@ -188,7 +188,7 @@ public class UserContextService implements Serializable {
     				JSONObject jsonObj=JSONObject.parseObject(configStr);
     				String cpmURL=jsonObj.getString("cpmURL");
     				if(StringUtils.isEmpty(cpmURL)){
-    					tenant.setCpmURL("/portal/asset/assetMgtNone.xhtml");
+    					tenant.setCpmURL("asset/assetMgtNone.xhtml");
     				}
     				else{
     					tenant.setCpmURL(cpmURL);
@@ -566,17 +566,18 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserDefaultHomePage() {
-        this.getLoginUser();
-
-        if (userAccount == null) {
-            return "/login.xhtml";
-        } else {
-            if(isIBorUltraSoundIBEndUser())
-                return "portal/profile.xhtml";
-            
-            UaaService uaaService = WebUtil.getBean(UaaService.class);
-            return uaaService.getUserDefaultHomePage(userAccount);
-        }
+    	return "/portal/profile.xhtml";
+//        this.getLoginUser();
+//
+//        if (userAccount == null) {
+//            return "/login.xhtml";
+//        } else {
+//            if(isIBorUltraSoundIBEndUser())
+//                return "portal/profile.xhtml";
+//            
+//            UaaService uaaService = WebUtil.getBean(UaaService.class);
+//            return uaaService.getUserDefaultHomePage(userAccount);
+//        }
     }
 
     public static String getAccessToken() {
