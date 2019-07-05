@@ -85,7 +85,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     @Getter
     @Setter
-    private String notificationContent;
+    private String notificationContent = "";
 
     private String workflowConfigJson;
 
@@ -224,8 +224,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
             //JIRA#4576
-            workflowConfigJson = currentWorkflowConfig.getSwapCenterConfig();
-            notificationContent = JSON.parseObject(workflowConfigJson).getString("hintText");
+            if(currentWorkflowConfig != null) {
+                workflowConfigJson = currentWorkflowConfig.getSwapCenterConfig();
+                if(StringUtils.isNotBlank(workflowConfigJson)) {
+                    notificationContent = JSON.parseObject(workflowConfigJson).getString("hintText");
+                }
+            }
         }
     }
 
@@ -1789,30 +1793,29 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public String workOrderRouter() {
     	String retrunUrl = "";
     	RequestContext requestContext = RequestContext.getCurrentInstance();
-    	requestContext.addCallbackParam("showNotification", true);
 
-      JSONObject scObject = JSON.parseObject(workflowConfigJson);
-    	String startTime = scObject.getString("periodStart");
-    	String endTime = scObject.getString("periodEnd");
-
-    	Boolean enableAllocateOperation = Boolean.TRUE;
-    	Boolean willShowNotification = Boolean.FALSE;
-    	String notificationContent = "";
-    	// process to check if operations in allocation center is enabled
-    	if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-          DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-          // catch parse exception
-          try {
-              LocalTime startLocalTime = LocalTime.parse(startTime);
-              LocalTime endLocalTime = LocalTime.parse(endTime);
-              LocalTime currentTime = LocalTime.now();
-              if(currentTime.isBefore(startLocalTime) || currentTime.isAfter(endLocalTime)) {
-                  // operations in allocation center may not be enabled
-                  enableAllocateOperation = scObject.getBoolean("openService");
-                  willShowNotification = scObject.getBoolean("enableHint");
+      Boolean enableAllocateOperation = Boolean.TRUE;
+      Boolean willShowNotification = Boolean.FALSE;
+    	if(StringUtils.isNotBlank(workflowConfigJson)) {
+          JSONObject scObject = JSON.parseObject(workflowConfigJson);
+          String startTime = scObject.getString("periodStart");
+          String endTime = scObject.getString("periodEnd");
+          // process to check if operations in allocation center is enabled
+          if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+              DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+              // catch parse exception
+              try {
+                  LocalTime startLocalTime = LocalTime.parse(startTime, dateTimeFormatter);
+                  LocalTime endLocalTime = LocalTime.parse(endTime, dateTimeFormatter);
+                  LocalTime currentTime = LocalTime.now();
+                  if(currentTime.isBefore(startLocalTime) || currentTime.isAfter(endLocalTime)) {
+                      // operations in allocation center may not be enabled
+                      enableAllocateOperation = scObject.getBoolean("openService");
+                      willShowNotification = scObject.getBoolean("enableHint");
+                  }
+              } catch (Exception ex) {
+                  logger.info("Configuration regarding to allocation center may be wrong: " + workflowConfigJson);
               }
-          } catch (Exception ex) {
-              logger.info("Configuration regarding to allocation center may be wrong: " + workflowConfigJson);
           }
       }
 
