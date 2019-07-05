@@ -120,7 +120,8 @@
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
             <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContains('link')}">
-            	<p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('link.CPM')}" ></p:menuitem>
+            	<p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('link.CPM') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
+            	<p:menuitem id="um103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContains('link.CPM') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
             </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>

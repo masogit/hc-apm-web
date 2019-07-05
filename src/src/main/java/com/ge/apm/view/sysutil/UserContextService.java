@@ -188,7 +188,6 @@ public class UserContextService implements Serializable {
     				JSONObject jsonObj=JSONObject.parseObject(configStr);
     				String cpmURL=jsonObj.getString("cpmURL");
     				if(StringUtils.isEmpty(cpmURL)){
-    					tenant.setCpmURL("asset/assetMgtNone.xhtml");
     				}
     				else{
     					tenant.setCpmURL(cpmURL);
