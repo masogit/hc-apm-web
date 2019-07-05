@@ -566,18 +566,17 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserDefaultHomePage() {
-    	return "/portal/profile.xhtml";
-//        this.getLoginUser();
-//
-//        if (userAccount == null) {
-//            return "/login.xhtml";
-//        } else {
-//            if(isIBorUltraSoundIBEndUser())
-//                return "portal/profile.xhtml";
-//            
-//            UaaService uaaService = WebUtil.getBean(UaaService.class);
-//            return uaaService.getUserDefaultHomePage(userAccount);
-//        }
+//    	return "/portal/profile.xhtml";
+        this.getLoginUser();
+        if (userAccount == null) {
+            return "/login.xhtml";
+        } else {
+            if(isIBorUltraSoundIBEndUser())
+                return "portal/profile.xhtml";
+            
+            UaaService uaaService = WebUtil.getBean(UaaService.class);
+            return uaaService.getUserDefaultHomePage(userAccount);
+        }
     }
 
     public static String getAccessToken() {
