@@ -44,7 +44,7 @@ public class AssetLifecyleService {
         }else{
             assetLifecycle.setCurrentStatus(currentStatus);
         }
-        assetLifecycle.setModifyBy(user.getLastModifiedBy());
+        assetLifecycle.setModifyBy(user.getLoginName());
         assetLifecycle.setModifyByUserId(user.getId());
         assetLifecycle.setModifyTime(new Date());
         assetLifecycle.setTenantUID(user.getTenantUID());

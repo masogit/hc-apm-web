@@ -201,8 +201,12 @@ public class WorkflowConfig implements Serializable {
      * { "periodStart": "08:00", "periodEnd": "20:00", "openService": true, "enableHint": true, "hintText": "20:00 - 08:00不受理调剂申请， 紧急情况请拨打xxxxx" }
      */
 
-    private String periodStart;
-    private String periodEnd;
+    @Column(name = "period_start")
+    private Date periodStart;
+
+    @Column(name = "period_end")
+    private Date periodEnd;
+
     private Boolean openService;
     private Boolean enableHint;
     private String hintText;
@@ -218,19 +222,19 @@ public class WorkflowConfig implements Serializable {
         this.swapCenterConfig = swapCenterConfig;
     }
 
-    public String getPeriodStart() {
+    public Date getPeriodStart() {
         return periodStart;
     }
 
-    public void setPeriodStart(String periodStart) {
+    public void setPeriodStart(Date periodStart) {
         this.periodStart = periodStart;
     }
 
-    public String getPeriodEnd() {
+    public Date getPeriodEnd() {
         return periodEnd;
     }
 
-    public void setPeriodEnd(String periodEnd) {
+    public void setPeriodEnd(Date periodEnd) {
         this.periodEnd = periodEnd;
     }
 

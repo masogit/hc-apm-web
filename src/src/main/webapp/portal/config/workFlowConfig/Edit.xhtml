@@ -338,25 +338,33 @@
                                 </p:inputNumber>
                             </h:panelGroup>
 
+
+<!--                            <h:panelGroup>
+                                <label class="label">正常值班时间*</label>
+                                <p:calendar value="#{sharedAssetConfigController.startTime}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                                -
+                                <p:calendar value="#{sharedAssetConfigController.endTime}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>-->
+
                             <h:panelGroup>
                                 <label class="label">开始时间</label>
-                                <p:inputText id="periodStart" value="#{workflowConfigController.selected.periodStart}" placeholder="08:00"/>
+                                <p:calendar id="periodStart" value="#{workflowConfigController.selected.periodStart}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="00" defaultMinute="00" defaultSecond="00"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
                                 <label class="label">结束时间</label>
-                                <p:inputText id="periodEnd" value="#{workflowConfigController.selected.periodEnd}" placeholder="20:00"/>
+                                <p:calendar id="periodEnd" value="#{workflowConfigController.selected.periodEnd}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59"/>
                             </h:panelGroup>
 
-                            <h:panelGroup >
+<!--                            <h:panelGroup >
                                 <label class = "label">是否开启调剂服务?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.openService}"/>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class = "label">是否开启弹窗?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableHint}"/>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
                             <h:panelGroup>
                                 <label class="label">弹窗内容</label>

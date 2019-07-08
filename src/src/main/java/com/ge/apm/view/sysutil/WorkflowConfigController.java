@@ -543,17 +543,22 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     public void setSwapCenter(){
 		Map<String,Object> swapCenterMap = Maps.newHashMap();
 		if(selected.getPeriodStart() != null){
-			swapCenterMap.put("periodStart",selected.getPeriodStart());
+			DateTime start = new DateTime(selected.getPeriodStart());
+			swapCenterMap.put("periodStart",start.toString("HH:mm"));
 		}
 		if(selected.getPeriodEnd() != null){
-			swapCenterMap.put("periodEnd",selected.getPeriodEnd());
+			DateTime end = new DateTime(selected.getPeriodEnd());
+			swapCenterMap.put("periodEnd",end.toString("HH:mm"));
 		}
-		if(selected.getEnableHint() != null){
+		swapCenterMap.put("enableHint",Boolean.TRUE);
+		swapCenterMap.put("openService",Boolean.TRUE);
+
+/*		if(selected.getEnableHint() != null){
 			swapCenterMap.put("enableHint",selected.getEnableHint());
 		}
 		if(selected.getOpenService() != null){
 			swapCenterMap.put("openService",selected.getOpenService());
-		}
+		}*/
 		if(selected.getHintText() != null){
 			swapCenterMap.put("hintText",selected.getHintText());
 		}
@@ -589,13 +594,16 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	}
 
 	public void parseSwapCenter(){
+/*		if(selected.getId() == null){
+			selected.setPeriodStart(new DateTime().withTimeAtStartOfDay().toDate());
+			selected.setPeriodEnd(new DateTime().withHourOfDay(59).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
+		}*/
 		if(Strings.isBlank(selected.getSwapCenterConfig())){
 			return;
 		}
-
 		JSONObject swapCenter = JSON.parseObject(selected.getSwapCenterConfig());
-		selected.setPeriodStart(swapCenter.getString("periodStart"));
-		selected.setPeriodEnd(swapCenter.getString("periodEnd"));
+		//selected.setPeriodStart(swapCenter.getString("periodStart"));
+		//selected.setPeriodEnd(swapCenter.getString("periodEnd"));
 		selected.setOpenService(swapCenter.getBoolean("openService"));
 		selected.setEnableHint(swapCenter.getBoolean("enableHint"));
 		selected.setHintText(swapCenter.getString("hintText"));
@@ -617,6 +625,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
+		selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
 		selectedUserOrg = null;
 
 /*		updateDispater();
