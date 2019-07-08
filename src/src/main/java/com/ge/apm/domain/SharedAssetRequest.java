@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
@@ -144,6 +145,9 @@ public class SharedAssetRequest implements Serializable{
 
     @Column(name = "req_patients_info")//申请调剂设备时记录对应患者
     private String req4PatientsInfo;
+
+    @Transient
+    private List<PatientInfo> patientInfoList;//患者信息列表, based on req4PatientsInfo
 
     public String getId() {
         return id;
@@ -539,12 +543,14 @@ public class SharedAssetRequest implements Serializable{
         this.req4PatientsInfo = req4PatientsInfo;
     }
 
-    public List<PatientInfo> getPatientList() {
-        List patientInfoList = null;
+    public List<PatientInfo> getPatientInfoList() {
         if(StringUtils.isNotBlank(req4PatientsInfo)) {
-            patientInfoList = JSONArray.parseArray(req4PatientsInfo, PatientInfo.class);
+            patientInfoList = JSON.parseArray(req4PatientsInfo, PatientInfo.class);
         }
         return patientInfoList;
     }
 
+    public void setPatientInfoList(List<PatientInfo> patientInfoList) {
+        this.patientInfoList = patientInfoList;
+    }
 }
