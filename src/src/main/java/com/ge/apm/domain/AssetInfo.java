@@ -525,6 +525,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "termination_cause")
     private String terminationCause;
 
+    @Column(name = "measuring_type")
+    private String measuringType;
+
     @Transient
     private int lineNum;
 
@@ -1725,6 +1728,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setTerminationCause(String terminationCause) {
         this.terminationCause = terminationCause;
+    }
+
+    public String getMeasuringType() {
+        return measuringType;
+    }
+
+    public void setMeasuringType(String measuringType) {
+        this.measuringType = measuringType;
     }
 
     @Override
