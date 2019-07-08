@@ -21,6 +21,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +89,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String notificationContent = "";
 
     private String workflowConfigJson;
+
+    @Getter
+    @Setter
+    private PatientInfo selectedPatient;
+
+    @Getter
+    @Setter
+    private String selectedPatientJson;
 
     public String getFilterApplyTime() {
         return filterApplyTime;
@@ -781,6 +790,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
      }
     
     public void getAssetInfo(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
+        PatientInfo selectedPatientInfo = null;
+        if(StringUtils.isNotBlank(this.selectedPatientJson)) {
+            selectedPatientInfo = JSONObject.parseObject(this.selectedPatientJson, PatientInfo.class);
+        }
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -894,6 +907,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     }
                                     
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
+
+                                    logger.info("isLogPatientInfoEnabled: " + isLogPatientInfoEnabled());
+                                    if(isLogPatientInfoEnabled() && selectedPatientInfo != null) {
+                                        assetDetaiVo.setPatientNum(selectedPatientInfo.getPatientNum());
+                                        assetDetaiVo.setPatientBedNum(selectedPatientInfo.getPatientBedNum());
+                                    }
                                     
                                     if (sardList != null && sardList.size() > 0) {
                                         for (int i = 0; i < sardList.size(); i++) {
@@ -1949,6 +1968,70 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             maxChargingEndTime = this.setEndTime(maxChargingEndTime);
         }
         return maxChargingEndTime;
+    }
+
+    public Boolean isLogPatientInfoEnabled() {
+        return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
+    }
+
+    public void prepareCreatePatient() {
+        this.selectedPatient = new PatientInfo();
+    }
+
+    private PatientInfo patientBeforeEdit;
+    public void prepareEditPatient() {
+        this.patientBeforeEdit = new PatientInfo();
+        BeanUtils.copyProperties(this.selectedPatient, this.patientBeforeEdit);
+        logger.info(this.selectedPatient.getPatientBedNum());
+    }
+
+    public void deletePatient() {
+        logger.info(this.selectedPatient.getPatientBedNum());
+        List<PatientInfo> patientInfoList = null;
+        if(this.selectedPatient.getIndex() != null) {
+            if(StringUtils.isNotBlank(this.selected.getReq4PatientsInfo())) {
+                patientInfoList = JSON.parseArray(this.selected.getReq4PatientsInfo(), PatientInfo.class);
+            } else {
+                patientInfoList = new ArrayList<>();
+            }
+            patientInfoList.remove(this.selectedPatient);
+        }
+        this.selectedPatient = null;
+        this.selected.setReq4PatientsInfo(JSONObject.toJSONString(patientInfoList));
+        logger.info("patient list: " + this.selected.getReq4PatientsInfo());
+    }
+
+    public void savePatientInfo() {
+        List<PatientInfo> patientInfoList = null;
+        int index;
+
+        if(StringUtils.isNotBlank(this.selected.getReq4PatientsInfo())) {
+            patientInfoList = JSON.parseArray(this.selected.getReq4PatientsInfo(), PatientInfo.class);
+        } else {
+            patientInfoList = new ArrayList<>();
+        }
+
+        if(this.selectedPatient.getIndex() == null) {//Add new patient
+            Optional<PatientInfo> patientWithMaxIndex = patientInfoList.stream().max(Comparator.comparing(PatientInfo::getIndex));
+            if(patientWithMaxIndex.isPresent()) {
+                index = patientWithMaxIndex.get().getIndex() + 1;
+            } else {
+                index = 1;
+            }
+
+            this.selectedPatient.setIndex(index);
+            patientInfoList.add(this.selectedPatient);
+        } else {//Update existed patient
+            int patient2UpdateIdx = patientInfoList.indexOf(patientBeforeEdit);
+            if(patient2UpdateIdx > 0) {
+                PatientInfo patientInfo = patientInfoList.get(patient2UpdateIdx);
+                patientInfo.setPatientNum(this.selectedPatient.getPatientNum());
+                patientInfo.setPatientBedNum(this.selectedPatient.getPatientBedNum());
+            }
+        }
+
+        this.selected.setReq4PatientsInfo(JSONObject.toJSONString(patientInfoList));
+        logger.info("patient list: " + this.selected.getReq4PatientsInfo());
     }
 
 }
