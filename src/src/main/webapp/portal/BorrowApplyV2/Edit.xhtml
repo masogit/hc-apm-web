@@ -105,19 +105,30 @@
                 </p:dataTable>
                 </p:fieldset>
 
-                <p:fieldset legend="患者信息" style="margin-bottom:20px">
-                    <p:dataTable id="patientInfo" value="#{sharedAssetRequestV2Controller.selected.sartList}"
+                <p:fieldset legend="患者信息" style="margin-bottom:20px" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                    <p:dataTable id="patientInfoList" value="#{sharedAssetRequestV2Controller.selected.patientInfoList}"
                                  var="item" widgetVar="varDataListDetail"
-                                 selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
+                                 selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedPatient}"
                                  paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                                 lazy="true" rowKey="#{item.swapName.hashCode()}"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
+                                 lazy="true" rowKey="#{item.getIndex()}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.index}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+                      <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
 
-
+                      <p:column headerText="病人号">
+                        <h:outputText value="#{item.patientNum}"/>
+                      </p:column>
+                      <p:column headerText="床号">
+                        <h:outputText value="#{item.patientBedNum}"/>
+                      </p:column>
+                      <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{sharedAssetRequestV2Controller.prepareCreatePatient}" update=":patientInfoDlg" oncomplete="PF('PatientInfoDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.prepareEditPatient}" update=":patientInfoDlg" oncomplete="PF('PatientInfoDialog').show()" disabled="#{empty sharedAssetRequestV2Controller.selectedPatient}"/>
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestV2Controller.deletePatient}" update="patientInfoList" disabled="#{empty sharedAssetRequestV2Controller.selectedPatient}"/>
+                      </f:facet>
                     </p:dataTable>
                 </p:fieldset>
 
@@ -144,6 +155,7 @@
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <!--<ui:include src="/portal/asset/selectAssetDialog.xhtml"/>-->
+              <ui:include src="patientInfoDialog.xhtml"/>
          </div>  
         </div> 
 
