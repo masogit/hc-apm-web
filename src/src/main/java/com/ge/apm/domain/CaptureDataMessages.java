@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,27 +12,61 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.Size;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+
+
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627
  */
 @Entity
 @Table(name = "capture_data_messages")
-public class CaptureDataMessages extends JHipAbstractAuditingEntity implements Serializable {
+public class CaptureDataMessages implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
 	@GeneratedValue(generator = "uuid")
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(columnDefinition = "CHAR(32)")
 	private String id;
+	
+	@CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50, updatable = false)
+    private String createdBy = "system";
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate = new Date();
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate = new Date();
+    
+    
+    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    private String tenantUID;
+    
+    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    private String institutionUID;
+    
+    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+    
+    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    private String siteUID;
 
 	@Column(name = "system_id")
 	private String systemId;
@@ -51,6 +86,22 @@ public class CaptureDataMessages extends JHipAbstractAuditingEntity implements S
 
 	@Column(name = "content",columnDefinition="text")
 	private String content;
+	
+	@Column(name = "title")
+	private String title;
+
+	@Column(name = "icon")
+	private String icon;
+	
+	@Column(name = "start_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date startDate;
+
+	@Column(name = "end_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date endDate;
 
 	@Transient
 	private Integer excelIdex;
@@ -64,6 +115,9 @@ public class CaptureDataMessages extends JHipAbstractAuditingEntity implements S
 	@Transient
 	private Integer ibStatus;
 	
+	@Column(name = "region")
+	private String region;
+	
 	@Column(name = "ge_device_type")
 	private Integer geDeviceType;
 
@@ -72,26 +126,6 @@ public class CaptureDataMessages extends JHipAbstractAuditingEntity implements S
 
 	@Transient
 	private String otherErrorMessage;
-	
-
-	@Column(name = "start_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date startDate;
-
-	@Column(name = "end_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date endDate;
-	
-	public static final int imageLength2="</img>".length();
-	public static final int pLength1="<p>".length();
-	public static final int pLength2="</p>".length();
-	public static final String beginImage="<img";
-	public static final String endImage="</img>";
-	public static final String beginP="<p>";
-	public static final String endP="</p>";
-	public static final String pageLimit="<!--page-->";
 
 	public String getId() {
 		return id;
@@ -107,25 +141,6 @@ public class CaptureDataMessages extends JHipAbstractAuditingEntity implements S
 
 	public void setExcelIdex(Integer excelIdex) {
 		this.excelIdex = excelIdex;
-	}
-
-	public String getStatusDisplay() {
-		if (this.status != null) {
-			String result = "";
-			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
-				result += "格式错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
-				result += "占比总和错误；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
-				result += "设备名称不存在；";
-			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
-				result += this.otherErrorMessage;
-			} else {
-				result += this.status;
-			}
-			return result;
-		}
-		return statusDisplay;
 	}
 
 	public void setStatusDisplay(String statusDisplay) {
@@ -267,6 +282,112 @@ public class CaptureDataMessages extends JHipAbstractAuditingEntity implements S
 
 	public void setIbStatus(Integer ibStatus) {
 		this.ibStatus = ibStatus;
+	}
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	public String getStatusDisplay() {
+		if (this.status != null) {
+			String result = "";
+			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
+				result += "格式错误；";
+			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
+				result += "占比总和错误；";
+			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
+				result += "设备名称不存在；";
+			} else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+				result += this.otherErrorMessage;
+			} else {
+				result += this.status;
+			}
+			return result;
+		}
+		return statusDisplay;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(String lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public String getTenantUID() {
+		return tenantUID;
+	}
+
+	public void setTenantUID(String tenantUID) {
+		this.tenantUID = tenantUID;
+	}
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
 	}
 
 	@Override
