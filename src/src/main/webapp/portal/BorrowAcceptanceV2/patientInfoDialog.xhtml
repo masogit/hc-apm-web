@@ -23,7 +23,7 @@
           </h:panelGroup>
         </p:panelGrid>
         <br/>
-        <p:commandButton validateClient="false" actionListener="#{sharedAssetRequestV2Controller.savePatientInfo()}" value="#{msg.Save}" update="IouEditForm:patientInfoList" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PatientInfoDialog');"/>
+        <p:commandButton validateClient="false" actionListener="#{sharedAssetRequestV2Controller.savePatientInfo()}" value="#{msg.Save}" update="IouEditForm:patientInfoList,IouEditForm:patientInfoDropdown" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PatientInfoDialog');"/>
         <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('PatientInfoDialog').hide()"/>
       </h:panelGroup>
     </h:form>
