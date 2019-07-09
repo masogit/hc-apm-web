@@ -552,16 +552,16 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}
 		swapCenterMap.put("enableHint",Boolean.TRUE);
 		swapCenterMap.put("openService",Boolean.TRUE);
-
+		swapCenterMap.put("hintText",null);//暂不启用20190709
 /*		if(selected.getEnableHint() != null){
 			swapCenterMap.put("enableHint",selected.getEnableHint());
 		}
 		if(selected.getOpenService() != null){
 			swapCenterMap.put("openService",selected.getOpenService());
-		}*/
+		}
 		if(selected.getHintText() != null){
 			swapCenterMap.put("hintText",selected.getHintText());
-		}
+		}*/
 		if(swapCenterMap.isEmpty()){
 			selected.setSwapCenterConfig(null);
 		}else{
@@ -594,10 +594,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	}
 
 	public void parseSwapCenter(){
-/*		if(selected.getId() == null){
-			selected.setPeriodStart(new DateTime().withTimeAtStartOfDay().toDate());
-			selected.setPeriodEnd(new DateTime().withHourOfDay(59).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
-		}*/
 		if(Strings.isBlank(selected.getSwapCenterConfig())){
 			return;
 		}
