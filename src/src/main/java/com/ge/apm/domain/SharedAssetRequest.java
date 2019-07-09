@@ -143,7 +143,7 @@ public class SharedAssetRequest implements Serializable{
     @Column(name = "effort")//工时
     private Double effort;
 
-    @Column(name = "req_patients_info")//申请调剂设备时记录对应患者
+    @Column(name = "req_patients_info", columnDefinition = "TEXT")//申请调剂设备时记录对应患者
     private String req4PatientsInfo;
 
     @Transient
