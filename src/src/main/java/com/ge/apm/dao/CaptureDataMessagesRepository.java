@@ -9,7 +9,7 @@ import com.ge.apm.domain.CaptureDataMessages;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
- * Created by 212605082 on 2018/3/7.
+ * Created by 503035627.
  */
 public interface CaptureDataMessagesRepository extends GenericRepositoryUUID<CaptureDataMessages> {
 
@@ -19,7 +19,7 @@ public interface CaptureDataMessagesRepository extends GenericRepositoryUUID<Cap
 	@Query(value="select o.* from capture_data_messages o where o.ge_device_type=?1 and o.type=1 order by o.index desc fetch first 1 rows only",nativeQuery=true)
 	public CaptureDataMessages findByGeDeviceType(Integer geDeviceType);
 	
-	@Query("select o.content from CaptureDataMessages o where o.id=?1")
+	@Query(value="select o.content from capture_data_messages o where o.id=?1",nativeQuery=true)
 	public String getContentById(String id);
 	
 	@Query("select o from CaptureDataMessages o where o.assetUID=?1 and o.startDate<?2 and o.endDate>?2 and o.type=0 order by o.index")
