@@ -85,6 +85,12 @@
                             <p:ajax update=":IouEditForm:confirmBtn"/>
                         </p:inputNumber>
                     </p:column>
+                    <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <h:outputText value="#{item.patientNum}"/>
+                    </p:column>
+                    <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <h:outputText value="#{item.patientBedNum}"/>
+                    </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}">
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
@@ -123,26 +129,6 @@
                             <p:dataExporter type="xls" target="datalist" fileName="IouApplyDetail_export"/>
                         </p:commandButton>
                     </f:facet>
-                    </p:dataTable>
-                </p:fieldset>
-
-                <p:fieldset legend="患者信息" style="margin-bottom:20px" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
-                    <p:dataTable id="patientInfoList" value="#{sharedAssetRequestV2Controller.selected.patientInfoList}"
-                                 var="item" widgetVar="varDataListDetail"
-                                 selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedPatient}"
-                                 paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                                 lazy="true" rowKey="#{item.getIndex()}"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.index}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
-                        <p:column headerText="病人号">
-                            <h:outputText value="#{item.patientNum}"/>
-                        </p:column>
-                        <p:column headerText="床号">
-                            <h:outputText value="#{item.patientBedNum}"/>
-                        </p:column>
                     </p:dataTable>
                 </p:fieldset>
 

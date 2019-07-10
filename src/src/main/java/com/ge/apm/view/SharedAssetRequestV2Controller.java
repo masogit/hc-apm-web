@@ -13,15 +13,16 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -90,14 +91,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     private String workflowConfigJson;
 
-    @Getter
-    @Setter
-    private PatientInfo selectedPatient;
-
-    @Getter
-    @Setter
-    private String selectedPatientJson;
-
     public String getFilterApplyTime() {
         return filterApplyTime;
     }
@@ -160,6 +153,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void prepareCreateSart(){
+        crudActionName = "Create";
         selectedSart = new SharedAssetReqType();
     }
     
@@ -790,10 +784,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
      }
     
     public void getAssetInfo(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
-        PatientInfo selectedPatientInfo = null;
-        if(StringUtils.isNotBlank(this.selectedPatientJson)) {
-            selectedPatientInfo = JSONObject.parseObject(this.selectedPatientJson, PatientInfo.class);
-        }
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -909,9 +899,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
 
                                     logger.info("isLogPatientInfoEnabled: " + isLogPatientInfoEnabled());
-                                    if(isLogPatientInfoEnabled() && selectedPatientInfo != null) {
-                                        assetDetaiVo.setPatientNum(selectedPatientInfo.getPatientNum());
-                                        assetDetaiVo.setPatientBedNum(selectedPatientInfo.getPatientBedNum());
+                                    if(isLogPatientInfoEnabled() && StringUtils.isNotBlank(applySwapType.getPatientNum())) {
+                                        assetDetaiVo.setPatientNum(applySwapType.getPatientNum());
+                                        assetDetaiVo.setPatientBedNum(applySwapType.getPatientBedNum());
                                     }
                                     
                                     if (sardList != null && sardList.size() > 0) {
@@ -1556,25 +1546,47 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             WebUtil.addWarnMessage("申请数必须大于0！");
             return;
         }
-        selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
-        String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
-        selectedSart.setSwapName(swapName);
-        selectedSart.setSharedId(selected.getId());
+
         List<SharedAssetReqType> sartList = selected.getSartList();
-         if (sartList != null && sartList.size()!=0 ) {
-             for (int i = 0; i < sartList.size(); i++) {
-                SharedAssetReqType sharedAssetReqType = sartList.get(i);
-                
-                if (sharedAssetReqType.getSwapName().equals(swapName)) {
-                    sartList.remove(i);
-                    i--;
-                  
+        if(this.isLogPatientInfoEnabled()) {
+            if("Create".equals(super.crudActionName)) {
+                selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
+                String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
+                selectedSart.setSwapName(swapName);
+                selectedSart.setSharedId(selected.getId());
+                sartList.add(selectedSart);
+            } else {
+                Map<String, SharedAssetReqType> sharedAssetReqTypeMap = new HashMap();
+
+                Optional<SharedAssetReqType> optionalSharedAssetReqType = selected.getSartList()
+                    .stream().filter(sart -> sart.getId().equals(selectedSart.getId()))
+                    .findFirst();
+                if(optionalSharedAssetReqType.isPresent()) {
+                    optionalSharedAssetReqType.get();
+                    try {
+                        BeanUtils.copyProperties(optionalSharedAssetReqType, selectedSart);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
-               
-             }
-             
-         }
-         sartList.add(selectedSart);
+            }
+        } else {
+            selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
+            String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
+            selectedSart.setSwapName(swapName);
+            selectedSart.setSharedId(selected.getId());
+            Iterator<SharedAssetReqType> iterator = sartList.iterator();
+            while(iterator.hasNext()) {
+                SharedAssetReqType sharedAssetReqType = iterator.next();
+                if(sharedAssetReqType.getSwapName().equals(selectedSart.getSwapName())) {
+                    iterator.remove();
+                }
+            }
+            sartList.add(selectedSart);
+        }
+        logger.info(selected.getSartList().size());
     }
     
     
@@ -1772,9 +1784,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         return this.getNameByLoginName(selected.getApplicant());
     }
 
-
-
-
     /**
      * @return the total
      */
@@ -1893,15 +1902,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public boolean validateAllExpectedQty() {
         List<SharedAssetReqType> sartList = selected.getSartList();
-        boolean expectedQtyGTZero = false;
+        Boolean expectedQtyLTZero = Boolean.FALSE;
         for (SharedAssetReqType sart : sartList) {
             if (sart.getExceptQty() > 0){
-                expectedQtyGTZero = true;
+            } else {
+                expectedQtyLTZero = Boolean.TRUE;
                 break;
             }
         }
-        logger.debug("validateTotalExpectedQty result: " + expectedQtyGTZero);
-        return !expectedQtyGTZero;
+        logger.debug("validateTotalExpectedQty result: " + expectedQtyLTZero);
+        return expectedQtyLTZero;
     }
 
     public String getOrgLocation() {
@@ -1971,67 +1981,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
     public Boolean isLogPatientInfoEnabled() {
-        return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
-    }
-
-    public void prepareCreatePatient() {
-        this.selectedPatient = new PatientInfo();
-    }
-
-    private PatientInfo patientBeforeEdit;
-    public void prepareEditPatient() {
-        this.patientBeforeEdit = new PatientInfo();
-        BeanUtils.copyProperties(this.selectedPatient, this.patientBeforeEdit);
-        logger.info(this.selectedPatient.getPatientBedNum());
-    }
-
-    public void deletePatient() {
-        logger.info(this.selectedPatient.getPatientBedNum());
-        List<PatientInfo> patientInfoList = null;
-        if(this.selectedPatient.getIndex() != null) {
-            if(StringUtils.isNotBlank(this.selected.getReq4PatientsInfo())) {
-                patientInfoList = JSON.parseArray(this.selected.getReq4PatientsInfo(), PatientInfo.class);
-            } else {
-                patientInfoList = new ArrayList<>();
-            }
-            patientInfoList.remove(this.selectedPatient);
+        Boolean result = Boolean.FALSE;
+        WorkflowConfig wfConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        if(wfConfig != null) {
+            result = (wfConfig.getEnableLogPatientInfo() != null) ? wfConfig.getEnableLogPatientInfo() : Boolean.FALSE;
         }
-        this.selectedPatient = null;
-        this.selected.setReq4PatientsInfo(JSONObject.toJSONString(patientInfoList));
-        logger.info("patient list: " + this.selected.getReq4PatientsInfo());
-    }
-
-    public void savePatientInfo() {
-        List<PatientInfo> patientInfoList = null;
-        int index;
-
-        if(StringUtils.isNotBlank(this.selected.getReq4PatientsInfo())) {
-            patientInfoList = JSON.parseArray(this.selected.getReq4PatientsInfo(), PatientInfo.class);
-        } else {
-            patientInfoList = new ArrayList<>();
-        }
-
-        if(this.selectedPatient.getIndex() == null) {//Add new patient
-            Optional<PatientInfo> patientWithMaxIndex = patientInfoList.stream().max(Comparator.comparing(PatientInfo::getIndex));
-            if(patientWithMaxIndex.isPresent()) {
-                index = patientWithMaxIndex.get().getIndex() + 1;
-            } else {
-                index = 1;
-            }
-
-            this.selectedPatient.setIndex(index);
-            patientInfoList.add(this.selectedPatient);
-        } else {//Update existed patient
-            int patient2UpdateIdx = patientInfoList.indexOf(patientBeforeEdit);
-            if(patient2UpdateIdx > 0) {
-                PatientInfo patientInfo = patientInfoList.get(patient2UpdateIdx);
-                patientInfo.setPatientNum(this.selectedPatient.getPatientNum());
-                patientInfo.setPatientBedNum(this.selectedPatient.getPatientBedNum());
-            }
-        }
-
-        this.selected.setReq4PatientsInfo(JSONObject.toJSONString(patientInfoList));
-        logger.info("patient list: " + this.selected.getReq4PatientsInfo());
+        return result;
     }
 
 }
