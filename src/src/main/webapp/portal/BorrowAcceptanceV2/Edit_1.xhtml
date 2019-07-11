@@ -61,7 +61,7 @@
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+                        <p:ajax event="rowSelect" update="editButton"/>
 
                         <p:column headerText="调剂设备名称" sortBy="#{item.swapName}">
                             <h:outputText value="#{item.swapName}"/>
@@ -88,9 +88,9 @@
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{sharedAssetRequestV2Controller.prepareCreateSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" />-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.prepareEditSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" />
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestV2Controller.deleteSart}" update="datalistDetail" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" >
+                            <!--<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestV2Controller.deleteSart}" update="datalistDetail" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
-                            </p:commandButton>
+                            </p:commandButton>-->
                         </f:facet>
                     </p:dataTable>
                 </p:fieldset>

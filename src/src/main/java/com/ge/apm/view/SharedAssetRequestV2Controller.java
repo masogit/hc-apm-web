@@ -569,6 +569,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 else{
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
+                            if(this.isLogPatientInfoEnabled()) {
+                                if (StringUtils.isNotBlank(this.selectedSartId) && !this.selectedSartId.equals(applySwapType.getId())) {
+                                    continue;
+                                }
+                            }
                             if(infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())){
                                 selectedSart = applySwapType;//明细表联动选中
                                 
@@ -648,6 +653,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         }
                                     }
                                     sard.setAccessoryList(sard.getAccessoryList());
+
+                                    logger.info("isLogPatientInfoEnabled: " + isLogPatientInfoEnabled());
+                                    if(isLogPatientInfoEnabled() && StringUtils.isNotBlank(applySwapType.getPatientNum())) {
+                                        sard.setPatientNum(applySwapType.getPatientNum());
+                                        sard.setPatientBedNum(applySwapType.getPatientBedNum());
+                                    }
 
                                     //asdDao.save(detail_list.get(0));
                                     if (sardList != null && sardList.size() > 0) {
@@ -854,7 +865,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                 if(applySwapType.getActualQty() < applySwapType.getExceptQty()){
                                     SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
                                     assetDetaiVo.setBorrowId(Uid);
-                                    assetDetaiVo.setSharedId(Uid);
+                                    assetDetaiVo.setSharedId(selectedSart.getSharedId());
 
                                     assetDetaiVo.setAssetInfoId(infoVo.getUid());
                                     assetDetaiVo.setAssetName(infoVo.getName());
@@ -1579,6 +1590,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     try {
                         SharedAssetReqType sharedAssetReqType = optionalSharedAssetReqType.get();
                         BeanUtils.copyProperties(sharedAssetReqType, selectedSart);
+                        logger.info("selected shared_asset_req_type.shared_id: " + selectedSart.getSharedId());
                         //update shared asset req detail if necessary
                         this.selected.getSardList()
                             .stream()
