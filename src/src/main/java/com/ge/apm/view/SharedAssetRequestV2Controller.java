@@ -231,11 +231,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
             //JIRA#4576
-            if(currentWorkflowConfig != null) {
+            if(currentWorkflowConfig != null && StringUtils.isNotBlank(currentWorkflowConfig.getSiteUID())) {
                 workflowConfigJson = currentWorkflowConfig.getSwapCenterConfig();
-                if(StringUtils.isNotBlank(workflowConfigJson)) {
-                    notificationContent = JSON.parseObject(workflowConfigJson).getString("hintText");
+                List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(currentWorkflowConfig.getSiteUID());
+                String virtualCellNum = "";
+                if(sharedAssetConfigList != null && sharedAssetConfigList.size() > 0) {
+                    virtualCellNum = sharedAssetConfigList.get(0).getTel();
                 }
+                this.setNotificationContent("如需借用设备，请拨打虚拟网电话：" + virtualCellNum);
             }
         }
     }
@@ -1872,8 +1875,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                   LocalTime currentTime = LocalTime.now();
                   if(currentTime.isBefore(startLocalTime) || currentTime.isAfter(endLocalTime)) {
                       // operations in allocation center may not be enabled
-                      enableAllocateOperation = scObject.getBoolean("openService");
-                      willShowNotification = scObject.getBoolean("enableHint");
+//                      enableAllocateOperation = scObject.getBoolean("openService");
+//                      willShowNotification = scObject.getBoolean("enableHint");
+                      enableAllocateOperation = Boolean.FALSE;
+                      willShowNotification = Boolean.TRUE;
                   }
               } catch (Exception ex) {
                   logger.info("Configuration regarding to allocation center may be wrong: " + workflowConfigJson);
