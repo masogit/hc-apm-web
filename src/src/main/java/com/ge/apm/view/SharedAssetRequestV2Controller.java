@@ -89,6 +89,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     @Setter
     private String notificationContent = "";
 
+    @Getter
+    @Setter
+    private String selectedSartId;
+
     private String workflowConfigJson;
 
     public String getFilterApplyTime() {
@@ -838,6 +842,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
 
+                            if(this.isLogPatientInfoEnabled()) {
+                                if (StringUtils.isNotBlank(this.selectedSartId) && !this.selectedSartId.equals(applySwapType.getId())) {
+                                    continue;
+                                }
+                            }
+
                             if(applySwapType.getSharedAssetTypeId().equals(infoVo.getSharedAssetTypeUid())){
                                 selectedSart = applySwapType;//明细表联动选中
                                 
@@ -940,7 +950,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     WebUtil.addSuccessMessage("录入成功！");
                                     return;
                                 }else{
-                                    WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 预计借用数量已满！");
+                                    if(this.isLogPatientInfoEnabled()) {
+                                        WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName() + "-" + applySwapType.getPatientNum() + "-" + applySwapType.getPatientBedNum() +"’ 预计借用数量已满！");
+                                    } else {
+                                        WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 预计借用数量已满！");
+                                    }
                                     return;
                                 }
                             }
@@ -1562,9 +1576,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     .stream().filter(sart -> sart.getId().equals(selectedSart.getId()))
                     .findFirst();
                 if(optionalSharedAssetReqType.isPresent()) {
-                    optionalSharedAssetReqType.get();
                     try {
-                        BeanUtils.copyProperties(optionalSharedAssetReqType, selectedSart);
+                        SharedAssetReqType sharedAssetReqType = optionalSharedAssetReqType.get();
+                        BeanUtils.copyProperties(sharedAssetReqType, selectedSart);
+                        //update shared asset req detail if necessary
+                        this.selected.getSardList()
+                            .stream()
+                            .filter(sard -> sharedAssetReqType.getSharedId().equals(sard.getSharedId()))
+                            .forEach(sard -> {
+                                sard.setPatientNum(sharedAssetReqType.getPatientNum());
+                                sard.setPatientBedNum(sharedAssetReqType.getPatientBedNum());
+                            });
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
