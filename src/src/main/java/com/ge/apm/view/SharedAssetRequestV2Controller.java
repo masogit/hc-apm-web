@@ -1623,7 +1623,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
             sartList.add(selectedSart);
         }
-        logger.info(selected.getSartList().size());
     }
     
     
