@@ -25,6 +25,16 @@
                             <label class="label">设备在借数*</label>
                             <p:inputText id="broQty" value="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"   readonly="true"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <label class="label">病人号*</label>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
+                                         required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <label class="label">床号*</label>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientBedNum}"
+                                         required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还申请数*</label>
                             <!--<p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->

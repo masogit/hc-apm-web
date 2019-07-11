@@ -88,12 +88,14 @@
                                  var="item" widgetVar="varDataListDetail"
                         selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                        lazy="true" rowKey="#{item.swapName.hashCode()}" 
-                       sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
-                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        lazy="true" rowKey="#{item.id}"
+                       sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,50,100,500">
+
+                     <p:ajax event="rowSelect" update="editButton"/>
                 
                     <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
                         <h:outputText value="#{item.swapName}"/>
@@ -107,15 +109,19 @@
                     <p:column headerText="实际归还数" sortBy="#{item.actualQty}">
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>
+                   <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                     <h:outputText value="#{item.patientNum}"/>
+                   </p:column>
+                   <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                     <h:outputText value="#{item.patientBedNum}"/>
+                   </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
-                     <!--<f:facet name="{Toolbar}">-->
-                       <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">-->
-                            <!--<p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>-->
-                        <!--</p:commandButton>-->
-                       <!---->
-                    <!--</f:facet>-->
+
+                     <f:facet name="{Toolbar}">
+                       <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.prepareEditSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" />
+                     </f:facet>
                 </p:dataTable>
                 </p:fieldset>
                 
@@ -130,8 +136,14 @@
                             <h:outputText value="工时"/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.effort}"/>
                         </h:panelGroup>
+                        <h:panelGroup id="patientInfo" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                          <h:outputText value="病人号"/>
+                          <p:selectOneMenu value="#{sharedAssetRequestV2Controller.selectedSartId}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{sharedAssetRequestV2Controller.selected.sartList}" var="sart" itemLabel="#{sart.swapName} - #{sart.patientNum} - #{sart.patientBedNum}"  itemValue="#{sart.id}"/>
+                          </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup >
-<!--                            <p:growl id="growl2" showDetail="true" sticky="false" life="0"/> -->
                             <p:messages id="messages" closable="true" autoUpdate="true" style="width: 900px" />
                              
                             <p:inputText id="applyAssetInfo" maxlength="100" style="width: 200px" placeholder="资产编号/设备编号/二维码"  value="#{sharedAssetRequestV2Controller.selected.applyAssetInfo}" />
@@ -190,6 +202,12 @@
                             <h:outputText value="#{sharedAssetRequestV2Controller.getTotalAmount(item)}">
                                 <f:convertNumber pattern="0.00"/>
                             </h:outputText>
+                        </p:column>
+                        <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}" >
+                          <h:outputText value="#{item.patientNum}"/>
+                        </p:column>
+                        <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}" >
+                          <h:outputText value="#{item.patientBedNum}"/>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
