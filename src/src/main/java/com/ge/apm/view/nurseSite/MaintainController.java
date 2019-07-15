@@ -279,31 +279,31 @@ public class MaintainController implements ServerEventInterface{
 		listMaintainData.add(tempNurseSiteMaintain);
 	}
 
-	private List<NurseSiteMaintain> getMaintainDataNeedToRemove(List<NurseSiteMaintain> listSave) {
-		List<NurseSiteMaintain> existMaintainDataNoCheck = nurseSiteMaintainService.getDefaultMaintainDataUnchecked(orgUidList, startBatchDate, endBatchDate, 
-				nurseSiteMaintainConfig.getId());
-		List<NurseSiteMaintain> existMaintainDataChecked = nurseSiteMaintainService.getDefaultMaintainDataChecked(orgUidList, startBatchDate, endBatchDate,
-				nurseSiteMaintainConfig.getId());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Set<String> setCheckedMaintainStr = new HashSet<String>();
-		if (existMaintainDataChecked != null && existMaintainDataChecked.size() > 0) {
-			for (int i = 0; i < existMaintainDataChecked.size(); ++i) {
-				NurseSiteMaintain tempMaintain = existMaintainDataChecked.get(i);
-				setCheckedMaintainStr.add(sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence());
-			}
-		}
-		if (listSave != null && listSave.size() > 0) {
-			for (int i = 0; i > -1 && i < listSave.size(); ++i) {
-				NurseSiteMaintain tempMaintain = listSave.get(i);
-				String str = sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence();
-				if (setCheckedMaintainStr.contains(str)) {
-					listSave.remove(i);
-					--i;
-				}
-			}
-		}
-		return existMaintainDataNoCheck;
-	}
+//	private List<NurseSiteMaintain> getMaintainDataNeedToRemove(List<NurseSiteMaintain> listSave) {
+//		List<NurseSiteMaintain> existMaintainDataNoCheck = nurseSiteMaintainService.getDefaultMaintainDataUnchecked(orgUidList, startBatchDate, endBatchDate, 
+//				nurseSiteMaintainConfig.getId());
+//		List<NurseSiteMaintain> existMaintainDataChecked = nurseSiteMaintainService.getDefaultMaintainDataChecked(orgUidList, startBatchDate, endBatchDate,
+//				nurseSiteMaintainConfig.getId());
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//		Set<String> setCheckedMaintainStr = new HashSet<String>();
+//		if (existMaintainDataChecked != null && existMaintainDataChecked.size() > 0) {
+//			for (int i = 0; i < existMaintainDataChecked.size(); ++i) {
+//				NurseSiteMaintain tempMaintain = existMaintainDataChecked.get(i);
+//				setCheckedMaintainStr.add(sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence());
+//			}
+//		}
+//		if (listSave != null && listSave.size() > 0) {
+//			for (int i = 0; i > -1 && i < listSave.size(); ++i) {
+//				NurseSiteMaintain tempMaintain = listSave.get(i);
+//				String str = sdf.format(tempMaintain.getScheduleDate()) + tempMaintain.getSequence();
+//				if (setCheckedMaintainStr.contains(str)) {
+//					listSave.remove(i);
+//					--i;
+//				}
+//			}
+//		}
+//		return existMaintainDataNoCheck;
+//	}
 
 	// private void afterBatchCreateMaintain(List<NurseSiteMaintain>
 	// listCreate,List<NurseSiteMaintain> listExist){
