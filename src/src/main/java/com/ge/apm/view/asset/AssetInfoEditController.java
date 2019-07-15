@@ -856,11 +856,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        return autoCompleteService.autoCompleteManufacture(query, supplierList);
+        return autoCompleteService.autoCompleteManufacture(query, manuList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
+        return autoCompleteService.autoCompleteMaintainer(query, mantainList);
     }
 
     public List<String> completeAssetName(String prefix) {
