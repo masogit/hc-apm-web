@@ -12,7 +12,6 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ge.apm.domain.BatchJob;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
@@ -20,7 +19,6 @@ import com.ge.apm.service.uaa.TenantInfoConfigService;
 import lombok.Getter;
 import lombok.Setter;
 import webapp.framework.web.WebUtil;
-
 @ManagedBean
 @ViewScoped
 public class AdminConsoleController {
@@ -162,5 +160,15 @@ public class AdminConsoleController {
 		adminConsoleService.dailyUpdateNurseSiteJob(selectDate);
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
-	
+	public void deleteObjectHub(){
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				adminConsoleService.deleteObjectHub();
+			}
+		});
+		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }

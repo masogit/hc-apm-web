@@ -3,10 +3,12 @@ package com.ge.apm.service.uaa;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,14 +16,19 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BatchJobRepository;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
@@ -43,6 +50,9 @@ import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 
 @Service
@@ -96,6 +106,18 @@ public class AdminConsoleService {
 	
 	@Autowired
 	BatchJobRepository batchJobRepository;
+	
+	@Autowired
+    RestTemplate template;
+	
+	@Autowired
+	BlobFileService blobFileService;
+	
+	@Autowired
+	BlobObjectRepository blobObjectRepository;
+	
+	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
+    private String baseURL;
 	
 	private static final String MSG_TYPE_VERSION = "tenantVersionMenu";
 	
@@ -369,4 +391,66 @@ public class AdminConsoleService {
 		batchJob.setName(BatchJob.NAME_NURSESITE);
 		batchJobRepository.save(batchJob);
 	}
+	
+	public void deleteObjectHub(){
+		String gatewayURL = getGatewayURL(GatewayURL.SEARCH_FILE);
+		Set<String> setSkip=new HashSet<String>();
+		while(true){
+			int page=0;
+			int pageSize=1000;
+			boolean blnDelete=false;
+			String tempGateway=gatewayURL+"?page="+page+"&pageSize="+pageSize;
+	        try {
+	        	ResponseEntity<LinkedHashMap> response =template.getForEntity(tempGateway,LinkedHashMap.class);
+	            if (isOkay(response)) {
+	                LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+	                Collection<LinkedHashMap<String, Object>> listData = (Collection<LinkedHashMap<String, Object>>) responseMap.get("data");
+	                try {
+	                	if(listData!=null && listData.size()>0){
+	                		for(Map<String,Object> objMap:listData){
+	                			String id=(String)objMap.get("id");
+	                			if(!setSkip.contains(id)){
+	                				List<V2_BlobObject> listObj=blobObjectRepository.findAllByObjectStorageId(id);
+		                			if(listObj==null || listObj.size()==0){
+		                				blnDelete=true;
+		                				logger.info("delete storageId:"+id);
+		                				blobFileService.deleteBlobFilesByStorageId(id);
+		                			}
+		                			else{
+		                				setSkip.add(id);
+		                			}
+	                			}
+	                		}
+	                	}
+	                	else{
+	                		break;
+	                	}
+	    			} catch (Exception e) {
+	    				// TODO: handle exception
+	    				logger.error(e.getMessage());
+	    			}
+	            }
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.error(e.getMessage());
+			}
+	        if(!blnDelete){
+	        	++page;
+	        }
+	        if(setSkip.size()>100000){
+	        	setSkip.clear();
+	        }
+		}
+	}
+	public String getGatewayURL(GatewayURL url) {
+        return baseURL + url.toString();
+    }
+	private Boolean isOkay(ResponseEntity res) {
+
+        if (!res.getStatusCode().equals(HttpStatus.OK)) {
+            return false;
+        }
+        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
+        return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
+    }
 }
