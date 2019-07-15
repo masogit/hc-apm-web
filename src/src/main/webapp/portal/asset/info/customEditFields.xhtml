@@ -12,6 +12,7 @@
                          requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('serialNum')}"/>
         </h:panelGroup>
     </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'name')}" >
         <h:panelGroup>
             <label class="label">#{msg.name}<span style="color:red">*</span></label>
@@ -260,7 +261,7 @@
                          requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}" >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
         <h:panelGroup>
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
             <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacture']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
