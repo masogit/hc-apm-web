@@ -83,6 +83,17 @@ public class AssetInstallationService {
     @Autowired
     private ContractInfoItemRepository contractItemDao;
 
+
+    public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
+        return supplierDao.findSupplierByTenantUID(tenantUid);
+    }
+    public List<Supplier> getOnlyMaintainListBySiteUid(String tenantUid) {
+        return supplierDao.findMaintainByTenantUID(tenantUid);
+    }
+    public List<Supplier> getOnlyManuListBySiteUid(String tenantUid) {
+        return supplierDao.findManuByTenantUID(tenantUid);
+    }
+
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalList(token, srrivalListId);
