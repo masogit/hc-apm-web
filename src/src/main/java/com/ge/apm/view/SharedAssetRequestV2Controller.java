@@ -238,14 +238,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(sharedAssetConfigList != null && sharedAssetConfigList.size() > 0) {
                     virtualCellNum = sharedAssetConfigList.get(0).getTel();
                 }
-                if(selected != null && selected.getBehavior() != null) {
-                    if(selected.getBehavior().intValue() == 1) {
-                        this.setNotificationContent("如需借用设备，请拨打虚拟网电话：" + virtualCellNum);
-                    }
-                    if(selected.getBehavior().intValue() == 2) {
-                        this.setNotificationContent("如需归还设备，请拨打虚拟网电话：" + virtualCellNum);
-                    }
-                }
                 this.setNotificationContent(virtualCellNum);
             }
         }
