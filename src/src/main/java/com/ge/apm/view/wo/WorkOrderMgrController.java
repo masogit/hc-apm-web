@@ -971,6 +971,8 @@ public void partsPriceUpdate(){
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
+        statusStartTime=selectedWorkOrder.getStatusStartTime();
+        statusCloseTime=selectedWorkOrder.getStatusCloseTime();
       //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
