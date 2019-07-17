@@ -346,8 +346,12 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(4);
         formData.setAssigneeId(assigneeId);
         selectedWorkOrder.setCurrentStepName("维修中");
-        formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
-        formData.setStatusStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusStartTime()));
+        if(selectedWorkOrder.getStatusCloseTime()!=null) {
+            formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
+        }
+        if(selectedWorkOrder.getStatusStartTime()!=null) {
+            formData.setStatusStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusStartTime()));
+        }
         formData.setSubStatus(selectedWorkOrder.getSubStatus());
         formData.setDesc(comments);
         formData.setAssetStatus(assetStatus.toString());
