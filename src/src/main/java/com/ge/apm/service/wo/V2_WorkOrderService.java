@@ -392,6 +392,15 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
+
+        if(selectedWorkOrder.getStatusCloseTime()!=null) {
+            formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
+        }
+        if(selectedWorkOrder.getStatusStartTime()!=null) {
+            formData.setStatusStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusStartTime()));
+        }
+        formData.setSubStatus(selectedWorkOrder.getSubStatus());
+
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
