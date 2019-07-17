@@ -926,6 +926,11 @@ public void partsPriceUpdate(){
 
         selectedWorkOrder = dao.findById(woid);
         acker=woService.getAckerList(selectedWorkOrder.getId());
+        //如果子状态为1 说明是等待备件 需要显示日期
+       if(selectedWorkOrder.getSubStatus()==1){
+           displayTime=true;
+       }
+
         Integer userId = selectedWorkOrder.getAckId();
        if( userId!=null){
           ua1 = userDao.getById(userId);
