@@ -253,6 +253,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'repairType', '维修类别', 'repairType', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'coworker', '协作者', 'coworker', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'suscriber', '关注者', 'Suscriber', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'otherLink', '相关链接', 'Third Link', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetMgt', '设备运营管理', 'CPM Mgt', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ArrivalList', '到货清单', 'Arrival List', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListMgmt', '到货清单', 'Asset Arrival List Mgmt', NULL, '-1');
@@ -1710,6 +1712,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'common', '通用版', 'Common Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'business', '业务版', 'Business Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'ultrasound', '超声科室版', 'Ultrasound Dept', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'assetMgt', '设备运营管理', 'Asset Management', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Open', 'Open', 'Open', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Assigned', 'Assigned', 'Assigned', NULL, '-1');
@@ -1801,7 +1804,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'maintain.reportFormMgt', '报表模版管理', 'maintain.reportFormMgt', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure', '计量管理', 'measure', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.console', '计量工作台', 'measure.console', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.config', '计量管理', 'measure.config', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.categoryConfig', '计量类别设置', 'measure.categoryConfig', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.info', '计量信息', 'measure.info', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.rule', '计量规则', 'measure.rule', NULL, '-1');
@@ -1821,6 +1823,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.config', '设备绩效配置', 'performance.config', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.import', '设备绩效导入', 'performance.import', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'performance.BI', 'BI绩效分析平台', 'performance.BI', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'link', '相关链接', 'link', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'link.CPM', '设备运营管理', 'link.CPM', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config', '系统配置', 'config', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.org', '组织机构管理', 'config.org', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'config.user', '用户管理', 'config.user', NULL, '-1');
@@ -1895,3 +1899,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringOwner', '计量负责人', 'measuring owner', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersionMenu', 'measure.console', '计量工作台', 'measure.console', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '1', '等待备件', 'waitting acc', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '2', '返厂维修-有备机', 'return-backup', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '3', '返厂维修-无备机', 'return-unBackup', NULL, '-1');

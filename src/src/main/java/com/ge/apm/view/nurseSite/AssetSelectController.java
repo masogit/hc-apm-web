@@ -139,13 +139,15 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         //clear selected asset for each search
         this.selectedAssetUids.clear();
         this.selectedAssets.clear();
-        log.debug("findAssets2Maintain");
         this.buildBaseSearchFilters();
-        this.buildAdvancedSearchFilters();
-        assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
-        log.debug("{} assets has been loaded", assets4Maintain.size());
+        int filterCount=this.buildAdvancedSearchFilters();
+        if(filterCount==0){
+        	WebUtil.addErrorMessage("缺少筛选条件！");
+        }
+        else{
+        	assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+        }
         this.searchFilters.clear();
-//        this.tiggerEvent();
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
@@ -219,14 +221,14 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private void buildBaseSearchFilters() {
         // for access control
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID(), "1*"));
-        if(currentUser.getOrgLevel() == 1) {
+        if(selectedOrg.getOrgLevel() == 1) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
         }
-        if(currentUser.getOrgLevel() == 2) {
+        if(selectedOrg.getOrgLevel() == 2) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
         }
-        if(currentUser.getOrgLevel() == 3) {
+        if(selectedOrg.getOrgLevel() == 3) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
@@ -242,26 +244,33 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
      * In the form, depart_num has highest priority, it means if this field isn't blank, it will be
      * used as the only search filter, others will be ignored
      */
-    private void buildAdvancedSearchFilters() {
+    private int buildAdvancedSearchFilters() {
+    	int count=0;
         if(StringUtils.isNotBlank(this.getDepartNum())) {
             searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, this.getDepartNum(), "1*"));
+            ++count;
         } else {
             if(StringUtils.isNotBlank(this.getAssetName())) {
                 searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
                 searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, this.getAssetName(), "1*2+"));
+                ++count;
             }
             if(StringUtils.isNotBlank(this.getAssetGroup())) {
                 searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.getAssetGroup(), "1*"));
+                ++count;
             }
             if(StringUtils.isNotBlank(this.getFunctionType())) {
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
+                ++count;
             }
             if(StringUtils.isNotBlank(this.getSelectedDeptName())) {
                 String selectedDeptUid = deptList.stream().filter(dept -> this.getSelectedDeptName().equals(dept.getShortName())).map(dept -> dept.getUid()).findFirst().get();
                 searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
                 searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selectedDeptUid, "1*3+"));
+                ++count;
             }
         }
+        return count;
     }
 
 }

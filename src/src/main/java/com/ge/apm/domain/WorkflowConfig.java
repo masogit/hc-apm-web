@@ -194,6 +194,74 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "measure_dispatch_user_name2")
     private String measureDispatchUserName2;
 
+
+    /***
+     * 调剂相关
+     * @return
+     * { "periodStart": "08:00", "periodEnd": "20:00", "openService": true, "enableHint": true, "hintText": "20:00 - 08:00不受理调剂申请， 紧急情况请拨打xxxxx" }
+     */
+
+    @Column(name = "period_start")
+    private Date periodStart;
+
+    @Column(name = "period_end")
+    private Date periodEnd;
+
+    private Boolean openService;
+    private Boolean enableHint;
+    private String hintText;
+
+    @Column(name = "swap_center_config")
+    private String swapCenterConfig;
+
+    public String getSwapCenterConfig() {
+        return swapCenterConfig;
+    }
+
+    public void setSwapCenterConfig(String swapCenterConfig) {
+        this.swapCenterConfig = swapCenterConfig;
+    }
+
+    public Date getPeriodStart() {
+        return periodStart;
+    }
+
+    public void setPeriodStart(Date periodStart) {
+        this.periodStart = periodStart;
+    }
+
+    public Date getPeriodEnd() {
+        return periodEnd;
+    }
+
+    public void setPeriodEnd(Date periodEnd) {
+        this.periodEnd = periodEnd;
+    }
+
+    public Boolean getOpenService() {
+        return openService;
+    }
+
+    public void setOpenService(Boolean openService) {
+        this.openService = openService;
+    }
+
+    public Boolean getEnableHint() {
+        return enableHint;
+    }
+
+    public void setEnableHint(Boolean enableHint) {
+        this.enableHint = enableHint;
+    }
+
+    public String getHintText() {
+        return hintText;
+    }
+
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
+    }
+
     public Boolean getNotSendMsgInTakeOrderMode() {
         return notSendMsgInTakeOrderMode;
     }
@@ -359,6 +427,11 @@ public class WorkflowConfig implements Serializable {
     @Setter
     @Column(name = "aa_default_return_man_hour")
     private Double defaultReturnManHour = 0.0D;
+
+    @Getter
+    @Setter
+    @Column(name = "aa_enable_log_patient_info")
+    private Boolean enableLogPatientInfo = Boolean.FALSE;
 
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;

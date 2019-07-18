@@ -32,17 +32,19 @@ public class TenantInfoConfigService {
 	public static final String VERSION_FUNCTION = "business";
 	public static final String VERSION_COMMON = "common";
 	public static final String VERSION_ULTRASOUND = "ultrasound";
+	public static final String VERSION_ASSETMGT="assetMgt";
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
 	private List<TenantInfoConfigItem> menuList;
 	private TreeNode root;
 	private List<TenantInfoConfigItem> listOriginVersionInfo;
-	private List<String> listVersionName;
 	// private static Map<String, String> mapVersion;
 	private List<String> listKey;
 	private List<String> listLabel;
 	private TreeNode[] selectedNodes;
+	private String cpmURL;
+	
 
 	@Autowired
 	I18nMessageRepository i18nRepository;
@@ -50,26 +52,28 @@ public class TenantInfoConfigService {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
+		JSONObject jsonResult=new JSONObject();
+		jsonResult.put("edition", edition);
 		if (root == null) {
-			return "{\"edition\":\"" + edition + "\",\"menuList\":" + parseNodeToList().toString() + "}";
+			jsonResult.put("menuList", parseNodeToJSONArray());
 		} else {
-			StringBuilder sb = new StringBuilder();
-			readTreeNode(root, sb);
-			String result = sb.toString();
-			if (result.length() > 0) {
-				result = result.substring(0, result.length() - 1);
+			JSONArray jsonArr=new JSONArray();
+			readTreeNode(root, jsonArr);
+			jsonResult.put("menuList", jsonArr);
+			if(cpmURL!=null){
+				jsonResult.put("cpmURL", cpmURL);
 			}
-			return "{\"edition\":\"" + edition + "\",\"menuList\":[" + result + "]}";
 		}
+		return jsonResult.toJSONString();
 	}
 	
 	public String toMenusStr(){
 		if (root == null) {
 			return null;
 		} else {
-			StringBuilder sb = new StringBuilder();
-			readTreeNodeN(root, sb);
-			String result = sb.toString();
+			JSONArray jsonArr=new JSONArray();
+			readTreeNodeN(root, jsonArr);
+			String result = jsonArr.toString();
 			if (result.length() > 0) {
 				result = result.substring(0, result.length() - 1);
 			}
@@ -77,26 +81,26 @@ public class TenantInfoConfigService {
 		}
 	}
 
-	private void readTreeNode(TreeNode root, StringBuilder sb) {
+	private void readTreeNode(TreeNode root, JSONArray jsonArr) {
 		if (root.isSelected()) {
 			TenantInfoConfigItem tempItem = (TenantInfoConfigItem) root.getData();
 			if (tempItem != null) {
-				sb.append("\"" + tempItem.getKey() + "\",");
+				jsonArr.add((tempItem.getKey()));
 			}
 		}
 		for (TreeNode node : root.getChildren()) {
-			readTreeNode(node, sb);
+			readTreeNode(node, jsonArr);
 		}
 	}
-	private void readTreeNodeN(TreeNode root, StringBuilder sb) {
+	private void readTreeNodeN(TreeNode root, JSONArray jsonArr) {
 		if (root.isSelected()) {
 			TenantInfoConfigItem tempItem = (TenantInfoConfigItem) root.getData();
 			if (tempItem != null) {
-				sb.append(tempItem.getKey() + ",");
+				jsonArr.add(tempItem.getKey());
 			}
 		}
 		for (TreeNode node : root.getChildren()) {
-			readTreeNodeN(node, sb);
+			readTreeNodeN(node, jsonArr);
 		}
 	}
 
@@ -111,15 +115,15 @@ public class TenantInfoConfigService {
 		return sb.toString();
 	}
 
-	private List<TenantInfoConfigItem> parseNodeToList() {
-		List<TenantInfoConfigItem> tempList = new ArrayList<TenantInfoConfigItem>();
+	private JSONArray parseNodeToJSONArray() {
+		JSONArray jsonArr=new JSONArray();
 		for (int i = 0; i < menuList.size(); ++i) {
 			TenantInfoConfigItem tempItem = menuList.get(i);
 			if (tempItem.isValue()) {
-				tempList.add(tempItem);
+				jsonArr.add(tempItem.getKey());
 			}
 		}
-		return tempList;
+		return jsonArr;
 	}
 
 	private void resetVersion() {
@@ -167,6 +171,29 @@ public class TenantInfoConfigService {
 			}
 			if(key.equals("performance.bigScreen")){
 				tempItem.setValue(false);
+			}
+			if(key.equals("measure.console")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("measure.rule")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("measure.ruleMgt")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("link")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("link.CPM")){
+				tempItem.setValue(false);
+			}
+			if (edition.equals(VERSION_ASSETMGT)) {
+				if(key.equals("link")){
+					tempItem.setValue(true);
+				}
+				if(key.equals("link.CPM")){
+					tempItem.setValue(true);
+				}
 			}
 		}
 		if (root != null) {
@@ -222,8 +249,10 @@ public class TenantInfoConfigService {
 		}
 	}
 
+	//init method
 	public void init() {
 		initKeyLabel();
+		this.cpmURL="";
 		menuList = getListVersions();
 		setEdition(VERSION_COMMON);
 	}
@@ -272,6 +301,7 @@ public class TenantInfoConfigService {
 			buildRoot();
 		}
 	}
+	//init method
 	public void parseStr(String str) {
 		initKeyLabel();
 		if (StringUtils.isEmpty(str)) {
@@ -280,6 +310,7 @@ public class TenantInfoConfigService {
 		}
 		JSONObject jsonObj = JSONObject.parseObject(str);
 		edition = jsonObj.getString("edition");
+		this.cpmURL=jsonObj.getString("cpmURL");
 		JSONArray arr = jsonObj.getJSONArray("menuList");
 		List<TenantInfoConfigItem> tempListVersionItem = new ArrayList<TenantInfoConfigItem>();
 		Set<String> setItemKey = new HashSet<String>();
@@ -352,16 +383,6 @@ public class TenantInfoConfigService {
 		}
 	}
 
-	public List<String> getListVersionName() {
-		if (listVersionName == null) {
-			listVersionName = new ArrayList<String>();
-			listVersionName.add(VERSION_FUNCTION);
-			listVersionName.add(VERSION_COMMON);
-			listVersionName.add(VERSION_ULTRASOUND);
-		}
-		return listVersionName;
-	}
-
 	private List<TenantInfoConfigItem> getListVersions() {
 		if (listOriginVersionInfo == null) {
 			listOriginVersionInfo = new ArrayList<TenantInfoConfigItem>();
@@ -426,4 +447,13 @@ public class TenantInfoConfigService {
 	public List<String> getListKey() {
 		return this.listKey;
 	}
+
+	public String getCpmURL() {
+		return cpmURL;
+	}
+
+	public void setCpmURL(String cpmURL) {
+		this.cpmURL = cpmURL;
+	}
+	
 }

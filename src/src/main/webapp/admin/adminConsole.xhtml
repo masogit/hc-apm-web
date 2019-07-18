@@ -71,6 +71,13 @@
 					</p:scrollPanel>
 					<p:commandButton actionListener="#{adminConsoleController.updateSysMenu()}" value="更新系统角色默认菜单" update=":growl"></p:commandButton>
 				</p:fieldset>
+				<p:fieldset legend="触发护士站日常更新Job（只用点击一次即可，请勿重复点击）">
+					<p:calendar value="#{adminConsoleController.selectDate}"></p:calendar>
+					<p:commandButton actionListener="#{adminConsoleController.dailyUpdateNurseSiteJob()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.deleteObjectHub()}" value="批量更新所有租户" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

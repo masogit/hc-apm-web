@@ -12,7 +12,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 
 /**
- * Created by 212605082 on 2017/11/7.
+ * Created by 503035627
  */
 @Service
 public class CaptureDataMessagesService {

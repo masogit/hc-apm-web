@@ -159,6 +159,22 @@
                             </p:fieldset>
 
                         </p:tab>-->
+                        <!--<p:tab title="维修字段配置">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:dataList id="WebWorkOrderFieldsList" value="#{customConfigController.customConfigObject.webPage.pageWorkOrder.group}" var="groupItem" varStatus="groupIndex" type="definition" >
+                                    <p:fieldset legend="维修信息字段组" rendered="#{groupItem.type eq 'assetInfo'}">
+                                        <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                        <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('WebWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
+                                        <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveWebWorkOrderFieldsList')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+
+                                    </p:fieldset>
+
+                                </p:dataList>
+                            </p:panelGrid>
+
+
+                        </p:tab>-->
+
                         <p:tab title="微信端报修页面">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <p:dataList id="MobileWorkOrderFieldsList" value="#{customConfigController.customConfigObject.mobilePage.pageWorkOrder.group}" var="groupItem" varStatus="groupIndex" type="definition" >

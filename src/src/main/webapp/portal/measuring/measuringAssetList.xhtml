@@ -70,6 +70,9 @@
                     <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
+                    <p:column headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.measuringType}"/>
+                    </p:column>
                     <p:column headerText="最后计量日期" sortBy="#{item.lastMeteringDate}" filterBy="#{item.lastMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterLastMeteringDate" widgetVar="varFilterLastMeteringDate" />

@@ -181,9 +181,25 @@ public class UserContextService implements Serializable {
     }
     public TenantInfo getTenantInfo(){
         if(tenant!=null) return tenant;
-        
     	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
     	tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
+    	if(tenant.getCpmURL()==null){
+    		String configStr=tenant.getTenantConfig();
+        	if(StringUtils.isNotEmpty(configStr)){
+        		try {
+    				JSONObject jsonObj=JSONObject.parseObject(configStr);
+    				String cpmURL=jsonObj.getString("cpmURL");
+    				if(StringUtils.isEmpty(cpmURL)){
+    				}
+    				else{
+    					tenant.setCpmURL(cpmURL);
+    				}
+    			} catch (Exception e) {
+    				// TODO: handle exception
+    				tenant.setCpmURL("");
+    			}
+        	}
+    	}
         return tenant;
     }
     public List<CustomRole> getListCustomRole(Integer userId){
@@ -551,8 +567,8 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserDefaultHomePage() {
+//    	return "/portal/profile.xhtml";
         this.getLoginUser();
-
         if (userAccount == null) {
             return "/login.xhtml";
         } else {

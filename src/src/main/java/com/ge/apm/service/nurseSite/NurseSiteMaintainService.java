@@ -253,7 +253,6 @@ public class NurseSiteMaintainService {
 		nurseSiteMaintainConfigItemRepository.save(obj);
 	}
 
-	@Transactional
 	public boolean deleteMaintain(NurseSiteMaintain maintain,String userUid) {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
@@ -1154,7 +1153,15 @@ public class NurseSiteMaintainService {
 				if (assetInfo != null) {
 					if (StringUtils.isEmpty(clinicalUid)) {
 						clinicalUid = assetInfo.getClinicalDeptUID();
-						clinicalName = getOrgInfo(clinicalUid).getShortName();
+						OrgInfo tempOrgInfo=getOrgInfo(clinicalUid);
+						if(tempOrgInfo!=null){
+							clinicalName = tempOrgInfo.getShortName();
+						}
+						else{
+							listCheckAssets.remove(i);
+							--i;
+							continue;
+						}
 						tenantUID = assetInfo.getTenantUID();
 						institutionUID = assetInfo.getInstitutionUID();
 						hospitalUID = assetInfo.getHospitalUID();

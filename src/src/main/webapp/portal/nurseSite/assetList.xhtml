@@ -40,7 +40,6 @@
                                 scrollHeight="300"  forceSelection="true" size="20" disabled="#{assetSelectController.is4Edit}"
                                 completeMethod="#{assetSelectController.autoCompleteDeptName}">
                     <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
-                    <f:validator validatorId="assetSearchValidator"/>
                     <f:attribute name="departNumComponent" value="#{departNumComponent}"/>
                 </p:autoComplete>
             </h:panelGroup>

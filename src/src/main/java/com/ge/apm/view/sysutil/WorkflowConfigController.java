@@ -7,11 +7,15 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -522,6 +526,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			return;
 		}
 
+		setSwapCenter();
+
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
@@ -533,6 +539,35 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         super.save();
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
     }
+
+    public void setSwapCenter(){
+		Map<String,Object> swapCenterMap = Maps.newHashMap();
+		if(selected.getPeriodStart() != null){
+			DateTime start = new DateTime(selected.getPeriodStart());
+			swapCenterMap.put("periodStart",start.toString("HH:mm"));
+		}
+		if(selected.getPeriodEnd() != null){
+			DateTime end = new DateTime(selected.getPeriodEnd());
+			swapCenterMap.put("periodEnd",end.toString("HH:mm"));
+		}
+		swapCenterMap.put("enableHint",Boolean.TRUE);
+		swapCenterMap.put("openService",Boolean.TRUE);
+		swapCenterMap.put("hintText",null);//暂不启用20190709
+/*		if(selected.getEnableHint() != null){
+			swapCenterMap.put("enableHint",selected.getEnableHint());
+		}
+		if(selected.getOpenService() != null){
+			swapCenterMap.put("openService",selected.getOpenService());
+		}
+		if(selected.getHintText() != null){
+			swapCenterMap.put("hintText",selected.getHintText());
+		}*/
+		if(swapCenterMap.isEmpty()){
+			selected.setSwapCenterConfig(null);
+		}else{
+			selected.setSwapCenterConfig(JSON.toJSONString(swapCenterMap));
+		}
+	}
 
 	@Override
 	public void delete() {
@@ -555,6 +590,19 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		updateDispater();
 		updateApproverList();
 		updateDispatherClinical();
+		parseSwapCenter();
+	}
+
+	public void parseSwapCenter(){
+		if(Strings.isBlank(selected.getSwapCenterConfig())){
+			return;
+		}
+		JSONObject swapCenter = JSON.parseObject(selected.getSwapCenterConfig());
+		//selected.setPeriodStart(swapCenter.getString("periodStart"));
+		//selected.setPeriodEnd(swapCenter.getString("periodEnd"));
+		selected.setOpenService(swapCenter.getBoolean("openService"));
+		selected.setEnableHint(swapCenter.getBoolean("enableHint"));
+		selected.setHintText(swapCenter.getString("hintText"));
 	}
 
 	public void prepareCreate(){
@@ -573,6 +621,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
+		selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
 		selectedUserOrg = null;
 
 /*		updateDispater();
