@@ -326,6 +326,9 @@ class WorkOrderActionForm {
     String caseType;
     String confirmedDownTime;
     String confirmedUpTime;
+    String statusStartTime;
+    String statusCloseTime;
+    Integer subStatus;
     String assetStatus;
     String intExtType;
     Object stepDetail;
@@ -338,6 +341,7 @@ class WorkOrderActionForm {
     Integer repairType;
     String repairResult;
     Double externalExpense;
+
     List<V2_BlobObject> attachments;
 
     public String getRepairResult() {
@@ -540,6 +544,29 @@ class WorkOrderActionForm {
         this.externalExpense = externalExpense;
     }
 
+    public String getStatusStartTime() {
+        return statusStartTime;
+    }
+
+    public void setStatusStartTime(String statusStartTime) {
+        this.statusStartTime = statusStartTime;
+    }
+
+    public String getStatusCloseTime() {
+        return statusCloseTime;
+    }
+
+    public void setStatusCloseTime(String statusCloseTime) {
+        this.statusCloseTime = statusCloseTime;
+    }
+
+    public Integer getSubStatus() {
+        return subStatus;
+    }
+
+    public void setSubStatus(Integer subStatus) {
+        this.subStatus = subStatus;
+    }
 }
 
 class WorkOrderForm {

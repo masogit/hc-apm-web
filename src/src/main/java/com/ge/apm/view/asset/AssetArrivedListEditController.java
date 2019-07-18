@@ -97,6 +97,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
+    List<Supplier> manueList;
     private boolean needInstorageCheck;
     private AutoCompleteService autoCompleteService;
 
@@ -177,7 +178,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
         suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
+
+        manueList=aiService.getOnlyManuListBySiteUid( UserContextService.getCurrentUserAccount().getTenantUID());
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+
         needInstorageCheck = userContextService.needInstorageCheck();
     }
 
@@ -497,7 +501,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        return autoCompleteService.autoCompleteManufacture(query, suppliersList);
+        return autoCompleteService.autoCompleteManufacture(query, manueList);
     }
 
     public void onSupplierChange() {

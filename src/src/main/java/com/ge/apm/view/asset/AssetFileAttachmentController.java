@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import java.util.HashMap;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -7,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.asset.AssetTagService;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -27,6 +29,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
@@ -72,6 +75,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private V2_BlobObject batchBlobObject;
     private String boSubTypeBatch;
 
+    //复选的附件数据
+    private Map<String, Boolean> selectedMap;
+    private List<V2_BlobObject> currentPageBlobObject;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(BlobObjectRepository.class);
@@ -87,6 +94,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
+        this.selectedMap = new HashMap();
         this.initBatchData();
     }
 
@@ -104,10 +112,19 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String)item.value).findAny().orElse(""));
         String boName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String)item.value).findAny().orElse(""));
         String assetName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.name")).map(item -> (String)item.value).findAny().orElse(""));
-        String functionType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.functionType")).map(item -> (String)item.value).findAny().orElse(""));
 
-        return dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
-        
+        String functionTypeStr = searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.functionType")).map(item -> (String)item.value).findAny().orElse("");
+        String functionType = "%like%".replace("like", functionTypeStr);
+
+        Page<V2_BlobObject> blobObjectPage;
+        if(StringUtils.isEmpty(functionTypeStr)){
+            blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+        }else{
+            blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+        }
+
+        currentPageBlobObject = blobObjectPage.getContent();
+        return blobObjectPage;
     }
 
     @Override
@@ -251,11 +268,15 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     public void getQueryAssetsList() {
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null)){
             sourceAssets = assetTagService.getAssetList(queryAsset);
-            targetAssets.forEach((item)->{
+
+            sourceAssets = new ArrayList(sourceAssets);
+            sourceAssets.removeAll(targetAssets);
+
+            /*targetAssets.forEach((item)->{
                 if(sourceAssets.contains(item)){
                     sourceAssets.remove(item);
                 }
-            });
+            });*/
         }else{
             sourceAssets = new ArrayList<AssetInfo>();
         }
@@ -300,6 +321,25 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         batchBlobObject.setObjectName(null);
         batchBlobObject.setObjectStorageId(null);
         batchBlobObject.setObjectSize(null);
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageBlobObject.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (V2_BlobObject item : currentPageBlobObject) {
+            selectedMap.put(item.getId(), !isSelectedAll);
+        }
+    }
+
+    public void deleteBatch(){
+        selectedMap.forEach((key, value) -> {
+            if(value){
+                blobService.deleteBlobFileById(key);
+            }
+        });
+    }
+
+    public boolean isChecked(){
+        return selectedMap.containsValue(true);
     }
 
     public void batchSave(){
@@ -431,5 +471,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void setBoSubTypeBatch(String boSubTypeBatch) {
         this.boSubTypeBatch = boSubTypeBatch;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
     }
 }

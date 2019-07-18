@@ -187,6 +187,12 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "will_be_delivered")
     private Boolean willBeDelivered = Boolean.FALSE;
 
+    @Column(name = "patient_num")
+    private String patientNum;
+
+    @Column(name = "patient_bed_num")
+    private String patientBedNum;
+
     public String getId() {
         return id;
     }
@@ -900,4 +906,19 @@ public class SharedAssetReqDetail implements Serializable{
         return Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
     }
 
+    public String getPatientNum() {
+        return patientNum;
+    }
+
+    public void setPatientNum(String patientNum) {
+        this.patientNum = patientNum;
+    }
+
+    public String getPatientBedNum() {
+        return patientBedNum;
+    }
+
+    public void setPatientBedNum(String patientBedNum) {
+        this.patientBedNum = patientBedNum;
+    }
 }

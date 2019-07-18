@@ -73,6 +73,10 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "case_type")
     private Integer caseType;
 
+
+    @Column(name = "sub_status")
+    private Integer subStatus;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 16)
@@ -111,6 +115,12 @@ public class V2_WorkOrder implements Serializable {
 
     @Column(name = "close_time")
     private Date closeTime;
+
+
+    @Column(name = "status_start_time")
+    private Date statusStartTime;
+    @Column(name = "status_close_time")
+    private Date statusCloseTime;
 
     @Column(name = "checkin")
     private Integer checkin;
@@ -767,6 +777,15 @@ public class V2_WorkOrder implements Serializable {
         this.closeStepEndTime = closeStepEndTime;
     }
 
+
+    public Integer getSubStatus() {
+        return subStatus;
+    }
+
+    public void setSubStatus(Integer subStatus) {
+        this.subStatus = subStatus;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
@@ -793,5 +812,21 @@ public class V2_WorkOrder implements Serializable {
 
     public void setAckId(Integer ackId) {
         this.ackId = ackId;
+    }
+
+    public Date getStatusStartTime() {
+        return statusStartTime;
+    }
+
+    public void setStatusStartTime(Date statusStartTime) {
+        this.statusStartTime = statusStartTime;
+    }
+
+    public Date getStatusCloseTime() {
+        return statusCloseTime;
+    }
+
+    public void setStatusCloseTime(Date statusCloseTime) {
+        this.statusCloseTime = statusCloseTime;
     }
 }

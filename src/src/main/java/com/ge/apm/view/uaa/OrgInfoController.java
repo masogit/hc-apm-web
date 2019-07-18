@@ -439,12 +439,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         //检查该组织是否已经有资产属于该组织。
         checkFilters.clear();
-        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-        checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-        checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-        checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-        checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
+        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
+        checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
+        checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
+        checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
+        checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(), "1*2+"));
 
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
@@ -505,8 +506,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         //检查该组织是否已经有资产属于该组织。
         checkFilters.clear();
-        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
-        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1*2+"));
+        checkFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1*2+"));
+
 
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);

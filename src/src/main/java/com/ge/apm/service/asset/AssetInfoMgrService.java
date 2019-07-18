@@ -195,6 +195,16 @@ public class AssetInfoMgrService {
     public List<Supplier> getSuplierListBySiteUid(String tenantUid) {
         return supplierDao.getByTenantUID(tenantUid);
     }
+    public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
+        return supplierDao.findSupplierByTenantUID(tenantUid);
+    }
+    public List<Supplier> getOnlyMaintainListBySiteUid(String tenantUid) {
+        return supplierDao.findMaintainByTenantUID(tenantUid);
+    }
+    public List<Supplier> getOnlyManuListBySiteUid(String tenantUid) {
+        return supplierDao.findManuByTenantUID(tenantUid);
+    }
+
 
     public AssetInfo getAssetInfoByUid(String assetUid) {
         return assetDao.findByUid(assetUid);

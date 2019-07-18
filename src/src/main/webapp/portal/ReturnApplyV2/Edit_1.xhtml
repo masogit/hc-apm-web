@@ -86,6 +86,12 @@
                         <p:column headerText="实际归还数" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.actualQty}"/>
                         </p:column>
+                        <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{item.patientNum}"/>
+                        </p:column>
+                        <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{item.patientBedNum}"/>
+                        </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
                         </p:column>

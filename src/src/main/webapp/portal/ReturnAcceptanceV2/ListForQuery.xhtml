@@ -108,6 +108,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patientNum}" filterBy="#{item.patientNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.patientNum}"/>
+                        </p:column>
+                        <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patientBedNum}" filterBy="#{item.patientBedNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.patientBedNum}"/>
+                        </p:column>
                         <p:column headerText="单价" sortBy="#{item.unitPrice}">
                             <f:facet name="filter">
                                 <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>

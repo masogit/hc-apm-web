@@ -525,6 +525,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "termination_cause")
     private String terminationCause;
 
+    @Column(name = "measuring_type")
+    private String measuringType;
+
     @Transient
     private int lineNum;
 
@@ -1727,6 +1730,14 @@ public class AssetInfo implements ChineseName,Serializable {
         this.terminationCause = terminationCause;
     }
 
+    public String getMeasuringType() {
+        return measuringType;
+    }
+
+    public void setMeasuringType(String measuringType) {
+        this.measuringType = measuringType;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1781,6 +1792,8 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("assetInfoUID", this.getUid());
         reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
         reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
+        reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
+        reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
         return reqDetail;
     }
 
@@ -1802,6 +1815,8 @@ public class AssetInfo implements ChineseName,Serializable {
         reqDetail.put("isIntact", this.getSharedAssetReqDetail().getIntact());
         reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
         reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
+        reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
+        reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
         return reqDetail;
     }
 

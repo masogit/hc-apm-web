@@ -5,7 +5,7 @@
 
 <ui:composition>
 	<p:dialog id="SiteInfoEditVersionDlg" widgetVar="SiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息"
-		width="700px" height="600px;">
+		width="700px" height="600px;" maximizable="true">
 		<p:ajax event="close" update=":SiteInfoListForm:datalist" />
 		<h:form id="SiteInfoEditVersionForm" rendered="#{tenantInfoController.selected != null}">
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -15,6 +15,10 @@
 						<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
 						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 					</p:selectOneMenu>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">设备运营管理链接</label>
+					<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
 				</h:panelGroup>
 			</p:panelGrid>
 			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
