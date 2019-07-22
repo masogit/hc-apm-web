@@ -73,9 +73,16 @@ public class TenantInfoConfigService {
 		} else {
 			JSONArray jsonArr=new JSONArray();
 			readTreeNodeN(root, jsonArr);
-			String result = jsonArr.toString();
-			if (result.length() > 0) {
-				result = result.substring(0, result.length() - 1);
+			StringBuilder sb=new StringBuilder();
+			if(jsonArr!=null && jsonArr.size()>0){
+				for(int i=0;i<jsonArr.size();++i){
+					sb.append(jsonArr.get(i));
+					sb.append(",");
+				}
+			}
+			String result=sb.toString();
+			if(StringUtils.isNotEmpty(result) && result.length()>1){
+				result=result.substring(0, result.length()-1);
 			}
 			return result;
 		}
