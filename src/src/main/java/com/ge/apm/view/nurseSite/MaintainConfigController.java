@@ -165,10 +165,14 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
+  
     	if(this.listSelected!=null && this.listSelected.size()>0){
     		for(int i=0;i<listSelected.size();++i){
     			NurseSiteMaintainConfig tempConfig=listSelected.get(i);
-    			nurseSiteMaintainService.deleteMaintainConfig(tempConfig);
+    			boolean result=nurseSiteMaintainService.deleteMaintainConfig(tempConfig);
+    			if(!result){
+    				WebUtil.addSuccessMessage("配置 "+tempConfig.getName()+" 有工单存在不能删除！");
+    			}
     		}
     	}
     	WebUtil.addSuccessMessage("删除成功！");
