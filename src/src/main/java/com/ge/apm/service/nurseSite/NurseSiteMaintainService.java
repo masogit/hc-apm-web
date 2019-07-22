@@ -1240,13 +1240,8 @@ public class NurseSiteMaintainService {
 
 	@Transactional
 	public boolean deleteMaintainConfig(NurseSiteMaintainConfig tempConfig) {
-		Integer count = nurseSiteMaintainRepository.fetchCountByConfigId(tempConfig.getId());
-		if (count != null && count > 0) {
-			return false;
-		} else {
-			deleteConfigChildren(tempConfig.getId());
-			delete(tempConfig);
-		}
+		deleteConfigChildren(tempConfig.getId());
+		delete(tempConfig);
 		return true;
 	}
 

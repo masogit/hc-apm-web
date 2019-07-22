@@ -688,9 +688,6 @@ public class PccExamineReportController extends MyCRUDController<PccExamineRepor
 	}
 
 	public void setListSelected(List<PccExamineReport> listSelected) {
-		if (listSelected != null) {
-		}
-
 		if (listSelected != null && listSelected.size() == 1) {
 			this.selected = listSelected.get(0);
 		} else {
