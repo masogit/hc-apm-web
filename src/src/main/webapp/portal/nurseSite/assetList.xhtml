@@ -20,7 +20,7 @@
                         <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}"
                                 var="node" selectionMode="single">
                             <p:ajax process="@this" event="select"
-                                    update="@parent:selectedOrgName,@parent:deptOrgInfo"
+                                    update="@parent:selectedOrgName,@parent:deptOrgInfoCreate"
                                     listener="#{assetSelectController.onSelectOrgFromTree}" oncomplete="PF('varOrgPanel').hide();" />
                             <p:ajax process="@this" event="expand" />
                             <p:ajax process="@this" event="collapse" />
@@ -35,14 +35,28 @@
             <h:panelGroup>
                 <!--指代所属科室或使用科室-->
                 <label class="label">科室</label>
-                <p:autoComplete id="deptOrgInfo"
+                <!-- <p:autoComplete id="deptOrgInfo"
                                 dropdown="true" value="#{assetSelectController.selectedDeptName}"
                                 scrollHeight="300"  forceSelection="true" size="20" disabled="#{assetSelectController.is4Edit}"
-                                completeMethod="#{assetSelectController.autoCompleteDeptName}">
+                                completeMethod="#{assetSelectController.autoCompleteDeptName}" multiple="true">
                     <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
                     <f:attribute name="departNumComponent" value="#{departNumComponent}"/>
-                </p:autoComplete>
-            </h:panelGroup>
+                </p:autoComplete> -->
+				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
+					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">
+					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+					<p:column style="float: left;text-align:left;">
+						<h:outputText value="#{t.shortName}" />
+					</p:column>
+				</p:selectManyMenu>
+				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
+					showCheckbox="false" style="width:100%" rendered="#{assetSelectController.is4Edit}" disabled="#{assetSelectController.is4Edit}">
+					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+					<p:column style="float: left;text-align:left;">
+						<h:outputText value="#{t.shortName}" />
+					</p:column>
+				</p:selectOneMenu>
+			</h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备名称</label>
                 <p:inputText value="#{assetSelectController.assetName}"/>
