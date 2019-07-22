@@ -14,6 +14,7 @@
 					<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg"
 						oncomplete="PF('maintainBatchCompleteDialog').show()" rendered="#{maintainController.customRoleAuth.authModify}"/>
 					<p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{maintainController.customRoleAuth.authCreate}"/>
+					<p:commandButton id="batchDeleteButton" value="批量删除" title="批量删除" update=":maintainBatchDeleteDlg" oncomplete="PF('maintainBatchDeleteDialog').show()" rendered="#{maintainController.customRoleAuth.authDelete}"/>
 					<br />
 					<ui:include src="/portal/asset/searchDiv.xhtml"></ui:include>
 				</h:form>
@@ -79,6 +80,7 @@
 				</p:dialog>
 				
 				<ui:include src="maintainBatchCreate.xhtml" />
+				<ui:include src="maintainBatchDelete.xhtml" />
 				<ui:include src="maintainData.xhtml" />
 				<ui:include src="maintainBatchComplete.xhtml" />
 			</div>
