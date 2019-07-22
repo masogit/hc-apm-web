@@ -35,7 +35,7 @@
 				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.eventUid}" />
 				</p:column>
-				<p:column headerText="更新时间" sortBy="#{item.createTime}">
+				<p:column headerText="更新时间" sortBy="#{item.createTime}" rendered="false">
 					<h:outputText value="#{item.createTime}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
 					</h:outputText>
