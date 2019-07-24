@@ -263,6 +263,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
 
+    public void cancelBatchPMorder() {
+        pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
+    }
+
+
     public boolean allowChanged() {
         //is closed
         if (selected == null) {
