@@ -116,6 +116,7 @@ public class AssetClinicalRecord implements Serializable {
     @Column(name = "source_record_id")
     private String sourceRecordId;
 
+    @Size(max = 128)
     @Column(name = "pre_exam_department")
     private String preExamDepartment;
 
