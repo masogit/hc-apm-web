@@ -256,6 +256,19 @@ public void partsPriceUpdate(){
 //        res.sort(new PinYinComparatorByName());
         return res;
     }
+
+    public void repairResultSet(){
+        if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
+            currentStatus =1;
+        }
+        else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
+            currentStatus =3;
+        } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
+            currentStatus =4;
+        }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){
+            currentStatus =3;
+        }
+    }
     public void selectSubstatus(){
         if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
             subStatus =1;
