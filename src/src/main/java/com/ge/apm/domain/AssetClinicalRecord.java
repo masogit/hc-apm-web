@@ -122,7 +122,7 @@ public class AssetClinicalRecord implements Serializable {
 
     @Column(name = "is_positive")
     private Integer isPositive;
-    
+
     public AssetClinicalRecord() {
     }
 
@@ -320,22 +320,6 @@ public class AssetClinicalRecord implements Serializable {
 
     public void setOriginalProcedureStepName(String originalProcedureStepName) {
         this.originalProcedureStepName = originalProcedureStepName;
-    }
-
-    public String getPreExamDepartment() {
-        return preExamDepartment;
-    }
-
-    public void setPreExamDepartment(String preExamDepartment) {
-        this.preExamDepartment = preExamDepartment;
-    }
-
-    public Integer getIsPositive() {
-        return isPositive;
-    }
-
-    public void setIsPositive(Integer isPositive) {
-        this.isPositive = isPositive;
     }
 
     @Override
