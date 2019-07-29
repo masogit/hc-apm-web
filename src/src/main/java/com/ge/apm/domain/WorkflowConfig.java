@@ -165,6 +165,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "hour_required")
     private Boolean hourRequired = true;// 工时必填
 
+    @Column(name = "pm_is_support_batch_finish")
+    private Boolean pmIsSupportBatchFinish = true;// 保养是否支持批量完成，默认支持
+
 
     /***
      * for measure
@@ -213,6 +216,14 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "swap_center_config")
     private String swapCenterConfig;
+
+    public Boolean getPmIsSupportBatchFinish() {
+        return pmIsSupportBatchFinish;
+    }
+
+    public void setPmIsSupportBatchFinish(Boolean pmIsSupportBatchFinish) {
+        this.pmIsSupportBatchFinish = pmIsSupportBatchFinish;
+    }
 
     public String getSwapCenterConfig() {
         return swapCenterConfig;
