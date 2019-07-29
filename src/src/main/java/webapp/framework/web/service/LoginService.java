@@ -16,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -25,6 +26,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.util.B64Code;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +121,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         return plainPassword;
     }
 
-    protected void afterLogin(UserAccount originUser) {
+    protected void afterLogin(UserAccount originUser,String userAgent) {
 
     }
 
@@ -241,7 +243,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
         String userName = request.getParameter("j_username");
-        String passwordPlain = request.getParameter("j_password");
+        //String passwordPlain = request.getParameter("j_password");
+        String tempPasswordPlain = request.getParameter("j_password");
+        //String passwordPlain = B64Code.decode(tempPasswordPlain, "utf-8");
+        String passwordPlain = UserContextService.decryptData(tempPasswordPlain);
 
         if ("".equals(userName) || userName == null) {
             userName = request.getParameter("input_j_username");
@@ -335,7 +340,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(user);
+            String userAgent = request.getHeader("User-Agent");
+            afterLogin(user,userAgent);
             updateLoginStatus(user.getLoginName(), true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/

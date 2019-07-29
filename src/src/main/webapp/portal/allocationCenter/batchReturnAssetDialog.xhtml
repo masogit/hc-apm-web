@@ -64,6 +64,14 @@
                         <p:inputNumber value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.compensationAmount}" decimalPlaces="2" emptyValue="0" minValue="0">
                         </p:inputNumber>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                        <label class="label">病人号*</label>
+                        <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.patientNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                        <label class="label">床号*</label>
+                        <p:inputText value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.patientBedNum}"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>
                         <p:inputTextarea rows="3" cols="30" value="#{sharedAssetBatchController.selected.sharedAssetReqDetail.reqComment}" />

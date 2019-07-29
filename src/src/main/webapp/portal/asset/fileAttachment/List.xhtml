@@ -19,7 +19,7 @@
 
                 <h:form id="AssetFileAttachmentListForm">
                     <p:dataTable id="datalist" value="#{assetFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{assetFileAttachmentController.selected}"
+                                 selectionMode="single" selection="#{assetFileAttachmentController.selected}" disabledSelection="true"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -29,7 +29,18 @@
 
                         <p:ajax event="rowSelect" listener="#{assetFileAttachmentController.onSelectedChange}" update="createButton  deleteButton :AssetFileAttachmentEditForm"/>
                         <p:ajax event="filter" listener="#{assetFileAttachmentController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{assetFileAttachmentController.selectedMap[item.id]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{assetFileAttachmentController.onSelectAllOfPage}" update="@(.selectCheckBox) deleteButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
@@ -64,7 +75,10 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetFileAttachmentController.prepareView}" update=":AssetFileAttachmentViewDlg" oncomplete="PF('AssetFileAttachmentViewDialog').show()" disabled="#{empty assetFileAttachmentController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetFileAttachmentController.prepareEdit}"  update=":AssetFileAttachmentEditForm" disabled="#{empty assetFileAttachmentController.selected}"/>-->
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetFileAttachmentController.prepareDelete}" update=":AssetFileAttachmentViewDlg" oncomplete="PF('AssetFileAttachmentViewDialog').show()" disabled="#{empty assetFileAttachmentController.selected or assetFileAttachmentController.creatAction}"/>
+                            <!--<p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetFileAttachmentController.prepareDelete}" update=":AssetFileAttachmentViewDlg" oncomplete="PF('AssetFileAttachmentViewDialog').show()" disabled="#{empty assetFileAttachmentController.selected or assetFileAttachmentController.creatAction}"/>-->
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量删除" actionListener="#{assetFileAttachmentController.deleteBatch}" update=":AssetFileAttachmentListForm :growl" disabled="#{not assetFileAttachmentController.isChecked()}">
+                                <p:confirm header="批量删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-warning"/>
+                            </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetFileAttachment_export"/>
                             </p:commandButton>
@@ -78,14 +92,31 @@
             </div>
         </div>
         <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-    </ui:define>
-    <script type="text/javascript">
-        function start() {
-            PF('statusDialog').show();
-        }
 
-        function stop() {
-            PF('statusDialog').hide();
-        }
-    </script>
+        <script>
+            //<![CDATA[
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetFileAttachmentListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
 </ui:composition>
