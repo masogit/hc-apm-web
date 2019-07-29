@@ -27,6 +27,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(tenantInfo.getUid());
+        orgInfo.setParentID(tenantInfo.getId());
 
         return orgInfo;
     }
@@ -50,7 +51,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(parentOrg.getUid());
-
+        orgInfo.setParentID(parentOrg.getId());
         return orgInfo;
     }
 
@@ -73,7 +74,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(parentOrg.getUid());
-
+        orgInfo.setParentID(parentOrg.getId());
         return orgInfo;
     }
 
@@ -104,6 +105,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(parentOrg.getSiteUID());
 
         orgInfo.setParentUID(parentOrg.getUid());
+        orgInfo.setParentID(parentOrg.getId());
 
         return orgInfo;
     }
