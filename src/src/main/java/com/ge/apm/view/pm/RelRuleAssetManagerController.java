@@ -108,13 +108,14 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	public void batchDelete(){
 		Map<String, Boolean> map = this.selectedMap;
+		List<String> deleteAssetUids = Lists.newArrayList();
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
 			if (!entry.getValue()) {
 				continue;
 			}
-			String assetUid = entry.getKey();
+			deleteAssetUids.add(entry.getKey());
 		}
-		System.out.println(this.selectedMap.size());
+		dao.deleteByAssetUids(deleteAssetUids);
 		this.selectedMap.clear();
 	}
 
