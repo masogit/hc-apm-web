@@ -71,6 +71,12 @@ public class SharedAssetReqType implements Serializable{
     @Temporal(TemporalType.DATE)
     private Date modifyDate;//修改日期
 
+    @Column(name = "patient_num")
+    private String patientNum;
+
+    @Column(name = "patient_bed_num")
+    private String patientBedNum;
+
     public String getId() {
         return id;
     }
@@ -212,5 +218,21 @@ public class SharedAssetReqType implements Serializable{
 
     public void setExceptQty(int exceptQty) {
         this.exceptQty = exceptQty;
+    }
+
+    public String getPatientNum() {
+        return patientNum;
+    }
+
+    public void setPatientNum(String patientNum) {
+        this.patientNum = patientNum;
+    }
+
+    public String getPatientBedNum() {
+        return patientBedNum;
+    }
+
+    public void setPatientBedNum(String patientBedNum) {
+        this.patientBedNum = patientBedNum;
     }
 }

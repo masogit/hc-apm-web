@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
         <div class="ui-g">
@@ -37,17 +38,20 @@
                     rowsPerPageTemplate="20,50,100,500">
 
                      <p:ajax event="rowSelect" update="editButton"/>
-                    <!--  <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}" update="createButton editButton viewButton deleteButton"/>
-                 <p:column headerText="规则名称" sortBy="" filterBy="" filterMatchMode="LIKE">
-                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.id)}"/>
-                    </p:column> -->
+
+                    <p:column width="36" id="checkBoxColumn">
+                        <p:selectBooleanCheckbox value="#{relRuleAssetManagerController.selectedMap[item.assetUID]}"  class="selectCheckBox">
+                            <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                        <f:facet name="header"  >
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                <p:ajax listener="#{relRuleAssetManagerController.onSelectAllOfPage}" update="@(.selectCheckBox) :RelRuleAssetListForm:datalist:batchToBeTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                        </f:facet>
+                    </p:column>
                     <p:column headerText="资产名称"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
                     </p:column>
-                    <!-- <p:column headerText="一级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
-                    		<h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID1))}"/>
-                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID1)}"/>
-                    </p:column> -->
                     <p:column headerText="二级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID2))}"/> -->
@@ -83,22 +87,20 @@
                      	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                    	<!-- <p:link href="./../pmOrderRule/RelRuleAsset.xhtml"  title="批量设置规则" style="color:black;">批量设置规则</p:link>
-                    	<a href="./../pmOrderRule/RelRuleAsset.xhtml"  target="_Blank" title="批量设置规则">批量设置规则</a> -->
-                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings"  
-                    	class="btn btn-sm btn-gray"  title="批量设置规则"/>
-                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections"  
-                    	class="btn btn-sm btn-gray"  title="批量生成保养工单"/>
+                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="批量设置规则"/>
+                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="批量生成保养工单"/>
                         <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
                         </p:commandButton>
 
-                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
-
-                        <!--<p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
-                        <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
-                        <p:commandButton render="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
-                        <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>-->
+                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}"
+                                         update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                        <ui:fragment >
+                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量删除"
+                                             actionListener="#{relRuleAssetManagerController.batchDelete}" update=":RelRuleAssetListForm" disabled="#{not relRuleAssetManagerController.isChecked()}">
+                                <p:confirm header="批量删除资产规则配置" message="您确定要删除选中的记录么?" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </ui:fragment>
                     </f:facet>
                 </p:dataTable>
             </h:form>
@@ -108,7 +110,24 @@
 				</div>
             </div>
         </div>
-        
+
+        <script>
+            //<![CDATA[
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#RelRuleAssetListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
     </ui:define>
 
 </ui:composition>

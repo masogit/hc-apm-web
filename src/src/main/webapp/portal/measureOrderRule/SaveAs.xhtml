@@ -14,7 +14,7 @@
 			}
 		</style>
 
-        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.MeasureOrderRule} 另存为">
+        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  width="1000" height="380" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.MeasureOrderRule} 另存为">
             <h:form id="MeasureOrderRuleSaveAsForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{measureOrderRuleController.selected != null}">
@@ -85,7 +85,7 @@
                         </h:panelGroup>-->
                     </p:panelGrid>
                     
-                    <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                    <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="false">
                     
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>

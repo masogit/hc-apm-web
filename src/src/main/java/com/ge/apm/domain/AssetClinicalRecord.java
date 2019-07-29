@@ -115,6 +115,13 @@ public class AssetClinicalRecord implements Serializable {
     private String sourceSystem;
     @Column(name = "source_record_id")
     private String sourceRecordId;
+
+    @Size(max = 128)
+    @Column(name = "pre_exam_department")
+    private String preExamDepartment;
+
+    @Column(name = "is_positive")
+    private Integer isPositive;
     
     public AssetClinicalRecord() {
     }
@@ -313,6 +320,22 @@ public class AssetClinicalRecord implements Serializable {
 
     public void setOriginalProcedureStepName(String originalProcedureStepName) {
         this.originalProcedureStepName = originalProcedureStepName;
+    }
+
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
+
+    public Integer getIsPositive() {
+        return isPositive;
+    }
+
+    public void setIsPositive(Integer isPositive) {
+        this.isPositive = isPositive;
     }
 
     @Override

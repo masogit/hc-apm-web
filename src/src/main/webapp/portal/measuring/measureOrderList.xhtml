@@ -16,7 +16,7 @@
 
                         <p:commandButton value="待办"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=-1" disabled="#{v2MeasureController.queryIndex==-1}" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
                         <p:commandButton value="创建计量" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}" actionListener="#{v2MeasureController.createPMRequest()}" process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm measureTab:measureRequestCreateForm"  oncomplete="PF('createMeasureDialog').show()" />
-                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=2" disabled="#{v2MeasureController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead')}"/>
+                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=2" disabled="#{v2MeasureController.queryIndex==2}" rendered="#{userContextService.isMeasuringDispatcher() or userContextService.hasRole('AssetHead')}"/>
                         <p:commandButton value="待接单"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=3" disabled="#{v2MeasureController.queryIndex==3}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
 
                         <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet measureTab:measureOrderDetailForm" action="measureOrderListAll.xhtml?faces-redirect=true&amp;query=31" disabled="#{v2MeasureController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff')}"  />
@@ -127,7 +127,7 @@
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
                             <p:commandButton value="取消" update="measureTab:measureCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
                         </p:column>
-                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
+                        <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==2 and (userContextService.isMeasuringDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2MeasureController.isChecked()}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureDispatchDialogForm" oncomplete="PF('measureDispatchDialog').show()"/>
 
                             <p:commandButton value="取消" update="measureTab:measureCancelForm" actionListener="#{v2MeasureController.prepareCancel(item.id)}" oncomplete="PF('measureCancelDialog').show()" />
@@ -165,7 +165,7 @@
 
                         <!--待审核 8-->
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==8}" exportable="false">
-                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDialog').show()"/>
+                            <p:commandButton value="审核" actionListener="#{v2MeasureController.prepareAproval(item.id)}" update="@(.measureApproveDialogCls)" oncomplete="PF('measureApproveDlg').show()"/>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2MeasureController.queryIndex==6}" exportable="false">
                             <p:commandButton value="关单" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2MeasureController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2MeasureController.prepareAct(item.id)}" update="measureTab:measureOrderListForm @(.closeMeasureDialogClass)" oncomplete="PF('closeMeasureDialog').show()" />
@@ -243,7 +243,7 @@
         <h:form id="measureCancelForm" class="measureCancelFormCls" >
         <p:selectOneRadio id="cancelRadio" value="#{v2MeasureController.cancelInt}">
             <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
-            <f:selectItem itemDisabled="#{v2MeasureController.selected.measureType eq 2 or v2MeasureController.selected.measureType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+            <f:selectItem itemDisabled="#{v2MeasureController.selected.measuringType eq 2 or v2MeasureController.selected.measuringType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
         </p:selectOneRadio>
     <h:panelGroup>
         <label class="label">取消原因</label>
@@ -358,7 +358,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <p:fileUpload id="type" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialog');"/>
 
@@ -386,7 +386,7 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                <p:fileUpload id="type" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 <h:panelGroup>
                     <p:commandButton rendered="true" validateClient="true" actionListener="#{v2MeasureController.closePM(v2MeasureController.selectedMeasureOrder)}" value="确认批量关单" update="measureTab:takeMeasureOrderDialogForm :growl measureTab:measureOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closeMeasureDialogBatch');"/>
                     <p:commandButton immediate="true" value="取消" actionListener="#{v2MeasureController.cancel()}" icon="ui-icon-cancel" onclick="PF('closeMeasureDialogBatch').hide()"/>

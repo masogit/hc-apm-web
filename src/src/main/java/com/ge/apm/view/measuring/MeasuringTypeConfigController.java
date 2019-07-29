@@ -82,9 +82,9 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
     }
 
     public List<I18nMessage> getmeasuringItemCategory(){
-        List<I18nMessage> micList = i18nDao.findI18nMessageByMeasuringAndTenantUID(currentUser.getTenantUID());
+        List<I18nMessage> micList = i18nDao.findByMsgTypeOrderById("measuringItemCategory");
         if(this.selected.getMeasuringItemCategory() != null){
-            I18nMessage tempData = i18nDao.getByMsgTypeAndMsgKey("measuringItemCategory", this.selected.getMeasuringItemCategory());
+            I18nMessage tempData = i18nDao.findByMsgTypeAndMsgKeyOrderById("measuringItemCategory", this.selected.getMeasuringItemCategory());
             micList.add(tempData);
         }
 

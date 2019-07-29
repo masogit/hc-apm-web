@@ -1,5 +1,7 @@
 
 package com.ge.apm.view;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
@@ -11,9 +13,13 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
@@ -79,7 +85,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     @Setter
     private SharedAssetReqDetail preSelectReqDetail;
 
-     public String getFilterApplyTime() {
+    @Getter
+    @Setter
+    private String notificationContent = "";
+
+    @Getter
+    @Setter
+    private String selectedSartId;
+
+    private String workflowConfigJson;
+
+    public String getFilterApplyTime() {
         return filterApplyTime;
     }
 
@@ -141,6 +157,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void prepareCreateSart(){
+        crudActionName = "Create";
         selectedSart = new SharedAssetReqType();
     }
     
@@ -212,6 +229,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                         }
                     }
                 }
+            }
+            //JIRA#4576
+            if(currentWorkflowConfig != null && StringUtils.isNotBlank(currentWorkflowConfig.getSiteUID())) {
+                workflowConfigJson = currentWorkflowConfig.getSwapCenterConfig();
+                List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(currentWorkflowConfig.getSiteUID());
+                String virtualCellNum = "";
+                if(sharedAssetConfigList != null && sharedAssetConfigList.size() > 0) {
+                    virtualCellNum = sharedAssetConfigList.get(0).getTel();
+                }
+                this.setNotificationContent(virtualCellNum);
             }
         }
     }
@@ -545,6 +572,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 else{
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
+                            if(this.isLogPatientInfoEnabled()) {
+                                if (StringUtils.isNotBlank(this.selectedSartId) && !this.selectedSartId.equals(applySwapType.getId())) {
+                                    continue;
+                                }
+                            }
                             if(infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())){
                                 selectedSart = applySwapType;//明细表联动选中
                                 
@@ -624,6 +656,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         }
                                     }
                                     sard.setAccessoryList(sard.getAccessoryList());
+
+                                    logger.info("isLogPatientInfoEnabled: " + isLogPatientInfoEnabled());
+                                    if(isLogPatientInfoEnabled() && StringUtils.isNotBlank(applySwapType.getPatientNum())) {
+                                        sard.setPatientNum(applySwapType.getPatientNum());
+                                        sard.setPatientBedNum(applySwapType.getPatientBedNum());
+                                    }
 
                                     //asdDao.save(detail_list.get(0));
                                     if (sardList != null && sardList.size() > 0) {
@@ -818,13 +856,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
 
+                            if(this.isLogPatientInfoEnabled()) {
+                                if (StringUtils.isNotBlank(this.selectedSartId) && !this.selectedSartId.equals(applySwapType.getId())) {
+                                    continue;
+                                }
+                            }
+
                             if(applySwapType.getSharedAssetTypeId().equals(infoVo.getSharedAssetTypeUid())){
                                 selectedSart = applySwapType;//明细表联动选中
                                 
                                 if(applySwapType.getActualQty() < applySwapType.getExceptQty()){
                                     SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
                                     assetDetaiVo.setBorrowId(Uid);
-                                    assetDetaiVo.setSharedId(Uid);
+                                    assetDetaiVo.setSharedId(selectedSart.getSharedId());
 
                                     assetDetaiVo.setAssetInfoId(infoVo.getUid());
                                     assetDetaiVo.setAssetName(infoVo.getName());
@@ -877,6 +921,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     }
                                     
                                     assetDetaiVo.setId(UUID.randomUUID().toString().replace("-", ""));
+
+                                    logger.info("isLogPatientInfoEnabled: " + isLogPatientInfoEnabled());
+                                    if(isLogPatientInfoEnabled() && StringUtils.isNotBlank(applySwapType.getPatientNum())) {
+                                        assetDetaiVo.setPatientNum(applySwapType.getPatientNum());
+                                        assetDetaiVo.setPatientBedNum(applySwapType.getPatientBedNum());
+                                    }
                                     
                                     if (sardList != null && sardList.size() > 0) {
                                         for (int i = 0; i < sardList.size(); i++) {
@@ -914,7 +964,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     WebUtil.addSuccessMessage("录入成功！");
                                     return;
                                 }else{
-                                    WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 预计借用数量已满！");
+                                    if(this.isLogPatientInfoEnabled()) {
+                                        WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName() + "-" + applySwapType.getPatientNum() + "-" + applySwapType.getPatientBedNum() +"’ 预计借用数量已满！");
+                                    } else {
+                                        WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 预计借用数量已满！");
+                                    }
                                     return;
                                 }
                             }
@@ -1520,25 +1574,55 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             WebUtil.addWarnMessage("申请数必须大于0！");
             return;
         }
-        selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
-        String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
-        selectedSart.setSwapName(swapName);
-        selectedSart.setSharedId(selected.getId());
+
         List<SharedAssetReqType> sartList = selected.getSartList();
-         if (sartList != null && sartList.size()!=0 ) {
-             for (int i = 0; i < sartList.size(); i++) {
-                SharedAssetReqType sharedAssetReqType = sartList.get(i);
-                
-                if (sharedAssetReqType.getSwapName().equals(swapName)) {
-                    sartList.remove(i);
-                    i--;
-                  
+        if(this.isLogPatientInfoEnabled()) {
+            if("Create".equals(super.crudActionName)) {
+                selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
+                String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
+                selectedSart.setSwapName(swapName);
+                selectedSart.setSharedId(selected.getId());
+                sartList.add(selectedSart);
+            } else {
+                Map<String, SharedAssetReqType> sharedAssetReqTypeMap = new HashMap();
+
+                Optional<SharedAssetReqType> optionalSharedAssetReqType = selected.getSartList()
+                    .stream().filter(sart -> sart.getId().equals(selectedSart.getId()))
+                    .findFirst();
+                if(optionalSharedAssetReqType.isPresent()) {
+                    try {
+                        SharedAssetReqType sharedAssetReqType = optionalSharedAssetReqType.get();
+                        BeanUtils.copyProperties(sharedAssetReqType, selectedSart);
+                        logger.info("selected shared_asset_req_type.shared_id: " + selectedSart.getSharedId());
+                        //update shared asset req detail if necessary
+                        this.selected.getSardList()
+                            .stream()
+                            .filter(sard -> sharedAssetReqType.getSharedId().equals(sard.getSharedId()))
+                            .forEach(sard -> {
+                                sard.setPatientNum(sharedAssetReqType.getPatientNum());
+                                sard.setPatientBedNum(sharedAssetReqType.getPatientBedNum());
+                            });
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
-               
-             }
-             
-         }
-         sartList.add(selectedSart);
+            }
+        } else {
+            selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
+            String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
+            selectedSart.setSwapName(swapName);
+            selectedSart.setSharedId(selected.getId());
+            Iterator<SharedAssetReqType> iterator = sartList.iterator();
+            while(iterator.hasNext()) {
+                SharedAssetReqType sharedAssetReqType = iterator.next();
+                if(sharedAssetReqType.getSwapName().equals(selectedSart.getSwapName())) {
+                    iterator.remove();
+                }
+            }
+            sartList.add(selectedSart);
+        }
     }
     
     
@@ -1736,9 +1820,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         return this.getNameByLoginName(selected.getApplicant());
     }
 
-
-
-
     /**
      * @return the total
      */
@@ -1776,21 +1857,40 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public String workOrderRouter() {
     	String retrunUrl = "";
     	RequestContext requestContext = RequestContext.getCurrentInstance();
-    	requestContext.addCallbackParam("showNotification", true);
-    	
-    	boolean onDuty = true;
-    	try {
-    		onDuty = sharedAssetService.onDuty();
-    	} catch(Exception ex) {
-    		ex.printStackTrace();
-    	}
-    	
-    	if(onDuty) {
-    		requestContext.addCallbackParam("showNotification", false);
-            requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
-            retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
-    	}
-    	
+
+      Boolean enableAllocateOperation = Boolean.TRUE;
+      Boolean willShowNotification = Boolean.FALSE;
+    	if(StringUtils.isNotBlank(workflowConfigJson)) {
+          JSONObject scObject = JSON.parseObject(workflowConfigJson);
+          String startTime = scObject.getString("periodStart");
+          String endTime = scObject.getString("periodEnd");
+          // process to check if operations in allocation center is enabled
+          if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+              DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+              // catch parse exception
+              try {
+                  LocalTime startLocalTime = LocalTime.parse(startTime, dateTimeFormatter);
+                  LocalTime endLocalTime = LocalTime.parse(endTime, dateTimeFormatter);
+                  LocalTime currentTime = LocalTime.now();
+                  if(currentTime.isBefore(startLocalTime) || currentTime.isAfter(endLocalTime)) {
+                      // operations in allocation center may not be enabled
+//                      enableAllocateOperation = scObject.getBoolean("openService");
+//                      willShowNotification = scObject.getBoolean("enableHint");
+                      enableAllocateOperation = Boolean.FALSE;
+                      willShowNotification = Boolean.TRUE;
+                  }
+              } catch (Exception ex) {
+                  logger.info("Configuration regarding to allocation center may be wrong: " + workflowConfigJson);
+              }
+          }
+      }
+
+    	requestContext.addCallbackParam("showNotification", willShowNotification);
+    	if(enableAllocateOperation) {
+          requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+          retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+      }
+
     	return retrunUrl;
     }
     
@@ -1840,15 +1940,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public boolean validateAllExpectedQty() {
         List<SharedAssetReqType> sartList = selected.getSartList();
-        boolean expectedQtyGTZero = false;
+        Boolean expectedQtyLTZero = Boolean.FALSE;
         for (SharedAssetReqType sart : sartList) {
             if (sart.getExceptQty() > 0){
-                expectedQtyGTZero = true;
+            } else {
+                expectedQtyLTZero = Boolean.TRUE;
                 break;
             }
         }
-        logger.debug("validateTotalExpectedQty result: " + expectedQtyGTZero);
-        return !expectedQtyGTZero;
+        logger.debug("validateTotalExpectedQty result: " + expectedQtyLTZero);
+        return expectedQtyLTZero;
     }
 
     public String getOrgLocation() {
@@ -1915,6 +2016,15 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             maxChargingEndTime = this.setEndTime(maxChargingEndTime);
         }
         return maxChargingEndTime;
+    }
+
+    public Boolean isLogPatientInfoEnabled() {
+        Boolean result = Boolean.FALSE;
+        WorkflowConfig wfConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        if(wfConfig != null) {
+            result = (wfConfig.getEnableLogPatientInfo() != null) ? wfConfig.getEnableLogPatientInfo() : Boolean.FALSE;
+        }
+        return result;
     }
 
 }

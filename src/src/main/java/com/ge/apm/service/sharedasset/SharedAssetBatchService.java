@@ -161,4 +161,8 @@ public class SharedAssetBatchService {
         return responseEntity;
     }
 
+    public Boolean isLogPatientInfoEnabled() {
+        return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
+    }
+
 }
