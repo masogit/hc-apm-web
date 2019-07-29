@@ -54,6 +54,7 @@ public class AssetLifecycleEvent implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     Date scheduleDate;
 
+//  public static final Integer SR_STATUS_CLOSED = 2;private static final int STATUS_OPEN = 1;
     @Column(name = "status")
     private Integer status;
 

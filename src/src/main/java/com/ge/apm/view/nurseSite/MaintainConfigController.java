@@ -14,6 +14,7 @@ import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +28,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAuth;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -54,6 +55,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     private NurseSiteMaintainConfigRepository dao;
     private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
+    private List<NurseSiteMaintainConfig> listSelected;
     //config
   	private NurseSiteMaintainConfigCheckItem objPairCheckItem;
   	private List<AssetInfo> listCheckAssets;
@@ -163,15 +165,21 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
-    	boolean result=nurseSiteMaintainService.deleteMaintainConfig(this.selected);
-    	if(result){
-    		WebUtil.addSuccessMessage("删除成功！");
+  
+    	if(this.listSelected!=null && this.listSelected.size()>0){
+    		for(int i=0;i<listSelected.size();++i){
+    			NurseSiteMaintainConfig tempConfig=listSelected.get(i);
+    			boolean result=nurseSiteMaintainService.deleteMaintainConfig(tempConfig);
+    			if(!result){
+    				WebUtil.addSuccessMessage("配置 "+tempConfig.getName()+" 有工单存在不能删除！");
+    			}
+    		}
     	}
-    	else{
-    		WebUtil.addSuccessMessage("不允许删除！");
+    	WebUtil.addSuccessMessage("删除成功！");
+    	if(this.listSelected!=null){
+    		this.listSelected.clear();
     	}
     	this.selected=null;
-    	
     }
 
 	
@@ -207,6 +215,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		//TODO
         assetSelectController.loadData4Edit(this.selected);
 	}
+	
 	private void initValues(){
 		this.listCheckAssets=new LinkedList<AssetInfo>();
 		this.listCheckDate=new ArrayList<String>();
@@ -503,6 +512,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		checkSaveDisable();
 	}
+	public void onPageSelect(PageEvent event) {
+	}
 
 	public List<MaintainDataPair> getCheckListWeekDays() {
 		if(checkListWeekDays==null){
@@ -736,6 +747,19 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setCustomRoleAuth(UserAuth customRoleAuth) {
 		this.customRoleAuth = customRoleAuth;
+	}
+
+	public List<NurseSiteMaintainConfig> getListSelected() {
+		return listSelected;
+	}
+	
+	public void setListSelected(List<NurseSiteMaintainConfig> listSelected) {
+		if (listSelected != null && listSelected.size() == 1) {
+			this.selected = listSelected.get(0);
+		} else {
+			this.selected = null;
+		}
+		this.listSelected = listSelected;
 	}
 
 	
