@@ -6,10 +6,6 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "v2_blob_object")
@@ -84,7 +80,10 @@ public class V2_BlobObject implements Serializable {
 
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
-    
+
+    @Column(name = "ext_link")
+    private String extLink;
+
     @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
@@ -208,6 +207,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getExtLink() {
+        return extLink;
+    }
+
+    public void setExtLink(String extLink) {
+        this.extLink = extLink;
     }
 
     @Override
