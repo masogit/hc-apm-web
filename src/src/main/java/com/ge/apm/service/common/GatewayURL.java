@@ -58,6 +58,8 @@ public enum GatewayURL {
     MEASURE_CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     MEASURE_CANCEL_MEASURE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/cancel"),
     MEASURE_BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
+    //批量取消
+    PM_BATCH_CANCEL("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     // User Schedule
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation

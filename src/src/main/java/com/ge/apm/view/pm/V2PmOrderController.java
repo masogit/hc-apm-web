@@ -263,9 +263,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
 
+
+    /*
+    *
+    *     private List<V2_PmOrder> currentPagePmOrders;
+
+     * */
     public void cancelBatchPMorder() {
-        pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
+        pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
+
 
 
     public boolean allowChanged() {
@@ -336,26 +343,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        /* FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "折叠", "Visibility:" + event.getVisibility());
         FacesContext.getCurrentInstance().addMessage(null, msg);*/
     }
-    ArrayList<String> orderNumList = new ArrayList<String>();
-   /* public void preparePmOrderBatchComplete() {
-        orderNumList = new ArrayList<String>();
-        List<Map.Entry<String, Boolean>> collect =
-                sameOpHashmap.entrySet().stream().filter(item -> item.getValue()).collect(Collectors.toList());
-        collect.stream().forEach(item -> {
-            orderNumList.add(item.getKey());
-        });
-        final Set<String> assetUidList = dao.getAssetUid(orderNumList);
-        final List<String> pmRuleIdList = pmOrderRuleRepository.findPmRuleForBatch(assetUidList);
-        pmCheckItemList= pmOrderRuleCheckListRepository.findAllByRuleUIDBatch(pmRuleIdList);
-        pmCheckItemList.stream().filter(item -> !hmCheck.containsKey(item.getUid()))
-                .forEach(item -> {
-                    UnstructuredData unData = new UnstructuredData();
-                    unData.setValue("pass");
-                    unData.setKey(item.getUid());
-                    hmCheck.put(item.getUid(), unData);
-                });
-    }*/
-
 
     public boolean sameType(){
         ArrayList<String> orderNumList = new ArrayList<String>();
@@ -1582,7 +1569,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void repairPmOrderBatch() {
 //        保存检查项
        // saveCheckItemDataBatch(orderNumList);
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours,         currentPagePmOrders, selectedMap);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap);
         selectedMap = new HashMap<String, Boolean>();
     }
 

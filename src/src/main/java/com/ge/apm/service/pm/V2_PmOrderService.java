@@ -154,6 +154,46 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     	reportDao.save(report);
     }
 
+    /*  一次性单子 qualityChecking就是2，如果是周期性的 再根据cancelInt来设置qualityChecking */
+    public void cancelPmBatch(Map<String, Boolean> hmPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        List<String> uidList = new ArrayList<String>();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        batchPmOrderList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                hmPmOrder.put(item.getId(),false);
+            }
+        });
+
+        batchPmOrderList.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+
+            formData.setQualityChecking("1");
+            if(item.getPmType()==1){
+                if(cancelInt.equalsIgnoreCase("1")){
+                    formData.setQualityChecking("1");
+                }else{
+                    formData.setQualityChecking("2");
+                }
+            }else{
+                formData.setQualityChecking("2");
+            }
+
+
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+        });
+
+        String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        if (res==null || !res.contains("OK")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量取消");
+        }else{
+            WebUtil.addSuccessMessage("批量取消成功");
+        }
+    }
 
     public void invokePmOerCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
         String token = UserContextService.getAccessToken();
@@ -181,24 +221,48 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
     }
 
-    public void invokePmOrderCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
+    //cancelInt: 1 取消当前工单或者 2 取消取消周期性工单
+    public void invokeBatchPmOrderCancel(String desc, Map<String, Boolean> hmPmOrder,String cancelInt){
         String token = UserContextService.getAccessToken();
-        PmOrderActionForm formData = new PmOrderActionForm();
+        //PmOrderActionForm formData = new PmOrderActionForm();
+        List<String> uidList = new ArrayList<String>();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+
         //如果是工单是周期性的
         /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
-        if(selectedPmOrder.getPmType()==1){ //周期性
-            if(cancelInt.equalsIgnoreCase("1")){
-                formData.setQualityChecking("1");
-            }else{
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+
+        batchPmOrderList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                hmPmOrder.put(item.getId(),false);
+            }
+        });
+
+
+        batchPmOrderList.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+
+
+            if(item.getPmType()==1){ //周期性
+                if(cancelInt.equalsIgnoreCase("1")){
+                    formData.setQualityChecking("1");
+                }else{
+                    formData.setQualityChecking("2");
+                }
+            }else{//一次性或重测
                 formData.setQualityChecking("2");
             }
-        }else{//一次性或重测
-            formData.setQualityChecking("2");
-        }
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+            formData.setDesc(desc);
+        });
 
-        formData.setDesc(desc);
 
-        String res = srApi.invokePmOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
+        String gatewayURL = getGatewayURL(GatewayURL.BATCH_TAKE_ORDER);
+
+        String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }else{
@@ -206,6 +270,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
 
     }
+
+
 
     public void saveReport(List<UnstructuredDataCollection> listReport){
     	reportDao.save(listReport);
@@ -466,9 +532,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("操作成功");
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_PmOrder> pmList,Map<String, Boolean> hmPmOrder) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder) {
         String token = UserContextService.getAccessToken();
-        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
         List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
