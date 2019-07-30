@@ -9,8 +9,11 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.ge.apm.service.utils.PasswordEncodeUtil;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -107,6 +110,9 @@ public class TenantInfo implements Serializable {
     
     @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
+
+    @Column(name = "initial_password")
+    private String initialPassword;
     
     @Transient
     private String cpmURL;
@@ -338,7 +344,30 @@ public class TenantInfo implements Serializable {
 		this.cpmURL = cpmURL;
 	}
 
-	@Override
+    public String getInitialPassword() {
+        return initialPassword;
+    }
+
+    public void setInitialPassword(String initialPassword) {
+        this.initialPassword = initialPassword;
+    }
+
+    public String getPlainPassword() {
+        if (StringUtils.isEmpty(initialPassword)) {
+            return null;
+        }
+
+        return PasswordEncodeUtil.decrypt(initialPassword);
+    }
+
+    public void setPlainPassword(String plainPassword) {
+        if (StringUtils.isEmpty(plainPassword)) {
+            this.initialPassword = null;
+        }
+        this.initialPassword = PasswordEncodeUtil.encrypt(plainPassword);
+    }
+
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
