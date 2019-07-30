@@ -15,4 +15,15 @@ public class PasswordEncodeUtilTest {
 
         assertEquals(password, decrypted);
     }
+
+    @Test
+    public void encrypt() {
+
+        String password = "JY2019@e";
+        String encrypted = PasswordEncodeUtil.encrypt(password);
+        System.out.println(encrypted.length());
+
+
+        assertTrue(encrypted.length() < 64);
+    }
 }
