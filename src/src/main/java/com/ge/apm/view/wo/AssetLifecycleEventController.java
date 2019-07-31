@@ -105,49 +105,18 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         PageRequest pr =  new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
         Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pr);
         updateSelectStatus(pageResult);
+        ignoreErrorDate(pageResult);
         return pageResult;
     }
     
     private void updateSelectStatus(Page<AssetLifecycleEvent> pageResult){
-    	Calendar current=Calendar.getInstance();
-    	Date currentDate=current.getTime();
     	boolean tempAllSelect=false;
-    	String lastEventUid=null;
-    	Date lastTime=null;
     	if(pageResult!=null){
         	List<AssetLifecycleEvent> tempList=pageResult.getContent();
         	if(tempList!=null && tempList.size()>0){
         		tempAllSelect=true;
         		for(int i=0;i<tempList.size();++i){
         			AssetLifecycleEvent tempEvent=tempList.get(i);
-        			String assetUid=tempEvent.getAssetUid();
-        			if(!assetUid.equals(lastEventUid)){
-        				lastEventUid=assetUid;
-        				lastTime=null;
-        			}
-        			//hide error createTime
-        			Date finishTime=tempEvent.getCreateTime();
-        			Date startTime=tempEvent.getScheduleDate();
-        			//done
-        			if(lastTime==null){
-        				lastTime=finishTime;
-        			}
-        			Integer status=tempEvent.getStatus();
-        			if(finishTime.after(currentDate)){
-        				tempEvent.setCreateTime(null);
-        			}
-        			Calendar ca=Calendar.getInstance();
-        			ca.setTime(startTime);
-        			ca.add(Calendar.DAY_OF_YEAR, 60);
-        			if(ca.getTime().before(currentDate)){
-        				tempEvent.setCreateTime(null);
-        			}
-        			if(status!=null && status==1){
-        				if(lastTime.after(startTime)){
-        					tempEvent.setCreateTime(null);
-        				}
-        			}
-        			//update select status
         			if(this.setSelectedItems.contains(tempEvent)){
         				tempEvent.setBlnSelected(true);
         			}
@@ -157,6 +126,74 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         		}
         	}
         	setBlnAllSelected(tempAllSelect);
+        }
+    }
+    
+    private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult){
+    	Calendar currentCa=Calendar.getInstance();
+    	Date currentDate=currentCa.getTime();
+    	if(pageResult!=null){
+        	List<AssetLifecycleEvent> tempList=pageResult.getContent();
+        	Map<String,Date> mapCloseDesc=new HashMap<String,Date>();
+        	Map<String,Date> mapOpenAsc=new HashMap<String,Date>();
+        	boolean blnNew=false;
+        	String lastAssetUid="";
+        	if(tempList!=null && tempList.size()>0){
+        		for(int i=0;i<tempList.size();++i){
+        			AssetLifecycleEvent tempEvent=tempList.get(i);
+        			String assetUid=tempEvent.getAssetUid();
+        			//1:open,2:closed,3:cancelled
+        			Integer status=tempEvent.getStatus();
+        			Date closeTime=tempEvent.getCreateTime();
+        			Date startTime=tempEvent.getScheduleDate();
+        			if(!lastAssetUid.equals(assetUid)){
+        				if((status==2&&closeTime==null)||(status==1&&startTime==null)){
+        					continue;
+        				}
+        				blnNew=true;
+        				lastAssetUid=assetUid;
+        			}
+        			else{
+        				blnNew=false;
+        			}
+        			if(status==2){
+        				if(blnNew){
+        					mapCloseDesc.put(assetUid, closeTime);
+        				}
+        			}
+        			else if(status==1){
+        				mapOpenAsc.put(assetUid, startTime);
+        			}
+        		}
+        		for(int i=0;i<tempList.size();++i){
+        			AssetLifecycleEvent tempEvent=tempList.get(i);
+        			String assetUid=tempEvent.getAssetUid();
+        			//1:open,2:closed,3:cancelled
+        			Integer status=tempEvent.getStatus();
+        			Date closeTime=tempEvent.getCreateTime();
+        			Date startTime=tempEvent.getScheduleDate();
+        			Date closeDesc=mapCloseDesc.get(assetUid);
+        			Date openAsc=mapOpenAsc.get(assetUid);
+        			if(status==2){
+        				if(closeTime!=null && closeTime.after(currentDate)){
+        					tempEvent.setCreateTime(null);
+        				}
+        			}
+        			else if(status==1){
+        				if(startTime!=null){
+        					Calendar ca=Calendar.getInstance();
+        					ca.setTime(startTime);
+        					ca.add(Calendar.DAY_OF_YEAR, 60);
+        					if(ca.getTime().before(currentDate)){
+        						tempEvent.setScheduleDate(null);
+        					}
+        					else if(closeDesc!=null && closeDesc.after(startTime)){
+        						tempEvent.setScheduleDate(null);
+        					}
+        				}
+        			}
+        		}
+        	}
         }
     }
 

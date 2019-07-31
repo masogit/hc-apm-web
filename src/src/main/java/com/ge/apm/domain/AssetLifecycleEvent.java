@@ -54,7 +54,7 @@ public class AssetLifecycleEvent implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     Date scheduleDate;
 
-//  public static final Integer SR_STATUS_CLOSED = 2;private static final int STATUS_OPEN = 1;
+  //1:open,2:closed,3:cancelled
     @Column(name = "status")
     private Integer status;
 
@@ -140,6 +140,9 @@ public class AssetLifecycleEvent implements Serializable {
     }    
     
     public Integer getStatus() {
+    	if(status==null){
+    		status=0;
+    	}
         return status;
     }
 

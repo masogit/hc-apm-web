@@ -14,6 +14,7 @@ import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -65,6 +66,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+    @Setter @Getter
+    private Boolean isBacthOp=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -186,6 +189,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmReportService pmReportService;
 
     private String queryAssetUid;
+    private ConfigService configService;
 
     public String getHead() {
         return head;
@@ -965,6 +969,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
@@ -1013,6 +1018,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         user = UserContextService.getCurrentUserAccount();
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
+        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        if(wfc !=null)
+            isBacthOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
     }
     public void saveNewSupplier() {
