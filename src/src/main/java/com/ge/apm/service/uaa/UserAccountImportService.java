@@ -59,7 +59,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 @Service
 public class UserAccountImportService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String HEADER_INSTITUTION="所属集团*";
+	private static final String HEADER_INSTITUTION="所属集团";
 	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
 	private static final String HEADER_DEPARTMENT="科室1";
@@ -837,10 +837,10 @@ public class UserAccountImportService {
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
 				
-				if(StringUtils.isEmpty(institution)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
-					pass=false;
-				}
+//				if(StringUtils.isEmpty(institution)){
+//					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
+//					pass=false;
+//				}
 				
 				if(StringUtils.isEmpty(loginName)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"登录名不能为空;");
