@@ -173,7 +173,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         			Date closeTime=tempEvent.getCreateTime();
         			Date startTime=tempEvent.getScheduleDate();
         			Date closeDesc=mapCloseDesc.get(assetUid);
-        			Date openAsc=mapOpenAsc.get(assetUid);
         			if(status==2){
         				if(closeTime!=null && closeTime.after(currentDate)){
         					tempEvent.setCreateTime(null);
