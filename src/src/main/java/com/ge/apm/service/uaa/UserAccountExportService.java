@@ -59,7 +59,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 @Service
 public class UserAccountExportService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String HEADER_INSTITUTION="所属集团*";
+	private static final String HEADER_INSTITUTION="所属集团";
 	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
 	private static final String HEADER_DEPARTMENT="科室1";
