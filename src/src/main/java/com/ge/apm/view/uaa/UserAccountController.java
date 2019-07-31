@@ -50,6 +50,7 @@ import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
 
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -407,7 +408,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
 
-        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+        } else {
+            selected.setPlainPassword(selectedTenant.getPlainPassword());
+        }
+
         try {
             selected.entryptPassword();
         } catch (NoSuchAlgorithmException ex) {
@@ -577,8 +583,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
+        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+        } else {
+            selected.setPlainPassword(selectedTenant.getPlainPassword());
+        }
 
-        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
         try {
             selected.entryptPassword();
         } catch (NoSuchAlgorithmException ex) {
