@@ -175,7 +175,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     			}
     		}
     	}
-    	WebUtil.addSuccessMessage("删除成功！");
+    	WebUtil.addSuccessMessage("操作完毕！");
     	if(this.listSelected!=null){
     		this.listSelected.clear();
     	}
