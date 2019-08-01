@@ -168,16 +168,13 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 							startTime=null;
 						}
 					}
-					if (status == 2) {
-						if (blnNew) {
-							if(closeTime!=null){
-								mapCloseDesc.put(assetUid, closeTime);
-							}
+					if (blnNew) {
+						if(closeTime!=null){
+							mapCloseDesc.put(assetUid, closeTime);
 						}
-					} else if (status == 1) {
-						if(startTime!=null){
-							mapOpenAsc.put(assetUid, startTime);
-						}
+					}
+					if(startTime!=null){
+						mapOpenAsc.put(assetUid, startTime);
 					}
 				}
 				for (int i = 0; i < tempList.size(); ++i) {
