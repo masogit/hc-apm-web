@@ -253,6 +253,10 @@
                             <label class="label">保养工单人工费用(元/小时)</label>
                             <p:inputNumber id="pmManHourPrice" value="#{workflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">#{msg.PmIsSupportBatchFinish}</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmIsSupportBatchFinish}"/>
+                        </h:panelGroup >
                     </p:panelGrid>
                 </p:fieldset>
 

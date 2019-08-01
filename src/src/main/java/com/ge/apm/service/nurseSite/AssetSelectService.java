@@ -69,7 +69,9 @@ public class AssetSelectService {
     }
 
     public List<OrgInfo> loadValidDeptList(OrgInfo selectedOrg) {
-        List<OrgInfo> accessibleDeptList = uaaService.getAllAccessibleClinicalDeptList();
+    	UserAccount currentUser = UserContextService.getCurrentUserAccount();
+//        List<OrgInfo> accessibleDeptList = uaaService.getAllAccessibleClinicalDeptList();
+    	List<OrgInfo> accessibleDeptList = uaaService.findAccessClinicalUidByUserUid(currentUser.getUid(), selectedOrg.getSiteUID());
         List<OrgInfo> validDeptList=new ArrayList<OrgInfo>();
         List<String> listDepts=getDeptsWithAsset(selectedOrg);
         if(listDepts!=null && listDepts.size()>0){

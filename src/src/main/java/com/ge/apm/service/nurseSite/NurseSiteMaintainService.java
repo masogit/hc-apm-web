@@ -257,16 +257,37 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		Set<String> setItemIds=new HashSet<String>();
-		List<NurseSiteMaintainItem> listItem=maintain.getListNurseSiteMaintainItem();
-		for(int i=0;i<listItem.size();++i){
-			setItemIds.add(listItem.get(i).getId());
-		}
+		Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
 		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
 		blobFileService.deleteBlobFile(listV2Obj);
+		nurseSiteMaintainRepository.delete(maintain);
 		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
 	}
+	
+	public boolean batchDeleteMaintainData(Date startDate,Date endDate,List<NurseSiteMaintainConfig> listConfig,String userUid) {
+		Thread t=new Thread(new Runnable(){
+			@Override
+			public void run() {
+				if(listConfig!=null && listConfig.size()>0){
+					Set<String> setConfigIds=new HashSet<String>();
+					for(int i=0;i<listConfig.size();++i){
+						setConfigIds.add(listConfig.get(i).getId());
+					}
+					List<NurseSiteMaintain> listMaintain=nurseSiteMaintainRepository.findDefaultDataUnchecked(startDate, endDate, setConfigIds);
+					if(listMaintain!=null && listMaintain.size()>0){
+						for(int i=0;i<listMaintain.size();++i){
+							deleteMaintain(listMaintain.get(i), userUid);
+						}
+					}
+				}
+			}
+		});
+		t.start();
+		return true;
+	}
+	
+	
 
 //	@Transactional
 //	public boolean deleteMaintain(List<NurseSiteMaintain> listMaintain) {

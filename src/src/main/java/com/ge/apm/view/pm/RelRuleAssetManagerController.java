@@ -49,6 +49,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private UserCommonService userCommonService;
 	private boolean deleteRule2 = false;
 	private boolean deleteRule3 = false;
+	private Map<String, Boolean> selectedMap;
+	private List<RelRuleAsset> currentPageAssets;
 	
 	@Override
 	protected void init() {
@@ -62,6 +64,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
+		this.selectedMap = new HashMap();
+		this.currentPageAssets = new ArrayList<>();
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
@@ -75,6 +79,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
 		assetMap.clear();
 		ruleMap.clear();
+
 		if(searchFilters != null) {
 			searchFilters.clear();
 		}else{
@@ -83,15 +88,39 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		if(StringUtils.isNotEmpty(queryCondition)){
 			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
 		}else {
-			//searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,findAssetUidBySearchFilter(getFilter(user.getSiteUID()))));
 			searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, getInvalidAssets(user.getTenantUID())));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		Page<RelRuleAsset> result = dao.findBySearchFilter(searchFilters, pageRequest);
+		currentPageAssets = result.getContent();
 		initMap(result);
 		return result;
+	}
+
+	public void onSelectAllOfPage() {
+		boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getAssetUID()) || !selectedMap.get(item.getAssetUID()));
+		for (RelRuleAsset item : currentPageAssets) {
+			selectedMap.put(item.getAssetUID(), !isSelectedAll);
+		}
+	}
+
+	public void batchDelete(){
+		Map<String, Boolean> map = this.selectedMap;
+		List<String> deleteAssetUids = Lists.newArrayList();
+		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+			if (!entry.getValue()) {
+				continue;
+			}
+			deleteAssetUids.add(entry.getKey());
+		}
+		dao.deleteByAssetUids(deleteAssetUids);
+		this.selectedMap.clear();
+	}
+
+	public boolean isChecked() {
+		return selectedMap.containsValue(true);
 	}
 
 	private List<String> getInvalidAssets(String tenantUID) {
@@ -163,14 +192,6 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return null;
 	}
-	
-/*	public Integer getRuleLevel(String ruleUID) {
-		PmOrderRule rule = ruleMap.get(ruleUID);
-		if (rule != null) {
-			return rule.getLevel();
-		}
-		return null;
-	}*/
 
 	public AssetInfo getAssetInfo(String assetUid) {
 		return assetMap.get(assetUid);
@@ -240,24 +261,6 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return null;
 	}
-	
-/*	public List<String> getAssetInfoByFilter() {
-		List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
-		if(StringUtils.isNotEmpty(queryCondition)) {
-			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-			searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		}
-		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
-		List<String> uids = new ArrayList<String>();
-		if(CollectionUtils.isNotEmpty(assetInfos)) {
-			assetInfos.forEach((asset) -> uids.add(asset.getUid()));
-		}
-		return uids;
-	}*/
 
 public List<SearchFilter> getAssetInfoByFilter(){
 	List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
@@ -274,17 +277,6 @@ public List<SearchFilter> getAssetInfoByFilter(){
 	
 	public List<SearchFilter> getFilter(String siteUID) {
 		List<SearchFilter> filter = getOrgFilter(siteUID);
-/*		List<SearchFilter> filter = new ArrayList<SearchFilter>();
-		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
-		if (orgInfo.getOrgType() == 3) {// 院区
-			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 2) {// 医院
-			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 1) {// 集团
-			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else {// 租户
-			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		}*/
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -376,6 +368,22 @@ public List<SearchFilter> getAssetInfoByFilter(){
 	public void deleteRule3(){
 		this.selected.setRuleUID(null);
 		this.deleteRule3 = true;
+	}
+
+	public Map<String, Boolean> getSelectedMap() {
+		return selectedMap;
+	}
+
+	public void setSelectedMap(Map<String, Boolean> selectedMap) {
+		this.selectedMap = selectedMap;
+	}
+
+	public List<RelRuleAsset> getCurrentPageAssets() {
+		return currentPageAssets;
+	}
+
+	public void setCurrentPageAssets(List<RelRuleAsset> currentPageAssets) {
+		this.currentPageAssets = currentPageAssets;
 	}
 
 	public boolean getDeleteRule2() {
