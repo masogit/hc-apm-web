@@ -858,6 +858,18 @@ public class UserAccountImportService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_LOCKED,"锁定值不能为空;");
 					pass=false;
 				}
+				if(StringUtils.isNotEmpty(department3)){
+					if(StringUtils.isEmpty(department2)){
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
+						pass=false;
+					}
+				}
+				if(StringUtils.isNotEmpty(department2)){
+					if(StringUtils.isEmpty(department)){
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
+						pass=false;
+					}
+				}
 				if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
 					newUser.setEmail(null);
 //                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
