@@ -16,6 +16,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,6 +74,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private ApplicationEventPublisher applicationEventPublisher;
     private MicroServiceUtil msUtil;
     private GeSsoService geSsoService;
+    private TenantInfoRepository tenantInfoDao;
     
     protected UserAccount user;
 
@@ -84,6 +87,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     @PostConstruct
     private void init() {
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         geSsoService = WebUtil.getBean(GeSsoService.class);
         WebApplicationContext ctx = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
         usernamePasswordAuthenticationFilter = ctx.getBean(UsernamePasswordAuthenticationFilter.class);
@@ -140,6 +144,16 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             return;
         Cookie cookie = new Cookie("Authorization", data.getString("id_token"));
         res.addCookie(cookie);
+    }
+
+    protected boolean isFirstTimeLogin(UserAccount user) {
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+
+        if (user.getPassword().equals(tenantInfo.getInitialPassword()) && user.getPwdSalt().equals(tenantInfo.getInitialPasswordSalt())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public String requestPost(String url, String body) {

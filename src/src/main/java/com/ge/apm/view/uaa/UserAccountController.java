@@ -410,15 +410,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
             selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+            try {
+                selected.entryptPassword();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
-            selected.setPlainPassword(selectedTenant.getPlainPassword());
+            selected.setPassword(selectedTenant.getInitialPassword());
+            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
 
-        try {
-            selected.entryptPassword();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
 
         this.selectedUserOrg = null;
 
@@ -585,15 +587,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
             selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+            try {
+                selected.entryptPassword();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
-            selected.setPlainPassword(selectedTenant.getPlainPassword());
+            selected.setPassword(selectedTenant.getInitialPassword());
+            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
 
-        try {
-            selected.entryptPassword();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
         dao.save(selected);
         WebUtil.addSuccessMessage("重置成功");
     }

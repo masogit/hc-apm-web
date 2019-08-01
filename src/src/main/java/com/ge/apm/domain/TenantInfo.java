@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PasswordEncodeUtil;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -111,8 +113,16 @@ public class TenantInfo implements Serializable {
     @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
 
+    @Size(max = 255)
     @Column(name = "initial_password")
     private String initialPassword;
+
+    @Size(max = 64)
+    @Column(name = "initial_password_salt")
+    private String initialPasswordSalt;
+
+    @Transient
+    private String plainPassword;
     
     @Transient
     private String cpmURL;
@@ -352,19 +362,35 @@ public class TenantInfo implements Serializable {
         this.initialPassword = initialPassword;
     }
 
-    public String getPlainPassword() {
-        if (StringUtils.isEmpty(initialPassword)) {
-            return null;
-        }
+    public String getInitialPasswordSalt() {
+        return initialPasswordSalt;
+    }
 
-        return PasswordEncodeUtil.decrypt(initialPassword);
+    public void setInitialPasswordSalt(String initialPasswordSalt) {
+        this.initialPasswordSalt = initialPasswordSalt;
+    }
+
+    public String getPlainPassword() {
+        return plainPassword;
     }
 
     public void setPlainPassword(String plainPassword) {
-        if (StringUtils.isEmpty(plainPassword)) {
-            this.initialPassword = null;
+        this.plainPassword = plainPassword;
+
+        encryptPassword();
+    }
+
+    public void encryptPassword() {
+        byte[] salt = Digests.generateSalt(UserAccount.SALT_SIZE);
+        setInitialPasswordSalt(Digests.encodeHex(salt));
+
+        byte[] hashPassword = new byte[0];
+        try {
+            hashPassword = Digests.sha1(getPlainPassword().getBytes(), salt, UserAccount.HASH_INTERATIONS);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
-        this.initialPassword = PasswordEncodeUtil.encrypt(plainPassword);
+        setInitialPassword(Digests.encodeHex(hashPassword));
     }
 
     @Override
