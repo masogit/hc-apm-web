@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,8 +22,6 @@ import java.util.zip.ZipOutputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.google.common.base.Strings;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,10 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.domain.AssetLifecycleEvent;
@@ -39,7 +42,9 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.AssetLifecycleEventService;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -93,8 +98,14 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         if (!this.hasFilterOnField("eventType")) {
         	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
         }
-        Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<String> listProp=new ArrayList<String>();
+        listProp.add("assetUid");
+        listProp.add("createTime");
+        Sort sort = new Sort(Direction.DESC,listProp);
+        PageRequest pr =  new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
+        Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pr);
         updateSelectStatus(pageResult);
+        ignoreErrorDate(pageResult);
         return pageResult;
     }
     
@@ -115,6 +126,73 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         		}
         	}
         	setBlnAllSelected(tempAllSelect);
+        }
+    }
+    
+    private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult){
+    	Calendar currentCa=Calendar.getInstance();
+    	Date currentDate=currentCa.getTime();
+    	if(pageResult!=null){
+        	List<AssetLifecycleEvent> tempList=pageResult.getContent();
+        	Map<String,Date> mapCloseDesc=new HashMap<String,Date>();
+        	Map<String,Date> mapOpenAsc=new HashMap<String,Date>();
+        	boolean blnNew=false;
+        	String lastAssetUid="";
+        	if(tempList!=null && tempList.size()>0){
+        		for(int i=0;i<tempList.size();++i){
+        			AssetLifecycleEvent tempEvent=tempList.get(i);
+        			String assetUid=tempEvent.getAssetUid();
+        			//1:open,2:closed,3:cancelled
+        			Integer status=tempEvent.getStatus();
+        			Date closeTime=tempEvent.getCreateTime();
+        			Date startTime=tempEvent.getScheduleDate();
+        			if(!lastAssetUid.equals(assetUid)){
+        				if((status==2&&closeTime==null)||(status==1&&startTime==null)){
+        					continue;
+        				}
+        				blnNew=true;
+        				lastAssetUid=assetUid;
+        			}
+        			else{
+        				blnNew=false;
+        			}
+        			if(status==2){
+        				if(blnNew){
+        					mapCloseDesc.put(assetUid, closeTime);
+        				}
+        			}
+        			else if(status==1){
+        				mapOpenAsc.put(assetUid, startTime);
+        			}
+        		}
+        		for(int i=0;i<tempList.size();++i){
+        			AssetLifecycleEvent tempEvent=tempList.get(i);
+        			String assetUid=tempEvent.getAssetUid();
+        			//1:open,2:closed,3:cancelled
+        			Integer status=tempEvent.getStatus();
+        			Date closeTime=tempEvent.getCreateTime();
+        			Date startTime=tempEvent.getScheduleDate();
+        			Date closeDesc=mapCloseDesc.get(assetUid);
+        			if(status==2){
+        				if(closeTime!=null && closeTime.after(currentDate)){
+        					tempEvent.setCreateTime(null);
+        				}
+        			}
+        			else if(status==1){
+        				if(startTime!=null){
+        					Calendar ca=Calendar.getInstance();
+        					ca.setTime(startTime);
+        					ca.add(Calendar.DAY_OF_YEAR, 60);
+        					if(ca.getTime().before(currentDate)){
+        						tempEvent.setScheduleDate(null);
+        					}
+        					else if(closeDesc!=null && closeDesc.after(startTime)){
+        						tempEvent.setScheduleDate(null);
+        					}
+        				}
+        			}
+        		}
+        	}
         }
     }
 

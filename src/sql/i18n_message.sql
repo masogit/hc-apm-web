@@ -1902,3 +1902,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '1', '等待备件', 'waitting acc', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '2', '返厂维修-有备机', 'return-backup', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('subStatus', '3', '返厂维修-无备机', 'return-unBackup', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'PmIsSupportBatchFinish', '保养是否支持批量完成', 'Does pm support batch finish?', NULL, '-1');
+

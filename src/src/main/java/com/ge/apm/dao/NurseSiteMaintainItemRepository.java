@@ -31,6 +31,9 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id in ?1",nativeQuery=true)
 	public Set<String> findIdsByParentId(Set<String> parentIds);
 	
+	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id = ?1",nativeQuery=true)
+	public Set<String> findIdsByParentId(String parentId);
+	
 	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and o.status=?2)",nativeQuery=true)
 	public Boolean findExistsItemStatus(String parentId,int status);
 	
