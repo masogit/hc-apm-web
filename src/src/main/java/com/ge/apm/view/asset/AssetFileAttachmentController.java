@@ -158,8 +158,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 return;
             }
             String parsedLink = vlinkParserService.parseVlink(vlink);
-            if (StringUtils.isEmpty(parsedLink)) {
+            if (StringUtils.isNotEmpty(parsedLink)) {
                 selected.setExtLink(parsedLink);
+            } else {
+                WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
+                return;
             }
             selected.setBoId(selectedAsset.getId());
             selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
