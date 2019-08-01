@@ -1,42 +1,41 @@
 package com.ge.apm.view.asset;
 
-import java.util.HashMap;
-import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetTagService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.VlinkParserService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.asset.AssetInfoService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.view.sysutil.UserContextService;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -83,6 +82,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private String vlinkTitle;
 
+    private VlinkParserService vlinkParserService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(BlobObjectRepository.class);
@@ -95,6 +96,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         currentUser = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
+        vlinkParserService = WebUtil.getBean(VlinkParserService.class);
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
@@ -155,10 +157,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("ValidationRequire"));
                 return;
             }
+            String parsedLink = vlinkParserService.parseVlink(vlink);
+            if (StringUtils.isEmpty(parsedLink)) {
+                selected.setExtLink(parsedLink);
+            }
             selected.setBoId(selectedAsset.getId());
             selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             selected.setBoUuid(selectedAsset.getUid());
-            selected.setExtLink(vlink);
             selected.setObjectName(vlinkTitle);
             dao.save(selected);
             cancel();
