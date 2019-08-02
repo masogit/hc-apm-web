@@ -912,16 +912,25 @@ public class UserAccountImportService {
 			updateUser(user);
 			return;
 		}
-		user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//TODO nickName
 		try {
+            if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
+                user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+                user.entryptPassword();
+                user.setPlainPassword(null);
+            } else {
+                user.setPassword(tenantInfo.getInitialPassword());
+                user.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+            }
+
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
 			user.setLastModifiedBy(user.getCreatedBy());
 			user.setLastModifiedDate(user.getCreatedDate());
 			user.setPasswordErrorCount(0);
-			user.entryptPassword();
-			user.setPlainPassword(null);
+
 			userAccountRepository.save(user);
 			saveUserRole(user,true);
 			saveUserOrgInfo(user, true);
