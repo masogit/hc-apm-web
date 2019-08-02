@@ -78,6 +78,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            LinkedHashMap<String, Object>  data = (LinkedHashMap<String, Object> )responseMap.get("data");
+            measuringOrderDetail.setId((String)data.get("id"));
             return (String) responseMap.get("message");
         } else {
             return null;
