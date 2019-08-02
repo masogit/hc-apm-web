@@ -380,7 +380,7 @@ public class TenantInfo implements Serializable {
         encryptPassword();
     }
 
-    public void encryptPassword() {
+    private void encryptPassword() {
 
         if (StringUtils.isEmpty(getPlainPassword())) {
             setInitialPassword(null);
