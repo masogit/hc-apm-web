@@ -70,272 +70,256 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
 	protected String queryAssetUid;
 
-    protected void init() {
-        uaaService = WebUtil.getBean(UaaService.class);
-        dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
-        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        service=WebUtil.getBean(AssetLifecycleEventService.class);
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        blnAllSelected=false;
-        setSelectedItems=new HashSet<AssetLifecycleEvent>();
-        tabStatus=3;
+	protected void init() {
+		uaaService = WebUtil.getBean(UaaService.class);
+		dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
+		fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+		service = WebUtil.getBean(AssetLifecycleEventService.class);
+		this.filterBySite = false;
+		this.filterByHospital = false;
+		blnAllSelected = false;
+		setSelectedItems = new HashSet<AssetLifecycleEvent>();
+		tabStatus = 3;
 
 		String enCodeParameters = WebUtil.getRequestParameter("str");
 		if (!Strings.isNullOrEmpty(enCodeParameters)) {
 			queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
 		}
-    }
+	}
 
-    @Override
-    protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
-        return dao;
-    }
-    @Override
-    protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
-        this.setSearchFilter();
-        this.selected = null;
-        if (!this.hasFilterOnField("eventType")) {
-        	searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));//3外部维修
-        }
-        List<String> listProp=new ArrayList<String>();
-        listProp.add("assetUid");
-        listProp.add("createTime");
-        Sort sort = new Sort(Direction.DESC,listProp);
-        PageRequest pr =  new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-        Page<AssetLifecycleEvent> pageResult=dao.findBySearchFilter(this.searchFilters, pr);
-        updateSelectStatus(pageResult);
-        ignoreErrorDate(pageResult);
-        return pageResult;
-    }
-    
-    private void updateSelectStatus(Page<AssetLifecycleEvent> pageResult){
-    	boolean tempAllSelect=false;
-    	if(pageResult!=null){
-        	List<AssetLifecycleEvent> tempList=pageResult.getContent();
-        	if(tempList!=null && tempList.size()>0){
-        		tempAllSelect=true;
-        		for(int i=0;i<tempList.size();++i){
-        			AssetLifecycleEvent tempEvent=tempList.get(i);
-        			if(this.setSelectedItems.contains(tempEvent)){
-        				tempEvent.setBlnSelected(true);
-        			}
-        			else{
-        				tempAllSelect=false;
-        			}
-        		}
-        	}
-        	setBlnAllSelected(tempAllSelect);
-        }
-    }
-    
-    private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult){
-    	Calendar currentCa=Calendar.getInstance();
-    	Date currentDate=currentCa.getTime();
-    	if(pageResult!=null){
-        	List<AssetLifecycleEvent> tempList=pageResult.getContent();
-        	Map<String,Date> mapCloseDesc=new HashMap<String,Date>();
-        	Map<String,Date> mapOpenAsc=new HashMap<String,Date>();
-        	boolean blnNew=false;
-        	String lastAssetUid="";
-        	if(tempList!=null && tempList.size()>0){
-        		for(int i=0;i<tempList.size();++i){
-        			AssetLifecycleEvent tempEvent=tempList.get(i);
-        			String assetUid=tempEvent.getAssetUid();
-        			//1:open,2:closed,3:cancelled
-        			Integer status=tempEvent.getStatus();
-        			Date closeTime=tempEvent.getCreateTime();
-        			Date startTime=tempEvent.getScheduleDate();
-        			if(!lastAssetUid.equals(assetUid)){
-        				if((status==2&&closeTime==null)||(status==1&&startTime==null)){
-        					continue;
-        				}
-        				blnNew=true;
-        				lastAssetUid=assetUid;
-        			}
-        			else{
-        				blnNew=false;
-        			}
-        			if(status==2){
-        				if(blnNew){
-        					mapCloseDesc.put(assetUid, closeTime);
-        				}
-        			}
-        			else if(status==1){
-        				mapOpenAsc.put(assetUid, startTime);
-        			}
-        		}
-        		for(int i=0;i<tempList.size();++i){
-        			AssetLifecycleEvent tempEvent=tempList.get(i);
-        			String assetUid=tempEvent.getAssetUid();
-        			//1:open,2:closed,3:cancelled
-        			Integer status=tempEvent.getStatus();
-        			Date closeTime=tempEvent.getCreateTime();
-        			Date startTime=tempEvent.getScheduleDate();
-        			Date closeDesc=mapCloseDesc.get(assetUid);
-        			Date openAsc=mapOpenAsc.get(assetUid);
-        			if(status==2){
-        				if(closeTime!=null && closeTime.after(currentDate)){
-        					tempEvent.setCreateTime(null);
-        				}
-        			}
-        			else if(status==1){
-        				if(startTime!=null){
-        					Calendar ca=Calendar.getInstance();
-        					ca.setTime(startTime);
-        					ca.add(Calendar.DAY_OF_YEAR, 60);
-        					if(ca.getTime().before(currentDate)){
-        						tempEvent.setScheduleDate(null);
-        					}
-        					else if(closeDesc!=null && closeDesc.after(startTime)){
-        						tempEvent.setScheduleDate(null);
-        					}
-        				}
-        			}
-        		}
-        	}
-        }
-    }
+	@Override
+	protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
+		return dao;
+	}
 
-    @Override
-    public void setSearchFilter() {
-        if (this.searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        }
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
+	@Override
+	protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
+		this.setSearchFilter();
+		this.selected = null;
+		if (!this.hasFilterOnField("eventType")) {
+			searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));// 3外部维修
+		}
+		List<String> listProp = new ArrayList<String>();
+		listProp.add("assetUid");
+		listProp.add("createTime");
+		Sort sort = new Sort(Direction.DESC, listProp);
+		PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
+		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pr);
+		updateSelectStatus(pageResult);
+		ignoreErrorDate(pageResult);
+		return pageResult;
+	}
 
-        if (StringUtils.isNotEmpty(queryAssetUid)) {
+	private void updateSelectStatus(Page<AssetLifecycleEvent> pageResult) {
+		boolean tempAllSelect = false;
+		if (pageResult != null) {
+			List<AssetLifecycleEvent> tempList = pageResult.getContent();
+			if (tempList != null && tempList.size() > 0) {
+				tempAllSelect = true;
+				for (int i = 0; i < tempList.size(); ++i) {
+					AssetLifecycleEvent tempEvent = tempList.get(i);
+					if (this.setSelectedItems.contains(tempEvent)) {
+						tempEvent.setBlnSelected(true);
+					} else {
+						tempAllSelect = false;
+					}
+				}
+			}
+			setBlnAllSelected(tempAllSelect);
+		}
+	}
+
+	private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult) {
+		Calendar currentCa = Calendar.getInstance();
+		Date currentDate = currentCa.getTime();
+		if (pageResult != null) {
+			List<AssetLifecycleEvent> tempList = pageResult.getContent();
+			Map<String, Date> mapCloseDesc = new HashMap<String, Date>();
+			Map<String, Date> mapOpenAsc = new HashMap<String, Date>();
+			if (tempList != null && tempList.size() > 0) {
+				for (int i = 0; i < tempList.size(); ++i) {
+					AssetLifecycleEvent tempEvent = tempList.get(i);
+					String assetUid = tempEvent.getAssetUid();
+					// 1:open,2:closed,3:cancelled
+					Integer status = tempEvent.getStatus();
+					Date closeTime = tempEvent.getCreateTime();
+					Date startTime = tempEvent.getScheduleDate();
+					if (closeTime != null && closeTime.after(currentDate)) {
+						tempEvent.setCreateTime(null);
+						closeTime=null;
+					}
+					if (startTime != null) {
+						Calendar ca = Calendar.getInstance();
+						ca.setTime(startTime);
+						ca.add(Calendar.DAY_OF_YEAR, 60);
+						if (ca.getTime().before(currentDate)) {
+							tempEvent.setScheduleDate(null);
+							startTime=null;
+						}
+					}
+					if(closeTime!=null){
+						if(mapCloseDesc.get(assetUid)==null){
+							mapCloseDesc.put(assetUid, closeTime);
+						}
+					}
+					if(startTime!=null){
+						mapOpenAsc.put(assetUid, startTime);
+					}
+				}
+				for (int i = 0; i < tempList.size(); ++i) {
+					AssetLifecycleEvent tempEvent = tempList.get(i);
+					String assetUid = tempEvent.getAssetUid();
+					// 1:open,2:closed,3:cancelled
+					Integer status = tempEvent.getStatus();
+					Date closeTime = tempEvent.getCreateTime();
+					Date startTime = tempEvent.getScheduleDate();
+					Date closeDesc = mapCloseDesc.get(assetUid);
+					if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
+						tempEvent.setScheduleDate(null);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void setSearchFilter() {
+		if (this.searchFilters == null) {
+			searchFilters = new ArrayList<>();
+		}
+		if (!this.hasFilterOnField("assetInfo.siteUID")) {
+			List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid())
+					.collect(Collectors.toList());
+			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		}
+
+		if (StringUtils.isNotEmpty(queryAssetUid)) {
 			searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
 
 		}
-    }
+	}
 
-    public void onSelectAllItemsEvent() {
-    	List<AssetLifecycleEvent> listCurrentItems=this.lazyModel.getWrappedData();
-    	if(listCurrentItems!=null && listCurrentItems.size()>0){
-    		for(int i=0;i<listCurrentItems.size();++i){
-    			AssetLifecycleEvent tempEvent=listCurrentItems.get(i);
-    			tempEvent.setBlnSelected(blnAllSelected);
-    		}
-    	}
-    	if(blnAllSelected){
-    		this.setSelectedItems.addAll(listCurrentItems);
-    	}
-    	else{
-    		this.setSelectedItems.removeAll(listCurrentItems);
-    	}
-    }
-    
-    public void onItemSelect(AssetLifecycleEvent tempEvent){
-    	if(tempEvent.isBlnSelected()){
-    		this.setSelectedItems.add(tempEvent);
-    	}
-    	else{
-    		this.setSelectedItems.remove(tempEvent);
-    	}
-    }
-    
-    private void addMessage(String str) {
-		FacesMessage message = new FacesMessage(str,null);
+	public void onSelectAllItemsEvent() {
+		List<AssetLifecycleEvent> listCurrentItems = this.lazyModel.getWrappedData();
+		if (listCurrentItems != null && listCurrentItems.size() > 0) {
+			for (int i = 0; i < listCurrentItems.size(); ++i) {
+				AssetLifecycleEvent tempEvent = listCurrentItems.get(i);
+				tempEvent.setBlnSelected(blnAllSelected);
+			}
+		}
+		if (blnAllSelected) {
+			this.setSelectedItems.addAll(listCurrentItems);
+		} else {
+			this.setSelectedItems.removeAll(listCurrentItems);
+		}
+	}
+
+	public void onItemSelect(AssetLifecycleEvent tempEvent) {
+		if (tempEvent.isBlnSelected()) {
+			this.setSelectedItems.add(tempEvent);
+		} else {
+			this.setSelectedItems.remove(tempEvent);
+		}
+	}
+
+	private void addMessage(String str) {
+		FacesMessage message = new FacesMessage(str, null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
-	public void exportSelected(){
-		this.exportFile=null;
-		if(setSelectedItems==null || setSelectedItems.size()==0){
-			downloadFile(service.parseEventToMap(dao.findBySearchFilter(this.searchFilters),tabStatus));
-		}
-		else{
-			downloadFile(service.parseEventToMap(setSelectedItems,tabStatus));
+
+	public void exportSelected() {
+		this.exportFile = null;
+		if (setSelectedItems == null || setSelectedItems.size() == 0) {
+			downloadFile(service.parseEventToMap(dao.findBySearchFilter(this.searchFilters), tabStatus));
+		} else {
+			downloadFile(service.parseEventToMap(setSelectedItems, tabStatus));
 		}
 	}
-    
-    protected void downloadFile(List<Map<String,Object>> data){
+
+	protected void downloadFile(List<Map<String, Object>> data) {
 		try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/woMgr/woMgrOutList_export.xlsx");
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = service.exportData(doc, data);
-            if (exportFlag) {
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "woMgr_export.xlsx");
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }
+			InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/woMgr/woMgrOutList_export.xlsx");
+			ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+			Boolean exportFlag = service.exportData(doc, data);
+			if (exportFlag) {
+				exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "woMgr_export.xlsx");
+			}
+		} catch (IOException ex) {
+			LOGGER.error(ex.getMessage());
+		}
 	}
 
-    public String getMsStatus(AssetLifecycleEvent alse) {
-        return service.getMsStatus(alse);
-    }
+	public String getMsStatus(AssetLifecycleEvent alse) {
+		return service.getMsStatus(alse);
+	}
 
-    public StreamedContent getAnonymousReport(String reportStorageId) {
-        try {
-            StreamedContent file = fileDownloadService.getFile(reportStorageId);
-            String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getName());
-            String contentType = file.getContentType();
-            InputStream stream = file.getStream();
-            byte[] bytes = IOUtils.toByteArray(stream);
-            return new DefaultStreamedContent((new ByteArrayInputStream(bytes)), contentType, fileName);
-        } catch (IOException e) {
-            WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
-        }
-        return null;
-    }
-    public void downloadSelectedReport(){
-    	this.exportFile=null;
-    	if(setSelectedItems==null || setSelectedItems.size()==0){
-    		WebUtil.addErrorMessage("请选择需要下载报告的工单！");
-    		return;
-    	}
-    	Set<String> setReportIds=new HashSet<String>();
-    	Map<String,String> mapReportName=new HashMap<String,String>();
-//    	Map<String,Integer> mapName=new HashMap<String,Integer>();
-    	Iterator<AssetLifecycleEvent> itEvent=setSelectedItems.iterator();
-		while(itEvent.hasNext()){
-			AssetLifecycleEvent tempEvent=itEvent.next();
-			List<ServiceRequestReport> listReport=tempEvent.getReports();
-			if(listReport!=null && listReport.size()>0){
-				for(int j=0;j<listReport.size();++j){
-					ServiceRequestReport tempReport=listReport.get(j);
-					String reportStorageId=tempReport.getStorageId();
-					if(StringUtils.isNotEmpty(reportStorageId)){
+	public StreamedContent getAnonymousReport(String reportStorageId) {
+		try {
+			StreamedContent file = fileDownloadService.getFile(reportStorageId);
+			String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getName());
+			String contentType = file.getContentType();
+			InputStream stream = file.getStream();
+			byte[] bytes = IOUtils.toByteArray(stream);
+			return new DefaultStreamedContent((new ByteArrayInputStream(bytes)), contentType, fileName);
+		} catch (IOException e) {
+			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+		}
+		return null;
+	}
+
+	public void downloadSelectedReport() {
+		this.exportFile = null;
+		if (setSelectedItems == null || setSelectedItems.size() == 0) {
+			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
+			return;
+		}
+		Set<String> setReportIds = new HashSet<String>();
+		Map<String, String> mapReportName = new HashMap<String, String>();
+		// Map<String,Integer> mapName=new HashMap<String,Integer>();
+		Iterator<AssetLifecycleEvent> itEvent = setSelectedItems.iterator();
+		while (itEvent.hasNext()) {
+			AssetLifecycleEvent tempEvent = itEvent.next();
+			List<ServiceRequestReport> listReport = tempEvent.getReports();
+			if (listReport != null && listReport.size() > 0) {
+				for (int j = 0; j < listReport.size(); ++j) {
+					ServiceRequestReport tempReport = listReport.get(j);
+					String reportStorageId = tempReport.getStorageId();
+					if (StringUtils.isNotEmpty(reportStorageId)) {
 						setReportIds.add(reportStorageId);
 						mapReportName.put(reportStorageId, tempReport.getFileName());
 					}
 				}
 			}
 		}
-    	if(setReportIds.size()==0){
-    		WebUtil.addErrorMessage("工单报告为空！");
-    		return;
-    	}
-    	try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)){
-    		Iterator<String> it=setReportIds.iterator();
-    		while(it.hasNext()){
-    			String reportStorageId=it.next();
-    			StreamedContent file = fileDownloadService.getFile(reportStorageId);
-                String fileName = mapReportName.get(reportStorageId);
-                String contentType = file.getContentType();
-                InputStream stream = file.getStream();
-                zout.putNextEntry(new ZipEntry(fileName));
-                byte[] bytes = IOUtils.toByteArray(stream);
-                if (bytes != null) {
-                    IOUtils.write(bytes, zout);
-                }
-                zout.closeEntry();
-    		}
-    		zout.close();
-    		exportFile=new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
-        } catch (Exception e) {
-            WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
-        }
-    }
+		if (setReportIds.size() == 0) {
+			WebUtil.addErrorMessage("工单报告为空！");
+			return;
+		}
+		try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)) {
+			Iterator<String> it = setReportIds.iterator();
+			while (it.hasNext()) {
+				String reportStorageId = it.next();
+				StreamedContent file = fileDownloadService.getFile(reportStorageId);
+				String fileName = mapReportName.get(reportStorageId);
+				String contentType = file.getContentType();
+				InputStream stream = file.getStream();
+				zout.putNextEntry(new ZipEntry(fileName));
+				byte[] bytes = IOUtils.toByteArray(stream);
+				if (bytes != null) {
+					IOUtils.write(bytes, zout);
+				}
+				zout.closeEntry();
+			}
+			zout.close();
+			exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Reports.zip");
+		} catch (Exception e) {
+			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+		}
+	}
 
 	public Set<AssetLifecycleEvent> getSetSelectedItems() {
 		return setSelectedItems;
@@ -352,7 +336,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
 	}
-	
 
 	public boolean isBlnAllSelected() {
 		return blnAllSelected;
@@ -365,8 +348,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	public String getDescriptionStatusFilter() {
 		return descriptionStatusFilter;
 	}
@@ -374,5 +358,5 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	public void setDescriptionStatusFilter(String descriptionStatusFilter) {
 		this.descriptionStatusFilter = descriptionStatusFilter;
 	}
-	
+
 }
