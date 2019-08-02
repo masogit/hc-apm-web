@@ -136,8 +136,6 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			List<AssetLifecycleEvent> tempList = pageResult.getContent();
 			Map<String, Date> mapCloseDesc = new HashMap<String, Date>();
 			Map<String, Date> mapOpenAsc = new HashMap<String, Date>();
-			boolean blnNew = false;
-			String lastAssetUid = "";
 			if (tempList != null && tempList.size() > 0) {
 				for (int i = 0; i < tempList.size(); ++i) {
 					AssetLifecycleEvent tempEvent = tempList.get(i);
@@ -146,20 +144,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					Integer status = tempEvent.getStatus();
 					Date closeTime = tempEvent.getCreateTime();
 					Date startTime = tempEvent.getScheduleDate();
-					if (!lastAssetUid.equals(assetUid)) {
-						if ((status == 2 && closeTime == null) || (status == 1 && startTime == null)) {
-							continue;
-						}
-						blnNew = true;
-						lastAssetUid = assetUid;
-					} else {
-						blnNew = false;
-					}
 					if (closeTime != null && closeTime.after(currentDate)) {
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
-					else if (startTime != null) {
+					if (startTime != null) {
 						Calendar ca = Calendar.getInstance();
 						ca.setTime(startTime);
 						ca.add(Calendar.DAY_OF_YEAR, 60);
@@ -168,8 +157,8 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 							startTime=null;
 						}
 					}
-					if (blnNew) {
-						if(closeTime!=null){
+					if(closeTime!=null){
+						if(mapCloseDesc.get(assetUid)==null){
 							mapCloseDesc.put(assetUid, closeTime);
 						}
 					}
