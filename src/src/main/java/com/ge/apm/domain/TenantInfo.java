@@ -381,6 +381,13 @@ public class TenantInfo implements Serializable {
     }
 
     public void encryptPassword() {
+
+        if (StringUtils.isEmpty(getPlainPassword())) {
+            setInitialPassword(null);
+            setInitialPasswordSalt(null);
+            return;
+        }
+
         byte[] salt = Digests.generateSalt(UserAccount.SALT_SIZE);
         setInitialPasswordSalt(Digests.encodeHex(salt));
 
