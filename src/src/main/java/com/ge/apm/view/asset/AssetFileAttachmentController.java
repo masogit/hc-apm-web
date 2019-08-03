@@ -371,7 +371,12 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
 
     public void batchSave() {
-        if (batchBlobObject != null) {
+        if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
+            String parsedLink = vlinkParserService.parseVlink(vlink);
+            if (StringUtils.isEmpty(parsedLink)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
+                return;
+            }
             for (AssetInfo tempAssetInfo : targetAssets) {
                 V2_BlobObject tempBlobObject = new V2_BlobObject();
 
@@ -379,11 +384,15 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 tempBlobObject.setBoUuid(tempAssetInfo.getUid());
                 tempBlobObject.setBoSubType(boSubTypeBatch);
                 tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-                tempBlobObject.setObjectName(batchBlobObject.getObjectName());
-                tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
-                tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
-                tempBlobObject.setObjectType(batchBlobObject.getObjectType());
-
+                if ("vlink".equals(boSubTypeBatch)) {
+                    tempBlobObject.setObjectName(vlinkTitle);
+                    tempBlobObject.setExtLink(parsedLink);
+                } else {
+                    tempBlobObject.setObjectName(batchBlobObject.getObjectName());
+                    tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
+                    tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
+                    tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                }
                 dao.save(tempBlobObject);
             }
         } else {
