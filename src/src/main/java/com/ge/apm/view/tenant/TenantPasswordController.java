@@ -5,6 +5,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import org.apache.commons.codec.DecoderException;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -12,6 +13,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.List;
 
 @ManagedBean
@@ -20,10 +22,10 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
 
     TenantInfoRepository dao;
     UserAccountRepository userAccountDao;
-
     TenantPasswordService tenantPasswordService;
 
     List<TenantInfo> tenantInfos;
+    List<UserAccount> userAccountListBySelectedTenant;
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
@@ -43,10 +45,13 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
         tenantPasswordService = WebUtil.getBean(TenantPasswordService.class);
 
         tenantInfos = dao.findTenantInfoByInitialPasswordIsNotNull();
-
     }
 
     public void updateUserAccountPasswordWithTenantPassword() {
+        if (StringUtils.isEmpty(this.selected.getUid())) {
+            return;
+        }
+
         String tenantUid = this.selected.getUid();
 
         try {
@@ -55,6 +60,14 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
             e.printStackTrace();
         }
 
+    }
+
+    public void changeTenant() {
+        if (StringUtils.isEmpty(this.selected.getUid())) {
+            userAccountListBySelectedTenant = Collections.EMPTY_LIST;
+        } else {
+            userAccountListBySelectedTenant = listUserAccountsWithDefaultPassword();
+        }
     }
 
     public List<UserAccount> listUserAccountsWithDefaultPassword() {
@@ -80,4 +93,11 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
         this.tenantInfos = tenantInfos;
     }
 
+    public List<UserAccount> getUserAccountListBySelectedTenant() {
+        return userAccountListBySelectedTenant;
+    }
+
+    public void setUserAccountListBySelectedTenant(List<UserAccount> userAccountListBySelectedTenant) {
+        this.userAccountListBySelectedTenant = userAccountListBySelectedTenant;
+    }
 }
