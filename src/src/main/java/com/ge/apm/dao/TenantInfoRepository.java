@@ -11,6 +11,6 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
 
     public TenantInfo findByuid(String uid);
 
-    @Query("select t from TenantInfo t order by name")
-    public List<TenantInfo> getAllOrderByName();
+    @Query("select t from TenantInfo t where t.initialPassword is not null")
+    List<TenantInfo> findTenantInfoByInitialPasswordIsNotNull();
 }
