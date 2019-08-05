@@ -1095,9 +1095,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return new ArrayList<UserAccount>();
     }
 
-    public List<UserAccount> getApproveList() {
+    public List<UserAccount> getApproveList(String name) {
         if (this.selectedPmOrder != null)
-            return pmOrderService.getApproveList(selectedPmOrder.getAssetUid());
+            return pmOrderService.getApproveList(selectedPmOrder.getAssetUid(),name);
         else
             return new ArrayList<UserAccount>();
     }
@@ -1985,6 +1985,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public String getApprovaler() {
         return approvaler;
     }
+    public void setNothing(){}
 
     public void setApprovaler(String approvaler) {
         this.approvaler = approvaler;

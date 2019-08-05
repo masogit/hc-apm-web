@@ -551,8 +551,8 @@ public class V2_MeasureService extends MicroServiceInvoker {
     public List<UserAccount> getWorkerList(Integer assetId) {
         return ucService.getWorkerList(assetId,"");
     }
-    public List<UserAccount> getApproveList(String assetUid) {
-        return ucService.getApproveList(assetUid);
+    public List<UserAccount> getApproveList(String assetUid,String name) {
+        return ucService.getApproveList(assetUid,name);
     }
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);
