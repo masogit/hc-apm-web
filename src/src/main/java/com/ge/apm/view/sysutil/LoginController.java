@@ -114,7 +114,7 @@ public class LoginController extends LoginService {
     
     @Override
     protected boolean beforeLogin(String plainPassword) {
-        if(!StringUtils.isEmpty(PasswordUtil.checkPwd(plainPassword))){
+        if(!StringUtils.isEmpty(PasswordUtil.checkPwd(plainPassword)) || isFirstTimeLogin(user)){
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
             HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
             addErrorMessage(response, 205, "Resetpassword");

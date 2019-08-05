@@ -27,6 +27,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(tenantInfo.getUid());
+        orgInfo.setParentID(tenantInfo.getId());
 
         return orgInfo;
     }
@@ -50,7 +51,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(parentOrg.getUid());
-
+        orgInfo.setParentID(parentOrg.getId());
         return orgInfo;
     }
 
@@ -73,7 +74,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(parentOrg.getUid());
-
+        orgInfo.setParentID(parentOrg.getId());
         return orgInfo;
     }
 
@@ -85,7 +86,15 @@ public class OrgInfoBuilder {
         orgInfo.setOrgLevel(orgLevel);
         orgInfo.setOrgType(4);
         orgInfo.setShortName(name);
-        orgInfo.setName(name);
+
+        if (parentOrg.getOrgType() < 4) {
+            orgInfo.setName(name);
+        } else {
+            //if parent org is clinical, then name should use long name like A-B-C
+            orgInfo.setName(parentOrg.getName() + "-" + name);
+
+        }
+
 
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setHospitalId(parentOrg.getId());
@@ -96,6 +105,7 @@ public class OrgInfoBuilder {
         orgInfo.setSiteUID(parentOrg.getSiteUID());
 
         orgInfo.setParentUID(parentOrg.getUid());
+        orgInfo.setParentID(parentOrg.getId());
 
         return orgInfo;
     }

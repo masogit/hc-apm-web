@@ -240,14 +240,31 @@ public class OrgInfoService {
                         }
 
                         if (!StringUtils.isEmpty(departName)) {
-                            OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
+                            if (departName.contains("-")) {
+                                String[] departNames = departName.split("-");
+                                for (String childDepartName: departNames) {
+                                    //if there is child clinical dept name, then we need to use short name, because normal name used with concatination of all clinical depts
+                                    OrgInfo depart = orgDao.findFirstByParentUIDAndShortName(clinicalParent.getUid(),childDepartName);
 
-                            if (depart == null) {
-                                depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
-                                orgDao.save(depart);
-                                message = "导入成功";
-//                            depart = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 4, departName);
+                                    if (depart == null) {
+                                        depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, childDepartName, clinicalParent, clinicalOrgLevel);
+                                        orgDao.save(depart);
+                                        message = "导入成功";
+                                    }
+
+                                    clinicalParent = depart;
+                                }
+
+                            } else {
+                                OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
+
+                                if (depart == null) {
+                                    depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                                    orgDao.save(depart);
+                                    message = "导入成功";
+                                }
                             }
+
 
                         }
 
