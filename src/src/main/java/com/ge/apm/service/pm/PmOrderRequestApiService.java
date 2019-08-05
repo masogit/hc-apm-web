@@ -98,6 +98,20 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
     }
 }
 
+    //CANCEL_PM_ORDER_BATCH
+    public String invokeBatchPmOrderCancel(String token, ArrayList<PmOrderActionForm> formDataList, String actionName){
+        HttpEntity<ArrayList<PmOrderActionForm>> requestEntity = new HttpEntity<ArrayList<PmOrderActionForm>>(formDataList, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.PM_BATCH_CANCEL);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL,HttpMethod.DELETE,requestEntity,LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            logger.info("Invoke PmOrderCancel "+actionName+" has finished "+responseMap.get("data"));
+            return (String) responseMap.get("bizStatusCode");
+        } else {
+            return null;
+        }
+    }
+
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.PM_ORDER_ACTION);

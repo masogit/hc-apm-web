@@ -26,6 +26,7 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
 
     List<TenantInfo> tenantInfos;
     List<UserAccount> userAccountListBySelectedTenant;
+    String tenantUid;
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
@@ -48,22 +49,22 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
     }
 
     public void updateUserAccountPasswordWithTenantPassword() {
-        if (StringUtils.isEmpty(this.selected.getUid())) {
+        if (StringUtils.isEmpty(this.tenantUid)) {
             return;
         }
 
-        String tenantUid = this.selected.getUid();
-
         try {
             tenantPasswordService.updateUserAccountPasswordWithTenantPassword(tenantUid);
+            userAccountListBySelectedTenant = listUserAccountsWithDefaultPassword();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void changeTenant() {
-        if (StringUtils.isEmpty(this.selected.getUid())) {
+    public void onSelectTenant() {
+        if (StringUtils.isEmpty(this.tenantUid)) {
             userAccountListBySelectedTenant = Collections.EMPTY_LIST;
         } else {
             userAccountListBySelectedTenant = listUserAccountsWithDefaultPassword();
@@ -71,7 +72,6 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
     }
 
     public List<UserAccount> listUserAccountsWithDefaultPassword() {
-        String tenantUid = this.selected.getUid();
         List<UserAccount> resultList = null;
 
         try {
@@ -99,5 +99,13 @@ public class TenantPasswordController extends JpaCRUDController<TenantInfo> {
 
     public void setUserAccountListBySelectedTenant(List<UserAccount> userAccountListBySelectedTenant) {
         this.userAccountListBySelectedTenant = userAccountListBySelectedTenant;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 }
