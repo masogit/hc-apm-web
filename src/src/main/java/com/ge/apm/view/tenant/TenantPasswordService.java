@@ -36,7 +36,7 @@ public class TenantPasswordService {
 
             if (userAccount.getPassword().equals(hashPassword1) || userAccount.getPassword().equals(hashPassword2)) {
                 userAccount.setPassword(tenantInfo.getInitialPassword());
-//                userAccount.setPwdSalt(tenantInfo.getIni);
+                userAccount.setPwdSalt(tenantInfo.getInitialPasswordSalt());
                 userAccountDao.save(userAccount);
             }
         }
