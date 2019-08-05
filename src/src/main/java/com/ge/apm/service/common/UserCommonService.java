@@ -127,8 +127,8 @@ public class UserCommonService {
         return null;
     }
 
-    public List<UserAccount> getApproveList(String assetUid) {
-        Map<String, Object> res = pmApi.getApproveByAsset(UserContextService.getAccessToken(), assetUid == null ? "" : assetUid);
+    public List<UserAccount> getApproveList(String assetUid,String name) {
+        Map<String, Object> res = pmApi.getApproveByAsset(UserContextService.getAccessToken(), assetUid == null ? "" : assetUid,name);
         if (null != res) {
             List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
             List<UserAccount> userList = mapList.stream().map(item -> {

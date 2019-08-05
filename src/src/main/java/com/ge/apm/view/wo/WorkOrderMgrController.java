@@ -212,7 +212,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         this.filterByHospital = false;
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
-ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
+        ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
     }
 
@@ -220,7 +220,7 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
-public void partsPriceUpdate(){
+    public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
@@ -1586,9 +1586,11 @@ public void partsPriceUpdate(){
         return true;
     }
 
-    public List<UserAccount> getApproverList() {
-        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid());
+    public List<UserAccount> getApproverList(String name) {
+        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
     }
+
+    public void setNothing(){}
 
     //getter and setter
     public Integer getQueryIndex() {

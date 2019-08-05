@@ -161,8 +161,8 @@ public class V2_WorkOrderService {
         return ucService.getAckerList(woId,"");
     }
 
-    public List<UserAccount> getApproverListByAsset(String assetUid) {
-        return ucService.getApproveList(assetUid);
+    public List<UserAccount> getApproverListByAsset(String assetUid,String name) {
+        return ucService.getApproveList(assetUid,name);
     }
 
     public AssetInfo getAssetInfo(Integer assetId) {

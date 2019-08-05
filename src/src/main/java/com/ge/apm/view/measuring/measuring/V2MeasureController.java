@@ -994,12 +994,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             return new ArrayList<UserAccount>();
     }
 
-    public List<UserAccount> getApproveList() {
+    public List<UserAccount> getApproveList(String name) {
         if (this.selectedMeasureOrder != null)
-            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid());
+            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid(),name);
         else
             return new ArrayList<UserAccount>();
     }
+
+    public void setNothing(){}
 
     private List<Integer> tagGroupAssets;
 

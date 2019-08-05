@@ -14,6 +14,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
+import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -40,12 +41,15 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public Map<String, Object> getApproveByAsset(String token, String assetUid) {
+    public Map<String, Object> getApproveByAsset(String token, String assetUid,String name) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         String gatewayURL = getGatewayURL(GatewayURL.GET_APPROVE_BY_ASSET);
         String url = gatewayURL.replace("{assetUid}",assetUid);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if(!Strings.isNullOrEmpty(name)){
+            url = url.concat("?name=").concat(name);
+        }
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class,name);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (LinkedHashMap<String, Object>) responseMap;
