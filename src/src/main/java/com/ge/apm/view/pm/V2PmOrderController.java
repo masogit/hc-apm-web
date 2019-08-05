@@ -199,6 +199,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.head = head;
     }
 
+    public void preBatchCancel(){
+        cancelReason=null;
+    }
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())

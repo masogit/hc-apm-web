@@ -259,9 +259,6 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             formData.setDesc(desc);
         });
 
-
-        String gatewayURL = getGatewayURL(GatewayURL.BATCH_TAKE_ORDER);
-
         String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
