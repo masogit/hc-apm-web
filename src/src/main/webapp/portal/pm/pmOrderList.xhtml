@@ -285,8 +285,10 @@
         <h:form id="pmCancelForm" class="pmCancelFormCls" >
         <p:selectOneRadio id="cancelRadio" value="#{v2PmOrderController.cancelInt}">
             <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
-            <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+            <f:selectItem itemLabel="取消所有周期性工单" itemValue="2"/>
         </p:selectOneRadio>
+            <!--<f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+        </p:selectOneRadio>-->
     <h:panelGroup>
         <label class="label">取消原因</label>
         <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" />
@@ -305,7 +307,8 @@
             <h:form id="pmBatchCancelForm" class="pmCancelFormCls" >
                 <p:selectOneRadio id="cancelBatchRadio" value="#{v2PmOrderController.cancelInt}">
                     <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
-                    <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
+                    <f:selectItem itemLabel="取消所有周期性工单" itemValue="2"/>
+                   <!-- <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="取消所有周期性工单&#45;&#45;" itemValue="2"/>-->
                 </p:selectOneRadio>
                 <h:panelGroup>
                     <label class="label">取消原因</label>
