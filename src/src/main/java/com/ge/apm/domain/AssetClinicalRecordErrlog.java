@@ -91,6 +91,13 @@ public class AssetClinicalRecordErrlog implements Serializable {
     @Column(name = "err_msg")
     private String errMsg;
 
+    @Size(max = 128)
+    @Column(name = "pre_exam_department")
+    private String preExamDepartment;
+
+    @Column(name = "is_positive")
+    private Integer isPositive;
+
     public AssetClinicalRecordErrlog() {
     }
 
@@ -288,6 +295,22 @@ public class AssetClinicalRecordErrlog implements Serializable {
 
     public void setErrMsg(String errMsg) {
         this.errMsg = errMsg;
+    }
+
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
+
+    public Integer getIsPositive() {
+        return isPositive;
+    }
+
+    public void setIsPositive(Integer isPositive) {
+        this.isPositive = isPositive;
     }
 
     @Override
