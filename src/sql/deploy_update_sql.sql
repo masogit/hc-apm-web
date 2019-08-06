@@ -385,3 +385,9 @@ update asset_alert_config set pad_message = '图像重建状态异常，将对�
 update asset_alert_config set wechat_message = '图像重建状态异常，将对诊断安全构成风险，请重启设备，如仍未解决请致电GE400热线报修' where config_type = '504' or config_type = '204';
 update asset_alert_config set pad_message = '医院网络连接状况异常，将影响设备正常信息传送, 请检查设备网络连接' where config_type = '505' or config_type = '205';
 update asset_alert_config set wechat_message = '医院网络连接状况异常，将影响设备正常信息传送, 请检查设备网络连接' where config_type = '505' or config_type = '205';
+
+update workflow_config set clinical_dept_head_weight = 5 where clinical_dept_head_weight is null;
+update workflow_config set asset_dept_head_weight = 4 where asset_dept_head_weight is null;
+update workflow_config set asset_head_weight = 3 where asset_head_weight is null;
+update workflow_config set clinical_staff_weight = 2 where clinical_staff_weight is null;
+update workflow_config set other_clinical_dept_head_weight = 1 where other_clinical_dept_head_weight is null;

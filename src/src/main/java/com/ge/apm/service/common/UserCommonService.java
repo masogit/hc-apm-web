@@ -184,7 +184,7 @@ public class UserCommonService {
             StringBuilder sb = new StringBuilder();
             Collection<String> values = map.values();
             for (String s : values) {
-                sb.append(s).append("\\|");
+                sb.append(s).append("|");
             }
             return sb.toString().substring(0,sb.toString().length()-1);
         }
