@@ -221,8 +221,8 @@
 
                                 <p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBacthOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>
-                                <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="批量取消"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="true" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
-                                </p:commandButton><!--rendered="#{v2PmOrderController.queryIndex!=0}"-->
+                                <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="批量取消"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{v2PmOrderController.queryIndex!=0 and v2PmOrderController.queryIndex!=7 }" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
+                                </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBacthOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>
