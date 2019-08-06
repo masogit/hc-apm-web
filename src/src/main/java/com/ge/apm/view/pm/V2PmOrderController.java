@@ -76,6 +76,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Setter @Getter
     private String filterClinicalDeptOrg;
 
+    @Setter @Getter
+    private Boolean periodShow;
+
     private String filterAssetDeptOrg;
     @Setter @Getter
     List<UnstructuredDataCollection> reportList;
@@ -199,8 +202,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.head = head;
     }
 
+
     public void preBatchCancel(){
         cancelReason=null;
+        List<String> pmIdList = new ArrayList<String>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+        });
+  List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+  //周期性工单的pmtype是1
+        Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
+        if(any.isPresent()){
+            periodShow=true;
+        }else{
+            periodShow=false;
+        }
+
     }
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
@@ -273,6 +291,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
      * */
     public void cancelBatchPMorder() {
+
+
         pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
@@ -936,6 +956,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
+
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
