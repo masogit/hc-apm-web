@@ -1914,3 +1914,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'isChecked', '是否选勾', 'isChecked', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'warranty', '担保', 'warranty', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'logout', '注销', 'Logout', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'clinicalDeptHeadWeight', '备件审核-所属科室主任权重', 'clinicalDeptHeadWeight', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetDeptHeadWeight', '备件审核-使用科室主任权重', 'assetDeptHeadWeight', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetHeadWeight', '备件审核-医工主任权重', 'assetHeadWeight', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'clinicalStaffWeight', '备件审核-临床科室人员权重', 'clinicalStaffWeight', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'otherClinicalDeptHeadWeight', '备件审核-其他临床科室主任权重', 'otherClinicalDeptHeadWeight', NULL, '-1');

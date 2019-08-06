@@ -217,6 +217,66 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "swap_center_config")
     private String swapCenterConfig;
 
+    /***
+     *
+     * 备件审核人排列，保养、维修、计量都适用
+     * @return
+     */
+    @Column(name = "clinical_dept_head_weight")
+    private Integer clinicalDeptHeadWeight = 5;//所属科室主任
+
+    @Column(name = "asset_dept_head_weight")
+    private Integer assetDeptHeadWeight = 4;//使用科室主任
+
+    @Column(name = "asset_head_weight")
+    private Integer assetHeadWeight = 3;//医工主任
+
+    @Column(name = "clinical_staff_weight")
+    private Integer clinicalStaffWeight = 2;//所属科室医工
+
+    @Column(name = "other_clinical_dept_head_weight")
+    private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
+
+    public Integer getClinicalDeptHeadWeight() {
+        return clinicalDeptHeadWeight;
+    }
+
+    public void setClinicalDeptHeadWeight(Integer clinicalDeptHeadWeight) {
+        this.clinicalDeptHeadWeight = clinicalDeptHeadWeight;
+    }
+
+    public Integer getAssetDeptHeadWeight() {
+        return assetDeptHeadWeight;
+    }
+
+    public void setAssetDeptHeadWeight(Integer assetDeptHeadWeight) {
+        this.assetDeptHeadWeight = assetDeptHeadWeight;
+    }
+
+    public Integer getAssetHeadWeight() {
+        return assetHeadWeight;
+    }
+
+    public void setAssetHeadWeight(Integer assetHeadWeight) {
+        this.assetHeadWeight = assetHeadWeight;
+    }
+
+    public Integer getClinicalStaffWeight() {
+        return clinicalStaffWeight;
+    }
+
+    public void setClinicalStaffWeight(Integer clinicalStaffWeight) {
+        this.clinicalStaffWeight = clinicalStaffWeight;
+    }
+
+    public Integer getOtherClinicalDeptHeadWeight() {
+        return otherClinicalDeptHeadWeight;
+    }
+
+    public void setOtherClinicalDeptHeadWeight(Integer otherClinicalDeptHeadWeight) {
+        this.otherClinicalDeptHeadWeight = otherClinicalDeptHeadWeight;
+    }
+
     public Boolean getPmIsSupportBatchFinish() {
         return pmIsSupportBatchFinish;
     }

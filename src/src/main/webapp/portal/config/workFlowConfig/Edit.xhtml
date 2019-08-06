@@ -38,6 +38,42 @@
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
 
+                            <h:panelGroup>
+                                <label class="label">#{msg.clinicalDeptHeadWeight}</label>
+                                <p:inputNumber id="clinicalDeptHeadWeight" value="#{workflowConfigController.selected.clinicalDeptHeadWeight}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetDeptHeadWeight}</label>
+                                <p:inputNumber id="assetDeptHeadWeight" value="#{workflowConfigController.selected.assetDeptHeadWeight}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetHeadWeight}</label>
+                                <p:inputNumber id="assetHeadWeight" value="#{workflowConfigController.selected.assetHeadWeight}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.clinicalStaffWeight}</label>
+                                <p:inputNumber id="clinicalStaffWeight" value="#{workflowConfigController.selected.clinicalStaffWeight}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.otherClinicalDeptHeadWeight}</label>
+                                <p:inputNumber id="otherClinicalDeptHeadWeight" value="#{workflowConfigController.selected.otherClinicalDeptHeadWeight}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+
+
                         </p:panelGrid>
                     </p:fieldset>
 

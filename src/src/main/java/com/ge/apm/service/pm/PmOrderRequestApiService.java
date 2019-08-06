@@ -41,13 +41,20 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public Map<String, Object> getApproveByAsset(String token, String assetUid,String name) {
+    public Map<String, Object> getApproveByAsset(String token, String assetUid,String name,String order) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         String gatewayURL = getGatewayURL(GatewayURL.GET_APPROVE_BY_ASSET);
         String url = gatewayURL.replace("{assetUid}",assetUid);
         if(!Strings.isNullOrEmpty(name)){
             url = url.concat("?name=").concat(name);
+            if(!Strings.isNullOrEmpty(order)){
+                url = url.concat("&order=").concat(order);
+            }
+        }else{
+            if(!Strings.isNullOrEmpty(order)){
+                url = url.concat("?order=").concat(order);
+            }
         }
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class,name);
         if (isOkay(response)) {
