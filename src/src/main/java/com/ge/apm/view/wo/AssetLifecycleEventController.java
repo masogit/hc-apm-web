@@ -157,9 +157,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 							startTime=null;
 						}
 					}
-					if(closeTime!=null){
-						if(mapCloseDesc.get(assetUid)==null){
-							mapCloseDesc.put(assetUid, closeTime);
+					if(status.equals(2)){
+						if(closeTime!=null){
+							if(mapCloseDesc.get(assetUid)==null){
+								mapCloseDesc.put(assetUid, closeTime);
+							}
 						}
 					}
 					if(startTime!=null){
@@ -174,8 +176,10 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					Date closeTime = tempEvent.getCreateTime();
 					Date startTime = tempEvent.getScheduleDate();
 					Date closeDesc = mapCloseDesc.get(assetUid);
-					if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
-						tempEvent.setScheduleDate(null);
+					if(status.equals(1)){
+						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
+							tempEvent.setScheduleDate(null);
+						}
 					}
 				}
 			}
