@@ -138,6 +138,7 @@ public class AssetCreateController {
         Integer parentAssetId = createRequest.getParentAssetId();
         if(parentAssetId != null){
             selectedObjectMap.put("parentAsset", assetInfoDao.findById(parentAssetId));
+            assetInfo.setParentAssetId(parentAssetId);
         }
 
     }
