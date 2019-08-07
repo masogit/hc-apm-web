@@ -501,7 +501,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     pmList.add(item);
             });
         });
-        //x3存放的是所选中pm工单
+        //pmList存放的是所选中pm工单
         if (pmList.size() > 0)
             mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
         return mark;
