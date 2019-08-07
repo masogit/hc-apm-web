@@ -76,6 +76,9 @@ public class BatchJob implements Serializable {
 	@Column(name="priority")
 	private Integer priority=0;
 	
+	@Column(name="times")
+	private Integer times=0;
+	
 	@Transient
 	private boolean needGetItem=true;
 	
@@ -222,6 +225,14 @@ public class BatchJob implements Serializable {
 
 	public void setSubName(String subName) {
 		this.subName = subName;
+	}
+
+	public Integer getTimes() {
+		return times;
+	}
+
+	public void setTimes(Integer times) {
+		this.times = times;
 	}
 
 	@Override
