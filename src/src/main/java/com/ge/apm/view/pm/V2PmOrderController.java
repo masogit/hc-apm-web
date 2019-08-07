@@ -220,6 +220,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
     }
+
+    public boolean batchCancelShow(){
+         if(queryIndex==0 || queryIndex==-1){
+             if(!userContextService.hasRole("AssetHead"))
+             {
+                 return true;
+             }
+             else{
+                 return false;
+             }
+         }else{
+             return false;
+         }
+    }
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
