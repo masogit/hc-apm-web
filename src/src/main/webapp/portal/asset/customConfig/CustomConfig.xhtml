@@ -161,7 +161,7 @@
                         </p:tab>-->
                         <p:tab title="微信端维修页面">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:dataList id="WebWorkOrderFieldsList" value="#{customConfigController.customConfigObject.webPage.pageWorkOrder.group}" var="groupItem" varStatus="groupIndex" type="definition" >
+                                <p:dataList id="WebWorkOrderFieldsList" value="#{customConfigController.customConfigObject.mobileMaintainPage.pageWorkOrder.group}" var="groupItem" varStatus="groupIndex" type="definition" >
                                     <p:fieldset legend="维修信息字段组" rendered="#{groupItem.type eq 'assetInfo'}">
                                         <p:orderList value="#{groupItem.assetInfoFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
                                         <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('WebWorkOrderFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>

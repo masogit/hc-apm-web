@@ -44,7 +44,7 @@ public class CustomConfigObject {
     JSONObject mobilePage;
 
 
-    JSONObject webPage;
+    JSONObject mobileMaintainPage;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -227,15 +227,16 @@ public class CustomConfigObject {
         this.mobilePage = mobilePage;
     }
 
-
-    public JSONObject getWebPage() {
-        if (webPage == null) {
-            webPage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+    public JSONObject getMobileMaintainPage() {
+        if (mobileMaintainPage == null) {
+            mobileMaintainPage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
         }
-        return webPage;
+        return mobileMaintainPage;
     }
 
-    public void setWebPage(JSONObject webPage) {
-        this.webPage = webPage;
+    public void setMobileMaintainPage(JSONObject mobileMaintainPage) {
+        this.mobileMaintainPage = mobileMaintainPage;
     }
+
+
 }

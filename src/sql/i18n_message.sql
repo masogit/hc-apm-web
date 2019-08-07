@@ -1924,3 +1924,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetHeadWeight', '备件审核-医工主任权重', 'assetHeadWeight', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'clinicalStaffWeight', '备件审核-临床科室人员权重', 'clinicalStaffWeight', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'otherClinicalDeptHeadWeight', '备件审核-其他临床科室主任权重', 'otherClinicalDeptHeadWeight', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'orgPath', '所属单位', 'orgPath', NULL, '-1');
