@@ -207,20 +207,17 @@
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="批量接单"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
                                 </p:commandButton>
 
-                                <!--<p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.batchTransfer()}" oncomplete="PF('transferOrderDialog').show()">
-                                </p:commandButton>-->
                                 <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
                                 </p:commandButton>
 
-                                <!--<p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+
+
+
+                                <p:commandButton  icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.isBacthOp and (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3)}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
+                                </p:commandButton>
+
+                                <!--<p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBacthOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>-->
-
-
-                                <p:commandButton  icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
-                                </p:commandButton>
-
-                                <p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBacthOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
-                                </p:commandButton>
                                 <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="批量取消"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1}" disabled="#{not v2PmOrderController.isChecked() or !userContextService.hasRole('AssetHead')}" oncomplete="PF('pmBatchCancelDialog').show()">
                                 </p:commandButton>
 

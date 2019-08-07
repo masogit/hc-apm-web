@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
     @Setter @Getter
-    private Boolean isBacthOp=true;
+    private Boolean isBatchOp=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -1036,7 +1036,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         isInsulate = isInsulate == null ? false : isInsulate;
         WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
         if(wfc !=null)
-            isBacthOp=wfc.getPmIsSupportBatchFinish();
+            isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
     }
     public void saveNewSupplier() {
