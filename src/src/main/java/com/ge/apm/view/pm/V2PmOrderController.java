@@ -507,6 +507,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return mark;
     }
 
+    public boolean isBatchComplete_backup() {
+        boolean mark = false;
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k, v) -> {
+            result.getContent().stream().forEach(item -> {
+                if (item.getId().equalsIgnoreCase(k) && v == true)
+                    pmList.add(item);
+            });
+        });
+        //pmList存放的是所选中pm工单
+        if (pmList.size() > 0)
+            mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
+        return mark;
+    }
     public boolean isBatchRob() {
         boolean mark = false;
         List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
