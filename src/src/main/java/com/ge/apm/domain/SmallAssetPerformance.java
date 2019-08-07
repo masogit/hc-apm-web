@@ -230,7 +230,31 @@ public class SmallAssetPerformance implements Serializable {
 		this.excelIdex = excelIdex;
 	}
 
-	public String getStatusDisplay() {
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
+
+    public String getStatusDisplay() {
 		if (this.status != null) {
 			String result = "";
 			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
