@@ -322,6 +322,22 @@ public class AssetClinicalRecord implements Serializable {
         this.originalProcedureStepName = originalProcedureStepName;
     }
 
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
+
+    public Integer getIsPositive() {
+        return isPositive;
+    }
+
+    public void setIsPositive(Integer isPositive) {
+        this.isPositive = isPositive;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
