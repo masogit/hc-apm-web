@@ -218,7 +218,7 @@
 
                                 <!--<p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmOrderListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBatchOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>-->
-                                <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="批量取消"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{userContextService.hasRole('AssetHead')  and (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1)}" disabled="#{not v2PmOrderController.isChecked() or !userContextService.hasRole('AssetHead')}" oncomplete="PF('pmBatchCancelDialog').show()">
+                                <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="批量取消"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{ (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1)}" disabled="#{v2PmOrderController.batchCancelShow() or not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
                                 </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量抢单"  rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
@@ -525,7 +525,7 @@
             </h:form>
         </p:dialog>
 <!--接单对话框-->
-        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框-------">
+        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框">
             <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
