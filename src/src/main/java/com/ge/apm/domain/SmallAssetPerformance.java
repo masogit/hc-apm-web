@@ -73,6 +73,15 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
 	private String siteUID;
 
+	@Column(name = "group_name")
+	private String groupName;
+
+	@Column(name = "group_code")
+	private String groupCode;
+
+	@Column(name = "pre_exam_department")
+	private String preExamDepartment;
+
 	@Transient
 	private Integer excelIdex;
 
