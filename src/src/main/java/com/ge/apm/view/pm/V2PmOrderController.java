@@ -214,8 +214,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
   //周期性工单的pmtype是1
         Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
         if(any.isPresent()){
+            cancelInt="2";
             periodShow=true;
         }else{
+            cancelInt="1";
             periodShow=false;
         }
 
@@ -286,10 +288,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (type == 1) {
             cancelInt = "2";
         }
-        if (type == 2) {
-            cancelInt = "1";
-        }
-        if (type == 3) {
+        if (type == 2 || type ==3 ) {
             cancelInt = "1";
         }
     }
@@ -299,14 +298,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-    /*
-    *
-    *     private List<V2_PmOrder> currentPagePmOrders;
-
-     * */
     public void cancelBatchPMorder() {
-
-
         pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
