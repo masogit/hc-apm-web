@@ -420,8 +420,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
 
-
-
         this.selectedUserOrg = null;
 
     }

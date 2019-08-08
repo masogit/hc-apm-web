@@ -137,6 +137,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     private List<MeasuringOrderDetail> accessoryList;
     private List<MeasuringOrderCoworker> coWorkerList;
     private MeasuringOrderDetail itemDetail;
+    private MeasureOrderDetailsRepository measureOrderDetailsRepository;
     private MeasuringOrderCoworker coWorkerDetail;
     private Date esTime;
     private String comments;
@@ -197,6 +198,26 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     }
 
     public void saveItem(){
+            //合同价格"默认等于"预估单价
+        if (!accessoryList.contains(itemDetail)) {
+            if (itemDetail.getClosedPrice() == null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
+            accessoryList.add(itemDetail);
+        }
+            //调用微服务来存附件
+            //
+
+        MeasuringOrderDetail byId = measureOrderDetailsRepository.getById(itemDetail.getId());
+        if(null == byId){
+            itemDetail.setId(null);
+        }
+        serviceRequestApiService.addAccessMeasuring(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
+            System.out.println();
+    }
+    /*public void saveItem-backup(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getClosedPrice()==null) {
@@ -207,9 +228,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             accessoryList.add(itemDetail);
             //调用微服务来存附件
             serviceRequestApiService.addAccessMeasuring(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
+            System.out.println();
         }
-    }
-
+    }*/
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
@@ -881,6 +902,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        measureOrderDetailsRepository =WebUtil.getBean(MeasureOrderDetailsRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
@@ -972,12 +994,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             return new ArrayList<UserAccount>();
     }
 
-    public List<UserAccount> getApproveList() {
+    public List<UserAccount> getApproveList(String name) {
         if (this.selectedMeasureOrder != null)
-            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid());
+            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid(),name);
         else
             return new ArrayList<UserAccount>();
     }
+
+    public void setNothing(){}
 
     private List<Integer> tagGroupAssets;
 
@@ -1472,7 +1496,8 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         //cancel();
     }
 
-    public void stagingPmOrder() {
+    public void stagingPmOrder() { // gl: 新增加一条备件的时候 就存到数据表里了，然后又按暂存 这个时候备件里的id会不一样
+        /*accessoryList 需要从更新种种的备件id */
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));

@@ -594,15 +594,25 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	}
 
 	public void parseSwapCenter(){
-		if(Strings.isBlank(selected.getSwapCenterConfig())){
+/*		if(Strings.isBlank(selected.getSwapCenterConfig())){
 			return;
 		}
-		JSONObject swapCenter = JSON.parseObject(selected.getSwapCenterConfig());
-		//selected.setPeriodStart(swapCenter.getString("periodStart"));
-		//selected.setPeriodEnd(swapCenter.getString("periodEnd"));
-		selected.setOpenService(swapCenter.getBoolean("openService"));
+		JSONObject swapCenter = JSON.parseObject(selected.getSwapCenterConfig());*/
+		if(selected.getPeriodStart() == null && selected.getPeriodEnd() == null){
+			selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
+			selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
+		}
+
+/*		if(swapCenter.getString("periodStart") == null && swapCenter.getString("periodEnd") == null){
+			selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
+			selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
+		}else {
+			selected.setPeriodStart(swapCenter.getDate("periodStart"));
+			selected.setPeriodEnd(swapCenter.getDate("periodEnd"));
+		}*/
+/*		selected.setOpenService(swapCenter.getBoolean("openService"));
 		selected.setEnableHint(swapCenter.getBoolean("enableHint"));
-		selected.setHintText(swapCenter.getString("hintText"));
+		selected.setHintText(swapCenter.getString("hintText"));*/
 	}
 
 	public void prepareCreate(){

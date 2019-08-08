@@ -65,11 +65,8 @@
                             <h:outputText value="#{item.objectName}"/>
                         </p:column>
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">下载</p:link>
-                            
-<!--                            <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download">
-                                <p:fileDownload value="#{fileDownloadService.getFile(item.fileUrl)}" />
-                            </p:commandButton>-->
+                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}" rendered="#{'vlink' ne item.boSubType}">下载</p:link>
+                            <p:link href="#{item.extLink}" target="_blank" rendered="#{'vlink' eq item.boSubType}">打开</p:link>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />

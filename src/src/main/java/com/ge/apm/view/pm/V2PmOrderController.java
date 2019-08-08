@@ -14,6 +14,7 @@ import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -65,6 +66,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+    @Setter @Getter
+    private Boolean isBatchOp=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -72,6 +75,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //选定科室过滤
     @Setter @Getter
     private String filterClinicalDeptOrg;
+
+    @Setter @Getter
+    private Boolean periodShow;
 
     private String filterAssetDeptOrg;
     @Setter @Getter
@@ -186,6 +192,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmReportService pmReportService;
 
     private String queryAssetUid;
+    private ConfigService configService;
 
     public String getHead() {
         return head;
@@ -195,6 +202,38 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.head = head;
     }
 
+
+    public void preBatchCancel(){
+        cancelReason=null;
+        List<String> pmIdList = new ArrayList<String>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+        });
+  List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+  //周期性工单的pmtype是1
+        Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
+        if(any.isPresent()){
+            periodShow=true;
+        }else{
+            periodShow=false;
+        }
+
+    }
+
+    public boolean batchCancelShow(){
+         if(queryIndex==0 || queryIndex==-1){
+             if(!userContextService.hasRole("AssetHead"))
+             {
+                 return true;
+             }
+             else{
+                 return false;
+             }
+         }else{
+             return false;
+         }
+    }
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
@@ -258,6 +297,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void cancelPMorder() {
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
+
+
+    /*
+    *
+    *     private List<V2_PmOrder> currentPagePmOrders;
+
+     * */
+    public void cancelBatchPMorder() {
+
+
+        pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
+    }
+
+
 
     public boolean allowChanged() {
         //is closed
@@ -327,26 +380,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        /* FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "折叠", "Visibility:" + event.getVisibility());
         FacesContext.getCurrentInstance().addMessage(null, msg);*/
     }
-    ArrayList<String> orderNumList = new ArrayList<String>();
-   /* public void preparePmOrderBatchComplete() {
-        orderNumList = new ArrayList<String>();
-        List<Map.Entry<String, Boolean>> collect =
-                sameOpHashmap.entrySet().stream().filter(item -> item.getValue()).collect(Collectors.toList());
-        collect.stream().forEach(item -> {
-            orderNumList.add(item.getKey());
-        });
-        final Set<String> assetUidList = dao.getAssetUid(orderNumList);
-        final List<String> pmRuleIdList = pmOrderRuleRepository.findPmRuleForBatch(assetUidList);
-        pmCheckItemList= pmOrderRuleCheckListRepository.findAllByRuleUIDBatch(pmRuleIdList);
-        pmCheckItemList.stream().filter(item -> !hmCheck.containsKey(item.getUid()))
-                .forEach(item -> {
-                    UnstructuredData unData = new UnstructuredData();
-                    unData.setValue("pass");
-                    unData.setKey(item.getUid());
-                    hmCheck.put(item.getUid(), unData);
-                });
-    }*/
-
 
     public boolean sameType(){
         ArrayList<String> orderNumList = new ArrayList<String>();
@@ -482,12 +515,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     pmList.add(item);
             });
         });
-        //x3存放的是所选中pm工单
+        //pmList存放的是所选中pm工单
         if (pmList.size() > 0)
             mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
         return mark;
     }
 
+    public boolean isBatchComplete_backup() {
+        boolean mark = false;
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k, v) -> {
+            result.getContent().stream().forEach(item -> {
+                if (item.getId().equalsIgnoreCase(k) && v == true)
+                    pmList.add(item);
+            });
+        });
+        //pmList存放的是所选中pm工单
+        if (pmList.size() > 0)
+            mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
+        return mark;
+    }
     public boolean isBatchRob() {
         boolean mark = false;
         List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
@@ -937,6 +985,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
+
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -965,6 +1014,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
@@ -1013,6 +1063,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         user = UserContextService.getCurrentUserAccount();
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
+        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        if(wfc !=null)
+            isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
     }
     public void saveNewSupplier() {
@@ -1092,9 +1145,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return new ArrayList<UserAccount>();
     }
 
-    public List<UserAccount> getApproveList() {
+    public List<UserAccount> getApproveList(String name) {
         if (this.selectedPmOrder != null)
-            return pmOrderService.getApproveList(selectedPmOrder.getAssetUid());
+            return pmOrderService.getApproveList(selectedPmOrder.getAssetUid(),name);
         else
             return new ArrayList<UserAccount>();
     }
@@ -1569,7 +1622,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void repairPmOrderBatch() {
 //        保存检查项
        // saveCheckItemDataBatch(orderNumList);
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours,         currentPagePmOrders, selectedMap);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap);
         selectedMap = new HashMap<String, Boolean>();
     }
 
@@ -1982,6 +2035,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public String getApprovaler() {
         return approvaler;
     }
+    public void setNothing(){}
 
     public void setApprovaler(String approvaler) {
         this.approvaler = approvaler;

@@ -122,7 +122,7 @@ public class AssetClinicalRecord implements Serializable {
 
     @Column(name = "is_positive")
     private Integer isPositive;
-    
+
     public AssetClinicalRecord() {
     }
 

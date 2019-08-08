@@ -73,6 +73,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.fileType}*</label>
                             <p:selectOneMenu id="fileType" value="#{assetFileAttachmentController.boSubTypeBatch}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
+                                <p:ajax update=":FileEditForm:display"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                 <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
                                     <c:if test="#{v.msgKey ne '4'}">
@@ -82,7 +83,8 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
+                        <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0"
+                                 rendered="#{'vlink' ne assetFileAttachmentController.boSubTypeBatch}">
                             <h:panelGroup rendered="#{assetFileAttachmentController.batchBlobObject.objectName==null}">
                                 <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                               multiple="false" sizeLimit="100000000" update=":FileEditForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M"  label="#{msg.Add}" />
@@ -94,6 +96,18 @@
                                 <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(assetFileAttachmentController.batchBlobObject.boId)}" id="iconOnly" update=":FileEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
+                            </h:panelGroup>
+                        </p:panel>
+                        <p:panel id="vlinkPanel" styleClass="ui-panelgrid-blank" style=" border: 0"
+                                 rendered="#{'vlink' eq assetFileAttachmentController.boSubTypeBatch}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}<span style="color:red">*</span></label>
+                                <p:inputTextarea id="vlinkTitle" value="#{assetFileAttachmentController.vlinkTitle}"
+                                                 rows="1" cols="33"/>
+
+                                <label class="label">#{msg.link}<span style="color:red">*</span></label>
+                                <p:inputTextarea id="vlinkinput" value="#{assetFileAttachmentController.vlink}" rows="1"
+                                                 cols="33"/>
                             </h:panelGroup>
                         </p:panel>
                     </p:panelGrid>
