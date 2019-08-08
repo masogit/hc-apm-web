@@ -123,7 +123,7 @@ public class TenantInfo implements Serializable {
 
     @Transient
     private String plainPassword;
-    
+
     @Transient
     private String cpmURL;
 

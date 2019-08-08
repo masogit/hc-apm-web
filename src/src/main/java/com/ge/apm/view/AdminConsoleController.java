@@ -82,10 +82,12 @@ public class AdminConsoleController {
 		}
 		String menu=currentSysRole.getMenus();
 		tenantConfigService.parseMenuList(menu);
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 	public void updateSysMenu(){
 		currentSysRole.setMenus(tenantConfigService.toMenusStr());
 		adminConsoleService.saveSysRole(currentSysRole);
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 	public void updateVersion(){
 		String tempVersion="";

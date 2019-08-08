@@ -555,6 +555,31 @@ public class MaintainController implements ServerEventInterface{
 		return "maintainMain?faces-redirect=true";
 	}
 	
+	public String batchDeleteMaintainData(){
+		if (listCheckedNurseSiteMaintainConfig == null || listCheckedNurseSiteMaintainConfig.size()<1) {
+			addMessage("请创建并选择配置模板");
+			return "maintainMain?faces-redirect=false";
+		}
+		if (startBatchDate == null) {
+			startBatchDate = new Date();
+		}
+		if (endBatchDate == null) {
+			endBatchDate = new Date();
+		}
+		Calendar endCalendar = Calendar.getInstance();
+		endCalendar.setTime(endBatchDate);
+		Calendar maxCalendar = Calendar.getInstance();
+		maxCalendar.setTime(startBatchDate);
+		maxCalendar.add(Calendar.YEAR, 1);
+		if (endCalendar.getTimeInMillis() > maxCalendar.getTimeInMillis()) {
+			addMessage("请选择一年之内的日期");
+			return "maintainMain?faces-redirect=false";
+		}
+		nurseSiteMaintainService.batchDeleteMaintainData(startBatchDate,endBatchDate,listCheckedNurseSiteMaintainConfig,currentUser.getUid());
+		addMessage("工单详情后台删除中，请耐心等待。。。");
+		return "maintainMain?faces-redirect=true";
+	}
+	
 	private void batchSaveMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig){
 		Calendar currentCalendar = Calendar.getInstance();
 		Calendar startCalendar = Calendar.getInstance();
