@@ -393,7 +393,8 @@ update workflow_config set clinical_staff_weight = 2 where clinical_staff_weight
 update workflow_config set other_clinical_dept_head_weight = 1 where other_clinical_dept_head_weight is null;
 
 --v19.8.2
-update asset_alert_config set lower_limit = 0.5, upper_limit = null where config_type = 104
-update asset_alert_config set lower_limit = 6, upper_limit = 150, config_type = 5 where config_type = 105
-update asset_alert_config set lower_limit = 50, upper_limit = null, "label"='液氦液面高度A', pad_message = '液氦页面高度异常，我们将尽快派工程师去现场检查报警原因，任何问题请致电GE400热线。', wechat_message = '液氦页面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），我们将尽快派工程师去现场检查报警原因，任何问题请致电GE400热线。' where config_type = 103
+update asset_alert_config set lower_limit = 0.5, upper_limit = null where config_type = 104;
+update asset_alert_config set lower_limit = 6, upper_limit = 150, config_type = 5 where config_type = 105;
+update asset_alert_config set lower_limit = 50, upper_limit = null, "label"='液氦液面高度A', pad_message = '液氦页面高度异常，我们将尽快派工程师去现场检查报警原因，任何问题请致电GE400热线。', wechat_message = '液氦页面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），我们将尽快派工程师去现场检查报警原因，任何问题请致电GE400热线。' where config_type = 103;
+delete from asset_alert_config where config_type = 113;
 insert into asset_alert_config (id, asset_uid, config_type, create_by, create_date, lower_limit, upper_limit, check_type, device_type, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message) values ('4413b7eec1f9431fbc72ff99f06b86c0', null, 113, null, now(), 50.0, 60, 5, 1, '液氦液面高度B', 1440, '液氦页面高度异常，液氦液位偏低，有失超风险，请即刻报修，添加液氦。', '%', null, '液氦页面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），液氦液位偏低，有失超风险，请即刻报修，添加液氦。');
