@@ -302,7 +302,6 @@
             <h:form id="pmBatchCancelForm" class="pmCancelFormCls" >
                 <p:selectOneRadio id="cancelBatchRadio" value="#{v2PmOrderController.cancelInt}">
                     <f:selectItem itemDisabled="false" itemLabel="取消当前工单" itemValue="1"/>
-                   <!-- <f:selectItem itemLabel="取消所有周期性工单" itemValue="2"/>-->
                     <f:selectItem itemDisabled="#{not v2PmOrderController.periodShow}" itemLabel="取消所有周期性工单" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
