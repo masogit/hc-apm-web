@@ -210,8 +210,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (v == true)
                 pmIdList.add(k);
         });
-  List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
-  //周期性工单的pmtype是1
+         List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+         //周期性工单的pmtype是1
         Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
         if(any.isPresent()){
             cancelInt="2";
