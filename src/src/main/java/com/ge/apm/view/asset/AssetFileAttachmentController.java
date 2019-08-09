@@ -373,7 +373,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     public void batchSave() {
         if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
             String parsedLink = vlinkParserService.parseVlink(vlink);
-            if (StringUtils.isEmpty(parsedLink)) {
+            if ("vlink".equals(boSubTypeBatch) && StringUtils.isEmpty(parsedLink)) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
                 return;
             }
