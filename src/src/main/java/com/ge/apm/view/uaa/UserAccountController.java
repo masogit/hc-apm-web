@@ -50,6 +50,7 @@ import com.google.common.base.Strings;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
 
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -407,11 +408,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
 
-        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-        try {
-            selected.entryptPassword();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+            try {
+                selected.entryptPassword();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            selected.setPassword(selectedTenant.getInitialPassword());
+            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
 
         this.selectedUserOrg = null;
@@ -577,13 +583,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
-        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-        try {
-            selected.entryptPassword();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+            try {
+                selected.entryptPassword();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            selected.setPassword(selectedTenant.getInitialPassword());
+            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
+
+
         dao.save(selected);
         WebUtil.addSuccessMessage("重置成功");
     }
@@ -927,7 +939,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
             MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
 
-            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword());
+            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(),request.getHeader("User-Agent"));
             request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
         }catch(Exception e){
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);

@@ -211,6 +211,12 @@
                                     </p:outputLabel>
                                 </h:panelGroup>
 
+
+                                <h:panelGroup>
+                                    <label class="label">维修子状态</label>
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('subStatus',woItem.subStatus)}" style="word-wrap: break-word;"/>
+                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>

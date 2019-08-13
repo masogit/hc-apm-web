@@ -138,6 +138,9 @@ public class MeasuringService {
                 tempAssetInfo.setUsageStatus(2);//停用
                 tempAssetInfo.setStatus(5);
             }
+
+            tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
+
             assetInfoDao.save(tempAssetInfo);
 
         }

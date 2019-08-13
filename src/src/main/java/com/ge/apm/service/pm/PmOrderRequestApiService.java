@@ -14,6 +14,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
+import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,6 +28,7 @@ import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  *
@@ -39,12 +41,22 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public Map<String, Object> getApproveByAsset(String token, String assetUid) {
+    public Map<String, Object> getApproveByAsset(String token, String assetUid,String name,String order) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         String gatewayURL = getGatewayURL(GatewayURL.GET_APPROVE_BY_ASSET);
         String url = gatewayURL.replace("{assetUid}",assetUid);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if(!Strings.isNullOrEmpty(name)){
+            url = url.concat("?name=").concat(name);
+            if(!Strings.isNullOrEmpty(order)){
+                url = url.concat("&order=").concat(order);
+            }
+        }else{
+            if(!Strings.isNullOrEmpty(order)){
+                url = url.concat("?order=").concat(order);
+            }
+        }
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class,name);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (LinkedHashMap<String, Object>) responseMap;
@@ -52,17 +64,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
-    String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
-        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
-        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
-        if (isOkay(response)) {
-            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-            return (String) responseMap.get("message");
-        } else {
-            return null;
-        }
-    }
+
     public Map<String, Object> getPmOrderSteps(String token, String pmOrderId) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
@@ -76,6 +78,20 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
+
+    String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_WODETAIL_PRICE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
 
     //CANCEL_PM_ORDER
 public String invokePmOrderCancel(String token, PmOrderActionForm formData, String actionName, String pmOrderId){
@@ -92,6 +108,20 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
         return null;
     }
 }
+
+    //CANCEL_PM_ORDER_BATCH
+    public String invokeBatchPmOrderCancel(String token, ArrayList<PmOrderActionForm> formDataList, String actionName){
+        HttpEntity<ArrayList<PmOrderActionForm>> requestEntity = new HttpEntity<ArrayList<PmOrderActionForm>>(formDataList, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.PM_BATCH_CANCEL);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL,HttpMethod.DELETE,requestEntity,LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            logger.info("Invoke PmOrderCancel "+actionName+" has finished "+responseMap.get("data"));
+            return (String) responseMap.get("bizStatusCode");
+        } else {
+            return null;
+        }
+    }
 
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
@@ -179,3 +209,26 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
 }
 
 
+/* 使用方法参数化的方法可以将公共的代码抽象出: 公共的方法抽象*/
+    /*public Map<String, Object> commonMethod(String token,Function<String,String> f, String urltmp){
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        String url= f.apply(urltmp);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public String getApproveByAsset(String uid){
+        String gatewayURL = getGatewayURL(GatewayURL.GET_APPROVE_BY_ASSET);
+        return gatewayURL.replace("{assetUid}",uid);
+    }
+
+    public String getPmOrderSteps(String uid){
+        String gatewayURL = getGatewayURL(GatewayURL.PM_ORDER_STEPS);
+        return gatewayURL.replace("{pmOrderId}",uid);
+    }*/

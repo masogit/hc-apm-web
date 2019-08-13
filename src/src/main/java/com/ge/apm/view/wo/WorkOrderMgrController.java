@@ -15,6 +15,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -60,6 +61,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
     private SupplierController supplierController;
+    @Setter @Getter
+    Date statusStartTime;
+    @Setter @Getter
+    Date statusCloseTime;
     MvsAssetInfo mvsAssetInfo;
     @Setter @Getter
     private Supplier newSupplier;
@@ -100,6 +105,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private AssetInfo selectedAsset;
     private String assetStatus;
     private Integer currentStatus = 1;
+    private Integer subStatus =1;
     private Boolean needConfirmTime = false;
     private String cancelReason;
     private String stepFileter;
@@ -206,7 +212,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         this.filterByHospital = false;
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
-ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
+        ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
     }
 
@@ -214,13 +220,21 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
-public void partsPriceUpdate(){
+    public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
 }
 
-
+   /* public boolean displayTime(){
+       if(subStatus==1)
+            return true;
+       else
+           return false;
+    }
+*/
+    @Getter @Setter
+    public boolean displayTime=false;
 
     public UserAccount getUa1() {
         return ua1;
@@ -242,18 +256,32 @@ public void partsPriceUpdate(){
 //        res.sort(new PinYinComparatorByName());
         return res;
     }
-public void repairResultSet(){
-    if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
-    currentStatus =1;
-}
-    else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
-        currentStatus =3;
-    } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
-        currentStatus =4;
-    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ 
-        currentStatus =3;
+
+    public void repairResultSet(){
+        if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
+            currentStatus =1;
+        }
+        else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
+            currentStatus =3;
+        } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
+            currentStatus =4;
+        }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){
+            currentStatus =3;
+        }
     }
-}
+    public void selectSubstatus(){
+        if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+            subStatus =1;
+            displayTime=true;
+        }
+        else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+            subStatus =2;
+            displayTime=false;
+        } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
+            subStatus =3;
+            displayTime=false;
+        }
+    }
 
     public void closePrcieUpdate(){
             itemDetail.setClosedPrice(itemDetail.getClosedPrice());
@@ -911,6 +939,12 @@ public void repairResultSet(){
 
         selectedWorkOrder = dao.findById(woid);
         acker=woService.getAckerList(selectedWorkOrder.getId());
+        //如果子状态为1 说明是等待备件 需要显示日期
+
+       if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
+           displayTime=true;
+       }
+
         Integer userId = selectedWorkOrder.getAckId();
        if( userId!=null){
           ua1 = userDao.getById(userId);
@@ -951,6 +985,8 @@ public void repairResultSet(){
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
+        statusStartTime=selectedWorkOrder.getStatusStartTime();
+        statusCloseTime=selectedWorkOrder.getStatusCloseTime();
       //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
@@ -976,8 +1012,23 @@ public void repairResultSet(){
         accessoryList.forEach(item -> item.setCreatedDate(null));
         if (!attachList.isEmpty())
             picList.addAll(attachList);
+        updateSelectedWorkOrder(selectedWorkOrder);
         woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
+    }
+
+    private void updateSelectedWorkOrder(V2_WorkOrder v2_workOrder){
+        if(subStatus==ApmConstant.SUBSTATUS1) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS1);
+            selectedWorkOrder.setStatusStartTime(statusStartTime);
+            selectedWorkOrder.setStatusCloseTime(statusCloseTime);
+        }
+        if(subStatus==ApmConstant.SUBSTATUS2) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS2);
+        }
+        if(subStatus==ApmConstant.SUBSTATUS3) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS3);
+        }
     }
 
     public List<UserAccount> getWorkerList() {
@@ -1069,6 +1120,8 @@ public void repairResultSet(){
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
+        //更新维修子状态
+        updateSelectedWorkOrder(selectedWorkOrder);
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
@@ -1533,9 +1586,11 @@ public void repairResultSet(){
         return true;
     }
 
-    public List<UserAccount> getApproverList() {
-        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid());
+    public List<UserAccount> getApproverList(String name) {
+        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
     }
+
+    public void setNothing(){}
 
     //getter and setter
     public Integer getQueryIndex() {
@@ -1945,6 +2000,14 @@ public void repairResultSet(){
         }else{
             return mvsAssetInfo;
         }
+    }
+
+    public Integer getSubStatus() {
+        return subStatus;
+    }
+
+    public void setSubStatus(Integer subStatus) {
+        this.subStatus = subStatus;
     }
 }
 

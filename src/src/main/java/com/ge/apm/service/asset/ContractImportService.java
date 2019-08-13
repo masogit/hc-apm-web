@@ -69,6 +69,7 @@ public class ContractImportService {
             contractRow.setFieldStringValue("合同UID", "setId");
             contractRow.setFieldStringValue("名称", "setName");
             contractRow.setFieldStringValue("合同编号", "setContractNum");
+            contractRow.setFieldStringValue("报告号", "setReportNum");
             contractRow.setFieldStringValue("外贸合同号", "setForeignTradeNum");
             contractRow.setFieldStringValue("发票号", "setInvoiceNum");
             contractRow.setFieldStringValue("供应商", "setSupplierName");
@@ -78,7 +79,6 @@ public class ContractImportService {
             contractRow.setFieldIntegerValue("合同时间(月)", "setEndMonths");
 
             /*contractRow.setFieldStringValue("清单序号", "setListNum");
-            contractRow.setFieldStringValue("报告号", "setReportNum");
             contractRow.setFieldStringValue("项目申请名称", "setApplyProjectName");
             contractRow.setFieldStringValue("申请科室", "setApplyDept");
             contractRow.setFieldStringValue("参数撰写人", "setParameterPerson");
