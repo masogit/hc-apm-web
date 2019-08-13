@@ -72,7 +72,28 @@ public class TenantInfoConfigService {
 			return null;
 		} else {
 			JSONArray jsonArr=new JSONArray();
-			readTreeNodeN(root, jsonArr);
+			readTreeNode(root, jsonArr);
+			StringBuilder sb=new StringBuilder();
+			if(jsonArr!=null && jsonArr.size()>0){
+				for(int i=0;i<jsonArr.size();++i){
+					sb.append(jsonArr.get(i));
+					sb.append(",");
+				}
+			}
+			String result=sb.toString();
+			if(StringUtils.isNotEmpty(result) && result.length()>1){
+				result=result.substring(0, result.length()-1);
+			}
+			return result;
+		}
+	}
+	
+	public String toMenusLabelStr(){
+		if (root == null) {
+			return null;
+		} else {
+			JSONArray jsonArr=new JSONArray();
+			readTreeNodeLabel(root, jsonArr);
 			StringBuilder sb=new StringBuilder();
 			if(jsonArr!=null && jsonArr.size()>0){
 				for(int i=0;i<jsonArr.size();++i){
@@ -99,27 +120,16 @@ public class TenantInfoConfigService {
 			readTreeNode(node, jsonArr);
 		}
 	}
-	private void readTreeNodeN(TreeNode root, JSONArray jsonArr) {
+	private void readTreeNodeLabel(TreeNode root, JSONArray jsonArr) {
 		if (root.isSelected()) {
 			TenantInfoConfigItem tempItem = (TenantInfoConfigItem) root.getData();
 			if (tempItem != null) {
-				jsonArr.add(tempItem.getKey());
+				jsonArr.add((tempItem.getLabel()));
 			}
 		}
 		for (TreeNode node : root.getChildren()) {
-			readTreeNodeN(node, jsonArr);
+			readTreeNodeLabel(node, jsonArr);
 		}
-	}
-
-	private String readTreeNode(StringBuilder sb) {
-		if (selectedNodes != null && selectedNodes.length > 0) {
-			for (int i = 0; i < selectedNodes.length; ++i) {
-				TreeNode tempNode = selectedNodes[i];
-				TenantInfoConfigItem tempItem = (TenantInfoConfigItem) tempNode.getData();
-				sb.append("\"" + tempItem.getKey() + "\",");
-			}
-		}
-		return sb.toString();
 	}
 
 	private JSONArray parseNodeToJSONArray() {
