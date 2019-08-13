@@ -12,6 +12,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.pure.ComparatorDomain;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
@@ -166,7 +167,31 @@ public class UserCommonService {
         if(workflowConfig == null){
             return null;
         }
-        SortedMap<Integer,String> map = new TreeMap<>(new Comparator<Integer>(){
+
+        if(workflowConfig.getAssetDeptHeadWeight() != null &&
+                workflowConfig.getClinicalDeptHeadWeight() != null &&
+                workflowConfig.getAssetHeadWeight() != null &&
+                workflowConfig.getClinicalStaffWeight() != null &&
+                workflowConfig.getOtherClinicalDeptHeadWeight() != null){
+                List<ComparatorDomain> domains = new ArrayList<>(10);
+                domains.add(new ComparatorDomain(workflowConfig.getClinicalDeptHeadWeight(),"ClinicalDeptHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getAssetDeptHeadWeight(),"AssetDeptHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getAssetHeadWeight(),"AssetHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getClinicalStaffWeight(),"ClinicalStaffWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getOtherClinicalDeptHeadWeight(),"OtherClinicalDeptHeadWeight"));
+                domains.sort(new Comparator<ComparatorDomain>() {
+                    @Override
+                    public int compare(ComparatorDomain o1, ComparatorDomain o2) {
+                        return o2.getIdx()- o1.getIdx();
+                    }
+                });
+                StringBuilder sb = new StringBuilder();
+                domains.stream().forEach( domain -> sb.append(domain.getValue()+"|"));
+                return sb.toString().substring(0,sb.toString().length()-1);
+            }
+            return null;
+
+/*        SortedMap<Integer,String> map = new TreeMap<>(new Comparator<Integer>(){
             public int compare(Integer a,Integer b){
                 return b-a;
             }
@@ -188,7 +213,7 @@ public class UserCommonService {
             }
             return sb.toString().substring(0,sb.toString().length()-1);
         }
-        return null;
+        return null;*/
     }
 
     public List<UserAccount> getClinicalDeptOwnerList(OrgInfo clinicalDept) {

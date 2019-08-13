@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
     @Setter @Getter
-    private Boolean isBacthOp=true;
+    private Boolean isBatchOp=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -219,6 +219,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             periodShow=false;
         }
 
+    }
+
+    public boolean batchCancelShow(){
+         if(queryIndex==0 || queryIndex==-1){
+             if(!userContextService.hasRole("AssetHead"))
+             {
+                 return true;
+             }
+             else{
+                 return false;
+             }
+         }else{
+             return false;
+         }
     }
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
@@ -501,12 +515,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     pmList.add(item);
             });
         });
-        //x3存放的是所选中pm工单
+        //pmList存放的是所选中pm工单
         if (pmList.size() > 0)
             mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
         return mark;
     }
 
+    public boolean isBatchComplete_backup() {
+        boolean mark = false;
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k, v) -> {
+            result.getContent().stream().forEach(item -> {
+                if (item.getId().equalsIgnoreCase(k) && v == true)
+                    pmList.add(item);
+            });
+        });
+        //pmList存放的是所选中pm工单
+        if (pmList.size() > 0)
+            mark = pmList.stream().allMatch(item -> item.getSimplify().equals(true));
+        return mark;
+    }
     public boolean isBatchRob() {
         boolean mark = false;
         List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
@@ -1036,7 +1065,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         isInsulate = isInsulate == null ? false : isInsulate;
         WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
         if(wfc !=null)
-            isBacthOp=wfc.getPmIsSupportBatchFinish();
+            isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
     }
     public void saveNewSupplier() {
