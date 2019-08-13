@@ -169,19 +169,19 @@ public class CustomConfigController {
                 break;
             case "WebWorkOrderFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
 
             case "WebMaintainFieldsList":
                 addFieldsList.addAll(customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
+                        .filter(item -> !JSONPath.containsValue(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", item)).collect(Collectors.toList()));
                 break;
             case "RemoveMobileWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
 
             case "RemoveWebWorkOrderFieldsList":
-                addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
+                addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
 
 
@@ -345,7 +345,7 @@ public class CustomConfigController {
                         && !customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "WebWorkOrderFieldsList":
-                JSONPath.set(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", ((JSONArray) JSONPath.eval(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                JSONPath.set(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields", ((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                         .fluentAddAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
 
@@ -369,8 +369,8 @@ public class CustomConfigController {
                                 .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
             case "RemoveWebWorkOrderFieldsList":
-                JSONPath.set(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
-                        ((JSONArray) JSONPath.eval(customConfigObject, "$.webPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
+                JSONPath.set(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
+                        ((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
 
