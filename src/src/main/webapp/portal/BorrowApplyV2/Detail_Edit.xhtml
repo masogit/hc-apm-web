@@ -27,11 +27,17 @@
                             <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
                                            decimalPlaces="0" minValue="0"/>
                         </h:panelGroup>
-                        
-<!--                        <h:panelGroup>
-                            <label class='label'>预计归还日期</label>
-                            <p:calendar id="expectDate" pattern="yyyy/MM/dd" value="#{sharedAssetRequestV2Controller.selectedSart.expectDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
-                        </h:panelGroup>-->
+
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <label class="label">病人号*</label>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
+                                         required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <label class="label">床号*</label>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientBedNum}"
+                                         required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
 
                         <h:panelGroup>
                             <label class='label'>备注</label>

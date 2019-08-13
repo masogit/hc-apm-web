@@ -118,7 +118,7 @@
                 </p:overlayPanel>
             </h:form>
              <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="提示信息" >
-                 <p:outputPanel>如需归还设备请拨打虚拟网 #{sharedAssetRequestV2Controller.getOnCallNumber()}</p:outputPanel>
+                 <p:outputPanel>如需归还设备，请拨打虚拟网电话：#{sharedAssetRequestV2Controller.getNotificationContent()}</p:outputPanel>
              </p:dialog>
             </div>
             </div>

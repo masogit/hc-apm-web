@@ -19,7 +19,7 @@
                             <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2MeasureController.selectedMeasureOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间#{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">结束保养时间*</label>
+                            <label class="label">结束计量时间*</label>
                             <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{v2MeasureController.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -130,13 +130,13 @@
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>
-                        <p:fileUpload id="type1" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" id="type1" fileUploadListener="#{v2MeasureController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     </p:fieldset>
 
                     <p:growl id="msgs" showDetail="true" />
                     <p:fieldset legend="计量清单"  toggleable="true" toggleSpeed="500">
                         <p:ajax event="toggle" listener="#{v2MeasureController.handleToggle}" update="msgs" />
-                        <p:fieldset legend="计量报告" >
+                        <!--<p:fieldset legend="计量报告" >
                             <h:panelGroup id="addReport">
                                 <p:selectOneMenu value="#{v2MeasureController.reportUid}">
                                     <p:ajax update="addReport" />
@@ -150,13 +150,13 @@
                                 <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
-                                <!--<p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
                                 <h:outputLabel> | </h:outputLabel>
                                 <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                                 <h:outputLabel> | </h:outputLabel>
-                                <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>-->
+                                <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>
                             </p:dataList>
-                        </p:fieldset>
+                        </p:fieldset>-->
                         <p:fieldset  legend="检查项"  rendered="#{not empty v2MeasureController.selectedMeasureOrder}">
                             <c:forEach  items="#{v2MeasureController.measureCheckItemList}" var="item">
                                 <h:panelGroup>
@@ -202,12 +202,24 @@
             <h:form id="approveMeasureDlgForm" >
                 <h:panelGroup id="display2" rendered="#{v2MeasureController.selectedMeasureOrder !=null}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
                         <h:panelGroup>
+                            <label class="label">审核人*</label>
+                            <p:autoComplete id="approver" value="#{v2MeasureController.approvaler}" dropdown="true" scrollHeight="300"
+                                            forceSelection="true" required="true" requiredMessage="审核人#{msg.ValidationRequire}"
+                                            completeMethod="#{v2MeasureController.getApproveList}"
+                                            var="t" itemLabel="#{t.name}" itemValue="#{t.uid}">
+                                <p:ajax process="@this" event="itemSelect" listener="#{v2MeasureController.setNothing()}"/>
+                                <p:ajax process="@this" listener="#{v2MeasureController.setNothing()}"/>
+                            </p:autoComplete>
+                        </h:panelGroup>
+
+<!--                        <h:panelGroup>
                             <label class="label">审核人</label>
                             <p:selectOneMenu value="#{v2MeasureController.approvaler}"  required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                                 <f:selectItems value="#{v2MeasureController.getApproveList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
                         <h:panelGroup>
                             <label class="label">申请审核原因</label>

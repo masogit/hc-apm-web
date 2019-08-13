@@ -78,6 +78,8 @@ public class QrCodeLib implements Serializable {
     private String modelNum;
     @Column(name = "manufacture_date")
     private Date manufactureDate;
+    @Column(name = "parent_asset_id")
+    private Integer parentAssetId;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -283,7 +285,15 @@ public class QrCodeLib implements Serializable {
     public void setManufactureDate(Date manufactureDate) {
         this.manufactureDate = manufactureDate;
     }
-    
+
+    public Integer getParentAssetId() {
+        return parentAssetId;
+    }
+
+    public void setParentAssetId(Integer parentAssetId) {
+        this.parentAssetId = parentAssetId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

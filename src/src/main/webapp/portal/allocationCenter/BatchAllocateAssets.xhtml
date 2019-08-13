@@ -54,7 +54,16 @@
                                             <p:ajax process="@this" listener="#{sharedAssetBatchController.onLeaseDeptNameChange}" event="itemSelect"/>
                                         </p:autoComplete>
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <label class="label">病人号*</label>
+                                        <p:inputText value="#{sharedAssetBatchController.patientNum}" required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <label class="label">床号*</label>
+                                        <p:inputText value="#{sharedAssetBatchController.patientBedNum}" required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
                                 </p:panelGrid>
+
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup >
                                         <p:inputText value="#{sharedAssetBatchController.searchCriteria}"
@@ -98,6 +107,12 @@
                                         <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="病人号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
+                                    </p:column>
+                                    <p:column headerText="床号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
                                     </p:column>
                                     <p:column headerText="单价">
                                         <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
@@ -183,6 +198,14 @@
                                                     showButtonPanel="true"
                                                     navigator="true"/>
                                     </h:panelGroup>
+                                    <!--<h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <label class="label">病人号*</label>
+                                        <p:inputText value="#{sharedAssetBatchController.patientNum}" required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <label class="label">床号*</label>
+                                        <p:inputText value="#{sharedAssetBatchController.patientBedNum}" required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>-->
                                 </p:panelGrid>
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup >
@@ -241,6 +264,12 @@
                                             <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="病人号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientNum}"/>
+                                    </p:column>
+                                    <p:column headerText="床号" rendered="#{sharedAssetBatchController.isLogPatientInfoEnabled()}">
+                                        <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
+                                    </p:column>
                                     <p:column headerText="单价">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.unitPrice}"/>
                                     </p:column>
@@ -251,14 +280,13 @@
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getFormattedRentalTime()}"/>
                                     </p:column>
                                     <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableReturnPrintCol()}">
-										<p:commandButton value="打印" ajax="false"
-											actionListener="#{sharedAssetStockController.printVoucher(asset)}"
-											rendered="true">
-											<p:fileDownload
-												value="#{sharedAssetStockController.exportPdf}" />
-										</p:commandButton>
+                                        <p:commandButton value="打印" ajax="false"
+                                          actionListener="#{sharedAssetStockController.printVoucher(asset)}"
+                                          rendered="true">
+                                          <p:fileDownload
+                                            value="#{sharedAssetStockController.exportPdf}" />
+                                        </p:commandButton>
                                     </p:column>
-                                    
                                     <p:column headerText="当前费用" visible="false">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.getRentalAmount()}"/>
                                     </p:column>
