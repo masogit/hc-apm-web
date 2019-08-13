@@ -5,8 +5,8 @@
 
 <ui:composition>
 
-	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="800" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
-		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
+	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="1150" height="600" modal="true" resizable="true" draggable="true" appendTo="@(body)"
+		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}" maximizable="true">
 		<h:form id="CustomRoleEditForm">
 			<h:panelGroup id="display">
 				<p:fieldset id="title" legend="角色描述">
@@ -26,11 +26,22 @@
 					</p:panelGrid>
 				</p:fieldset>
 				<p:fieldset id="menuConfig" legend="网页端菜单配置">
-					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
-							<p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
+							<!-- <p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
 								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-							</p:selectManyCheckbox>
+							</p:selectManyCheckbox> -->
+							<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+								<p:tree id="menuId" class="tree" value="#{customRoleController.tenantConfigService.root}"
+									selection="#{customRoleController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox"
+									highlight="true">
+									<p:ajax event="select" listener="#{customRoleController.tenantConfigService.onSelectTenantConfig}" process="@this" />
+									<p:ajax event="unselect" listener="#{customRoleController.tenantConfigService.onUnSelectTenantConfig}" process="@this" />
+									<p:treeNode type="tenantConfigTree">
+										<h:outputText value="#{item.label}" />
+									</p:treeNode>
+								</p:tree>
+							</p:scrollPanel>
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
