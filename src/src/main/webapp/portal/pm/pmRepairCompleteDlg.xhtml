@@ -153,9 +153,9 @@
                                 </h:outputText>
 
                                 <h:outputLabel> | </h:outputLabel>
-                                <p:link value="编辑test" target="_blank" href="#{request.contextPath}#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
-                                <h:outputLabel> | </h:outputLabel>
-                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                                <p:link value="编辑" target="_blank" href="#{request.contextPath}#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                               <!-- <h:outputLabel> | </h:outputLabel>
+                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>-->
                                 <h:outputLabel> | </h:outputLabel>
                                 <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                                 <h:outputLabel> | </h:outputLabel>
