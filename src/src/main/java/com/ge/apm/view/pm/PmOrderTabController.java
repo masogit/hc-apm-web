@@ -25,8 +25,7 @@ public class PmOrderTabController {
     private TabView tabView;
     @Getter @Setter
     private boolean showInOrder;
-    @Autowired
-    UserContextService userContextService;
+    private UserContextService userContextService;
     @PostConstruct
     public void init() {
     	userContextService = WebUtil.getBean(UserContextService.class);
