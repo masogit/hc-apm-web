@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tabview.TabView;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -21,9 +23,24 @@ public class PmOrderTabController {
     private Integer queryTab;
     @Getter @Setter
     private TabView tabView;
-
+    @Getter @Setter
+    private boolean showInOrder;
+    @Autowired
+    UserContextService userContextService;
     @PostConstruct
     public void init() {
+    	userContextService = WebUtil.getBean(UserContextService.class);
+    	if(userContextService.isIBTenant()){
+    		if(userContextService.hasAnyRole("AssetStaff,AssetHead")){
+    			showInOrder=true;
+    		}
+    		else{
+    			showInOrder=false;
+    		}
+    	}
+    	else{
+    		showInOrder=true;
+    	}
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             String queryTab = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryTab");
@@ -80,4 +97,6 @@ public class PmOrderTabController {
         }
 
     }
+    
+    
 }
