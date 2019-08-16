@@ -19,20 +19,17 @@ public class EsbUnmarshalTool {
 
     public List<AssetPerformanceRecordDelta> unmarshal(String xml) throws JAXBException, XMLStreamException {
         JAXBContext jc = JAXBContext.newInstance(AssetPerformanceRecordDelta.class);
-        String businessResponse = null;
         XMLInputFactory xif = XMLInputFactory.newFactory();
-        XMLStreamReader xsr = xif.createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()));
-        while (xsr.hasNext()) {
-            if (xsr.isStartElement() && "BussinessResponse".equals(xsr.getLocalName())) {
-                businessResponse = xsr.getElementText();
-                break;
-            }
-            xsr.next();
-        }
 
+        XMLStreamReader xsr;
+
+        String responseMessage = extract(xml, xif, "string");
+
+        String businessResponse = extract(responseMessage, xif, "BussinessResponse");
+
+        xsr = xif.createXMLStreamReader(new ByteArrayInputStream(businessResponse.getBytes()));
         Unmarshaller unmarshaller = jc.createUnmarshaller();
         List<AssetPerformanceRecordDelta> list = new ArrayList<>();
-        xsr = xif.createXMLStreamReader(new ByteArrayInputStream(businessResponse.getBytes()));
         while (xsr.hasNext()) {
             while (xsr.isStartElement() && "Table".equals(xsr.getLocalName())) {
                 list.add((AssetPerformanceRecordDelta) unmarshaller.unmarshal(xsr));
@@ -43,5 +40,17 @@ public class EsbUnmarshalTool {
             logger.info(object.toString());
         }
         return list;
+    }
+
+    private String extract(String xml, XMLInputFactory xif, String string) throws XMLStreamException {
+        XMLStreamReader xsr;
+        xsr = xif.createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()));
+        while (xsr.hasNext()) {
+            if (xsr.isStartElement() && string.equals(xsr.getLocalName())) {
+                return xsr.getElementText();
+            }
+            xsr.next();
+        }
+        return null;
     }
 }
