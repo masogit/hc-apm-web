@@ -113,6 +113,31 @@ public class AssetPerformanceRecordDelta {
     @Column(name = "pre_exam_department_code")
     private String preExamDepartmentCode;
 
+    @XmlElement(name = "InPeople")
+    @Column(name = "inpatient_count")
+    private Double inpatientCount;
+
+    @XmlElement(name = "InIncome")
+    @Column(name = "inpatient_revenue")
+    private Double inpatientRevenue;
+
+    @XmlElement(name = "DayPeople")
+    @Column(name = "outpatient_count")
+    private Double outpatientCount;
+
+    @XmlElement(name = "DayIncome")
+    @Column(name = "outpatient_revenue")
+    private Double outpatientRevenue;
+
+    @XmlElement(name = "SPPeople")
+    @Column(name = "emergency_count")
+    private Double emergencyCount;
+
+    @XmlElement(name = "SPIncome")
+    @Column(name = "emergency_revenue")
+    private Double emergencyRevenue;
+
+
     public AssetPerformanceRecordDelta() {
         uploadStatus = "N";
         createTime = Calendar.getInstance().getTime();
@@ -276,6 +301,54 @@ public class AssetPerformanceRecordDelta {
 
     public void setPreExamDepartmentCode(String preExamDepartmentCode) {
         this.preExamDepartmentCode = preExamDepartmentCode;
+    }
+
+    public Double getInpatientCount() {
+        return inpatientCount;
+    }
+
+    public void setInpatientCount(Double inpatientCount) {
+        this.inpatientCount = inpatientCount;
+    }
+
+    public Double getInpatientRevenue() {
+        return inpatientRevenue;
+    }
+
+    public void setInpatientRevenue(Double inpatientRevenue) {
+        this.inpatientRevenue = inpatientRevenue;
+    }
+
+    public Double getOutpatientCount() {
+        return outpatientCount;
+    }
+
+    public void setOutpatientCount(Double outpatientCount) {
+        this.outpatientCount = outpatientCount;
+    }
+
+    public Double getOutpatientRevenue() {
+        return outpatientRevenue;
+    }
+
+    public void setOutpatientRevenue(Double outpatientRevenue) {
+        this.outpatientRevenue = outpatientRevenue;
+    }
+
+    public Double getEmergencyCount() {
+        return emergencyCount;
+    }
+
+    public void setEmergencyCount(Double emergencyCount) {
+        this.emergencyCount = emergencyCount;
+    }
+
+    public Double getEmergencyRevenue() {
+        return emergencyRevenue;
+    }
+
+    public void setEmergencyRevenue(Double emergencyRevenue) {
+        this.emergencyRevenue = emergencyRevenue;
     }
 
     @Override

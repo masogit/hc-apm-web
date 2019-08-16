@@ -18,9 +18,9 @@ public class EsbUnmarshalToolTest {
 
     @Test
     public void testUnmarshal() throws IOException, JAXBException, XMLStreamException {
-        String content = IOUtils.toString(new FileInputStream("src\\test\\resource\\mdm\\esbresponse.xml"));
+        String content = IOUtils.toString(new FileInputStream("src\\test\\resource\\mdm\\prod-response.xml"));
         List<AssetPerformanceRecordDelta> unmarshal = esbUnmarshalTool.unmarshal(content);
-        assertEquals(2, unmarshal.size());
+        assertEquals(122, unmarshal.size());
     }
 
 }
