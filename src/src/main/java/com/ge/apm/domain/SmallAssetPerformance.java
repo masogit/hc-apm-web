@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -81,6 +80,27 @@ public class SmallAssetPerformance implements Serializable {
 
 	@Column(name = "pre_exam_department")
 	private String preExamDepartment;
+
+	@Column(name = "pre_exam_department_code")
+	private String preExamDepartmentCode;
+
+	@Column(name = "inpatient_count")
+	private Double inpatientCount;
+
+	@Column(name = "inpatient_revenue")
+	private Double inpatientRevenue;
+
+	@Column(name = "outpatient_count")
+	private Double outpatientCount;
+
+	@Column(name = "outpatient_revenue")
+	private Double outpatientRevenue;
+
+	@Column(name = "emergency_count")
+	private Double emergencyCount;
+
+	@Column(name = "emergency_revenue")
+	private Double emergencyRevenue;
 
 	@Transient
 	private Integer excelIdex;
@@ -254,7 +274,63 @@ public class SmallAssetPerformance implements Serializable {
         this.preExamDepartment = preExamDepartment;
     }
 
-    public String getStatusDisplay() {
+	public String getPreExamDepartmentCode() {
+		return preExamDepartmentCode;
+	}
+
+	public void setPreExamDepartmentCode(String preExamDepartmentCode) {
+		this.preExamDepartmentCode = preExamDepartmentCode;
+	}
+
+	public Double getInpatientCount() {
+		return inpatientCount;
+	}
+
+	public void setInpatientCount(Double inpatientCount) {
+		this.inpatientCount = inpatientCount;
+	}
+
+	public Double getInpatientRevenue() {
+		return inpatientRevenue;
+	}
+
+	public void setInpatientRevenue(Double inpatientRevenue) {
+		this.inpatientRevenue = inpatientRevenue;
+	}
+
+	public Double getOutpatientCount() {
+		return outpatientCount;
+	}
+
+	public void setOutpatientCount(Double outpatientCount) {
+		this.outpatientCount = outpatientCount;
+	}
+
+	public Double getOutpatientRevenue() {
+		return outpatientRevenue;
+	}
+
+	public void setOutpatientRevenue(Double outpatientRevenue) {
+		this.outpatientRevenue = outpatientRevenue;
+	}
+
+	public Double getEmergencyCount() {
+		return emergencyCount;
+	}
+
+	public void setEmergencyCount(Double emergencyCount) {
+		this.emergencyCount = emergencyCount;
+	}
+
+	public Double getEmergencyRevenue() {
+		return emergencyRevenue;
+	}
+
+	public void setEmergencyRevenue(Double emergencyRevenue) {
+		this.emergencyRevenue = emergencyRevenue;
+	}
+
+	public String getStatusDisplay() {
 		if (this.status != null) {
 			String result = "";
 			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
