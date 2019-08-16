@@ -130,7 +130,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	}
 
 	private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult) {
-		List<AssetLifecycleEvent> listErrorDateEvent=new ArrayList<AssetLifecycleEvent>();
+		Set<String> listErrorDateEvent=new HashSet<String>();
 		Calendar currentCa = Calendar.getInstance();
 		Date currentDate = currentCa.getTime();
 		if (pageResult != null) {
@@ -147,8 +147,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					Date startTime = tempEvent.getScheduleDate();
 					if (closeTime != null && closeTime.after(currentDate)) {
 						if(tempEvent.getCheckStatus().equals(0)){
-							tempEvent.setCheckStatus(1);
-	            			listErrorDateEvent.add(tempEvent);
+	            			listErrorDateEvent.add(tempEvent.getId());
 	            		}
 						tempEvent.setCreateTime(null);
 						closeTime=null;
@@ -159,8 +158,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 						ca.add(Calendar.DAY_OF_YEAR, 60);
 						if (ca.getTime().before(currentDate)) {
 							if(tempEvent.getCheckStatus().equals(0)){
-								tempEvent.setCheckStatus(1);
-		            			listErrorDateEvent.add(tempEvent);
+		            			listErrorDateEvent.add(tempEvent.getId());
 		            		}
 							tempEvent.setScheduleDate(null);
 							startTime=null;
@@ -188,8 +186,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					if(status.equals(1)){
 						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
 							if(tempEvent.getCheckStatus().equals(0)){
-								tempEvent.setCheckStatus(1);
-		            			listErrorDateEvent.add(tempEvent);
+		            			listErrorDateEvent.add(tempEvent.getId());
 		            		}
 							tempEvent.setScheduleDate(null);
 						}
@@ -198,7 +195,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			}
 		}
 		if(listErrorDateEvent.size()>0){
-			dao.save(listErrorDateEvent);
+			dao.recordErrorData(listErrorDateEvent);
 		}
 	}
 
