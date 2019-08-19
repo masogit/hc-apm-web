@@ -122,7 +122,7 @@
                 
             </h:form>
             <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="提示信息" >
-                <p:outputPanel>如需借用设备请拨打虚拟网 #{sharedAssetRequestV2Controller.getOnCallNumber()}</p:outputPanel>
+                <p:outputPanel>如需借用设备，请拨打虚拟网电话：#{sharedAssetRequestV2Controller.getNotificationContent()}</p:outputPanel>
             </p:dialog>
             </div>
             </div>
@@ -144,6 +144,7 @@
             function router(xhr, status, args) {
             	var d = PF('UserAccountEditDialog');
             	if(args['showNotification']) {
+            	  console.log(args['notificationContent']);
             		d.show();
             	}
             }

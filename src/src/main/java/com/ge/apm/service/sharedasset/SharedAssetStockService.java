@@ -64,7 +64,7 @@ public class SharedAssetStockService {
     private OrgInfoRepository orgInfoRepository;
     
     @Autowired
-	AssetInfoRepository assetInfoRepository;
+	  AssetInfoRepository assetInfoRepository;
 
     @Autowired
     private WorkflowConfigRepository wfCfigDao;
@@ -383,6 +383,10 @@ public class SharedAssetStockService {
                 traverse(nodeItem, itemList, excludeItemList);
             }
         }
+    }
+
+    public Boolean isLogPatientInfoEnabled() {
+        return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
     }
 
 }

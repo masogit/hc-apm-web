@@ -45,6 +45,20 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
+    public String delAccessMeasuring(String token,String accId){
+        HttpEntity<String> requestEntity = new HttpEntity<String>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSDEL_MEASURING);
+        String url = gatewayURL.replace("{id}", accId.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
     public String addAccess(String token,String assetUid,V2_WorkOrder_Detail workOrderDetail){
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
@@ -57,13 +71,15 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
-    public String addAccessMeasuring(String token, String assetUid, MeasuringOrderDetail workOrderDetail){
-        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(workOrderDetail, createHttpHeaders(token));
-        String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
+    public String addAccessMeasuring(String token, String assetUid, MeasuringOrderDetail measuringOrderDetail){
+        HttpEntity<MeasuringOrderDetail> requestEntity = new HttpEntity<MeasuringOrderDetail>(measuringOrderDetail, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ACCESSAD_MEASURING);
         String url = gatewayURL.replace("{assetUid}",assetUid);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            LinkedHashMap<String, Object>  data = (LinkedHashMap<String, Object> )responseMap.get("data");
+            measuringOrderDetail.setId((String)data.get("id"));
             return (String) responseMap.get("message");
         } else {
             return null;
@@ -312,6 +328,9 @@ class WorkOrderActionForm {
     String caseType;
     String confirmedDownTime;
     String confirmedUpTime;
+    String statusStartTime;
+    String statusCloseTime;
+    Integer subStatus;
     String assetStatus;
     String intExtType;
     Object stepDetail;
@@ -324,6 +343,7 @@ class WorkOrderActionForm {
     Integer repairType;
     String repairResult;
     Double externalExpense;
+
     List<V2_BlobObject> attachments;
 
     public String getRepairResult() {
@@ -526,6 +546,29 @@ class WorkOrderActionForm {
         this.externalExpense = externalExpense;
     }
 
+    public String getStatusStartTime() {
+        return statusStartTime;
+    }
+
+    public void setStatusStartTime(String statusStartTime) {
+        this.statusStartTime = statusStartTime;
+    }
+
+    public String getStatusCloseTime() {
+        return statusCloseTime;
+    }
+
+    public void setStatusCloseTime(String statusCloseTime) {
+        this.statusCloseTime = statusCloseTime;
+    }
+
+    public Integer getSubStatus() {
+        return subStatus;
+    }
+
+    public void setSubStatus(Integer subStatus) {
+        this.subStatus = subStatus;
+    }
 }
 
 class WorkOrderForm {
