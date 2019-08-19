@@ -146,12 +146,16 @@
                                 </p:selectOneMenu>
                                 <p:commandLink value="添加报告"  class="addLink" validateClient="false" process="addReport" actionListener="#{v2PmOrderController.addReporter(v2PmOrderController.selectedPmOrder.id)}"  update="@(.rpClass) @(.addLink)" disabled="#{empty v2PmOrderController.reportUid or v2PmOrderController.hasRepairReport() }"/>
                             </h:panelGroup>
-                            <p:dataList class="rpClass"  value="#{v2PmOrderController.findByBoUuidNoPMCheckList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                            <p:dataList class="rpClass" id="reportDatalist" value="#{v2PmOrderController.findByBoUuidNoPMCheckList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                                 #{v2PmOrderController.getTableDefName(reportItem.schemaId)}
                                 <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
-                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:link value="编辑" target="_blank" href="#{request.contextPath}#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                               <!-- <h:outputLabel> | </h:outputLabel>
+                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>-->
                                 <h:outputLabel> | </h:outputLabel>
                                 <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                                 <h:outputLabel> | </h:outputLabel>
@@ -248,7 +252,9 @@
                     }
                 }
                 function handleRepairComplete(xhr, status, args) {
-                    if(args.needManhours){
+                    if(args.reports){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:reportDatalist').addClass("ui-state-error");
+                    }else if(args.needManhours){
                         $('#pmTab\\:pmrepairCompleteDialogForm\\:manHoursId').addClass("ui-state-error");
                     }else if(args.needendtime){
                         $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");

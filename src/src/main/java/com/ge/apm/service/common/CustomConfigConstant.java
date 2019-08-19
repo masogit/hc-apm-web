@@ -222,6 +222,7 @@ public class CustomConfigConstant {
             allFields.put("createdDate", WebUtil.getMessage("createdDate"));
             allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
             allFields.put("measuringOwner", WebUtil.getMessage("measuringOwner"));
+            allFields.put("orgPath", WebUtil.getMessage("orgPath"));
 
         }
         return allFields;

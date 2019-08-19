@@ -20,11 +20,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  *
  * @author 212579464
@@ -82,6 +86,35 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private UnstructuredDataRepository unstructuredDataDao;
     @Autowired
     private PmOrderRuleCheckListRepository pmckLstDao;
+
+    /*
+    *1 查看工单时候否pm_performance_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
+    * 2 查看工单时候否pm_safty_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
+    * */
+    public HashMap<String,String> fillInform(V2_PmOrder v2PmOrder){
+        HashMap<String, String> hm = new HashMap<String, String>();
+          //默认false表示不用提示用户填写报告信息
+           hm.put("pmReportNeedFill","");
+           hm.put("saftyReportNeedFill","");
+        UnstructuredDataCollection reporter;
+        reporter=reportDao.findPerformanceReport(v2PmOrder.getId());
+        if(null != reporter) {
+            //unstructuredDataCollection如果在unstructuredData没有对应值 说明工单的性能或安全报告没有填写信息
+            if(CollectionUtils.isEmpty(reporter.getData())){
+                //获取保养报告的名字
+                TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+                hm.put("pmReportNeedFill",byBaseId.getName());
+            }
+        }
+        reporter =reportDao.findSaftyReport(v2PmOrder.getId());
+        if(null != reporter) {
+            TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+            if(CollectionUtils.isEmpty(reporter.getData())){
+                hm.put("saftyReportNeedFill",byBaseId.getName());
+            }
+        }
+        return hm;
+    }
 
     public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
