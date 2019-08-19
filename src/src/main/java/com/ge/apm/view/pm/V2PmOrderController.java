@@ -117,6 +117,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private V2_PmOrderRepository dao;
+    @Getter @Setter
     private Double totalManHours;
     @Getter @Setter
     private String dptName;
@@ -214,8 +215,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
   //周期性工单的pmtype是1
         Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
         if(any.isPresent()){
+            cancelInt="2";
             periodShow=true;
         }else{
+            cancelInt="1";
             periodShow=false;
         }
 
@@ -286,10 +289,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (type == 1) {
             cancelInt = "2";
         }
-        if (type == 2) {
-            cancelInt = "1";
-        }
-        if (type == 3) {
+        if (type == 2 || type ==3 ) {
             cancelInt = "1";
         }
     }
@@ -299,14 +299,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-    /*
-    *
-    *     private List<V2_PmOrder> currentPagePmOrders;
-
-     * */
     public void cancelBatchPMorder() {
-
-
         pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
@@ -718,7 +711,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             getNeedApprovalDetails().stream().filter(item -> !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
-//            approvedDetails.stream().filter(item->item.getId().equals(id)).findFirst().get().setApproved(selectedMap.get(id));
         }
     }
 
@@ -853,7 +845,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public boolean isFillRequired(HashMap<String,String> hashMap){
+        if(!StringUtils.isEmpty(hashMap.get("pmReportNeedFill"))){
+            WebUtil.addErrorMessage(hashMap.get("pmReportNeedFill")+"  未填写");
+            RequestContext.getCurrentInstance().addCallbackParam("reports", true);
+            return true;
+        }
+        if(!StringUtils.isEmpty(hashMap.get("saftyReportNeedFill"))){
+            WebUtil.addErrorMessage(hashMap.get("saftyReportNeedFill")+" 未填写");
+            RequestContext.getCurrentInstance().addCallbackParam("reports", true);
+            return true;
+        }
+        return false;
+    }
     public boolean requiredCheck() {
+
+
         if (selectedPmOrder.getManHours() == null && endTime == null) {
             WebUtil.addErrorMessage("工时必填写");
             RequestContext.getCurrentInstance().addCallbackParam("needManhours", true);
@@ -1202,6 +1209,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return tagGroupAssets;
     }
 
+    public void filterOutPm(List<SearchFilter> searchFilters){
+        searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE,true));
+        searchFilters.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
+        searchFilters.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
+        searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
+    }
+
     /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
     Page<V2_PmOrder> result;
@@ -1220,17 +1234,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("assetInfo.assetOwnerId3");
 
         if(queryIndex == 20){
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已取消"));
         }
 
         if(queryIndex==100){
             //from asset detail page
+            filterOutPm(searchFilters);
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
                 searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
             }
         }
         if(queryIndex==10){
-
+            filterOutPm(searchFilters);
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -1257,6 +1273,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
@@ -1282,6 +1299,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return result;
         }
         if (queryIndex == 2) { //待派工  Assign
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
@@ -1295,13 +1313,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
 
         } else if (queryIndex == 3) {//待接单
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 31) {//待抢单 dispatch 2表示人工派工或抢单模式 3表示抢单模式 4表示人工派工
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
-            /*  searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList("Assign","Accept")));*/
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
             List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
@@ -1337,11 +1356,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
         } else if (queryIndex == 6) { //待关单
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 8) { //待审核
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
             //1表示该pm工单已被提交等待审核
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
@@ -1349,6 +1370,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 0) { //已计划
+            filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
@@ -1357,6 +1379,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 7) { //已关单
+            filterOutPm(searchFilters);
             if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
                 searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
@@ -1508,28 +1531,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         }
 
-//        if (pmCheckItemList != null) {
-//            if (hmCheck.isEmpty()) {
-//                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
-//                    UnstructuredData unData = new UnstructuredData();
-//                    unData.setValue("pass");
-//                    unData.setKey(pmList.getUid());
-//                    hmCheck.put(pmList.getUid(), unData);
-//                }
-//            }
-//        }
+
         picList = new ArrayList<V2_BlobObject>();
         picListForRP = new ArrayList<V2_BlobObject>();
     }
 
-    //
-    /*public void onSelectAllOfPage_bak() {
-        for (V2_PmOrder item : currentPagePmOrders) {
-            selectedMap.put(item.getId(), this.isSelectedCurrentPage);
-        }
-        isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-        isSelectedCurrentPage=false;
-    }*/
+
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         for (V2_PmOrder item : currentPagePmOrders) {
@@ -1579,17 +1586,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void cancel() {
-        this.selectedAsset = null;
-        planTime = null;
-        planTimeForBatch = null;
-        selectedPmOrder = null;
-        assetName = null;
-        endTime = null;
-        ruleLevel = null;
-        dptName = null;
-        picList = null;
-        planTimeForBatch = null;
-        comments = null;
+        selectedAsset = null;planTime  = null;planTimeForBatch = null;
+        selectedPmOrder = null;assetName = null;endTime = null;
+        ruleLevel = null;dptName = null;picList = null;
+        planTimeForBatch = null;comments = null;
     }
 
     public void prepareActTakeGrap(String woid, String head) {
@@ -1629,9 +1629,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //已计划-->保养完成
     public void repairPmOrder() {
-        if (!requiredCheck()) {
+        HashMap<String, String> hm = pmOrderService.fillInform(selectedPmOrder);
+        //如果返回false的话就不用跳出提醒填写报告提示
+        if(isFillRequired(hm)||!requiredCheck()){
             return;
         }
+
         //保存检查项
         saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1766,11 +1769,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void addAcessItem() {
         saveItem();
     }
-
+    List<TableDefinition> tDefinitions;
     public List<TableDefinition> getTablesName(V2_PmOrder v2) {
-        List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
+        tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
+    public void x10(){
+
+    }
+
     public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
         * key就是检查项uid*/
@@ -2157,14 +2164,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.qaStatus = qaStatus;
     }
 
-    public Double getTotalManHours() {
-        return totalManHours;
-    }
-
-    public void setTotalManHours(Double totalManHours) {
-        this.totalManHours = totalManHours;
-    }
-
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
@@ -2293,9 +2292,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void setReportUid(String reportUid) {
         this.reportUid = reportUid;
     }
-
-
-
 
     public Date getApplyTime() {
         return applyTime;

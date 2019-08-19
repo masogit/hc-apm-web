@@ -1,22 +1,42 @@
 package com.ge.apm.view.wo;
 
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-import org.apache.commons.lang3.StringUtils;
-import webapp.framework.web.WebUtil;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.component.tabview.TabView;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+
+import lombok.Getter;
+import lombok.Setter;
+import webapp.framework.web.WebUtil;
 
 @ManagedBean
 @ViewScoped
 public class WorkOrderTabController {
     private int queryTab;
-
+    @Getter @Setter
+    private boolean showInOrder;
+    private UserContextService userContextService;
     @PostConstruct
     public void init() {
+    	userContextService = WebUtil.getBean(UserContextService.class);
+    	if(userContextService.isIBTenant()){
+    		if(userContextService.hasAnyRole("AssetStaff,AssetHead")){
+    			showInOrder=true;
+    		}
+    		else{
+    			showInOrder=false;
+    		}
+    	}
+    	else{
+    		showInOrder=true;
+    	}
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             String queryTab = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryTab");
