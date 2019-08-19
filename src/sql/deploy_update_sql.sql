@@ -404,3 +404,11 @@ ALTER TABLE public.alert_item DROP COLUMN modify_date;
 ALTER TABLE public.alert_item DROP COLUMN modify_by;
 ALTER TABLE public.alert_item DROP COLUMN ole_action;
 ALTER TABLE public.alert_item DROP COLUMN sr_num;
+CREATE INDEX "nurseSiteMaintainDataParentId"
+    ON public.nurse_site_maintain_data USING btree
+    (parent_id ASC NULLS LAST)
+    TABLESPACE pg_default;
+CREATE INDEX "nurseSiteMaintainItemParentId"
+    ON public.nurse_site_maintain_item USING btree
+    (parent_id ASC NULLS LAST)
+    TABLESPACE pg_default;
