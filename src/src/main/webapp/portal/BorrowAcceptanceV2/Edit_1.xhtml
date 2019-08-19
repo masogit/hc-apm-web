@@ -20,9 +20,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
-                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
-                            <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请科室</label>
@@ -43,8 +41,6 @@
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applyTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
-                            <!--<p:calendar id="applyTime"  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.applyTime}" mindate="#{sharedAssetRequestV2Controller.selected.applyTime}"-->
-                                        <!--maxdate="#{sharedAssetRequestV2Controller.selected.applyTime}" timeOnly="true" readonlyInput="true" showButtonPanel="false"/>-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>
@@ -52,35 +48,21 @@
                         </h:panelGroup>  
                     </p:panelGrid>
                 </p:fieldset>
-<!--                <p:fieldset legend="借用受理信息录入" style="margin-bottom:20px">
-                 
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
-                      
-                        <h:panelGroup>
-                            <label class='label'>设备接收人</label>
-                            <p:inputText id="accepter" value="#{sharedAssetRequestV2Controller.selected.accepter}" />
-                        </h:panelGroup>
-                        
-                        <h:panelGroup>
-                            <label class='label'>接收人工号</label>
-                            <p:inputText id="accepterNumber" value="#{sharedAssetRequestV2Controller.selected.accepterNumber}" />
-                        </h:panelGroup>
-                        
-                    </p:panelGrid>
-                </p:fieldset>-->
-                
-                <p:fieldset legend="借用申请明细" style="margin-bottom:20px">
+
+                <p:fieldset id="borrowDetails" legend="借用申请明细" style="margin-bottom:20px">
                     <p:dataTable id="datalistDetail" value="#{sharedAssetRequestV2Controller.selected.sartList}" 
-                                 var="item" widgetVar="varDataListDetail"
+                                 var="item" widgetVar="varDataListDetail1"
                         selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                        lazy="true" rowKey="#{item.swapName.hashCode()}" 
-                       sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
-                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        lazy="true" rowKey="#{item.id}"
+                        sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,50,100,500">
-                        
+
+                        <p:ajax event="rowSelect" update="editButton"/>
+
                         <p:column headerText="调剂设备名称" sortBy="#{item.swapName}">
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
@@ -93,15 +75,23 @@
                         <p:column headerText="实际借用数" sortBy="#{item.actualQty}" >
                             <h:outputText value="#{item.actualQty}"/>
                         </p:column>
+                        <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{item.patientNum}"/>
+                        </p:column>
+                        <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <h:outputText value="#{item.patientBedNum}"/>
+                        </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
-                        <!--<f:facet name="{Toolbar}">-->
-                       <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">-->
-                            <!--<p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>-->
-                        <!--</p:commandButton>-->
-                       <!---->
-                    <!--</f:facet>-->
+
+                        <f:facet name="{Toolbar}">
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{sharedAssetRequestV2Controller.prepareCreateSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" />-->
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.prepareEditSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" />
+                            <!--<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestV2Controller.deleteSart}" update="datalistDetail" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                            </p:commandButton>-->
+                        </f:facet>
                     </p:dataTable>
                 </p:fieldset>
 
@@ -110,7 +100,6 @@
                         <h:panelGroup >
                             <label class='label'>批量输入</label>
                             <h:outputText value="计费开始时间："/>
-                            <!--<p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>-->
                             <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                             <h:outputText value="设备接收人："/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
@@ -118,6 +107,13 @@
                         <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableLeaseManHour}">
                             <h:outputText value="工时"/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.effort}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="patientInfo" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                            <h:outputText value="病人号"/>
+                            <p:selectOneMenu value="#{sharedAssetRequestV2Controller.selectedSartId}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{sharedAssetRequestV2Controller.selected.sartList}" var="sart" itemLabel="#{sart.swapName} - #{sart.patientNum} - #{sart.patientBedNum}"  itemValue="#{sart.id}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <p:messages id="messages" closable="true" style="width: 900px" />
@@ -145,10 +141,6 @@
                     <p:column headerText="设备编号" sortBy="#{item.assetNumber}">
                             <h:outputText value="#{item.assetNumber}"/>
                         </p:column>
-<!--                        <p:column headerText="状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
-                            <h:outputText value="待归还" rendered="#{item.state eq '0'}"></h:outputText> 
-                            <h:outputText value="已归还" rendered="#{item.state eq '1'}"></h:outputText> 
-                        </p:column>-->
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
                             <f:facet name="filter">
                                 <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
@@ -159,6 +151,12 @@
                         </p:column>
                         <p:column headerText="设备接收人" sortBy="#{item.accepter}" >
                             <h:outputText value="#{item.accepter}"/>
+                        </p:column>
+                        <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}" >
+                            <h:outputText value="#{item.patientNum}"/>
+                        </p:column>
+                        <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}" >
+                            <h:outputText value="#{item.patientBedNum}"/>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
@@ -186,6 +184,7 @@
                 </h:panelGroup>
             </h:form>
                 <ui:include src="EditDetail.xhtml"/>
+                <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
          </div>
         </div>

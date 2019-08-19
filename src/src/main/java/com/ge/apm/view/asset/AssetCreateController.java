@@ -51,6 +51,7 @@ public class AssetCreateController {
     private BrandRepository brandDao;
     private OrgInfoRepository orgDao;
     private AutoCompleteService autoCompleteService;
+    private AssetInfoRepository assetInfoDao;
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
@@ -102,6 +103,7 @@ public class AssetCreateController {
         assetMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
+        assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
 
         createRequest = acService.getCreateRequest(qrCode, siteUid);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -132,6 +134,12 @@ public class AssetCreateController {
         supplierList = aimService.getSuplierListBySiteUid(createRequest.getTenantUID());
         parentAssetList = assetMgrService.getParentsAssetsList(assetInfo);
         initGbTree();
+
+        Integer parentAssetId = createRequest.getParentAssetId();
+        if(parentAssetId != null){
+            selectedObjectMap.put("parentAsset", assetInfoDao.findById(parentAssetId));
+            assetInfo.setParentAssetId(parentAssetId);
+        }
 
     }
 

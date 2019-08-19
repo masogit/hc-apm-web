@@ -7,6 +7,10 @@ package com.ge.apm.domain.pure;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.view.asset.AssetInfoListController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
  * @author 212579464
  */
 public class CustomConfigObject {
+    private static final Logger logger = LoggerFactory.getLogger(CustomConfigObject.class);
 
     Map<String, CustomConfigAssetField> assetFields;
 
@@ -34,15 +39,26 @@ public class CustomConfigObject {
     List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
+    List<String> assetsWebMaintainDetailFields;
     
-    JSONObject mobilePage; 
-    
+    JSONObject mobilePage;
+
+
+    JSONObject mobileMaintainPage;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
         if (null == assetFields) {
             assetFields = CustomConfigConstant.getAllFields().entrySet().stream().filter(item -> !CustomConfigConstant.getExtFields().contains(item.getKey()))
-                    .collect(Collectors.toMap(item -> item.getKey(), item -> new CustomConfigAssetField(item.getKey(),CustomConfigConstant.getConfigRolesName(), CustomConfigConstant.getConfigEditRolesName())));
+                    .collect(Collectors.toMap(
+                            item -> item.getKey(),
+                            item -> new CustomConfigAssetField(item.getKey(),CustomConfigConstant.getConfigRolesName(), CustomConfigConstant.getConfigEditRolesName()),
+                            (assetField1, assetField2) -> {
+                                logger.error("duplicate key found!, {}", assetField1.getKey());
+                                return assetField1;
+                            }
+                            )
+                    );
             CustomConfigConstant.getSystemFields().forEach(item -> {
                 assetFields.get(item).setRequired(true);
                 assetFields.get(item).setArrivalRequired(true);
@@ -177,6 +193,14 @@ public class CustomConfigObject {
         return assetsMobilepageDetailFields;
     }
 
+    public List<String> getAssetsWebMaintainDetailFields() {
+        return assetsWebMaintainDetailFields;
+    }
+
+    public void setAssetsWebMaintainDetailFields(List<String> assetsWebMaintainDetailFields) {
+        this.assetsWebMaintainDetailFields = assetsWebMaintainDetailFields;
+    }
+
     public void setAssetsMobilepageDetailFields(List<String> assetsMobilepageDetailFields) {
         this.assetsMobilepageDetailFields = assetsMobilepageDetailFields;
     }
@@ -203,5 +227,16 @@ public class CustomConfigObject {
         this.mobilePage = mobilePage;
     }
 
-    
+    public JSONObject getMobileMaintainPage() {
+        if (mobileMaintainPage == null) {
+            mobileMaintainPage = JSONObject.parseObject(CustomConfigConstant.DEFAULT_MOBILE_PAGE_JSON);
+        }
+        return mobileMaintainPage;
+    }
+
+    public void setMobileMaintainPage(JSONObject mobileMaintainPage) {
+        this.mobileMaintainPage = mobileMaintainPage;
+    }
+
+
 }

@@ -6,33 +6,66 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition>
+<ui:composition>
 
-        <p:dialog id="IouAssetDetailEditDlg" widgetVar="IouAssetDetailEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetReqDetailV2Controller.CRUDActionName} #{msg.IouAssetDetail}">
-            <h:form id="IouAssetDetailEditForm">
-                <h:panelGroup id="display">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetReqDetailV2Controller.selected != null}">
-                        
-                        
-                        
-                        <h:panelGroup>
-                            <label class="label">申请数</label>
-                            <p:inputText id="applyQty" value="#{sharedAssetReqDetailV2Controller.selected.applyQty}" />
-                            
-                        </h:panelGroup>
-                        
-                        
-                        
-                    </p:panelGrid>
-                    <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetReqDetailV2Controller.save}" value="#{msg.Save}" oncomplete="handleSubmit(args, 'IouAssetDetailEditDialog');"/>
-                    &nbsp;&nbsp;
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('IouAssetDetailEditDialog').hide()"/>
-                </h:panelGroup>
-            </h:form>
-        </p:dialog>
+    <p:dialog id="SharedAssetReqTypeEditDlg" widgetVar="SharedAssetReqTypeEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetRequestV2Controller.CRUDActionName} 借用设备">
+        <h:form id="SharedAssetReqTypeEditForm">
+            <h:panelGroup id="display2">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-    </ui:composition>
-    
-     
+                    <h:panelGroup>
+                        <label class="label">调剂设备名称*</label>
+                        <p:selectOneMenu id="sharedAssetTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}"
+                                         required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}"
+                                         disabled="true">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{sharedAssetTypeController.getSwapNameList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">借用申请数*</label>
+                        <!--<p:inputText id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
+                        <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
+                                       decimalPlaces="0" minValue="0" disabled="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <label class="label">病人号*</label>
+                        <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
+                                     required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <label class="label">床号*</label>
+                        <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientBedNum}"
+                                     required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class='label'>备注</label>
+                        <p:inputTextarea id="remark" rows="1"  cols="47"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selectedSart.remark}" />
+                    </h:panelGroup>
+
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
+                                 update=":IouEditForm:datalistDetail :IouEditForm:patientInfo :IouEditForm:datalistOperation" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow2(xhr, status, args)" />
+                &nbsp;&nbsp;
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                <script>
+
+                        function openSwapTypeViewWindow2(xhr, status, args) {
+                            var message = args.message;
+                            if (message == "wrong") {
+
+                            } else {
+                                PF('SharedAssetReqTypeEditDialog').hide();
+                            }
+                        }
+
+                    </script>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
 </html>

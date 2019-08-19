@@ -1,45 +1,71 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml"
-                >
-<ui:define name="content">
-    
-               <div class="ui-g-12 card cardTitle">
-                    <p:outputLabel class="pageTitle" value="采购清单-到货"/>
-                </div>
-                
-                        <h:form id="PurchaseApplicationForm1">
-                            <div class="ui-g-12 card ">
-       
-                                
-                                
-                                <div class="ui-g">
-                                    <div class="ui-g-2"> <p:outputLabel value="附件:"/></div>
-                                    <div class="ui-g-4"> 
-                                        
-                                        
-                                        
-                                        <p:selectManyCheckbox id="grid" value="#{sharedAssetReqDetailV2Controller.selectedAccessory.name}" layout="grid" columns="3">
-                                            <f:selectItems value="#{sharedAssetTypeController.getAccessoriesById('64f679c7de644916a6ddfe2a5ff7a362').accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />
-                                        </p:selectManyCheckbox>
-                                        
-                                        
-                                    </div>
-                                    
-                                </div>
-                                
-                                
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-                                <h:panelGroup>
-                                   <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{sharedAssetReqDetailV2Controller.save()}" action="List?faces-redirect=true" validateClient="true" update=":growl" style="float:left"/>
-                                   <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" immediate="true"  style="float:left"/>
-                                </h:panelGroup>
-                            </div>
-                        </h:form>
-           
-    
-</ui:define>
+<ui:composition>
+
+  <p:dialog id="SharedAssetReqTypeEditDlg" widgetVar="SharedAssetReqTypeEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetRequestV2Controller.CRUDActionName} 借用设备">
+    <h:form id="SharedAssetReqTypeEditForm">
+      <h:panelGroup id="display2">
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+          <h:panelGroup>
+            <label class="label">调剂设备名称*</label>
+            <p:selectOneMenu id="sharedAssetTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}"
+                             required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}"
+                              disabled="true">
+              <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+              <f:selectItems value="#{sharedAssetTypeController.getSwapNameList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
+            </p:selectOneMenu>
+          </h:panelGroup>
+
+          <h:panelGroup>
+            <label class="label">借用申请数*</label>
+            <!--<p:inputText id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
+            <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
+                           decimalPlaces="0" minValue="0" disabled="true"/>
+          </h:panelGroup>
+
+          <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+            <label class="label">病人号*</label>
+            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientNum}"
+                         required="true" requiredMessage="病人号 #{msg.ValidationRequire}"/>
+          </h:panelGroup>
+          <h:panelGroup rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+            <label class="label">床号*</label>
+            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.patientBedNum}"
+                         required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+          </h:panelGroup>
+
+          <h:panelGroup>
+            <label class='label'>备注</label>
+            <p:inputTextarea id="remark" rows="1"  cols="47"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selectedSart.remark}" />
+          </h:panelGroup>
+
+        </p:panelGrid>
+        <br/>
+        <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
+                         update=":IouEditForm:datalistDetail :IouEditForm:patientInfo :IouEditForm:datalistOperation" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow2(xhr, status, args)" />
+        &nbsp;&nbsp;
+        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+        <script>
+
+                        function openSwapTypeViewWindow2(xhr, status, args) {
+                            var message = args.message;
+                            if (message == "wrong") {
+
+                            } else {
+                                PF('SharedAssetReqTypeEditDialog').hide();
+                            }
+                        }
+
+                    </script>
+      </h:panelGroup>
+    </h:form>
+  </p:dialog>
 </ui:composition>
+</html>

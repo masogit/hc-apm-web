@@ -92,7 +92,8 @@ public class CommonReportController {
         if (null != table.getExcelStorageId()) {
             return "/geapm/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }else{
-            return "/geapm/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
+           // return "/geapm/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }
     }
 
@@ -104,6 +105,8 @@ public class CommonReportController {
             return "/geapm/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
         }else{
             return "/geapm/portal/reporter/ViewReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
+
+
         }
     }
 

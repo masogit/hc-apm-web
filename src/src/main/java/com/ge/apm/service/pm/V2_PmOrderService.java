@@ -20,11 +20,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  *
  * @author 212579464
@@ -82,6 +86,35 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private UnstructuredDataRepository unstructuredDataDao;
     @Autowired
     private PmOrderRuleCheckListRepository pmckLstDao;
+
+    /*
+    *1 查看工单时候否pm_performance_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
+    * 2 查看工单时候否pm_safty_report报告 , 再查看该报告的属性值有没有被填写即对应的unstrucData中有没有数据
+    * */
+    public HashMap<String,String> fillInform(V2_PmOrder v2PmOrder){
+        HashMap<String, String> hm = new HashMap<String, String>();
+          //默认false表示不用提示用户填写报告信息
+           hm.put("pmReportNeedFill","");
+           hm.put("saftyReportNeedFill","");
+        UnstructuredDataCollection reporter;
+        reporter=reportDao.findPerformanceReport(v2PmOrder.getId());
+        if(null != reporter) {
+            //unstructuredDataCollection如果在unstructuredData没有对应值 说明工单的性能或安全报告没有填写信息
+            if(CollectionUtils.isEmpty(reporter.getData())){
+                //获取保养报告的名字
+                TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+                hm.put("pmReportNeedFill",byBaseId.getName());
+            }
+        }
+        reporter =reportDao.findSaftyReport(v2PmOrder.getId());
+        if(null != reporter) {
+            TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+            if(CollectionUtils.isEmpty(reporter.getData())){
+                hm.put("saftyReportNeedFill",byBaseId.getName());
+            }
+        }
+        return hm;
+    }
 
     public String updateWorkOrderDetailPrice(String token, V2_WorkOrder_Detail workOrderDetail) {
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
@@ -154,6 +187,46 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     	reportDao.save(report);
     }
 
+    /*  一次性单子 qualityChecking就是2，如果是周期性的 再根据cancelInt来设置qualityChecking */
+    public void cancelPmBatch(Map<String, Boolean> hmPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        List<String> uidList = new ArrayList<String>();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        batchPmOrderList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                hmPmOrder.put(item.getId(),false);
+            }
+        });
+
+        batchPmOrderList.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+
+            formData.setQualityChecking("1");
+            if(item.getPmType()==1){
+                if(cancelInt.equalsIgnoreCase("1")){
+                    formData.setQualityChecking("1");
+                }else{
+                    formData.setQualityChecking("2");
+                }
+            }else{
+                formData.setQualityChecking("2");
+            }
+
+
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+        });
+
+        String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        if (res==null || !res.contains("OK")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量取消");
+        }else{
+            WebUtil.addSuccessMessage("批量取消成功");
+        }
+    }
 
     public void invokePmOerCancel(String desc, V2_PmOrder selectedPmOrder,String cancelInt){
         String token = UserContextService.getAccessToken();
@@ -180,6 +253,55 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
 
     }
+
+    //cancelInt: 1 取消当前工单或者 2 取消取消周期性工单
+    public void invokeBatchPmOrderCancel(String desc, Map<String, Boolean> hmPmOrder,String cancelInt){
+        String token = UserContextService.getAccessToken();
+        //PmOrderActionForm formData = new PmOrderActionForm();
+        List<String> uidList = new ArrayList<String>();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+
+        //如果是工单是周期性的
+        /*qualityChecking (string, optional):  1-继续生成保养, 2-不生成保养 ,*/
+        hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+
+        batchPmOrderList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                hmPmOrder.put(item.getId(),false);
+            }
+        });
+
+
+        batchPmOrderList.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+
+
+            if(item.getPmType()==1){ //周期性
+                if(cancelInt.equalsIgnoreCase("1")){
+                    formData.setQualityChecking("1");
+                }else{
+                    formData.setQualityChecking("2");
+                }
+            }else{//一次性或重测
+                formData.setQualityChecking("2");
+            }
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+            formData.setDesc(desc);
+        });
+
+        String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("取消提交成功");
+        }
+
+    }
+
+
 
     public void saveReport(List<UnstructuredDataCollection> listReport){
     	reportDao.save(listReport);
@@ -440,9 +562,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage("操作成功");
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_PmOrder> pmList,Map<String, Boolean> hmPmOrder) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder) {
         String token = UserContextService.getAccessToken();
-        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
         List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
@@ -573,8 +694,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public List<UserAccount> getWorkerList(Integer assetId) {
         return ucService.getWorkerList(assetId,"");
     }
-    public List<UserAccount> getApproveList(String assetUid) {
-        return ucService.getApproveList(assetUid);
+    public List<UserAccount> getApproveList(String assetUid,String name) {
+        return ucService.getApproveList(assetUid,name);
     }
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);

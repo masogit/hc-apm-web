@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.asset.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -101,7 +102,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
+    @Getter
+    @Setter
     private List<Supplier> supplierList = Collections.emptyList();
+    @Getter
+    @Setter
+    private List<Supplier> manuList = Collections.emptyList();
+    @Getter
+    @Setter
+    private List<Supplier> mantainList = Collections.emptyList();
     private List<UserAccount> clinicalOwnerList;
     private List<V2_BlobObject> attachements;
     private ConfigService configService;
@@ -126,6 +135,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     @Setter
     private Supplier newSupplier;
+
+    @Getter
+    @Setter
+    private int assetLifecyleStatus;// 0、初始状态，其他对应资产status
+
+    AssetLifecyleService assetLifecyleService;
 
     @Override
     protected void init() {
@@ -153,7 +168,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
-
+        assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
 
@@ -162,6 +177,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
+                assetLifecyleStatus = 0;
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -172,6 +188,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
             prepareEdit();
             beforeEdit();
+            assetLifecyleStatus = selected.getStatus();
         }
         if(selected ==null){
             try {
@@ -189,7 +206,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
+        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
+        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
 
         initGbTree();
         initOrgTree();
@@ -240,6 +259,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("assetOwner2", selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2()));
         selectedObjectMap.put("assetOwner3", selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3()));
         selectedObjectMap.put("pmOwner", selected.getPmOwnerId() == null ? null : userDao.findById(selected.getPmOwnerId()));
+
+        selectedObjectMap.put("measuringOwner", selected.getMeasuringOwnerId() == null ? null : userDao.findById(selected.getMeasuringOwnerId()));
+
+
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
         selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
@@ -384,12 +407,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setClinicalOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setClinicalOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
                 break;
-
+            case "measuringOwner":
+                selected.setMeasuringOwnerId(null == selectedUser ? null : selectedUser.getId());
+                selected.setMeasuringOwnerName(null == selectedUser ? null : selectedUser.getName());
+                selected.setMeasuringOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
+                break;
             case "pmOwner":
                 selected.setPmOwnerId(null == selectedUser ? null : selectedUser.getId());
                 selected.setPmOwnerName(null == selectedUser ? null : selectedUser.getName());
                 selected.setPmOwnerTel(null == selectedUser ? null : selectedUser.getTelephone());
         }
+
+
+
     }
 
     public void onSupplierChange(String idx) {
@@ -516,8 +546,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-
+        int status = selected.getStatus();
         this.save();
+        if(status != assetLifecyleStatus){
+            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,UserContextService.getCurrentUserAccount());
+        }
         if (this.selected.getStatus() == 4) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
@@ -654,17 +687,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    //转入待报废
     public String processToBeTerminated() {
+        int originStatus = selected.getStatus();
         this.selected.setStatus(4);
         update();
+        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetList?faces-redirect=true";
     }
 
+    //重新启用
     public String processToBeValid() {
+        int originStatus = selected.getStatus();
         this.selected.setStatus(1);
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
         update();
+        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetTerminateEntryList?faces-redirect=true";
     }
 
@@ -817,11 +856,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        return autoCompleteService.autoCompleteManufacture(query, supplierList);
+        return autoCompleteService.autoCompleteManufacture(query, manuList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
+        return autoCompleteService.autoCompleteMaintainer(query, mantainList);
     }
 
     public List<String> completeAssetName(String prefix) {

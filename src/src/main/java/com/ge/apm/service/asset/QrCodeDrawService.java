@@ -66,7 +66,7 @@ public class QrCodeDrawService {
     @Value("#{wxProperties.suscribeLink}")
     private String suscribeLink;
 
-    @Value("#{wxProperties.web_context_url}")
+    @Value("#{wxProperties.qrcode_web_context_url}")
     private String webContextUrl;
 
     private BufferedImage createBitMatrixImage(String content, Integer size) throws Exception {

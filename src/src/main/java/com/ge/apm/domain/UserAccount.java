@@ -639,6 +639,11 @@ public class UserAccount implements ChineseName, Serializable {
 		setPassword(Digests.encodeHex(hashPassword));
 	}
 
+	public void applyNewSalt() throws NoSuchAlgorithmException {
+		byte[] salt = Digests.generateSalt(SALT_SIZE);
+		setPwdSalt(Digests.encodeHex(salt));
+	}
+
 	public Date getLockTime() {
 		return lockTime;
 	}
