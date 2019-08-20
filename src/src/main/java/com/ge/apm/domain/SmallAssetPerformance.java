@@ -84,22 +84,22 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "pre_exam_department_code")
 	private String preExamDepartmentCode;
 
-	@Column(name = "inpatient_count")
+	@Transient
 	private Double inpatientCount;
 
-	@Column(name = "inpatient_revenue")
+	@Transient
 	private Double inpatientRevenue;
 
-	@Column(name = "outpatient_count")
+	@Transient
 	private Double outpatientCount;
 
-	@Column(name = "outpatient_revenue")
+	@Transient
 	private Double outpatientRevenue;
 
-	@Column(name = "emergency_count")
+	@Transient
 	private Double emergencyCount;
 
-	@Column(name = "emergency_revenue")
+	@Transient
 	private Double emergencyRevenue;
 
 	@Transient
