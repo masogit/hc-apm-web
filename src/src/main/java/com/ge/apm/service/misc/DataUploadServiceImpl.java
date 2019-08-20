@@ -93,7 +93,7 @@ public class DataUploadServiceImpl implements DataUploadService {
     @Override
     public String uploadAssetPerformanceRecord(AssetPerformanceUploadRequest request) throws Exception {
         String edgeServerKey = request.getEdgeServerKey();
-        SmallAssetPerformance record = request.getSmallAssetPerformance();
+        SmallAssetPerformance record = request.getPerformanceRecord();
         try {
             EdgeServerInfo edgeServerInfo = getEdgeServerInfo(edgeServerKey);
             OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
@@ -105,10 +105,10 @@ public class DataUploadServiceImpl implements DataUploadService {
             record.setId(null);
             SmallAssetPerformanceRepository dao = WebUtil.getBean(SmallAssetPerformanceRepository.class);
             dao.save(record);
-        } catch (Exception e) {
-
+            return "dataUploadedOK";
+        } catch (Exception ex) {
+            throw ex;
         }
-        return null;
     }
 
     public void logToAssetClinicalRecordErrLog(String edgeServerKey, AssetClinicalRecord assetClinicalRecord, String errMsg) {
