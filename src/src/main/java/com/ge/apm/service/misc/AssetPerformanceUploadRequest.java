@@ -8,7 +8,7 @@ import com.ge.apm.domain.SmallAssetPerformance;
  */
 public class AssetPerformanceUploadRequest {
     private String edgeServerKey;
-    private SmallAssetPerformance smallAssetPerformance;
+    private SmallAssetPerformance performanceRecord;
 
     public String getEdgeServerKey() {
         return edgeServerKey;
@@ -18,11 +18,11 @@ public class AssetPerformanceUploadRequest {
         this.edgeServerKey = edgeServerKey;
     }
 
-    public SmallAssetPerformance getSmallAssetPerformance() {
-        return smallAssetPerformance;
+    public SmallAssetPerformance getPerformanceRecord() {
+        return performanceRecord;
     }
 
-    public void setSmallAssetPerformance(SmallAssetPerformance smallAssetPerformance) {
-        this.smallAssetPerformance = smallAssetPerformance;
+    public void setPerformanceRecord(SmallAssetPerformance performanceRecord) {
+        this.performanceRecord = performanceRecord;
     }
 }
