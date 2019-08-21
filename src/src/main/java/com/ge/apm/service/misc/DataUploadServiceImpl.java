@@ -103,6 +103,23 @@ public class DataUploadServiceImpl implements DataUploadService {
             record.setHospitalUID(hospital.getUid());
             record.setTenantUID(site.getTenantUID());
             record.setId(null);
+
+            if (record.getInpatientCount() != null) {
+                record.setAmount(record.getInpatientRevenue());
+                record.setQuantity(record.getInpatientCount());
+                record.setCostType("inpatient");
+            } else if (record.getEmergencyCount() != null) {
+                record.setAmount(record.getEmergencyRevenue());
+                record.setQuantity(record.getEmergencyCount());
+                record.setCostType("emergency");
+            } else if (record.getOutpatientCount() != null) {
+                record.setAmount(record.getOutpatientRevenue());
+                record.setQuantity(record.getOutpatientCount());
+                record.setCostType("outpatient");
+            } else {
+                throw new IllegalStateException("Unknown record:" + record.print());
+            }
+
             SmallAssetPerformanceRepository dao = WebUtil.getBean(SmallAssetPerformanceRepository.class);
             dao.save(record);
             return "dataUploadedOK";
