@@ -79,7 +79,7 @@ public class CallEsbTool {
         return params;
     }
 
-    public String esbResponse() throws IOException {
+    public String mockResponse() throws IOException {
         return IOUtils.toString(new FileInputStream("d:\\prod-response"));
     }
 
