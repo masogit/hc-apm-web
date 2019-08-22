@@ -1216,6 +1216,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
     }
 
+
     /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
     Page<V2_PmOrder> result;
@@ -1379,6 +1380,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 7) { //已关单
+
             if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
                 searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));

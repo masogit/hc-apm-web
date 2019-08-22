@@ -395,6 +395,7 @@ update workflow_config set clinical_staff_weight = 2 where clinical_staff_weight
 update workflow_config set other_clinical_dept_head_weight = 1 where other_clinical_dept_head_weight is null;
 
 --v19.8.2
+insert into asset_fault_type values (50,-1,'可规避故障');
 update asset_alert_config set lower_limit = 0.5, upper_limit = null where config_type = 104;
 update asset_alert_config set lower_limit = 6, upper_limit = 150, check_type = 5 where config_type = 105;
 delete from asset_alert_config where config_type = 103;
