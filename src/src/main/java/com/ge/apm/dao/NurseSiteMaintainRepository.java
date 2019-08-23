@@ -78,5 +78,15 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	
 	@Query(value="select o.* from nurse_site_maintain o where o.config_id in ?1",nativeQuery=true)
 	public List<NurseSiteMaintain> findByConfig(Set<String> configIds);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain where id = ?1", nativeQuery = true)
+	void deleteMaintainById(String id);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain a where a.id not in (select b.parent_id from nurse_site_maintain_item b )", nativeQuery = true)
+	void deleteInvalid();
 }
 

@@ -130,6 +130,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	}
 
 	private void ignoreErrorDate(Page<AssetLifecycleEvent> pageResult) {
+		Set<String> listErrorDateEvent=new HashSet<String>();
 		Calendar currentCa = Calendar.getInstance();
 		Date currentDate = currentCa.getTime();
 		if (pageResult != null) {
@@ -145,6 +146,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					Date closeTime = tempEvent.getCreateTime();
 					Date startTime = tempEvent.getScheduleDate();
 					if (closeTime != null && closeTime.after(currentDate)) {
+						if(tempEvent.getCheckStatus().equals(0)){
+	            			listErrorDateEvent.add(tempEvent.getId());
+	            		}
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
@@ -153,6 +157,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 						ca.setTime(startTime);
 						ca.add(Calendar.DAY_OF_YEAR, 60);
 						if (ca.getTime().before(currentDate)) {
+							if(tempEvent.getCheckStatus().equals(0)){
+		            			listErrorDateEvent.add(tempEvent.getId());
+		            		}
 							tempEvent.setScheduleDate(null);
 							startTime=null;
 						}
@@ -178,11 +185,17 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 					Date closeDesc = mapCloseDesc.get(assetUid);
 					if(status.equals(1)){
 						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
+							if(tempEvent.getCheckStatus().equals(0)){
+		            			listErrorDateEvent.add(tempEvent.getId());
+		            		}
 							tempEvent.setScheduleDate(null);
 						}
 					}
 				}
 			}
+		}
+		if(listErrorDateEvent.size()>0){
+			dao.recordErrorData(listErrorDateEvent);
 		}
 	}
 

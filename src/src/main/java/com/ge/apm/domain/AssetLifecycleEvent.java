@@ -70,6 +70,10 @@ public class AssetLifecycleEvent implements Serializable {
     @Transient
     private boolean blnSelected=false;
     
+    //0:valid,1:notValid
+    @Column(name="check_status")
+    private Integer checkStatus;
+    
 
     public String getId() {
         return id;
@@ -182,6 +186,17 @@ public class AssetLifecycleEvent implements Serializable {
 		this.blnSelected = blnSelected;
 	}
 	
+	public Integer getCheckStatus() {
+		if(checkStatus==null){
+			checkStatus=0;
+		}
+		return checkStatus;
+	}
+
+	public void setCheckStatus(Integer checkStatus) {
+		this.checkStatus = checkStatus;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;

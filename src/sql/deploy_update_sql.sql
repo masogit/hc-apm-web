@@ -370,12 +370,14 @@ insert into ole_alert_config (id, error_code, message) values ('0ba6a478745d4151
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,repair,repair.reportMgt,maintain,maintain.reportFormMgt,maintain.reportMgt,link,link.CPM,config,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.ssoImp' where name = 'LocalITAdmin';
 update sys_role set menus='homePage,repair,repair.reportMgt,link,link.CPM,config,config.org,config.user,config.customRole,config.assetMessage,config.qrCode,config.qrCodeMgt,config.repairOwner,config.assetMark,config.engineerGroup,config.workFlow,config.custom,config.attribute,config.repairMessage,examineMgt,examineMgt.pcc,examineMgt.ssoImp' where name = 'ITAdmin';
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.workSchedule,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgtknowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,performance.scan,performance.CT,performance.config,performance.import,performance.BI,examineMgt,examineMgt.pcc,examineMgt.pccConfig,link,link.CPM' where name = 'AssetHead';
+
 ALTER TABLE user_behavior alter COLUMN change type character varying(3000);
 
 --v19.8.1
 update workflow_config set pm_is_support_batch_finish = true where pm_is_support_batch_finish is null;
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.console,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgt,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig' where name = 'AssetStaff';
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.workSchedule,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.console,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgt,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,performance.scan,performance.CT,performance.config,performance.import,performance.BI,examineMgt,examineMgt.pcc,examineMgt.pccConfig,link,link.CPM' where name = 'AssetHead';
+
 update ole_alert_config set message = '设备已失超，请切断氦压机电源； GE工程师将跟进处理故障。' where error_code = 'mrquench';
 update asset_alert_config set pad_message = '请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。' where config_type = '9901';
 update asset_alert_config set wechat_message = '环境温度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。' where config_type = '9901';
@@ -391,3 +393,23 @@ update workflow_config set asset_dept_head_weight = 4 where asset_dept_head_weig
 update workflow_config set asset_head_weight = 3 where asset_head_weight is null;
 update workflow_config set clinical_staff_weight = 2 where clinical_staff_weight is null;
 update workflow_config set other_clinical_dept_head_weight = 1 where other_clinical_dept_head_weight is null;
+
+--v19.8.2
+insert into asset_fault_type values (50,-1,'可规避故障');
+update asset_alert_config set lower_limit = 0.5, upper_limit = null where config_type = 104;
+update asset_alert_config set lower_limit = 6, upper_limit = 150, check_type = 5 where config_type = 105;
+delete from asset_alert_config where config_type = 103;
+delete from asset_alert_config where config_type = 113;
+insert into asset_alert_config (id, asset_uid, config_type, create_by, create_date, lower_limit, upper_limit, is_default, is_enabled, check_type, device_type, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_notify_fe, is_notify_ole, is_notify_sales, is_notify_customer) values ('4413b7eec1f9431fbc72ff99f06b86c0', null, 113, null, now(), 50.0, 60.0, true, true, 5, 1, '液氦液面高度', 0, '液氦液面高度异常，液氦液位偏低，有失超风险，请即刻报修，添加液氦。', '%', null, '液氦液面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），液氦液位偏低，有失超风险，请即刻报修，添加液氦。',true, false, true, true);
+ALTER TABLE public.alert_item DROP COLUMN modify_date;
+ALTER TABLE public.alert_item DROP COLUMN modify_by;
+ALTER TABLE public.alert_item DROP COLUMN ole_action;
+ALTER TABLE public.alert_item DROP COLUMN sr_num;
+CREATE INDEX "nurseSiteMaintainDataParentId"
+    ON public.nurse_site_maintain_data USING btree
+    (parent_id ASC NULLS LAST)
+    TABLESPACE pg_default;
+CREATE INDEX "nurseSiteMaintainItemParentId"
+    ON public.nurse_site_maintain_item USING btree
+    (parent_id ASC NULLS LAST)
+    TABLESPACE pg_default;

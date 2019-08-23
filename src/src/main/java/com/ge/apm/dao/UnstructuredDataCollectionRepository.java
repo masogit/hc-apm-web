@@ -38,6 +38,9 @@ public interface UnstructuredDataCollectionRepository extends GenericRepositoryU
     @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type != 'measure-checklist-report' ",nativeQuery = true)
     public List<UnstructuredDataCollection> findByBoUuidNoMeasureCheckList(String boUuid);
 
-
+    @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type = 'pm-performance-report' ",nativeQuery = true)
+    public UnstructuredDataCollection findPerformanceReport(String boUuid);
+    @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type = 'pm-safety-report' ",nativeQuery = true)
+    public UnstructuredDataCollection findSaftyReport(String boUuid);
 
 }
