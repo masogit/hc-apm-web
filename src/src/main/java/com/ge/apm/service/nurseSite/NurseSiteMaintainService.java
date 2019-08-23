@@ -923,6 +923,9 @@ public class NurseSiteMaintainService {
 		Date currentTime=ca.getTime();
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
+			if(tempMaintain.getStatus()!=0){
+				continue;
+			}
 			Calendar tempCa=Calendar.getInstance();
 			tempCa.setTime(tempMaintain.getScheduleDate());
 			tempCa.add(Calendar.DAY_OF_YEAR, 1);
