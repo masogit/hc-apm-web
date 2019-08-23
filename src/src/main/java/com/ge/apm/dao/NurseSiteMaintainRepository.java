@@ -81,7 +81,7 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	
 	@Transactional
 	@Modifying
-	@Query(value = "delete from nurse_site_maintain_item where id = ?1", nativeQuery = true)
+	@Query(value = "delete from nurse_site_maintain where id = ?1", nativeQuery = true)
 	void deleteMaintainById(String id);
 	
 	@Transactional
