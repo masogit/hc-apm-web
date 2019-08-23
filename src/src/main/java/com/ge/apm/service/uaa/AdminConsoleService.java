@@ -32,6 +32,7 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
+import com.ge.apm.dao.NurseSiteMaintainDataRepository;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -97,6 +98,9 @@ public class AdminConsoleService {
 	
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+	
+	@Autowired
+	NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
 	
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
@@ -207,6 +211,11 @@ public class AdminConsoleService {
 			listR=nurseSiteMaintainConfigItemRepository.findByLimit(limit, offset);
 			logger.info("updateNurseSiteDeleteAsset done.");
 		}
+	}
+	public void deleteInvalidOrder(){
+		nurseSiteMaintainDataRepository.deleteInvalid();
+		nurseSiteMaintainItemRepository.deleteInvalid();
+		nurseSiteMaintainRepository.deleteInvalid();
 	}
 	public void updateNurseSiteStatus(){
 		int limit=1000;

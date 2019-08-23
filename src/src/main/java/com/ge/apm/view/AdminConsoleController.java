@@ -173,4 +173,16 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+	
+	public void deleteInvalidOrder(){
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				adminConsoleService.deleteInvalidOrder();
+			}
+		});
+		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }
