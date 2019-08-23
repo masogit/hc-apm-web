@@ -138,11 +138,11 @@ public class UserContextService implements Serializable {
     public boolean hasAnyRole(String roleList) {
         UserAccount user = getLoginUser();
         Integer userId = user.getId();
-        if(user.getIsSuperAdmin()){
-            return roleList.contains("SuperAdmin");
+        if(roleList.contains("SuperAdmin")){
+            return user.getIsSuperAdmin();
         }
-        if(user.getIsSiteAdmin()){
-            return roleList.contains("SiteAdmin");
+        if(roleList.contains("SiteAdmin")){
+            return user.getIsSiteAdmin();
         }
         List<String> userRoles = user.getRoleNames();
         String[] roles = roleList.split(",");
