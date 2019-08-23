@@ -260,8 +260,8 @@ public class NurseSiteMaintainService {
 		Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
 		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
 		blobFileService.deleteBlobFile(listV2Obj);
-		nurseSiteMaintainRepository.delete(maintain);
-		addBatchJob("delete", null, null, null, userUid, maintain.getId());
+		simpleDeleteNurseSiteMaintain(maintain);
+//		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
 	}
 	
@@ -318,6 +318,12 @@ public class NurseSiteMaintainService {
 //			deleteMaintain(obj2);
 //		}
 //	}
+	@Transactional
+	public void simpleDeleteNurseSiteMaintain(NurseSiteMaintain maintain){
+		nurseSiteMaintainDataRepository.deleteMaintainDataByMaintainId(maintain.getId());
+		nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(maintain.getId());
+		nurseSiteMaintainRepository.deleteMaintainById(maintain.getId());
+	}
 
 	public void save(NurseSiteMaintainConfig obj) {
 		nurseSiteMaintainConfigRepository.save(obj);
@@ -917,6 +923,9 @@ public class NurseSiteMaintainService {
 		Date currentTime=ca.getTime();
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
+			if(tempMaintain.getStatus()!=0){
+				continue;
+			}
 			Calendar tempCa=Calendar.getInstance();
 			tempCa.setTime(tempMaintain.getScheduleDate());
 			tempCa.add(Calendar.DAY_OF_YEAR, 1);

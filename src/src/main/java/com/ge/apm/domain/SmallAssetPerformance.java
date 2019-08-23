@@ -418,4 +418,26 @@ public class SmallAssetPerformance implements Serializable {
 	public String toString() {
 		return "com.ge.apm.domain.SmallAssetPerformance[ id=" + id + " ]";
 	}
+
+	public String print() {
+		return "SmallAssetPerformance{" +
+				"department='" + department + '\'' +
+				", costType='" + costType + '\'' +
+				", code='" + code + '\'' +
+				", standard=" + standard +
+				", quantity=" + quantity +
+				", amount=" + amount +
+				", happenDate=" + happenDate +
+				", groupName='" + groupName + '\'' +
+				", groupCode='" + groupCode + '\'' +
+				", preExamDepartment='" + preExamDepartment + '\'' +
+				", preExamDepartmentCode='" + preExamDepartmentCode + '\'' +
+				", inpatientCount=" + inpatientCount +
+				", inpatientRevenue=" + inpatientRevenue +
+				", outpatientCount=" + outpatientCount +
+				", outpatientRevenue=" + outpatientRevenue +
+				", emergencyCount=" + emergencyCount +
+				", emergencyRevenue=" + emergencyRevenue +
+				'}';
+	}
 }

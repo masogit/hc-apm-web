@@ -29,8 +29,11 @@ import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.CustomRoleService;
+import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import lombok.Getter;
+import lombok.Setter;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -42,7 +45,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	private CustomRoleRepository dao = null;
 	private String[] authorities = new String[200];
 	private String[] cards = new String[100];
-	private String[] menus = new String[100];
+//	private String[] menus = new String[100];
 	private UserAccount user;
 	private I18nMessageRepository i18nMessageRepository;
 	public static List<String> keyRoles = new ArrayList<>();
@@ -51,6 +54,10 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	private List<I18nMessage> listI18nCards;
 	private JSONArray authJSONArr;
 	private Map<String,String[]> mapAuthCard=new HashMap<String,String[]>();
+	private TenantInfoConfigService tenantConfigService;
+	@Getter
+	@Setter
+	private List<String> versionLabelKey;
 	static {
 		keyRoles.add("院长");
 		keyRoles.add("医学工程处主任");
@@ -74,7 +81,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		dao = WebUtil.getBean(CustomRoleRepository.class);
 		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		service = WebUtil.getBean(CustomRoleService.class);
-		listI18nMenus = service.getMenusByTenant(user.getTenantUID());
+		initMenu();
+//		listI18nMenus = service.getMenusByTenant(user.getTenantUID());
 		listI18nCards=service.getCardI18n();
 		authJSONArr = service.getAuth();
 		service.init();
@@ -151,7 +159,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				}
 			}
 			if (StringUtils.isNotEmpty(selected.getMenus())) {
-				menus = selected.getMenus().split(",");
+//				menus = selected.getMenus().split(",");
+				tenantConfigService.parseMenuList(selected.getMenus());
 			}
 		}
 	}
@@ -180,6 +189,19 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				String[] strArr=new String[1];
 				mapAuthCard.put(key, tempMap.get(key).toArray(strArr));
 			}
+		}
+	}
+	private void initMenu(){
+		tenantConfigService=WebUtil.getBean(TenantInfoConfigService.class);
+		tenantConfigService.init();
+		formatVersionInfo();
+	}
+	private void formatVersionInfo(){
+		List<String> listKey=tenantConfigService.getListKey();
+		List<String> listLabel=tenantConfigService.getListLabel();
+		versionLabelKey=new ArrayList<String>();
+		for(int i=0;i<listKey.size();++i){
+			versionLabelKey.add(listLabel.get(i)+","+listKey.get(i));
 		}
 	}
 	
@@ -245,11 +267,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		selected.setLastModifiedDate(new Date());
 		List<I18nMessage> messages;
 		Map<String, I18nMessage> map = new HashMap<>();
-		if (authorities.length > 0 || cards.length > 0 || menus.length > 0) {
+		if (authorities.length > 0 || cards.length > 0 ) {
 			List<String> param = new ArrayList<>(500);
 			param.addAll(Arrays.asList(authorities));
 			param.addAll(Arrays.asList(cards));
-			param.addAll(Arrays.asList(menus));
+//			param.addAll(Arrays.asList(menus));
 			if (CollectionUtils.isNotEmpty(param)) {
 				messages = i18nMessageRepository.findI18ns(param);
 				if (CollectionUtils.isNotEmpty(messages)) {
@@ -294,24 +316,25 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setCardsCH("");
 			selected.setCards("");
 		}
-		if (menus.length > 0) {
-			StringBuilder sb2 = new StringBuilder();
-			for (String card : menus) {
-				if (map.containsKey(card)) {
-					sb2.append(map.get(card).getValue() + ",");
-				}
-			}
-			selected.setMenusCH(removeComma(sb2));
-			selected.setMenus(parseMenus(menus));
-		}
-		else{
-			selected.setMenusCH("");
-			selected.setMenus("");
-		}
+//		if (menus.length > 0) {
+//			StringBuilder sb2 = new StringBuilder();
+//			for (String card : menus) {
+//				if (map.containsKey(card)) {
+//					sb2.append(map.get(card).getValue() + ",");
+//				}
+//			}
+//			selected.setMenusCH(removeComma(sb2));
+//			selected.setMenus(parseMenus(menus));
+//		}
+//		else{
+//			selected.setMenusCH("");
+//			selected.setMenus("");
+//		}
+		selected.setMenus(tenantConfigService.toMenusStr());
+		selected.setMenusCH(tenantConfigService.toMenusLabelStr());
 		dao.save(selected);
 		authorities = new String[200];
 		cards = new String[100];
-		menus = new String[100];
 	}
 	public void authChange(){
 		if(authJSONArr!=null){
@@ -327,10 +350,10 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		mapAuthCard.clear();
 		authorities = new String[200];
 		cards = new String[100];
-		menus=new String[100];
-		for (int i = 0; i < listI18nMenus.size(); ++i) {
-			menus[i] = listI18nMenus.get(i).getMsgKey();
-		}
+//		menus=new String[100];
+//		for (int i = 0; i < listI18nMenus.size(); ++i) {
+//			menus[i] = listI18nMenus.get(i).getMsgKey();
+//		}
 		for (int i = 0; i < listI18nCards.size(); ++i) {
 			cards[i] = listI18nCards.get(i).getMsgKey();
 		}
@@ -378,14 +401,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		this.cards = cards;
 	}
 
-	public String[] getMenus() {
-		return menus;
-	}
-
-	public void setMenus(String[] menus) {
-		this.menus = menus;
-	}
-
 	public List<I18nMessage> getListI18nMenus() {
 		return listI18nMenus;
 	}
@@ -416,6 +431,14 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 
 	public void setMapAuthCard(Map<String, String[]> mapAuthCard) {
 		this.mapAuthCard = mapAuthCard;
+	}
+
+	public TenantInfoConfigService getTenantConfigService() {
+		return tenantConfigService;
+	}
+
+	public void setTenantConfigService(TenantInfoConfigService tenantConfigService) {
+		this.tenantConfigService = tenantConfigService;
 	}
 
 

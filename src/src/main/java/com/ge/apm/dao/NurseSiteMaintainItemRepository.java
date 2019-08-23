@@ -64,4 +64,14 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_item where id in ?1", nativeQuery = true)
 	void deleteMaintainItem(Set<String> ids);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain_item where parent_id = ?1", nativeQuery = true)
+	void deleteMaintainItemByParentId(String parentId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain_item a where a.id not in (select b.parent_id from nurse_site_maintain_data b )", nativeQuery = true)
+	void deleteInvalid();
 }

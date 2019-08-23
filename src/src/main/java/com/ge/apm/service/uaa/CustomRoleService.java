@@ -118,7 +118,8 @@ public class CustomRoleService {
 			}
 		}
 		//temp delete some menus
-		return removeNoNeedI18nMenus(listNew);
+//		return removeNoNeedI18nMenus(listNew);
+		return listNew;
 	}
 	//v5.1
 	private List<I18nMessage> removeNoNeedI18nMenus(List<I18nMessage> list18){

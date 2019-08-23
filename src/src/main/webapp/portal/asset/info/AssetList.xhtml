@@ -551,7 +551,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'purchasePrice'}">
-                                <p:column  headerText="#{msg.purchasePrice}" >
+                                <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
                                     <h:outputText value="#{item.purchasePrice}"/>
                                 </p:column>
                             </c:if>
