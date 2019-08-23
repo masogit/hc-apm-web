@@ -260,7 +260,7 @@ public class NurseSiteMaintainService {
 		Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
 		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
 		blobFileService.deleteBlobFile(listV2Obj);
-		nurseSiteMaintainRepository.delete(maintain);
+		simpleDeleteNurseSiteMaintain(maintain);
 		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
 	}
@@ -318,6 +318,11 @@ public class NurseSiteMaintainService {
 //			deleteMaintain(obj2);
 //		}
 //	}
+	@Transactional
+	public void simpleDeleteNurseSiteMaintain(NurseSiteMaintain maintain){
+		nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(maintain.getId());
+		nurseSiteMaintainRepository.delete(maintain);
+	}
 
 	public void save(NurseSiteMaintainConfig obj) {
 		nurseSiteMaintainConfigRepository.save(obj);
