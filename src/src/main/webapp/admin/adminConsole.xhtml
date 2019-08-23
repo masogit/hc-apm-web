@@ -45,6 +45,9 @@
 				<p:fieldset legend="批量删除护士站中报废，待报废，已删除的设备（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteDeleteAsset()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
 				</p:fieldset>
+				<p:fieldset legend="批量删除护士站无效工单（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.deleteInvalidOrder()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
+				</p:fieldset>
 				<p:fieldset legend="批量更新护士站状态（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.updateNurseSiteStatus()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
 				</p:fieldset>
@@ -75,9 +78,9 @@
 					<p:calendar value="#{adminConsoleController.selectDate}"></p:calendar>
 					<p:commandButton actionListener="#{adminConsoleController.dailyUpdateNurseSiteJob()}" value="批量更新所有租户护士站" update=":growl"></p:commandButton>
 				</p:fieldset>
-				<p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
+				<!-- <p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.deleteObjectHub()}" value="批量更新所有租户" update=":growl"></p:commandButton>
-				</p:fieldset>
+				</p:fieldset> -->
 			</h:panelGroup>
 		</h:form>
 	</ui:define>
