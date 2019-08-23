@@ -19,7 +19,7 @@ public class CustomConfigConstant {
     private static HashMap<String, String> exportFields;
 
     public static final String DEFAULT_MOBILE_PAGE_JSON =
-            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"clinicalDeptName\",\"locationName\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
+            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"orgPath\",\"clinicalDeptName\",\"locationName\",\"assetLocation\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
 
    /* public static final String DEFAULT_MOBILE_PAGE_JSON =
             "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"clinicalDeptName\",\"locationName\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";*/
@@ -223,6 +223,7 @@ public class CustomConfigConstant {
             allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
             allFields.put("measuringOwner", WebUtil.getMessage("measuringOwner"));
             allFields.put("orgPath", WebUtil.getMessage("orgPath"));
+            allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
 
         }
         return allFields;
