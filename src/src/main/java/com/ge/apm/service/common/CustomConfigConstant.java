@@ -51,7 +51,7 @@ public class CustomConfigConstant {
         return Arrays.asList("AssetHead", "AssetStaff");
     }
 
-    public static Map<String, String> getExportFields() {
+    public synchronized static Map<String, String> getExportFields() {
         if (null == exportFields) {
             exportFields = new LinkedHashMap();
             exportFields.put("设备编号", "departNum");
@@ -143,7 +143,7 @@ public class CustomConfigConstant {
         return exportFields;
     }
 
-    static public LinkedHashMap<String, String> getAllFields() {
+     public static synchronized LinkedHashMap<String, String> getAllFields() {
         if (null == allFields) {
             allFields = new LinkedHashMap();
             allFields.put("serialNum", WebUtil.getMessage("serialNum"));
