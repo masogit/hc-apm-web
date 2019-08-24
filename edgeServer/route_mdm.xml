@@ -10,7 +10,7 @@
          http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
     <bean id="callEsbTool" class="com.ge.apm.edgeserver.sysutil.CallEsbTool"/>
     <routeContext id="route_mdm" xmlns="http://camel.apache.org/schema/spring">
-        <route id="mdmRoute">
+        <route id="mdm_output">
             <from uri="sql:select * from asset_performance_record_delta where upload_status='N' and create_time>=current_date + integer '-30' limit 3?consumer.delay=120000&amp;maxMessagesPerPoll=30"/>
             <doTry>
                 <removeHeaders pattern="*"/>
@@ -66,7 +66,7 @@
             </doTry>
         </route>
 
-        <route id="callMdm">
+        <route id="mdm_input">
             <from uri="timer://mdmInput?fixedRate=true&amp;period=1200000"/>
             <!--            <bean ref="callEsbTool" method="mockResponse"/>-->
             <bean ref="callEsbTool" method="getRequest"/>
