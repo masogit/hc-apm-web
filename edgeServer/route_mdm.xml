@@ -40,7 +40,7 @@
                 <choice>
                     <when>
                         <simple>${body} not contains 'soap:Fault'</simple>
-                        <!--                        <to uri="sql:update asset_clinical_record_history set upload_status='Y', upload_time=current_timestamp where upload_status='N' and id=:#id::integer"/>-->
+                        <to uri="sql:update asset_performance_record_delta set upload_status='Y', upload_time=current_timestamp where upload_status='N' and id=:#id"/>
                         <log message="*** uploadAssetPerformanceRecord Error, message body not contains fault: ${body}"
                              loggingLevel="ERROR"/>
                     </when>
@@ -51,7 +51,7 @@
                         <setHeader headerName="errMsg">
                             <simple>${body}</simple>
                         </setHeader>
-                        <!--                        <to uri="sql:update asset_clinical_record_history set upload_status='E', upload_time=current_timestamp,err_msg=:#errMsg where upload_status='N' and id=:#id::integer"/>-->
+                        <to uri="sql:update asset_performance_record_delta set upload_status='E', upload_time=current_timestamp,err_msg=:#errMsg where upload_status='N' and id=:#id"/>
                     </when>
                 </choice>
                 <doCatch>
@@ -61,7 +61,7 @@
                     </setHeader>
                     <log message="*** uploadAssetPerformanceRecord Error, message: ${headers.errMsg}"
                          loggingLevel="ERROR"/>
-                    <!--                    <to uri="sql:update asset_clinical_record_history set upload_status='E', upload_time=current_timestamp, err_msg=:#errMsg where upload_status='N' and id=:#id::integer"/>-->
+                    <to uri="sql:update asset_performance_record_delta set upload_status='E', upload_time=current_timestamp, err_msg=:#errMsg where upload_status='N' and id=:#id"/>
                 </doCatch>
             </doTry>
         </route>
