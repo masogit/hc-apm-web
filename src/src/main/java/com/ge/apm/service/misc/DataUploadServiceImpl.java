@@ -5,11 +5,16 @@ import com.ge.apm.domain.*;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
 public class DataUploadServiceImpl implements DataUploadService {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
 
     public EdgeServerInfo getEdgeServerInfo(String edgeServerKey, AssetClinicalRecord assetClinicalRecord) throws Exception {
         Integer siteId = assetClinicalRecord.getSiteId();
@@ -104,20 +109,21 @@ public class DataUploadServiceImpl implements DataUploadService {
             record.setTenantUID(site.getTenantUID());
             record.setId(null);
 
-            if (record.getInpatientCount() != null) {
+            if (record.getInpatientCount() > 0) {
                 record.setAmount(record.getInpatientRevenue());
                 record.setQuantity(record.getInpatientCount());
                 record.setCostType("inpatient");
-            } else if (record.getEmergencyCount() != null) {
+            } else if (record.getEmergencyCount() > 0) {
                 record.setAmount(record.getEmergencyRevenue());
                 record.setQuantity(record.getEmergencyCount());
                 record.setCostType("emergency");
-            } else if (record.getOutpatientCount() != null) {
+            } else if (record.getOutpatientCount() > 0) {
                 record.setAmount(record.getOutpatientRevenue());
                 record.setQuantity(record.getOutpatientCount());
                 record.setCostType("outpatient");
             } else {
-                throw new IllegalStateException("Unknown record:" + record.print());
+                logger.error("Invalid record: {}", record.print());
+                throw new IllegalStateException("Invalid record");
             }
 
             SmallAssetPerformanceRepository dao = WebUtil.getBean(SmallAssetPerformanceRepository.class);
