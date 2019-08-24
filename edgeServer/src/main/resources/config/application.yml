@@ -1,0 +1,31 @@
+spring:
+  jackson:
+    serialization.indent_output: true
+  datasource:
+    name: edgeDataSource
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://127.0.0.1:5432/ge_apm
+    username: postgres
+    password: root
+  jpa:
+    database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
+    database: POSTGRESQL
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      user-new-id-generator-mappings: true
+    properties:
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+      hibernate.connection.useUnicode: true
+      hibernate.connection.charSet: UTF-8
+      hibernate.bytecode.use_reflection_optimizer: true
+      hibernate.jdbc.use_scrollable_resultset: false
+      hibernate.jdbc.use_streams_for_binary: true
+      hibernate.jdbc.fetch_size: 300
+      hibernate.format_sql: true
+      hibernate.use_sql_comments: false
+
+
+
