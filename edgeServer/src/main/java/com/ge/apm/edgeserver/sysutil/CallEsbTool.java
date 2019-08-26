@@ -4,14 +4,19 @@ import com.ge.apm.edgeserver.dataupload.dao.AssetPerformanceRecordDeltaRepositor
 import com.ge.apm.edgeserver.dataupload.entity.AssetPerformanceRecordDelta;
 import org.apache.camel.Body;
 import org.apache.camel.Headers;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +24,55 @@ import java.util.Map;
 @Component
 public class CallEsbTool {
 
+    private final String HEADER_QUERY_DATE = "queryDate";
+
     @Autowired
     AssetPerformanceRecordDeltaRepository repository;
 
-    public void setQueryDate(@Headers Map<String, Object> header) {
-        return;
+    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+
+    public void setQueryDate(@Headers Map<String, Object> headers) {
+        try {
+            String queryDateStr = FileUtils.readFileToString(new File("mdm_queryDate.txt"), "utf-8");
+            Date lastUpdatedDate = format.parse(queryDateStr);
+            headers.put(HEADER_QUERY_DATE, DateUtils.addDays(lastUpdatedDate, 1));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public esbRequestParams getRequest(@Headers Map<String, Object> headers) {
+        esbRequestParams params = new esbRequestParams();
+        params.setAppCode("APP644");
+        params.setPassword("d98M4lUh");
+        params.setTime(new Date());
+        params.setStartDate((Date) headers.get(HEADER_QUERY_DATE));
+        params.setEndDate((Date) headers.get(HEADER_QUERY_DATE));
+        return params;
+    }
+
+    public String mockResponse() throws IOException {
+        return IOUtils.toString(new FileInputStream("d:\\prod-response"));
+    }
+
+    public void save(@Body String body, @Headers Map<String, Object> headers) throws JAXBException, XMLStreamException {
+        Date queryDate = (Date) headers.get(this.HEADER_QUERY_DATE);
+        List<AssetPerformanceRecordDelta> deltas = unmarshal(body, queryDate);
+        repository.save(deltas);
+        try {
+            FileUtils.writeStringToFile(new File("mdm_queryDate.txt"), format.format(queryDate), "utf-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) throws JAXBException, XMLStreamException {
+        EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
+        List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
+        list.forEach(i -> i.setHappenDate(queryDate));
+        return list;
     }
 
     public class esbRequestParams {
@@ -72,33 +121,6 @@ public class CallEsbTool {
         public void setTime(Date time) {
             this.time = time;
         }
-    }
-
-    public esbRequestParams getRequest(@Headers Map<String, Object> headers) {
-        esbRequestParams params = new esbRequestParams();
-        params.setAppCode("APP644");
-        params.setPassword("d98M4lUh");
-        params.setTime(new Date());
-        params.setStartDate((Date) headers.get("queryDate"));
-        params.setEndDate((Date) headers.get("queryDate"));
-        return params;
-    }
-
-    public String mockResponse() throws IOException {
-        return IOUtils.toString(new FileInputStream("d:\\prod-response"));
-    }
-
-    public void save(@Body String body, @Headers Map<String, Object> headers) throws JAXBException, XMLStreamException {
-        Date queryDate = (Date) headers.get("queryDate");
-        List<AssetPerformanceRecordDelta> deltas = unmarshal(body, queryDate);
-        repository.save(deltas);
-    }
-
-    protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) throws JAXBException, XMLStreamException {
-        EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
-        List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
-        list.forEach(i -> i.setHappenDate(queryDate));
-        return list;
     }
 
 }

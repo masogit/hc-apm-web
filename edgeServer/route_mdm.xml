@@ -70,7 +70,7 @@
             <log message="${headers}"/>
             <choice>
                 <when>
-                    <simple>${headers.keySet} contains 'queryDate'</simple>
+                    <simple>${headers.queryDate} != null</simple>
                     <bean ref="callEsbTool" method="getRequest"/>
                     <log message="${body}"/>
                     <doTry>
@@ -83,6 +83,7 @@
                             <constant>POST</constant>
                         </setHeader>
                         <toD uri="{{MdmUrlProd}}"/>
+<!--                        <bean ref="callEsbTool" method="mockResponse"/>-->
                         <setBody>
                             <simple>${bodyAs(String)}</simple>
                         </setBody>
@@ -91,7 +92,7 @@
                     <bean ref="callEsbTool" method="save"/>
                 </when>
                 <when>
-                    <simple>${headers.keySet} not contains 'queryDate'</simple>
+                    <simple>${headers.queryDate} == null</simple>
                     <log message="no queryDate"/>
                 </when>
             </choice>
