@@ -66,24 +66,35 @@
         <route id="mdm_input">
             <from uri="timer://mdmInput?fixedRate=true&amp;period=1200000"/>
             <!--            <bean ref="callEsbTool" method="mockResponse"/>-->
-            <bean ref="callEsbTool" method="getRequest"/>
-            <log message="${body}"/>
-            <doTry>
-                <to uri="freemarker:mdmRequestTemplate.xml"/>
-                <log message="${body}"/>
-                <setHeader headerName="Content-Type">
-                    <constant>application/x-www-form-urlencoded</constant>
-                </setHeader>
-                <setHeader headerName="CamelHttpMethod">
-                    <constant>POST</constant>
-                </setHeader>
-                <toD uri="{{MdmUrlProd}}"/>
-                <setBody>
-                    <simple>${bodyAs(String)}</simple>
-                </setBody>
-                <log message="${body}"/>
-            </doTry>
-            <bean ref="callEsbTool" method="save"/>
+            <bean ref="callEsbTool" method="setQueryDate"/>
+            <log message="${headers}"/>
+            <choice>
+                <when>
+                    <simple>${headers.keySet} contains 'queryDate'</simple>
+                    <bean ref="callEsbTool" method="getRequest"/>
+                    <log message="${body}"/>
+                    <doTry>
+                        <to uri="freemarker:mdmRequestTemplate.xml"/>
+                        <log message="${body}"/>
+                        <setHeader headerName="Content-Type">
+                            <constant>application/x-www-form-urlencoded</constant>
+                        </setHeader>
+                        <setHeader headerName="CamelHttpMethod">
+                            <constant>POST</constant>
+                        </setHeader>
+                        <toD uri="{{MdmUrlProd}}"/>
+                        <setBody>
+                            <simple>${bodyAs(String)}</simple>
+                        </setBody>
+                        <log message="${body}"/>
+                    </doTry>
+                    <bean ref="callEsbTool" method="save"/>
+                </when>
+                <when>
+                    <simple>${headers.keySet} not contains 'queryDate'</simple>
+                    <log message="no queryDate"/>
+                </when>
+            </choice>
         </route>
     </routeContext>
 </beans>
