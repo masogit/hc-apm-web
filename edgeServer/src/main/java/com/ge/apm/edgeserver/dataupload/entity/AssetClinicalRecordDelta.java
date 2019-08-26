@@ -3,6 +3,7 @@
 package com.ge.apm.edgeserver.dataupload.entity;
 
 import com.ge.apm.edgeserver.sysutil.JsonMapper;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,10 +25,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
  * @author 212547631
  */
-@XmlRootElement(name="AssetClinicalRecord")
+@XmlRootElement(name = "AssetClinicalRecord")
 @XmlAccessorType(XmlAccessType.NONE)
 @Entity
 @Table(name = "asset_clinical_record_delta")
@@ -47,7 +47,7 @@ public class AssetClinicalRecordDelta implements Serializable {
     @Column(name = "create_time")
     @Temporal(TemporalType.DATE)
     private Date createTime;
-    
+
     @XmlTransient
     @Column(name = "upload_status")
     private String uploadStatus;
@@ -130,11 +130,11 @@ public class AssetClinicalRecordDelta implements Serializable {
     @Column(name = "exam_start_time")
     @Temporal(TemporalType.TIME)
     private Date examStartTime;
-    
+
     @XmlElement
     @Column(name = "exam_duration")
     private Integer examDuration;
-    
+
     @XmlElement
     @Column(name = "source_system")
     private String sourceSystem;
@@ -142,6 +142,14 @@ public class AssetClinicalRecordDelta implements Serializable {
     @XmlElement
     @Column(name = "source_record_id")
     private String sourceRecordId;
+
+    @XmlElement
+    @Column(name = "is_positive")
+    private String isPositive;
+
+    @XmlElement
+    @Column(name = "pre_exam_department")
+    private String preExamDepartment;
 
     public AssetClinicalRecordDelta() {
         uploadStatus = "N";
@@ -308,6 +316,21 @@ public class AssetClinicalRecordDelta implements Serializable {
         this.uploadStatus = uploadStatus;
     }
 
+    public String getIsPositive() {
+        return isPositive;
+    }
+
+    public void setIsPositive(String isPositive) {
+        this.isPositive = isPositive;
+    }
+
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
 
     @Override
     public int hashCode() {
@@ -334,5 +357,5 @@ public class AssetClinicalRecordDelta implements Serializable {
         JsonMapper mapper = JsonMapper.nonEmptyMapper();
         return mapper.toJson(this);
     }
-    
+
 }
