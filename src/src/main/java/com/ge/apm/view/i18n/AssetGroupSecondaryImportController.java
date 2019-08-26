@@ -65,6 +65,11 @@ public class AssetGroupSecondaryImportController extends JpaCRUDController<I18nM
 
     public void uploadDataFile(FileUploadEvent event) {
 
+        if (StringUtils.isEmpty(tenantUid)) {
+            WebUtil.addErrorMessage("请选择租户！", null);
+            return;
+        }
+
         this.file = event.getFile();
 
 
