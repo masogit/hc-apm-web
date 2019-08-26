@@ -5,6 +5,7 @@ import com.ge.apm.edgeserver.dataupload.entity.AssetPerformanceRecordDelta;
 import org.apache.camel.Body;
 import org.apache.camel.Headers;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,14 @@ public class CallEsbTool {
     protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) throws JAXBException, XMLStreamException {
         EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
         List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
-        list.forEach(i -> i.setHappenDate(queryDate));
+        list.forEach(i -> {
+            i.setHappenDate(queryDate);
+            if (StringUtils.contains(i.getHospitalName(), "南部")) {
+                i.setSiteUID("6f32b4f4ae0e40f3a1db627e854cece1");
+            } else if (StringUtils.contains(i.getHospitalName(), "北部")) {
+                i.setSiteUID("5c563184623311e7aeb25254001a1c14");
+            }
+        });
         return list;
     }
 
