@@ -94,9 +94,12 @@ public class AssetPerformanceRecordDelta implements Serializable {
     @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
-    @XmlElement
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @XmlElement(name = "HospitalName")
+    @Column(name = "hospital_name", columnDefinition = "CHAR(32)")
+    private String hospitalName;
 
     @XmlElement(name = "GroupName")
     @Column(name = "group_name")
@@ -254,6 +257,14 @@ public class AssetPerformanceRecordDelta implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
     }
 
     public String getGroupName() {

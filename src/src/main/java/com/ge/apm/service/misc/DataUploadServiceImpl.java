@@ -2,14 +2,13 @@ package com.ge.apm.service.misc;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
+
+import java.util.List;
 
 public class DataUploadServiceImpl implements DataUploadService {
 
@@ -100,13 +99,20 @@ public class DataUploadServiceImpl implements DataUploadService {
         String edgeServerKey = request.getEdgeServerKey();
         SmallAssetPerformance record = request.getPerformanceRecord();
         try {
-            EdgeServerInfo edgeServerInfo = getEdgeServerInfo(edgeServerKey);
             OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-            OrgInfo site = orgInfoRepository.findById(edgeServerInfo.getSiteId());
-            record.setSiteUID(site.getUid());
-            OrgInfo hospital = orgInfoRepository.findById(edgeServerInfo.getHospitalId());
-            record.setHospitalUID(hospital.getUid());
-            record.setTenantUID(site.getTenantUID());
+            OrgInfo recordSiteOrg = orgInfoRepository.findByUid(record.getSiteUID());
+            if (recordSiteOrg == null) {
+                throw new IllegalStateException("Empty site id: " + record.getSiteUID());
+            }
+
+            EdgeServerInfo edgeServerInfo = getEdgeServerInfo(edgeServerKey);
+//            OrgInfo edgeSiteOrg = orgInfoRepository.findById(edgeServerInfo.getSiteId());
+//            if (!StringUtils.equals(recordSiteOrg.getTenantUID(), edgeSiteOrg.getTenantUID())) {
+//                throw new IllegalStateException("Invalid site id: " + record.getSiteUID());
+//            }
+            record.setHospitalUID(recordSiteOrg.getHospitalUID());
+            record.setInstitutionUID(recordSiteOrg.getInstitutionUID());
+            record.setTenantUID(recordSiteOrg.getTenantUID());
             record.setId(null);
 
             if (record.getInpatientCount() > 0) {
