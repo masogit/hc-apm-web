@@ -11,6 +11,7 @@ import com.ge.apm.service.i18n.AssetGroupSecondaryImportService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -19,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ManagedBean
@@ -32,7 +34,6 @@ public class AssetGroupSecondaryImportController extends JpaCRUDController<I18nM
     AssetGroupSecondaryImportService importService;
 
     List<TenantInfo> tenantInfos;
-    List<UserAccount> userAccountListBySelectedTenant;
     String tenantUid;
 
     private UploadedFile file;
@@ -58,7 +59,16 @@ public class AssetGroupSecondaryImportController extends JpaCRUDController<I18nM
         tenantInfos = tenantInfoDao.getAllOrderByName();
     }
 
+    public void onSelectTenant() {
+
+    }
+
     public void uploadDataFile(FileUploadEvent event) {
+
+        if (StringUtils.isEmpty(tenantUid)) {
+            WebUtil.addErrorMessage("请选择租户！", null);
+            return;
+        }
 
         this.file = event.getFile();
 
@@ -68,7 +78,7 @@ public class AssetGroupSecondaryImportController extends JpaCRUDController<I18nM
                 null, null);)
         {
 
-            importService.importAssetGroupSecondary(excelDoc);
+            importService.importAssetGroupSecondary(tenantUid, excelDoc);
 
 
         } catch (IOException e) {
@@ -87,14 +97,6 @@ public class AssetGroupSecondaryImportController extends JpaCRUDController<I18nM
 
     public void setTenantInfos(List<TenantInfo> tenantInfos) {
         this.tenantInfos = tenantInfos;
-    }
-
-    public List<UserAccount> getUserAccountListBySelectedTenant() {
-        return userAccountListBySelectedTenant;
-    }
-
-    public void setUserAccountListBySelectedTenant(List<UserAccount> userAccountListBySelectedTenant) {
-        this.userAccountListBySelectedTenant = userAccountListBySelectedTenant;
     }
 
     public String getTenantUid() {
