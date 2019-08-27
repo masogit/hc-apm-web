@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,8 @@ import java.util.Map;
 @Component
 public class CallEsbTool {
 
-    private final String HEADER_QUERY_DATE = "queryDate";
+    private static final Logger logger = Logger.getLogger(CallEsbTool.class);
+    private static final String HEADER_QUERY_DATE = "queryDate";
 
     @Autowired
     AssetPerformanceRecordDeltaRepository repository;
@@ -36,11 +38,14 @@ public class CallEsbTool {
         try {
             String queryDateStr = FileUtils.readFileToString(new File("mdm_queryDate.txt"), "utf-8");
             Date lastUpdatedDate = format.parse(queryDateStr);
-            headers.put(HEADER_QUERY_DATE, DateUtils.addDays(lastUpdatedDate, 1));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            Date now = new Date();
+            Date fetchBefore = DateUtils.addDays(now, -21);
+            if (fetchBefore.after(lastUpdatedDate)) {
+                headers.put(HEADER_QUERY_DATE, DateUtils.addDays(lastUpdatedDate, 1));
+            }
+        } catch (ParseException | IOException e) {
+            logger.error("Fail to fetch query date", e);
         }
     }
 
@@ -70,17 +75,22 @@ public class CallEsbTool {
     }
 
     protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) throws JAXBException, XMLStreamException {
-        EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
-        List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
-        list.forEach(i -> {
-            i.setHappenDate(queryDate);
-            if (StringUtils.contains(i.getHospitalName(), "南部")) {
-                i.setSiteUID("6f32b4f4ae0e40f3a1db627e854cece1");
-            } else if (StringUtils.contains(i.getHospitalName(), "北部")) {
-                i.setSiteUID("5c563184623311e7aeb25254001a1c14");
-            }
-        });
-        return list;
+        try {
+            EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
+            List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
+            list.forEach(i -> {
+                i.setHappenDate(queryDate);
+                if (StringUtils.contains(i.getHospitalName(), "南部")) {
+                    i.setSiteUID("6f32b4f4ae0e40f3a1db627e854cece1");
+                } else if (StringUtils.contains(i.getHospitalName(), "北部")) {
+                    i.setSiteUID("394497ce5c554b9489526eb9d6b340e1");
+                }
+            });
+            return list;
+        } catch (Exception e) {
+            logger.error("unmarshal failure", e);
+            throw e;
+        }
     }
 
     public class esbRequestParams {
