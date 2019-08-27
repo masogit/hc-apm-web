@@ -11,7 +11,7 @@
     <bean id="callEsbTool" class="com.ge.apm.edgeserver.sysutil.CallEsbTool"/>
     <routeContext id="route_mdm" xmlns="http://camel.apache.org/schema/spring">
         <route id="mdm_output">
-            <from uri="sql:select * from asset_performance_record_delta where upload_status='N' and create_time>=current_date + integer '-30' limit 30?consumer.delay=120000&amp;maxMessagesPerPoll=30"/>
+            <from uri="sql:select * from asset_performance_record_delta where upload_status='N' and create_time>=current_date + integer '-30' limit 30?consumer.delay=60000&amp;maxMessagesPerPoll=30"/>
             <doTry>
                 <removeHeaders pattern="*"/>
                 <bean ref="clinicalDataServiceImpl" method="putServerKey"/>
@@ -83,7 +83,7 @@
                             <constant>POST</constant>
                         </setHeader>
                         <toD uri="{{MdmUrlProd}}"/>
-<!--                        <bean ref="callEsbTool" method="mockResponse"/>-->
+                        <!--                        <bean ref="callEsbTool" method="mockResponse"/>-->
                         <setBody>
                             <simple>${bodyAs(String)}</simple>
                         </setBody>
@@ -97,5 +97,11 @@
                 </when>
             </choice>
         </route>
+
+        <route id="purgeMdmData">
+            <from uri="timer://purgeClinicalData?fixedRate=true&amp;period=1200000"/>
+            <to uri="sql:delete from asset_performance_record_delta where create_time &lt; current_date + integer '-360'"/>
+        </route>
+
     </routeContext>
 </beans>
