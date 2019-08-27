@@ -27,6 +27,6 @@ spring:
       hibernate.format_sql: true
       hibernate.use_sql_comments: false
 
-server.port: 9090
+#server.port: 9000
 
 

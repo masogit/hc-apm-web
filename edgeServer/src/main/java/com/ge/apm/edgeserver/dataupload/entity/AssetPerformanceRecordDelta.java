@@ -1,5 +1,6 @@
 package com.ge.apm.edgeserver.dataupload.entity;
 
+import com.ge.apm.edgeserver.sysutil.JsonMapper;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -60,7 +61,7 @@ public class AssetPerformanceRecordDelta implements Serializable {
     @Column(name = "projectNumber")
     private String projectNumber;
 
-    // 一类标准=单价
+    //标准
     @XmlElement
     @Column(name = "standard")
     private Double standard;
@@ -385,26 +386,7 @@ public class AssetPerformanceRecordDelta implements Serializable {
 
     @Override
     public String toString() {
-        return "AssetPerformanceRecordDelta{" +
-                "id='" + id + '\'' +
-                ", createTime=" + createTime +
-                ", uploadStatus='" + uploadStatus + '\'' +
-                ", department='" + department + '\'' +
-                ", costType='" + costType + '\'' +
-                ", code='" + code + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", projectNumber='" + projectNumber + '\'' +
-                ", standard=" + standard +
-                ", quantity=" + quantity +
-                ", amount=" + amount +
-                ", happenDate=" + happenDate +
-                ", tenantUID='" + tenantUID + '\'' +
-                ", institutionUID='" + institutionUID + '\'' +
-                ", hospitalUID='" + hospitalUID + '\'' +
-                ", siteUID='" + siteUID + '\'' +
-                ", groupName='" + groupName + '\'' +
-                ", groupCode='" + groupCode + '\'' +
-                ", preExamDepartment='" + preExamDepartment + '\'' +
-                '}';
+        JsonMapper mapper = JsonMapper.nonEmptyMapper();
+        return mapper.toJson(this);
     }
 }

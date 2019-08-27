@@ -21,13 +21,11 @@ public class EsbUnmarshalTool {
         JAXBContext jc = JAXBContext.newInstance(AssetPerformanceRecordDelta.class);
         XMLInputFactory xif = XMLInputFactory.newFactory();
 
-        XMLStreamReader xsr;
-
         String responseMessage = extract(xml, xif, "string");
 
         String businessResponse = extract(responseMessage, xif, "BussinessResponse");
 
-        xsr = xif.createXMLStreamReader(new ByteArrayInputStream(businessResponse.getBytes()));
+        XMLStreamReader xsr = xif.createXMLStreamReader((new ByteArrayInputStream(businessResponse.getBytes())), "UTF-8");
         Unmarshaller unmarshaller = jc.createUnmarshaller();
         List<AssetPerformanceRecordDelta> list = new ArrayList<>();
         while (xsr.hasNext()) {
@@ -43,8 +41,7 @@ public class EsbUnmarshalTool {
     }
 
     private String extract(String xml, XMLInputFactory xif, String string) throws XMLStreamException {
-        XMLStreamReader xsr;
-        xsr = xif.createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()));
+        XMLStreamReader xsr = xif.createXMLStreamReader(new ByteArrayInputStream(xml.getBytes()), "UTF-8");
         while (xsr.hasNext()) {
             if (xsr.isStartElement() && string.equals(xsr.getLocalName())) {
                 return xsr.getElementText();

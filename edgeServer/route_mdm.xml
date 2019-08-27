@@ -30,7 +30,7 @@
                     <constant>POST</constant>
                 </setHeader>
 
-                <toD uri="{{APMCloudUrlDev}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false"/>
+                <toD uri="{{APMCloudUrlSIT}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false"/>
 
                 <setBody>
                     <simple>${bodyAs(String)}</simple>
@@ -76,17 +76,7 @@
                     <doTry>
                         <to uri="freemarker:mdmRequestTemplate.xml"/>
                         <log message="${body}"/>
-                        <setHeader headerName="Content-Type">
-                            <constant>application/x-www-form-urlencoded</constant>
-                        </setHeader>
-                        <setHeader headerName="CamelHttpMethod">
-                            <constant>POST</constant>
-                        </setHeader>
-                        <toD uri="{{MdmUrlProd}}"/>
-<!--                        <bean ref="callEsbTool" method="mockResponse"/>-->
-                        <setBody>
-                            <simple>${bodyAs(String)}</simple>
-                        </setBody>
+                        <bean ref="callEsbTool" method="callEsb"/>
                         <log message="${body}"/>
                     </doTry>
                     <bean ref="callEsbTool" method="save"/>
