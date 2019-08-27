@@ -42,6 +42,9 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
+    <bean id="tomcatContainerFactory" class="org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory"
+          p:port="${webServer.port}"/>
+
     <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
         <property name="dataSource" ref="edgeDataSource"/>
     </bean>

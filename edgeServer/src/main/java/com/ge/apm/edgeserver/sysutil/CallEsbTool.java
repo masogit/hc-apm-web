@@ -4,6 +4,8 @@ import com.ge.apm.edgeserver.dataupload.dao.AssetPerformanceRecordDeltaRepositor
 import com.ge.apm.edgeserver.dataupload.entity.AssetPerformanceRecordDelta;
 import org.apache.camel.Body;
 import org.apache.camel.Headers;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -49,6 +51,25 @@ public class CallEsbTool {
         }
     }
 
+    public String callEsb(@Body String body, @Headers Map<String, Object> headers) throws IOException {
+        HttpClient client = new HttpClient();
+        PostMethod postMethod = new PostMethod("http://192.168.26.90/ESBService2/ESBService.asmx/CallESB");
+        postMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        postMethod.setRequestBody(body);
+        int statusCode = 0;
+        try {
+            statusCode = client.executeMethod(postMethod);
+        } catch (IOException e) {
+            throw e;
+        }
+        System.out.println(statusCode);
+        try {
+            return postMethod.getResponseBodyAsString();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
     public esbRequestParams getRequest(@Headers Map<String, Object> headers) {
         esbRequestParams params = new esbRequestParams();
         params.setAppCode("APP644");
@@ -84,6 +105,8 @@ public class CallEsbTool {
                     i.setSiteUID("6f32b4f4ae0e40f3a1db627e854cece1");
                 } else if (StringUtils.contains(i.getHospitalName(), "北部")) {
                     i.setSiteUID("394497ce5c554b9489526eb9d6b340e1");
+                } else {
+                    logger.info(i.toString());
                 }
             });
             return list;
