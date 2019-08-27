@@ -852,14 +852,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
+        //重新获取一下供应商
+        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
         return autoCompleteService.autoCompleteVendor(query, supplierList);
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
+        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
         return autoCompleteService.autoCompleteManufacture(query, manuList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
+        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
         return autoCompleteService.autoCompleteMaintainer(query, mantainList);
     }
 
@@ -1077,6 +1081,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void prepareCreateSupplier() {
         newSupplier = new Supplier();
     }
+
+
 
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();

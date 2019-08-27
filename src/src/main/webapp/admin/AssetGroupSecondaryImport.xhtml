@@ -10,17 +10,17 @@
     <ui:define name="content">
         <h:form id="searchForm">
             <h:panelGrid id="searchPanel" columns="10">
-                <p:selectOneMenu value="#{tenantPasswordController.tenantUid}">
+                <p:selectOneMenu value="#{assetGroupSecondaryImportController.tenantUid}">
                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                     <f:selectItems value="#{assetGroupSecondaryImportController.tenantInfos}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-<!--                    <p:ajax listener="#{tenantPasswordController.onSelectTenant()}"-->
-<!--                            event="change" update="datalist" process="@this"/>-->
+                    <p:ajax listener="#{assetGroupSecondaryImportController.onSelectTenant()}"
+                            event="change" process="@this" update=":searchForm"/>
                 </p:selectOneMenu>
 
 
             </h:panelGrid>
             <p:fileUpload  id="fileUpload" fileUploadListener="#{assetGroupSecondaryImportController.uploadDataFile}" value="#{AssetGroupSecondaryImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                           multiple="false" sizeLimit="10000000" update="" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="导入" rendered="#{empty AssetGroupSecondaryImportController.file}" />
+                           multiple="false" sizeLimit="10000000" update="" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="导入" rendered="#{empty AssetGroupSecondaryImportController.file}" disabled="#{empty assetGroupSecondaryImportController.tenantUid}"/>
 
         </h:form>
 
