@@ -103,13 +103,6 @@ public class CallEsbTool {
             List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
             list.forEach(i -> {
                 i.setHappenDate(queryDate);
-                if (StringUtils.contains(i.getHospitalName(), "南部")) {
-                    i.setSiteUID("6f32b4f4ae0e40f3a1db627e854cece1");
-                } else if (StringUtils.contains(i.getHospitalName(), "北部")) {
-                    i.setSiteUID("394497ce5c554b9489526eb9d6b340e1");
-                } else {
-                    logger.info(i.toString());
-                }
             });
             return list;
         } catch (Exception e) {

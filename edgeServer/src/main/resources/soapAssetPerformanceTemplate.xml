@@ -20,9 +20,10 @@
             <tenantUID>${body['tenant_uid']?default("")}</tenantUID>
             <institutionUID>${body['institution_uid']?default("0")}</institutionUID>
             <hospitalUID>${body['hospital_uid']?default("")}</hospitalUID>
-            <siteUID>${body['site_uid']?default("")}</siteUID>
+            <siteUID>6f32b4f4ae0e40f3a1db627e854cece1</siteUID>
             <groupName>${body['group_name']?default("")}</groupName>
             <groupCode>${body['group_code']?default("")}</groupCode>
+            <hospitalName>${body['hospital_name']?default("")}</hospitalName>
             <preExamDepartment>${body['pre_exam_department']?default("")}</preExamDepartment>
             <preExamDepartmentCode>${body['pre_exam_department_code']?default("")}</preExamDepartmentCode>
             <inpatientCount>${body['inpatient_count']?default("0")}</inpatientCount>
