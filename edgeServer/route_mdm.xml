@@ -14,7 +14,7 @@
             <from uri="sql:select * from asset_performance_record_delta where upload_status='N' and create_time>=current_date + integer '-30' limit 30?consumer.delay=60000&amp;maxMessagesPerPoll=30"/>
             <doTry>
                 <removeHeaders pattern="*"/>
-                <bean ref="clinicalDataServiceImpl" method="putServerKey"/>
+                <bean ref="callEsbTool" method="putServerKey"/>
                 <log message="${body}"/>
                 <setHeader headerName="id">
                     <simple>${body[id]}</simple>

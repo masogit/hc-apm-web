@@ -14,8 +14,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -70,6 +68,10 @@ public class CallEsbTool {
         }
     }
 
+    public void putServerKey(@Headers Map<String, Object> headers) {
+        headers.put("edgeServerKey", "4699bf886715acaab243faa50810bfcb4bc7d43b9ae2527af2c89c92db0d3a83");
+    }
+
     public esbRequestParams getRequest(@Headers Map<String, Object> headers) {
         esbRequestParams params = new esbRequestParams();
         params.setAppCode("APP644");
@@ -84,7 +86,7 @@ public class CallEsbTool {
         return IOUtils.toString(new FileInputStream("d:\\prod-response"));
     }
 
-    public void save(@Body String body, @Headers Map<String, Object> headers) throws JAXBException, XMLStreamException {
+    public void save(@Body String body, @Headers Map<String, Object> headers) {
         Date queryDate = (Date) headers.get(this.HEADER_QUERY_DATE);
         List<AssetPerformanceRecordDelta> deltas = unmarshal(body, queryDate);
         repository.save(deltas);
@@ -95,7 +97,7 @@ public class CallEsbTool {
         }
     }
 
-    protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) throws JAXBException, XMLStreamException {
+    protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) {
         try {
             EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
             List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
@@ -116,7 +118,7 @@ public class CallEsbTool {
         }
     }
 
-    public class esbRequestParams {
+    public static class esbRequestParams {
         String appCode;
         String password;
         Date startDate;
