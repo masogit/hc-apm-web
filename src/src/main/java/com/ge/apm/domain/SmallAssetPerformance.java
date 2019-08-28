@@ -84,6 +84,9 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "pre_exam_department_code")
 	private String preExamDepartmentCode;
 
+	@Column(name = "hospital_name", columnDefinition = "CHAR(32)")
+	private String hospitalName;
+
 	@Transient
 	private Double inpatientCount;
 
@@ -328,6 +331,14 @@ public class SmallAssetPerformance implements Serializable {
 
 	public void setEmergencyRevenue(Double emergencyRevenue) {
 		this.emergencyRevenue = emergencyRevenue;
+	}
+
+	public String getHospitalName() {
+		return hospitalName;
+	}
+
+	public void setHospitalName(String hospitalName) {
+		this.hospitalName = hospitalName;
 	}
 
 	public String getStatusDisplay() {
