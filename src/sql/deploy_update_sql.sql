@@ -400,7 +400,7 @@ update asset_alert_config set lower_limit = 0.5, upper_limit = null where config
 update asset_alert_config set lower_limit = 6, upper_limit = 150, check_type = 5 where config_type = 105;
 delete from asset_alert_config where config_type = 103;
 delete from asset_alert_config where config_type = 113;
-insert into asset_alert_config (id, asset_uid, config_type, create_by, create_date, lower_limit, upper_limit, is_default, is_enabled, check_type, device_type, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_notify_fe, is_notify_ole, is_notify_sales, is_notify_customer) values ('4413b7eec1f9431fbc72ff99f06b86c0', null, 113, null, now(), 50.0, 60.0, true, true, 5, 1, '液氦液面高度', 0, '液氦液面高度异常，液氦液位偏低，有失超风险，请即刻报修，添加液氦。', '%', null, '液氦液面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），液氦液位偏低，有失超风险，请即刻报修，添加液氦。',true, false, true, true);
+insert into asset_alert_config (id, asset_uid, config_type, create_by, create_date, lower_limit, upper_limit, is_default, is_enabled, check_type, device_type, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_notify_fe, is_notify_ole, is_notify_sales, is_notify_customer) values ('4413b7eec1f9431fbc72ff99f06b86c0', null, 113, null, now(), 50.0, 60.0, true, true, 5, 1, '液氦液面高度', 1440, '液氦液面高度异常，液氦液位偏低，有失超风险，请即刻报修，添加液氦。', '%', null, '液氦液面高度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），液氦液位偏低，有失超风险，请即刻报修，添加液氦。',true, false, true, true);
 ALTER TABLE public.alert_item DROP COLUMN modify_date;
 ALTER TABLE public.alert_item DROP COLUMN modify_by;
 ALTER TABLE public.alert_item DROP COLUMN ole_action;
