@@ -104,6 +104,13 @@ public class CallEsbTool {
             list.forEach(i -> {
                 i.setHappenDate(queryDate);
             });
+            list.removeIf(i -> {
+                boolean allZero = i.getEmergencyCount() == 0 && i.getInpatientCount() == 0 && i.getOutpatientCount() == 0;
+                if (allZero) {
+                    logger.warn("all zero record is dropped: " + i.toString());
+                }
+                return allZero;
+            });
             return list;
         } catch (Exception e) {
             logger.error("unmarshal failure", e);
