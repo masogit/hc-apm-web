@@ -132,6 +132,11 @@
             <artifactId>camel-freemarker</artifactId>
             <version>2.15.2</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
 
         <!-- jdbc -->
         <dependency>
@@ -183,18 +188,22 @@
             <version>2.16.2</version>
             <type>jar</type>
         </dependency>
-		
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.24</version>
         </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>14.0.0</version>
-        </dependency>
-        
+<!--        <dependency>-->
+<!--            <groupId>com.oracle</groupId>-->
+<!--            <artifactId>ojdbc14</artifactId>-->
+<!--            <version>14.0.0</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>net.sourceforge.jtds</groupId>
             <artifactId>jtds</artifactId>
@@ -284,7 +293,7 @@
                         <type>jar</type>
                         <scope>compile</scope>
                     </dependency>
-                </dependencies>                
+                </dependencies>
                 <configuration>
                     <transformers>
                         <transformer
@@ -350,7 +359,7 @@
                             <mainClass>${camel-standalone.mainClass}</mainClass>
                         </transformer>
                     </transformers>
-					
+
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
@@ -361,7 +370,7 @@
                             </excludes>
                         </filter>
                     </filters>
-					
+
                     <finalName>${artifactId}-${version}-full</finalName>
                 </configuration>
             </plugin>
