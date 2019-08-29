@@ -148,22 +148,22 @@
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
                     <p:commandButton value="派工" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
 
                     <p:commandButton  value="取消"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" oncomplete="PF('cancelDialog').show()"/>
 
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
                     <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                     <p:commandButton  value="取消"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" oncomplete="PF('cancelDialog').show()"/>
 
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
                     <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
@@ -171,28 +171,28 @@
                     <!--报修后，被接单的工单 医工主任有权限能够取消 -->
                     <p:commandButton  value="取消" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
                     <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
                     <p:commandButton value="验收" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm"  oncomplete="PF('ackDialog').show()"/>
                     <p:commandButton value="修改" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
 
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
                     <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
                     <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                 </p:column>
-                <p:column headerText="#{msg.maintenanceValue}" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
+                <p:column headerText="#{msg.maintenanceValue}" style="width: 100px" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8}">
                     <h:outputText value="#{item.maintenanceValue}"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <p:commandButton value="修改" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==0}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==0}">
    <!--待派工 待接单 待维修-->
                     <p:commandButton  value="取消" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>

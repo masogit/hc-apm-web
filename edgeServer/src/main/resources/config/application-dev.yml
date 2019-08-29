@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: dev
+
+  datasource:
+    name: edgeDataSource
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://192.168.245.128:5432/mdm
+    username: postgres
+    password: root
+
+
+

@@ -2,27 +2,24 @@
  */
 package com.ge.apm.edgeserver;
 
-import java.util.HashMap;
-import javax.sql.DataSource;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
 
 /**
- *
  * @author 212547631
  */
 @Configuration
 @EnableJpaRepositories(
-    basePackages = "com.ge.apm.edgeserver.dataupload.dao", 
-    entityManagerFactoryRef = "entityManager", 
-    transactionManagerRef = "transactionManager"
+        basePackages = "com.ge.apm.edgeserver.dataupload.dao",
+        entityManagerFactoryRef = "entityManager",
+        transactionManagerRef = "transactionManager"
 )
 public class AppDbConfig {
     //@Autowired
@@ -63,8 +60,8 @@ public class AppDbConfig {
         dataSource.setUrl("jdbc:postgresql://127.0.0.1:5432/ge_apm");
         dataSource.setUsername("postgres");
         dataSource.setPassword("root");
- 
+
         return dataSource;
     }
-    
+
 }

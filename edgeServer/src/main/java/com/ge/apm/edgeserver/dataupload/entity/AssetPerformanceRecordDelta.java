@@ -1,11 +1,13 @@
 package com.ge.apm.edgeserver.dataupload.entity;
 
+import com.ge.apm.edgeserver.sysutil.JsonMapper;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,7 +15,7 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "asset_performance_record_delta")
-public class AssetPerformanceRecordDelta {
+public class AssetPerformanceRecordDelta implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +61,7 @@ public class AssetPerformanceRecordDelta {
     @Column(name = "projectNumber")
     private String projectNumber;
 
-    // 一类标准=单价
+    //标准
     @XmlElement
     @Column(name = "standard")
     private Double standard;
@@ -93,9 +95,12 @@ public class AssetPerformanceRecordDelta {
     @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
-    @XmlElement
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    @XmlElement(name = "HospitalName")
+    @Column(name = "hospital_name", columnDefinition = "CHAR(32)")
+    private String hospitalName;
 
     @XmlElement(name = "GroupName")
     @Column(name = "group_name")
@@ -255,6 +260,14 @@ public class AssetPerformanceRecordDelta {
         this.siteUID = siteUID;
     }
 
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
     public String getGroupName() {
         return groupName;
     }
@@ -352,27 +365,28 @@ public class AssetPerformanceRecordDelta {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof AssetPerformanceRecordDelta)) {
+            return false;
+        }
+        AssetPerformanceRecordDelta other = (AssetPerformanceRecordDelta) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
-        return "AssetPerformanceRecordDelta{" +
-                "id='" + id + '\'' +
-                ", createTime=" + createTime +
-                ", uploadStatus='" + uploadStatus + '\'' +
-                ", department='" + department + '\'' +
-                ", costType='" + costType + '\'' +
-                ", code='" + code + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", projectNumber='" + projectNumber + '\'' +
-                ", standard=" + standard +
-                ", quantity=" + quantity +
-                ", amount=" + amount +
-                ", happenDate=" + happenDate +
-                ", tenantUID='" + tenantUID + '\'' +
-                ", institutionUID='" + institutionUID + '\'' +
-                ", hospitalUID='" + hospitalUID + '\'' +
-                ", siteUID='" + siteUID + '\'' +
-                ", groupName='" + groupName + '\'' +
-                ", groupCode='" + groupCode + '\'' +
-                ", preExamDepartment='" + preExamDepartment + '\'' +
-                '}';
+        JsonMapper mapper = JsonMapper.nonEmptyMapper();
+        return mapper.toJson(this);
     }
 }

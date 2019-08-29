@@ -271,7 +271,7 @@
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
             </p:autoComplete>
 
-            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >

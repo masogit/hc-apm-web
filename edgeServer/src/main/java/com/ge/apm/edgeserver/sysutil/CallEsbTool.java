@@ -3,25 +3,122 @@ package com.ge.apm.edgeserver.sysutil;
 import com.ge.apm.edgeserver.dataupload.dao.AssetPerformanceRecordDeltaRepository;
 import com.ge.apm.edgeserver.dataupload.entity.AssetPerformanceRecordDelta;
 import org.apache.camel.Body;
+import org.apache.camel.Headers;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CallEsbTool {
 
+    private static final Logger logger = Logger.getLogger(CallEsbTool.class);
+    private static final String HEADER_QUERY_DATE = "queryDate";
+
     @Autowired
     AssetPerformanceRecordDeltaRepository repository;
 
-    public class esbRequestParams {
+    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+
+    public void setQueryDate(@Headers Map<String, Object> headers) {
+        try {
+            String queryDateStr = FileUtils.readFileToString(new File("mdm_queryDate.txt"), "utf-8");
+            Date lastUpdatedDate = format.parse(queryDateStr);
+
+            Date now = new Date();
+            Date fetchBefore = DateUtils.addDays(now, -21);
+            if (fetchBefore.after(lastUpdatedDate)) {
+                headers.put(HEADER_QUERY_DATE, DateUtils.addDays(lastUpdatedDate, 1));
+            }
+        } catch (ParseException | IOException e) {
+            logger.error("Fail to fetch query date", e);
+        }
+    }
+
+    public String callEsb(@Body String body, @Headers Map<String, Object> headers) throws IOException {
+        HttpClient client = new HttpClient();
+        PostMethod postMethod = new PostMethod("http://192.168.26.90/ESBService2/ESBService.asmx/CallESB");
+        postMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        postMethod.setRequestBody(body);
+        int statusCode = 0;
+        try {
+            statusCode = client.executeMethod(postMethod);
+        } catch (IOException e) {
+            throw e;
+        }
+        System.out.println(statusCode);
+        try {
+            return postMethod.getResponseBodyAsString();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    public void putServerKey(@Headers Map<String, Object> headers) {
+        headers.put("edgeServerKey", "4699bf886715acaab243faa50810bfcb4bc7d43b9ae2527af2c89c92db0d3a83");
+    }
+
+    public esbRequestParams getRequest(@Headers Map<String, Object> headers) {
+        esbRequestParams params = new esbRequestParams();
+        params.setAppCode("APP644");
+        params.setPassword("d98M4lUh");
+        params.setTime(new Date());
+        params.setStartDate((Date) headers.get(HEADER_QUERY_DATE));
+        params.setEndDate((Date) headers.get(HEADER_QUERY_DATE));
+        return params;
+    }
+
+    public String mockResponse() throws IOException {
+        return IOUtils.toString(new FileInputStream("d:\\prod-response"));
+    }
+
+    public void save(@Body String body, @Headers Map<String, Object> headers) {
+        Date queryDate = (Date) headers.get(this.HEADER_QUERY_DATE);
+        List<AssetPerformanceRecordDelta> deltas = unmarshal(body, queryDate);
+        repository.save(deltas);
+        try {
+            FileUtils.writeStringToFile(new File("mdm_queryDate.txt"), format.format(queryDate), "utf-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected List<AssetPerformanceRecordDelta> unmarshal(String body, Date queryDate) {
+        try {
+            EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
+            List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
+            list.forEach(i -> {
+                i.setHappenDate(queryDate);
+            });
+            list.removeIf(i -> {
+                boolean allZero = i.getEmergencyCount() == 0 && i.getInpatientCount() == 0 && i.getOutpatientCount() == 0;
+                if (allZero) {
+                    logger.warn("all zero record is dropped: " + i.toString());
+                }
+                return allZero;
+            });
+            return list;
+        } catch (Exception e) {
+            logger.error("unmarshal failure", e);
+            throw e;
+        }
+    }
+
+    public static class esbRequestParams {
         String appCode;
         String password;
         Date startDate;
@@ -67,31 +164,6 @@ public class CallEsbTool {
         public void setTime(Date time) {
             this.time = time;
         }
-    }
-
-    public esbRequestParams getRequest() {
-        esbRequestParams params = new esbRequestParams();
-        params.setAppCode("APP564");
-        params.setPassword("JZnsfqOO");
-        params.setTime(new Date());
-        params.setStartDate(new Date());
-        params.setEndDate(DateUtils.addDays(new Date(), -3));
-        return params;
-    }
-
-    public String mockResponse() throws IOException {
-        return IOUtils.toString(new FileInputStream("d:\\prod-response"));
-    }
-
-    public void save(@Body String body) throws JAXBException, XMLStreamException {
-        List<AssetPerformanceRecordDelta> deltas = unmarshal(body);
-        repository.save(deltas);
-    }
-
-    protected List<AssetPerformanceRecordDelta> unmarshal(String body) throws JAXBException, XMLStreamException {
-        EsbUnmarshalTool esbUnmarshalTool = new EsbUnmarshalTool();
-        List<AssetPerformanceRecordDelta> list = esbUnmarshalTool.unmarshal(body);
-        return list;
     }
 
 }
