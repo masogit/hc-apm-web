@@ -438,7 +438,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			}
 		}
 		nurseSiteMaintainConfig.setTypeValue(typeValue);
-		JSONArray jsonArray=new JSONArray();
 		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems, nurseSiteMaintainConfig);
 		if(isSave){
 			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
