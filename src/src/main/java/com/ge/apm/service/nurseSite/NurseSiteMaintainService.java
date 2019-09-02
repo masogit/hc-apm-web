@@ -37,6 +37,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BatchJobRepository;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.CustomRoleRepository;
+import com.ge.apm.dao.NurseSiteMaintainCheckItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainDataRepository;
@@ -49,6 +50,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.BatchJob;
 import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.NurseSiteMaintain;
+import com.ge.apm.domain.NurseSiteMaintainCheckItem;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.NurseSiteMaintainData;
@@ -85,6 +87,9 @@ public class NurseSiteMaintainService {
 
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+	
+	@Autowired
+	NurseSiteMaintainCheckItemRepository nurseSiteMaintainCheckItemRepository;
 
 	@Autowired
 	AssetInfoRepository assetInfoRepository;
@@ -146,6 +151,10 @@ public class NurseSiteMaintainService {
 
 	public NurseSiteMaintainConfig getMaintainConfigById(String id) {
 		return nurseSiteMaintainConfigRepository.findById(id);
+	}
+	
+	public NurseSiteMaintainCheckItem getMaintainCheckItemById(String id) {
+		return nurseSiteMaintainCheckItemRepository.findById(id);
 	}
 
 	public List<NurseSiteMaintain> getDefaultMaintainData(List<String> orgUids, Date startDate, Date endDate) {
@@ -263,6 +272,40 @@ public class NurseSiteMaintainService {
 		simpleDeleteNurseSiteMaintain(maintain);
 //		addBatchJob("delete", null, null, null, userUid, maintain.getId());
 		return true;
+	}
+	
+	public List<NurseSiteMaintainCheckItem> loadWholeCheckItem(String siteUid){
+		return nurseSiteMaintainCheckItemRepository.findBySiteUid(siteUid);
+	}
+	
+	public void loadSelectedCheckItem(List<NurseSiteMaintainCheckItem> listWhole,List<NurseSiteMaintainCheckItem> listSelected,NurseSiteMaintainConfig config){
+		String checkDetail=config.getCheckItemsDetail();
+		if(StringUtils.isNotEmpty(checkDetail)){
+			JSONArray arr=JSONArray.parseArray(checkDetail);
+			for(int i=0;i<arr.size();++i){
+				NurseSiteMaintainCheckItem item=JSONObject.parseObject(arr.getString(i), NurseSiteMaintainCheckItem.class);
+				listSelected.add(item);
+				if(!listWhole.contains(item)){
+					listWhole.add(item);
+				}
+			}
+		}
+	}
+	
+	public void saveSelectedCheckItem(List<NurseSiteMaintainCheckItem> listSelected,NurseSiteMaintainConfig config){
+		if(listSelected!=null && listSelected.size()>0){
+			JSONArray arr=new JSONArray();
+			for(int i=0;i<listSelected.size();++i){
+				NurseSiteMaintainCheckItem item=listSelected.get(i);
+				JSONObject obj=new JSONObject();
+				obj.put("name", item.getName());
+				obj.put("key", item.getKey());
+				obj.put("description", item.getDescription());
+				obj.put("id", item.getId());
+				arr.add(obj);
+			}
+			config.setCheckItemsDetail(arr.toJSONString());
+		}
 	}
 	
 	public boolean batchDeleteMaintainData(Date startDate,Date endDate,List<NurseSiteMaintainConfig> listConfig,String userUid) {
