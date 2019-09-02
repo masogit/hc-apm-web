@@ -413,3 +413,7 @@ CREATE INDEX "nurseSiteMaintainItemParentId"
     ON public.nurse_site_maintain_item USING btree
     (parent_id ASC NULLS LAST)
     TABLESPACE pg_default;
+
+
+--v19.9.1
+update asset_alert_config set lower_limit = null where config_type = 102
