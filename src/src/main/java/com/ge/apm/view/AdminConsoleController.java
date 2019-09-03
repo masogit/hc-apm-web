@@ -193,12 +193,6 @@ public class AdminConsoleController {
 	}
 	
 	public void batchUpdateAssetLifecycleEvent(){
-		if(startDate==null || endDate==null){
-			Calendar ca=Calendar.getInstance();
-			endDate=ca.getTime();
-			ca.add(Calendar.MONTH, -1);
-			startDate=ca.getTime();
-		}
 		Thread t=new Thread(new Runnable() {
 			@Override
 			public void run() {
