@@ -221,14 +221,15 @@ public class AdminConsoleService {
 	public void batchUpdateAssetLifecycleEvent(Date start,Date end){
 		int limit=1000;
 		int offset=0;
-		Set<String> listR=assetLifecycleEventRepository.findAssetUidByLimit(start,end,limit, offset);
+		Calendar currentCa = Calendar.getInstance();
+		Set<String> listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
 		while(listR!=null && listR.size()>0){
 			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR);
 			if(listR2!=null && listR2.size()>0){
-				ignoreErrorDate(listR2);
+				ignoreErrorDate(listR2,currentCa.getTime());
 			}
 			++offset;
-			listR=assetLifecycleEventRepository.findAssetUidByLimit(start,end,limit, offset);
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
 	}
@@ -331,10 +332,9 @@ public class AdminConsoleService {
 			}
 		}
 	}
-	private void ignoreErrorDate(List<AssetLifecycleEvent> tempList) {
+	private void ignoreErrorDate(List<AssetLifecycleEvent> tempList,Date currentDate) {
 		Set<String> listErrorDateEvent=new HashSet<String>();
-		Calendar currentCa = Calendar.getInstance();
-		Date currentDate = currentCa.getTime();
+		Set<String> listCorrectDateEvent=new HashSet<String>();
 		if (tempList != null) {
 			Map<String, Date> mapCloseDesc = new HashMap<String, Date>();
 			Map<String, Date> mapOpenAsc = new HashMap<String, Date>();
@@ -353,16 +353,18 @@ public class AdminConsoleService {
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
-					if (startTime != null) {
-						Calendar ca = Calendar.getInstance();
-						ca.setTime(startTime);
-						ca.add(Calendar.DAY_OF_YEAR, 60);
-						if (ca.getTime().before(currentDate)) {
-							if(tempEvent.getCheckStatus().equals(0)){
-		            			listErrorDateEvent.add(tempEvent.getId());
-		            		}
-							tempEvent.setScheduleDate(null);
-							startTime=null;
+					if(status.equals(1)){
+						if (startTime != null) {
+							Calendar ca = Calendar.getInstance();
+							ca.setTime(startTime);
+							ca.add(Calendar.DAY_OF_YEAR, 60);
+							if (ca.getTime().before(currentDate)) {
+								if(tempEvent.getCheckStatus().equals(0)){
+			            			listErrorDateEvent.add(tempEvent.getId());
+			            		}
+								tempEvent.setScheduleDate(null);
+								startTime=null;
+							}
 						}
 					}
 					if(status.equals(2)){
@@ -396,6 +398,14 @@ public class AdminConsoleService {
 		}
 		if(listErrorDateEvent.size()>0){
 			assetLifecycleEventRepository.recordErrorData(listErrorDateEvent);
+		}
+		for(int i=0;i<tempList.size();++i){
+			if(!listErrorDateEvent.contains(tempList.get(i).getId())){
+				listCorrectDateEvent.add(tempList.get(i).getId());
+			}
+		}
+		if(listCorrectDateEvent.size()>0){
+			assetLifecycleEventRepository.recordCorrectData(listCorrectDateEvent);
 		}
 	}
 	@Transactional

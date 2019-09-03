@@ -152,16 +152,18 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 						tempEvent.setCreateTime(null);
 						closeTime=null;
 					}
-					if (startTime != null) {
-						Calendar ca = Calendar.getInstance();
-						ca.setTime(startTime);
-						ca.add(Calendar.DAY_OF_YEAR, 60);
-						if (ca.getTime().before(currentDate)) {
-							if(tempEvent.getCheckStatus().equals(0)){
-		            			listErrorDateEvent.add(tempEvent.getId());
-		            		}
-							tempEvent.setScheduleDate(null);
-							startTime=null;
+					if(status.equals(1)){
+						if (startTime != null) {
+							Calendar ca = Calendar.getInstance();
+							ca.setTime(startTime);
+							ca.add(Calendar.DAY_OF_YEAR, 60);
+							if (ca.getTime().before(currentDate)) {
+								if(tempEvent.getCheckStatus().equals(0)){
+			            			listErrorDateEvent.add(tempEvent.getId());
+			            		}
+								tempEvent.setScheduleDate(null);
+								startTime=null;
+							}
 						}
 					}
 					if(status.equals(2)){
