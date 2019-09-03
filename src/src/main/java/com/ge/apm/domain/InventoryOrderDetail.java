@@ -71,6 +71,7 @@ public class InventoryOrderDetail implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AssetInfo assetInfo;
+    //0:未盘点，1：已盘点，2：无台账
     @Column(name = "status")
     private Integer status;
     
