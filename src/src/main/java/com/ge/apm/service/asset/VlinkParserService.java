@@ -7,6 +7,16 @@ import org.springframework.stereotype.Component;
 public class VlinkParserService {
 
     public String parseVlink(String vlink) {
+        if (vlink.startsWith("https://v.youku.com/")) {
+            return parseYoukulink(vlink);
+        } else if (vlink.startsWith("https://www.bilibili.com/")) {
+            return parseBilibililink(vlink);
+        } else {
+            return null;
+        }
+    }
+
+    private String parseYoukulink(String vlink) {
         String code = StringUtils.substringAfter(vlink, "https://v.youku.com/v_show/id_");
         if (StringUtils.isEmpty(code)) {
             code = StringUtils.substringAfter(vlink, "https://v.youku.com/v_show/id_");
@@ -25,5 +35,9 @@ public class VlinkParserService {
         } else {
             return null;
         }
+    }
+
+    private String parseBilibililink(String vlink) {
+        return vlink;
     }
 }
