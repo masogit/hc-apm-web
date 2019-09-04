@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @ViewScoped
-public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     @Setter @Getter
     private Boolean isBatchOp=true;
     private SupplierController supplierController;
