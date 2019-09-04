@@ -423,6 +423,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSupplierChange(String idx) {
+        changeSelect(idx);
+    }
+
+    private void changeSelect(String idx){
         Supplier supplier = (Supplier) selectedObjectMap.get(idx);
         switch (idx) {
             case "supplier":
@@ -435,12 +439,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setMaitanance(supplier == null ? null : supplier.getName());
                 selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
                 break;
-            case "manufacture":
+            case "manufacturer":
                 selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
                 selected.setManufacture(supplier == null ? null : supplier.getName());
                 break;
         }
     }
+
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null) {
@@ -1078,8 +1083,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.mvsAssetInfo = mvsAssetInfo;
     }
 
-    public void prepareCreateSupplier() {
+
+    public String createTpye=null;
+    public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
+        if("manufacturer".equals(type)){
+            createTpye=type;
+            newSupplier.setManufacturerT(true);
+        }
+        if("supplier".equals(type)){
+            createTpye=type;
+            newSupplier.setSupplierT(true);
+        }
+        if("maintainer".equals(type)){
+            createTpye=type;
+            newSupplier.setMaintainerT(true);
+        }
+
     }
 
 
@@ -1089,16 +1109,20 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.newSupplier.setSiteId(loginUser.getSiteId());
         if (newSupplier.getMaintainerT()) {
             supplierController.setMaintainerT(true);
+            selectedObjectMap.put("maintainer",newSupplier);
         } else {
             supplierController.setMaintainerT(false);
         }
         if (newSupplier.getManufacturerT()) {
+
             supplierController.setManufacturerT(true);
+            selectedObjectMap.put("manufacture",newSupplier);
         } else {
             supplierController.setManufacturerT(false);
         }
         if (newSupplier.getSupplierT()) {
             supplierController.setSupplierT(true);
+            selectedObjectMap.put("supplier",newSupplier);
         } else {
             supplierController.setSupplierT(false);
         }
@@ -1108,6 +1132,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
             supplierList.add(newSupplier);
         }
+        changeSelect(createTpye);
+
     }
 
 }
