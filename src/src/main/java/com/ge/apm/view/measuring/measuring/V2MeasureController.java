@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrder> implements Serializable, ServerEventInterface {
+public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrder> implements  ServerEventInterface {
     public CustomConfigService customConfigService;
     UnstructuredData untest;
     //选定科室过滤
