@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.dao.BatchJobRepository;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.I18nMessageRepository;
@@ -43,6 +45,7 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.apm.domain.BatchJob;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -98,6 +101,9 @@ public class AdminConsoleService {
 	
 	@Autowired
 	NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+	
+	@Autowired
+	AssetLifecycleEventRepository assetLifecycleEventRepository;
 	
 	@Autowired
 	NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
@@ -212,6 +218,22 @@ public class AdminConsoleService {
 			logger.info("updateNurseSiteDeleteAsset done.");
 		}
 	}
+	public void batchUpdateAssetLifecycleEvent(Date start,Date end){
+		int limit=1000;
+		int offset=0;
+		Calendar currentCa = Calendar.getInstance();
+		Set<String> listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
+		while(listR!=null && listR.size()>0){
+			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR);
+			if(listR2!=null && listR2.size()>0){
+				ignoreErrorDate(listR2,currentCa.getTime());
+			}
+			++offset;
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
+			logger.info("batchUpdateAssetLifecycleEvent done.");
+		}
+	}
+	
 	public void deleteInvalidOrder(){
 		nurseSiteMaintainDataRepository.deleteInvalid();
 		nurseSiteMaintainItemRepository.deleteInvalid();
@@ -273,6 +295,7 @@ public class AdminConsoleService {
 			nurseSiteMaintainRepository.updateErrorMaintain(setIds, originStatus, newStatus);
 		}
 	}
+	
 	@Transactional
 	public void tUpdateNurseSiteDeleteAsset(List<NurseSiteMaintainConfigItem> listR){
 		Set<String> setAssetUid=new HashSet<String>();
@@ -307,6 +330,82 @@ public class AdminConsoleService {
 				}
 				nurseSiteMaintainService.deleteAssetUid(tempAsset.getUid());
 			}
+		}
+	}
+	private void ignoreErrorDate(List<AssetLifecycleEvent> tempList,Date currentDate) {
+		Set<String> listErrorDateEvent=new HashSet<String>();
+		Set<String> listCorrectDateEvent=new HashSet<String>();
+		if (tempList != null) {
+			Map<String, Date> mapCloseDesc = new HashMap<String, Date>();
+			Map<String, Date> mapOpenAsc = new HashMap<String, Date>();
+			if (tempList != null && tempList.size() > 0) {
+				for (int i = 0; i < tempList.size(); ++i) {
+					AssetLifecycleEvent tempEvent = tempList.get(i);
+					String assetUid = tempEvent.getAssetUid();
+					// 1:open,2:closed,3:cancelled
+					Integer status = tempEvent.getStatus();
+					Date closeTime = tempEvent.getCreateTime();
+					Date startTime = tempEvent.getScheduleDate();
+					if (closeTime != null && closeTime.after(currentDate)) {
+						if(tempEvent.getCheckStatus().equals(0)){
+	            			listErrorDateEvent.add(tempEvent.getId());
+	            		}
+						tempEvent.setCreateTime(null);
+						closeTime=null;
+					}
+					if(status.equals(1)){
+						if (startTime != null) {
+							Calendar ca = Calendar.getInstance();
+							ca.setTime(startTime);
+							ca.add(Calendar.DAY_OF_YEAR, 60);
+							if (ca.getTime().before(currentDate)) {
+								if(tempEvent.getCheckStatus().equals(0)){
+			            			listErrorDateEvent.add(tempEvent.getId());
+			            		}
+								tempEvent.setScheduleDate(null);
+								startTime=null;
+							}
+						}
+					}
+					if(status.equals(2)){
+						if(closeTime!=null){
+							if(mapCloseDesc.get(assetUid)==null){
+								mapCloseDesc.put(assetUid, closeTime);
+							}
+						}
+					}
+					if(startTime!=null){
+						mapOpenAsc.put(assetUid, startTime);
+					}
+				}
+				for (int i = 0; i < tempList.size(); ++i) {
+					AssetLifecycleEvent tempEvent = tempList.get(i);
+					String assetUid = tempEvent.getAssetUid();
+					// 1:open,2:closed,3:cancelled
+					Integer status = tempEvent.getStatus();
+					Date startTime = tempEvent.getScheduleDate();
+					Date closeDesc = mapCloseDesc.get(assetUid);
+					if(status.equals(1)){
+						if (startTime != null&&closeDesc != null && closeDesc.after(startTime)) {
+							if(tempEvent.getCheckStatus().equals(0)){
+		            			listErrorDateEvent.add(tempEvent.getId());
+		            		}
+							tempEvent.setScheduleDate(null);
+						}
+					}
+				}
+			}
+		}
+		if(listErrorDateEvent.size()>0){
+			assetLifecycleEventRepository.recordErrorData(listErrorDateEvent);
+		}
+		for(int i=0;i<tempList.size();++i){
+			if(!listErrorDateEvent.contains(tempList.get(i).getId())){
+				listCorrectDateEvent.add(tempList.get(i).getId());
+			}
+		}
+		if(listCorrectDateEvent.size()>0){
+			assetLifecycleEventRepository.recordCorrectData(listCorrectDateEvent);
 		}
 	}
 	@Transactional
