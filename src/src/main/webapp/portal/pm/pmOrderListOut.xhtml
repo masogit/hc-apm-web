@@ -35,11 +35,11 @@
 				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.eventUid}" />
 				</p:column>
-				<p:column headerText="更新时间" sortBy="#{item.createTime}" >
+				<!-- <p:column headerText="更新时间" sortBy="#{item.createTime}" >
 					<h:outputText value="#{item.createTime}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
 					</h:outputText>
-				</p:column>
+				</p:column> -->
 				<p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.systemId}" />
 				</p:column>
@@ -58,11 +58,11 @@
 					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent4Controller.getMsStatus(item)}" />
 				</p:column>
-				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
+				<!-- <p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
 					<h:outputText value="#{item.scheduleDate}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 					</h:outputText>
-				</p:column>
+				</p:column> -->
 
 				<p:column headerText="报告下载" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">

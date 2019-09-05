@@ -76,11 +76,11 @@
                 <label class="label">设备编号</label>
                 <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
             </h:panelGroup>
-            <p:commandButton validateClient="true"
-                             value="查询"
-                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
-                             action="#{assetSelectController.findAssets2Maintain}"/>
-        </p:panelGrid>
+			<p:commandButton validateClient="true" value="查询"
+				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
+				action="#{assetSelectController.findAssets2Maintain}" />
+
+		</p:panelGrid>
 
         <!--asset search result list-->
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -111,6 +111,50 @@
                 </p:column>
             </p:dataTable>
         </p:panelGrid>
-    </div>
+
+		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+			<p:commandButton validateClient="true" value="添加已勾选设备"
+				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+				action="#{assetSelectController.addAssetInfo}" />
+		</p:panelGrid>
+
+		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+            <p:dataTable id="assets5maintain" value="#{assetSelectController.assets5Maintain}" var="asset"
+                         selectionMode="single"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:column width="40" id="checkBoxCol">
+                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids5[asset.uid]}" class="selectCheckBox2">
+                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList5}" update=":maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"/>
+                        <f:attribute name="assetObj" value="#{asset}"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected5}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage5}" update="@(.selectCheckBox2) :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:saveButtonId"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                    <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}">
+                    <h:outputText value="#{asset.departNum}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panelGrid>
+
+		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+			<p:commandButton validateClient="true" value="删除已勾选设备"
+				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+				action="#{assetSelectController.removeAssetInfo}" />
+			<p:commandButton validateClient="true" value="清空"
+				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+				action="#{assetSelectController.clearAssetInfo}" />
+		</p:panelGrid>
+	</div>
 </ui:composition>
 </html>
