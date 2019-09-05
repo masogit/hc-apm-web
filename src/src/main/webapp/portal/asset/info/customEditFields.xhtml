@@ -263,7 +263,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
         <h:panelGroup>
-            <label class="label">#{msg.manufacture}----<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
+            <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
             <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacture']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}" 
                             completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
