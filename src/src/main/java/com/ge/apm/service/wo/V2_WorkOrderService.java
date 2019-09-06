@@ -94,6 +94,10 @@ public class V2_WorkOrderService {
         return detailMeasuringDao.findByOrderId(woId);
     }
 
+    public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
+       return  stepDao.findResponsor(woId,step);
+    }
+
     public List<String> getSRListByStatus(List<Integer> status) {
         List<SearchFilter> srSearchFilters = new ArrayList();
         srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, status));
