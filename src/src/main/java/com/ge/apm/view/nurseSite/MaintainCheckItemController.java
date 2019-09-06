@@ -85,7 +85,10 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     @Override
     public void save(){
     	boolean exists=dao.findExistsBySiteUid(currentUser.getSiteUID(), this.selected.getName());
-    	if(!exists){
+    	if(StringUtils.isEmpty(this.selected.getId()) && exists){
+    		WebUtil.addSuccessMessage("请勿重复添加检查项");
+    	}
+    	else{
     		Date date=new Date();
         	this.selected.setModifyByUid(currentUser.getUid());
         	this.selected.setModifyDate(date);
@@ -94,9 +97,6 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         	}
         	dao.save(this.selected);
             WebUtil.addSuccessMessage("保存成功");
-    	}
-    	else{
-    		WebUtil.addSuccessMessage("请勿重复添加检查项");
     	}
     	this.selected=null;
     }
