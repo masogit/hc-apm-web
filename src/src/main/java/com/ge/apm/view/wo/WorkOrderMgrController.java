@@ -842,6 +842,17 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
+   public String getRepairResponer(String woId,Integer step){
+      List <V2_WorkOrder_Step >vs=null;
+        vs =woService.getWorkOrderDetailResponsor(woId,step);
+        if(vs !=null && vs.size()>1){
+                return vs.get(0).getOwnerName();
+        }else {
+            return "";
+        }
+
+   }
+
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);

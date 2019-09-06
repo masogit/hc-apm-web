@@ -16,5 +16,8 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
 
     public V2_WorkOrder_Step findFirstByWoIdAndStepIdOrderByStartTimeAsc(String woId, Integer stepId);
 
+    @Query("select s from V2_WorkOrder_Step s where s.woId=?1 and s.stepId=?2")
+    public List<V2_WorkOrder_Step> findResponsor(String woId,Integer stepId);
+
 //    public List<V2_WorkOrder_Step> findByWoIdAndStepIdOrderByCreatedDateDesc(String woId, int stepId);
 }
