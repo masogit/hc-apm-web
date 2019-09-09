@@ -62,7 +62,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
-    HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
     private SupplierController supplierController;
     @Setter @Getter
     Double c_woManhourPrice =0d;
@@ -1023,7 +1022,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         Double tHours = coWorkerList.stream().mapToDouble(p->p.getManHours()).sum();
         //维修人工费用=工单人工费用（元/小时）*总计工时（“工单人工费用”需在流程配置项中配置），若未配置则按照0计算
         c_repairManCost=c_woManhourPrice*tHours;
-        //备件费用
+        //备件费用w
         Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()).sum();
         //维修总金额=备件费用+维修人工费用+外部费用+其他费用
         if(v2WorkOrder.getOtherExpense()==null){
