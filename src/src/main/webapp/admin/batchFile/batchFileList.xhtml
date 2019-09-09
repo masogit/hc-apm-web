@@ -57,8 +57,11 @@
                         
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{batchFileController.prepareCreate}" update=":BatchFileImportForm :BatchFileImportEditForm" />
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="BatchFile_export"/>
+                            </p:commandButton>-->
+                            <p:commandButton ajax="false" actionListener="#{batchFileController.exportData()}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{batchFileController.exportFile}" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
