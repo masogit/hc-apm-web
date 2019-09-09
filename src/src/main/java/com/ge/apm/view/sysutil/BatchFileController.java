@@ -11,19 +11,29 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ImportFiles;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.FileScanExportService;
 import com.ge.apm.service.utils.FileScanService;
 import com.google.common.base.Strings;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import webapp.framework.web.WebUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javaslang.Tuple2;
@@ -45,16 +55,20 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private FileScanService fileService;
     private UserCommonService userService;
+    private FileScanExportService fileScanExportService;
 
     private String fileType;
 
     private List<I18nMessage> batchFileType;
+
+    private StreamedContent exportFile;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
         fileService = WebUtil.getBean(FileScanService.class);
         userService = WebUtil.getBean(UserCommonService.class);
+        fileScanExportService = WebUtil.getBean(FileScanExportService.class);
 
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -155,6 +169,19 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
     }
 
+    public void exportData() {
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/admin/batchFile/APM_ImportFiles_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = fileScanExportService.exportData(doc, fileScanExportService.createFileScanData(dao.findBySearchFilter(this.searchFilters)));
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ImportFiles.xlsx");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(BatchFileController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public List<I18nMessage> getBatchFileType() {
         return batchFileType;
     }
@@ -171,4 +198,11 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         this.fileType = fileType;
     }
 
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
 }
