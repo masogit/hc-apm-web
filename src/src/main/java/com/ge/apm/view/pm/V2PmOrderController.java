@@ -417,7 +417,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
     }
-    public void addReporter(String boUid) {
+    public void addReporter(String boUid) {//boUid  is pmOrderId
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
         TableDefinition tbd = tableDao.findByBaseId(reportUid);
@@ -1775,9 +1775,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         tDefinitions = pmOrderService.getTablesName(v2);
         return tDefinitions;
     }
-    public void x10(){
-
-    }
 
     public  List<PmOrderRuleCheckList> getPmRuleCLclosed(V2_PmOrder v2PmOrder,String ruleUid){
         /*   unsDC:bo_uuid(工单)-->unsDC:id====>unsDC:id/unsD:collecitoId-->key
@@ -1824,7 +1821,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
         if (pmCheckItemList == null) return ;
         //The below guys seems to exist no reason.
-        for (int i = 0; i < pmCheckItemList.size(); i++) {
+       /* for (int i = 0; i < pmCheckItemList.size(); i++) {
             pmCheckItem = (PmOrderRuleCheckList) pmCheckItemList.get(i);
             if (unDataCollection != null && !unDataCollection.isEmpty()) { //
                 unCollection = (UnstructuredDataCollection) unDataCollection.get(0);
@@ -1838,7 +1835,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     }
                 }
             }
-        }
+        }*/
     }
 
 

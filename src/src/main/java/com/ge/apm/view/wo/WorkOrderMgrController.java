@@ -1021,9 +1021,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         c_woManhourPrice=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data")).map(data -> (Double) data.get("woManhourPrice")).orElse(new Double(0));
         Double tHours = coWorkerList.stream().mapToDouble(p->p.getManHours()).sum();
         //维修人工费用=工单人工费用（元/小时）*总计工时（“工单人工费用”需在流程配置项中配置），若未配置则按照0计算
-        c_repairManCost=c_woManhourPrice*tHours;
-        //备件费用w
-        Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()).sum();
+        //总计工时=维修工程师工时+协作者工时
+
+        c_repairManCost=c_woManhourPrice*(tHours+v2WorkOrder.getManHours());
+        //备件费用
+        Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()*p.getApartsQuantity()).sum();
         //维修总金额=备件费用+维修人工费用+外部费用+其他费用
         if(v2WorkOrder.getOtherExpense()==null){
             v2WorkOrder.setOtherExpense(0.0);
