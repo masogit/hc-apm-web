@@ -109,7 +109,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         	listOrgUid.addAll(setOrgUid);
         }
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_CONFIG);
-        loadWholeCheckItem(currentUser.getSiteUID());
+        
         //test
     }
 
@@ -196,6 +196,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		//TODO
         assetSelectController.loadData4Create();
+        loadWholeCheckItem(currentUser.getSiteUID());
 	}
 	
 	@Override
@@ -206,9 +207,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		initValues();
 		loadMaintainConfig(this.selected);
 		setDefaultValueForAssetList();
-		loadSelectedCheckItem();
 		//TODO
         assetSelectController.loadData4Edit(this.selected);
+        loadWholeCheckItem(currentUser.getSiteUID());
+        loadSelectedCheckItem();
 	}
 	
 	private void initValues(){
