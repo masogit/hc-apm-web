@@ -301,7 +301,6 @@ public class NurseSiteMaintainService {
 				obj.put("name", item.getName());
 				obj.put("key", item.getKey());
 				obj.put("description", item.getDescription());
-				obj.put("id", item.getId());
 				arr.add(obj);
 			}
 			config.setCheckItemsDetail(arr.toJSONString());
