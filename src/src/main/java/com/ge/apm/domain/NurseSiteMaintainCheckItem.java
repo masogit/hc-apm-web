@@ -201,7 +201,7 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 
 	@Override
 	public String toString() {
-		return "NurseSiteMaintainConfig [ id=" + id + " ]";
+		return "NurseSiteMaintainConfig [ id=" + id + ",name=" + name + ",siteUID=" + siteUID + ",createByUid=" + createByUid+ " ]";
 	}
 	
 	@Override
