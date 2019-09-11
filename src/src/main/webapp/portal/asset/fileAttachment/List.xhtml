@@ -28,10 +28,10 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" listener="#{assetFileAttachmentController.onSelectedChange}" update="createButton  deleteButton :AssetFileAttachmentEditForm"/>
-                        <p:ajax event="filter" listener="#{assetFileAttachmentController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{assetFileAttachmentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-                        <p:column width="36"  id="checkBoxColumn">
+                        <p:column width="36" id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{assetFileAttachmentController.selectedMap[item.id]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
