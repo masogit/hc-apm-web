@@ -15,7 +15,7 @@
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.hospitalId}</label>
-                        <p:inputText id="selectedOrgName" value="#{assetFileAttachmentController.selectedOrg==null ? '': assetFileAttachmentController.selectedOrg.name}" readonly="true"/>
+                        <p:inputText id="selectedOrgName" value="#{assetFileAttachmentController.selectedOrg==null ? '': assetFileAttachmentController.selectedOrg.name}" readonly="true" required="true"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                         <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -34,7 +34,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}</label>
-                        <p:selectOneMenu id="clinicalDeptName" value="#{assetFileAttachmentController.queryAsset.clinicalDeptId}">
+                        <p:selectOneMenu id="clinicalDeptName" value="#{assetFileAttachmentController.queryAsset.clinicalDeptId}" required="true">
                             <!--<p:ajax  listener="#{assetFileAttachmentController.getQueryAssetsList()}" update="AssetsPickList"/>-->
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetFileAttachmentController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -55,7 +55,7 @@
                 </p:panelGrid>
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton actionListener="#{assetFileAttachmentController.getQueryAssetsList()}" value="#{msg.Search}" update=":FileAssetForm:AssetsPickList"/>
+                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.getQueryAssetsList()}" value="#{msg.Search}" update=":FileAssetForm:AssetsPickList"/>
             </h:panelGroup>
         </h:form>
         <h:form id="FileAssetForm">
