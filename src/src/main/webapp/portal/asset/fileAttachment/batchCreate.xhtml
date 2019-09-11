@@ -124,11 +124,11 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.name}<span style="color:red">*</span></label>
                                 <p:inputTextarea id="vlinkTitle" value="#{assetFileAttachmentController.vlinkTitle}"
-                                                 rows="1" cols="33"/>
+                                                 rows="1" cols="33" required="true"/>
 
                                 <label class="label">#{msg.link}<span style="color:red">*</span></label>
                                 <p:inputTextarea id="vlinkinput" value="#{assetFileAttachmentController.vlink}" rows="1"
-                                                 cols="33"/>
+                                                 cols="33" required="true"/>
                             </h:panelGroup>
                         </p:panel>
                     </p:panelGrid>
