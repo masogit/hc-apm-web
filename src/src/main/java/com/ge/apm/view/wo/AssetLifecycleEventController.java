@@ -197,7 +197,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			}
 		}
 		if(listErrorDateEvent.size()>0){
-			dao.recordErrorData(listErrorDateEvent);
+//			dao.recordErrorData(listErrorDateEvent);
 		}
 	}
 
