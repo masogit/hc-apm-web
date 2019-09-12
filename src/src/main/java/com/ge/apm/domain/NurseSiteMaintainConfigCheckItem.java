@@ -33,6 +33,16 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private Long key;
 	private String name;
 	private String description;
+	private String id;
+	
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public Long getKey() {
 		return key;

@@ -284,26 +284,29 @@ public class NurseSiteMaintainService {
 			JSONArray arr=JSONArray.parseArray(checkDetail);
 			for(int i=0;i<arr.size();++i){
 				NurseSiteMaintainCheckItem item=JSONObject.parseObject(arr.getString(i), NurseSiteMaintainCheckItem.class);
-				listSelected.add(item);
-				if(!listWhole.contains(item)){
-					listWhole.add(item);
+				if(StringUtils.isNotEmpty(item.getId())){
+					if(listWhole.contains(item)){
+						listSelected.add(item);
+					}
 				}
+//				if(!listWhole.contains(item)){
+//					listWhole.add(item);
+//				}
 			}
 		}
 	}
 	
-	public void saveSelectedCheckItem(List<NurseSiteMaintainCheckItem> listSelected,NurseSiteMaintainConfig config){
+	public void saveSelectedCheckItem(List<NurseSiteMaintainCheckItem> listSelected,JSONArray arr){
 		if(listSelected!=null && listSelected.size()>0){
-			JSONArray arr=new JSONArray();
 			for(int i=0;i<listSelected.size();++i){
 				NurseSiteMaintainCheckItem item=listSelected.get(i);
 				JSONObject obj=new JSONObject();
 				obj.put("name", item.getName());
 				obj.put("key", item.getKey());
 				obj.put("description", item.getDescription());
+				obj.put("id", item.getId());
 				arr.add(obj);
 			}
-			config.setCheckItemsDetail(arr.toJSONString());
 		}
 	}
 	
@@ -1806,6 +1809,69 @@ public class NurseSiteMaintainService {
 		}
 
 		return Boolean.TRUE;
+	}
+	
+	public void updateNurseSiteMaintainCheckItem(NurseSiteMaintainCheckItem item,String siteUid){
+		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
+		List<NurseSiteMaintainConfig> listModifyConfig=new ArrayList<NurseSiteMaintainConfig>();
+		if(listConfig!=null && listConfig.size()>0){
+			boolean find=false;
+			for(int i=0;i<listConfig.size();++i){
+				find=false;
+				NurseSiteMaintainConfig config=listConfig.get(i);
+				String jsonStr=config.getCheckItemsDetail();
+				if(StringUtils.isNotEmpty(jsonStr)){
+					JSONArray arr=JSONArray.parseArray(jsonStr);
+					for(int j=0;j<arr.size();++j){
+						JSONObject jsonObj=arr.getJSONObject(j);
+						NurseSiteMaintainCheckItem obj=JSONObject.parseObject(arr.getString(j), NurseSiteMaintainCheckItem.class);
+						if(item.getId().equals(obj.getId())){
+							find=true;
+							jsonObj.put("name", item.getName());
+							jsonObj.put("description", item.getDescription());
+						}
+					}
+					if(find){
+						config.setCheckItemsDetail(arr.toJSONString());
+						listModifyConfig.add(config);
+					}
+				}
+			}
+		}
+		if(listModifyConfig.size()>0){
+			nurseSiteMaintainConfigRepository.save(listModifyConfig);
+		}
+	}
+	
+	public void deleteNurseSiteMaintainCheckItem(NurseSiteMaintainCheckItem item,String siteUid){
+		List<NurseSiteMaintainConfig> listConfig=nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
+		List<NurseSiteMaintainConfig> listModifyConfig=new ArrayList<NurseSiteMaintainConfig>();
+		if(listConfig!=null && listConfig.size()>0){
+			boolean find=false;
+			for(int i=0;i<listConfig.size();++i){
+				find=false;
+				NurseSiteMaintainConfig config=listConfig.get(i);
+				String jsonStr=config.getCheckItemsDetail();
+				if(StringUtils.isNotEmpty(jsonStr)){
+					JSONArray arr=JSONArray.parseArray(jsonStr);
+					for(int j=0;j<arr.size();++j){
+						NurseSiteMaintainCheckItem obj=JSONObject.parseObject(arr.getString(j), NurseSiteMaintainCheckItem.class);
+						if(item.getId().equals(obj.getId())){
+							find=true;
+							arr.remove(j);
+							--j;
+						}
+					}
+					if(find){
+						config.setCheckItemsDetail(arr.toJSONString());
+						listModifyConfig.add(config);
+					}
+				}
+			}
+		}
+		if(listModifyConfig.size()>0){
+			nurseSiteMaintainConfigRepository.save(listModifyConfig);
+		}
 	}
 
 	// private void formatExistMaintainDate(){
