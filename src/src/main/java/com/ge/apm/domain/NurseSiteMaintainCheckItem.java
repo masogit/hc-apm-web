@@ -188,15 +188,10 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 			return false;
 		}
 		NurseSiteMaintainCheckItem other = (NurseSiteMaintainCheckItem) object;
-		if(other.id!=null && this.id!=null && other.id.equals(this.id)){
-			return true;
-		}
-		else if(other.name!=null && this.name!=null && other.name.equals(this.name)){
-			return true;
-		}
-		else{
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 			return false;
 		}
+		return true;
 	}
 
 	@Override
