@@ -222,14 +222,44 @@ public class AdminConsoleService {
 		int limit=1000;
 		int offset=0;
 		Calendar currentCa = Calendar.getInstance();
-		Set<String> listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
+		Set<String> listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,3);
 		while(listR!=null && listR.size()>0){
-			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR);
+			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,3);
 			if(listR2!=null && listR2.size()>0){
 				ignoreErrorDate(listR2,currentCa.getTime());
 			}
 			++offset;
-			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset);
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,3);
+			logger.info("batchUpdateAssetLifecycleEvent done.");
+		}
+		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,4);
+		while(listR!=null && listR.size()>0){
+			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,4);
+			if(listR2!=null && listR2.size()>0){
+				ignoreErrorDate(listR2,currentCa.getTime());
+			}
+			++offset;
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,4);
+			logger.info("batchUpdateAssetLifecycleEvent done.");
+		}
+		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,5);
+		while(listR!=null && listR.size()>0){
+			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,5);
+			if(listR2!=null && listR2.size()>0){
+				ignoreErrorDate(listR2,currentCa.getTime());
+			}
+			++offset;
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,5);
+			logger.info("batchUpdateAssetLifecycleEvent done.");
+		}
+		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,6);
+		while(listR!=null && listR.size()>0){
+			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,6);
+			if(listR2!=null && listR2.size()>0){
+				ignoreErrorDate(listR2,currentCa.getTime());
+			}
+			++offset;
+			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,6);
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
 	}
