@@ -232,6 +232,7 @@ public class AdminConsoleService {
 			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,3);
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
+		offset=0;
 		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,4);
 		while(listR!=null && listR.size()>0){
 			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,4);
@@ -242,6 +243,7 @@ public class AdminConsoleService {
 			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,4);
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
+		offset=0;
 		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,5);
 		while(listR!=null && listR.size()>0){
 			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,5);
@@ -252,6 +254,7 @@ public class AdminConsoleService {
 			listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,5);
 			logger.info("batchUpdateAssetLifecycleEvent done.");
 		}
+		offset=0;
 		listR=assetLifecycleEventRepository.findAssetUidByLimit(limit, offset,6);
 		while(listR!=null && listR.size()>0){
 			List<AssetLifecycleEvent> listR2=assetLifecycleEventRepository.findByAssetUid(listR,6);
