@@ -58,7 +58,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
     private List<NurseSiteMaintainConfig> listSelected;
     //config
-  	private NurseSiteMaintainCheckItem objPairCheckItem;
+  	private NurseSiteMaintainConfigCheckItem objPairCheckItem;
   	private List<AssetInfo> listCheckAssets;
   	private List<OrgInfo> listOrgInfo;
   	private List<String> listCheckDate;
@@ -66,6 +66,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listMonthDay;
   	private List<NurseSiteMaintainCheckItem> listWholeCheckItems;
   	private List<NurseSiteMaintainCheckItem> listSelectedCheckItems;
+  	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
   	
   	//input
   	private String assetInfoName;
@@ -218,9 +219,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listCheckDate=new ArrayList<String>();
 		this.listMonthDay=new ArrayList<String>();
 		this.listWeekDay=new ArrayList<String>();
-//		listPairCheckItems=null;
+		listPairCheckItems=null;
 		isSaveDisable=true;
-//		initObjPairCheckItem();
+		initObjPairCheckItem();
 		if(listOrgInfo==null){
 			listOrgInfo=new ArrayList<OrgInfo>();
 		}
@@ -239,10 +240,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.selectedOrgInfo=null;
 		this.selectedParentOrgInfo=null;
 	}
-//	private void initObjPairCheckItem(){
-//		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
-//		objPairCheckItem.setKey(new Date().getTime());
-//	}
+	private void initObjPairCheckItem(){
+		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+		objPairCheckItem.setKey(new Date().getTime());
+	}
 	private void loadParentOrgInfo(){
 		checkListParentOrgInfo=nurseSiteMaintainService.getListParentSiteByUid(setOrgUid);
 		if(checkListOrgInfo==null){
@@ -294,6 +295,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	private void loadWholeCheckItem(String siteUid){
 		listWholeCheckItems=nurseSiteMaintainService.loadWholeCheckItem(siteUid);
+		if(listSelectedCheckItems==null){
+			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
+		}
+		else{
+			listSelectedCheckItems.clear();
+		}
 	}
 	private void loadSelectedCheckItem(){
 		if(listWholeCheckItems==null){
@@ -440,7 +447,19 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			}
 		}
 		nurseSiteMaintainConfig.setTypeValue(typeValue);
-		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems, nurseSiteMaintainConfig);
+		JSONArray jsonArray=new JSONArray();
+		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
+			for(int i=0;i<listPairCheckItems.size();++i){
+				JSONObject jsonObject=new JSONObject();
+				NurseSiteMaintainConfigCheckItem p=listPairCheckItems.get(i);
+				if(StringUtils.isNotEmpty(p.getName())){
+					jsonObject=(JSONObject) jsonObject.toJSON(p);
+					jsonArray.add(jsonObject);
+				}
+			}
+		}
+		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems,jsonArray);
+		nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		if(isSave){
 			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
 		}
@@ -461,7 +480,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			if(listCheckAssets.size()==0){
 				isSaveDisable=true;
 			}
-			else if(listSelectedCheckItems.size()==0){
+			else if(listSelectedCheckItems.size()+listPairCheckItems.size()<2){
 				isSaveDisable=true;
 			}
 		} catch (Exception e) {
@@ -502,21 +521,21 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.checkListHours = checkListHours;
 	}
 	
-//	public void saveCheckListItem(){
-//		if(listPairCheckItems.contains(objPairCheckItem)){
-//		}
-//		else{
-//			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
-//		}
-//		initObjPairCheckItem();
-//		checkSaveDisable();
-//	}
-//	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
-//		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
-//			listPairCheckItems.remove(item);
-//		}
-//		checkSaveDisable();
-//	}
+	public void saveCheckListItem(){
+		if(listPairCheckItems.contains(objPairCheckItem)){
+		}
+		else{
+			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
+		}
+		initObjPairCheckItem();
+		checkSaveDisable();
+	}
+	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
+		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
+			listPairCheckItems.remove(item);
+		}
+		checkSaveDisable();
+	}
 	public void onPageSelect(PageEvent event) {
 	}
 
@@ -615,40 +634,57 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void setListStrNurseSiteMaintainConfig(List<MaintainDataPair> listStrNurseSiteMaintainConfig) {
 		this.listStrNurseSiteMaintainConfig = listStrNurseSiteMaintainConfig;
 	}
-//	public NurseSiteMaintainConfigCheckItem getObjCheckItem() {
-//		if(objPairCheckItem==null){
-//			initObjPairCheckItem();
-//		}
-//		return objPairCheckItem;
-//	}
-//
-//	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
-//		this.objPairCheckItem = objCheckItem;
-//	}
-//
-//	public List<NurseSiteMaintainConfigCheckItem> getListPairCheckItems() {
-//		String strTemp=this.selected.getCheckItemsDetail();
-//		if(listPairCheckItems==null){
-//			List<NurseSiteMaintainConfigCheckItem> list=new ArrayList<NurseSiteMaintainConfigCheckItem>();
-//			if(StringUtils.isNotEmpty(strTemp)){
-//				JSONArray jsonArray=JSONObject.parseArray(strTemp);
-//				for(int i=0;i<jsonArray.size();++i){
-//					NurseSiteMaintainConfigCheckItem p=(NurseSiteMaintainConfigCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainConfigCheckItem.class);
-//					list.add(p);
-//				}
-//			}
-//			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
-//			p.setName("");
-//			list.add(p);
-//			listPairCheckItems=list;
-//			checkSaveDisable();
-//		}
-//		return listPairCheckItems;
-//	}
-//
-//	public void setListPairCheckItems(List<NurseSiteMaintainConfigCheckItem> listPairCheckItems) {
-//		this.listPairCheckItems = listPairCheckItems;
-//	}
+	public NurseSiteMaintainConfigCheckItem getObjCheckItem() {
+		if(objPairCheckItem==null){
+			initObjPairCheckItem();
+		}
+		return objPairCheckItem;
+	}
+
+	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
+		this.objPairCheckItem = objCheckItem;
+	}
+	
+	private boolean containsCheckItem(List<NurseSiteMaintainCheckItem> list,NurseSiteMaintainConfigCheckItem p){
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				if(list.get(i).getId().equals(p.getId())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public List<NurseSiteMaintainConfigCheckItem> getListPairCheckItems() {
+		String strTemp=this.selected.getCheckItemsDetail();
+		if(listPairCheckItems==null){
+			List<NurseSiteMaintainConfigCheckItem> list=new ArrayList<NurseSiteMaintainConfigCheckItem>();
+			if(StringUtils.isNotEmpty(strTemp)){
+				JSONArray jsonArray=JSONObject.parseArray(strTemp);
+				for(int i=0;i<jsonArray.size();++i){
+					NurseSiteMaintainConfigCheckItem p=(NurseSiteMaintainConfigCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainConfigCheckItem.class);
+					if(StringUtils.isEmpty(p.getId())){
+						list.add(p);
+					}
+					//to be done
+					else if(!containsCheckItem(listWholeCheckItems,p)){
+						list.add(p);
+					}
+				}
+			}
+			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
+			p.setName("");
+			list.add(p);
+			listPairCheckItems=list;
+			checkSaveDisable();
+		}
+		return listPairCheckItems;
+	}
+
+	public void setListPairCheckItems(List<NurseSiteMaintainConfigCheckItem> listPairCheckItems) {
+		this.listPairCheckItems = listPairCheckItems;
+	}
 
 	public Integer getPerDayCount() {
 		return perDayCount;

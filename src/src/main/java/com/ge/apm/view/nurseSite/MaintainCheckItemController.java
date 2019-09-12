@@ -96,9 +96,16 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         		this.selected.setKey(date.getTime());
         	}
         	dao.save(this.selected);
+        	nurseSiteMaintainService.updateNurseSiteMaintainCheckItem(this.selected, this.selected.getSiteUID());
             WebUtil.addSuccessMessage("保存成功");
     	}
     	this.selected=null;
+    }
+    
+    @Override
+    public void delete() {
+    	// TODO Auto-generated method stub
+    	super.delete();
     }
 	
 	@Override
