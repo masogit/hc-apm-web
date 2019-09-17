@@ -84,6 +84,14 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     @Setter
     private String assetDeptName;
 
+    @Getter
+    @Setter
+    private String patientNum;
+
+    @Getter
+    @Setter
+    private String patientBedNum;
+
     private List<OrgInfo> leaseDeptList;
 
     @Getter
@@ -184,6 +192,8 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                         leaseDept.map(dept -> dept.getName()).ifPresent(reqDetail::setClinicalDeptName);
                         //记录下送到req_detail
                         reqDetail.setWillBeDelivered(this.willBeDelivered);
+                        reqDetail.setPatientNum(this.patientNum);
+                        reqDetail.setPatientBedNum(this.patientBedNum);
                         assetInfo.setSharedAssetReqDetail(reqDetail);
                     }
 
@@ -213,6 +223,8 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                     SharedAssetReqDetail reqDetail = sharedAssetBatchService.findReqDetailByAsset(assetInfo);
                     if(reqDetail != null) {
                         reqDetail.setChargingEndTime(this.batchChargingEndDate);
+//                        reqDetail.setPatientNum(this.patientNum);
+//                        reqDetail.setPatientBedNum(this.patientBedNum);
                         assetInfo.setSharedAssetReqDetail(reqDetail);
                         OrgInfo assetDept = orgInfoMap.get(assetInfo.getAssetDeptUID());
                         assetInfo.setAssetDeptOrg(assetDept);
@@ -383,6 +395,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
             result = reqDetail.validateChargingBeginTime() && reqDetail.validateChargingEndTime();
         }
         return result;
+    }
+
+    public Boolean isLogPatientInfoEnabled() {
+        return sharedAssetBatchService.isLogPatientInfoEnabled();
     }
 
     private Boolean validateAssetDept(AssetInfo assetInfo) {

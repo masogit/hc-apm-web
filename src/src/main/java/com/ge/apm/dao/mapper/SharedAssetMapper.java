@@ -66,7 +66,7 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
      */
     @Select("SELECT sard.voucher_num,sard.charging_begin_time, sard.charging_end_time," +
             "sard.unit_price,sard.charging_type,sard.starting_duration,sard.starting_price,sard.will_be_delivered," +
-            "sar.type " +
+            "sar.type, sard.patient_num, sard.patient_bed_num " +
             "FROM shared_asset_req_detail sard INNER JOIN shared_asset_request sar on sard.borrow_id=sar.id " +
             "WHERE (sard.charging_end_time is null or sard.charging_end_time > now()) ${ew.sqlSegment}")
     @Results({
@@ -78,7 +78,9 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
         @Result(column = "starting_duration", property = "startingDuration"),
         @Result(column = "starting_price", property = "startingPrice"),
         @Result(column = "will_be_delivered", property = "willBeDelivered"),
-        @Result(column = "type", property = "leaseRequest.type")
+        @Result(column = "type", property = "leaseRequest.type"),
+        @Result(column = "patient_num", property = "patientNum"),
+        @Result(column = "patient_bed_num", property = "patientBedNum")
     })
     List<SharedAssetReqDetail> findReqDetailByAsset(@Param("ew") Wrapper<AssetInfo> wrapper);
 

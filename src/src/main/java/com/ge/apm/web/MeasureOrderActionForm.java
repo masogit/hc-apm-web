@@ -24,17 +24,16 @@ public class MeasureOrderActionForm {
     Integer ruleLevel;
     String desc;
     String comments;
-    String measureOrderId;
+    String orderId;
     Integer measuringType;
     String applyTime;
 
-
-    public String getMeasureOrderId() {
-        return measureOrderId;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setMeasureOrderId(String measureOrderId) {
-        this.measureOrderId = measureOrderId;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public Integer getMeasuringType() {

@@ -149,19 +149,20 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
     }
 
-    public String getAuthenticateByUserPassword(String userName, String password) {
-        return doGetAuthenticateByUserPassword(userName, password, false); //password is in plain text
+    public String getAuthenticateByUserPassword(String userName, String password,String userAgent) {
+        return doGetAuthenticateByUserPassword(userName, password, false,userAgent); //password is in plain text
     }
 
-    public String getAuthenticateByUserPasswordEncrypted(String userName, String password) {
-        return doGetAuthenticateByUserPassword(userName, password, true); //password is already encrypted
+    public String getAuthenticateByUserPasswordEncrypted(String userName, String password,String userAgent) {
+        return doGetAuthenticateByUserPassword(userName, password, true,userAgent); //password is already encrypted
     }
 
-    public String doGetAuthenticateByUserPassword(String userName, String password, boolean isPasswordEncrypted) {
+    public String doGetAuthenticateByUserPassword(String userName, String password, boolean isPasswordEncrypted,String userAgent) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
-
+        headers.add("User-Agent",userAgent);
+        headers.add("request-source","legacy");
         Map<String, String> postParameters = new HashMap<String, String>();
         postParameters.put("loginName", userName);
         postParameters.put("password", password);

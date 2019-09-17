@@ -69,7 +69,7 @@
                                  var="item" widgetVar="varDataListDetail" 
                         selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                        lazy="true" rowKey="#{item.swapName.hashCode()}" 
+                        lazy="true" rowKey="#{item.id}"
                         sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
@@ -88,6 +88,12 @@
 <!--                    <p:column headerText="借用数" sortBy="#{item.actualQty}" filterBy="#{item.actualQty}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>-->
+                    <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                      <h:outputText value="#{item.patientNum}"/>
+                    </p:column>
+                    <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                      <h:outputText value="#{item.patientBedNum}"/>
+                    </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
@@ -128,7 +134,7 @@
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <!--<ui:include src="/portal/asset/selectAssetDialog.xhtml"/>-->
-         </div>  
+         </div>
         </div> 
 
     </ui:define>  

@@ -4,6 +4,7 @@ import com.ge.apm.domain.I18nMessage;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
@@ -42,4 +43,14 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     
     @Query(value = "select value_zh from i18n_message where msg_type = ?1",nativeQuery = true)
     List<String> findValueZHByType(String msgType);
+
+    List<I18nMessage> findByMsgTypeOrderById(String msgType);
+    public I18nMessage findByMsgTypeAndMsgKeyOrderById(String msgType, String msgKey);
+
+    public I18nMessage findFirstByMsgTypeAndValueZhAndSiteId(String msgType, String msgValue, int siteId);
+
+    @Query(value = "select max(to_number(msg_key, '999')) from i18n_message where msg_type = ?1 and site_id = ?2",nativeQuery = true)
+    public List<BigDecimal> getMaxMsgKeyByMsgTypeAndSiteId(String msgType, int siteId);
+
+    public I18nMessage findFirstByMsgTypeAndSiteIdOrderByMsgKeyDesc(String msgType, int siteId);
 }

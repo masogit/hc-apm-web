@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -25,12 +26,38 @@ public class MeasuringTypeConfig implements Serializable {
     @NotNull
     @Column(name = "measuring_item_category")
     private String measuringItemCategory;
-    @NotNull
+    @Column(name = "measuring_item_category_name")
+    private String measuringItemCategoryName;
     @Column(name = "measure_grade")
     private String measureGrade;
-    @NotNull
     @Column(name = "measure_cycle")
     private Integer measureCycle;
+
+    //上次计量日期
+    @Column(name = "last_metering_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date lastMeteringDate;
+
+    //下次计量日期
+    @Column(name = "next_metering_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date nextMeteringDate;
+
+    //责任人UID
+    @Column(name = "measure_owner_uid")
+    private String measureOwnerUid;
+
+    //责任人ID
+    @Column(name = "measure_owner_id")
+    private Integer measureOwnerId;
+
+    @JoinColumn(insertable=false,updatable=false, name = "measure_owner_uid", referencedColumnName = "uid")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JsonBackReference
+    private UserAccount measureOwner;
+
     @Column(name = "site_id")
     private Integer siteId;
     @Column(name = "hospital_id")
@@ -139,6 +166,54 @@ public class MeasuringTypeConfig implements Serializable {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Date getLastMeteringDate() {
+        return lastMeteringDate;
+    }
+
+    public void setLastMeteringDate(Date lastMeteringDate) {
+        this.lastMeteringDate = lastMeteringDate;
+    }
+
+    public Date getNextMeteringDate() {
+        return nextMeteringDate;
+    }
+
+    public void setNextMeteringDate(Date nextMeteringDate) {
+        this.nextMeteringDate = nextMeteringDate;
+    }
+
+    public String getMeasureOwnerUid() {
+        return measureOwnerUid;
+    }
+
+    public void setMeasureOwnerUid(String measureOwnerUid) {
+        this.measureOwnerUid = measureOwnerUid;
+    }
+
+    public Integer getMeasureOwnerId() {
+        return measureOwnerId;
+    }
+
+    public void setMeasureOwnerId(Integer measureOwnerId) {
+        this.measureOwnerId = measureOwnerId;
+    }
+
+    public UserAccount getMeasureOwner() {
+        return measureOwner;
+    }
+
+    public void setMeasureOwner(UserAccount measureOwner) {
+        this.measureOwner = measureOwner;
+    }
+
+    public String getMeasuringItemCategoryName() {
+        return measuringItemCategoryName;
+    }
+
+    public void setMeasuringItemCategoryName(String measuringItemCategoryName) {
+        this.measuringItemCategoryName = measuringItemCategoryName;
     }
 
     @Override

@@ -5,7 +5,6 @@
  */
 package com.ge.apm.domain;
 
-
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
@@ -524,4 +523,5 @@ public class SharedAssetRequest implements Serializable{
     public void setEffort(Double effort) {
         this.effort = effort;
     }
+
 }

@@ -1,0 +1,12 @@
+<#setting datetime_format="yyyy-MM-dd HH:mm:ss"/>
+<#setting date_format="yyyyMMdd">
+xmlMessage=<ESBEnvelope xmlns="http://ESB.TopSchemaV2">
+    <ESBHeader>
+        <HeaderControl AppCode="${body['appCode']}" Password="${body['password']}" MessageCategory="GetGEDevices" Version=""
+                       CreateTime="${body['time']?datetime}"/>
+    </ESBHeader>
+    <ESBBody>
+        <BusinessRequest>
+            <![CDATA[<QueryGEDeviceModel><TempCode>2e014ad8-5091-45bc-9a97-c5a4287243f1</TempCode><StartDate>${body['startDate']?date}</StartDate><EndDate>${body['endDate']?date}</EndDate><HospitalType></HospitalType><DeptCode></DeptCode></QueryGEDeviceModel>]]></BusinessRequest>
+    </ESBBody>
+</ESBEnvelope>

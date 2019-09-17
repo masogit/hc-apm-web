@@ -94,6 +94,10 @@ public class V2_WorkOrderService {
         return detailMeasuringDao.findByOrderId(woId);
     }
 
+    public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
+       return  stepDao.findResponsor(woId,step);
+    }
+
     public List<String> getSRListByStatus(List<Integer> status) {
         List<SearchFilter> srSearchFilters = new ArrayList();
         srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, status));
@@ -161,8 +165,8 @@ public class V2_WorkOrderService {
         return ucService.getAckerList(woId,"");
     }
 
-    public List<UserAccount> getApproverListByAsset(String assetUid) {
-        return ucService.getApproveList(assetUid);
+    public List<UserAccount> getApproverListByAsset(String assetUid,String name) {
+        return ucService.getApproveList(assetUid,name);
     }
 
     public AssetInfo getAssetInfo(Integer assetId) {
@@ -346,6 +350,13 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(4);
         formData.setAssigneeId(assigneeId);
         selectedWorkOrder.setCurrentStepName("维修中");
+        if(selectedWorkOrder.getStatusCloseTime()!=null) {
+            formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
+        }
+        if(selectedWorkOrder.getStatusStartTime()!=null) {
+            formData.setStatusStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusStartTime()));
+        }
+        formData.setSubStatus(selectedWorkOrder.getSubStatus());
         formData.setDesc(comments);
         formData.setAssetStatus(assetStatus.toString());
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
@@ -385,6 +396,15 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
+
+        if(selectedWorkOrder.getStatusCloseTime()!=null) {
+            formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
+        }
+        if(selectedWorkOrder.getStatusStartTime()!=null) {
+            formData.setStatusStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusStartTime()));
+        }
+        formData.setSubStatus(selectedWorkOrder.getSubStatus());
+
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());

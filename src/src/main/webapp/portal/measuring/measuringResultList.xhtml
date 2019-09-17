@@ -93,7 +93,7 @@
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
-                        <p:fileUpload id="measuringUploadFile" fileUploadListener="#{measureAssetListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                        <p:fileUpload id="measuringUploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                       multiple="true"  sizeLimit="100000000"  update="measuringUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                 </p:fieldset>

@@ -78,7 +78,12 @@
                     <p:column headerText="实际借用数" sortBy="#{item.actualQty}" >
                         <h:outputText value="#{item.actualQty}"/>
                     </p:column>
-                    
+                    <p:column headerText="病人号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <h:outputText value="#{item.patientNum}"/>
+                    </p:column>
+                    <p:column headerText="床号" rendered="#{sharedAssetRequestV2Controller.isLogPatientInfoEnabled()}">
+                        <h:outputText value="#{item.patientBedNum}"/>
+                    </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
@@ -131,7 +136,7 @@
                     
                     </p:dataTable>
                 </p:fieldset>
-                
+
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmit}" action="List?faces-redirect=true" value="确认借用" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 3}"/>
@@ -141,7 +146,7 @@
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-         </div>  
+         </div>
         </div>
 
     </ui:define>  

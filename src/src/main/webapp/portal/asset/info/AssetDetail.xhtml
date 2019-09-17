@@ -280,6 +280,11 @@
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                         </p:dataList>
                     </p:tab>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 'vlink')}">
+                        <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,'vlink')}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:link href="#{fileitem.extLink}" target="_blank">#{fileitem.objectName}</p:link>
+                        </p:dataList>
+                    </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
                         <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />
                     </p:tab>

@@ -35,6 +35,9 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
+                        <p:column headerText="报告号" sortBy="#{item.reportNum}" filterBy="#{item.reportNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.reportNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.contractType}" sortBy="#{item.contractType}" filterBy="#{item.contractType}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('contractInfoType', item.contractType)}"/>
                             <f:facet name="filter">

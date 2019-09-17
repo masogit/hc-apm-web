@@ -134,6 +134,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private UaaService uuaService;
 
     private StreamedContent assetTemplateFile;
+    private AssetLifecyleService assetLifecyleService;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -158,7 +159,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
         uuaService = WebUtil.getBean(UaaService.class);
-
+        assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
         this.selectedObject = new HashMap<>();
@@ -508,11 +509,12 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
         logger.info("Terminate: " + assetInfo.getUid());
         if (validateTermination(assetInfo)) return;
-
+        int originStatus = assetInfo.getStatus();
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
         dao.save(assetInfo);
+        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
     }
 

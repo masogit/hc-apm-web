@@ -7,15 +7,30 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="measuringTypeConfigEditDlg" widgetVar="measuringTypeConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{measuringTypeConfigController.CRUDActionName} 计量类型设置">
+        <p:dialog id="measuringTypeConfigEditDlg" widgetVar="measuringTypeConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{measuringTypeConfigController.CRUDActionName} 计量类型设置" height="370">
             <h:form id="measuringTypeConfigEditForm">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{measuringTypeConfigController.selected != null}">
 
-                    <h:panelGroup >
+                    <h:panelGroup>
+                        <label class="label">计量类别*</label>
+                        <p:autoComplete dropdown="true" value="#{measuringTypeConfigController.i18nMessage}"  scrollHeight="300" forceSelection="true" required="true" disabled="#{not empty measuringTypeConfigController.selected.id}"
+                                        completeMethod="#{measuringTypeConfigController.autoCompleteMeasuringItemCategory}" var="t" itemLabel="#{t.value}" itemValue="#{t}" converter="i18nMessageConverter">
+                        </p:autoComplete>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">责任人</label>
+                        <p:autoComplete dropdown="true" value="#{measuringTypeConfigController.selected.measureOwner}"
+                                        scrollHeight="250"  forceSelection="true" completeMethod="#{measuringTypeConfigController.autoCompleteOwner}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
+                        </p:autoComplete>
+                    </h:panelGroup>
+
+                    <!--<h:panelGroup >
                         <label class="label" >计量类别*</label>
                         <p:selectOneMenu id="measuringItemCategory" value="#{measuringTypeConfigController.selected.measuringItemCategory}"  required="true" requiredMessage="计量类别不能为空">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{measuringTypeConfigController.getmeasuringItemCategory()}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            <f:selectItems value="#{measuringTypeConfigController.measuringItemCategoryList}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
 
@@ -25,19 +40,28 @@
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>-->
+
+                    <h:panelGroup>
+                        <label class="label">最后计量日期</label>
+                        <p:calendar timeZone="GMT+8"  id="lastMeteringDate" pattern="yyyy/MM/dd" value="#{measuringTypeConfigController.selected.lastMeteringDate}" required="false" requiredMessage="最后计量日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">下次计量日期</label>
+                        <p:calendar timeZone="GMT+8"  id="nextMeteringDate" pattern="yyyy/MM/dd" value="#{measuringTypeConfigController.selected.nextMeteringDate}" required="false" requiredMessage="下次计量日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
 
-                    <h:panelGroup >
+                    <!--<h:panelGroup >
                         <label class="label">计量周期(月)*</label>
                         <p:inputNumber id="measureCycle"  decimalPlaces="0" minValue="1" maxValue="9999" value="#{measuringTypeConfigController.selected.measureCycle}" required="true" requiredMessage="计量周期不能为空">
                             <f:convertNumber pattern="0" type="number"/>
                         </p:inputNumber>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
 
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{measuringTypeConfigController.save}" update=":measuringTypeConfigEditDlg, :measuringTypeConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measuringTypeConfigEditDialog');"/>
-
+                <!--<p:commandButton validateClient="true" value="#{msg.Save}" action="#{measuringTypeConfigController.save}" update=":measuringTypeConfigEditDlg, :measuringTypeConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measuringTypeConfigEditDialog');"/>-->
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{measuringTypeConfigController.saveMeasuringTypeConfig}" update=":growl" icon="ui-icon-check"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('measuringTypeConfigEditDialog').hide()"/>
             </h:form>
         </p:dialog>

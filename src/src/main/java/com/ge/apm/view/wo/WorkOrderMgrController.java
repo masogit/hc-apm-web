@@ -15,6 +15,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -40,7 +41,9 @@ import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpSession;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -60,6 +63,16 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
     private SupplierController supplierController;
+    @Setter @Getter
+    Double c_woManhourPrice =0d;
+    @Setter @Getter
+    Double c_repairManCost=0d;
+    @Setter @Getter
+    Date statusStartTime;
+    @Setter @Getter
+    Date statusCloseTime;
+    @Setter @Getter
+    private Double c_repairTotalCost=0d;
     MvsAssetInfo mvsAssetInfo;
     @Setter @Getter
     private Supplier newSupplier;
@@ -100,6 +113,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private AssetInfo selectedAsset;
     private String assetStatus;
     private Integer currentStatus = 1;
+    private Integer subStatus =1;
     private Boolean needConfirmTime = false;
     private String cancelReason;
     private String stepFileter;
@@ -206,7 +220,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         this.filterByHospital = false;
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         List<I18nMessage> ix2 = FieldValueMessageController.getFieldValueListByMsgType("woSteps");
-ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
+        ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.getMsgKey())));
         loadClinicalDeptList();
     }
 
@@ -214,13 +228,21 @@ ix2.stream().forEach(item->woStatus.put(item.getValueZh(),Integer.parseInt(item.
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
-public void partsPriceUpdate(){
+    public void partsPriceUpdate(){
         if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
             itemDetail.setClosedPrice(itemDetail.getPartsPrice());
         }
 }
 
-
+   /* public boolean displayTime(){
+       if(subStatus==1)
+            return true;
+       else
+           return false;
+    }
+*/
+    @Getter @Setter
+    public boolean displayTime=false;
 
     public UserAccount getUa1() {
         return ua1;
@@ -242,18 +264,32 @@ public void partsPriceUpdate(){
 //        res.sort(new PinYinComparatorByName());
         return res;
     }
-public void repairResultSet(){
-    if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
-    currentStatus =1;
-}
-    else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
-        currentStatus =3;
-    } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
-        currentStatus =4;
-    }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){ 
-        currentStatus =3;
+
+    public void repairResultSet(){
+        if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
+            currentStatus =1;
+        }
+        else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("2")){
+            currentStatus =3;
+        } else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("3")){
+            currentStatus =4;
+        }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){
+            currentStatus =3;
+        }
     }
-}
+    public void selectSubstatus(){
+        if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+            subStatus =1;
+            displayTime=true;
+        }
+        else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+            subStatus =2;
+            displayTime=false;
+        } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
+            subStatus =3;
+            displayTime=false;
+        }
+    }
 
     public void closePrcieUpdate(){
             itemDetail.setClosedPrice(itemDetail.getClosedPrice());
@@ -814,6 +850,20 @@ public void repairResultSet(){
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
+   public String getRepairResponer(String woId,Integer step){
+        if("ff8080816bff3570016bff9458830001".equalsIgnoreCase(woId)){
+            System.out.println();
+        }
+      List <V2_WorkOrder_Step >vs=null;
+        vs =woService.getWorkOrderDetailResponsor(woId,step);
+        if(vs !=null && vs.size()>0){
+                return vs.get(0).getOwnerName();
+        }else {
+            return "";
+        }
+
+   }
+
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
@@ -864,8 +914,9 @@ public void repairResultSet(){
         attachList = new ArrayList<V2_BlobObject>();
     }
 
-    public void prepareAproval(String woid) {
-        prepareAct(woid);
+    public void prepareAproval(V2_WorkOrder v2WorkOrder) {
+        submitForApproveCost(v2WorkOrder);
+        prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
         approvedDetails.stream().forEach(item -> {
@@ -907,10 +958,16 @@ public void repairResultSet(){
 
     private Boolean hourRequired;
 
+
     public void prepareCompleteOrder(String woid) {
 
         selectedWorkOrder = dao.findById(woid);
         acker=woService.getAckerList(selectedWorkOrder.getId());
+        //如果子状态为1 说明是等待备件 需要显示日期
+
+       if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
+           displayTime=true;
+       }
         Integer userId = selectedWorkOrder.getAckId();
        if( userId!=null){
           ua1 = userDao.getById(userId);
@@ -919,22 +976,15 @@ public void repairResultSet(){
 
        }
 
-
-
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
-           if (result.equalsIgnoreCase("2")) {
+           if (result.equalsIgnoreCase("2")||result.equalsIgnoreCase("4")) {
                currentStatus = 3;
-
            }
            if (result.equalsIgnoreCase("3")) {
                currentStatus = 4;
-
            }
 
-           if (result.equalsIgnoreCase("4")) {
-               currentStatus = 3;
-           }
            if (result.equalsIgnoreCase("1")) {
                currentStatus = 1;
 
@@ -947,15 +997,46 @@ public void repairResultSet(){
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
+
+
+
         if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
+        statusStartTime=selectedWorkOrder.getStatusStartTime();
+        statusCloseTime=selectedWorkOrder.getStatusCloseTime();
       //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
+
+    }
+
+    //  提交审核前的计算
+    private  void submitForApproveCost(V2_WorkOrder v2WorkOrder){
+        accessoryList = getWorkOrderDetail(v2WorkOrder.getId());
+        coWorkerList = getWorkOrderCoworker(v2WorkOrder.getId());
+
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                v2WorkOrder.getAssetId());
+        c_woManhourPrice=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data")).map(data -> (Double) data.get("woManhourPrice")).orElse(new Double(0));
+        Double tHours = coWorkerList.stream().mapToDouble(p->p.getManHours()).sum();
+        //维修人工费用=工单人工费用（元/小时）*总计工时（“工单人工费用”需在流程配置项中配置），若未配置则按照0计算
+        //总计工时=维修工程师工时+协作者工时
+
+        c_repairManCost=c_woManhourPrice*(tHours+v2WorkOrder.getManHours());
+        //备件费用
+        Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()*p.getApartsQuantity()).sum();
+        //维修总金额=备件费用+维修人工费用+外部费用+其他费用
+        if(v2WorkOrder.getOtherExpense()==null){
+            v2WorkOrder.setOtherExpense(0.0);
+        }
+        if(v2WorkOrder.getExternalExpense()==null){
+            v2WorkOrder.setExternalExpense(0.0);
+        }
+        c_repairTotalCost = accPrice+c_repairManCost+v2WorkOrder.getExternalExpense()+v2WorkOrder.getOtherExpense();
     }
 
     public void saveRepairWorkOrder() {
@@ -976,8 +1057,23 @@ public void repairResultSet(){
         accessoryList.forEach(item -> item.setCreatedDate(null));
         if (!attachList.isEmpty())
             picList.addAll(attachList);
+        updateSelectedWorkOrder(selectedWorkOrder);
         woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
+    }
+
+    private void updateSelectedWorkOrder(V2_WorkOrder v2_workOrder){
+        if(subStatus==ApmConstant.SUBSTATUS1) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS1);
+            selectedWorkOrder.setStatusStartTime(statusStartTime);
+            selectedWorkOrder.setStatusCloseTime(statusCloseTime);
+        }
+        if(subStatus==ApmConstant.SUBSTATUS2) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS2);
+        }
+        if(subStatus==ApmConstant.SUBSTATUS3) {
+            selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS3);
+        }
     }
 
     public List<UserAccount> getWorkerList() {
@@ -1069,6 +1165,8 @@ public void repairResultSet(){
         accessoryList.forEach(item -> item.setCreatedDate(null));
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
+        //更新维修子状态
+        updateSelectedWorkOrder(selectedWorkOrder);
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
@@ -1533,9 +1631,11 @@ public void repairResultSet(){
         return true;
     }
 
-    public List<UserAccount> getApproverList() {
-        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid());
+    public List<UserAccount> getApproverList(String name) {
+        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
     }
+
+    public void setNothing(){}
 
     //getter and setter
     public Integer getQueryIndex() {
@@ -1945,6 +2045,14 @@ public void repairResultSet(){
         }else{
             return mvsAssetInfo;
         }
+    }
+
+    public Integer getSubStatus() {
+        return subStatus;
+    }
+
+    public void setSubStatus(Integer subStatus) {
+        this.subStatus = subStatus;
     }
 }
 

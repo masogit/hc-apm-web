@@ -6,7 +6,7 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
-              draggable="true" appendTo="@this" header="#{msg.Supplier}">
+              draggable="true" appendTo="@this" header="供应商信息">
         <h:form id="SupplierEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
@@ -38,14 +38,14 @@
                         <label class="label">#{msg.tel}</label>
                         <p:inputText id="tel" value="#{assetInfoEditController.newSupplier.tel}"/>
                     </h:panelGroup>
-                    <h:panelGroup class="test1">
+                    <h:panelGroup class="typepanel">
                         <label class="label">类型*</label>
                         <h:panelGrid columns="3">
                             <h:panelGrid columns="3">
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox id="wxs" value="#{assetInfoEditController.newSupplier.maintainerT}"/>
-                                        <p:outputLabel value="维修商 "/>
+                                        <p:outputLabel value="维修商"/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -72,7 +72,7 @@
                                  actionListener="#{assetInfoEditController.saveNewSupplier}"
                                  value="#{msg.Save}"
                                  icon="ui-icon-check"
-                                 update=":growl"
+                                 update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) :growl"
                                  oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
                <!-- <p:commandButton validateClient="true"
                                  actionListener="#{assetInfoEditController.saveNewSupplier}"

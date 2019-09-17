@@ -18,8 +18,11 @@ public class CustomConfigConstant {
     private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
-    public static final String DEFAULT_MOBILE_PAGE_JSON = "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"siteUID\",\"clinicalDeptName\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
+    public static final String DEFAULT_MOBILE_PAGE_JSON =
+            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"orgPath\",\"clinicalDeptName\",\"locationName\",\"assetLocation\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";
 
+   /* public static final String DEFAULT_MOBILE_PAGE_JSON =
+            "{\"pageWorkOrder\":{\"group\":[{\"type\":\"assetInfo\",\"show\":true,\"assetInfoFields\":[\"departNum\",\"name\",\"functionType\",\"status\",\"clinicalDeptName\",\"locationName\",\"serialNum\",\"financingNum\",\"qrCode\",\"assetGroup\",\"factoryWarrantyDate\",\"installDate\"]},{\"type\":\"orderFields\",\"show\":true,\"priority\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true},\"assetStatus\":{\"defaultValue\":\"3\",\"enable\":true,\"required\":true}},{\"type\":\"descriptions\",\"show\":true,\"attachments\":{\"enable\":true,\"required\":false},\"voiceAttachment\":{\"enable\":true,\"required\":false},\"voiceOrReasonRequired\":true,\"requestReason\":{\"defaultValue\":\"\",\"enable\":true,\"required\":false}}]}}";*/
     
     //默认不使用的字段
     static public List<String> getExtFields() {
@@ -48,7 +51,7 @@ public class CustomConfigConstant {
         return Arrays.asList("AssetHead", "AssetStaff");
     }
 
-    public static Map<String, String> getExportFields() {
+    public synchronized static Map<String, String> getExportFields() {
         if (null == exportFields) {
             exportFields = new LinkedHashMap();
             exportFields.put("设备编号", "departNum");
@@ -140,7 +143,7 @@ public class CustomConfigConstant {
         return exportFields;
     }
 
-    static public LinkedHashMap<String, String> getAllFields() {
+     public static synchronized LinkedHashMap<String, String> getAllFields() {
         if (null == allFields) {
             allFields = new LinkedHashMap();
             allFields.put("serialNum", WebUtil.getMessage("serialNum"));
@@ -218,6 +221,10 @@ public class CustomConfigConstant {
             allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
             allFields.put("createdDate", WebUtil.getMessage("createdDate"));
             allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
+            allFields.put("measuringOwner", WebUtil.getMessage("measuringOwner"));
+            allFields.put("orgPath", WebUtil.getMessage("orgPath"));
+            allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
+
         }
         return allFields;
     }
