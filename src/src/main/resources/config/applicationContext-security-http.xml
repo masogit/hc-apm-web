@@ -81,6 +81,7 @@
         <intercept-url pattern="/portal/metering/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 计量管理 -->
         <intercept-url pattern="/portal/qc/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 质控管理 -->
         <intercept-url pattern="/portal/adverseEvent/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 不良事件上报 -->
+        <intercept-url pattern="/portal/analysis/mt.xhtml**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/><!-- 计量模板 -->
 
         <!-- 知识文档 -->
         <intercept-url pattern="/portal/asset/fileAttachment/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff')"/> <!-- 文档管理 -->

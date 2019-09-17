@@ -77,10 +77,11 @@
 
               <!--  <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.config')}"/>-->
                 <p:menuitem id="um404" value="计量工作台" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.console')}"/>
-                <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.accessContains('measure.categoryConfig')}"/>
+                <p:menuitem id="um305" value="计量类别设置" url="#{facesContext.externalContext.requestContextPath}/portal/analysis/mt.xhtml#/list" rendered="#{userContextService.accessContains('measure.categoryConfig')}"/>
                 <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml" rendered="#{userContextService.accessContains('measure.info')}"/>
                 <p:menuitem id="um402" value="#{msg.MeasureOrderRule}" outcome="/portal/measureOrderRule/List.xhtml" rendered="#{userContextService.accessContains('measure.rule')}"/>
                 <p:menuitem id="um403" value="资产规则管理" outcome="/portal/measureOrderRule/relMeasureRule/List.xhtml" rendered="#{userContextService.accessContains('measure.ruleMgt')}"/>
+                <p:menuitem id="um406" value="计量报告模板管理" url="#{facesContext.externalContext.requestContextPath}/portal/analysis/mt.xhtml#/list" rendered="#{userContextService.accessContains('measure.templateMgt')}"/>
             </p:submenu>
             <p:submenu id="um70" label="临床助手" icon="fa fa-file-excel-o" rendered="#{userContextService.accessContains('nurseSite')}">
                        <p:menuitem id="um701" value="日常检查" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.maintain')}"/>
