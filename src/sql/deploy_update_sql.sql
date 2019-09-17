@@ -396,3 +396,6 @@ CREATE INDEX "nurseSiteMaintainItemParentId"
     ON public.nurse_site_maintain_item USING btree
     (parent_id ASC NULLS LAST)
     TABLESPACE pg_default;
+
+DROP INDEX IF EXISTS nurseSiteMaintainDataParentId;
+DROP INDEX IF EXISTS nurseSiteMaintainItemParentId;
