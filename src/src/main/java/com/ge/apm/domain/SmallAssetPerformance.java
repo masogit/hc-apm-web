@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -72,6 +71,39 @@ public class SmallAssetPerformance implements Serializable {
 
 	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
 	private String siteUID;
+
+	@Column(name = "group_name")
+	private String groupName;
+
+	@Column(name = "group_code")
+	private String groupCode;
+
+	@Column(name = "pre_exam_department")
+	private String preExamDepartment;
+
+	@Column(name = "pre_exam_department_code")
+	private String preExamDepartmentCode;
+
+	@Column(name = "hospital_name", columnDefinition = "CHAR(32)")
+	private String hospitalName;
+
+	@Transient
+	private Double inpatientCount;
+
+	@Transient
+	private Double inpatientRevenue;
+
+	@Transient
+	private Double outpatientCount;
+
+	@Transient
+	private Double outpatientRevenue;
+
+	@Transient
+	private Double emergencyCount;
+
+	@Transient
+	private Double emergencyRevenue;
 
 	@Transient
 	private Integer excelIdex;
@@ -221,6 +253,94 @@ public class SmallAssetPerformance implements Serializable {
 		this.excelIdex = excelIdex;
 	}
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public String getPreExamDepartment() {
+        return preExamDepartment;
+    }
+
+    public void setPreExamDepartment(String preExamDepartment) {
+        this.preExamDepartment = preExamDepartment;
+    }
+
+	public String getPreExamDepartmentCode() {
+		return preExamDepartmentCode;
+	}
+
+	public void setPreExamDepartmentCode(String preExamDepartmentCode) {
+		this.preExamDepartmentCode = preExamDepartmentCode;
+	}
+
+	public Double getInpatientCount() {
+		return inpatientCount;
+	}
+
+	public void setInpatientCount(Double inpatientCount) {
+		this.inpatientCount = inpatientCount;
+	}
+
+	public Double getInpatientRevenue() {
+		return inpatientRevenue;
+	}
+
+	public void setInpatientRevenue(Double inpatientRevenue) {
+		this.inpatientRevenue = inpatientRevenue;
+	}
+
+	public Double getOutpatientCount() {
+		return outpatientCount;
+	}
+
+	public void setOutpatientCount(Double outpatientCount) {
+		this.outpatientCount = outpatientCount;
+	}
+
+	public Double getOutpatientRevenue() {
+		return outpatientRevenue;
+	}
+
+	public void setOutpatientRevenue(Double outpatientRevenue) {
+		this.outpatientRevenue = outpatientRevenue;
+	}
+
+	public Double getEmergencyCount() {
+		return emergencyCount;
+	}
+
+	public void setEmergencyCount(Double emergencyCount) {
+		this.emergencyCount = emergencyCount;
+	}
+
+	public Double getEmergencyRevenue() {
+		return emergencyRevenue;
+	}
+
+	public void setEmergencyRevenue(Double emergencyRevenue) {
+		this.emergencyRevenue = emergencyRevenue;
+	}
+
+	public String getHospitalName() {
+		return hospitalName;
+	}
+
+	public void setHospitalName(String hospitalName) {
+		this.hospitalName = hospitalName;
+	}
+
 	public String getStatusDisplay() {
 		if (this.status != null) {
 			String result = "";
@@ -308,5 +428,27 @@ public class SmallAssetPerformance implements Serializable {
 	@Override
 	public String toString() {
 		return "com.ge.apm.domain.SmallAssetPerformance[ id=" + id + " ]";
+	}
+
+	public String print() {
+		return "SmallAssetPerformance{" +
+				"department='" + department + '\'' +
+				", costType='" + costType + '\'' +
+				", code='" + code + '\'' +
+				", standard=" + standard +
+				", quantity=" + quantity +
+				", amount=" + amount +
+				", happenDate=" + happenDate +
+				", groupName='" + groupName + '\'' +
+				", groupCode='" + groupCode + '\'' +
+				", preExamDepartment='" + preExamDepartment + '\'' +
+				", preExamDepartmentCode='" + preExamDepartmentCode + '\'' +
+				", inpatientCount=" + inpatientCount +
+				", inpatientRevenue=" + inpatientRevenue +
+				", outpatientCount=" + outpatientCount +
+				", outpatientRevenue=" + outpatientRevenue +
+				", emergencyCount=" + emergencyCount +
+				", emergencyRevenue=" + emergencyRevenue +
+				'}';
 	}
 }

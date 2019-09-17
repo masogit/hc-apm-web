@@ -123,7 +123,7 @@
                             <p:commandButton class="dispatchOrderButton" value="派工" disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
                         <!--待接单 3-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==3}" exportable="false">
+                        <p:column headerText="操作" width="10" rendered="#{v2PmOrderController.queryIndex==3}" exportable="false">
 
                             <p:commandButton  class="completeButton" value="完成" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
    <!--v2PmOrderController.isChecked()加了后 一选中了checkbox 接单按钮就会灰掉 保证不能即批量又单个接单-->
@@ -138,8 +138,8 @@
                         </p:column>
 
                         <!--已计划 0-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">
-                            <p:commandButton value="保养" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                        <p:column headerText="操作" width="10" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">
+                            <p:commandButton value="保养"  class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
                             <p:commandButton value="转单" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
@@ -148,7 +148,7 @@
 
 
                         <!--待审核 8-->
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}" exportable="false">
+                        <p:column headerText="操作" width="" rendered="#{v2PmOrderController.queryIndex==8}" exportable="false">
                             <p:commandButton value="审核" actionListener="#{v2PmOrderController.prepareAproval(item.id)}" update="@(.pmapproveDialogCls)" oncomplete="PF('pmapproveDialog').show()"/>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}" exportable="false">
@@ -168,7 +168,7 @@
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="批量接单"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
                                 </p:commandButton>
 
-                                <!--<p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.batchTransfer()}" oncomplete="PF('transferOrderDialog').show()">
+                                <!--<p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminate   d" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.batchTransfer()}" oncomplete="PF('transferOrderDialog').show()">
                                 </p:commandButton>-->
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
                                 </p:commandButton>
@@ -330,7 +330,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
@@ -358,7 +358,7 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                <p:fileUpload id="type" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureListBatch" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 <h:panelGroup>
                     <p:commandButton rendered="true" validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认批量关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialogBatch');"/>
                     <p:commandButton immediate="true" value="取消" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialogBatch').hide()"/>

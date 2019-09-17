@@ -93,6 +93,9 @@ public class AssetTagService {
             if (null != queryAsset.getAssetGroup()) {
                 assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
             }
+            if (null != queryAsset.getFunctionType()) {
+                assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+            }
 
             //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
             Pageable pageable = new PageRequest(0, 5000);

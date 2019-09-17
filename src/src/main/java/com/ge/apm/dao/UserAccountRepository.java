@@ -144,6 +144,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     List<UserAccount> findByTenantUIDAndName(String tenantUid, String name);
 
+    List<UserAccount> findByTenantUID(String tenantUid);
+
     @Transactional
     @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where tenant_uid = ?1",nativeQuery=true)
@@ -190,5 +192,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
+
+    int deleteUserAccountsByTenantUID(String tenantUid);
+    int countUserAccountsByTenantUID(String tenantUid);
 
 }

@@ -91,4 +91,9 @@ public class CustomConfigAssetField {
         this.arrivalRequired = arrivalRequired;
     }
 
+    @Override
+    public String toString() {
+        return key;
+    }
+
 }

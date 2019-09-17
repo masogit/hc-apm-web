@@ -200,7 +200,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'clinicalDeptName'}">
-                                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                                <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" width="100">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"
@@ -551,7 +551,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'purchasePrice'}">
-                                <p:column  headerText="#{msg.purchasePrice}" >
+                                <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
                                     <h:outputText value="#{item.purchasePrice}"/>
                                 </p:column>
                             </c:if>

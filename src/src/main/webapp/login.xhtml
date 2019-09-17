@@ -26,6 +26,7 @@
             <h:outputStylesheet name="css/main2.css" />
             <h:outputScript name="js/ripple.js" library="ultima-layout" />
             <h:outputScript name="js/layout.js" library="ultima-layout" />
+            <script type="text/javascript" src="resources/js/main.js"></script>
             <f:metadata>
                 <f:viewParam name="session_expired" value="#{loginController.sessionExpired}" />
             </f:metadata>
@@ -88,6 +89,23 @@
             </style>
             <script type="text/javascript" src="resources/bower_components/lscache/lscache.js"></script>
             <h:outputScript>
+
+                var __encode =_0xb483=["ge","ge"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox4402c=["\x76\x61\x6C\x75\x65","\x6A\x5F\x70\x61\x73\x73\x77\x6F\x72\x64","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64"];function handleUpdateFormValue(){var _0x2864x2=document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]];document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]]= encryptAES(_0x2864x2)}
+                var __encode =_0xb483=["ge","ge"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox44034=["\x76\x61\x6C\x75\x65","\x70\x61\x73\x73\x77\x6F\x72\x64\x31","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x70\x61\x73\x73\x77\x6F\x72\x64\x32"];function updatePwd_r(){var _0xfca9x2=document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]];var _0xfca9x3=document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]];document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]]= encryptAES(_0xfca9x2);document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]]= encryptAES(_0xfca9x3)}
+
+                function handleComplete() {
+                    document.getElementById("j_password").value = "";
+                    document.getElementById("j_password").html = "";
+                }
+
+                function handleComplete_r() {
+                    document.getElementById("password1").value = "";
+                    document.getElementById("password2").value = "";
+
+                    document.getElementById("password1").html = "";
+                    document.getElementById("password2").html = "";
+                }
+
                 // clear local storage when logged out
                 var match = location.search.match(/uid=(\d+)/);
                 if(match) {
@@ -114,6 +132,7 @@
                         PF("dlgResetPassword").show();
                     }
                 }
+
             </h:outputScript>
         </h:head>
 
@@ -140,7 +159,7 @@
                             <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                         </div>
                         <div class="ui-g-12" style="margin-bottom: 0px;">
-                            <p:commandButton onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl"/>
+                            <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
                         </div>
                     </div>
                 </div>
@@ -191,13 +210,13 @@
                         </p:panelGrid>
                     </p:fieldset>
                     <br/>
-                    <p:commandButton value="#{msg.Confirm}" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl"/>
+                    <p:commandButton value="#{msg.Confirm}" onclick="updatePwd_r();" validateClient="true" id="btnResetPassword" actionListener="#{loginController.resetPassword()}" update=":growl" oncomplete="handleComplete_r();"/>
                     <p:commandButton value="#{msg.Cancel}" immediate="true" process="@this" type="button" onclick="PF('dlgResetPassword').hide()"/>
                 </h:form>
             </p:dialog>
             
             <div id="bottom_container" class="bottom-ctner">
-                <table align="right"><tr><td><img src="resources/img/ChinaTelecom.png"/></td><td>ICP证号: 沪ICP备05002432号</td></tr></table>
+                <table align="right"><tr><td>ICP证号: 沪ICP备05002432号</td></tr></table>
             </div>
         </h:body>
     </html>

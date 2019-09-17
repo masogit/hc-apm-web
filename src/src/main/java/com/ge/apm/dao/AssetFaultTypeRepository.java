@@ -12,6 +12,8 @@ public interface AssetFaultTypeRepository extends GenericRepository<AssetFaultTy
 
     public List<AssetFaultType> getByAssetGroupId(Integer assetGroupId);
 
+    public List<AssetFaultType> getByAssetGroupIdOrderById(Integer assetGroupId);
+
     @Query(value = "select fault_name from asset_fault_type where id = :id",nativeQuery = true)
     public String getCaseTypeName(@Param("id") Integer id);
 

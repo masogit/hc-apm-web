@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+         http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+    <bean id="callEsbTool" class="com.ge.apm.edgeserver.sysutil.CallEsbTool"/>
+    <routeContext id="route_mdm" xmlns="http://camel.apache.org/schema/spring">
+        <route id="mdm_output">
+            <from uri="sql:select * from asset_performance_record_delta where upload_status='N' and create_time>=current_date + integer '-30' limit 30?consumer.delay=60000&amp;maxMessagesPerPoll=30"/>
+            <doTry>
+                <removeHeaders pattern="*"/>
+                <bean ref="callEsbTool" method="putServerKey"/>
+                <log message="${body}"/>
+                <setHeader headerName="id">
+                    <simple>${body[id]}</simple>
+                </setHeader>
+                <to uri="freemarker:soapAssetPerformanceTemplate.xml"/>
+                <setHeader headerName="SOAPAction">
+                    <constant>"uploadAssetPerformanceRecord"</constant>
+                </setHeader>
+                <setHeader headerName="Content-Type">
+                    <constant>text/xml; charset=utf-8</constant>
+                </setHeader>
+                <setHeader headerName="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+
+                <toD uri="{{APMCloudUrlSIT}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false"/>
+
+                <setBody>
+                    <simple>${bodyAs(String)}</simple>
+                </setBody>
+
+                <choice>
+                    <when>
+                        <simple>${body} not contains 'soap:Fault'</simple>
+                        <to uri="sql:update asset_performance_record_delta set upload_status='Y', upload_time=current_timestamp where upload_status='N' and id=:#id"/>
+                    </when>
+                    <when>
+                        <simple>${body} contains 'soap:Fault'</simple>
+                        <log message="*** uploadAssetPerformanceRecord Error, message body contains fault: ${body}"
+                             loggingLevel="ERROR"/>
+                        <setHeader headerName="errMsg">
+                            <simple>${body}</simple>
+                        </setHeader>
+                        <to uri="sql:update asset_performance_record_delta set upload_status='E', upload_time=current_timestamp,err_msg=:#errMsg where upload_status='N' and id=:#id"/>
+                    </when>
+                </choice>
+                <doCatch>
+                    <exception>java.lang.Exception</exception>
+                    <setHeader headerName="errMsg">
+                        <simple>${exception.message}</simple>
+                    </setHeader>
+                    <log message="*** uploadAssetPerformanceRecord Error, message: ${headers.errMsg}"
+                         loggingLevel="ERROR"/>
+                    <to uri="sql:update asset_performance_record_delta set upload_status='E', upload_time=current_timestamp, err_msg=:#errMsg where upload_status='N' and id=:#id"/>
+                </doCatch>
+            </doTry>
+        </route>
+
+        <route id="mdm_input">
+            <from uri="timer://mdmInput?fixedRate=true&amp;period=120000"/>
+            <!--            <bean ref="callEsbTool" method="mockResponse"/>-->
+            <bean ref="callEsbTool" method="setQueryDate"/>
+            <log message="${headers}"/>
+            <choice>
+                <when>
+                    <simple>${headers.queryDate} != null</simple>
+                    <bean ref="callEsbTool" method="getRequest"/>
+                    <log message="${body}"/>
+                    <doTry>
+                        <to uri="freemarker:mdmRequestTemplate.xml"/>
+                        <log message="${body}"/>
+                        <bean ref="callEsbTool" method="callEsb"/>
+                        <log message="${body}"/>
+                    </doTry>
+                    <bean ref="callEsbTool" method="save"/>
+                </when>
+                <when>
+                    <simple>${headers.queryDate} == null</simple>
+                    <log message="no queryDate"/>
+                </when>
+            </choice>
+        </route>
+
+        <route id="purgeMdmData">
+            <from uri="timer://purgeClinicalData?fixedRate=true&amp;period=1200000"/>
+            <to uri="sql:delete from asset_performance_record_delta where create_time &lt; current_date + integer '-360'"/>
+        </route>
+
+    </routeContext>
+</beans>

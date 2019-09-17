@@ -54,10 +54,12 @@ public enum GatewayURL {
     MEASURE_ORDER_ACTION("/hcapmworkflowservice/api/apm/measuringOrders/{orderId}/action"),
     MEASURE_REQUEST_CREATE("/hcapmworkflowservice/api/apm/measuringOrders"),
     MEASURE_GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/measuringOrders/{assetUid}/approver"),
-    MEASURE_ORDER_STEPS("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/OrderSteps"),
+    MEASURE_ORDER_STEPS("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/orderSteps"),
     MEASURE_CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     MEASURE_CANCEL_MEASURE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/{OrderId}/cancel"),
     MEASURE_BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
+    //批量取消
+    PM_BATCH_CANCEL("/hcapmworkflowservice/api/apm/pmOrders/cancel"),
     // User Schedule
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
@@ -66,6 +68,10 @@ public enum GatewayURL {
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
     ACCESSDEL("/hcapmassetservice/api/apm/asset/workOrderDetails/{id}"),
+
+    ACCESSAD_MEASURING("/hcapmassetservice/api/apm/asset/MeasuringOrderDetails/{assetUid}"),
+    ACCESSDEL_MEASURING("/hcapmassetservice/api/apm/asset/MeasuringOrderDetails/{id}"),
+
     // Allocation Center URLs
     SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
     ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList?requestId={requestId}"),

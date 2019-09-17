@@ -16,6 +16,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -25,6 +28,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.util.B64Code;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +74,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private ApplicationEventPublisher applicationEventPublisher;
     private MicroServiceUtil msUtil;
     private GeSsoService geSsoService;
+    private TenantInfoRepository tenantInfoDao;
     
     protected UserAccount user;
 
@@ -82,6 +87,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     @PostConstruct
     private void init() {
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         geSsoService = WebUtil.getBean(GeSsoService.class);
         WebApplicationContext ctx = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
         usernamePasswordAuthenticationFilter = ctx.getBean(UsernamePasswordAuthenticationFilter.class);
@@ -119,7 +125,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         return plainPassword;
     }
 
-    protected void afterLogin(UserAccount originUser) {
+    protected void afterLogin(UserAccount originUser,String userAgent) {
 
     }
 
@@ -138,6 +144,16 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             return;
         Cookie cookie = new Cookie("Authorization", data.getString("id_token"));
         res.addCookie(cookie);
+    }
+
+    protected boolean isFirstTimeLogin(UserAccount user) {
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+
+        if (user.getPassword().equals(tenantInfo.getInitialPassword()) && user.getPwdSalt().equals(tenantInfo.getInitialPasswordSalt())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public String requestPost(String url, String body) {
@@ -241,7 +257,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
         String userName = request.getParameter("j_username");
-        String passwordPlain = request.getParameter("j_password");
+        //String passwordPlain = request.getParameter("j_password");
+        String tempPasswordPlain = request.getParameter("j_password");
+        //String passwordPlain = B64Code.decode(tempPasswordPlain, "utf-8");
+        String passwordPlain = UserContextService.decryptData(tempPasswordPlain);
 
         if ("".equals(userName) || userName == null) {
             userName = request.getParameter("input_j_username");
@@ -335,7 +354,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-            afterLogin(user);
+            String userAgent = request.getHeader("User-Agent");
+            afterLogin(user,userAgent);
             updateLoginStatus(user.getLoginName(), true);
 			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
 			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/

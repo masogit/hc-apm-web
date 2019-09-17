@@ -59,7 +59,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 @Service
 public class UserAccountImportService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String HEADER_INSTITUTION="所属集团*";
+	private static final String HEADER_INSTITUTION="所属集团";
 	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
 	private static final String HEADER_DEPARTMENT="科室1";
@@ -837,10 +837,10 @@ public class UserAccountImportService {
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
 				
-				if(StringUtils.isEmpty(institution)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
-					pass=false;
-				}
+//				if(StringUtils.isEmpty(institution)){
+//					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
+//					pass=false;
+//				}
 				
 				if(StringUtils.isEmpty(loginName)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"登录名不能为空;");
@@ -857,6 +857,18 @@ public class UserAccountImportService {
 				if(StringUtils.isEmpty(strLocked)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_LOCKED,"锁定值不能为空;");
 					pass=false;
+				}
+				if(StringUtils.isNotEmpty(department3)){
+					if(StringUtils.isEmpty(department2)){
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
+						pass=false;
+					}
+				}
+				if(StringUtils.isNotEmpty(department2)){
+					if(StringUtils.isEmpty(department)){
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
+						pass=false;
+					}
 				}
 				if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
 					newUser.setEmail(null);
@@ -900,16 +912,25 @@ public class UserAccountImportService {
 			updateUser(user);
 			return;
 		}
-		user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//TODO nickName
 		try {
+            if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
+                user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+                user.entryptPassword();
+                user.setPlainPassword(null);
+            } else {
+                user.setPassword(tenantInfo.getInitialPassword());
+                user.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+            }
+
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
 			user.setLastModifiedBy(user.getCreatedBy());
 			user.setLastModifiedDate(user.getCreatedDate());
 			user.setPasswordErrorCount(0);
-			user.entryptPassword();
-			user.setPlainPassword(null);
+
 			userAccountRepository.save(user);
 			saveUserRole(user,true);
 			saveUserOrgInfo(user, true);

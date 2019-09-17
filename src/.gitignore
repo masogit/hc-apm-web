@@ -4,6 +4,7 @@ node_modules/
 target/
 #src/main/webapp/resources/elements/**/*-styles.html
 src/main/webapp/resources/*.*
+src/main/webapp/css/
 .idea/
 *.iml
 sql/insert-apm-data/

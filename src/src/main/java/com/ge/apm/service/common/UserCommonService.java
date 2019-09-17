@@ -3,30 +3,33 @@
 package com.ge.apm.service.common;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.pure.ComparatorDomain;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
-import com.ge.apm.view.UserAgentController;
 import com.ge.apm.view.measuring.measuring.MeasureOrderSteps;
 import com.ge.apm.view.measuring.measuring.MeasureRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.sysutil.V2_WorkflowConfigController;
 import com.google.common.base.Strings;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.service.UserContext;
 
 /**
  *
@@ -52,6 +55,12 @@ public class UserCommonService {
 
     @Autowired
     private TenantInfoRepository tenantInfoRepository;
+
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+
+    @Autowired
+    private ConfigService configService;
 
     public List<UserAccount> getWorkerList(Integer assetId, String orgUid) {
         Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId == null ? 0 : assetId, orgUid);
@@ -130,8 +139,9 @@ public class UserCommonService {
         return null;
     }
 
-    public List<UserAccount> getApproveList(String assetUid) {
-        Map<String, Object> res = pmApi.getApproveByAsset(UserContextService.getAccessToken(), assetUid == null ? "" : assetUid);
+    public List<UserAccount> getApproveList(String assetUid,String name) {
+        String order = getWorkflowConfig(assetUid);
+        Map<String, Object> res = pmApi.getApproveByAsset(UserContextService.getAccessToken(), assetUid == null ? "" : assetUid,name,order);
         if (null != res) {
             List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
             List<UserAccount> userList = mapList.stream().map(item -> {
@@ -146,6 +156,64 @@ public class UserCommonService {
             return userList;
         }
         return null;
+    }
+
+    public String getWorkflowConfig(String assetUid){
+        AssetInfo assetInfo = assetInfoRepository.findByUid(assetUid);
+        if(assetInfo == null){
+            return null;
+        }
+        WorkflowConfig workflowConfig = configService.findConfigBySite(assetInfo.getSiteUID());
+        if(workflowConfig == null){
+            return null;
+        }
+
+        if(workflowConfig.getAssetDeptHeadWeight() != null &&
+                workflowConfig.getClinicalDeptHeadWeight() != null &&
+                workflowConfig.getAssetHeadWeight() != null &&
+                workflowConfig.getClinicalStaffWeight() != null &&
+                workflowConfig.getOtherClinicalDeptHeadWeight() != null){
+                List<ComparatorDomain> domains = new ArrayList<>(10);
+                domains.add(new ComparatorDomain(workflowConfig.getClinicalDeptHeadWeight(),"ClinicalDeptHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getAssetDeptHeadWeight(),"AssetDeptHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getAssetHeadWeight(),"AssetHeadWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getClinicalStaffWeight(),"ClinicalStaffWeight"));
+                domains.add(new ComparatorDomain(workflowConfig.getOtherClinicalDeptHeadWeight(),"OtherClinicalDeptHeadWeight"));
+                domains.sort(new Comparator<ComparatorDomain>() {
+                    @Override
+                    public int compare(ComparatorDomain o1, ComparatorDomain o2) {
+                        return o2.getIdx()- o1.getIdx();
+                    }
+                });
+                StringBuilder sb = new StringBuilder();
+                domains.stream().forEach( domain -> sb.append(domain.getValue()+"|"));
+                return sb.toString().substring(0,sb.toString().length()-1);
+            }
+            return null;
+
+/*        SortedMap<Integer,String> map = new TreeMap<>(new Comparator<Integer>(){
+            public int compare(Integer a,Integer b){
+                return b-a;
+            }
+        });
+        if(workflowConfig.getAssetDeptHeadWeight() != null &&
+            workflowConfig.getClinicalDeptHeadWeight() != null &&
+            workflowConfig.getAssetHeadWeight() != null &&
+            workflowConfig.getClinicalStaffWeight() != null &&
+            workflowConfig.getOtherClinicalDeptHeadWeight() != null){
+            map.put(workflowConfig.getClinicalDeptHeadWeight(),"ClinicalDeptHeadWeight");
+            map.put(workflowConfig.getAssetDeptHeadWeight(),"AssetDeptHeadWeight");
+            map.put(workflowConfig.getAssetHeadWeight(),"AssetHeadWeight");
+            map.put(workflowConfig.getClinicalStaffWeight(),"ClinicalStaffWeight");
+            map.put(workflowConfig.getOtherClinicalDeptHeadWeight(),"OtherClinicalDeptHeadWeight");
+            StringBuilder sb = new StringBuilder();
+            Collection<String> values = map.values();
+            for (String s : values) {
+                sb.append(s).append("|");
+            }
+            return sb.toString().substring(0,sb.toString().length()-1);
+        }
+        return null;*/
     }
 
     public List<UserAccount> getClinicalDeptOwnerList(OrgInfo clinicalDept) {

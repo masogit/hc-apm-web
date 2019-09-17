@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrder> implements Serializable, ServerEventInterface {
+public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrder> implements  ServerEventInterface {
     public CustomConfigService customConfigService;
     UnstructuredData untest;
     //选定科室过滤
@@ -137,6 +137,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     private List<MeasuringOrderDetail> accessoryList;
     private List<MeasuringOrderCoworker> coWorkerList;
     private MeasuringOrderDetail itemDetail;
+    private MeasureOrderDetailsRepository measureOrderDetailsRepository;
     private MeasuringOrderCoworker coWorkerDetail;
     private Date esTime;
     private String comments;
@@ -197,6 +198,26 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     }
 
     public void saveItem(){
+            //合同价格"默认等于"预估单价
+        if (!accessoryList.contains(itemDetail)) {
+            if (itemDetail.getClosedPrice() == null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
+            accessoryList.add(itemDetail);
+        }
+            //调用微服务来存附件
+            //
+
+        MeasuringOrderDetail byId = measureOrderDetailsRepository.getById(itemDetail.getId());
+        if(null == byId){
+            itemDetail.setId(null);
+        }
+        serviceRequestApiService.addAccessMeasuring(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
+            System.out.println();
+    }
+    /*public void saveItem-backup(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getClosedPrice()==null) {
@@ -207,9 +228,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             accessoryList.add(itemDetail);
             //调用微服务来存附件
             serviceRequestApiService.addAccessMeasuring(token,selectedMeasureOrder.getAssetInfo().getUid(),itemDetail);
+            System.out.println();
         }
-    }
-
+    }*/
     public void saveAndadd(){
         //照旧原来的添加一个备件
         saveItem();
@@ -330,13 +351,6 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
              if(result){
                  WebUtil.addErrorMessage("审核中的工单,无法操作");
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForApproval", true);
-                 return result;
-             }
-
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
-             if(result){
-                 WebUtil.addErrorMessage("3级保养工单不能批量完成");
-                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
          }
@@ -695,7 +709,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             if (null != planTime) {
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
-            formData.setRuleLevel(ruleLevel);
+            if(ruleLevel==null)
+                formData.setRuleLevel(3);
+            else
+                formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setMeasuringType(measureType);
             Map<String, Object> res = measureOrderService.createMeasureRequestApi(selectedAsset.getUid(), formData);
@@ -885,6 +902,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        measureOrderDetailsRepository =WebUtil.getBean(MeasureOrderDetailsRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
@@ -976,12 +994,14 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             return new ArrayList<UserAccount>();
     }
 
-    public List<UserAccount> getApproveList() {
+    public List<UserAccount> getApproveList(String name) {
         if (this.selectedMeasureOrder != null)
-            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid());
+            return measureOrderService.getApproveList(selectedMeasureOrder.getAssetUid(),name);
         else
             return new ArrayList<UserAccount>();
     }
+
+    public void setNothing(){}
 
     private List<Integer> tagGroupAssets;
 
@@ -1089,7 +1109,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         }
         if (queryIndex == -1) {//待办
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*4+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new Sort.Order(Sort.Direction.DESC,"measuringNum"));
@@ -1476,7 +1496,8 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         //cancel();
     }
 
-    public void stagingPmOrder() {
+    public void stagingPmOrder() { // gl: 新增加一条备件的时候 就存到数据表里了，然后又按暂存 这个时候备件里的id会不一样
+        /*accessoryList 需要从更新种种的备件id */
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -1603,7 +1624,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
         //调用微服务删除备件
-        serviceRequestApiService.delAccess(token,itemId);
+        serviceRequestApiService.delAccessMeasuring(token,itemId);
     }
 
     public void prepareBatchComplete() {
@@ -1616,7 +1637,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         if ("new".equals(itemId)) {
             coWorkerDetail = new MeasuringOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
-            coWorkerDetail.setWoId(selectedMeasureOrder.getId());
+            coWorkerDetail.setOrderId(selectedMeasureOrder.getId());
         } else {
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }

@@ -22,6 +22,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 
 import javaslang.control.Option;
+import org.eclipse.jetty.util.B64Code;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
@@ -47,6 +48,7 @@ public class UserContextService implements Serializable {
         // reset previous cached data
         userContextService.isDispatcher = null;
         userContextService.isPmDispatcher = null;
+        userContextService.isMeasuringDispatcher = null;
         userContextService.isAssetApprover = null;
         userContextService.needAssetApproval = null;
         userContextService.needInstorageCheck = null;
@@ -598,6 +600,7 @@ public class UserContextService implements Serializable {
 
     private Boolean isDispatcher = null;
     private Boolean isPmDispatcher = null;
+    private Boolean isMeasuringDispatcher = null;
 
     private Boolean isAssetApprover = null;
     
@@ -634,6 +637,13 @@ public class UserContextService implements Serializable {
         return isPmDispatcher;
 
     }
+    public Boolean isMeasuringDispatcher(){
+        if (isMeasuringDispatcher == null) {
+            getUserPrivilege();
+        }
+        return isMeasuringDispatcher;
+
+    }
 
     public Boolean isAssetApprover() {
         if (isAssetApprover == null) {
@@ -649,6 +659,9 @@ public class UserContextService implements Serializable {
 
         isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
                 || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
+        isMeasuringDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getMeasureDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getMeasureDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
         
@@ -759,5 +772,46 @@ public class UserContextService implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public static String decryptData(String data){
+        try {
+            String [] secondDecryptionArray = data.split("");
+            String [] tempSecondDecryptionArray = new String[secondDecryptionArray.length];
+            for (int i = 0 ; i < secondDecryptionArray.length ; i++) {
+                if(i % 2 == 0){
+                    tempSecondDecryptionArray[i] = secondDecryptionArray[i + 1];
+                }else{
+                    tempSecondDecryptionArray[i] = secondDecryptionArray[i - 1];
+                }
+            }
+            StringBuffer secondDecryptionArrayStringBuffer = new StringBuffer();
+            for (String tempData : tempSecondDecryptionArray) {
+                secondDecryptionArrayStringBuffer.append(tempData);
+            }
+            String firstDecryptionData = B64Code.decode(secondDecryptionArrayStringBuffer.toString(), "utf-8");
+
+            String [] firstDecryptionArray = firstDecryptionData.split("");
+            String tempFistData = firstDecryptionArray[firstDecryptionArray.length - 1];
+            firstDecryptionArray[firstDecryptionArray.length - 1] = firstDecryptionArray[0];
+            firstDecryptionArray[0] = tempFistData;
+            String [] tempFirstDecryptionArray = new String[firstDecryptionArray.length];
+            for (int i = 0 ; i < firstDecryptionArray.length ; i++) {
+                if(i % 2 == 0){
+                    tempFirstDecryptionArray[i] = firstDecryptionArray[i + 1];
+                }else{
+                    tempFirstDecryptionArray[i] = firstDecryptionArray[i - 1];
+                }
+            }
+            StringBuffer firstDecryptionArrayStringBuffer = new StringBuffer();
+            for (String tempData : tempFirstDecryptionArray) {
+                firstDecryptionArrayStringBuffer.append(tempData);
+            }
+            String decryptionData = B64Code.decode(firstDecryptionArrayStringBuffer.toString(), "utf-8");
+
+            return decryptionData;
+        }catch (Exception ex){
+            return null;
+        }
     }
 }
