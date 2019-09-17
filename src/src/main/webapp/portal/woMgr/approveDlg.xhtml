@@ -75,13 +75,15 @@
                         <h:panelGroup>
                             <label class="label">维修总金额</label>
 
-                            <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairTotalCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="20"/>
+                          <!--  <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairTotalCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
+                            <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairTotalCost}" />
                         </h:panelGroup>
                     <br/>
                     <br/>
                         <h:panelGroup>
                             <label class="label">维修人工费用</label>
-                            <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairManCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="20"/>
+                           <!-- <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairManCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
+                            <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairManCost}" />
                         </h:panelGroup>
                     <br/>
                     <br/>
