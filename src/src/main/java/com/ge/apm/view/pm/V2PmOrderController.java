@@ -1643,7 +1643,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-     //tbc   pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
         //保养合格的话 去关单
         //cancel();
     }
