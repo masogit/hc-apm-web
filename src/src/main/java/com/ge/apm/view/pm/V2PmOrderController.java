@@ -1643,7 +1643,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+     //tbc   pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
         //保养合格的话 去关单
         //cancel();
     }
@@ -1820,8 +1820,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
         unDataCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(), "pm-checklist-report");//为0说明该工单的规则还没有绑定 通过和不通过
         if (pmCheckItemList == null) return ;
-        //The below guys seems to exist no reason.
-       /* for (int i = 0; i < pmCheckItemList.size(); i++) {
+        //下面的代码是需要的 ，没有的话 检查项如改动后 在详细信息只会显示通过状态
+        for (int i = 0; i < pmCheckItemList.size(); i++) {
             pmCheckItem = (PmOrderRuleCheckList) pmCheckItemList.get(i);
             if (unDataCollection != null && !unDataCollection.isEmpty()) { //
                 unCollection = (UnstructuredDataCollection) unDataCollection.get(0);
@@ -1835,7 +1835,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     }
                 }
             }
-        }*/
+        }
     }
 
 
