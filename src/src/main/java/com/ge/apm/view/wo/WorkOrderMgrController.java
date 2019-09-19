@@ -41,7 +41,9 @@ import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpSession;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -62,9 +64,15 @@ import webapp.framework.web.mvc.ServerEventInterface;
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
     private SupplierController supplierController;
     @Setter @Getter
+    Double c_woManhourPrice =0d;
+    @Setter @Getter
+    Double c_repairManCost=0d;
+    @Setter @Getter
     Date statusStartTime;
     @Setter @Getter
     Date statusCloseTime;
+    @Setter @Getter
+    private Double c_repairTotalCost=0d;
     MvsAssetInfo mvsAssetInfo;
     @Setter @Getter
     private Supplier newSupplier;
@@ -842,6 +850,20 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
+   public String getRepairResponer(String woId,Integer step){
+        if("ff8080816bff3570016bff9458830001".equalsIgnoreCase(woId)){
+            System.out.println();
+        }
+      List <V2_WorkOrder_Step >vs=null;
+        vs =woService.getWorkOrderDetailResponsor(woId,step);
+        if(vs !=null && vs.size()>0){
+                return vs.get(0).getOwnerName();
+        }else {
+            return "";
+        }
+
+   }
+
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
@@ -892,8 +914,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         attachList = new ArrayList<V2_BlobObject>();
     }
 
-    public void prepareAproval(String woid) {
-        prepareAct(woid);
+    public void prepareAproval(V2_WorkOrder v2WorkOrder) {
+        submitForApproveCost(v2WorkOrder);
+        prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
         approvedDetails.stream().forEach(item -> {
@@ -935,6 +958,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     private Boolean hourRequired;
 
+
     public void prepareCompleteOrder(String woid) {
 
         selectedWorkOrder = dao.findById(woid);
@@ -944,7 +968,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
        if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
            displayTime=true;
        }
-
         Integer userId = selectedWorkOrder.getAckId();
        if( userId!=null){
           ua1 = userDao.getById(userId);
@@ -953,22 +976,15 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
        }
 
-
-
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
-           if (result.equalsIgnoreCase("2")) {
+           if (result.equalsIgnoreCase("2")||result.equalsIgnoreCase("4")) {
                currentStatus = 3;
-
            }
            if (result.equalsIgnoreCase("3")) {
                currentStatus = 4;
-
            }
 
-           if (result.equalsIgnoreCase("4")) {
-               currentStatus = 3;
-           }
            if (result.equalsIgnoreCase("1")) {
                currentStatus = 1;
 
@@ -981,6 +997,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
+
+
+
         if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
@@ -992,6 +1011,32 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
+
+    }
+
+    //  提交审核前的计算
+    private  void submitForApproveCost(V2_WorkOrder v2WorkOrder){
+        accessoryList = getWorkOrderDetail(v2WorkOrder.getId());
+        coWorkerList = getWorkOrderCoworker(v2WorkOrder.getId());
+
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                v2WorkOrder.getAssetId());
+        c_woManhourPrice=Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data")).map(data -> (Double) data.get("woManhourPrice")).orElse(new Double(0));
+        Double tHours = coWorkerList.stream().mapToDouble(p->p.getManHours()).sum();
+        //维修人工费用=工单人工费用（元/小时）*总计工时（“工单人工费用”需在流程配置项中配置），若未配置则按照0计算
+        //总计工时=维修工程师工时+协作者工时
+
+        c_repairManCost=c_woManhourPrice*(tHours+v2WorkOrder.getManHours());
+        //备件费用
+        Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()*p.getApartsQuantity()).sum();
+        //维修总金额=备件费用+维修人工费用+外部费用+其他费用
+        if(v2WorkOrder.getOtherExpense()==null){
+            v2WorkOrder.setOtherExpense(0.0);
+        }
+        if(v2WorkOrder.getExternalExpense()==null){
+            v2WorkOrder.setExternalExpense(0.0);
+        }
+        c_repairTotalCost = accPrice+c_repairManCost+v2WorkOrder.getExternalExpense()+v2WorkOrder.getOtherExpense();
     }
 
     public void saveRepairWorkOrder() {

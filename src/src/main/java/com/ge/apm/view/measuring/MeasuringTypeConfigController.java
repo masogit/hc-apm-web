@@ -2,11 +2,14 @@ package com.ge.apm.view.measuring;
 
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.MeasuringTypeConfig;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -20,7 +23,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/10/11.
@@ -31,17 +37,22 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
 
     private MeasuringTypeConfigRepository dao;
     private I18nMessageRepository i18nDao;
+    private UserAccountRepository userDao;
+    private UserCommonService userCommonService;
 
     private UserAccount currentUser;
     private String measuringItemCategory;
     private String measureGrade;
     private Integer measureCycle;
-
+    private List<I18nMessage> measuringItemCategoryList;
+    private I18nMessage i18nMessage;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(MeasuringTypeConfigRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
     }
@@ -53,14 +64,16 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
 
     @Override
     protected Page<MeasuringTypeConfig> loadData(PageRequest pageRequest) {
-        //this.selected = null;
-        this.setSearchFilter();
-        if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+        List<SearchFilter> searchFilters = this.searchFilters;
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
         }
+
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+
     }
 
     @Override
@@ -72,6 +85,8 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
     public void onBeforeNewObject(MeasuringTypeConfig object) {
         super.onBeforeNewObject(object);
 
+        object.setMeasureCycle(0);
+        object.setMeasureGrade("1");
         object.setSiteId(currentUser.getSiteId());
         object.setHospitalId(currentUser.getHospitalId());
         object.setTenantUID(currentUser.getTenantUID());
@@ -81,28 +96,87 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
 
     }
 
-    public List<I18nMessage> getmeasuringItemCategory(){
-        List<I18nMessage> micList = i18nDao.findByMsgTypeOrderById("measuringItemCategory");
-        if(this.selected.getMeasuringItemCategory() != null){
-            I18nMessage tempData = i18nDao.findByMsgTypeAndMsgKeyOrderById("measuringItemCategory", this.selected.getMeasuringItemCategory());
-            micList.add(tempData);
-        }
+    @Override
+    public void prepareEdit() {
+        super.prepareEdit();
 
-        return micList;
-    }
-
-    public String getMeasuringItemCategory() {
-        return measuringItemCategory;
-    }
-
-    public void setMeasuringItemCategory(String measuringItemCategory) {
-        this.measuringItemCategory = measuringItemCategory;
+        this.initMeasuringItemCategoryList();
     }
 
     @Override
-    public void save() {
-        super.save();
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+
+        this.initMeasuringItemCategoryList();
+    }
+
+    public void initMeasuringItemCategoryList(){
+
+        measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory",currentUser.getSiteId());
+
+        List<MeasuringTypeConfig> measuringTypeConfigList = dao.findBySiteUID(currentUser.getSiteUID());
+        for (MeasuringTypeConfig mtc : measuringTypeConfigList) {
+            for (I18nMessage i18n : measuringItemCategoryList) {
+                if(mtc.getMeasuringItemCategory().equals(i18n.getMsgKey())){
+                    measuringItemCategoryList.remove(i18n);
+                    break;
+                }
+            }
+        }
+
+        if(this.selected.getMeasuringItemCategory() != null){
+            i18nMessage = i18nDao.getByMsgTypeAndMsgKeyAndSiteId("measuringItemCategory", this.selected.getMeasuringItemCategory(), currentUser.getSiteId());
+            if(i18nMessage == null){
+                i18nMessage = i18nDao.getByMsgTypeAndMsgKeyAndSiteId("measuringItemCategory", this.selected.getMeasuringItemCategory(), -1);
+            }
+
+            measuringItemCategoryList.add(i18nMessage);
+
+        }
+
+    }
+
+    public UserAccount getUserAccount(String userUID){
+        return userDao.getByUid(userUID);
+    }
+
+    public List<I18nMessage> autoCompleteMeasuringItemCategory(String query){
+        List<I18nMessage> res = measuringItemCategoryList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getValueZh().contains(query)).collect(Collectors.toList());
+
+        return res;
+    }
+
+    public List<UserAccount> autoCompleteOwner(String query) {
+
+        List<UserAccount> userAccountList = userCommonService.getWorkerList(null,null);
+
+        if (userAccountList == null) {
+            return Collections.emptyList();
+        }
+        List<UserAccount> res = userAccountList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        return res;
+    }
+
+    public String saveMeasuringTypeConfig(){
+
+        if(selected.getLastMeteringDate() != null && selected.getNextMeteringDate() != null){
+            if(selected.getNextMeteringDate().before(selected.getLastMeteringDate())){
+                WebUtil.addErrorMessage("下次计量日期不能早于最后计量日期");
+                return "";
+            }
+        }
+
+        this.selected.setMeasuringItemCategory(this.i18nMessage.getMsgKey());
+        this.selected.setMeasuringItemCategoryName(this.i18nMessage.getValue());
+        this.selected.setMeasureOwnerUid(this.selected.getMeasureOwner() != null ? this.selected.getMeasureOwner().getUid() : null);
+        this.selected.setMeasureOwnerId(this.selected.getMeasureOwner() != null ? this.selected.getMeasureOwner().getId() : null);
+
+        dao.save(this.selected);
         this.selected=null;
+
+        return "measuringTypeConfigList?faces-redirect=true";
     }
 
     public String getMeasureGrade() {
@@ -119,5 +193,29 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
 
     public void setMeasureCycle(Integer measureCycle) {
         this.measureCycle = measureCycle;
+    }
+
+    public List<I18nMessage> getMeasuringItemCategoryList() {
+        return measuringItemCategoryList;
+    }
+
+    public void setMeasuringItemCategoryList(List<I18nMessage> measuringItemCategoryList) {
+        this.measuringItemCategoryList = measuringItemCategoryList;
+    }
+
+    public I18nMessage getI18nMessage() {
+        return i18nMessage;
+    }
+
+    public void setI18nMessage(I18nMessage i18nMessage) {
+        this.i18nMessage = i18nMessage;
+    }
+
+    public String getMeasuringItemCategory() {
+        return measuringItemCategory;
+    }
+
+    public void setMeasuringItemCategory(String measuringItemCategory) {
+        this.measuringItemCategory = measuringItemCategory;
     }
 }

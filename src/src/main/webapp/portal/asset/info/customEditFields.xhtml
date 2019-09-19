@@ -271,7 +271,7 @@
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
             </p:autoComplete>
 
-            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
@@ -291,13 +291,14 @@
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}" />
             </p:autoComplete>
-            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
         <h:panelGroup>
             <label class="label">#{msg.vendorTel}</label>
             <p:inputText id="vendorTel" value="#{assetInfoEditController.selected.vendorTel}" class="vendorChange" readonly="true" />
         </h:panelGroup>
     </c:if>
+    <!--维修商下拉-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitanance')}" >
         <h:panelGroup>
             <label class="label">#{msg.maitanance}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</span></label>
@@ -307,7 +308,7 @@
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
             </p:autoComplete>
-            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+            <p:commandButton id="createSupplierButton2" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('maintainer')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitananceTel')}" >

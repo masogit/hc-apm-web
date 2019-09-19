@@ -51,6 +51,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private String departNum;
 
     private Boolean isAllSelected = Boolean.FALSE;
+    
+    private Boolean isAllSelected5 = Boolean.FALSE;
 
     private Boolean is4Edit = Boolean.FALSE;
 
@@ -64,10 +66,16 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private List<SearchFilter> searchFilters;
 
     private List<AssetInfo> assets4Maintain;
+    
+    private List<AssetInfo> assets5Maintain;
 
     private Set<AssetInfo> selectedAssets;
+    
+    private Set<AssetInfo> selectedAssets5;
 
     private Map<String, Boolean> selectedAssetUids;
+    
+    private Map<String, Boolean> selectedAssetUids5;
 
     private ServerEventInterface callingController;
 
@@ -86,6 +94,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         searchFilters = new ArrayList<>(8);
         selectedAssetUids = new HashMap<>(32);
         selectedAssets = new HashSet<>();
+        selectedAssetUids5 = new HashMap<>(32);
+        selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
@@ -99,7 +109,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         //TODO
         this.selectedAssetUids.clear();
         this.selectedAssets.clear();
+        this.selectedAssetUids5.clear();
+        this.selectedAssets5.clear();
         this.assets4Maintain = null;
+        this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
@@ -128,8 +141,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
                 .filter(t -> !this.selectedAssetUids.getOrDefault(t.getUid(), Boolean.FALSE))
                 .collect(Collectors.toList());
-        this.assets4Maintain = new ArrayList<>(this.selectedAssets);
+        this.assets4Maintain = new ArrayList<>();
         this.assets4Maintain.addAll(assetsWithoutSelected);
+        this.assets5Maintain = new ArrayList<>(this.selectedAssets);
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
@@ -155,6 +169,24 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
         this.searchFilters.clear();
     }
+    
+    public void addAssetInfo(){
+    	for(AssetInfo assetInfo: selectedAssets){
+    		if(!assets5Maintain.contains(assetInfo)){
+    			assets5Maintain.add(assetInfo);
+    		}
+    	}
+    	this.tiggerEvent();
+    }
+    
+    public void removeAssetInfo(){
+    	assets5Maintain.removeAll(selectedAssets5);
+    	this.tiggerEvent();
+    }
+    
+    public void clearAssetInfo(){
+    	assets5Maintain.clear();
+    }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
         log.debug("value of isAllSelected: {}", this.isAllSelected);
@@ -171,7 +203,23 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
         isAllSelected = !isAllSelected;
         log.debug("size of selectedAssetUids: {}", selectedAssetUids.size());
-        this.tiggerEvent();
+    }
+    
+    public void addAssetsOfCurrentPage5(AjaxBehaviorEvent event) {
+        log.debug("value of isAllSelected5: {}", this.isAllSelected5);
+        if(isAllSelected5) {
+            assets5Maintain.stream().forEach(t -> {
+                selectedAssetUids5.put(t.getUid(), Boolean.TRUE);
+                selectedAssets5.add(t);
+            });
+        } else {
+            assets5Maintain.stream().forEach(t -> {
+                selectedAssetUids5.put(t.getUid(), Boolean.FALSE);
+                selectedAssets5.remove(t);
+            });
+        }
+        isAllSelected5 = !isAllSelected5;
+        log.debug("size of selectedAssetUids5: {}", selectedAssetUids.size());
     }
 
     public void updateSelctedAssetList(AjaxBehaviorEvent event) {
@@ -183,7 +231,17 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         } else {
             selectedAssets.remove(asset);
         }
-        this.tiggerEvent();
+    }
+    
+    public void updateSelctedAssetList5(AjaxBehaviorEvent event) {
+        log.debug("updateSelctedAssetList5");
+        SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+        AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+        if(box.isSelected()) {
+            selectedAssets5.add(asset);
+        } else {
+            selectedAssets5.remove(asset);
+        }
     }
 
 //    public void onDeptNameChange(AjaxBehaviorEvent event) {
@@ -217,7 +275,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private void tiggerEvent() {
         if(this.callingController != null) {
-            this.callingController.onServerEvent("change", selectedAssets.stream().collect(Collectors.toList()));
+            this.callingController.onServerEvent("change", assets5Maintain.stream().collect(Collectors.toList()));
         }
     }
 

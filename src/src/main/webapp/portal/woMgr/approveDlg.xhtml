@@ -72,10 +72,27 @@
                         </p:dataTable>
 
                     </p:fieldset>
+                        <h:panelGroup>
+                            <label class="label">维修总金额</label>
+
+                          <!--  <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairTotalCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
+                            <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairTotalCost}" />
+                        </h:panelGroup>
+                    <br/>
+                    <br/>
+                        <h:panelGroup>
+                            <label class="label">维修人工费用</label>
+                           <!-- <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairManCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
+                            <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairManCost}" />
+                        </h:panelGroup>
+                    <br/>
+                    <br/>
                     <h:panelGroup>
                         <label class="label">备注</label>
-                        <p:inputTextarea id="comment" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                        <p:inputText id="comment" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                     </h:panelGroup>
+                    <br/>
+                    <br/>
                     <br/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>

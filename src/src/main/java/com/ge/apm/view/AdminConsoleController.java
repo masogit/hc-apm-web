@@ -54,6 +54,12 @@ public class AdminConsoleController {
 	private AdminConsoleService adminConsoleService;
 	private SysRole currentSysRole;
 	private List<SysRole> listSysRole;
+	@Getter
+	@Setter
+	private Date startDate;
+	@Getter
+	@Setter
+	private Date endDate;
 	@PostConstruct
 	public void init() {
 		// TODO Auto-generated method stub
@@ -180,6 +186,18 @@ public class AdminConsoleController {
 			public void run() {
 				// TODO Auto-generated method stub
 				adminConsoleService.deleteInvalidOrder();
+			}
+		});
+		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+	
+	public void batchUpdateAssetLifecycleEvent(){
+		Thread t=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				adminConsoleService.batchUpdateAssetLifecycleEvent(startDate,endDate);
 			}
 		});
 		t.start();
