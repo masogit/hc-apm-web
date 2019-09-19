@@ -12,4 +12,6 @@ public interface MeasuringTypeConfigRepository extends GenericRepositoryUUID<Mea
 
     public MeasuringTypeConfig findByMeasuringItemCategoryAndTenantUID(String measuringItemCategory, String tenantUID);
 
+    public List<MeasuringTypeConfig> findBySiteUID(String siteUID);
+
 }

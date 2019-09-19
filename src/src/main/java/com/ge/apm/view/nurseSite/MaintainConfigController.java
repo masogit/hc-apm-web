@@ -30,6 +30,7 @@ import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MaintainDataPair;
+import com.ge.apm.domain.NurseSiteMaintainCheckItem;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
 import com.ge.apm.domain.OrgInfo;
@@ -63,6 +64,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listCheckDate;
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
+  	private List<NurseSiteMaintainCheckItem> listWholeCheckItems;
+  	private List<NurseSiteMaintainCheckItem> listSelectedCheckItems;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
   	
   	//input
@@ -107,6 +110,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         	listOrgUid.addAll(setOrgUid);
         }
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_CONFIG);
+        
         //test
     }
 
@@ -138,15 +142,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				LOGGER.error("onServerEvent"+e.getMessage());
 			}
     	}
-    }
-
-    @Override
-    public void onBeforeNewObject(NurseSiteMaintainConfig object) {
-        super.onBeforeNewObject(object);
-//        object.setTenantUID(currentUser.getTenantUID());
-//        object.setInstitutionUID(currentUser.getInstitutionUID());
-//        object.setHospitalUID(currentUser.getHospitalUID());
-//        object.setSiteUID(currentUser.getSiteUID());
     }
 
     @Override
@@ -202,6 +197,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		loadMaintainConfig(this.selected);
 		//TODO
         assetSelectController.loadData4Create();
+        loadWholeCheckItem(currentUser.getSiteUID());
 	}
 	
 	@Override
@@ -214,6 +210,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		setDefaultValueForAssetList();
 		//TODO
         assetSelectController.loadData4Edit(this.selected);
+        loadWholeCheckItem(currentUser.getSiteUID());
+        loadSelectedCheckItem();
 	}
 	
 	private void initValues(){
@@ -294,6 +292,27 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		if(isCreate){
 			loadParentOrgInfo();
 		}
+	}
+	private void loadWholeCheckItem(String siteUid){
+		listWholeCheckItems=nurseSiteMaintainService.loadWholeCheckItem(siteUid);
+		if(listSelectedCheckItems==null){
+			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
+		}
+		else{
+			listSelectedCheckItems.clear();
+		}
+	}
+	private void loadSelectedCheckItem(){
+		if(listWholeCheckItems==null){
+			listWholeCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
+		}
+		if(listSelectedCheckItems==null){
+			listSelectedCheckItems=new ArrayList<NurseSiteMaintainCheckItem>();
+		}
+		else{
+			listSelectedCheckItems.clear();
+		}
+		nurseSiteMaintainService.loadSelectedCheckItem(listWholeCheckItems, listSelectedCheckItems, this.selected);
 	}
 	
 	public boolean checkListCheckAssets(){
@@ -438,8 +457,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					jsonArray.add(jsonObject);
 				}
 			}
-			nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		}
+		nurseSiteMaintainService.saveSelectedCheckItem(listSelectedCheckItems,jsonArray);
+		nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		if(isSave){
 			nurseSiteMaintainService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
 		}
@@ -460,7 +480,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			if(listCheckAssets.size()==0){
 				isSaveDisable=true;
 			}
-			else if(listPairCheckItems.size()<2){
+			else if(listSelectedCheckItems.size()+listPairCheckItems.size()<2){
 				isSaveDisable=true;
 			}
 		} catch (Exception e) {
@@ -468,6 +488,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			isSaveDisable=true;
 			LOGGER.error("checkSaveDisable"+e.getMessage());
 		}
+	}
+	
+	public void onSelectedCheckItemChange(){
+		checkSaveDisable();
 	}
 	
 	public void onAssetsTransfer(TransferEvent event) {
@@ -620,6 +644,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
 		this.objPairCheckItem = objCheckItem;
 	}
+	
+	private boolean containsCheckItem(List<NurseSiteMaintainCheckItem> list,NurseSiteMaintainConfigCheckItem p){
+		if(list!=null && list.size()>0){
+			for(int i=0;i<list.size();++i){
+				if(list.get(i).getId().equals(p.getId())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	public List<NurseSiteMaintainConfigCheckItem> getListPairCheckItems() {
 		String strTemp=this.selected.getCheckItemsDetail();
@@ -629,7 +664,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				JSONArray jsonArray=JSONObject.parseArray(strTemp);
 				for(int i=0;i<jsonArray.size();++i){
 					NurseSiteMaintainConfigCheckItem p=(NurseSiteMaintainConfigCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainConfigCheckItem.class);
-					list.add(p);
+					if(StringUtils.isEmpty(p.getId())){
+						list.add(p);
+					}
+					//to be done
+					else if(!containsCheckItem(listWholeCheckItems,p)){
+						list.add(p);
+					}
 				}
 			}
 			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
@@ -760,6 +801,22 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			this.selected = null;
 		}
 		this.listSelected = listSelected;
+	}
+
+	public List<NurseSiteMaintainCheckItem> getListWholeCheckItems() {
+		return listWholeCheckItems;
+	}
+
+	public void setListWholeCheckItems(List<NurseSiteMaintainCheckItem> listWholeCheckItems) {
+		this.listWholeCheckItems = listWholeCheckItems;
+	}
+
+	public List<NurseSiteMaintainCheckItem> getListSelectedCheckItems() {
+		return listSelectedCheckItems;
+	}
+
+	public void setListSelectedCheckItems(List<NurseSiteMaintainCheckItem> listSelectedCheckItems) {
+		this.listSelectedCheckItems = listSelectedCheckItems;
 	}
 
 	

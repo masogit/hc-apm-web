@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="常用日常检查项设置" />
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="maintainConfigCheckItemListForm">
+                    <p:dataTable id="datalist" value="#{maintainCheckItemController.lazyModel}" var="item" widgetVar="varDataList"
+                        selection="#{maintainCheckItemController.selected}" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                        rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.id}"
+                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+               			<!--<p:column selectionMode="single" style="width:32px;text-align:center" exportable="false">
+						</p:column>-->
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+						<!-- <p:ajax event="rowSelectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="rowUnselectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="toggleSelect" update="createButton editButton deleteButton"/> -->
+                        <p:ajax event="filter" listener="#{maintainCheckItemController.onFilter}" />
+                
+                        <p:column headerText="检查项" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}" />
+                        </p:column>
+                        <p:column headerText="描述" filterBy="#{item.description}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.description}" />
+                        </p:column>
+<!--                         <p:column headerText="创建人"> -->
+<!--                             <h:outputText value="#{item.createBy.name}" /> -->
+<!--                         </p:column> -->
+                        <p:column headerText="创建日期">
+                            <h:outputText value="#{item.createDate}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+<!--                         <p:column headerText="修改人"> -->
+<!--                             <h:outputText value="#{item.modifyBy.name}" /> -->
+<!--                         </p:column> -->
+                        <p:column headerText="修改日期">
+                            <h:outputText value="#{item.modifyDate}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+                                actionListener="#{maintainCheckItemController.prepareCreate}" update=":maintainConfigcheckItemEditDlg"
+                                oncomplete="PF('maintainConfigcheckItemEditDlg').show()"/>
+                            <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+                                update="maintainConfigcheckItemEditDlg" oncomplete="PF('maintainConfigcheckItemEditDlg').show()" disabled="#{empty maintainCheckItemController.selected}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"  disabled="#{empty maintainCheckItemController.selected}"
+                                actionListener="#{maintainCheckItemController.delete}" update=":maintainConfigCheckItemListForm:datalist">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+		<p:dialog id="maintainConfigcheckItemEditDlg" widgetVar="maintainConfigcheckItemEditDlg" width="400" height="130" modal="true" resizable="true"
+			draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
+			<h:form id="checkItemEditForm" rendered="#{maintainCheckItemController.selected!=null}">
+				<h:panelGroup>
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label>#{msg.name} *：</label>
+							<p:inputText id="name" value="#{maintainCheckItemController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<label>备注：</label>
+							<p:inputText id="description" value="#{maintainCheckItemController.selected.description}" />
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:commandButton validateClient="true" actionListener="#{maintainCheckItemController.save}" update=":growl,:maintainConfigCheckItemListForm"
+						value="#{msg.Save}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'maintainConfigcheckItemEditDlg');" />
+					<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('maintainConfigcheckItemEditDlg').hide()" />
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

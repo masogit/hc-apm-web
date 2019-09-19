@@ -24,7 +24,8 @@ public class AssetFaultTypeService {
         List<AssetFaultType> byAssetGroupId = assetFaultTypeRepository.getByAssetGroupId(astypeId);
         if(CollectionUtils.isEmpty(byAssetGroupId)){
             //如果设备错误类型未定义过，默认取-1
-            byAssetGroupId = assetFaultTypeRepository.getByAssetGroupId(-1);
+            //byAssetGroupId = assetFaultTypeRepository.getByAssetGroupId(-1);
+            byAssetGroupId = assetFaultTypeRepository.getByAssetGroupIdOrderById(-1);
         }
         return byAssetGroupId;
     }

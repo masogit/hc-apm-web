@@ -25,15 +25,29 @@
                         <p:ajax event="rowSelect" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{measuringTypeConfigController.onFilter}" />
 
-                        <p:column headerText="计量类别" >
+                        <p:column headerText="计量类别" filterBy="#{item.measuringItemCategoryName}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                         </p:column>
-                        <p:column headerText="计量等级" >
+                        <p:column headerText="责任人" filterBy="#{item.measureOwner.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.measureOwner.name}"/>
+                        </p:column>
+                        <!--<p:column headerText="计量等级" >
                             <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
+                        </p:column>-->
+                        <p:column headerText="最后计量日期" >
+                            <h:outputText value="#{item.lastMeteringDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="计量周期(月)" >
+                        <p:column headerText="下次计量日期" >
+                            <h:outputText value="#{item.nextMeteringDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <!--<p:column headerText="计量周期(月)" >
                             <h:outputText value="#{item.measureCycle}"/>
-                        </p:column>
+                        </p:column>-->
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{measuringTypeConfigController.prepareCreate}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" />
