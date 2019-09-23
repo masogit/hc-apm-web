@@ -23,6 +23,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PMORDER_REPORT_TEMPLATE = "PmOrderReportTemplate";
     public static final String BO_TYPE_InspectionOrder = "InspectionOrder";
     public static final String BO_TYPE_AssetInfo = "AssetInfo";
+    public static final String BO_TYPE_Supply = "supplier";
     public static final String BO_TYPE_AssetContract = "AssetContract";
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
     public static final String BO_TYPE_PmOrder = "PmOrder";
