@@ -1356,7 +1356,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         Object eval;
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
-            itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+          //  itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
@@ -1449,7 +1449,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
     }
-
+    //保存一个备件
     public void saveItem(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
