@@ -55,6 +55,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版'
 														// ，添加模版按钮就设置为灰色
 
+	public boolean isIdeaUser(){
+return true;
+	}
 	public boolean createOrEdit() {
 		if ("create".equalsIgnoreCase(type)) {
 			return false;
