@@ -1723,7 +1723,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if ("new".equals(itemId)) {
             switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
-            itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+            //itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedPmOrder.getId());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));

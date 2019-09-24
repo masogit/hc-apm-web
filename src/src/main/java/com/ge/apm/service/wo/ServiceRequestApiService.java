@@ -8,6 +8,8 @@ package com.ge.apm.service.wo;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
+
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -66,6 +68,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            HashMap data = (LinkedHashMap)responseMap.get("data");
+            workOrderDetail.setId((String)data.get("id"));
             return (String) responseMap.get("message");
         } else {
             return null;
