@@ -1438,7 +1438,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        vwd.setId(itemDetail.getId());
         // clear 备件名称 备件数量  预估价格
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
