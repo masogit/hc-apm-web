@@ -1429,8 +1429,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
-    public void saveAndadd(){
+    public void saveAndadd(int oper){
         //照旧原来的添加一个备件
+        if(oper ==1){ //来自保存新增，从新建一个item
+            itemDetail.setId(null);
+        }
         saveItem();
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
