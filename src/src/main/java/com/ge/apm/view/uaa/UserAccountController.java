@@ -68,6 +68,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     //public static final int ACTIVATION_ROLE = 10;
     public static final String ACTIVATION_ROLE = "ActivationPerson";
+
+    private static final Integer LX_USER_TYPE = -1; // lixinag usertype
+    private boolean isShowButton = true;
+
     UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -137,6 +141,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         setTenantUid(loginUser.getTenantUID());
+
+        //判断是否是理想用户
+        if(LX_USER_TYPE.equals(loginUser.getType())){
+            this.isShowButton = Boolean.FALSE;
+        }else {
+            this.isShowButton = Boolean.TRUE;
+        }
 
     }
 
@@ -1056,5 +1067,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setRoles(List<SysRole> roles) {
         this.roles = roles;
+    }
+
+    public boolean isShowButton() {
+        return isShowButton;
+    }
+
+    public void setShowButton(boolean showButton) {
+        isShowButton = showButton;
     }
 }
