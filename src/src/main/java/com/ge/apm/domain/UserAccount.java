@@ -166,6 +166,10 @@ public class UserAccount implements ChineseName, Serializable {
 	@JsonIgnore
 	private Date lastModifiedDate = new Date();
 
+	//-1:理想用户户,99：测试用户,
+	@Column(name = "type")
+	private Integer type;
+
 	@Transient
 	private String plainPassword;
 
@@ -1074,5 +1078,12 @@ public class UserAccount implements ChineseName, Serializable {
 	public void setGeSSO(boolean isGeSSO) {
 		this.isGeSSO = isGeSSO;
 	}
-	
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
 }
