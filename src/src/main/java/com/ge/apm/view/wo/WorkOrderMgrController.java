@@ -1466,7 +1466,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
     }
+    //保存备件操作
     public void addAcessItem() {
+        itemDetail.setId(null);
         saveItem();
         cancelWorkdetail();
     }
