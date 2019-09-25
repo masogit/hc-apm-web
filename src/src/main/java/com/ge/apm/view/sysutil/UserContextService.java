@@ -758,7 +758,7 @@ public class UserContextService implements Serializable {
         if (null == user.getType()) {
             return false;
         }
-        if (-1 == user.getType()) {
+        if (-1 == user.getType() && user.getIsSuperAdmin()) {
             return true;
         }
 
