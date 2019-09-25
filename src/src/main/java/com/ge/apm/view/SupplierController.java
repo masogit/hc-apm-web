@@ -64,6 +64,7 @@ public void removeAttachmentById(String blobId) {
         supplierT=null;
         maintainerT=null;
         manufacturerT=null;
+        attachements=new ArrayList<V2_BlobObject>();
     }
 
     @Override
@@ -78,7 +79,7 @@ public void removeAttachmentById(String blobId) {
     }
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
-        if (attachements == null) {
+        if (attachements == null || attachements.size()==0) {
             attachements = blobService.findBlobObjectsByBoUid(assetuid);
         }
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());

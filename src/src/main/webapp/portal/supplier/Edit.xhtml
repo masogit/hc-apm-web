@@ -7,8 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <!--设备档案-->
-        <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
+        <!--设备档案  修改 供应商信息-->
+        <p:dialog id="SupplierEditDlg" width="1000" class="modiSupplyDlg" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
             <h:form id="SupplierEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
