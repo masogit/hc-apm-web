@@ -165,7 +165,15 @@ return true;
 
 	@Override
 	public List<TenantInfo> getItemList() {
-		return dao.getAllOrderByName();
+		List<TenantInfo> tenantInfos;
+		if (UserContextService.isSuperAdminWithPartnerAccount()) {
+			tenantInfos = dao.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
+		} else {
+			tenantInfos = dao.getAllOrderByName();
+		}
+
+		return tenantInfos;
+
 	}
 
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {

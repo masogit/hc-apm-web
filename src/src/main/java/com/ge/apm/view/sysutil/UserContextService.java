@@ -758,11 +758,16 @@ public class UserContextService implements Serializable {
         if (null == user.getType()) {
             return false;
         }
-        if (-1 == user.getType() && user.getIsSuperAdmin()) {
+        if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
             return true;
         }
 
         return false;
+    }
+
+    public static boolean isSuperAdminWithPartnerAccount(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.isPartnerAccount();
     }
     
     public static boolean isOnlyLocalITAdmin() {
