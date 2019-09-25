@@ -748,6 +748,22 @@ public class UserContextService implements Serializable {
         if(isIBEndUser()) return false;
         return !isUltraSoundIBEndUser();
     }
+
+    /**
+     * this api is to check whether login user is for lixiang company.
+     * @return
+     */
+    public boolean isPartnerAccount() {
+        UserAccount user = getLoginUser();
+        if (null == user.getType()) {
+            return false;
+        }
+        if (-1 == user.getType()) {
+            return true;
+        }
+
+        return false;
+    }
     
     public static boolean isOnlyLocalITAdmin() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
