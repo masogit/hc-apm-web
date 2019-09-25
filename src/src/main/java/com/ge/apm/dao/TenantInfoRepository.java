@@ -16,4 +16,6 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
 
     @Query("select t from TenantInfo t where t.initialPassword is not null")
     List<TenantInfo> findTenantInfoByInitialPasswordIsNotNull();
+
+    public List<TenantInfo> findAllByTestStatusIsNullOrTestStatusNotOrderByName(int testStatus);
 }
