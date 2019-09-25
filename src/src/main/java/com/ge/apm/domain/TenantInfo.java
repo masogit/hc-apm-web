@@ -121,6 +121,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "initial_password_salt")
     private String initialPasswordSalt;
 
+    @Column(name = "test_status")
+    private Integer testStatus;
+
     @Transient
     private String plainPassword;
 
@@ -447,5 +450,13 @@ public class TenantInfo implements Serializable {
 
     public void setActiveType(Integer activeType) {
         this.activeType = activeType;
+    }
+
+    public Integer getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(Integer testStatus) {
+        this.testStatus = testStatus;
     }
 }
