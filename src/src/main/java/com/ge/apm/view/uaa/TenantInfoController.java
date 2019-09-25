@@ -43,7 +43,8 @@ import webapp.framework.web.mvc.JpaCRUDController;
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
 	TenantInfoRepository dao = null;
-	UserAccountRepository userAccountRepository;
+	UserAccountRepository
+			userAccountRepository;
 	UserAccount loginUser;
 	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
@@ -56,6 +57,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 														// ，添加模版按钮就设置为灰色
 
 	public boolean isIdeaUser(){
+		//理想用户
+
+	/*	if(loginUser.getType()!=null && loginUser.getType()==-1){
+			return true;
+		}else{
+		return 	false;
+		}*/
+
 return true;
 	}
 	public boolean createOrEdit() {
