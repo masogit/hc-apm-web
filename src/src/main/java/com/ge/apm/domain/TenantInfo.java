@@ -490,4 +490,12 @@ public class TenantInfo implements Serializable {
     public void setTestStatus(Integer testStatus) {
         this.testStatus = testStatus;
     }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
 }
