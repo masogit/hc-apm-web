@@ -65,9 +65,6 @@ public class TenantInfo implements Serializable {
     @Column(name = "contact_email")
     private String contactEmail;
     @Size(max = 64)
-    @Column(name = "contact_no")
-    private String contactNo;
-    @Size(max = 64)
     @Column(name = "location")
     private String location;
     @Size(max = 256)
@@ -120,7 +117,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "active_type")
     private Integer activeType;//0 means super admin ,1 means by tenant user
     
-    @Column(name="tenpant_config",columnDefinition="text")
+    @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
 
     @Size(max = 255)
@@ -130,6 +127,9 @@ public class TenantInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "initial_password_salt")
     private String initialPasswordSalt;
+
+    @Column(name = "test_status")
+    private Integer testStatus;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "created_date", nullable = true)
@@ -454,14 +454,6 @@ public class TenantInfo implements Serializable {
         return true;
     }
 
-    public String getContactNo() {
-        return contactNo;
-    }
-
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
-    }
-
     @Override
     public String toString() {
         return "com.ge.apm.domain.SiteInfo[ id=" + id + " ]";
@@ -489,5 +481,13 @@ public class TenantInfo implements Serializable {
 
     public void setActiveType(Integer activeType) {
         this.activeType = activeType;
+    }
+
+    public Integer getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(Integer testStatus) {
+        this.testStatus = testStatus;
     }
 }
