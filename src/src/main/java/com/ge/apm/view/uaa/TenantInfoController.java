@@ -182,6 +182,9 @@ return true;
 			}
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
+		if(!this.getCRUDActionName().equalsIgnoreCase("修改"))
+			this.selected.setCreatedDate(new Date());
+		this.selected.setLastModifiedDate(new Date());
 		super.save();
 	}
 

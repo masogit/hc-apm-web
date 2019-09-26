@@ -11,10 +11,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PasswordEncodeUtil;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.util.StringUtils;
 
 /**
@@ -62,6 +65,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "contact_email")
     private String contactEmail;
     @Size(max = 64)
+    @Column(name = "contact_no")
+    private String contactNo;
+    @Size(max = 64)
     @Column(name = "location")
     private String location;
     @Size(max = 256)
@@ -104,13 +110,17 @@ public class TenantInfo implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date activeTime;
 
+
+    @Column(name="contract_no")
+    private String contractNo;
+
     @Column(name = "active_user_id")
     private Integer activeUserId;
 
     @Column(name = "active_type")
     private Integer activeType;//0 means super admin ,1 means by tenant user
     
-    @Column(name="tenant_config",columnDefinition="text")
+    @Column(name="tenpant_config",columnDefinition="text")
     private String tenantConfig;
 
     @Size(max = 255)
@@ -120,6 +130,14 @@ public class TenantInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "initial_password_salt")
     private String initialPasswordSalt;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
 
     @Transient
     private String plainPassword;
@@ -407,6 +425,22 @@ public class TenantInfo implements Serializable {
         return hash;
     }
 
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -418,6 +452,14 @@ public class TenantInfo implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public String getContactNo() {
+        return contactNo;
+    }
+
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 
     @Override
