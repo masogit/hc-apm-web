@@ -15,6 +15,9 @@ public interface ApmConstant {
     public static final String MVS_ROLE_NAME_ADMIN = "MVSAdmin";
     public static final String MVS_ROLE_NAME_FE = "MVSFE";
 
+    //this type value is for company IDEAL
+    public static final int USER_ACCOUNT_TYPE_PARTNER = -1;
+
 
 
 }

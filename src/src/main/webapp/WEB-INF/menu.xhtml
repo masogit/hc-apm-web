@@ -12,7 +12,12 @@
             <a id="menu-button" class="menu-button flex flex--row flex--middle flex--center u-mv--" href="javascript:;" style="text-decoration:none;">
               <i class="material-icons">play_circle_outlined</i>
             </a>
-            <ui:include src="./menu-content.xhtml"/>
+            <ui:fragment rendered="#{userContextService.partnerAccount}" >
+                <ui:include src="./menu-content-partner.xhtml"/>
+            </ui:fragment>
+            <ui:fragment rendered="#{!userContextService.partnerAccount}">
+                <ui:include src="./menu-content.xhtml"/>
+            </ui:fragment>
         </div>
         <script>
           window.onload = function () {

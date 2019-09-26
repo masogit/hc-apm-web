@@ -95,6 +95,10 @@
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="院区隔离" value="#{tenantInfoController.selected.insulate}"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{tenantInfoController.showTestTenant}">
+                            <label class="label">&nbsp;</label>
+                            <p:selectBooleanCheckbox itemLabel="测试租户" value="#{tenantInfoController.testTenant}"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <p:fieldset legend="#{msg.WorkOrderConfig}" rendered="false">
