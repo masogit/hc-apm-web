@@ -7,8 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-
-        <p:dialog id="SiteInfoEditDlg" widgetVar="SiteInfoEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{tenantInfoController.CRUDActionName} #{msg.SiteInfo}">
+<!--新增 医联体/租户信息-->
+        <p:dialog id="SiteInfoEditDlg" widgetVar="SiteInfoEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{tenantInfoController.CRUDActionName} #{msg.SiteInfo}---------">
             <p:ajax event="close" update=":SiteInfoListForm:datalist" />
             <h:form id="SiteInfoEditForm">
                 <h:panelGroup id="display">
@@ -41,6 +41,12 @@
                             <label class="label">#{msg.contactEmail}</label>
                             <p:inputText id="contactEmail" value="#{tenantInfoController.selected.contactEmail}" validatorMessage="#{msg.invalidEmail}"/>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">合同号</label>
+                            <p:inputText id="contactNo" value="#{tenantInfoController.selected.contactNo}" />
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.location}</label>
                             <p:inputText id="location" value="#{tenantInfoController.selected.location}" />

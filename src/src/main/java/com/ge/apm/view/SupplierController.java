@@ -72,10 +72,7 @@ public void removeAttachmentById(String blobId) {
         dao = WebUtil.getBean(SupplierRepository.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
                 blobService = WebUtil.getBean(BlobFileService.class);
-
-
         this.filterBySite = false;
-
     }
 
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {

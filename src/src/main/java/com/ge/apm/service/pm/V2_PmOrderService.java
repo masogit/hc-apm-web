@@ -102,7 +102,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             //unstructuredDataCollection如果在unstructuredData没有对应值 说明工单的性能或安全报告没有填写信息
             if(CollectionUtils.isEmpty(reporter.getData())){
                 //获取保养报告的名字
-                TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+                TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
                 hm.put("pmReportNeedFill",byBaseId.getName());
             }
         }

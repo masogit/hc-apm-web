@@ -851,9 +851,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         return woService.getWorkOrderSteps(woId);
     }
    public String getRepairResponer(String woId,Integer step){
-        if("ff8080816bff3570016bff9458830001".equalsIgnoreCase(woId)){
-            System.out.println();
-        }
       List <V2_WorkOrder_Step >vs=null;
         vs =woService.getWorkOrderDetailResponsor(woId,step);
         if(vs !=null && vs.size()>0){
