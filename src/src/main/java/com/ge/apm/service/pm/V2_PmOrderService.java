@@ -108,7 +108,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         reporter =reportDao.findSaftyReport(v2PmOrder.getId());
         if(null != reporter) {
-            TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+            TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
             if(CollectionUtils.isEmpty(reporter.getData())){
                 hm.put("saftyReportNeedFill",byBaseId.getName());
             }
