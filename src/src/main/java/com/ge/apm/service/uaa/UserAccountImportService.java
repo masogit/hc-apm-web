@@ -73,6 +73,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ISLOCKED="锁定?*";
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
+	private static final String HEADER_PASSWORD="初始密码";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
@@ -716,6 +717,7 @@ public class UserAccountImportService {
 		headers.add(HEADER_ISLOCKED);
 		headers.add(HEADER_ROLENAME);
 		headers.add(HEADER_ACCESSSCOPE);
+		headers.add(HEADER_PASSWORD);
 		headers.add(HEADER_UUID);
 		Map<String, Integer> header = ExcelParser.findHeader(sheet,headers);
 		if (header.isEmpty()) {
@@ -735,6 +737,7 @@ public class UserAccountImportService {
 		boolean isLocked;
 		String roleName;
 		String accessScope;
+		String password;
 		String UUID;
 
 		int institutionIndex=header.get(HEADER_INSTITUTION);
@@ -751,6 +754,7 @@ public class UserAccountImportService {
 		int islockedIndex=header.get(HEADER_ISLOCKED);
 		int rolenameIndex=header.get(HEADER_ROLENAME);
 		int accessScopeIndex=header.get(HEADER_ACCESSSCOPE);
+		int passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
 
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
@@ -804,6 +808,7 @@ public class UserAccountImportService {
 				}
 				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
 				accessScope=ExcelParser.getCellStringValue(row, accessScopeIndex);
+				password = ExcelParser.getCellStringValue(row, passwordIndex);
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
 				
 				if(!pass){
@@ -836,6 +841,21 @@ public class UserAccountImportService {
 				newUser.setDepartName3(department3);
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
+
+
+				//handle password
+				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
+					newUser.setPlainPassword(password.trim());
+					newUser.entryptPassword();
+				} else {
+					if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
+						newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+						newUser.entryptPassword();
+					} else {
+						newUser.setPassword(tenantInfo.getInitialPassword());
+						newUser.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+					}
+				}
 				
 //				if(StringUtils.isEmpty(institution)){
 //					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
@@ -916,14 +936,7 @@ public class UserAccountImportService {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//TODO nickName
 		try {
-            if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
-                user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-                user.entryptPassword();
-                user.setPlainPassword(null);
-            } else {
-                user.setPassword(tenantInfo.getInitialPassword());
-                user.setPwdSalt(tenantInfo.getInitialPasswordSalt());
-            }
+
 
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
@@ -934,7 +947,7 @@ public class UserAccountImportService {
 			userAccountRepository.save(user);
 			saveUserRole(user,true);
 			saveUserOrgInfo(user, true);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (Exception e) {
 			logger.error("create user error : {}", e.getMessage());
 		}
 	}
