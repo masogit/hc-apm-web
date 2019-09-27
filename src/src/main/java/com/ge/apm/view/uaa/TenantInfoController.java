@@ -213,8 +213,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			}
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
-		if(!this.getCRUDActionName().equalsIgnoreCase("修改"))
-			this.selected.setCreatedDate(new Date());
 		this.selected.setLastModifiedDate(new Date());
 		super.save();
 	}
@@ -378,6 +376,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void onBeforeNewObject(TenantInfo tenant) {
+		tenant.setLastModifiedDate(new Date());
+		tenant.setCreatedDate(new Date());
 		tenant.setTestStatus(NORMAL_Tenant_STATUS);
 		tenant.setIsEnabled(false);
 		super.onBeforeNewObject(tenant);
@@ -399,6 +399,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	}
 
 	public void onBeforeSave(TenantInfo tenantInfo) {
+
 		if (tenantInfo.getIsEnabled() && tenantInfo.getActiveTime() == null) {
 			tenantInfo.setActiveTime(new Date());
 			tenantInfo.setActiveType(0);
