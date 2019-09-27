@@ -572,6 +572,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
+            if(isPartnerAccount())
+                return "/admin/uaa/siteInfo/List.xhtml";
+
             if(isIBorUltraSoundIBEndUser())
                 return "portal/profile.xhtml";
             
