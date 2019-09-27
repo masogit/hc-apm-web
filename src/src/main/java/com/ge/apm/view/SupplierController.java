@@ -106,7 +106,18 @@ public void removeAttachmentById(String blobId) {
             supplierT=selected.getSupplierT();
         }
     }
-
+    @Override
+    public void onAfterNewObject(Supplier object, boolean isOK) {
+        if (isOK) {
+            attachements.forEach(item -> {
+                if (item.getBoId() == null) {
+                    item.setBoId(object.getId());
+                    item.setBoUuid(object.getUid());
+                    blobService.saveBlobObject(item);
+                }
+            });
+        }
+    }
 
     public void saveSubmit(){
         if (!requiredCheck()) {
