@@ -419,18 +419,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
 
-        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
-            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-            try {
-                selected.entryptPassword();
-            } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            selected.setPassword(selectedTenant.getInitialPassword());
-            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
-        }
-
         this.selectedUserOrg = null;
 
     }
@@ -584,7 +572,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
-        super.save();
+        try {
+            //input new password in create or edit page, so update
+            if (!StringUtils.isEmpty(selected.getPlainPassword())) {
+                selected.entryptPassword();
+
+            } else {
+                //if new user, use tenant initial password or system default password.
+                if (null == selected.getId()) {
+                    if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+                        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+                        selected.entryptPassword();
+                    } else {
+                        selected.setPassword(selectedTenant.getInitialPassword());
+                        selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
+                    }
+                }
+
+            }
+
+            super.save();
+
+        } catch(NoSuchAlgorithmException e) {
+            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
+        }
+
+
     }
 
     public void resetPassword() {
