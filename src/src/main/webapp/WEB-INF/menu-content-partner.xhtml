@@ -2,8 +2,6 @@
 
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
-            <p:menuitem style=" font-size: 30" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}"/>
-
             <p:submenu label="#{msg.SysAdmin}" icon="settings">
                 <p:menuitem value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml"/>
             </p:submenu>
