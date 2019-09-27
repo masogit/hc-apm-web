@@ -67,7 +67,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public boolean isIdeaUser(){
 		//理想用户
-		if(loginUser.getType()!=null && loginUser.getType().intValue()==-1){
+		if(loginUser.getType()!=null && loginUser.getType().intValue()==-1 && loginUser.getIsSuperAdmin()){
 			return true;
 		}else{
 		return 	false;
