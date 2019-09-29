@@ -572,6 +572,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
+        if (!StringUtils.isEmpty(selected.getPlainPassword())) {
+            String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
+            if(!StringUtils.isEmpty(checkResult)) {
+                WebUtil.addErrorMessage(checkResult);
+                return;
+            }
+        }
+
         try {
             //input new password in create or edit page, so update
             if (!StringUtils.isEmpty(selected.getPlainPassword())) {
