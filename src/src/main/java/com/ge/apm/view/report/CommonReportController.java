@@ -90,9 +90,10 @@ public class CommonReportController {
         if(table==null)
                 return "";
         if (null != table.getExcelStorageId()) {
-            return "/geapm/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
+            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }else{
            // return "/geapm/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
+
             return "/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }
     }
