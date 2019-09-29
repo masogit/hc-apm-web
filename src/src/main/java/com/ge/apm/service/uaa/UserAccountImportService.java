@@ -845,8 +845,15 @@ public class UserAccountImportService {
 
 				//handle password
 				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
-					newUser.setPlainPassword(password.trim());
-					newUser.entryptPassword();
+					String checkResult = PasswordUtil.checkPwd(password.trim());
+					if(!StringUtils.isEmpty(checkResult)) {
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.PASSWORD,checkResult);
+						pass=false;
+					} else {
+						newUser.setPlainPassword(password.trim());
+						newUser.entryptPassword();
+					}
+
 				} else {
 					if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
 						newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
