@@ -426,8 +426,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
         TableDefinition tbd = tableDao.findByBaseId(reportUid);//table_def:baseId
+        if(tbd==null) return;
         newReport.setSchemaId(tbd.getId());
         PmOrderRule pmOrderRule = pmOrderService.acqPmOrderRule(selectedPmOrder);
+        if(pmOrderRule==null){
+            pmOrderService.saveReport(newReport);
+            return;
+        }
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getPerformanceReport()))
             newReport.setBoType("pm-performance-report");
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
