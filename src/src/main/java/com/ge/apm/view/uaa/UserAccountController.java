@@ -23,6 +23,7 @@ import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.view.sysutil.UserInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -576,6 +577,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
             if(!StringUtils.isEmpty(checkResult)) {
                 WebUtil.addErrorMessage(checkResult);
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
                 return;
             }
         }
