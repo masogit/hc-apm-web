@@ -415,7 +415,7 @@ CREATE INDEX "nurseSiteMaintainItemParentId"
     TABLESPACE pg_default;
 
 --v19.9.1
-update asset_alert_config set lower_limit = null where config_type = 102
+update asset_alert_config set lower_limit = null where config_type = 102;
 DROP INDEX IF EXISTS nurseSiteMaintainDataParentId;
 DROP INDEX IF EXISTS nurseSiteMaintainItemParentId;
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.console,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig' where name = 'AssetStaff';
@@ -423,7 +423,7 @@ update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.an
 
 
 --v19.10.1
-update tenant_info set test_status=0 where test_status is null
+update tenant_info set test_status=0 where test_status is null;
 
 --just for 九院
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '40', '北区口腔开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
