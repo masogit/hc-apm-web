@@ -141,7 +141,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-        setTenantUid(loginUser.getTenantUID());
+
+
+        if (UserContextService.isSuperAdminWithPartnerAccount()) {
+            //if current user belongs to test tenant, then use the first tenant in non test tenant list
+            List<TenantInfo> tenantInfos = tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
+            setTenantUid(tenantInfos.get(0).getUid());
+        } else {
+            setTenantUid(loginUser.getTenantUID());
+        }
 
         //判断是否是理想用户
         if(LX_USER_TYPE.equals(loginUser.getType())){
