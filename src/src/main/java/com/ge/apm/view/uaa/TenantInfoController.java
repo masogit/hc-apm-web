@@ -169,6 +169,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareCreate();
 		tenantConfigService.init();
 		this.type = type;
+        this.isTestTenant = Boolean.FALSE;
 	}
 
 	@Override
@@ -411,7 +412,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 		if(this.isTestTenant){
 			tenantInfo.setTestStatus(TEST_Tenant_STATUS);
-		}
+		}else{
+            tenantInfo.setTestStatus(NORMAL_Tenant_STATUS);
+        }
 
 	}
 

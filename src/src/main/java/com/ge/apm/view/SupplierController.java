@@ -11,6 +11,8 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.SearchFilter;
@@ -29,6 +31,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     SupplierRepository dao = null;
     private BlobFileService blobService;
+    @Getter @Setter
     private List<V2_BlobObject> attachements;
 
     AssetInfoRepository assetInfoDao;
@@ -64,7 +67,13 @@ public void removeAttachmentById(String blobId) {
         supplierT=null;
         maintainerT=null;
         manufacturerT=null;
+
         attachements=new ArrayList<V2_BlobObject>();
+    }
+    @Override
+    public void prepareEdit(){
+        super.prepareEdit();
+        attachements=getAttachList(selected.getUid(),"1");
     }
 
     @Override
@@ -75,12 +84,12 @@ public void removeAttachmentById(String blobId) {
         this.filterBySite = false;
     }
 
-    public List<V2_BlobObject> getAttachList(String assetuid, String type) {
-        if (attachements == null || attachements.size()==0) {
-            attachements = blobService.findBlobObjectsByBoUid(assetuid);
-        }
+    public List<V2_BlobObject> getAttachList(String supplierUid, String type) {
+        attachements = blobService.findBlobObjectsByBoUid(supplierUid);
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+
     }
+
 /*
     public void maintainerTSet(){maintainerT=!maintainerT;}
     public void manufacturerTSet(){ manufacturerT=!manufacturerT;}
