@@ -261,8 +261,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
             //调用微服务来存附件
-            serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
+
         }
+        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
     }
 
     public void saveAndadd(int oper){
@@ -1735,7 +1736,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if ("new".equals(itemId)) {
             switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
-            itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+            itemDetail.setId(null);
             itemDetail.setWoId(selectedPmOrder.getId());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
@@ -1780,7 +1781,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void addAcessItem() {
-        itemDetail.setId(null);
+      /*  if(switchTmp){ //如果为true 则新增备件 否则为修改备件
+            itemDetail.setId(null);
+        }*/
+        //itemDetail.setId(null);
         saveItem();
     }
     List<TableDefinition> tDefinitions;
