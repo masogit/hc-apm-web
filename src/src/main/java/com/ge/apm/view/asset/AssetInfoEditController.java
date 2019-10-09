@@ -439,7 +439,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setMaitanance(supplier == null ? null : supplier.getName());
                 selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
                 break;
-            case "manufacture":
+            case "manufacturer":
                 selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
                 selected.setManufacture(supplier == null ? null : supplier.getName());
                 break;
@@ -1116,7 +1116,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (newSupplier.getManufacturerT()) {
 
             supplierController.setManufacturerT(true);
-            selectedObjectMap.put("manufacture",newSupplier);
+            selectedObjectMap.put("manufacturer",newSupplier);
         } else {
             supplierController.setManufacturerT(false);
         }
