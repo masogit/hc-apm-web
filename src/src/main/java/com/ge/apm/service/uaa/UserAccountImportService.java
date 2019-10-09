@@ -702,24 +702,24 @@ public class UserAccountImportService {
 		if (sheet == null) {
 			return null;
 		}
-		List<String> headers = new ArrayList<>();
-		headers.add(HEADER_INSTITUTION);
-		headers.add(HEADER_HOSPITAL);
-		headers.add(HEADER_SITE);
-		headers.add(HEADER_DEPARTMENT);
-		headers.add(HEADER_DEPARTMENT2);
-		headers.add(HEADER_DEPARTMENT3);
-		headers.add(HEADER_LOGINNAME);
-		headers.add(HEADER_NAME);
-		headers.add(HEADER_EMAIL);
-		headers.add(HEADER_TELEPHONE);
-		headers.add(HEADER_ISACTIVE);
-		headers.add(HEADER_ISLOCKED);
-		headers.add(HEADER_ROLENAME);
-		headers.add(HEADER_ACCESSSCOPE);
-		headers.add(HEADER_PASSWORD);
-		headers.add(HEADER_UUID);
-		Map<String, Integer> header = ExcelParser.findHeader(sheet,headers);
+//		List<String> headers = new ArrayList<>();
+//		headers.add(HEADER_INSTITUTION);
+//		headers.add(HEADER_HOSPITAL);
+//		headers.add(HEADER_SITE);
+//		headers.add(HEADER_DEPARTMENT);
+//		headers.add(HEADER_DEPARTMENT2);
+//		headers.add(HEADER_DEPARTMENT3);
+//		headers.add(HEADER_LOGINNAME);
+//		headers.add(HEADER_NAME);
+//		headers.add(HEADER_EMAIL);
+//		headers.add(HEADER_TELEPHONE);
+//		headers.add(HEADER_ISACTIVE);
+//		headers.add(HEADER_ISLOCKED);
+//		headers.add(HEADER_ROLENAME);
+//		headers.add(HEADER_ACCESSSCOPE);
+//		headers.add(HEADER_PASSWORD);
+//		headers.add(HEADER_UUID);
+		Map<String, Integer> header = ExcelParser.findFirstRowHeader(sheet);
 		if (header.isEmpty()) {
 			return null;
 		}
@@ -754,10 +754,10 @@ public class UserAccountImportService {
 		int islockedIndex=header.get(HEADER_ISLOCKED);
 		int rolenameIndex=header.get(HEADER_ROLENAME);
 		int accessScopeIndex=header.get(HEADER_ACCESSSCOPE);
-		int passwordIndex=header.get(HEADER_PASSWORD);
+		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
 
-		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
+		for (int j = 1; j <= sheet.getLastRowNum(); j++) {
 			Row row = sheet.getRow(j);
 			if (row == null) {
 				continue;
@@ -808,7 +808,12 @@ public class UserAccountImportService {
 				}
 				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
 				accessScope=ExcelParser.getCellStringValue(row, accessScopeIndex);
-				password = ExcelParser.getCellStringValue(row, passwordIndex);
+				if (passwordIndex != null) {
+					password = ExcelParser.getCellStringValue(row, passwordIndex);
+				} else {
+					password = null;
+				}
+
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
 				
 				if(!pass){
@@ -855,12 +860,15 @@ public class UserAccountImportService {
 					}
 
 				} else {
-					if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
-						newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-						newUser.entryptPassword();
-					} else {
-						newUser.setPassword(tenantInfo.getInitialPassword());
-						newUser.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+					if (passwordIndex != null) {
+						//only support new user to have password column
+						if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
+							newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+							newUser.entryptPassword();
+						} else {
+							newUser.setPassword(tenantInfo.getInitialPassword());
+							newUser.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+						}
 					}
 				}
 				

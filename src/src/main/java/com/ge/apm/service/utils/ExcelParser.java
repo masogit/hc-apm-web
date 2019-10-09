@@ -53,6 +53,31 @@ public class ExcelParser {
         return result;
     }
 
+    public static Map<String, Integer> findFirstRowHeader(Sheet sheet) {
+        Map<String, Integer> result = new HashMap<>();
+        String header = "";
+
+        Row row = sheet.getRow(0);
+        if (row == null) {
+            return null;
+        }
+
+        for (int colIndex = row.getFirstCellNum(); colIndex <= row.getLastCellNum(); colIndex++) {
+            Cell cell = row.getCell(colIndex);
+            if (cell == null) {
+                break;
+            }
+            if (StringUtils.isEmpty(cell.getStringCellValue())) {
+                break;
+            }
+
+            result.put(cell.getStringCellValue(), colIndex);
+        }
+
+        return result;
+
+    }
+
 	public static Date getCellDateValue(Row row, int columIndex, SimpleDateFormat sdf) throws Exception {
         Cell cell = row.getCell(columIndex);
         String value = "";
