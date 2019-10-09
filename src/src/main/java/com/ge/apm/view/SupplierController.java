@@ -118,13 +118,15 @@ public void removeAttachmentById(String blobId) {
     @Override
     public void onAfterNewObject(Supplier object, boolean isOK) {
         if (isOK) {
-            attachements.forEach(item -> {
-                if (item.getBoId() == null) {
-                    item.setBoId(object.getId());
-                    item.setBoUuid(object.getUid());
-                    blobService.saveBlobObject(item);
-                }
-            });
+            if (attachements != null){
+                attachements.forEach(item -> {
+                    if (item.getBoId() == null) {
+                        item.setBoId(object.getId());
+                        item.setBoUuid(object.getUid());
+                        blobService.saveBlobObject(item);
+                    }
+                });
+            }
         }
     }
 
