@@ -62,7 +62,6 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     }
 
     public String addAccess(String token,String assetUid,V2_WorkOrder_Detail workOrderDetail){
-        workOrderDetail.setId(null);
         HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(workOrderDetail, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ACCESSADD);
         String url = gatewayURL.replace("{assetUid}",assetUid);
