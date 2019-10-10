@@ -410,6 +410,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
                 + "&asset_name=" + selected.getName()
