@@ -437,4 +437,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '48', '19年大购', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '49', '精神文明创建项目经费', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
 
-
+--YHAAO-5419 V19.10.2
+CREATE INDEX idx_asset_info_clinical_dept_id on asset_info USING BTREE(clinical_dept_uid);
