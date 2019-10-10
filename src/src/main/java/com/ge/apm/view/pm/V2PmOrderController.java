@@ -67,6 +67,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
+    V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
     @Setter @Getter
     private Boolean isBatchOp=true;
     private SupplierController supplierController;
@@ -260,10 +261,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setArrivedGood(false);
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
-            //调用微服务来存附件
-
         }
+       //switchTmp is false 是修改
+        if(switchTmp) {
+            if (itemDetail.getId() != null) {
+                V2_WorkOrder_Detail byId = v2_workOrderDetailRepository.findById(itemDetail.getId());
+                //如果是新的备件 或者 备件是刚刚"新增保存"完成的，那么这个备件都视为新的备件
+                if (byId == null || !byId.getParts().equalsIgnoreCase(itemDetail.getParts())) {
+                    itemDetail.setId(null);
+                }
+            }
+        }
+
         serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
+        accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
     }
 
     public void saveAndadd(int oper){
@@ -271,7 +282,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(oper ==1){ //来自保存新增，从新建一个item
             itemDetail.setId(null);
         }
-        saveItem();
+        //saveItem();
+
+        if (!accessoryList.contains(itemDetail)) {
+            //合同价格"默认等于"预估单价
+            if(itemDetail.getClosedPrice()==null) {
+                itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            itemDetail.setArrivedGood(false);
+            itemDetail.setArrivedGoodReturn(false);
+            accessoryList.add(itemDetail);
+
+        }
+        itemDetail.setId(null);
+        //调用微服务来存附件
+        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
+
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
             BeanUtils.copyProperties(vwd,itemDetail);
@@ -1033,6 +1059,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
+        v2_workOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
