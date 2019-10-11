@@ -37,7 +37,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAccountController.selected != null}" style="min-width: 500px;">
                         <h:panelGroup>
                             <label class="label">#{msg.login_name}*</label>
-                            <p:inputText id="loginName" value="#{userAccountController.selected.loginName}" required="true" requiredMessage="#{msg.login_name} #{msg.ValidationRequire}"/>
+                            <p:inputText id="loginName" value="#{userAccountController.selected.loginName}" required="true" requiredMessage="#{msg.login_name} #{msg.ValidationRequire}" autocomplete="new-password"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.userName}*</label>
@@ -57,6 +57,10 @@
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">初始密码</label>
+                            <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="false">
                             <p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>

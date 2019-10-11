@@ -260,15 +260,15 @@
             <p:inputText id="clinicalOwnerTel" value="#{assetInfoEditController.selected.clinicalOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required}" 
                          requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
         </h:panelGroup>
-    </c:if>
+    </c:if>  <!--制造商 下拉-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
         <h:panelGroup>
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
-            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacture']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
-                            forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}" 
+            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacturer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
+                            forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacturer'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"
                             completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>
             </p:autoComplete>
 
             <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>

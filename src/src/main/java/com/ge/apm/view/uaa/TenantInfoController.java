@@ -13,6 +13,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
@@ -35,6 +36,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import lombok.Getter;
 import lombok.Setter;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -43,18 +45,25 @@ import webapp.framework.web.mvc.JpaCRUDController;
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
 	TenantInfoRepository dao = null;
-	UserAccountRepository userAccountRepository;
+	UserAccountRepository
+			userAccountRepository;
 	UserAccount loginUser;
 	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
 	TableDefinitionRepository tbDao;
 	boolean tempAlready = false;
 	String type = "";
+
+	private boolean isTestTenant = false;
+	private boolean isShowTestTenant = true;
+	private static final Integer NORMAL_Tenant_STATUS = 0; //NORMALTenant
+	private static final Integer TEST_Tenant_STATUS = -1; //TestTenant
+	private static final Integer LX_USER_TYPE = -1; // lixiang user type
+
 	@Getter
 	@Setter
 	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版'
 														// ，添加模版按钮就设置为灰色
-
 	public boolean createOrEdit() {
 		if ("create".equalsIgnoreCase(type)) {
 			return false;
@@ -72,6 +81,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		tenantConfigService = WebUtil.getBean(TenantInfoConfigService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
+
+		//判断是否是理想用户
+		if(LX_USER_TYPE.equals(loginUser.getType())){
+			this.isShowTestTenant = Boolean.FALSE;
+		}else {
+			this.isShowTestTenant = Boolean.TRUE;
+		}
+
 	}
 
 	@Override
@@ -83,11 +100,22 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	protected Page<TenantInfo> loadData(PageRequest pageRequest) {
 		selected = null;
 
-		if (this.searchFilters == null) {
+		List<SearchFilter> searchFilters = this.searchFilters;
+		if (searchFilters == null) {
+			searchFilters = new ArrayList<SearchFilter>();
+		}
+
+		if(LX_USER_TYPE.equals(loginUser.getType())){
+			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_Tenant_STATUS));
+		}
+
+		return dao.findBySearchFilter(searchFilters, pageRequest);
+
+		/*if (this.searchFilters == null) {
 			return dao.findAll(pageRequest);
 		} else {
 			return dao.findBySearchFilter(this.searchFilters, pageRequest);
-		}
+		}*/
 	}
 
 	public static File[] getResourceFolderFiles(String folder) {
@@ -125,7 +153,15 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public List<TenantInfo> getItemList() {
-		return dao.getAllOrderByName();
+		List<TenantInfo> tenantInfos;
+		if (UserContextService.isSuperAdminWithPartnerAccount()) {
+			tenantInfos = dao.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
+		} else {
+			tenantInfos = dao.getAllOrderByName();
+		}
+
+		return tenantInfos;
+
 	}
 
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
@@ -133,6 +169,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareCreate();
 		tenantConfigService.init();
 		this.type = type;
+        this.isTestTenant = Boolean.FALSE;
 	}
 
 	@Override
@@ -156,6 +193,13 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			disableCreateTemplateBt = true;
 		}
 		tempAlready = false;
+
+		//判断是否是测试租户
+		if(TEST_Tenant_STATUS.equals(selected.getTestStatus())){
+			this.isTestTenant = Boolean.TRUE;
+		}else{
+			this.isTestTenant = Boolean.FALSE;
+		}
 	}
 
 	@Transactional
@@ -170,6 +214,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			}
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
+		this.selected.setLastModifiedDate(new Date());
 		super.save();
 	}
 
@@ -332,6 +377,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void onBeforeNewObject(TenantInfo tenant) {
+		tenant.setLastModifiedDate(new Date());
+		tenant.setCreatedDate(new Date());
+		tenant.setTestStatus(NORMAL_Tenant_STATUS);
 		tenant.setIsEnabled(false);
 		super.onBeforeNewObject(tenant);
 	}
@@ -352,6 +400,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	}
 
 	public void onBeforeSave(TenantInfo tenantInfo) {
+
 		if (tenantInfo.getIsEnabled() && tenantInfo.getActiveTime() == null) {
 			tenantInfo.setActiveTime(new Date());
 			tenantInfo.setActiveType(0);
@@ -360,6 +409,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		if (!tenantInfo.getIsEnabled() && tenantInfo.getActiveTime() != null) {
 			tenantInfo.setActiveTime(null);
 		}
+
+		if(this.isTestTenant){
+			tenantInfo.setTestStatus(TEST_Tenant_STATUS);
+		}else{
+            tenantInfo.setTestStatus(NORMAL_Tenant_STATUS);
+        }
 
 	}
 
@@ -393,5 +448,19 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		this.tenantConfigService = tenantConfigService;
 	}
 
-	
+	public boolean isTestTenant() {
+		return isTestTenant;
+	}
+
+	public void setTestTenant(boolean testTenant) {
+		isTestTenant = testTenant;
+	}
+
+	public boolean isShowTestTenant() {
+		return isShowTestTenant;
+	}
+
+	public void setShowTestTenant(boolean showTestTenant) {
+		isShowTestTenant = showTestTenant;
+	}
 }

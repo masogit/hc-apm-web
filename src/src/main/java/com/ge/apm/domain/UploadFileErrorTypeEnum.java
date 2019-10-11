@@ -8,6 +8,7 @@ public enum UploadFileErrorTypeEnum {
 	FORMAT_ERROR,
 	LOGINNAME,
 	NAME,
+	PASSWORD,
 	EMAIL,
 	INSTITUTION,
 	INSTITUTION_ERROR,

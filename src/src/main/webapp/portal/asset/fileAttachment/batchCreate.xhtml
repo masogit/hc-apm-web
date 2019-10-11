@@ -34,7 +34,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}</label>
-                        <p:selectOneMenu id="clinicalDeptName" value="#{assetFileAttachmentController.queryAsset.clinicalDeptId}" required="true">
+                        <p:selectOneMenu id="clinicalDeptName" value="#{assetFileAttachmentController.queryAsset.clinicalDeptId}">
                             <!--<p:ajax  listener="#{assetFileAttachmentController.getQueryAssetsList()}" update="AssetsPickList"/>-->
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetFileAttachmentController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>

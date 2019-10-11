@@ -3,12 +3,18 @@ package com.ge.apm.view;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.BlobFileService;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -24,6 +30,9 @@ import webapp.framework.web.WebUtil;
 public class SupplierController extends JpaCRUDController<Supplier> {
 
     SupplierRepository dao = null;
+    private BlobFileService blobService;
+    @Getter @Setter
+    private List<V2_BlobObject> attachements;
 
     AssetInfoRepository assetInfoDao;
 
@@ -31,22 +40,56 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     Boolean manufacturerT =false;
     Boolean supplierT =false;
 
+public void handleFileUpload(FileUploadEvent event) {
+    V2_BlobObject blobObject = blobService.uploadFile(event);
+    if (null != blobObject) {
+        String type = event.getComponent().getId();
+        type = type.substring(type.indexOf("type") + 4);
+        attachements.add(blobObject);
+       // blobObject.setBoId(selected.getId());
+        blobObject.setBoType(V2_BlobObject.BO_TYPE_Supply);
+        blobObject.setBoSubType(type);
+        blobObject.setBoUuid(selected.getUid());
+        blobService.saveBlobObject(blobObject);
+        WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+    } else {
+        WebUtil.addErrorMessage("fail to upload file");
+    }
+}
+public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
         supplierT=null;
         maintainerT=null;
         manufacturerT=null;
+
+        attachements=new ArrayList<V2_BlobObject>();
+    }
+    @Override
+    public void prepareEdit(){
+        super.prepareEdit();
+        attachements=getAttachList(selected.getUid(),"1");
     }
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
-
+                blobService = WebUtil.getBean(BlobFileService.class);
         this.filterBySite = false;
+    }
+
+    public List<V2_BlobObject> getAttachList(String supplierUid, String type) {
+        attachements = blobService.findBlobObjectsByBoUid(supplierUid);
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
 
     }
+
 /*
     public void maintainerTSet(){maintainerT=!maintainerT;}
     public void manufacturerTSet(){ manufacturerT=!manufacturerT;}
@@ -72,7 +115,20 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             supplierT=selected.getSupplierT();
         }
     }
-
+    @Override
+    public void onAfterNewObject(Supplier object, boolean isOK) {
+        if (isOK) {
+            if (attachements != null){
+                attachements.forEach(item -> {
+                    if (item.getBoId() == null) {
+                        item.setBoId(object.getId());
+                        item.setBoUuid(object.getUid());
+                        blobService.saveBlobObject(item);
+                    }
+                });
+            }
+        }
+    }
 
     public void saveSubmit(){
         if (!requiredCheck()) {

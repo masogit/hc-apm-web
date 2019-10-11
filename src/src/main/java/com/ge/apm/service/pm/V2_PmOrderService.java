@@ -102,13 +102,19 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             //unstructuredDataCollection如果在unstructuredData没有对应值 说明工单的性能或安全报告没有填写信息
             if(CollectionUtils.isEmpty(reporter.getData())){
                 //获取保养报告的名字
-                TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+                TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
+                if(byBaseId == null){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "检查项对应的保养报告不存在"));
+                }
                 hm.put("pmReportNeedFill",byBaseId.getName());
             }
         }
         reporter =reportDao.findSaftyReport(v2PmOrder.getId());
         if(null != reporter) {
-            TableDefinition byBaseId = tableDao.findByBaseId(reporter.getSchemaId());
+            TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
+            if(byBaseId == null){
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "检查项对应的保养报告不存在"));
+            }
             if(CollectionUtils.isEmpty(reporter.getData())){
                 hm.put("saftyReportNeedFill",byBaseId.getName());
             }

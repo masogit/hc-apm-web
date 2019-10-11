@@ -7,8 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-
-        <p:dialog id="SupplierEditDlg" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
+        <!--设备档案  修改 供应商信息-->
+        <p:dialog id="SupplierEditDlg" width="1000" height="600" class="modiSupplyDlg" widgetVar="SupplierEditDialog" modal="true" resizable="false" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
             <h:form id="SupplierEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
@@ -61,8 +61,26 @@
                                         </h:panelGrid>
                                 </h:panelGrid>
                         </h:panelGroup>
-                    </p:panelGrid>
 
+                    </p:panelGrid>
+                    <h:panelGroup>
+
+                        <p:fieldset legend="附件上传"><!--供应商的附件上传-->
+                            <h:panelGroup >
+                                <p:dataList id="pictureList" class="pictureListCls" value="#{supplierController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 10)}</f:facet>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                    <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="@(.pictureListCls)" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+
+
+                        </p:fieldset>
+                    </h:panelGroup>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>

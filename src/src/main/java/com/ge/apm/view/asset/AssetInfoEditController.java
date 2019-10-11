@@ -1116,7 +1116,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (newSupplier.getManufacturerT()) {
 
             supplierController.setManufacturerT(true);
-            selectedObjectMap.put("manufacture",newSupplier);
+            selectedObjectMap.put("manufacturer",newSupplier);
         } else {
             supplierController.setManufacturerT(false);
         }

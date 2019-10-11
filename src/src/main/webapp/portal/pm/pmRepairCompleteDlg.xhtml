@@ -159,7 +159,7 @@
                                 <h:outputLabel> | </h:outputLabel>
                                 <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                                 <h:outputLabel> | </h:outputLabel>
-                                <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>
+                                <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{v2PmOrderController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>
                             </p:dataList>
                         </p:fieldset>
                         <p:fieldset  legend="检查项"  rendered="#{not empty v2PmOrderController.selectedPmOrder}">

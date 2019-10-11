@@ -23,6 +23,7 @@ import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.view.sysutil.UserInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -68,6 +69,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     //public static final int ACTIVATION_ROLE = 10;
     public static final String ACTIVATION_ROLE = "ActivationPerson";
+
+    private static final Integer LX_USER_TYPE = -1; // lixinag usertype
+    private boolean isShowButton = true;
+
     UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -136,7 +141,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-        setTenantUid(loginUser.getTenantUID());
+
+
+        if (UserContextService.isSuperAdminWithPartnerAccount()) {
+            //if current user belongs to test tenant, then use the first tenant in non test tenant list
+            List<TenantInfo> tenantInfos = tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
+            setTenantUid(tenantInfos.get(0).getUid());
+        } else {
+            setTenantUid(loginUser.getTenantUID());
+        }
+
+        //判断是否是理想用户
+        if(LX_USER_TYPE.equals(loginUser.getType())){
+            this.isShowButton = Boolean.FALSE;
+        }else {
+            this.isShowButton = Boolean.TRUE;
+        }
 
     }
 
@@ -408,18 +428,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
 
-        if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
-            selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-            try {
-                selected.entryptPassword();
-            } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            selected.setPassword(selectedTenant.getInitialPassword());
-            selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
-        }
-
         this.selectedUserOrg = null;
 
     }
@@ -573,7 +581,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
-        super.save();
+        if (!StringUtils.isEmpty(selected.getPlainPassword())) {
+            String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
+            if(!StringUtils.isEmpty(checkResult)) {
+                WebUtil.addErrorMessage(checkResult);
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
+
+        try {
+            //input new password in create or edit page, so update
+            if (!StringUtils.isEmpty(selected.getPlainPassword())) {
+                selected.entryptPassword();
+
+            } else {
+                //if new user, use tenant initial password or system default password.
+                if (null == selected.getId()) {
+                    if (StringUtils.isEmpty(selectedTenant.getInitialPassword())) {
+                        selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+                        selected.entryptPassword();
+                    } else {
+                        selected.setPassword(selectedTenant.getInitialPassword());
+                        selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
+                    }
+                }
+
+            }
+
+            super.save();
+
+        } catch(NoSuchAlgorithmException e) {
+            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
+        }
+
+
     }
 
     public void resetPassword() {
@@ -1056,5 +1099,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setRoles(List<SysRole> roles) {
         this.roles = roles;
+    }
+
+    public boolean isShowButton() {
+        return isShowButton;
+    }
+
+    public void setShowButton(boolean showButton) {
+        isShowButton = showButton;
     }
 }
