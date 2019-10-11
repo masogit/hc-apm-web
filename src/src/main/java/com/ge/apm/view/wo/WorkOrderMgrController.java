@@ -851,9 +851,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         return woService.getWorkOrderSteps(woId);
     }
    public String getRepairResponer(String woId,Integer step){
-        if("ff8080816bff3570016bff9458830001".equalsIgnoreCase(woId)){
-            System.out.println();
-        }
       List <V2_WorkOrder_Step >vs=null;
         vs =woService.getWorkOrderDetailResponsor(woId,step);
         if(vs !=null && vs.size()>0){
@@ -1025,7 +1022,8 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         Double tHours = coWorkerList.stream().mapToDouble(p->p.getManHours()).sum();
         //维修人工费用=工单人工费用（元/小时）*总计工时（“工单人工费用”需在流程配置项中配置），若未配置则按照0计算
         //总计工时=维修工程师工时+协作者工时
-
+            if(v2WorkOrder.getManHours()==null)
+                v2WorkOrder.setManHours(new Double(0.0));
         c_repairManCost=c_woManhourPrice*(tHours+v2WorkOrder.getManHours());
         //备件费用
         Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()*p.getApartsQuantity()).sum();
@@ -1356,7 +1354,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         Object eval;
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
-            itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+          //  itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
@@ -1429,8 +1427,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
-    public void saveAndadd(){
+    public void saveAndadd(int oper){
         //照旧原来的添加一个备件
+        if(oper ==1){ //来自保存新增，从新建一个item
+            itemDetail.setId(null);
+        }
         saveItem();
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
@@ -1438,7 +1439,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        vwd.setId(itemDetail.getId());
         // clear 备件名称 备件数量  预估价格
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
@@ -1449,7 +1450,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
     }
-
+    //保存一个备件
     public void saveItem(){
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
@@ -1463,7 +1464,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
     }
+    //保存备件操作
     public void addAcessItem() {
+        itemDetail.setId(null);
         saveItem();
         cancelWorkdetail();
     }

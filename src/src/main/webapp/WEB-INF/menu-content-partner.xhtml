@@ -1,0 +1,20 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" xmlns="http://www.w3.org/1999/xhtml" xmlns:p="http://primefaces.org/ui" xmlns:pu="http://primefaces.org/ultima">
+
+    <div class="menu-content" tabindex="0">
+        <pu:menu widgetVar="me">
+            <p:submenu label="#{msg.SysAdmin}" icon="settings">
+                <p:menuitem value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml"/>
+            </p:submenu>
+
+            <!--Super admin and GE OP only-->
+            <p:submenu label="APM平台管理" icon="settings" >
+                <p:menuitem value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" />
+            </p:submenu>
+
+            <p:menuitem value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
+            <p:menuitem value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
+
+        </pu:menu>
+        
+    </div>
+</ui:composition>

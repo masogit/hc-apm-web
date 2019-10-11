@@ -38,8 +38,6 @@
                         </h:panelGroup>-->
                     </p:panelGrid>
                     <p:commandButton validateClient="true" actionListener="#{measureOrderRuleController.addCheckListItem}" update=":MeasureOrderRuleEditForm:addCheckList :growl" value="#{msg.Save}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MeasureOrderRuleItemEditDlg');">
-
-                        <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
                     </p:commandButton>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{measureOrderRuleController.cancelCheckListItem}" update=":growl" icon="ui-icon-cancel" onclick="PF('MeasureOrderRuleItemEditDlg').hide()"/>

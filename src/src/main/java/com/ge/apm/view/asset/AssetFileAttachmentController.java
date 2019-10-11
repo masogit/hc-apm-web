@@ -294,7 +294,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
 
     public void getQueryAssetsList() {
-        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null)) {
+        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null)) {
             sourceAssets = assetTagService.getAssetList(queryAsset);
 
             sourceAssets = new ArrayList(sourceAssets);

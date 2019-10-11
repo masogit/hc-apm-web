@@ -415,8 +415,27 @@ CREATE INDEX "nurseSiteMaintainItemParentId"
     TABLESPACE pg_default;
 
 --v19.9.1
-update asset_alert_config set lower_limit = null where config_type = 102
+update asset_alert_config set lower_limit = null where config_type = 102;
 DROP INDEX IF EXISTS nurseSiteMaintainDataParentId;
 DROP INDEX IF EXISTS nurseSiteMaintainItemParentId;
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.console,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig' where name = 'AssetStaff';
 update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.analysis,asset.mgt,asset.supplierMgt,asset.scrap,asset.create,asset.audit,asset.batchImportData,asset.inventory,assetAdjust,assetAdjust.borrowAccept,assetAdjust.returnAccept,assetAdjust.batch,assetAdjust.cost,assetAdjust.stock,assetAdjust.config,assetAdjust.nameConfig,install,install.list,install.store,install.check,repair,repair.workbench,repair.count,repair.message,repair.report,repair.workSchedule,repair.vacationMgt,maintain,maintain.reportFormMgt,maintain.workbench,maintain.rule,maintain.assetMgt,maintain.electricDataImport,maintain.reportMgt,measure,measure.console,measure.categoryConfig,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,knowledge,knowledge.mgt,performance,performance.bigScreen,performance.deptMgt,performance.scan,performance.CT,performance.config,performance.import,performance.BI,examineMgt,examineMgt.pcc,examineMgt.pccConfig,link,link.CPM' where name = 'AssetHead';
+
+
+--v19.10.1
+update tenant_info set test_status=0 where test_status is null;
+
+--just for 九院
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '40', '北区口腔开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '41', '北部融合', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '42', '北区手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '43', '北部日间手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '44', '自筹资金', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '45', '"九院浦东科教园区科研大楼及精准医学研究院"建设项目', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '46', '北区中心供应室', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '47', '北区口腔购置', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '48', '19年大购', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '49', '精神文明创建项目经费', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+
+--YHAAO-5419 V19.10.2
+CREATE INDEX idx_asset_info_clinical_dept_id on asset_info USING BTREE(clinical_dept_uid);

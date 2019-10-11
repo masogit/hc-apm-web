@@ -18,6 +18,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
@@ -78,6 +79,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Setter @Getter
     private Boolean periodShow;
+    private TableDefinitionService tableService;
 
     private String filterAssetDeptOrg;
     @Setter @Getter
@@ -259,12 +261,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
             //调用微服务来存附件
-            serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
+
         }
+        serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
     }
 
-    public void saveAndadd(){
+    public void saveAndadd(int oper){
         //照旧原来的添加一个备件
+        if(oper ==1){ //来自保存新增，从新建一个item
+            itemDetail.setId(null);
+        }
         saveItem();
         V2_WorkOrder_Detail vwd= new V2_WorkOrder_Detail();
         try {
@@ -272,7 +278,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } catch (Exception e) {
             e.printStackTrace();
         }
-        vwd.setId(UUID.randomUUID().toString().replace("-", ""));
+        vwd.setId(itemDetail.getId());
         // clear 备件名称 备件数量  预估价格
         vwd.setParts(null);
         vwd.setApartsQuantity(null);
@@ -420,9 +426,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void addReporter(String boUid) {//boUid  is pmOrderId
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
-        TableDefinition tbd = tableDao.findByBaseId(reportUid);
+        TableDefinition tbd = tableDao.findByBaseId(reportUid);//table_def:baseId
+        if(tbd==null) return;
         newReport.setSchemaId(tbd.getId());
         PmOrderRule pmOrderRule = pmOrderService.acqPmOrderRule(selectedPmOrder);
+        if(pmOrderRule==null){
+            pmOrderService.saveReport(newReport);
+            return;
+        }
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getPerformanceReport()))
             newReport.setBoType("pm-performance-report");
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
@@ -992,7 +1003,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
     protected void init() {
-
+        tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -1216,7 +1227,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
     }
 
-
+    public void deleteReporter(String id) {
+        if (null != id) {
+            tableService.deleteReport(id);
+        }
+    }
     /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
     Page<V2_PmOrder> result;
@@ -1644,8 +1659,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
-        //保养合格的话 去关单
-        //cancel();
     }
 
     public void stagingPmOrder() {
@@ -1723,7 +1736,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if ("new".equals(itemId)) {
             switchTmp=true;
             itemDetail = new V2_WorkOrder_Detail();
-            itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+            itemDetail.setId(null);
             itemDetail.setWoId(selectedPmOrder.getId());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             itemDetail.setApplyTime(sdf.parse(sdf.format(new Date())));
@@ -1768,6 +1781,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void addAcessItem() {
+      /*  if(switchTmp){ //如果为true 则新增备件 否则为修改备件
+            itemDetail.setId(null);
+        }*/
+        //itemDetail.setId(null);
         saveItem();
     }
     List<TableDefinition> tDefinitions;

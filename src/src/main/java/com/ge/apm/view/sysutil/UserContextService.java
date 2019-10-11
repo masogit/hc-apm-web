@@ -572,6 +572,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
+            if(isPartnerAccount())
+                return "/admin/uaa/siteInfo/List.xhtml";
+
             if(isIBorUltraSoundIBEndUser())
                 return "portal/profile.xhtml";
             
@@ -747,6 +750,27 @@ public class UserContextService implements Serializable {
         if(isDealerEndUser()) return false;
         if(isIBEndUser()) return false;
         return !isUltraSoundIBEndUser();
+    }
+
+    /**
+     * this api is to check whether login user is for lixiang company.
+     * @return
+     */
+    public boolean isPartnerAccount() {
+        UserAccount user = getLoginUser();
+        if (null == user.getType()) {
+            return false;
+        }
+        if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isSuperAdminWithPartnerAccount(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.isPartnerAccount();
     }
     
     public static boolean isOnlyLocalITAdmin() {
