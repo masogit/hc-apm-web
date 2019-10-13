@@ -16,6 +16,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
@@ -26,6 +27,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import lombok.Data;
@@ -38,6 +40,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -82,6 +85,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Boolean periodShow;
     private TableDefinitionService tableService;
 
+    private List<String> pmFieldsExport= new ArrayList<>();
     private String filterAssetDeptOrg;
     @Setter @Getter
     List<UnstructuredDataCollection> reportList;
@@ -205,16 +209,38 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void setHead(String head) {
         this.head = head;
     }
+    @Getter @Setter
+    private StreamedContent excelFile;
 
 
-    public void preBatchCancel(){
-        cancelReason=null;
+   public void exportExcel() throws IOException{
+       PmFileExportTemplate template = new PmFileExportTemplate();
+        List<V2_PmOrder> pmOrderList = getPmListByselectedId();
+       if(pmOrderList ==null){
+           WebUtil.addErrorMessage("请先选择要导出的文件");
+         //  RequestContext.getCurrentInstance().addCallbackParam("", true);
+           return;
+       }
+        template.exportPm(pmOrderList,pmFieldsExport);
+       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
+   }
+
+   private  List<V2_PmOrder> getPmListByselectedId(){
         List<String> pmIdList = new ArrayList<String>();
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
         });
-         List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+        if(pmIdList.size()==0) {
+            return null;
+        }
+        List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
+        return pmList;
+    }
+
+    public void preBatchCancel(){
+        cancelReason=null;
+         List<V2_PmOrder> pmList =getPmListByselectedId();
          //周期性工单的pmtype是1
         Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
         if(any.isPresent()){
@@ -1086,6 +1112,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 searchList(queryIndex);
             }
         }
+        for (ExportFields exs: ExportFields.values()
+        ) {
+            pmFieldsExport.add(exs.getChinese());
+        }
+
         /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
             String query = WebUtil.getRequestParameter("query");
             if (Strings.isNullOrEmpty(query)) {
@@ -1475,7 +1506,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      return orders;
     }
 
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
     public void onSelectPmOrder() {
+
         accessoryList = getWorkOrderDetail(selected.getId());
         coWorkerList = getWorkOrderCoworker(selected.getId());
         // 获取picList
@@ -1494,9 +1530,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
- if(selected!=null)
+
+    if(selected!=null)
         return pmOrderService.getWorkOrderDetails(selected.getId());
- else
+        else
      return null;
     }
 

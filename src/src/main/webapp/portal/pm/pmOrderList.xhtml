@@ -195,8 +195,9 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}" >
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="PmOrder_export"/>
+                            <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}"  onclick="PrimeFaces.monitorDownload(start, stop);">
+
+                                <p:fileDownload value="#{v2PmOrderController.excelFile}"/>
                             </p:commandButton>
 
                             <ui:fragment rendered="true">
@@ -209,9 +210,6 @@
 
                                 <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
                                 </p:commandButton>
-
-
-
 
                                 <p:commandButton  icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.isBatchOp and (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3)}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
                                 </p:commandButton>
@@ -611,7 +609,11 @@
                     handleSubmit(args, 'closePmDialog');
                     PF('createSRDialog').show()
                 }
+function test(){
+    if(args.xxx){
 
+    }
+}
                 function forbidBatchComplete(xhr, status, args) {
                      if(args.batchForbidForApproval){
 
@@ -629,6 +631,7 @@
                         PF('transferOrderDialog').show()
                     }
                 }
+
                 function updateSelectAllCheckBox() {
                     var checkboxlist = $(".selectCheckBox");
                     var selectAllstatus = true;
