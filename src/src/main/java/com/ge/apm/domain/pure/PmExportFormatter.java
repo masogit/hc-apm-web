@@ -54,7 +54,7 @@ public class PmExportFormatter<T> {
         return type;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap() {
+    public Map<String, Object> buildExcelCoxlumnKeyValueMap() {
 
         Map<String, Object> map = new HashMap<>();
         map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
