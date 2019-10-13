@@ -535,7 +535,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
 
 
     public Boolean canCreateSr() {
-        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() != 0) {
             if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
                 if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
                     return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
