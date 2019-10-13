@@ -263,9 +263,8 @@
     </c:if>  <!--制造商 下拉-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
         <h:panelGroup>
-            <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
-            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacturer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
-                            forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacturer'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"
+            <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacturer'].required? '*':''}</span></label>
+            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacturer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('manufacturer')}" forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacturer'].required}"  requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"
                             completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>
                 <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacturer')}"/>

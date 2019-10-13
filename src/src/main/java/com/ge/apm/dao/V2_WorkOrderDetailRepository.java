@@ -16,7 +16,10 @@ public interface V2_WorkOrderDetailRepository extends GenericRepositoryUUID<V2_W
 //    @Query(value ="select wod.* from V2_WorkOrder_Detail wod ,V2_Work_Order wo  where wod.wo_id=wo.id and wo.asset_Id =?1 and  wod.contract_num=?3 and wo.tenant_UID=?4"
 //            + "union all select wod.* from V2_WorkOrder_Detail wod ,v2_pm_order po  where wod.wo_id=po.id and po.asset_uid =?2 and  wod.contract_num=?3 and po.tenant_UID=?4",nativeQuery = true)
 //    List<V2_WorkOrder_Detail> findByAssetUidAndContractNum(Integer assetId,String assetUid, String contractNum, String tenant_uid);
-//    
+//
+
+
+
     @Query("select wo from V2_WorkOrder_Detail wod , V2_WorkOrder wo where wo.id=wod.woId and wod.contractNum=?1 and wo.tenantUID=?2")
     List<V2_WorkOrder> findWorkOrderByContractNum(String contractNum, String tenant_uid);
     
