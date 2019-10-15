@@ -439,3 +439,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 --YHAAO-5419 V19.10.2
 CREATE INDEX idx_asset_info_clinical_dept_id on asset_info USING BTREE(clinical_dept_uid);
+update asset_alert_config set label = '机柜湿度', pad_message = '机柜湿度异常，请检测室内空调，并联系在线工程师。', wechat_message='机柜湿度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检测室内空调，并联系在线工程师。' where config_type = '405';
+update asset_alert_config set label = '机柜温度', pad_message = '机柜温度异常，请检测室内空调，并联系在线工程师。', wechat_message='机柜温度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检测室内空调，并联系在线工程师。' where config_type = '404';
