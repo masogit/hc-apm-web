@@ -67,8 +67,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
+    public static final String SYSTEM_ACTIVE = "ActivationPerson";
     //public static final int ACTIVATION_ROLE = 10;
-    public static final String ACTIVATION_ROLE = "ActivationPerson";
 
     private static final Integer LX_USER_TYPE = -1; // lixinag usertype
     private boolean isShowButton = true;
@@ -327,6 +327,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return;
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
+        roleListVO = new ArrayList<>();//
+        assignedRoles = new ArrayList<>();
+        if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
+            SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
+            if(sysRoleVO == null){
+                logger.error("cann't find system role by ActivationPerson");
+                return;
+            }
+            roleListVO.add(sysRoleVO);
+            assignedRoles.add(sysRoleVO.getRoleDesc());
+        }else{
+            roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
+            List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
+            if(CollectionUtils.isNotEmpty(customRoles)){
+                for (CustomRole customRole : customRoles) {
+                    assignedRoles.add(customRole.getName());
+                }
+            }
+            List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
+            for (UserRole userRole : sysRoleList) {
+                assignedRoles.add(userRole.getRole().getRoleDesc());
+            }
+        }
+        prepareUserScope();
+
 
         /*TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
 
@@ -351,19 +376,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
 
         }*/
-        roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
-        assignedRoles = new ArrayList<>();
-        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
-        if(CollectionUtils.isNotEmpty(customRoles)){
-            for (CustomRole customRole : customRoles) {
-                assignedRoles.add(customRole.getName());
-            }
+    }
+
+    public SysRoleVO getVOBySysRoleName(String sysRoleName){
+        SysRole sr =sysRoleRepository.getByName(sysRoleName);
+        if(sr != null){
+            SysRoleVO srVO = new SysRoleVO();
+            srVO.setId(sr.getId());
+            srVO.setName(sr.getName());
+            srVO.setRoleDesc(sr.getRoleDesc());
+            srVO.setRoleType(0);
+            return srVO;
         }
-        List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
-        for (UserRole userRole : sysRoleList) {
-            assignedRoles.add(userRole.getRole().getRoleDesc());
-        }
-        prepareUserScope();
+        return null;
     }
 
     public void saveRoles() {
@@ -873,7 +898,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
         List<UserRole> roles = loginUser.getUserRoleList();
-        SysRole sysRole = sysRoleRepository.getByName(ACTIVATION_ROLE);
+        SysRole sysRole = sysRoleRepository.getByName(SYSTEM_ACTIVE);
         if(sysRole != null){
             roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
             if(CollectionUtils.isNotEmpty(roles)){
