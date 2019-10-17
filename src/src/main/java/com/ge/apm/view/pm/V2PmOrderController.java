@@ -216,7 +216,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
    public void exportExcel() throws IOException{
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
-       if(pmOrderList ==null){
+       if(pmOrderList ==null && queryIndex !=10){
            WebUtil.addErrorMessage("请先选择要导出的文件");
          //  RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
