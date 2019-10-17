@@ -216,7 +216,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
    public void exportExcel() throws IOException{
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
-       if(pmOrderList ==null){
+       if(pmOrderList ==null && queryIndex!=10){
            WebUtil.addErrorMessage("请先选择要导出的文件");
          //  RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
@@ -231,6 +231,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (v == true)
                 pmIdList.add(k);
         });
+       if(queryIndex == 10){
+           if(pmIdList.size()==0) {//如果全部没选 就是在"全部中"点击了导出
+               selectedMap.forEach((k, v) -> {
+                   pmIdList.add(k);
+               });
+
+           }
+       }
+
         if(pmIdList.size()==0) {
             return null;
         }
