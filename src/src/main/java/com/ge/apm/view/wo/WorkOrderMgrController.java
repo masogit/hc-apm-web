@@ -1379,12 +1379,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     public void prepareEditAccDetail(String itemId) {
         Object eval;
         if ("new".equals(itemId)) {
+            selectedObjectMap = new HashMap();
             itemDetail = new V2_WorkOrder_Detail();
-          //  itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
-            selectedObjectMap = new HashMap();
             switchTmp=true;
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
@@ -1397,12 +1396,13 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;
     }
-    public void prepareEditAccDetail1(V2_WorkOrder_Detail vwd) {
-
-            switchTmp=false;
+    public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
+        switchTmp=false;
+        accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        selectedObjectMap.put("supplier",supplierName);
         nochange=false;
     }
 
@@ -1410,7 +1410,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
         supplierName=itemDetail.getSupplier();
+
         nochange = true;
     }
 
@@ -1479,7 +1481,12 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
         vwd.setClosedPrice(null);
-
+        vwd.setWarrantyDate(null);
+        vwd.setEstimatedArriveTime(null);
+        vwd.setSerialNum(null);
+        vwd.setComment(null);
+        vwd.setPartsType(null);
+        selectedObjectMap = new HashMap();
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
@@ -1494,15 +1501,20 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             itemDetail.setArrivedGood(false);
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
-            //调用微服务来存附件
-            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
+        //调用微服务来存附件
+        if(switchTmp==true){
+            itemDetail.setId(null);
+        }
+        serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
     }
     //保存备件操作
     public void addAcessItem() {
-        itemDetail.setId(null);
         saveItem();
+        accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         cancelWorkdetail();
+
+        System.out.println(accessoryList);
     }
     public void updateAccessPrice(){
         woService.updateAccessPrice(itemDetail);
