@@ -1201,9 +1201,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             WebUtil.addErrorMessage("取物时间大于当前时间");
             takeTime = null;
         } else {
-            if (null == takeTime) {
-                takeTime = new Date();
-            }
+            takeTime = new Date();
             woService.takeEquip(selectedWorkOrder, equipmentTaker, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(takeTime));
         }
     }
