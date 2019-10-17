@@ -337,6 +337,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         vwd.setPartsPrice(null);
         vwd.setClosedPrice(null);
         itemDetail= vwd;
+
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
 
     }
@@ -1511,6 +1512,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void onSelectPmOrder() {
+
         accessoryList = getWorkOrderDetail(selected.getId());
         coWorkerList = getWorkOrderCoworker(selected.getId());
         // 获取picList
@@ -1529,9 +1531,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetailON() {
- if(selected!=null)
+
+    if(selected!=null)
         return pmOrderService.getWorkOrderDetails(selected.getId());
- else
+        else
      return null;
     }
 
