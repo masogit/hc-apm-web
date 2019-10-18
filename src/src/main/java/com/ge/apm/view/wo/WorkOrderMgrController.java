@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,7 @@ import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -1037,7 +1039,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         c_repairTotalCost = accPrice+c_repairManCost+v2WorkOrder.getExternalExpense()+v2WorkOrder.getOtherExpense();
     }
 
-    public void saveRepairWorkOrder() {
+    public void saveRepairWorkOrder() throws Exception{
         assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
@@ -1049,7 +1051,19 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         /*else if(selectedWorkOrder.getManHours()!=null && selectedWorkOrder.getManHours()==0.00){
                 selectedWorkOrder.setManHours(null);
             }*/
-        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+
+
+        V2_WorkOrder_Detail tmp = new V2_WorkOrder_Detail();
+        List<V2_WorkOrder_Detail> tmpList = new ArrayList<>();
+        tmpList.addAll(accessoryList);
+        for (V2_WorkOrder_Detail vwd:accessoryList) {
+            if(vwd.getId().equalsIgnoreCase("000")){
+                tmp=vwd;
+            }
+        }
+        tmpList.remove(tmp);
+        accessoryList= tmpList;
+       /* accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));*/
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
@@ -1350,25 +1364,45 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         cancel();
     }
 
+    public void prepareNewAccDetail(){
+        itemDetail = new V2_WorkOrder_Detail();
+
+        itemDetail.setWoId(selectedWorkOrder.getId());
+        itemDetail.setApplyTime(new Date());
+        supplierName = null;
+        selectedObjectMap = new HashMap();
+        switchTmp=true;
+        currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
+        Object eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
+        itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+    }
     public void prepareEditAccDetail(String itemId) {
         Object eval;
         if ("new".equals(itemId)) {
+            selectedObjectMap = new HashMap();
             itemDetail = new V2_WorkOrder_Detail();
-          //  itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
             itemDetail.setApplyTime(new Date());
             supplierName = null;
-            selectedObjectMap = new HashMap();
             switchTmp=true;
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
         } else {
             switchTmp=false;
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        nochange=false;
+    }
+    public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
+        switchTmp=false;
+        accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
+            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().get();
+            supplierName = itemDetail.getSupplier();
+        supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        selectedObjectMap.put("supplier",supplierName);
         nochange=false;
     }
 
@@ -1376,7 +1410,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
         supplierName=itemDetail.getSupplier();
+
         nochange = true;
     }
 
@@ -1445,7 +1481,12 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         vwd.setApartsQuantity(null);
         vwd.setPartsPrice(null);
         vwd.setClosedPrice(null);
-
+        vwd.setWarrantyDate(null);
+        vwd.setEstimatedArriveTime(null);
+        vwd.setSerialNum(null);
+        vwd.setComment(null);
+        vwd.setPartsType(null);
+        selectedObjectMap = new HashMap();
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
 
@@ -1460,15 +1501,20 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             itemDetail.setArrivedGood(false);
             itemDetail.setArrivedGoodReturn(false);
             accessoryList.add(itemDetail);
-            //调用微服务来存附件
-            serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
         }
+        //调用微服务来存附件
+        if(switchTmp==true){
+            itemDetail.setId(null);
+        }
+        serviceRequestApiService.addAccess(token,selectedWorkOrder.getAssetInfo().getUid(),itemDetail);
     }
     //保存备件操作
     public void addAcessItem() {
-        itemDetail.setId(null);
         saveItem();
+        accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         cancelWorkdetail();
+
+        System.out.println(accessoryList);
     }
     public void updateAccessPrice(){
         woService.updateAccessPrice(itemDetail);
@@ -1623,7 +1669,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     //是否允许内修
     public Boolean canCreateSr() {
-        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() != 0) {
             if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
                 if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
                     return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());

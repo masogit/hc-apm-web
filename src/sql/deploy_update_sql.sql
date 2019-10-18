@@ -426,16 +426,19 @@ update sys_role set menus='homePage,asset,asset.scrapTempMgt,asset.info,asset.an
 update tenant_info set test_status=0 where test_status is null;
 
 --just for 九院
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '40', '北区口腔开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '41', '北部融合', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '42', '北区手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '43', '北部日间手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '44', '自筹资金', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '45', '"九院浦东科教园区科研大楼及精准医学研究院"建设项目', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '46', '北区中心供应室', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '47', '北区口腔购置', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '48', '19年大购', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '49', '精神文明创建项目经费', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '490', '经常经费', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '500', '北区口腔开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '510', '北部融合', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '520', '北区手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '530', '北部日间手术室开办', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '540', '自筹资金', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '550', '"九院浦东科教园区科研大楼及精准医学研究院"建设项目', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '560', '北区中心供应室', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '570', '北区口腔购置', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '580', '19年大购', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
+--INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('capitalSource', '590', '精神文明创建项目经费', 'capitalSource', NULL,(select id from tenant_info where name like '%上海交通大学医学院附属第九人民医院%'));
 
 --YHAAO-5419 V19.10.2
 CREATE INDEX idx_asset_info_clinical_dept_id on asset_info USING BTREE(clinical_dept_uid);
+update asset_alert_config set label = '机柜湿度', pad_message = '机柜湿度异常，请检测室内空调，并联系在线工程师。', wechat_message='机柜湿度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检测室内空调，并联系在线工程师。' where config_type = '405';
+update asset_alert_config set label = '机柜温度', pad_message = '机柜温度异常，请检测室内空调，并联系在线工程师。', wechat_message='机柜温度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检测室内空调，并联系在线工程师。' where config_type = '404';
