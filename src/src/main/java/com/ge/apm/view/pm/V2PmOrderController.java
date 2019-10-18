@@ -1399,10 +1399,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 //如果选择除计划完成时间的其它列 进行排序
                 orders =  acqListSortOrder(pageRequest);
             }
-
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
             currentPagePmOrders = result.getContent();
             return result;
         }
