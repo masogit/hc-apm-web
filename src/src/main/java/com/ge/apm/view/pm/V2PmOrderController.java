@@ -233,13 +233,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
-
         template.exportPm(pmOrderList,pmFieldsExport);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
    }
     List<String> pmIdList = new ArrayList<String>();
    private  List<V2_PmOrder> getPmListByselectedId(){
-
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
@@ -1345,7 +1343,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已取消"));
         }
-
         if(queryIndex==100){
             //from asset detail page
             filterOutPm(searchFilters);
@@ -1379,9 +1376,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return result;
         }
         if(queryIndex==-2){
+            pmIdList = new ArrayList<>();
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
+            pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
@@ -1522,7 +1521,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
        // isSelectedCurrentPage=false;
-        if(queryIndex==20){
+        if(queryIndex==20 || queryIndex== 8){
             pmIdList= new ArrayList<>();
             result.getContent().forEach(item->pmIdList.add(item.getId()));
 
