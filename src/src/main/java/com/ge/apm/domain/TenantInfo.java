@@ -98,7 +98,7 @@ public class TenantInfo implements Serializable {
     private Integer passwordLifeTime; //密码有效天数
     
     @Column(name = "type")
-    private Integer type = 0;//0、普通租户，1、代理商租户
+    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户
 
     @Column(name = "is_insulate")
     private Boolean isInsulate;
@@ -129,7 +129,7 @@ public class TenantInfo implements Serializable {
     private String initialPasswordSalt;
 
     @Column(name = "test_status")
-    private Integer testStatus;
+    private Integer testStatus;// 0:正常租户  -1：运营商租户（包含测试租户）
 
     @Temporal(TemporalType.DATE)
     @Column(name = "created_date", nullable = true)

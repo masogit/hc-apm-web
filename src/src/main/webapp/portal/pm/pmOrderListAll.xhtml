@@ -18,7 +18,7 @@
                    <!-- <p:ajax event="tabChange"/>-->
                  <!--   <p:ajax event="tabChange" listener="#{v2PmOrderController.onChange}" update="@(.pmOrderListFormRemote)"></p:ajax>-->
 <!---->
-                    <p:tab   class="ui-g-12" title="内部保养" id="pmOrderList" rendered="#{pmOrderTabController.showInOrder}">
+                    <p:tab   class="ui-g-12" title="内部保养" id="pmOrderList" rendered="#{not userContextService.isIBTenant()}">
 
                         <ui:include src="pmOrderList.xhtml"/>
                     </p:tab>
