@@ -212,26 +212,40 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private StreamedContent excelFile;
 
-
+    public boolean downloadButton(){
+        if(queryIndex==10){
+            return false;
+        }
+        if(pmIdList.size()>0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+   public void clearPmList(){
+       pmIdList = new ArrayList<String>();
+   }
    public void exportExcel() throws IOException{
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
        if(pmOrderList ==null && queryIndex!=10){
            WebUtil.addErrorMessage("请先选择要导出的文件");
-         //  RequestContext.getCurrentInstance().addCallbackParam("", true);
+           RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
+
         template.exportPm(pmOrderList,pmFieldsExport);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
    }
-
+    List<String> pmIdList = new ArrayList<String>();
    private  List<V2_PmOrder> getPmListByselectedId(){
-        List<String> pmIdList = new ArrayList<String>();
+
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
+
         });
-       if(queryIndex == 10){
+       if(queryIndex == 10 || queryIndex == 20){
            if(pmIdList.size()==0) {//如果全部没选 就是在"全部中"点击了导出
                selectedMap.forEach((k, v) -> {
                    pmIdList.add(k);
@@ -245,6 +259,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
         return pmList;
+    }
+    public void test(String itemId){
+        pmIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+
+        });
+
+        System.out.println(pmIdList);
     }
 
     public void preBatchCancel(){
@@ -1330,6 +1354,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         if(queryIndex==10){
+            pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
@@ -1348,9 +1373,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
             return result;
         }
         if(queryIndex==-2){
@@ -1494,8 +1519,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPagePmOrders = result.getContent();
+
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
        // isSelectedCurrentPage=false;
+        if(queryIndex==20){
+            pmIdList= new ArrayList<>();
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
+
+        }
         return result;
     }
 
@@ -1632,6 +1663,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         for (V2_PmOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), !isSelectedAll);
         }
+        pmIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+
+        });
+        System.out.println();
     }
 
     public void onItemSelected() {
@@ -1668,6 +1706,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void searchList(Integer buttonIndex) {
+        pmIdList = new ArrayList<String>();
         this.selectedMap = new HashedMap<>();
         queryIndex = buttonIndex;
         this.searchFilters = null;
