@@ -68,23 +68,23 @@ public class AssetTagService {
 
     public List<AssetInfo> getAssetList(AssetInfo queryAsset) {
 
-        if(queryAsset.getTenantUID() != null) {
+        if(queryAsset.getTenantUID() != null || queryAsset.getInstitutionUID() != null || queryAsset.getHospitalUID() != null || queryAsset.getSiteUID() != null) {
             List<SearchFilter> assetFilters = new ArrayList<>();
 
             //assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
             assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
             assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
 
-            if (queryAsset.getTenantUID() != null) {
+            if (null != queryAsset.getTenantUID()) {
                 assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
             }
-            if (queryAsset.getInstitutionUID() != null) {
+            if (null != queryAsset.getInstitutionUID()) {
                 assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, queryAsset.getInstitutionUID()));
             }
-            if (queryAsset.getHospitalUID() != null) {
+            if (null != queryAsset.getHospitalUID()) {
                 assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryAsset.getHospitalUID()));
             }
-            if (queryAsset.getSiteUID() != null) {
+            if (null != queryAsset.getSiteUID()) {
                 assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, queryAsset.getSiteUID()));
             }
             if (null != queryAsset.getClinicalDeptId()) {
@@ -95,6 +95,9 @@ public class AssetTagService {
             }
             if (null != queryAsset.getFunctionType()) {
                 assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+            }
+            if (null != queryAsset.getName()) {
+                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
             }
 
             //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
