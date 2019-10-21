@@ -19,7 +19,7 @@
 				</h:panelGroup>
 			</p:panelGrid>
 			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-				<h:panelGroup>
+				<h:panelGroup id="configSelection">
 					<label class="label">请选择配置</label>
 					<!-- <p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}">
 							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
@@ -29,6 +29,10 @@
 								<h:outputText value="#{t!=null?t.name:'请选择...'}" />
 							</p:column>
 	                    </p:selectOneMenu> -->
+					<br />
+					<p:selectBooleanCheckbox itemLabel="全选配置" value="#{maintainController.selectAll}">
+						<p:ajax listener="#{maintainController.onCheckChange}"  update="configSelection" />
+					</p:selectBooleanCheckbox>
 					<p:selectManyMenu id="nurseSiteMaintainConfigId" value="#{maintainController.listCheckedNurseSiteMaintainConfig}" var="t"
 						converter="nurseSiteMaintainConfigConverter" required="true" requiredMessage="配置 #{msg.ValidationRequire}" filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
 						<f:selectItems value="#{maintainController.showListNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
