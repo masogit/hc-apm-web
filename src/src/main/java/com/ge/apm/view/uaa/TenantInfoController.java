@@ -104,27 +104,17 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-
 		if(LX_USER_TYPE.equals(loginUser.getType())){
 			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_Tenant_STATUS));
 		}
-
 		return dao.findBySearchFilter(searchFilters, pageRequest);
-
-		/*if (this.searchFilters == null) {
-			return dao.findAll(pageRequest);
-		} else {
-			return dao.findBySearchFilter(this.searchFilters, pageRequest);
-		}*/
 	}
 
 	public static File[] getResourceFolderFiles(String folder) {
-
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		URL url = loader.getResource(folder);
 		String path = url.getPath();
 		return new File(path).listFiles();
-
 	}
 
 	private HashMap<String, String> fhMap = new HashMap<String, String>();
