@@ -108,7 +108,7 @@
                                  rendered="#{'vlink' ne assetFileAttachmentController.boSubTypeBatch}">
                             <h:panelGroup rendered="#{assetFileAttachmentController.batchBlobObject.objectName==null}">
                                 <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                              multiple="false" sizeLimit="100000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M"  label="#{msg.Add}" />
+                                              multiple="false" sizeLimit="500000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
                             <h:panelGroup id="namepanel" rendered="#{assetFileAttachmentController.batchBlobObject.objectName!=null}">
