@@ -146,7 +146,7 @@ public class TenantInfoConfigService {
 		return jsonArr;
 	}
 
-	private void resetVersion() {
+	public void resetVersion() {
 		if (StringUtils.isEmpty(edition)) {
 			return;
 		}
@@ -154,9 +154,13 @@ public class TenantInfoConfigService {
 			TenantInfoConfigItem tempItem = menuList.get(i);
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
-			if (edition.equals(VERSION_COMMON) || edition.equals(EXCELLENT_ENJOYMENT_B)) {
+			if (edition.equals(VERSION_COMMON)) {
 				//do nothing
-			}else if (edition.equals(VERSION_ULTRASOUND)) {
+			}else if(edition.equals(EXCELLENT_ENJOYMENT_A)){
+				if(key.equals("measure.templateMgt")){
+					tempItem.setValue(false);
+				}
+			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				} else if (key.equals("assetAdjust")) {
@@ -185,9 +189,7 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				}
 			}else if(edition.equals(EXCELLENT_ENJOYMENT_B)){
-				if (key.equals("assetAdjust")) {
-					tempItem.setValue(false);
-				} else if(key.contains("assetAdjust.")) {
+				if(key.contains("assetAdjust")) {
 					tempItem.setValue(false);
 				}else if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
@@ -195,7 +197,9 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				}else if(key.equals("maintain.reportMgt")){
 					tempItem.setValue(false);
-				}else if(key.equals("nurseSite")){
+				}else if(key.contains("nurseSite")){
+					tempItem.setValue(false);
+				}else if(key.equals("measure.templateMgt")){
 					tempItem.setValue(false);
 				}
 
@@ -214,8 +218,6 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				} else if(key.contains("assetAdjust.")) {
 					tempItem.setValue(false);
-				}else if(key.equals("assetAdjust")) {
-					tempItem.setValue(false);
 				}else if(key.equals("repair.count")) {
 					tempItem.setValue(false);
 				}else if(key.equals("repair.message")) {
@@ -227,6 +229,8 @@ public class TenantInfoConfigService {
 				}else if(key.contains("measure")){
 					tempItem.setValue(false);
 				}else if(key.contains("nurseSite")){
+					tempItem.setValue(false);
+				}else if(key.contains("install")){
 					tempItem.setValue(false);
 				}
 			}
