@@ -346,6 +346,14 @@ public class UserContextService implements Serializable {
     public boolean isIBTenant(){
         UserAccount currentUser = getLoginUser();
         int siteId= currentUser.getSiteId();
+
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+
+        if(siteId==46){
+            if(userContextService.hasRole("AssetStaff")|| userContextService.hasRole("AssetHead")){
+                return false;
+            }
+        }
         return siteId==46;
     }
     
@@ -746,9 +754,22 @@ public class UserContextService implements Serializable {
     }
     
     public boolean isAccountEndUser(){
-        if(isOpsOrSiteAdminUser()) return false;
-        if(isDealerEndUser()) return false;
-        if(isIBEndUser()) return false;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount currentUser = getLoginUser();
+        int siteId= currentUser.getSiteId();
+        /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
+        if(siteId==46){
+            if(userContextService.hasRole("AssetStaff")|| userContextService.hasRole("AssetHead")){
+                return false;
+            }
+        }
+
+        if(isOpsOrSiteAdminUser())
+            return false;
+        if(isDealerEndUser())
+            return false;
+        if(isIBEndUser())
+            return false;
         return !isUltraSoundIBEndUser();
     }
 
