@@ -11,7 +11,7 @@
 
     <p:dialog id="FileEditDlg" widgetVar="FileEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量创建" width="70%" height="550">
         <h:form id="FileSearchForm">
-            <p:fieldset legend="相关设备查询条件">
+            <p:fieldset legend="相关设备查询条件([所属院区]为必选条件，其它查询条件最少要填写或选择一个)">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.hospitalId}</label>
@@ -51,6 +51,10 @@
                     <h:panelGroup>
                         <label class="label">#{msg.functionType}</label>
                         <p:inputText id="functionType" value="#{assetFileAttachmentController.queryAsset.functionType}" maxlength="100"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetName}</label>
+                        <p:inputText id="assetName" value="#{assetFileAttachmentController.assetName}" maxlength="100" required="false"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
@@ -108,7 +112,7 @@
                                  rendered="#{'vlink' ne assetFileAttachmentController.boSubTypeBatch}">
                             <h:panelGroup rendered="#{assetFileAttachmentController.batchBlobObject.objectName==null}">
                                 <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                              multiple="false" sizeLimit="100000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M"  label="#{msg.Add}" />
+                                              multiple="false" sizeLimit="500000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
                             <h:panelGroup id="namepanel" rendered="#{assetFileAttachmentController.batchBlobObject.objectName!=null}">

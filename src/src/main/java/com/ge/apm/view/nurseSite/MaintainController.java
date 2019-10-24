@@ -81,6 +81,9 @@ public class MaintainController implements ServerEventInterface{
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
 	private UserAuth customRoleAuth;
+
+	private boolean isSelectAll = Boolean.FALSE;
+
 	@PostConstruct
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
@@ -714,6 +717,31 @@ public class MaintainController implements ServerEventInterface{
 		return "maintainMain?faces-redirect=true";
 	}
 
+	@Override
+	public void onServerEvent(String eventName, Object eventObject) {
+		// TODO Auto-generated method stub
+		OrgInfo tempOrg = (OrgInfo) eventObject;
+		if (listCheckClinicalOrgInfo != null) {
+			listCheckClinicalOrgInfo.clear();
+		} else {
+			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
+		}
+		if (tempOrg != null) {
+			listCheckClinicalOrgInfo.add(tempOrg);
+		}
+		onClinicalOrgInfoChange();
+	}
+
+	public void onCheckChange(){
+
+		listCheckedNurseSiteMaintainConfig = new ArrayList<>();
+
+		if(this.isSelectAll){
+			listCheckedNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
+		}
+
+	}
+
 	public UserAccount getCurrentUser() {
 		return currentUser;
 	}
@@ -906,19 +934,11 @@ public class MaintainController implements ServerEventInterface{
 		this.customRoleAuth = customRoleAuth;
 	}
 
-	@Override
-	public void onServerEvent(String eventName, Object eventObject) {
-		// TODO Auto-generated method stub
-		OrgInfo tempOrg = (OrgInfo) eventObject;
-		if (listCheckClinicalOrgInfo != null) {
-			listCheckClinicalOrgInfo.clear();
-		} else {
-			listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
-		}
-		if (tempOrg != null) {
-			listCheckClinicalOrgInfo.add(tempOrg);
-		}
-		onClinicalOrgInfoChange();
+	public boolean isSelectAll() {
+		return isSelectAll;
 	}
 
+	public void setSelectAll(boolean selectAll) {
+		isSelectAll = selectAll;
+	}
 }

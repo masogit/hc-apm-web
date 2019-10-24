@@ -67,6 +67,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
+    public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
     //public static final int ACTIVATION_ROLE = 10;
 
@@ -452,14 +453,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-
         this.selectedUserOrg = null;
-
     }
 
     @Override
     public void onAfterNewObject(UserAccount userAccount, boolean isOk) {
-        if (isOk && this.crudActionName.equals("Create")) {
+/*        if (isOk && this.crudActionName.equals("Create")) {
             List<String> role = new ArrayList<String>();
             role.add(DEFAULT_USER_ROLE);
             uaaService.setUserRoles(selected, role);
@@ -473,7 +472,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             prePareForScopeForNewUser(selected,accessOrgTree);
             userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
             userOrgInfoRepository.save(userOrgInfoList);
-        }
+        }*/
     }
 
     @Override
@@ -551,7 +550,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
-
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
         String loginName = user.getLoginName();
@@ -561,10 +559,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
         if (selectedUserOrg != null) {
-
             //keep old org uid to use in update
             previousOrgUid = user.getOrgInfoUID();
-
             user.setOrgInfoId(selectedUserOrg.getId());
             user.setOrgInfoUID(selectedUserOrg.getUid());
             user.setSiteId(selectedUserOrg.getSiteId());
@@ -598,6 +594,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
 
     @Override
+    @Transactional
     public void save() {
         if (selectedUserOrg != null) {
             //判断操作权限
@@ -605,7 +602,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
             if(!StringUtils.isEmpty(checkResult)) {
@@ -615,7 +611,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
         try {
             //input new password in create or edit page, so update
             if (!StringUtils.isEmpty(selected.getPlainPassword())) {
@@ -634,13 +629,36 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
 
             }
-
             super.save();
-
+            if (this.crudActionName.equals("Create")) {
+                updateUserRole(loginUser.getType());
+            }
         } catch(NoSuchAlgorithmException e) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
 
+
+    }
+
+    @Transactional
+    public void updateUserRole(Integer creatorUserType){
+        List<String> role = new ArrayList<String>();
+        if(creatorUserType != null && creatorUserType == LX_USER_TYPE){
+            role.add(SYSTEM_ACTIVE_ROLE);
+        }else{
+            role.add(DEFAULT_USER_ROLE);
+        }
+        uaaService.setUserRoles(selected, role);
+        uaaService.setDefaultScope(selected);
+
+        //绑定新建用户和该用户所在层级的以下层级
+        userOrgInfoList=new ArrayList<UserOrgInfo>();
+        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+        List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+        setSelectedOrgTree(accessOrgTree, orgList);
+        prePareForScopeForNewUser(selected,accessOrgTree);
+        userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+        userOrgInfoRepository.save(userOrgInfoList);
 
     }
 
