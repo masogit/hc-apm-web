@@ -1,6 +1,7 @@
 package com.ge.apm.service.utils;
 
 import com.ge.apm.domain.ImportFiles;
+import com.ge.apm.domain.ImportFilesVO;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -26,18 +27,18 @@ public class FileScanExportService {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public List<Map<String, Object>> createFileScanData(List<ImportFiles> fileScanList){
+    public List<Map<String, Object>> createFileScanData(List<ImportFilesVO> fileScanList){
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        for (ImportFiles importFiles : fileScanList) {
+        for (ImportFilesVO importFilesVO : fileScanList) {
             Map<String, Object> resultMap = new HashedMap();
 
-            resultMap.put("文件名称", importFiles.getFileName());
-            resultMap.put("文件类型", FieldValueMessageController.fieldValue(I18N_BATCH_FILE_TYPE, importFiles.getFileType()));
-            resultMap.put("上传时间", formatDate(importFiles.getUploadedTime()));
-            resultMap.put("创建人", getUserName(importFiles.getCreatorUID()));
-            resultMap.put("当前状态", FieldValueMessageController.fieldValue(I18N_BATCH_FILE_PROCESS_STATUS, importFiles.getStatus()));
+            resultMap.put("文件名称", importFilesVO.getFileName());
+            resultMap.put("文件类型", FieldValueMessageController.fieldValue(I18N_BATCH_FILE_TYPE, importFilesVO.getFileType()));
+            resultMap.put("上传时间", formatDate(importFilesVO.getUploadedTime()));
+            resultMap.put("创建人", getUserName(importFilesVO.getCreatorUID()));
+            resultMap.put("当前状态", FieldValueMessageController.fieldValue(I18N_BATCH_FILE_PROCESS_STATUS, importFilesVO.getStatus()));
 
             resultList.add(resultMap);
         }

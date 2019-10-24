@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.NativeSqlUtil;
@@ -15,6 +18,8 @@ import webapp.framework.web.mvc.SqlDataController;
 public class SqlDynaColumnController extends SqlDataController {
 
     private String sqlColumns = "";
+    private boolean isShow = true;
+    private static final Integer LX_USER_TYPE = -1; // lixinag usertype
 
     public String getSql() {
         return sql;
@@ -23,7 +28,27 @@ public class SqlDynaColumnController extends SqlDataController {
     public void setSql(String sql) {
         this.sql = sql;
     }
-    
+
+    public boolean isShow() {
+        return isShow;
+    }
+
+    public void setShow(boolean show) {
+        isShow = show;
+    }
+
+    @Override
+    public void init() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        //判断是否是理想用户
+        if(LX_USER_TYPE.equals(loginUser.getType())){
+            this.isShow = Boolean.FALSE;
+        }else {
+            this.isShow = Boolean.TRUE;
+        }
+    }
+
     @Override
     public String getColumnNameList() {
         return sqlColumns;

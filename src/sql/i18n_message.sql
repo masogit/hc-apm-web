@@ -1722,6 +1722,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'business', '业务版', 'Business Version', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'ultrasound', '超声科室版', 'Ultrasound Dept', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'assetMgt', '设备运营管理', 'Asset Management', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'excellentEnjoymentA', '享A', 'excellent enjoyment A', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'excellentEnjoymentB', '优/享B', 'excellent enjoyment B', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenantVersion', 'opsVersion', 'OPS版', 'ops version', NULL, '-1');
+
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Open', 'Open', 'Open', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetLifecycleEventStatus', 'Assigned', 'Assigned', 'Assigned', NULL, '-1');
@@ -1931,3 +1935,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'orgPath', '所属单位', 'orgPath', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetLocation', '当前位置', 'assetLocation', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'innerPm', '内部保养', 'inner pm orders', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerPm', '外部保养', 'outer pm orders', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerRemotePm', '外部远程保养', 'outer remote pm orders', NULL, '-1');

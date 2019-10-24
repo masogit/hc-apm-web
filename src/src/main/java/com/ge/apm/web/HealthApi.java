@@ -154,7 +154,11 @@ public class HealthApi {
 	  if (count==0)
 		  return "";
 
-	  String baseurl = request.getRequestURL().toString().substring(0, request.getRequestURL().toString().indexOf("/api/health"));
+	  //String baseurl = request.getRequestURL().toString().substring(0, request.getRequestURL().toString().indexOf("/api/health"));
+	  //String baseurl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI().substring(0, request.getRequestURI().indexOf("/api/health"));
+	  //String baseurl_local = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
+      String baseurl = request.getRequestURI().substring(0, request.getRequestURI().indexOf("/api/health"));
+      String baseurl_local = request.getRequestURI();
 
 	  switch (category) {
       case 0:
@@ -165,9 +169,11 @@ public class HealthApi {
       case 5:
       case 6:
     	  if (request.getQueryString()==null)
-    		  return String.format("%s", request.getRequestURL().toString());
+    		  //return String.format("%s", request.getRequestURL().toString());
+              return String.format("%s", baseurl_local);
     	  else
-    		  return String.format("%s?%s", request.getRequestURL().toString(), request.getQueryString());
+    		  //return String.format("%s?%s", request.getRequestURL().toString(), request.getQueryString());
+              return String.format("%s?%s", baseurl_local, request.getQueryString());
 
       case 11:
       case 12:
@@ -176,9 +182,11 @@ public class HealthApi {
       case 15:
       case 16:
         if (request.getQueryString()==null)
-          return String.format("%s?%s%s", request.getRequestURL().toString(), "category=", category-10);
+          //return String.format("%s?%s%s", request.getRequestURL().toString(), "category=", category-10);
+            return String.format("%s?%s%s", baseurl_local, "category=", category-10);
         else
-          return String.format("%s?%s%s&%s", request.getRequestURL().toString(), "category=", category-10, request.getQueryString());
+          //return String.format("%s?%s%s&%s", request.getRequestURL().toString(), "category=", category-10, request.getQueryString());
+            return String.format("%s?%s%s&%s", baseurl_local, "category=", category-10, request.getQueryString());
 
       case 10:
     	return String.format("%s%s", baseurl, redirect_1);

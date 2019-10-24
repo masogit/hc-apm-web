@@ -247,7 +247,6 @@ public class UaaService {
     @Transactional
     public void setUserRoles(UserAccount userAccount, List<String> newRoleNames){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
-
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
