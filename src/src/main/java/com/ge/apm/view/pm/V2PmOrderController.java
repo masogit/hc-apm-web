@@ -212,30 +212,61 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private StreamedContent excelFile;
 
-
+    public boolean downloadButton(){
+        if(queryIndex==10){
+            return false;
+        }
+        if(pmIdList.size()>0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+   public void clearPmList(){
+       pmIdList = new ArrayList<String>();
+   }
    public void exportExcel() throws IOException{
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
-       if(pmOrderList ==null && queryIndex !=10){
+       if(pmOrderList ==null && queryIndex!=10){
            WebUtil.addErrorMessage("请先选择要导出的文件");
-         //  RequestContext.getCurrentInstance().addCallbackParam("", true);
+           RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
         template.exportPm(pmOrderList,pmFieldsExport);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
    }
-
+    List<String> pmIdList = new ArrayList<String>();
    private  List<V2_PmOrder> getPmListByselectedId(){
-        List<String> pmIdList = new ArrayList<String>();
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
+
         });
+       if(queryIndex == 10 || queryIndex == 20){
+           if(pmIdList.size()==0) {//如果全部没选 就是在"全部中"点击了导出
+               selectedMap.forEach((k, v) -> {
+                   pmIdList.add(k);
+               });
+
+           }
+       }
+
         if(pmIdList.size()==0) {
             return null;
         }
         List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
         return pmList;
+    }
+    public void test(String itemId){
+        pmIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+
+        });
+
+        System.out.println(pmIdList);
     }
 
     public void preBatchCancel(){
@@ -661,7 +692,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public Boolean canCreateSr() {
-        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() != 0) {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
             if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
                 if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
                     return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
@@ -1312,7 +1343,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已取消"));
         }
-
         if(queryIndex==100){
             //from asset detail page
             filterOutPm(searchFilters);
@@ -1321,6 +1351,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         if(queryIndex==10){
+            pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
@@ -1339,15 +1370,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
             return result;
         }
         if(queryIndex==-2){
+            pmIdList = new ArrayList<>();
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
+            pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
@@ -1366,10 +1399,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 //如果选择除计划完成时间的其它列 进行排序
                 orders =  acqListSortOrder(pageRequest);
             }
-
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
             currentPagePmOrders = result.getContent();
             return result;
         }
@@ -1485,8 +1518,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPagePmOrders = result.getContent();
+
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
        // isSelectedCurrentPage=false;
+        if(queryIndex==20 || queryIndex== 8){
+            pmIdList= new ArrayList<>();
+            result.getContent().forEach(item->pmIdList.add(item.getId()));
+
+        }
         return result;
     }
 
@@ -1623,6 +1662,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         for (V2_PmOrder item : currentPagePmOrders) {
             selectedMap.put(item.getId(), !isSelectedAll);
         }
+        pmIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                pmIdList.add(k);
+
+        });
+        System.out.println();
     }
 
     public void onItemSelected() {
@@ -1659,6 +1705,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void searchList(Integer buttonIndex) {
+        pmIdList = new ArrayList<String>();
         this.selectedMap = new HashedMap<>();
         queryIndex = buttonIndex;
         this.searchFilters = null;

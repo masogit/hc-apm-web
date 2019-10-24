@@ -1201,9 +1201,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             WebUtil.addErrorMessage("取物时间大于当前时间");
             takeTime = null;
         } else {
-            if (null == takeTime) {
-                takeTime = new Date();
-            }
+            takeTime = new Date();
             woService.takeEquip(selectedWorkOrder, equipmentTaker, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(takeTime));
         }
     }
@@ -1669,7 +1667,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     //是否允许内修
     public Boolean canCreateSr() {
-        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() != 0) {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
             if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
                 if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
                     return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
