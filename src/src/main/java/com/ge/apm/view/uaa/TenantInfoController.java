@@ -222,7 +222,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			RequestContext.getCurrentInstance().addCallbackParam("tmplateFilled", true);
 			return;
 		} else {
-			if (tenantConfigService.getEdition().contains(TenantInfoConfigService.VERSION_COMMON)) {
+			if (tenantConfigService.getEdition().contains(TenantInfoConfigService.VERSION_COMMON) ||
+					tenantConfigService.getEdition().contains(TenantInfoConfigService.EXCELLENT_ENJOYMENT_A) ||
+					tenantConfigService.getEdition().contains(TenantInfoConfigService.EXCELLENT_ENJOYMENT_B)) {
 				// 加载模版文件
 				loadTemplateFile();
 				// 将模版插入TableDefinition, 先从数据库里查有没有该模版，没有的话就将其加入tbList to be
