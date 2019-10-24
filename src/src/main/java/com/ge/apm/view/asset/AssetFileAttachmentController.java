@@ -2,10 +2,8 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -43,6 +41,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     BlobObjectRepository dao;
     OrgInfoRepository orgInfoDao;
+    TenantInfoRepository tenantInfoDao;
 
     BlobFileService blobFileService;
 
@@ -84,9 +83,12 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private VlinkParserService vlinkParserService;
 
+    private String assetName;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(BlobObjectRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         microService = WebUtil.getBean(MicroServiceUtil.class);
         assetService = WebUtil.getBean(AssetInfoService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -248,14 +250,18 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(loginUser.getTenantUID());
+        OrgInfo tempOrgInfo = orgInfoDao.getByUid(loginUser.getTenantUID());
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
         OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        /*rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));*/
+        rootOrg.setId(tenantInfo.getId());
+        rootOrg.setName(WebUtil.getMessage(tenantInfo.getName()));
         orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        TreeNode rootNode = new DefaultTreeNode("org", tempOrgInfo, orgTree);
         rootNode.getChildren().add(treeNode);
         //rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
         rootNode.setExpanded(true);
@@ -264,6 +270,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void onSelectTreeNode(NodeSelectEvent event) {
 
+        queryAsset.setTenantUID(null);
         queryAsset.setInstitutionUID(null);
         queryAsset.setHospitalUID(null);
         queryAsset.setSiteUID(null);
@@ -277,7 +284,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
 
         if (selectedOrg != null && selectedOrg.getOrgLevel() != null) {
-            if (selectedOrg.getOrgLevel() == 1) {
+            if(selectedOrg.getOrgLevel() == 0){
+                queryAsset.setTenantUID(selectedOrg.getTenantUID());
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getTenantUID(), 4);
+            } else if (selectedOrg.getOrgLevel() == 1) {
                 queryAsset.setInstitutionUID(selectedOrg.getInstitutionUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
             } else if (selectedOrg.getOrgLevel() == 2) {
@@ -289,12 +299,16 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             }
         }
 
-        this.getQueryAssetsList();
+        //this.getQueryAssetsList();
 
     }
 
     public void getQueryAssetsList() {
-        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null)) {
+        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null || this.assetName != null)) {
+
+            if(this.assetName != null){
+                queryAsset.setName(this.assetName);
+            }
             sourceAssets = assetTagService.getAssetList(queryAsset);
 
             sourceAssets = new ArrayList(sourceAssets);
@@ -532,5 +546,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void setVlinkTitle(String vlinkTitle) {
         this.vlinkTitle = vlinkTitle;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 }

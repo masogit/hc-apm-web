@@ -8,7 +8,7 @@
     <ui:define name="title">SQL</ui:define>
 
     <ui:define name="content">
-        <h:form id="searchForm">
+        <h:form id="searchForm" rendered="#{sqlDynaColumnController.show}">
             <h:panelGrid id="searchPanel" columns="10">
                 <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlDynaColumnController.sql}"/>
                 <p:commandButton value="Query" update=":listForm" actionListener="#{sqlDynaColumnController.setErrorMsg(null)}"/>
@@ -17,7 +17,7 @@
 
         </h:form>
 
-        <h:form id="listForm">
+        <h:form id="listForm" rendered="#{sqlDynaColumnController.show}">
             <p:dataTable id="datalist" value="#{sqlDynaColumnController.lazyModel}" var="item" widgetVar="varDataList"
                          selectionMode="single" selection="#{sqlDynaColumnController.selected}"
                          lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"

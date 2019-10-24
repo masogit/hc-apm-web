@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ESBReturn xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ESB.TopSchemaV2">
-	<ESBHeader Status="1" Remarks="" ReturnTime="2015-03-03 13:18:56"/>
-	<ESBBody>
-		<BussinessResponse>
-			<![CDATA[<ResultData> <Table><InPeople>1</InPeople><InIncome>48</InIncome><DayPeople></DayPeople><DayIncome></DayIncome><SPPeople></SPPeople><SPIncome></SPIncome><TecPeople></TecPeople><TecIncome></TecIncome><GroupCode>1414</GroupCode><GroupName>血氧测量仪</GroupName><OpenDepartCode>10030200</OpenDepartCode><OpenDepartName>消化内科</OpenDepartName><SecondCode>10030200</SecondCode><SecondName>消化内科</SecondName><HospitalName>第九人民医院南部</HospitalName></Table><Table><InPeople>1</InPeople><InIncome>336</InIncome><DayPeople></DayPeople><DayIncome></DayIncome><SPPeople></SPPeople><SPIncome></SPIncome><TecPeople></TecPeople><TecIncome></TecIncome><GroupCode>1344</GroupCode><GroupName>呼吸机</GroupName><OpenDepartCode>10030600</OpenDepartCode><OpenDepartName>肾脏内科</OpenDepartName><SecondCode>10030600</SecondCode><SecondName>肾脏内科</SecondName><HospitalName>第九人民医院南部</HospitalName></Table> </ResultData>]]>
-		</BussinessResponse>
-	</ESBBody>
-</ESBReturn>

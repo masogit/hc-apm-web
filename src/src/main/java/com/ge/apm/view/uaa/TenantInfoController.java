@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.service.common.UserCommonService;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
@@ -45,8 +46,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
 	TenantInfoRepository dao = null;
-	UserAccountRepository
-			userAccountRepository;
+	UserAccountRepository userAccountRepository;
 	UserAccount loginUser;
 	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
@@ -62,8 +62,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Getter
 	@Setter
-	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版'
-														// ，添加模版按钮就设置为灰色
+	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版',添加模版按钮就设置为灰色
+
 	public boolean createOrEdit() {
 		if ("create".equalsIgnoreCase(type)) {
 			return false;
@@ -104,27 +104,17 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-
 		if(LX_USER_TYPE.equals(loginUser.getType())){
 			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_Tenant_STATUS));
 		}
-
 		return dao.findBySearchFilter(searchFilters, pageRequest);
-
-		/*if (this.searchFilters == null) {
-			return dao.findAll(pageRequest);
-		} else {
-			return dao.findBySearchFilter(this.searchFilters, pageRequest);
-		}*/
 	}
 
 	public static File[] getResourceFolderFiles(String folder) {
-
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		URL url = loader.getResource(folder);
 		String path = url.getPath();
 		return new File(path).listFiles();
-
 	}
 
 	private HashMap<String, String> fhMap = new HashMap<String, String>();
@@ -185,10 +175,15 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type = type;
-		if (tenantConfigService.getEdition().equalsIgnoreCase(TenantInfoConfigService.VERSION_COMMON)) {
+		if (tenantConfigService.getEdition().equals(TenantInfoConfigService.VERSION_COMMON)) {
 			isGeneralVersion = true;
 			tempAlready = true;
-		} else {
+			disableCreateTemplateBt = false;
+		} else if(tenantConfigService.getEdition().equals(TenantInfoConfigService.EXCELLENT_ENJOYMENT_A) ||
+                tenantConfigService.getEdition().equals(TenantInfoConfigService.EXCELLENT_ENJOYMENT_B)){
+            disableCreateTemplateBt = false;
+            isGeneralVersion = false;
+        }else {
 			isGeneralVersion = false;
 			disableCreateTemplateBt = true;
 		}
@@ -324,9 +319,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		orgDao.save(org);
 
 		String config = tenantConfigService.getJSONStr();
-		// 如果是通用版 则要增加模版配置
 
-		if (config.contains(TenantInfoConfigService.VERSION_COMMON)) {
+		//通用版本和优享A默认导入8条模板
+		if (config.contains(TenantInfoConfigService.VERSION_COMMON) || config.contains(TenantInfoConfigService.EXCELLENT_ENJOYMENT_A)) {
 			List<TableDefinition> tbList = new ArrayList<TableDefinition>();
 			// 加载模版文件
 			loadTemplateFile();
@@ -421,11 +416,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public boolean isGeneralVersion;
 
 	public void onVersionChange() {
-		if (tenantConfigService.getEdition().equalsIgnoreCase(TenantInfoConfigService.VERSION_COMMON)) {
-			disableCreateTemplateBt = false;
+		List<String> showTemplateList = Lists.newArrayList(TenantInfoConfigService.VERSION_COMMON,
+                TenantInfoConfigService.EXCELLENT_ENJOYMENT_A,TenantInfoConfigService.EXCELLENT_ENJOYMENT_B);
+		if (showTemplateList.contains(tenantConfigService.getEdition())) {
+			disableCreateTemplateBt = Boolean.FALSE;
 		} else {
-			disableCreateTemplateBt = true;
+			disableCreateTemplateBt = Boolean.TRUE;
 		}
+		tenantConfigService.resetVersion();
 	}
 
 	private void parseTenantConfig() {

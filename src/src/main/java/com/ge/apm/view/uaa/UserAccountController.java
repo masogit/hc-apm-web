@@ -67,8 +67,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
+    public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
+    public static final String SYSTEM_ACTIVE = "ActivationPerson";
     //public static final int ACTIVATION_ROLE = 10;
-    public static final String ACTIVATION_ROLE = "ActivationPerson";
 
     private static final Integer LX_USER_TYPE = -1; // lixinag usertype
     private boolean isShowButton = true;
@@ -327,6 +328,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return;
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
+        roleListVO = new ArrayList<>();//
+        assignedRoles = new ArrayList<>();
+        if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
+            SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
+            if(sysRoleVO == null){
+                logger.error("cann't find system role by ActivationPerson");
+                return;
+            }
+            roleListVO.add(sysRoleVO);
+            assignedRoles.add(sysRoleVO.getRoleDesc());
+        }else{
+            roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
+            List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
+            if(CollectionUtils.isNotEmpty(customRoles)){
+                for (CustomRole customRole : customRoles) {
+                    assignedRoles.add(customRole.getName());
+                }
+            }
+            List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
+            for (UserRole userRole : sysRoleList) {
+                assignedRoles.add(userRole.getRole().getRoleDesc());
+            }
+        }
+        prepareUserScope();
+
 
         /*TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
 
@@ -351,19 +377,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
 
         }*/
-        roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
-        assignedRoles = new ArrayList<>();
-        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
-        if(CollectionUtils.isNotEmpty(customRoles)){
-            for (CustomRole customRole : customRoles) {
-                assignedRoles.add(customRole.getName());
-            }
+    }
+
+    public SysRoleVO getVOBySysRoleName(String sysRoleName){
+        SysRole sr =sysRoleRepository.getByName(sysRoleName);
+        if(sr != null){
+            SysRoleVO srVO = new SysRoleVO();
+            srVO.setId(sr.getId());
+            srVO.setName(sr.getName());
+            srVO.setRoleDesc(sr.getRoleDesc());
+            srVO.setRoleType(0);
+            return srVO;
         }
-        List<UserRole> sysRoleList = uaaService.getSystemRoles(selected.getId());
-        for (UserRole userRole : sysRoleList) {
-            assignedRoles.add(userRole.getRole().getRoleDesc());
-        }
-        prepareUserScope();
+        return null;
     }
 
     public void saveRoles() {
@@ -427,14 +453,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-
         this.selectedUserOrg = null;
-
     }
 
     @Override
     public void onAfterNewObject(UserAccount userAccount, boolean isOk) {
-        if (isOk && this.crudActionName.equals("Create")) {
+/*        if (isOk && this.crudActionName.equals("Create")) {
             List<String> role = new ArrayList<String>();
             role.add(DEFAULT_USER_ROLE);
             uaaService.setUserRoles(selected, role);
@@ -448,7 +472,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             prePareForScopeForNewUser(selected,accessOrgTree);
             userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
             userOrgInfoRepository.save(userOrgInfoList);
-        }
+        }*/
     }
 
     @Override
@@ -526,7 +550,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
-
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
         String loginName = user.getLoginName();
@@ -536,10 +559,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
         if (selectedUserOrg != null) {
-
             //keep old org uid to use in update
             previousOrgUid = user.getOrgInfoUID();
-
             user.setOrgInfoId(selectedUserOrg.getId());
             user.setOrgInfoUID(selectedUserOrg.getUid());
             user.setSiteId(selectedUserOrg.getSiteId());
@@ -573,6 +594,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
 
     @Override
+    @Transactional
     public void save() {
         if (selectedUserOrg != null) {
             //判断操作权限
@@ -580,7 +602,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
             if(!StringUtils.isEmpty(checkResult)) {
@@ -590,7 +611,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
         try {
             //input new password in create or edit page, so update
             if (!StringUtils.isEmpty(selected.getPlainPassword())) {
@@ -609,13 +629,36 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
 
             }
-
             super.save();
-
+            if (this.crudActionName.equals("Create")) {
+                updateUserRole(loginUser.getType());
+            }
         } catch(NoSuchAlgorithmException e) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
 
+
+    }
+
+    @Transactional
+    public void updateUserRole(Integer creatorUserType){
+        List<String> role = new ArrayList<String>();
+        if(creatorUserType != null && creatorUserType == LX_USER_TYPE){
+            role.add(SYSTEM_ACTIVE_ROLE);
+        }else{
+            role.add(DEFAULT_USER_ROLE);
+        }
+        uaaService.setUserRoles(selected, role);
+        uaaService.setDefaultScope(selected);
+
+        //绑定新建用户和该用户所在层级的以下层级
+        userOrgInfoList=new ArrayList<UserOrgInfo>();
+        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+        List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+        setSelectedOrgTree(accessOrgTree, orgList);
+        prePareForScopeForNewUser(selected,accessOrgTree);
+        userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+        userOrgInfoRepository.save(userOrgInfoList);
 
     }
 
@@ -873,7 +916,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
         List<UserRole> roles = loginUser.getUserRoleList();
-        SysRole sysRole = sysRoleRepository.getByName(ACTIVATION_ROLE);
+        SysRole sysRole = sysRoleRepository.getByName(SYSTEM_ACTIVE);
         if(sysRole != null){
             roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
             if(CollectionUtils.isNotEmpty(roles)){

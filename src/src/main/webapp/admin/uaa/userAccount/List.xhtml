@@ -79,7 +79,7 @@
                         <p:column headerText="#{msg.Locked}?" sortBy="#{item.isLocked}">
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
-                        <p:column headerText="#{msg.roleId}">
+                        <p:column headerText="#{msg.roleId}" rendered="#{userAccountController.isShowButton()}">
                             <h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
                             <!--<h:outputText value="#{item.userRoleNames}"/>-->
                         </p:column>
