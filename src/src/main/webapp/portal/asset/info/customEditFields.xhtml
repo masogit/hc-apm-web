@@ -260,7 +260,7 @@
             <p:inputText id="clinicalOwnerTel" value="#{assetInfoEditController.selected.clinicalOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required}" 
                          requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
         </h:panelGroup>
-    </c:if>  <!--制造商 下拉-->
+    </c:if>  <!--制造商 下拉 assetInfoEditController.needEdit('manufacture') 这里不能用"manufacturer"-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}">
         <h:panelGroup>
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacturer'].required? '*':''}</span></label>

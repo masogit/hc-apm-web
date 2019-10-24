@@ -29,9 +29,6 @@
 						<p:ajax listener="#{assetLifecycleEvent4Controller.onItemSelect(item)}"></p:ajax>
 					</p:selectBooleanCheckbox>
 				</p:column>
-				<p:column headerText="id" >
-					<h:outputText value="#{item.id}" />
-				</p:column>
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>

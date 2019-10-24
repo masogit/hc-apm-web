@@ -173,7 +173,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/admin/batchFile/APM_ImportFiles_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = fileScanExportService.exportData(doc, fileScanExportService.createFileScanData(dao.findBySearchFilter(this.searchFilters)));
+            Boolean exportFlag = fileScanExportService.exportData(doc, fileScanExportService.createFileScanData(dao.findAllImportFilesVO()));
             if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ImportFiles.xlsx");
             }

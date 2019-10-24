@@ -29,10 +29,13 @@ import com.ge.apm.domain.TenantInfoConfigItem;
 @Component
 public class TenantInfoConfigService {
 	private static final Logger logger = Logger.getLogger(TenantInfoConfigService.class);
-	public static final String VERSION_FUNCTION = "business";
-	public static final String VERSION_COMMON = "common";
-	public static final String VERSION_ULTRASOUND = "ultrasound";
-	public static final String VERSION_ASSETMGT="assetMgt";
+	public static final String VERSION_FUNCTION = "business";//业务板
+	public static final String VERSION_COMMON = "common";//通用版
+	public static final String VERSION_ULTRASOUND = "ultrasound";//超声科室版
+	public static final String VERSION_ASSETMGT="assetMgt";//设备运营管理
+	public static final String EXCELLENT_ENJOYMENT_A="excellentEnjoymentA";//优享A
+	public static final String EXCELLENT_ENJOYMENT_B="excellentEnjoymentB";//优享B
+	public static final String OPS_VERSION ="opsVersion";//OPS版
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
@@ -143,7 +146,7 @@ public class TenantInfoConfigService {
 		return jsonArr;
 	}
 
-	private void resetVersion() {
+	public void resetVersion() {
 		if (StringUtils.isEmpty(edition)) {
 			return;
 		}
@@ -152,6 +155,11 @@ public class TenantInfoConfigService {
 			tempItem.setValue(true);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
+				//do nothing
+			}else if(edition.equals(EXCELLENT_ENJOYMENT_A)){
+				if(key.equals("measure.templateMgt")){
+					tempItem.setValue(false);
+				}
 			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
@@ -164,7 +172,7 @@ public class TenantInfoConfigService {
 				} else if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
 				}
-			} else if (edition.equals(VERSION_FUNCTION)) {
+			}else if (edition.equals(VERSION_FUNCTION)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
 				} else if (key.equals("assetAdjust")) {
@@ -178,6 +186,51 @@ public class TenantInfoConfigService {
 				} else if (key.equals("repair.vacationMgt")) {
 					tempItem.setValue(false);
 				} else if (key.equals("maintain.electricDataImport")) {
+					tempItem.setValue(false);
+				}
+			}else if(edition.equals(EXCELLENT_ENJOYMENT_B)){
+				if(key.contains("assetAdjust")) {
+					tempItem.setValue(false);
+				}else if (key.equals("repair.workSchedule")) {
+					tempItem.setValue(false);
+				}else if(key.equals("repair.vacationMgt")){
+					tempItem.setValue(false);
+				}else if(key.equals("maintain.reportMgt")){
+					tempItem.setValue(false);
+				}else if(key.contains("nurseSite")){
+					tempItem.setValue(false);
+				}else if(key.equals("measure.templateMgt")){
+					tempItem.setValue(false);
+				}
+
+			}else if(edition.equals(OPS_VERSION)){
+				if(key.equals("asset.analysis")){
+					tempItem.setValue(false);
+				}else if(key.equals("asset.mgt")){
+					tempItem.setValue(false);
+				}else if(key.equals("asset.supplierMgt")){
+					tempItem.setValue(false);
+				}else if(key.equals("asset.scrapTempMgt")){
+					tempItem.setValue(false);
+				}else if(key.equals("asset.audit")){
+					tempItem.setValue(false);
+				}else if(key.equals("assetAdjust")) {
+					tempItem.setValue(false);
+				} else if(key.contains("assetAdjust.")) {
+					tempItem.setValue(false);
+				}else if(key.equals("repair.count")) {
+					tempItem.setValue(false);
+				}else if(key.equals("repair.message")) {
+					tempItem.setValue(false);
+				}else if (key.equals("repair.workSchedule")) {
+					tempItem.setValue(false);
+				}else if(key.equals("repair.vacationMgt")){
+					tempItem.setValue(false);
+				}else if(key.contains("measure")){
+					tempItem.setValue(false);
+				}else if(key.contains("nurseSite")){
+					tempItem.setValue(false);
+				}else if(key.contains("install")){
 					tempItem.setValue(false);
 				}
 			}
@@ -222,7 +275,7 @@ public class TenantInfoConfigService {
 		List<TenantInfoConfigItem> tempMenuList = new ArrayList<TenantInfoConfigItem>(menuList);
 		root = new DefaultTreeNode("root", null, null);
 		buildChildren(root, tempMenuList);
-	}
+}
 
 	private void buildChildren(TreeNode root, List<TenantInfoConfigItem> tempMenuList) {
 		List<String> headers = new ArrayList<String>();
