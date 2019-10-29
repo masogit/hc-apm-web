@@ -101,6 +101,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         vlinkParserService = WebUtil.getBean(VlinkParserService.class);
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        orgUidList.add(currentUser.getTenantUID());
 
         this.selectedMap = new HashMap();
         this.initBatchData();
@@ -250,18 +251,19 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(loginUser.getTenantUID());
-        OrgInfo tempOrgInfo = orgInfoDao.getByUid(loginUser.getTenantUID());
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
         OrgInfo rootOrg = new OrgInfo();
-        /*rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));*/
-        rootOrg.setId(tenantInfo.getId());
-        rootOrg.setName(WebUtil.getMessage(tenantInfo.getName()));
+        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() == 0){
+            OrgInfo tempOrgInfo = orgInfoDao.getByUid(loginUser.getTenantUID());
+            rootOrg = tempOrgInfo;
+        }else {
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        }
         orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", tempOrgInfo, orgTree);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.getChildren().add(treeNode);
         //rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
         rootNode.setExpanded(true);
@@ -308,6 +310,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
             if(this.assetName != null){
                 queryAsset.setName(this.assetName);
+            }else{
+                queryAsset.setName(null);
             }
             sourceAssets = assetTagService.getAssetList(queryAsset);
 
