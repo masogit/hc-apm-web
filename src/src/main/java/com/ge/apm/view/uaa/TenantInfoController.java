@@ -15,6 +15,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.service.common.UserCommonService;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
@@ -51,6 +52,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
 	TableDefinitionRepository tbDao;
+	OrgInfoRepository orgInfoDao;
+
 	boolean tempAlready = false;
 	String type = "";
 
@@ -81,6 +84,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		tenantConfigService = WebUtil.getBean(TenantInfoConfigService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
+		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
 		//判断是否是理想用户
 		if(LX_USER_TYPE.equals(loginUser.getType())){
@@ -211,6 +215,16 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		this.selected.setLastModifiedDate(new Date());
 		super.save();
+
+		if (!StringUtils.isEmpty(this.selected.getUid())) {
+			OrgInfo tenantOrg = orgInfoDao.findFirstByTenantUIDAndOrgType(this.selected.getUid(), 0);
+			if (tenantOrg != null) {
+				tenantOrg.setName(this.selected.getName());
+				tenantOrg.setShortName(this.selected.getName());
+				orgInfoDao.save(tenantOrg);
+			}
+		}
+
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();

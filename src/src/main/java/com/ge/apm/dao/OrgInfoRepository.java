@@ -123,6 +123,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	public List<OrgInfo> findBySiteUIDAndOrgType(String siteUID, Integer orgType);
 
+	public OrgInfo findFirstByTenantUIDAndOrgType(String tenantUid, Integer orgType);
+
 	public OrgInfo findFirstBySiteUIDAndNameAndOrgType(String siteUID, String name, Integer orgType);
 
 	public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
