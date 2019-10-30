@@ -101,7 +101,9 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         vlinkParserService = WebUtil.getBean(VlinkParserService.class);
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        orgUidList.add(currentUser.getTenantUID());
+        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() == 0){
+            orgUidList.add(currentUser.getTenantUID());
+        }
 
         this.selectedMap = new HashMap();
         this.initBatchData();
