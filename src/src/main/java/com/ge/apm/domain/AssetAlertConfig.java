@@ -89,6 +89,9 @@ public class AssetAlertConfig implements Serializable {
     @Column(name = "is_enabled")
     private Boolean isEnabled;
 
+    @Column(name = "ole_config")
+    private Boolean oleConfig;
+
     public String getId() {
         return id;
     }
@@ -263,5 +266,13 @@ public class AssetAlertConfig implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public Boolean getOleConfig() {
+        return oleConfig;
+    }
+
+    public void setOleConfig(Boolean oleConfig) {
+        this.oleConfig = oleConfig;
     }
 }
