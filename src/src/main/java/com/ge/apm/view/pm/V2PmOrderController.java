@@ -258,7 +258,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<V2_PmOrder> pmList = dao.getBatchPmOrderList(pmIdList);
         return pmList;
     }
-    public void test(String itemId){
+    public void pick(String itemId){
         pmIdList = new ArrayList<>();
         selectedMap.forEach((k, v) -> {
             if (v == true)
@@ -266,7 +266,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         });
 
-        System.out.println(pmIdList);
+      //  System.out.println(pmIdList);
     }
 
     public void preBatchCancel(){
@@ -1402,7 +1402,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
-            result.getContent().forEach(item->pmIdList.add(item.getId()));
+           // result.getContent().forEach(item->pmIdList.add(item.getId()));
             currentPagePmOrders = result.getContent();
             return result;
         }
