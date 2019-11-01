@@ -18,8 +18,8 @@
                                 <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                             <h:panelGroup>
-                                <label class="label">备注</label>
-                                <p:inputTextarea id="comment" placeholder="工作需要" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                                <label class="label">#{msg.Remark}</label>
+                                <p:inputTextarea id="comment" placeholder="#{msg.WorkRequirements}" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                             </h:panelGroup>
                         </h:panelGroup>
                     </p:panelGrid>

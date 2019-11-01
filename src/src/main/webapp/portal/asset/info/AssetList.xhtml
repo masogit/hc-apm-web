@@ -51,10 +51,10 @@
 
                 <h:form id="searchForm">
                     <h:panelGroup style="position: absolute; float: right; right: 50px;" rendered="#{assetInfoListController.showWarrantyAlert}">
-                        <span >图例：</span>
-                        <span class="warrantyExpireSoon">维保或质保即将到期</span>
+                        <span >#{msg.Legend}：</span>
+                        <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>
                         <span></span>
-                        <span class="warrantyExpired">维保或质保已经到期</span>
+                        <span class="warrantyExpired">#{msg.MorWExpired}</span>
                     </h:panelGroup>
                     
                     <h:panelGrid id="searchPanel" columns="3">
@@ -62,7 +62,7 @@
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
-                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
@@ -77,7 +77,7 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
-                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? '所有租户':assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? '#{msg.AllTenants}':assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
                             <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
@@ -108,7 +108,7 @@
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
                                  rowStyleClass="#{item.warrantyAlertStatus}"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
@@ -136,8 +136,8 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                             </h:panelGroup>
-                            <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
-                                <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
+                            <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                                <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </p:column>
                         <c:forEach items="#{assetInfoListController.customedColumns}" var="columnItem" >
@@ -541,7 +541,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'factoryWarrantyDate'}">
-                                <p:column headerText="质保日期" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE">
+                                <p:column headerText="#{msg.factoryWarrantyDate}" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE">
                                     <f:facet name="filter">
                                         <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate" value="#{assetInfoListController.factoryWarrantyDateFormatTime}"/>
                                     </f:facet>
@@ -641,8 +641,8 @@
                             <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
 
                             <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}">
-                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
-                                    <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchToBeTerminated}" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
+                                    <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
 
@@ -732,13 +732,13 @@
                 </p:tree>
             </p:scrollPanel>
         </p:overlayPanel>-->
-        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="导出二维码">
+        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >
-                    <label class="label">选择导出模版</label>
+                    <label class="label">#{msg.SelectExportTemplate}</label>
                     <p:selectOneMenu  value="#{assetInfoListController.exportQrCodeTemplateId}">
                         <p:ajax update="preview" />
-                        <f:selectItem itemLabel="默认使用中模版" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItem itemLabel="#{msg.TemplateUsedbyDefault}" itemValue="#{null}" noSelectionOption="true" />
                         <f:selectItems value="#{assetInfoListController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">

@@ -6,17 +6,17 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition>
-        <p:dialog id="approveDialog" widgetVar="approveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
+        <p:dialog id="approveDialog" widgetVar="approveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="#{msg.audit}" height="430">
             <h:form id="approveDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
-                    <p:fieldset legend="费用明细" >
+                    <p:fieldset legend="#{msg.expensedetail}" >
                         <p:dataTable  id="accessList123" value="#{workOrderMgrController.getNeedApprovalDetails()}" var="item" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <!--<p:column selectionMode="multiple" style="text-align:center;color: #000!important"/>-->
                             <p:column >
                                 <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
                                     <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
                                 </p:selectBooleanCheckbox>
-                                <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
+                                <h:outputText value="#{msg.Approved}"  rendered="#{item.approved}"/>
                                 <f:facet name="header"  >
                                     <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
                                         <p:ajax process="@this" listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@this @(.selectCheckBox)"/>
@@ -32,35 +32,35 @@
                                 <h:outputText value="#{item.apartsQuantity}"/>
                             </p:column>
 
-                            <p:column headerText="预估单价(元)">
+                            <p:column headerText="#{msg.EstimatedUnitPriceRMB}">
                                 <h:outputText value="#{item.partsPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="合同价格(元)">
+                            <p:column headerText="#{msg.ContractPriceRMB}">
                                 <h:outputText value="#{item.closedPrice}">
                                     <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
 
                             </p:column>
-                            <p:column headerText="备件类别">
+                            <p:column headerText="#{msg.PartType}">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                             </p:column>
 
 
-                            <p:column headerText="序列号">
+                            <p:column headerText="#{msg.assetsDashboardclm2}">
                                 <h:outputText value="#{item.serialNum}" />
                             </p:column>
-                            <p:column headerText="发票号">
+                            <p:column headerText="#{msg.invoiceNum}">
                                 <h:outputText value="#{item.invoiceNum}" />
                             </p:column>
 
-                            <p:column headerText="质保期">
+                            <p:column headerText="#{msg.qualityexpirdate}">
                                 <h:outputText value="#{item.warrantyDate}">
                                     <f:convertDateTime pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="预计到达时间">
+                            <p:column headerText="#{msg.EstimatedArrivalTime}">
                                 <h:outputText value="#{item.estimatedArriveTime}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                 </h:outputText>
@@ -88,7 +88,7 @@
                     <br/>
                     <br/>
                     <h:panelGroup>
-                        <label class="label">备注</label>
+                        <label class="label">#{msg.Remark}</label>
                         <p:inputText id="comment" value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                     </h:panelGroup>
                     <br/>

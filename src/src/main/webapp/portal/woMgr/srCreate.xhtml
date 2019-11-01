@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" >
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="#{msg.newrepair}" >
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
@@ -22,7 +22,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">当前位置</label>
+                            <label class="label">#{msg.assetLocation}</label>
                             <p:inputText id="lName" value="#{workOrderMgrController.locationName}" maxlength="256" />
                         </h:panelGroup>
 
@@ -49,7 +49,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.requestReason}*</label>
                             <!--<p:inputTextarea placeholder="设备故障" value="#{workOrderMgrController.newServiceRequest.requestReason}" maxlength="256" />-->
-                            <p:inputTextarea placeholder="设备故障" value="#{workOrderMgrController.faultReason}" maxlength="256" />
+                            <p:inputTextarea placeholder="#{msg.EquipmentFault}" value="#{workOrderMgrController.faultReason}" maxlength="256" />
                             <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestReason}" />
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus"><!--当前状态-->
@@ -67,7 +67,7 @@
                     </p:panelGrid>
                     
                     <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
-                        <f:facet name="header">报修图片</f:facet>
+                        <f:facet name="header">#{msg.RequestImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
@@ -89,7 +89,7 @@
                     </h:panelGroup>
                     
                      <h:panelGroup >
-                       <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (!(workOrderMgrController.selectedAsset.ibStatus eq 0) and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
+                       <h:outputText style="color:red; font-size:18px" value="#{msg.RepairTelephoneNumberTips}:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (!(workOrderMgrController.selectedAsset.ibStatus eq 0) and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>

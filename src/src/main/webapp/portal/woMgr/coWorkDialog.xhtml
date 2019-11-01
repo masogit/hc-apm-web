@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
 
-    <p:dialog class="coworkerDlg" id="coworkerDlg" widgetVar="coworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="协作者">
+    <p:dialog class="coworkerDlg" id="coworkerDlg" widgetVar="coworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.coworker}">
         <h:form id="coworkerDlgForm" >
             <h:panelGroup  rendered="#{not empty workOrderMgrController.coWorkerDetail}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -20,8 +20,8 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">内部工时(小时)*</label>
-                        <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true" requiredMessage="内部工时(小时) #{msg.ValidationRequire}"/>
+                        <label class="label">#{msg.manhourPrice}*</label>
+                        <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true" requiredMessage="#{msg.manhourPrice} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
