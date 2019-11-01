@@ -195,8 +195,6 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				}else if(key.equals("repair.vacationMgt")){
 					tempItem.setValue(false);
-				}else if(key.equals("maintain.reportMgt")){
-					tempItem.setValue(false);
 				}else if(key.contains("nurseSite")){
 					tempItem.setValue(false);
 				}else if(key.equals("measure.templateMgt")){

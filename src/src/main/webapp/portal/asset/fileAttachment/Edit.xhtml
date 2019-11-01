@@ -49,9 +49,9 @@
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/"
                                           fileUploadListener="#{assetFileAttachmentController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                          multiple="false" sizeLimit="100000000"
+                                          multiple="false" sizeLimit="500000000"
                                           update=":AssetFileAttachmentEditForm:upload" auto="true"
-                                          invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                          invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                         </h:panelGroup>
                         <h:panelGroup id="namepanel"
                                       rendered="#{assetFileAttachmentController.selected.objectName!=null}">

@@ -218,7 +218,8 @@
                                             <label class="label">#{msg.capitalSource}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired)? '*':''}</span></label>
                                             <p:selectOneMenu id="capitalSource" value="#{assetArrivedListEditController.easyInstallItem.capitalSource}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired}" requiredMessage="#{msg.capitalSource}#{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource').subList(0, 5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                <!--<f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource').subList(0, 5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                             </p:selectOneMenu>
                                         </h:panelGroup>
 
