@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition><!--维修工单关单对话框-->
-        <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="关单" height="500">
+        <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="#{msg.closeWo}" height="500">
             <h:form id="toCloseDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -83,12 +83,12 @@
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>
-                                    <p:column headerText="合同价格(元)">
+                                    <p:column headerText="#{msg.ContractPriceRMB}">
                                         <h:outputText value="#{item.closedPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="类型">
+                                    <p:column headerText="#{msg.type}">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                                     </p:column>
                                     <p:column headerText="#{msg.assetsDashboardclm2}">
@@ -104,8 +104,8 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="到货状态">
-                                        <h:outputText value="#{item.arrived?'已到货':'未到货'}" />
+                                    <p:column headerText="#{msg.ArrivalState}">
+                                        <h:outputText value="#{item.arrived?'#':'#{msg.NonArrived}'}" />
                                     </p:column>
 
                                 </p:dataTable>

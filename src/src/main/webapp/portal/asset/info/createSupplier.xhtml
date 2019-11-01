@@ -6,7 +6,7 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
-              draggable="true" appendTo="@this" header="供应商信息">
+              draggable="true" appendTo="@this" header="#{msg.Supplier}">
         <h:form id="SupplierEditForm">
             <h:panelGroup id="display">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
@@ -45,21 +45,21 @@
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox id="wxs" value="#{assetInfoEditController.newSupplier.maintainerT}"/>
-                                        <p:outputLabel value="维修商"/>
+                                        <p:outputLabel value="#{msg.maitanance}"/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox
                                                 value="#{assetInfoEditController.newSupplier.manufacturerT}"/>
-                                        <p:outputLabel value="制造商 "/>
+                                        <p:outputLabel value="#{msg.manufacture}"/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:panelGrid columns="2">
                                         <p:selectBooleanCheckbox
                                                 value="#{assetInfoEditController.newSupplier.supplierT}"/>
-                                        <p:outputLabel value="供应商 "/>
+                                        <p:outputLabel value="#{msg.vendor}"/>
                                     </h:panelGrid>
                                 </h:panelGroup>
                             </h:panelGrid>

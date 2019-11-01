@@ -37,25 +37,25 @@
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
                         <h:panelGroup class="test1">
-                            <label  class="label">类型*</label>
+                            <label  class="label">#{msg.type}*</label>
                                 <h:panelGrid columns="3">
                                         <h:panelGrid columns="3">
                                         <h:panelGroup>
                                             <h:panelGrid columns="2">
                                                 <p:selectBooleanCheckbox id="wxs" value="#{supplierController.maintainerT}"/>
-                                                <p:outputLabel  value="维修商 " />
+                                                <p:outputLabel  value="#{msg.maitanance} " />
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     <h:panelGroup>
                                         <h:panelGrid columns="2">
                                             <p:selectBooleanCheckbox   value="#{supplierController.manufacturerT}"/>
-                                            <p:outputLabel value="制造商 " />
+                                            <p:outputLabel value="#{msg.manufacture} " />
                                         </h:panelGrid>
                                     </h:panelGroup>
                                             <h:panelGroup >
                                                 <h:panelGrid columns="2">
                                                     <p:selectBooleanCheckbox  value="#{supplierController.supplierT}"/>
-                                                    <p:outputLabel value="供应商 " />
+                                                    <p:outputLabel value="#{msg.vendor} " />
                                                 </h:panelGrid>
                                             </h:panelGroup>
                                         </h:panelGrid>

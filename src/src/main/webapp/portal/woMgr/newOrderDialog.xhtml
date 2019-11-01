@@ -31,7 +31,7 @@
                             </h:panelGroup>
                         </p:panelGrid>
                         <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
-                        <f:facet name="header">报修图片</f:facet>
+                        <f:facet name="header">#{msg.RequestImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
@@ -51,7 +51,7 @@
                     </h:panelGroup>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.createWorkOrder}" value="提交" update="woTab:woMgrListForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'newWorkorderDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.createWorkOrder}" value="#{msg.Submit}" update="woTab:woMgrListForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'newWorkorderDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancel}" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('newWorkorderDlg').hide()"/>
 
                 </h:panelGroup>

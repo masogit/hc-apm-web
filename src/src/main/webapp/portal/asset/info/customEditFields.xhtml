@@ -145,7 +145,7 @@
 <!--计量负责人-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'measuringOwner')}" >
         <h:panelGroup >
-            <label class="label">计量负责人<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required? '*':''}</span></label>
+            <label class="label">#{msg.measuringOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required? '*':''}</span></label>
             <p:autoComplete id="measuringOwner" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwner')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
