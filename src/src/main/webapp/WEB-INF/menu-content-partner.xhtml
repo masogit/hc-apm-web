@@ -2,6 +2,9 @@
 
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
+            <p:menuitem id="um000111" value="切换成英文" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem id="um0011111" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>
+
             <p:submenu label="#{msg.SysAdmin}" icon="settings">
                 <p:menuitem value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml"/>
             </p:submenu>
