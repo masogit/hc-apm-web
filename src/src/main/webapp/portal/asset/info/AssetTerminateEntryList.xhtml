@@ -31,10 +31,10 @@
             </div>
             <div class="ui-g-12 card">
                 <p:tabView redirect="true" class="ui-g-12" id="woTab" dynamic="true" cache="false">
-                    <p:tab class="ui-g-12" title="待报废资产" id="toBeTerminatedAssets">
+                    <p:tab class="ui-g-12" title="#{msg.ToBeTerminatedAssets}" id="toBeTerminatedAssets">
                         <ui:include src="AssetToBeTerminatedList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="已报废资产" id="terminatedAssets">
+                    <p:tab class="ui-g-12" title="#{msg.TerminatedAssets}" id="terminatedAssets">
                         <ui:include src="AssetTerminatedList.xhtml"/>
                     </p:tab>
                 </p:tabView>
@@ -46,7 +46,7 @@
             var newWin;
             function prepareAssetViewWindow() {
                 newWin = window.open('about:blank', '_blank');
-                newWin.document.body.innerHTML = '加载中...';
+                newWin.document.body.innerHTML = '#{msg.Loading}';
             }
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
