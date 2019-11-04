@@ -48,26 +48,26 @@
                 <p:outputLabel class="pageTitle" value="#{msg.Create}#{msg.AssetInfo}"/>
             </div>
             <div class="ui-g-12 card ">
-                <p:fieldset legend="基本资料" id="accordion" >
+                <p:fieldset legend="#{msg.BasicInformation}" id="accordion" >
                     <div class="ui-g-7">
                         <p:galleria value="#{assetCreateController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/> 
+                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
                         </p:galleria>
                     </div>
                     <div class="ui-g-5">
-                        <p:fieldset legend="语音描述" id="audioComment" >
+                        <p:fieldset legend="#{msg.VoiceDescription}" id="audioComment" >
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                 <div id="jquery_jplayer"></div>
                                 <div id="jp_container" class="demo-container">
                                     <ul id="audioUl">
-                                        <li><span>语音列表 : </span></li>
+                                        <li><span>#{msg.VoiceList} : </span></li>
                                     </ul>
                                     <p>
                                         <span class="play-state"></span> :
-                                        <span class="track-name">无</span>
+                                        <span class="track-name">#{msg.None}</span>
                                         <span class="extra-play-info"></span>
-                                        共 <span class="jp-duration"></span>, 播放至
+                                        #{msg.ATotalOf} <span class="jp-duration"></span>, #{msg.PlayTo}
                                         <span class="jp-current-time"></span>
                                     </p>
                                     <ul>
@@ -82,7 +82,7 @@
                             </p:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="文字描述" id="textComment" >
+                        <p:fieldset legend="#{msg.TextDescription}" id="textComment" >
                             <c:forEach items="#{assetCreateController.getCommentsList()}" var="item">
                                 <p>#{item}</p>
                             </c:forEach>
@@ -94,7 +94,7 @@
             </div>
             <div class="ui-g-12 card ">
                 <p:tabView id="tab">
-                    <p:tab title="创建">
+                    <p:tab title="#{msg.Create2}">
                         <h:form id="CreateAsset">
                             <p:fieldset  style="margin-bottom:20px">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -134,8 +134,8 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.manufacture}</label>
                                         <!--<p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>-->
-                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['manufacture']}" scrollHeight="300" 
-                                                        forceSelection="true" 
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['manufacture']}" scrollHeight="300"
+                                                        forceSelection="true"
                                                         completeMethod="#{assetCreateController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
                                             <p:ajax listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
@@ -225,8 +225,8 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitanance}</label>
                                         <!--<p:inputText id="maitanance" value="#{assetCreateController.assetInfo.maitanance}"/>-->
-                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['maintainer']}" scrollHeight="300" 
-                                                        forceSelection="true" 
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['maintainer']}" scrollHeight="300"
+                                                        forceSelection="true"
                                                         completeMethod="#{assetCreateController.autoCompleteMaintainer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
                                             <p:ajax listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
@@ -244,7 +244,7 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup>
-                                        <label class="label">设备国标码</label>
+                                        <label class="label">#{msg.nationalStandardCode}</label>
                                         <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname financingNum">
                                             <!--<p:ajax process="@this"/>-->
                                         </p:autoComplete>
@@ -299,7 +299,7 @@
                                         <p:inputText  value="#{assetCreateController.assetInfo.financingNum}" class="financingNum">
                                             <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                         </p:inputText>
-                                        <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 4}" 
+                                        <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 4}"
                                                          update="@(.financingNum) :growl" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -314,7 +314,7 @@
                             </p:fieldset>
 
 
-                            <p:fieldset legend="选择图片作为资产附件保存"  style="margin-bottom:20px">
+                            <p:fieldset legend="#{msg.SelectAndSaveTheImageAsAnAttachmentToTheAsset}"  style="margin-bottom:20px">
                                 <p:selectManyCheckbox id="custom" value="#{assetCreateController.selectedPictures}"  layout="custom">
                                     <f:selectItems value="#{assetCreateController.pictureList}" var="item"  itemValue="#{item.objectStorageId}" />
                                 </p:selectManyCheckbox>
@@ -336,20 +336,20 @@
                         </h:form>
 
                     </p:tab>
-                    <p:tab title="拒绝退回">
+                    <p:tab title="#{msg.RefuseToReturnBack}">
                         <h:form id="returnback">
-                            <p:fieldset id="returnBackHistory" legend="退回原因历史" rendered="#{not empty assetCreateController.rejectTextHistory}">
+                            <p:fieldset id="returnBackHistory" legend="#{msg.ReturnBackHistory}" rendered="#{not empty assetCreateController.rejectTextHistory}">
                                 <c:forEach items="#{assetCreateController.rejectTextHistory}" var="item">
                                     <p>#{item}</p>
                                 </c:forEach>
                             </p:fieldset>
-                            <p:fieldset legend="退回原因">
-                                <p:inputTextarea id ="rejectTextarea" value="#{assetCreateController.rejectText}" counter="comentsCounts" counterTemplate="#{msg.remainingCharacters}" maxlength="100"  rows="6" cols="50" required="true" requiredMessage="原因必须填写"/>
+                            <p:fieldset legend="#{msg.ReturnBackReason}">
+                                <p:inputTextarea id ="rejectTextarea" value="#{assetCreateController.rejectText}" counter="comentsCounts" counterTemplate="#{msg.remainingCharacters}" maxlength="100"  rows="6" cols="50" required="true" requiredMessage="#{msg.ReasonRequired}"/>
                                 <p><h:outputText id="comentsCounts" /></p>
                             </p:fieldset>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup >
-                                    <p:commandButton value="退回" icon="ui-icon-check" action="#{assetCreateController.returnBack()}" validateClient="true" update=":growl returnback" style="float:left"/>
+                                    <p:commandButton value="#{msg.ReturnBack}" icon="ui-icon-check" action="#{assetCreateController.returnBack()}" validateClient="true" update=":growl returnback" style="float:left"/>
                                 </h:panelGroup>
                             </p:panelGrid>
 
@@ -367,8 +367,8 @@
         </div>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
-                <span id="shwoPicDialog_title" class="ui-dialog-title">图片</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
-                    <span class="ui-icon ui-icon-closethick"></span></a>
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                <span class="ui-icon ui-icon-closethick"></span></a>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
             <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">

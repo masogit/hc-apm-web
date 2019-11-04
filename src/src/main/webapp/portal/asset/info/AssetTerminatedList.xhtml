@@ -23,13 +23,13 @@
                                 <p:treeNode type="org">
                                     <h:outputText value="#{node.name}"/>
                                 </p:treeNode>
-								<p:treeNode type="hidden" rendered="false"/>
+                                <p:treeNode type="hidden" rendered="false"/>
                             </p:tree>
                         </p:scrollPanel>
                     </p:overlayPanel>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
-                    <p:commandButton id="btnTenant" value="#{empty assetInfoTerminatedListController.selectSite? '所有租户':assetInfoTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                    <p:commandButton id="btnTenant" value="#{empty assetInfoTerminatedListController.selectSite? '#{msg.AllTenants}':assetInfoTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
                     <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
@@ -39,7 +39,7 @@
                                 <p:treeNode type="org">
                                     <h:outputText value="#{node.name}"/>
                                 </p:treeNode>
-								<p:treeNode type="hidden" rendered="false"/>
+                                <p:treeNode type="hidden" rendered="false"/>
                             </p:tree>
                         </p:scrollPanel>
                     </p:overlayPanel>
@@ -59,7 +59,7 @@
                          selectionMode="single" selection="#{assetInfoTerminatedListController.selected}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"
-                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
@@ -87,8 +87,8 @@
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandLink>
                     </h:panelGroup>
-                    <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
-                        <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
+                    <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                        <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
                 <c:forEach items="#{assetInfoTerminatedListController.customedColumns}" var="columnItem" >
@@ -478,7 +478,7 @@
                         </p:column>
                     </c:if>
                     <c:if test="#{columnItem eq 'factoryWarrantyDate'}">
-                        <p:column headerText="质保日期" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE">
+                        <p:column headerText="#{msg.factoryWarrantyDate}" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE">
                             <f:facet name="filter">
                                 <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate" value="#{assetInfoTerminatedListController.factoryWarrantyDateFormatTime}"/>
                             </f:facet>
