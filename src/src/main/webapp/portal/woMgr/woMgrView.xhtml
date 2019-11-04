@@ -11,7 +11,7 @@
         <div class="ui-g-12 card">
 
             <h:form id="woMgrDetailForm">
-                <p:fieldset legend="报修单 (#{fieldMsg.fieldValue('casePriority',workOrderMgrController.selected.serviceRequest.casePriority)})" rendered="#{not empty workOrderMgrController.selected}">
+                <p:fieldset legend="#{msg.RequestWorkorder} (#{fieldMsg.fieldValue('casePriority',workOrderMgrController.selected.serviceRequest.casePriority)})" rendered="#{not empty workOrderMgrController.selected}">
 
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -21,12 +21,12 @@
 
 
                         <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
-                            <label class="label">MVS合同起始日</label>
+                            <label class="label">#{msg.MVSContractStartDate}</label>
                             <p:outputLabel value="#{workOrderMgrController.getMvsContract(workOrderMgrController.selected.assetInfo.id).contractStartDate}" />
 
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.assetInfo.mvsEquip eq 1 and (userContextService.loginUser.mvsRoleType eq 1 or userContextService.loginUser.mvsRoleType eq 2) }">
-                            <label class="label">MVS合同截止日</label>
+                            <label class="label">#{msg.MVSContractEndDate}</label>
                             <p:outputLabel value="#{workOrderMgrController.getMvsContract(workOrderMgrController.selected.assetInfo.id).contractEndDate}" />
                         </h:panelGroup>
 
@@ -50,7 +50,7 @@
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">当前位置</label>
+                            <label class="label">#{msg.assetLocation}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.assetLocation}" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -67,7 +67,7 @@
                             </p:selectOneRadio>
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
-                            <p:commandButton value="更新停机时间" rendered="#{workOrderMgrController.needConfirmTime}" actionListener="#{workOrderMgrController.updateDownTime}" process="@(.updateDownTime)" update="assetstatus showDownTime"/>
+                            <p:commandButton value="#{msg.UpdateShutdownTime}" rendered="#{workOrderMgrController.needConfirmTime}" actionListener="#{workOrderMgrController.updateDownTime}" process="@(.updateDownTime)" update="assetstatus showDownTime"/>
                         </h:panelGroup>
                         <h:panelGroup id="showDownTime">
                             <label class="label">#{msg.confirmedDownTime}</label>
@@ -76,7 +76,7 @@
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">开机时间</label>
+                            <label class="label">#{msg.UpTimeExcel}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.confirmedUpTime}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </p:outputLabel>
@@ -86,23 +86,23 @@
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.equipmentTaker}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">取件时间</label>
+                            <label class="label">#{msg.PickUpTime}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.takeTime}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.serviceRequest.status eq 3}">
-                            <label class="label">取消人</label>
+                            <label class="label">#{msg.Cancelor}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelPerson}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.serviceRequest.status eq 3}">
-                            <label class="label">取消原因</label>
+                            <label class="label">#{msg.cancelWorkOrderReason}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelReason}" style="word-wrap: break-word;"/>
                         </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
-                        <f:facet name="header">报修图片</f:facet>
+                        <f:facet name="header">#{msg.RequestImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
@@ -110,7 +110,7 @@
                         </p:panel>
                     </p:dataGrid>
                     <p:dataGrid var="woPicItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
-                        <f:facet name="header">维修图片</f:facet>
+                        <f:facet name="header">#{msg.RepairImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(woPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
@@ -120,18 +120,18 @@
 
 
                     <p:dataGrid var="woAttachItem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}">
-                        <f:facet name="header">维修附件</f:facet>
+                        <f:facet name="header">#{msg.RepairAttachment}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 #{woAttachItem.objectName}
-                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}"> 下载文件</p:link>
+                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}"> #{msg.DownloadFile}</p:link>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
 
 
                     <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
-                        <f:facet name="header">报修语音</f:facet>
+                        <f:facet name="header">#{msg.RequestVoice}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 <audio controls="controls">  
@@ -141,7 +141,7 @@
                         </p:panel>
                     </p:dataGrid>
                     <c:forEach items="#{workOrderMgrController.selectedWorkOrderList}" var="woItem" varStatus="rowIndex" >
-                        <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? '当前工单':msg.WorkOrder}" toggleable="false" >
+                        <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? '#{msg.CurrentWorkorder}':msg.WorkOrder}" toggleable="false" >
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                                 <h:panelGroup>
@@ -157,7 +157,7 @@
                                     <p:outputLabel value="#{woItem.totalPrice}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">签到时间</label>
+                                    <label class="label">#{msg.CheckInTime}</label>
                                     <p:outputLabel value="#{woItem.checkinTime}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -189,7 +189,7 @@
                                     <p:outputLabel value="#{woItem.otherExpense}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">外部费用</label>
+                                    <label class="label">#{msg.ExternalExpenses}</label>
                                     <p:outputLabel value="#{woItem.externalExpense}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -249,61 +249,61 @@
                             <br/>
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
-                                <label class="label">使用的备件</label>
+                                <label class="label">#{msg.UsedPart}</label>
                                 <p:dataTable id="x3" class="cl3" value="#{workOrderMgrController.getWorkOrderDetail(woItem.id)}" var="detailItem">
-                                    <p:column headerText="#{msg.accessory}名称">
+                                    <p:column headerText="#{msg.accessory}#{msg.Name}">
                                         <h:outputText value="#{detailItem.parts}" />
                                     </p:column>
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{detailItem.apartsQuantity}" />
                                     </p:column>
-                                    <p:column headerText="预估单价(元)">
+                                    <p:column headerText="#{msg.EstimatedUnitPriceRMB}">
                                         <h:outputText value="#{detailItem.partsPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="合同价格(元)">
+                                    <p:column headerText="#{msg.ContractPriceRMB}">
                                         <h:outputText value="#{detailItem.closedPrice}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="审核状态">
-                                        <h:outputText value="#{empty detailItem.approved? '未审核': detailItem.approved? '通过':'不通过'}" />
+                                    <p:column headerText="#{msg.ApprovalStatus}">
+                                        <h:outputText value="#{empty detailItem.approved? '#{msg.Unapproved}': detailItem.approved? '#{msg.pass}':'#{msg.fail}'}" />
                                     </p:column>
-                                    <p:column headerText="备件类别">
+                                    <p:column headerText="#{msg.PartType}">
                                         <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
                                     </p:column>
-                                    <p:column headerText="序列号">
+                                    <p:column headerText="#{msg.assetsDashboardclm2}">
                                         <h:outputText value="#{detailItem.serialNum}" />
                                     </p:column>
-                                    <p:column headerText="发票号">
+                                    <p:column headerText="#{msg.invoiceNum}">
                                         <h:outputText value="#{detailItem.invoiceNum}" />
                                     </p:column>
-                                    <p:column headerText="质保期">
+                                    <p:column headerText="#{msg.qualityexpirdate}">
                                         <h:outputText value="#{detailItem.warrantyDate}">
                                             <f:convertDateTime pattern="yyyy-MM-dd"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="申请时间">
+                                    <p:column headerText="#{msg.ApplyTime}">
                                         <h:outputText value="#{detailItem.applyTime}">
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="预计到达时间">
+                                    <p:column headerText="#{msg.EstimatedArrivalTime}">
                                         <h:outputText value="#{detailItem.estimatedArriveTime}">
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="到货确认时间">
+                                    <p:column headerText="#{msg.ArrivalConfirmationTime}">
                                         <h:outputText value="#{detailItem.arrivedTime}">
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="到货">
+                                    <p:column headerText="#{msg.arrival}">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
                                     </p:column>
 
-                                    <p:column headerText="操作" >
+                                    <p:column headerText="#{msg.operation}" >
                                         <p:commandButton rendered="#{workOrderMgrController.allowChanged()}" process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{workOrderMgrController.allowChangedForDisable() or (detailItem.approved==null?'false': not detailItem.approved)}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
 
                                         <p:commandButton process="@this" icon="ui-icon-search" style="zoom:0.8;" title="#{msg.View}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogViewDlg)" oncomplete="PF('moreAccDialogViewDlg').show()"/>
@@ -313,7 +313,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderCoworker(woItem.id)}">
-                                <label class="label">协作者工时</label>
+                                <label class="label">#{msg.CorworkerManhours}</label>
                                 <p:dataTable  value="#{workOrderMgrController.getWorkOrderCoworker(woItem.id)}" var="coWorkerItem" lazy="false" paginator="false"
                                               rowKey="#{coWorkerItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}" >
                                     <p:column headerText="#{msg.coworker}">

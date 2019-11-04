@@ -10,7 +10,7 @@
 
     <div class="ui-g clearfix">
         <div class="ui-g-12 card cardTitle">
-            <p:outputLabel class="pageTitle" value="设备消息订阅"/>
+            <p:outputLabel class="pageTitle" value="#{msg.MessageSubscriber}"/>
         </div>
         <div class="ui-g-12 card">
             <h:form id ="AssetSubscriberForm" style="margin-top: 20px;">
@@ -33,24 +33,24 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+                    <p:column headerText="#{msg.suscriber}" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
                         <h:outputText value="#{item.subscriberUser.name}" />
                     </p:column>
 
-                    <p:column headerText="设备" filterMatchMode="LIKE" filterBy="#{item.assetInfo.name}" sortBy="#{item.assetInfo.name}">
+                    <p:column headerText="#{msg.devicelb}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.name}" sortBy="#{item.assetInfo.name}">
                         <h:outputText value="#{item.assetInfo.name}" />
                     </p:column>
 
 
-                    <p:column headerText="所属科室" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
+                    <p:column headerText="#{msg.clinicalDeptId}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                     </p:column>
 
-                    <p:column headerText="设备编号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
+                    <p:column headerText="#{msg.EquipmentID}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
 
-                    <p:column headerText="设备型号" filterMatchMode="LIKE" filterBy="#{item.assetInfo.functionType}" sortBy="#{item.assetInfo.functionType}">
+                    <p:column headerText="#{msg.functionType}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.functionType}" sortBy="#{item.assetInfo.functionType}">
                         <h:outputText value="#{item.assetInfo.functionType}" />
                     </p:column>
 

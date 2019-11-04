@@ -24,7 +24,7 @@
                     <p:ajax event="rowSelect" update="@(.editCls) @(.delCls)"/>
                     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
-                    <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+                    <p:column headerText="#{msg.suscriber}" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
                         <h:outputText value="#{item.subscriberUser.name}" />
                     </p:column>
 
@@ -35,7 +35,7 @@
                     <p:column headerText="#{msg.messagepushoption}" >
                         <h:outputText value="#{tagSubscriberController.getMsgMode(item.receiveMsgMode)}" />
                     </p:column>
-                    <p:column headerText="#{msg.overtimenotification}" ><h:outputText value="#{item.isReceiveTimeoutMsg?'推送':'不推送'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
+                    <p:column headerText="#{msg.overtimenotification}" ><h:outputText value="#{item.isReceiveTimeoutMsg?'#{msg.Push}':'#{msg.NotPush}'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update="scriTab:AssetTagSubscribEditDlg scriTab:AssetTagSubscribEditForm" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
