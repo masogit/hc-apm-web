@@ -77,7 +77,7 @@
                                 <f:convertDateTime pattern="MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="创建" >
+                        <p:column headerText="#{msg.Create2}" >
                             <p:link   outcome="CreateAsset" >#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
                                 <f:param name="siteUid" value="#{item.siteUID}" />
