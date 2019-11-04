@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="设备维修统计"/>
+                <p:outputLabel class="pageTitle" value="#{msg.EquipmentRepairStatistics}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -20,7 +20,7 @@
                                 <label class="label">#{msg.hospitalId}</label>
                                 <p:inputText id="selectedOrgName"
                                              value="#{assetWorkOrderController.selectedOrg==null ? '': assetWorkOrderController.selectedOrg.name}"
-                                             readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                                             readonly="true" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}"/>
                                 <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
@@ -62,29 +62,29 @@
 
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">报修开始时间</label>
+                                <label class="label">#{msg.RequestStartTime}</label>
                                 <p:calendar timeZone="GMT+8" id="startDate" value="#{assetWorkOrderController.startDate}"
-                                            pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}"
+                                            pattern="yyyy/MM/dd" required="false" requiredMessage="#{msg.StartTime} #{msg.ValidationRequire}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">报修结束时间</label>
+                                <label class="label">#{msg.RequestEndTime}</label>
                                 <p:calendar timeZone="GMT+8" id="endDate" value="#{assetWorkOrderController.endDate}"
-                                            pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}"
+                                            pattern="yyyy/MM/dd" required="false" requiredMessage="#{msg.EndTime} #{msg.ValidationRequire}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
 
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <p:inputText id="searchText" value="#{assetWorkOrderController.searchStr}" placeholder="#{msg.name}/设备型号/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}" maxlength="100" style="width: 500px"/>
+                                <p:inputText id="searchText" value="#{assetWorkOrderController.searchStr}" placeholder="#{msg.name}/#{msg.functionType}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}" maxlength="100" style="width: 500px"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton value="查询结果" actionListener="#{assetWorkOrderController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :assetWorkOrderListForm:datalist">
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{assetWorkOrderController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :assetWorkOrderListForm:datalist">
                             </p:commandButton>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -114,13 +114,13 @@
                         <p:column headerText="#{msg.assetGroup}">
                             <h:outputText value="#{item.assetGroupName}" title="#{item.assetGroupName}" />
                         </p:column>
-                        <p:column headerText="所属科室">
+                        <p:column headerText="#{msg.clinicalDeptId}">
                             <h:outputText value="#{item.clinicalDeptName}" title="#{item.clinicalDeptName}" />
                         </p:column>
-                        <p:column headerText="二维码">
+                        <p:column headerText="#{msg.QRCode}">
                             <h:outputText value="#{item.qrCode}" title="#{item.qrCode}" />
                         </p:column>
-                        <p:column headerText="工单数量">
+                        <p:column headerText="#{msg.WorkorderQuantity}">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
                             </h:commandLink>

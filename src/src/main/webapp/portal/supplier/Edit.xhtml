@@ -65,7 +65,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
 
-                        <p:fieldset legend="附件上传"><!--供应商的附件上传-->
+                        <p:fieldset legend="#{msg.AttachmentUpload}"><!--供应商的附件上传-->
                             <h:panelGroup >
                                 <p:dataList id="pictureList" class="pictureListCls" value="#{supplierController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 10)}</f:facet>
