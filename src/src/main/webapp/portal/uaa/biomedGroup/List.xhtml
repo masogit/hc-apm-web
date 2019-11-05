@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="维修工程师群组"/>
+                <p:outputLabel class="pageTitle" value="#{msg.BiomedGroup}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -28,10 +28,10 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.groupName}" filterBy="#{item.groupName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.groupName}"/>
                         </p:column>
-                        <p:column headerText="租户">
+                        <p:column headerText="#{msg.TenantInfo}">
                             <h:outputText value="#{biomedGroupController.getTenantName(item.tenantUID)}"/>
                         </p:column>
-                        <p:column headerText="医院">
+                        <p:column headerText="#{msg.Hospital}">
                             <h:outputText value="#{biomedGroupController.getSiteName(item.siteUID)}"/>
                         </p:column>
 
