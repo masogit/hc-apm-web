@@ -9,7 +9,7 @@
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
-                    <p:outputLabel class="pageTitle" value="报表模版管理"/>
+                    <p:outputLabel class="pageTitle" value="#{msg.ReportTemplateManagement}"/>
                 </div>
                 <h:form id="WoExportTemplateListForm">
                     <p:dataTable id="datalist" value="#{workOrderExportTemplateController.lazyModel}" var="item"
@@ -25,25 +25,25 @@
                         <p:ajax event="rowSelect" listener="#{workOrderExportTemplateController.onSelect()}"
                                 update="createButton editButton deleteButton"/>
 
-                        <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
+                        <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
                                   filterMatchMode="EQ">
                             <h:outputText value="#{workOrderExportTemplateController.getTenantName(item.tenantUID)}"/>
                         </p:column>
-                        <p:column headerText="集团" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
+                        <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}"
                                   filterMatchMode="EQ">
                             <h:outputText
                                     value="#{workOrderExportTemplateController.getInsNameByUId(item.institutionUID)}"/>
                         </p:column>
-                        <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}"
+                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}"
                                   filterMatchMode="EQ">
                             <h:outputText
                                     value="#{workOrderExportTemplateController.getHospitalNameByUId(item.hospitalUID)}"/>
                         </p:column>
-                        <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
+                        <p:column headerText="#{msg.Site}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
                                   filterMatchMode="EQ">
                             <h:outputText value="#{workOrderExportTemplateController.getSiteNameByUId(item.siteUID)}"/>
                         </p:column>
-                        <p:column headerText="模版文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
+                        <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
                             <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
                                 <h:outputText value="#{item.fileName}"/>
