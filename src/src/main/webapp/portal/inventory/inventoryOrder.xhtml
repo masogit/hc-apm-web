@@ -4,7 +4,7 @@
 	<ui:define name="content">
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
-				<p:outputLabel class="pageTitle" value="盘点工单" />
+				<p:outputLabel class="pageTitle" value="#{msg.InventoryWorkorder}"/>
 			</div>
 
 			<div class="ui-g-12 card">
@@ -17,13 +17,15 @@
 
 						<p:ajax event="filter" listener="#{inventoryOrderController.onFilter}" />
 
-						<p:column headerText="盘点科室" filterBy="#{item.assigneeOrg}" filterMatchMode="LIKE" exportable="false">
+						<p:column headerText="#{msg.InventoryDepartment}" filterBy="#{item.assigneeOrg}"
+											filterMatchMode="LIKE" exportable="false">
 							<a href="inventoryOrderDetailAssetInfoMain.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
 						</p:column>
-						<p:column headerText="盘点科室" visible="false" exportable="true">
+						<p:column headerText="#{msg.InventoryDepartment}" visible="false" exportable="true">
 							<h:outputText value="#{item.clinicalDeptLabel}" />
 						</p:column>
-						<p:column headerText="计划开始时间" filterBy="#{item.planStartTime}" filterMatchMode="GTE">
+						<p:column headerText="#{msg.PlannedStartTime}" filterBy="#{item.planStartTime}"
+											filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterPlanStartTime" widgetVar="varFilterPlanStartTime" />
 							</f:facet>
@@ -31,7 +33,8 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="计划结束时间" filterBy="#{item.planEndTime}" filterMatchMode="GTE">
+						<p:column headerText="#{msg.PlannedEndTime}" filterBy="#{item.planEndTime}"
+											filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterPlanEndTime" widgetVar="varFilterPlanEndTime" />
 							</f:facet>
@@ -39,7 +42,8 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="实际开始时间" filterBy="#{item.startTime}" filterMatchMode="GTE">
+						<p:column headerText="#{msg.ActualStartTime}" filterBy="#{item.startTime}"
+											filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterStartTime" widgetVar="varFilterStartTime" />
 							</f:facet>
@@ -47,7 +51,8 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="实际结束时间" filterBy="#{item.endTime}" filterMatchMode="GTE">
+						<p:column headerText="#{msg.ActuaEndTime}" filterBy="#{item.endTime}"
+											filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterEndTime" widgetVar="varFilterEndTime" />
 							</f:facet>
@@ -55,16 +60,16 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="状态" filterBy="#{item.isFinished}" filterMatchMode="EQ">
+						<p:column headerText="#{msg.Status}" filterBy="#{item.isFinished}" filterMatchMode="EQ">
 							<f:facet name="filter">
 				                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
 				                	<f:converter converterId="javax.faces.Boolean"/>
 				                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-				                    <f:selectItem itemLabel="已完成" itemValue="true"/>
-				                    <f:selectItem itemLabel="进行中" itemValue="false"/>
+													<f:selectItem itemLabel="#{msg.Finished}" itemValue="true"/>
+													<f:selectItem itemLabel="#{msg.InProgress}" itemValue="false"/>
 				                </p:selectOneMenu>
 				            </f:facet>
-							<h:outputText value="#{item.isFinished?'已完成':'进行中'}" />
+							<h:outputText value="#{item.isFinished?msg.Finished:msg.InProgress}"/>
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">

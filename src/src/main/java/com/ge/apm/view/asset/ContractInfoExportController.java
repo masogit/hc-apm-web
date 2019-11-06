@@ -81,7 +81,7 @@ public class ContractInfoExportController {
         this.selectedItems = null;
 
         if (null == startDateFilter && null == endDateFilter) {
-            showMsgBox("合同开始时间和合同结束时间不能同时为空");
+            showMsgBox(WebUtil.getMessage("StartTimeEndTimeCantBeEmptyWhile"));
             return;
         }
 

@@ -116,9 +116,9 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     
     public void deleteContract(){
         if(contractService.deleteContract(selected)){
-            WebUtil.addSuccessMessage("已删除");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
         }else{
-            WebUtil.addErrorMessage("不能删除");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CannotBeDeleted"));
         }
     }
     
