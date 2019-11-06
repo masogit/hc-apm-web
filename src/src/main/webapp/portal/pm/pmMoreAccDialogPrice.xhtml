@@ -6,21 +6,21 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="pmMoreAccDialogPriceDlg" class="pmMoreAccDialogPriceDlg" widgetVar="pmMoreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件更新">
+    <p:dialog id="pmMoreAccDialogPriceDlg" class="pmMoreAccDialogPriceDlg" widgetVar="pmMoreAccDialogPriceDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PartUpdate}">
         <h:form id="pmMoreAccDialogFormX" > <!--备件对话框 工单细节中 修改-->
             <h:panelGroup id="display42">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">备件名称*</label>
+                        <label class="label">#{msg.PartName}*</label>
                         <p:inputText id="parts"  value="#{v2PmOrderController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备件(数量)*</label>
-                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
+                        <label class="label">#{msg.PartQuantity}*</label>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">预估单价(元)*</label>
-                        <p:inputNumber disabled="#{v2PmOrderController.nochange}" decimalPlaces="0" maxValue="999999" id="partsPriceM"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
+                        <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
+                        <p:inputNumber disabled="#{v2PmOrderController.nochange}" decimalPlaces="0" maxValue="999999" id="partsPriceM"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
                             <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                             </p:ajax>
                             <f:convertNumber pattern="0" type="number"/>
@@ -28,7 +28,7 @@
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备件类别</label>
+                        <label class="label">#{msg.PartType}</label>
                         <p:selectOneMenu value="#{v2PmOrderController.itemDetail.partsType}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -36,16 +36,16 @@
                     </h:panelGroup>
                     <!--update-->
                     <h:panelGroup>
-                        <label class="label">发票号</label>
+                        <label class="label">#{msg.InvoiceNumber}</label>
                         <p:inputText value="#{v2PmOrderController.itemDetail.invoiceNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">开票时间</label>
-                        <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.InvoicingTime}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">发票提供方</label>
+                        <label class="label">#{msg.InvoiceProvider}</label>
                         <p:autoComplete id="vendorM" dropdown="true" value="#{v2PmOrderController.supplierName}" scrollHeight="300"
                                         forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
                                         completeMethod="#{v2PmOrderController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
@@ -55,42 +55,42 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">合同价格(元)*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" required="true" requiredMessage="实际价格(元) #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.ContractPriceRMB}*</label>
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" required="true" requiredMessage="#{msg.ActualPriceRMB} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">合同号</label>
+                        <label class="label">#{msg.ContractNumber}</label>
                         <p:inputText value="#{v2PmOrderController.itemDetail.contractNum}"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">质保期</label>
-                        <p:calendar timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button"
+                        <label class="label">#{msg.WarrantyDate}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.EquipmentTakingTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button"
                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">序列号</label>
+                        <label class="label">#{msg.SerialNumber}</label>
                         <p:inputText value="#{v2PmOrderController.itemDetail.serialNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">预计到达时间</label>
-                        <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.EstimatedArrivalTime}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">申请时间</label>
-                        <p:calendar disabled="#{v2PmOrderController.nochange}" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.ApplyTime}</label>
+                        <p:calendar disabled="#{v2PmOrderController.nochange}" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备注</label>
+                        <label class="label">#{msg.feedbackComment}</label>
                         <p:inputTextarea id="area" value="#{v2PmOrderController.itemDetail.comment}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:column headerText="到货">
-                            <p:selectBooleanButton disabled="#{v2PmOrderController.selected.finished}" value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
+                        <p:column headerText="#{msg.Arrival}">
+                            <p:selectBooleanButton disabled="#{v2PmOrderController.selected.finished}" value="#{v2PmOrderController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">
                                 <p:ajax listener="#{v2PmOrderController.arrivalTimeSet}" event="change"></p:ajax>
                              </p:selectBooleanButton>
-                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.closed}" onLabel="#{msg.ClosedFinish}" offLabel="#{msg.IsOpened}">
                                 <p:ajax listener="#{v2PmOrderController.orderSet}" event="change"></p:ajax>
                             </p:selectBooleanButton>
                         </p:column>
@@ -117,27 +117,27 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="pmmoreAccDialogViewDlg" class="pmmoreAccDialogViewDlg" widgetVar="pmmoreAccDialogViewDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="备件查看">
+    <p:dialog id="pmmoreAccDialogViewDlg" class="pmmoreAccDialogViewDlg" widgetVar="pmmoreAccDialogViewDlg" modal="true" width="1200"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PartView}">
         <h:form id="pmmoreAccDialogViewForm" ><!--备件对话框 查看-->
             <h:panelGroup>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">备件名称*</label>
+                        <label class="label">#{msg.PartName}*</label>
                         <p:inputText id="parts_view" disabled="true" value="#{v2PmOrderController.itemDetail.parts}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备件(数量)*</label>
+                        <label class="label">#{msg.PartQuantity}*</label>
                         <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantityView" value="#{v2PmOrderController.itemDetail.apartsQuantity}" readonly="true"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">预估单价(元)*</label>
-                        <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice_view"  value="#{v2PmOrderController.itemDetail.partsPrice}" disabled="true" requiredMessage="预估单价(元) #{msg.ValidationRequire}">
+                        <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
+                        <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice_view"  value="#{v2PmOrderController.itemDetail.partsPrice}" disabled="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
                             <f:convertNumber pattern="0" type="number"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备件类别</label>
+                        <label class="label">#{msg.PartType}</label>
                         <p:selectOneMenu disabled="true" value="#{v2PmOrderController.itemDetail.partsType}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -145,56 +145,56 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">发票号</label>
+                        <label class="label">#{msg.InvoiceNumber}</label>
                         <p:inputText disabled="true" value="#{v2PmOrderController.itemDetail.invoiceNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">开票时间</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.InvoicingTime}</label>
+                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">供应商</label>
+                        <label class="label">#{msg.Vendor}</label>
                         <p:autoComplete id="vendor_view" disabled="true" dropdown="true" value="#{v2PmOrderController.supplierName}" scrollHeight="300" forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{v2PmOrderController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                         </p:autoComplete>
                     </h:panelGroup>
 
 
                     <h:panelGroup>
-                        <label class="label">合同价格(元)*</label>
+                        <label class="label">#{msg.ContractPriceRMB}*</label>
                         <p:inputNumber disabled="true" decimalPlaces="4" maxValue="99999999" id="closedPrice_view"  value="#{v2PmOrderController.itemDetail.closedPrice}" readonly="true" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">合同号</label>
+                        <label class="label">#{msg.ContractNumber}</label>
                         <p:inputText disabled="true" value="#{v2PmOrderController.itemDetail.contractNum}"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">质保期</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.WarrantyDate}</label>
+                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.EquipmentTakingTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">序列号</label>
+                        <label class="label">#{msg.SerialNumber}</label>
                         <p:inputText disabled="true" value="#{v2PmOrderController.itemDetail.serialNum}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">预计到达时间</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.EstimatedArrivalTime}</label>
+                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">申请时间</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.ApplyTime}</label>
+                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
-                    <p:column headerText="到货">
-                        <p:selectBooleanButton disabled="true"  value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
+                    <p:column headerText="#{msg.Arrival}">
+                        <p:selectBooleanButton disabled="true"  value="#{v2PmOrderController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">
                             <!--<p:ajax listener="#{v2PmOrderController.arrivalTimeSet}" event="change"></p:ajax>-->
                         </p:selectBooleanButton>
-                        <p:selectBooleanButton  disabled="true" value="#{v2PmOrderController.itemDetail.closed}" onLabel="已结单" offLabel="未结单">
+                        <p:selectBooleanButton  disabled="true" value="#{v2PmOrderController.itemDetail.closed}" onLabel="#{msg.ClosedFinish}" offLabel="#{msg.IsOpened}">
                            <!-- <p:ajax listener="#{v2PmOrderController.orderSet}" event="change"></p:ajax>-->
                         </p:selectBooleanButton>
                     </p:column>
                     <h:panelGroup>
-                        <label class="label">备注</label>
+                        <label class="label">#{msg.feedbackComment}</label>
                         <p:inputTextarea id="area_view" disabled="true" value="#{v2PmOrderController.itemDetail.comment}"/>
                     </h:panelGroup>
                 </p:panelGrid>

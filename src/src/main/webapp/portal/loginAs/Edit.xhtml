@@ -52,14 +52,14 @@
                             <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">地区</label>
+                            <label class="label">#{msg.Region}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.region}" >
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">初始密码</label>
+                            <label class="label">#{msg.InitialPassword}</label>
                             <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="false">

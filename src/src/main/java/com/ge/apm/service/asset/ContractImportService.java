@@ -201,25 +201,25 @@ public class ContractImportService {
 
         if(contractInfoVO.getContractNum() == null){
             item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 合同编号为空");
+            ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNumberIsEmpty"));
             isValidateData = false;
         }
 
         if(contractInfoVO.getName() == null){
             item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 合同名称为空");
+            ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNameIsEmpty"));
             isValidateData = false;
         }
 
         if(contractInfoVO.getStartDate() == null){
             item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 开始时间为空");
+            ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorStartTimeIsEmpty"));
             isValidateData = false;
         }
 
         if(contractInfoVO.getEndDate() == null && contractInfoVO.getEndMonths() == null){
             item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "错误: 结束时间为空和合同时间(月)不能同时为空");
+            ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorEndTimeContractPeriodCantEmptyWhile"));
             isValidateData = false;
         }
 
@@ -230,7 +230,7 @@ public class ContractImportService {
                 for(ContractInfo ci : contractInfoList){
                     if(!contractInfoVO.getId().equals(ci.getId())){
                         item.put("status", ImportStatus.Failure);
-                        ContractRow.addErrMessage(item, "错误: 合同编号不能重复");
+                        ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNumberCantDuplicated"));
                         isValidateData = false;
                         break;
                     }
@@ -238,7 +238,7 @@ public class ContractImportService {
             }else {
                 if(!contractInfoList.isEmpty()){
                     item.put("status", ImportStatus.Failure);
-                    ContractRow.addErrMessage(item, "错误: 合同编号不能重复");
+                    ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNumberCantDuplicated"));
                     isValidateData = false;
                 }
             }
@@ -248,11 +248,11 @@ public class ContractImportService {
             ContractInfo tempContractInfo = contractInfoDao.findOne(contractInfoVO.getId());
             if(tempContractInfo == null){
                 item.put("status", ImportStatus.Failure);
-                ContractRow.addErrMessage(item, "错误: 无效的合同UID");
+                ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorInvalidContractUID"));
                 isValidateData = false;
             }else if(!tempContractInfo.getContractType().equals(contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
-                ContractRow.addErrMessage(item, "错误: 不允许更改合同类型");
+                ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorChangeContractTypeNotAllowed"));
                 isValidateData = false;
             }
         }
@@ -261,7 +261,7 @@ public class ContractImportService {
             Supplier supplier = supplierDao.findFirstByTenantUIDAndName(contractInfoVO.getTenantUID(), contractInfoVO.getSupplierName());
             if(supplier == null){
                 item.put("status", ImportStatus.Failure);
-                ContractRow.addErrMessage(item, "错误: 不存在的供应商");
+                ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorInvalidSupplier"));
                 isValidateData = false;
             }else {
                 contractInfoVO.setSupplierUid(supplier.getUid());
@@ -273,7 +273,7 @@ public class ContractImportService {
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
             if(hashCode.equals(tempHashCode) && contractInfoVO.getLineNum() != tempContractInfoVO.getLineNum()){
                 item.put("status", ImportStatus.Failure);
-                ContractRow.addErrMessage(item, "错误: 重复的数据");
+                ContractRow.addErrMessage(item, WebUtil.getMessage("ErrorDuplicatedData"));
                 isValidateData = false;
                 break;
             }
