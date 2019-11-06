@@ -91,7 +91,7 @@ public class AssetFileImportController {
     public void uploadDataFile(FileUploadEvent event) {
 
         if (selectedOrg == null) {
-            WebUtil.addErrorMessage("请先选择所属院区！");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PleaseSelectASiteFirst"));
             return;
         }
 
@@ -103,14 +103,14 @@ public class AssetFileImportController {
         {
 
             if(!streamingService.checkDocVersion(assetDoc)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
+                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
                 return;
             }
 
             importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc);
 
             if(importAssetMap.size() > 5000){
-                WebUtil.addErrorMessage("导入Excel中资产行数最多5000条，请分批导入！");
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
 

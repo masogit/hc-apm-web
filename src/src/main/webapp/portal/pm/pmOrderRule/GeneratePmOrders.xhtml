@@ -15,13 +15,13 @@
 		</style>
        <div class="ui-g clearfix">
        <div class="ui-g-12 card cardTitle">
-           <p:outputLabel class="pageTitle" value="批量生成保养工单"/>
+           <p:outputLabel class="pageTitle" value="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
        </div>
 
        <div class="ui-g-12 card">
     
         <h:form id="GeneratePmOrderForm">
-				<p:fieldset id="pmOrder" legend="查询资产">
+				<p:fieldset id="pmOrder" legend="#{msg.SearchAssets}">
                    <p:panelGrid id="param" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					   <h:panelGroup>
 						   <label class="label">#{msg.ruleLevel}*</label>
@@ -103,28 +103,28 @@
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
-                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="查询" update=":GeneratePmOrderForm:dataTable"/>
+                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable"/>
 				   </p:panelGrid>
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
-			<p:fieldset id="dataTable" legend="共有#{generatePmOrdersController.total}个资产，下拉查看更多" >
+			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.total}#{msg.SeeMoreAsset}" >
 				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
-					<p:column headerText="资产名称">
+					<p:column headerText="#{msg.AssetName}">
 						<h:outputText value="#{generatePmOrdersController.getName(item)}" />
 					</p:column>
-					<p:column headerText="设备编号" >
+					<p:column headerText="#{msg.EquipmentID}" >
 						<h:outputText value="#{generatePmOrdersController.getDepartNum(item)}" />
 					</p:column>
-					<p:column headerText="所属科室" >
+					<p:column headerText="#{msg.Department}" >
 						<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
 					</p:column>
-					<p:column headerText="设备型号" >
+					<p:column headerText="#{msg.EquipmentModel}" >
 						<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />
 					</p:column>
-					<p:column headerText="制造商序列号" >
+					<p:column headerText="#{msg.ManufacturerSerialNumber}" >
 						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
 					</p:column>
-					<p:column headerText="操作" >
+					<p:column headerText="#{msg.Operation}" >
 						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
                                          icon="ui-icon-close" style="zoom: 0.7"/>
 					</p:column>
@@ -183,15 +183,15 @@
                 </p:fieldset>-->
                     <br/> <br/>
 
-                    <p:fieldset id="config" legend="配置工单">
+                    <p:fieldset id="config" legend="#{msg.ConfigureWorkorder}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">预计完成时间</label>
+                                <label class="label">#{msg.EstimatedCompletionTime}</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}"
                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">工单类型 *</label>
+                                <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -202,7 +202,7 @@
                     <br/> <br/>
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
-						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="生成" icon="ui-icon-check" update=":growl" />
+						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl" />
 						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">

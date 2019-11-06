@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import webapp.framework.web.WebUtil;
 
 /**
  * Created by 212605082 on 2018/9/18.
@@ -130,17 +131,17 @@ public class ContractItemImportService {
         ContractInfo contractInfo = null;
         if(contractInfoItem.getContractId() == null){
             item.put("status", ImportStatus.Failure);
-            ContractItemRow.addErrMessage(item, "错误: 合同UID不能为空");
+            ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorContractUIDCantEmpty"));
             isValidateData = false;
         }else{
             contractInfo = contractInfoDao.findOne(contractInfoItem.getContractId());
             if(contractInfo == null || !contractInfo.getTenantUID().equals(tenantUID)){
                 item.put("status", ImportStatus.Failure);
-                ContractItemRow.addErrMessage(item, "错误: 无效的合同UID");
+                ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorInvalidContractUID"));
                 isValidateData = false;
             }else if(!contractInfo.getContractType().equals(contractType)){
                 item.put("status", ImportStatus.Failure);
-                ContractItemRow.addErrMessage(item, "错误: 合同类型和所选合同类型不一致");
+                ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeInconsistent"));
                 isValidateData = false;
             }
         }
@@ -148,14 +149,14 @@ public class ContractItemImportService {
         AssetInfo assetInfo = null;
         if(contractInfoItem.getAssetUid() == null){
             item.put("status", ImportStatus.Failure);
-            ContractItemRow.addErrMessage(item, "错误: 相关设备UID不能为空");
+            ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorRelatedEquipmentUIDCantEmpty"));
             isValidateData = false;
         }else{
             if(contractInfo != null){
                 assetInfo = assetInfoDao.findByUidAndTenantUID(contractInfoItem.getAssetUid(), tenantUID);
                 if(assetInfo == null || !assetInfo.getSiteUID().equals(contractInfo.getSiteUID())){
                     item.put("status", ImportStatus.Failure);
-                    ContractItemRow.addErrMessage(item, "错误: 无效的相关设备UID");
+                    ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorInvalidRelatedEquipmentUID"));
                     isValidateData = false;
                 }
             }
@@ -165,7 +166,7 @@ public class ContractItemImportService {
             List<ContractInfoItem> contractInfoItemList = contractInfoItemDao.findByContractIdAndAssetUid(contractInfoItem.getContractId(), contractInfoItem.getAssetUid());
             if(!contractInfoItemList.isEmpty()){
                 item.put("status", ImportStatus.Failure);
-                ContractItemRow.addErrMessage(item, "错误: 合同中已经存在该设备");
+                ContractItemRow.addErrMessage(item, WebUtil.getMessage("ErrorTheEquipmentIsContained"));
                 isValidateData = false;
             }
         }

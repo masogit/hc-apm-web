@@ -52,8 +52,8 @@
 
                         <h:panelGroup id="pmCount">
                         <h:panelGroup rendered="#{assetContractController.selected.contractType == 5}">
-                            <label class="label">保养次数*</label>
-                            <p:inputNumber decimalPlaces="0" value="#{assetContractController.pmCount}" required="true" requiredMessage="保养次数 #{msg.ValidationRequire}"/>
+                            <label class="label">#{msg.FrequencyOfMaintenance}*</label>
+                            <p:inputNumber decimalPlaces="0" value="#{assetContractController.pmCount}" required="true" requiredMessage="#{msg.FrequencyOfMaintenance} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetContractAmount}*</label>
