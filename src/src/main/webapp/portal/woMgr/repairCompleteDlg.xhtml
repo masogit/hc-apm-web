@@ -50,11 +50,11 @@
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
                             <label class="label">#{msg.startTime}</label>
-                            <p:calendar timeZone="GMT+8" label="开始时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
                             <label class="label">#{msg.endTime}</label>
-                            <p:calendar timeZone="GMT+8" label="结束时间" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                     </p:panelGrid>
@@ -126,7 +126,7 @@
                                 <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">外部费用</label><!--外部费用-->
+                                <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
                                 <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -180,7 +180,7 @@
                                     </p:column>
 
                                     <p:column headerText="#{msg.arrival}">
-                                        <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
+                                        <h:outputText value="#{item.arrived?msg.Arrived:msg.NonArrived}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
 
                                     <p:column headerText="#{msg.Actions}"><!--操作-->
